@@ -1,28 +1,15 @@
+import Link from "next/link";
+import { SiteHeader } from "@/components/site-header";
 import { WaitlistForm } from "@/components/waitlist-form";
+import { VEHICLES, formatUSD, changeFromPrev } from "@/lib/market-data";
 
 export default function Home() {
+  // Use the first 4 vehicles as the "featured market" carousel.
+  const featured = VEHICLES.slice(0, 4);
+
   return (
     <>
-      {/* Header */}
-      <header className="w-full border-b border-rule">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 sm:px-10">
-          <a href="/" className="font-display text-2xl tracking-tight text-ink">
-            RYDA
-          </a>
-          <nav className="hidden gap-8 text-sm font-medium text-ink-soft sm:flex">
-            <a href="#how-it-works" className="hover:text-ink">How it works</a>
-            <a href="#vehicles" className="hover:text-ink">Vehicles</a>
-            <a href="#economics" className="hover:text-ink">The math</a>
-            <a href="#about" className="hover:text-ink">About</a>
-          </nav>
-          <a
-            href="#waitlist"
-            className="rounded-full border border-ink bg-ink px-5 py-2 text-sm font-medium text-cream transition-colors hover:bg-red hover:border-red"
-          >
-            Join the list
-          </a>
-        </div>
-      </header>
+      <SiteHeader />
 
       {/* Hero */}
       <section className="border-b border-rule">
@@ -32,85 +19,124 @@ export default function Home() {
               Coming soon · Miami · Q3 2026
             </p>
             <h1 className="font-display text-5xl font-light leading-[1.05] tracking-tight text-ink sm:text-6xl lg:text-7xl">
-              Own the cars you{" "}
-              <span className="italic text-red">never thought</span> you could.
+              Drive supercars.{" "}
+              <span className="italic text-red">Own them.</span>
             </h1>
             <p className="mt-8 max-w-xl text-lg leading-relaxed text-ink-soft">
-              RYDA is the first US asset-backed supercar co-ownership platform.
-              Hold a real share in a Ferrari, Lamborghini, or McLaren — share
-              the costs, share the storage, drive the dream.
+              RYDA is two products in one. Rent a Ferrari for the weekend.
+              Or own a real share — like a stock — in a curated supercar held
+              by a Delaware LLC. Trade it any time after 12 months.
             </p>
             <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
-              <a
-                href="#waitlist"
+              <Link
+                href="/markets"
                 className="inline-flex h-12 items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream transition-colors hover:bg-red"
               >
-                Request membership
-              </a>
-              <a
-                href="#how-it-works"
+                See the market
+              </Link>
+              <Link
+                href="/rent"
                 className="inline-flex h-12 items-center justify-center rounded-full border border-ink/15 px-7 text-sm font-medium text-ink hover:border-ink"
               >
-                See how it works
-              </a>
+                Rent for the weekend
+              </Link>
             </div>
           </div>
+
+          {/* Mini market preview */}
           <div className="lg:col-span-5">
-            <div className="rounded-2xl border border-rule bg-white p-8 shadow-sm">
-              <p className="text-xs font-medium uppercase tracking-[0.2em] text-mute">
-                Sample economics
-              </p>
-              <p className="mt-2 font-display text-3xl text-ink">
-                Ferrari 296 GTB
-              </p>
-              <p className="mt-1 text-sm text-ink-soft">2024 · 1 of 6 shares</p>
-              <dl className="mt-8 space-y-4 border-t border-rule pt-6 text-sm">
-                <Row label="Vehicle price" value="$340,000" />
-                <Row label="Your share (16.67%)" value="$56,667" />
-                <Row label="Your annual cost" value="$11,800" />
-                <Row label="Days you drive / year" value="~50 days" />
-                <Row
-                  label="Effective cost / day"
-                  value="$236"
-                  emphasis
-                />
-              </dl>
-              <p className="mt-6 rounded-lg bg-cream-2 px-4 py-3 text-sm text-ink-soft">
-                <span className="font-medium text-ink">90% less</span> than
-                renting the same car at $2,500/day.
-              </p>
+            <div className="rounded-2xl border border-rule bg-white p-6 shadow-sm">
+              <div className="mb-4 flex items-center justify-between">
+                <p className="text-xs font-medium uppercase tracking-[0.2em] text-mute">
+                  Live market
+                </p>
+                <Link href="/markets" className="text-xs font-medium text-red hover:text-red-deep">
+                  All →
+                </Link>
+              </div>
+              <ul className="divide-y divide-rule">
+                {featured.map((v) => {
+                  const c = changeFromPrev(v.pricePerShare, v.prevClose);
+                  return (
+                    <li key={v.symbol}>
+                      <Link
+                        href={`/markets/${v.symbol}`}
+                        className="flex items-center justify-between gap-4 py-3 transition-colors hover:bg-cream-2/40"
+                      >
+                        <div>
+                          <p className="font-display text-base text-ink">{v.name}</p>
+                          <p className="text-xs text-mute">{v.ticker}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-medium text-ink tabular-nums">
+                            {formatUSD(v.pricePerShare)}
+                          </p>
+                          <p
+                            className="text-xs tabular-nums"
+                            style={{ color: c.isUp ? "#00C805" : "#DC2626" }}
+                          >
+                            {c.isUp ? "▲" : "▼"} {c.pct.toFixed(2)}%
+                          </p>
+                        </div>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
+            <p className="mt-3 text-center text-xs text-mute">
+              Demo data — live trading begins at Miami launch.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Two products */}
+      <section className="border-b border-rule bg-cream-2">
+        <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-24">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+            <ProductCard
+              eyebrow="RENT"
+              title="By the day."
+              body="Curated supercars hand-prepared, fully insured, white-glove delivered. From $1,800/day."
+              href="/rent"
+              cta="Browse rentals"
+            />
+            <ProductCard
+              eyebrow="OWN"
+              title="By the share."
+              body="Real ownership in a single-purpose Delaware LLC. ~$236/day effective cost. Tradeable after 12 months."
+              href="/markets"
+              cta="See the market"
+              dark
+            />
           </div>
         </div>
       </section>
 
       {/* How it works */}
-      <section id="how-it-works" className="border-b border-rule bg-cream-2">
+      <section id="how-it-works" className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-28">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            How it works
-          </p>
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">How it works</p>
           <h2 className="mt-4 max-w-3xl font-display text-4xl font-light leading-tight text-ink sm:text-5xl">
             Five steps to a supercar in your name.
           </h2>
           <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-3 lg:grid-cols-5">
-            <Step n="01" title="Verify" body="Apply, complete identity verification, and confirm you meet RYDA membership requirements." />
-            <Step n="02" title="Choose" body="Browse curated supercars in Miami, LA, and NY. Each one priced as a share of a single-purpose LLC." />
-            <Step n="03" title="Acquire" body="3 to 8 co-owners form a vehicle LLC. You sign legal docs and fund your share via wire or ACH." />
-            <Step n="04" title="Drive" body="Book your time on the RYDA app. White-glove handover. ~50 days and ~4,000 miles per share, per year." />
-            <Step n="05" title="Exit" body="After 12 months, sell your share back to a fellow member. RYDA handles all the paperwork. 3% transfer fee." />
+            <Step n="01" title="Verify" body="Apply, complete identity verification, and confirm RYDA membership requirements." />
+            <Step n="02" title="Choose" body="Browse rentals or buy shares in curated supercars across Miami, LA, and NY." />
+            <Step n="03" title="Acquire" body="3 to 8 co-owners form a vehicle LLC. You sign and fund your share via wire or ACH." />
+            <Step n="04" title="Drive" body="Book your time on the RYDA app. ~50 days and ~4,000 miles per share, per year." />
+            <Step n="05" title="Exit" body="After 12 months, sell on the RYDA market. We handle the paperwork. 3% transfer fee." />
           </div>
         </div>
       </section>
 
-      {/* Pillars / why RYDA */}
-      <section id="economics" className="border-b border-rule">
+      {/* Pillars */}
+      <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-28">
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
             <div className="lg:col-span-5">
-              <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-                Why RYDA
-              </p>
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">Why RYDA</p>
               <h2 className="mt-4 font-display text-4xl font-light leading-tight text-ink sm:text-5xl">
                 Asset-backed. Curated. Concierge-operated.
               </h2>
@@ -135,9 +161,7 @@ export default function Home() {
       {/* Waitlist */}
       <section id="waitlist" className="border-b border-rule bg-ink text-cream">
         <div className="mx-auto max-w-3xl px-6 py-20 text-center sm:px-10 sm:py-28">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            Founding members
-          </p>
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">Founding members</p>
           <h2 className="mt-4 font-display text-4xl font-light leading-tight sm:text-5xl">
             Membership is by invitation.
           </h2>
@@ -150,8 +174,8 @@ export default function Home() {
           </div>
           <p className="mt-6 text-xs text-cream/50">
             Membership is limited to verified individuals 28 years or older.
-            Co-ownership shares are not registered securities — see legal
-            disclaimer (forthcoming).
+            Co-ownership shares are LLC membership interests, not registered
+            securities — see legal disclaimer (forthcoming).
           </p>
         </div>
       </section>
@@ -167,19 +191,19 @@ export default function Home() {
             </p>
           </div>
           <div className="text-sm">
-            <p className="font-medium text-ink">Contact</p>
+            <p className="font-medium text-ink">Product</p>
             <ul className="mt-3 space-y-2 text-ink-soft">
-              <li><a href="mailto:hello@ryda.com" className="hover:text-ink">hello@ryda.com</a></li>
-              <li><a href="mailto:investors@ryda.com" className="hover:text-ink">investors@ryda.com</a></li>
-              <li><a href="mailto:press@ryda.com" className="hover:text-ink">press@ryda.com</a></li>
+              <li><Link href="/markets" className="hover:text-ink">Markets</Link></li>
+              <li><Link href="/rent" className="hover:text-ink">Rent</Link></li>
+              <li><Link href="/portfolio" className="hover:text-ink">Portfolio</Link></li>
             </ul>
           </div>
           <div className="text-sm">
             <p className="font-medium text-ink">Legal</p>
             <ul className="mt-3 space-y-2 text-ink-soft">
-              <li><a href="/legal/privacy" className="hover:text-ink">Privacy Policy</a></li>
-              <li><a href="/legal/terms" className="hover:text-ink">Terms of Service</a></li>
-              <li><a href="/legal/disclaimer" className="hover:text-ink">Securities Disclaimer</a></li>
+              <li><Link href="/legal/privacy" className="hover:text-ink">Privacy Policy</Link></li>
+              <li><Link href="/legal/terms" className="hover:text-ink">Terms of Service</Link></li>
+              <li><Link href="/legal/disclaimer" className="hover:text-ink">Securities Disclaimer</Link></li>
             </ul>
           </div>
         </div>
@@ -191,40 +215,44 @@ export default function Home() {
   );
 }
 
-function Row({
-  label,
-  value,
-  emphasis,
+function ProductCard({
+  eyebrow,
+  title,
+  body,
+  href,
+  cta,
+  dark,
 }: {
-  label: string;
-  value: string;
-  emphasis?: boolean;
+  eyebrow: string;
+  title: string;
+  body: string;
+  href: string;
+  cta: string;
+  dark?: boolean;
 }) {
+  const bg = dark ? "bg-ink text-cream" : "bg-white text-ink";
+  const sub = dark ? "text-cream/70" : "text-ink-soft";
+  const ctaBg = dark
+    ? "bg-cream text-ink hover:bg-red hover:text-cream"
+    : "bg-ink text-cream hover:bg-red";
   return (
-    <div className="flex items-baseline justify-between">
-      <dt className="text-ink-soft">{label}</dt>
-      <dd
-        className={
-          emphasis
-            ? "font-display text-2xl text-red"
-            : "font-medium text-ink"
-        }
+    <div className={`rounded-2xl border border-rule p-10 ${bg}`}>
+      <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">{eyebrow}</p>
+      <p className="mt-4 font-display text-4xl font-light leading-tight sm:text-5xl">
+        {title}
+      </p>
+      <p className={`mt-4 max-w-md text-base leading-relaxed ${sub}`}>{body}</p>
+      <Link
+        href={href}
+        className={`mt-8 inline-flex h-12 items-center justify-center rounded-full px-7 text-sm font-medium transition-colors ${ctaBg}`}
       >
-        {value}
-      </dd>
+        {cta} →
+      </Link>
     </div>
   );
 }
 
-function Step({
-  n,
-  title,
-  body,
-}: {
-  n: string;
-  title: string;
-  body: string;
-}) {
+function Step({ n, title, body }: { n: string; title: string; body: string }) {
   return (
     <div>
       <p className="font-display text-sm text-red">{n}</p>
