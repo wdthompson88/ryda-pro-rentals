@@ -182,8 +182,8 @@ export default function Home() {
 
       {/* Footer */}
       <footer id="about" className="border-t border-rule">
-        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-10 px-6 py-16 sm:grid-cols-6 sm:px-10">
-          <div className="col-span-2">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-10 px-6 py-16 sm:grid-cols-3 sm:px-10 lg:grid-cols-7">
+          <div className="col-span-2 sm:col-span-3 lg:col-span-2">
             <p className="font-display text-2xl text-ink">RYDA</p>
             <p className="mt-3 max-w-sm text-sm text-ink-soft">
               The first US asset-backed supercar co-ownership platform.
@@ -198,12 +198,15 @@ export default function Home() {
               ["Portfolio", "/portfolio"],
               ["Membership", "/membership"],
               ["Founding members", "/founding-members"],
+              ["Events", "/events"],
             ]}
           />
           <FooterCol
             title="Services"
             links={[
               ["Insurance", "/insurance"],
+              ["Concierge", "/concierge"],
+              ["Storage", "/storage"],
               ["Track day", "/track-day"],
               ["List your car", "/host-your-car"],
               ["How it works", "/how-it-works"],
@@ -211,10 +214,21 @@ export default function Home() {
             ]}
           />
           <FooterCol
+            title="Locations"
+            links={[
+              ["Miami (2026)", "/locations/miami"],
+              ["Los Angeles (2027)", "/locations/los-angeles"],
+              ["New York (2027)", "/locations/new-york"],
+            ]}
+          />
+          <FooterCol
             title="Company"
             links={[
               ["About", "/about"],
+              ["Journal", "/journal"],
+              ["Sustainability", "/sustainability"],
               ["Press", "/press"],
+              ["Investors", "/investors"],
               ["Careers", "/careers"],
               ["Contact", "/contact"],
             ]}
@@ -222,6 +236,7 @@ export default function Home() {
           <FooterCol
             title="Legal"
             links={[
+              ["Sign in", "/signin"],
               ["Privacy Policy", "/legal/privacy"],
               ["Terms of Service", "/legal/terms"],
               ["Securities Disclaimer", "/legal/disclaimer"],
