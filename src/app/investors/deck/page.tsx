@@ -569,21 +569,21 @@ function TeamSlide() {
       <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-3">
         <Person
           name="Ryan Galli"
-          role="Co-Founder · CEO"
+          role="Co-Founder · CEO / CTO"
           image="/team/ryan.jpg"
-          tags={["Odin Partners", "Bucknell '21"]}
-          bio="Runs Rates & FX executive search at Odin Partners — placing senior front-office talent at banks and macro hedge funds across the US, Canada, LatAm, and Asia. Bucknell."
+          tags={["Odin Partners NY", "Bucknell Psych"]}
+          bio="Runs Fixed Income Executive Search at Odin Partners NY — placing senior front-office talent at banks and macro hedge funds. Bucknell Psychology."
         />
         <Person
           name="Dave Thompson"
-          role="Co-Founder · Capital & Ops"
+          role="Co-Founder · CFO / COO"
           image="/team/dave.jpg"
           tags={["SolomonEdwards", "Series 79"]}
           bio="Capital structuring + operational diligence. Manager, Private Equity Services at SolomonEdwards. 3+ years Healthcare M&A at Ziegler. SIE + Series 79. Bucknell Economics."
         />
         <Person
           name="Stefano Galli"
-          role="Co-Founder · Strategic Advisor"
+          role="Co-Founder · CRO / CSO"
           image="/team/stefano.jpg"
           tags={["Evercore ISI", "Wharton MBA"]}
           bio="30+ years in institutional equity markets. MD, Global Equity Sales at Evercore ISI. Prior: BofA ML (London), Artio Global ($75B AUM peak), 8 yrs at Merrill. Wharton MBA."

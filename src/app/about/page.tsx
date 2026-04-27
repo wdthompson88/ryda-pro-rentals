@@ -36,11 +36,11 @@ export default function AboutPage() {
           <h2 className="font-display text-3xl text-ink sm:text-4xl">Our story</h2>
           <div className="mt-8 space-y-6 text-base leading-relaxed text-ink-soft">
             <p>
-              RYDA started with a conversation about a car we couldn't justify
-              buying. Ryan had driven a Ferrari once, on a track day in Italy,
-              and spent the next three years thinking about it. The math of
-              owning one alone never worked. Renting was expensive and hollow.
-              Something was missing in the middle.
+              RYDA started in Florida. Ryan and Dave had rented a Lamborghini
+              for the weekend, and by Sunday night they were running the math
+              on what it would cost to actually own one. Solo, the numbers
+              never worked. Renting was expensive and hollow. Something was
+              missing in the middle.
             </p>
             <p>
               In Europe, that middle ground exists. Companies like Supercar
@@ -116,21 +116,21 @@ export default function AboutPage() {
           <div className="mt-12 grid grid-cols-1 gap-10 sm:grid-cols-3">
             <Founder
               name="Ryan Galli"
-              role="Co-Founder · CEO"
+              role="Co-Founder · CEO / CTO"
               image="/team/ryan.jpg"
-              tags={["Odin Partners", "Bucknell '21"]}
-              bio="Co-founder and CEO of RYDA. Currently runs Rates & FX executive search at Odin Partners, placing senior front-office talent at banks and macro hedge funds across the US, Canada, LatAm, and Asia. Prior: Maven Search, Jamesbeck, Signum Global Advisors. Bucknell University. Lifelong car enthusiast — RYDA started with a Ferrari he drove on a track day in Italy and spent three years thinking about."
+              tags={["Odin Partners NY", "Bucknell Psych"]}
+              bio="Co-founder and CEO of RYDA. Currently runs Fixed Income Executive Search at Odin Partners NY, placing senior front-office talent at banks and macro hedge funds across. Bucknell Psychology."
             />
             <Founder
               name="Dave Thompson"
-              role="Co-Founder · Capital & Operations"
+              role="Co-Founder · CFO / COO"
               image="/team/dave.jpg"
               tags={["SolomonEdwards", "Series 79", "Bucknell '21"]}
               bio="Co-founder leading capital structuring and operational diligence. Manager, Private Equity Services at SolomonEdwards. Previously spent 3+ years in Investment Banking at Ziegler covering Healthcare M&A — analyst through senior associate. Diamond Capital Advisors before that. SIE + Series 79 certified. Bucknell Economics."
             />
             <Founder
               name="Stefano Galli"
-              role="Co-Founder · Strategic Advisor"
+              role="Co-Founder · CRO / CSO"
               image="/team/stefano.jpg"
               tags={["Evercore ISI", "Wharton MBA"]}
               bio="Co-founder and strategic advisor with 30+ years in institutional equity markets. Managing Director, Global Equity Sales at Evercore ISI (9+ years). Previously Director of Global Equities Research Sales at Bank of America Merrill Lynch in London, Senior Portfolio Manager at Artio Global Management ($75B AUM at peak), and 8 years in research sales at Merrill Lynch. Wharton MBA, Civil Engineering and Economics at Delaware."
