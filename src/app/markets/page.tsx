@@ -55,11 +55,21 @@ export default function MarketsPage() {
                       className="border-b border-rule transition-colors last:border-b-0 hover:bg-cream-2/40"
                     >
                       <td className="px-6 py-5">
-                        <Link href={`/markets/${v.symbol}`} className="block">
-                          <p className="font-display text-lg text-ink">{v.name}</p>
-                          <p className="mt-1 text-xs text-mute">
-                            {v.ticker} · {v.year} · {v.brand}
-                          </p>
+                        <Link href={`/markets/${v.symbol}`} className="flex items-center gap-4">
+                          <div className="relative aspect-[4/3] w-20 shrink-0 overflow-hidden rounded-lg bg-cream-2 sm:w-24">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={v.hero}
+                              alt={v.name}
+                              className="h-full w-full object-cover"
+                            />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-display text-lg text-ink">{v.name}</p>
+                            <p className="mt-1 text-xs text-mute">
+                              {v.ticker} · {v.year} · {v.brand}
+                            </p>
+                          </div>
                         </Link>
                       </td>
                       <td className="px-6 py-5 text-right">

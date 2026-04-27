@@ -56,7 +56,16 @@ export default async function VehicleMarketPage({
           <div className="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-12">
             {/* Left column — title + chart (price + change live inside the chart) */}
             <div className="lg:col-span-8">
-              <h1 className="font-display text-4xl font-light text-ink sm:text-5xl">
+              <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl bg-cream-2">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={v.hero}
+                  alt={v.name}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+
+              <h1 className="mt-6 font-display text-4xl font-light text-ink sm:text-5xl">
                 {v.name}
               </h1>
               <p className="mt-1 text-xs text-mute">
