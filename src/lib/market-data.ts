@@ -214,7 +214,7 @@ export const VEHICLES: Vehicle[] = [
     daysPerYear: 30,
     milesPerYear: 2_000,
     effectiveDailyCost: 886,
-    hero: "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?auto=format&fit=crop&w=1920&q=80",
+    hero: "/cars/aston-valhalla.webp",
     description:
       "Aston Martin's first true hypercar. Plug-in hybrid V8 with 1,080 hp. One of 999 worldwide.",
     specs: {
