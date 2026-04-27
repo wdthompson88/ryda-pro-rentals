@@ -46,7 +46,7 @@ export default function MyCarsPage() {
                     <img
                       src={v.hero}
                       alt={v.name}
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      className={`h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 ${v.flipImage ? "-scale-x-100" : ""}`}
                     />
                     {h.isLeadOwner && (
                       <span className="absolute left-3 top-3 rounded-full bg-red px-3 py-1 text-xs font-medium text-cream">

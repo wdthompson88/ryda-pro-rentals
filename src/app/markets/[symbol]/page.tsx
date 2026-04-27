@@ -61,7 +61,7 @@ export default async function VehicleMarketPage({
                 <img
                   src={v.hero}
                   alt={v.name}
-                  className="h-full w-full object-cover"
+                  className={`h-full w-full object-cover ${v.flipImage ? "-scale-x-100" : ""}`}
                 />
               </div>
 

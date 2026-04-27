@@ -21,6 +21,7 @@ export type Vehicle = {
   milesPerYear: number;    // entitlement
   effectiveDailyCost: number;
   hero: string;            // hero image URL
+  flipImage?: boolean;     // mirror horizontally so the car faces right
   description: string;
   specs: {
     engine: string;
@@ -55,6 +56,7 @@ export const VEHICLES: Vehicle[] = [
     milesPerYear: 4_000,
     effectiveDailyCost: 236,
     hero: "https://images.unsplash.com/photo-1592198084033-aade902d1aae?auto=format&fit=crop&w=1920&q=80",
+    flipImage: true,
     description:
       "The Ferrari 296 GTB redefines the modern V6, paired with a plug-in hybrid system delivering 830 hp. Our example is finished in Rosso Corsa with Nero Alcantara interior, full carbon package, and lift system.",
     specs: {
@@ -87,6 +89,7 @@ export const VEHICLES: Vehicle[] = [
     milesPerYear: 2_500,
     effectiveDailyCost: 473,
     hero: "https://images.unsplash.com/photo-1621135802920-133df287f89c?auto=format&fit=crop&w=1920&q=80",
+    flipImage: true,
     description:
       "The final naturally-aspirated V12 Aventador. Our Ultimae Roadster is one of 250 produced worldwide.",
     specs: {
@@ -119,6 +122,7 @@ export const VEHICLES: Vehicle[] = [
     milesPerYear: 4_000,
     effectiveDailyCost: 230,
     hero: "https://images.unsplash.com/photo-1740806417439-490dba0d926a?auto=format&fit=crop&w=1920&q=80",
+    flipImage: true,
     description:
       "The lightest, most powerful series-production McLaren ever. Spider configuration with carbon roof.",
     specs: {
@@ -151,6 +155,7 @@ export const VEHICLES: Vehicle[] = [
     milesPerYear: 3_000,
     effectiveDailyCost: 370,
     hero: "https://images.unsplash.com/photo-1631295868223-63265b40d9e4?auto=format&fit=crop&w=1920&q=80",
+    flipImage: true,
     description:
       "Black Badge Cullinan with Starlight Headliner and bespoke interior. Ideal for the long-distance gentleman driver.",
     specs: {
@@ -183,6 +188,7 @@ export const VEHICLES: Vehicle[] = [
     milesPerYear: 3_000,
     effectiveDailyCost: 330,
     hero: "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&w=1920&q=80",
+    flipImage: true,
     description:
       "The last front-engined V12 Ferrari. Roof-down, 800 horses on tap.",
     specs: {
