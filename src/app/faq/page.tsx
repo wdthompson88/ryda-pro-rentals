@@ -1,0 +1,176 @@
+import Link from "next/link";
+import { SiteHeader } from "@/components/site-header";
+
+export const metadata = {
+  title: "FAQ — RYDA",
+  description:
+    "Answers to the most common questions about RYDA membership, share purchases, rentals, and operations.",
+};
+
+type Q = { q: string; a: string };
+
+const SECTIONS: { title: string; questions: Q[] }[] = [
+  {
+    title: "Membership",
+    questions: [
+      {
+        q: "Who can join?",
+        a: "Verified individuals 28 years or older with a valid US driver's license, a clean recent driving record, and the ability to pass identity verification. For share purchases, members also complete a financial qualification step.",
+      },
+      {
+        q: "Does membership cost anything?",
+        a: "RYDA Core is free. RYDA Black is $1,500/year (or $1,000/year for founding members, locked for life). Black includes a $500 share-purchase credit, priority listing access, free deliveries, and event invitations.",
+      },
+      {
+        q: "Why 28+?",
+        a: "Insurance carriers price exotic-car policies very aggressively for younger drivers. The 28+ minimum keeps fleet premiums manageable and matches the European norm we modeled on (Supercar Sharing AG).",
+      },
+      {
+        q: "Can I join from anywhere in the US?",
+        a: "Yes — but the actual vehicles only operate in our launch markets. Miami first (Q3 2026), then LA (2027), then NY (2027). Members anywhere in the US can join early to lock in founding pricing.",
+      },
+    ],
+  },
+  {
+    title: "Renting",
+    questions: [
+      {
+        q: "How is RYDA different from Turo?",
+        a: "Two big differences. (1) Every RYDA vehicle is curated, prepared, and inspected by us — not by a stranger. (2) RYDA carries the insurance and provides the handover. There's no host you've never met handing you keys in a parking lot.",
+      },
+      {
+        q: "What's included in a rental?",
+        a: "Full insurance, 200 miles per day, 24/7 roadside, and white-glove delivery if you choose it. Track-eligible vehicles can be booked with a track-day rider for unlimited miles on track.",
+      },
+      {
+        q: "What's the cancellation policy?",
+        a: "Free cancellation up to 7 days before pickup. After that, the cancellation policy depends on lead time — full details are shown at booking and in the rental agreement.",
+      },
+      {
+        q: "Can I drive across state lines?",
+        a: "Yes, within the US. We require a return at the original pickup location unless you've arranged white-glove drop-off in advance.",
+      },
+    ],
+  },
+  {
+    title: "Co-ownership",
+    questions: [
+      {
+        q: "What am I actually buying?",
+        a: "A membership interest in a single-purpose Delaware LLC that owns a specific vehicle. The LLC's only assets are the vehicle, its insurance/operating reserves, and a management contract with RYDA. You hold a registered legal interest, not a club point.",
+      },
+      {
+        q: "How many shares per vehicle?",
+        a: "Typically 6 to 10, depending on the car. Each share entitles you to roughly 50 days and 4,000 miles of usage per year on a 6-share split.",
+      },
+      {
+        q: "Are RYDA shares securities?",
+        a: "They're LLC membership interests offered under Reg D 506(c). Counsel reviews the share-purchase flow before launch. Membership is limited to verified accredited investors. The full Securities Disclaimer will be published before any purchase goes live.",
+      },
+      {
+        q: "Can I sell my share whenever I want?",
+        a: "After a 12-month minimum hold, yes — on the RYDA member-only secondary market. Settlement takes 1–3 business days. RYDA charges a 3% transfer fee on the sale price.",
+      },
+      {
+        q: "What if a co-owner stops paying?",
+        a: "The LLC's Operating Agreement has remedies, including forced sale of the delinquent share. RYDA also keeps a maintenance reserve at the LLC level so vehicle ops continue uninterrupted while it's resolved.",
+      },
+      {
+        q: "What if the car gets totaled?",
+        a: "The vehicle carries agreed-value physical damage insurance. If totaled, the insurance proceeds go to the LLC, are distributed pro-rata to co-owners, and the LLC is wound down. Most groups elect to roll proceeds into a replacement vehicle.",
+      },
+    ],
+  },
+  {
+    title: "Operations",
+    questions: [
+      {
+        q: "Where are the cars stored?",
+        a: "In RYDA-vetted partner facilities — climate-controlled, 24/7 monitored, fully insured. Miami first, with LA and NY following.",
+      },
+      {
+        q: "Who maintains them?",
+        a: "RYDA. We handle service, registration, inspections, photography, and condition reports. Co-owners are not on call for any of it.",
+      },
+      {
+        q: "How do I book my time?",
+        a: "Through the RYDA app, on a shared calendar with the other co-owners. Fair-use rules cap consecutive days during high season (May–September) at 7 per share, with 14 days allowed in low season.",
+      },
+      {
+        q: "Can I drive on a track?",
+        a: "Yes, on track-eligible vehicles, with our track-day rider. RYDA arranges the insurance, helmet drop, and post-track inspection. Some hypercars are not eligible by manufacturer warranty.",
+      },
+    ],
+  },
+];
+
+export default function FaqPage() {
+  return (
+    <>
+      <SiteHeader />
+
+      {/* Hero */}
+      <section className="border-b border-rule">
+        <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-28">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">FAQ</p>
+          <h1 className="mt-4 max-w-3xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
+            Everything we get asked, answered honestly.
+          </h1>
+          <p className="mt-8 max-w-2xl text-lg text-ink-soft">
+            Questions we haven't covered? Email{" "}
+            <a href="mailto:hello@ryda.com" className="text-red hover:text-red-deep">
+              hello@ryda.com
+            </a>{" "}
+            — we add new questions here when they come up.
+          </p>
+        </div>
+      </section>
+
+      {/* Sections */}
+      {SECTIONS.map((s, i) => (
+        <section
+          key={s.title}
+          className={`border-b border-rule ${i % 2 === 1 ? "bg-cream-2" : ""}`}
+        >
+          <div className="mx-auto max-w-3xl px-6 py-16 sm:px-10 sm:py-20">
+            <h2 className="font-display text-3xl text-ink sm:text-4xl">{s.title}</h2>
+            <div className="mt-10 space-y-4">
+              {s.questions.map((qa) => (
+                <details
+                  key={qa.q}
+                  className="group rounded-xl border border-rule bg-white p-5"
+                >
+                  <summary className="cursor-pointer list-none font-display text-lg text-ink marker:hidden">
+                    <span className="flex items-center justify-between gap-4">
+                      <span>{qa.q}</span>
+                      <span className="text-2xl text-red transition-transform group-open:rotate-45">
+                        +
+                      </span>
+                    </span>
+                  </summary>
+                  <p className="mt-4 text-sm leading-relaxed text-ink-soft">{qa.a}</p>
+                </details>
+              ))}
+            </div>
+          </div>
+        </section>
+      ))}
+
+      {/* CTA */}
+      <section className="bg-ink py-20 text-cream">
+        <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
+          <h2 className="font-display text-3xl sm:text-4xl">Still have a question?</h2>
+          <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
+            Talk to a real human. 30-minute call, no commitment.
+          </p>
+          <Link
+            href="/contact#consultation"
+            className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-red hover:text-cream"
+          >
+            Book a consultation
+          </Link>
+        </div>
+      </section>
+    </>
+  );
+}

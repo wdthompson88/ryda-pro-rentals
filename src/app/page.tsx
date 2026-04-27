@@ -182,30 +182,53 @@ export default function Home() {
 
       {/* Footer */}
       <footer id="about" className="border-t border-rule">
-        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-6 py-16 sm:grid-cols-4 sm:px-10">
-          <div className="sm:col-span-2">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-10 px-6 py-16 sm:grid-cols-6 sm:px-10">
+          <div className="col-span-2">
             <p className="font-display text-2xl text-ink">RYDA</p>
             <p className="mt-3 max-w-sm text-sm text-ink-soft">
               The first US asset-backed supercar co-ownership platform.
               Headquartered in Miami, FL. Delaware-incorporated.
             </p>
           </div>
-          <div className="text-sm">
-            <p className="font-medium text-ink">Product</p>
-            <ul className="mt-3 space-y-2 text-ink-soft">
-              <li><Link href="/markets" className="hover:text-ink">Markets</Link></li>
-              <li><Link href="/rent" className="hover:text-ink">Rent</Link></li>
-              <li><Link href="/portfolio" className="hover:text-ink">Portfolio</Link></li>
-            </ul>
-          </div>
-          <div className="text-sm">
-            <p className="font-medium text-ink">Legal</p>
-            <ul className="mt-3 space-y-2 text-ink-soft">
-              <li><Link href="/legal/privacy" className="hover:text-ink">Privacy Policy</Link></li>
-              <li><Link href="/legal/terms" className="hover:text-ink">Terms of Service</Link></li>
-              <li><Link href="/legal/disclaimer" className="hover:text-ink">Securities Disclaimer</Link></li>
-            </ul>
-          </div>
+          <FooterCol
+            title="Product"
+            links={[
+              ["Markets", "/markets"],
+              ["Rent", "/rent"],
+              ["Portfolio", "/portfolio"],
+              ["Membership", "/membership"],
+              ["Founding members", "/founding-members"],
+            ]}
+          />
+          <FooterCol
+            title="Services"
+            links={[
+              ["Insurance", "/insurance"],
+              ["Track day", "/track-day"],
+              ["List your car", "/host-your-car"],
+              ["How it works", "/how-it-works"],
+              ["FAQ", "/faq"],
+            ]}
+          />
+          <FooterCol
+            title="Company"
+            links={[
+              ["About", "/about"],
+              ["Press", "/press"],
+              ["Careers", "/careers"],
+              ["Contact", "/contact"],
+            ]}
+          />
+          <FooterCol
+            title="Legal"
+            links={[
+              ["Privacy Policy", "/legal/privacy"],
+              ["Terms of Service", "/legal/terms"],
+              ["Securities Disclaimer", "/legal/disclaimer"],
+              ["Cookie Policy", "/legal/cookies"],
+              ["Accessibility", "/legal/accessibility"],
+            ]}
+          />
         </div>
         <div className="border-t border-rule py-6 text-center text-xs text-mute">
           © {new Date().getFullYear()} RYDA LLC. All rights reserved.
@@ -267,6 +290,29 @@ function Pillar({ title, body }: { title: string; body: string }) {
     <div className="bg-white p-8">
       <p className="font-display text-xl text-ink">{title}</p>
       <p className="mt-3 text-sm leading-relaxed text-ink-soft">{body}</p>
+    </div>
+  );
+}
+
+function FooterCol({
+  title,
+  links,
+}: {
+  title: string;
+  links: [string, string][];
+}) {
+  return (
+    <div className="text-sm">
+      <p className="font-medium text-ink">{title}</p>
+      <ul className="mt-3 space-y-2 text-ink-soft">
+        {links.map(([label, href]) => (
+          <li key={href}>
+            <Link href={href} className="hover:text-ink">
+              {label}
+            </Link>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
