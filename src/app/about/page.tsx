@@ -119,7 +119,7 @@ export default function AboutPage() {
               role="Co-Founder · CEO / CTO"
               image="/team/ryan.jpg"
               tags={["Odin Partners NY", "Bucknell Psych"]}
-              bio="Co-founder and CEO of RYDA. Currently runs Fixed Income Executive Search at Odin Partners NY, placing senior front-office talent at banks and macro hedge funds across. Bucknell Psychology."
+              bio="Co-founder and CEO of RYDA. Currently runs Fixed Income Executive Search at Odin Partners NY, placing senior front-office talent at banks and macro hedge funds. Bucknell Psychology."
             />
             <Founder
               name="Dave Thompson"
