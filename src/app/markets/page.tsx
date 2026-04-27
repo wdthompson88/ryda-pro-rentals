@@ -62,6 +62,7 @@ export default function MarketsPage() {
                               src={v.hero}
                               alt={v.name}
                               className={`h-full w-full object-cover ${v.flipImage ? "-scale-x-100" : ""}`}
+                              style={{ objectPosition: v.imagePosition ?? "center" }}
                             />
                           </div>
                           <div className="min-w-0">
@@ -150,6 +151,7 @@ export default function MarketsPage() {
                       src={v.hero}
                       alt={v.name}
                       className={`h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 ${v.flipImage ? "-scale-x-100" : ""}`}
+                      style={{ objectPosition: v.imagePosition ?? "center" }}
                     />
                   </div>
                   <div className="p-4">

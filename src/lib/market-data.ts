@@ -22,6 +22,7 @@ export type Vehicle = {
   effectiveDailyCost: number;
   hero: string;            // hero image URL
   flipImage?: boolean;     // mirror horizontally so the car faces right
+  imagePosition?: string;  // CSS object-position to center the car in crops (default "center")
   description: string;
   specs: {
     engine: string;

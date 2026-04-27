@@ -47,7 +47,7 @@ export default async function MyVehiclePage({
             <div className="lg:col-span-7">
               <div className="aspect-[16/10] w-full overflow-hidden rounded-2xl bg-cream-2">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={v.hero} alt={v.name} className={`h-full w-full object-cover ${v.flipImage ? "-scale-x-100" : ""}`} />
+                <img src={v.hero} alt={v.name} className={`h-full w-full object-cover ${v.flipImage ? "-scale-x-100" : ""}`} style={{ objectPosition: v.imagePosition ?? "center" }} />
               </div>
             </div>
             <div className="lg:col-span-5">

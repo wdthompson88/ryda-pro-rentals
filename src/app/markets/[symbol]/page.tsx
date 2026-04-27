@@ -62,6 +62,7 @@ export default async function VehicleMarketPage({
                   src={v.hero}
                   alt={v.name}
                   className={`h-full w-full object-cover ${v.flipImage ? "-scale-x-100" : ""}`}
+                  style={{ objectPosition: v.imagePosition ?? "center" }}
                 />
               </div>
 
