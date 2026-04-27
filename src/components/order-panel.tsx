@@ -26,7 +26,7 @@ export function OrderPanel({ vehicle }: Props) {
   const sideAccent = side === "buy" ? "#00C805" : "#DC2626";
 
   return (
-    <div className="rounded-2xl border border-rule bg-white p-6 shadow-sm">
+    <div className="rounded-2xl border border-rule bg-surface p-6 shadow-sm">
       {/* Side switcher */}
       <div className="mb-5 flex gap-6 text-sm font-semibold">
         <button

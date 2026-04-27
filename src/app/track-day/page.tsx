@@ -155,7 +155,7 @@ function Track({
   notes: string;
 }) {
   return (
-    <div className="rounded-2xl border border-rule bg-white p-6">
+    <div className="rounded-2xl border border-rule bg-surface p-6">
       <p className="font-display text-lg text-ink">{name}</p>
       <p className="mt-1 text-xs uppercase tracking-wider text-red">{location}</p>
       <p className="mt-4 text-sm text-ink-soft">{notes}</p>

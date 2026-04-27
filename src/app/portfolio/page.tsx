@@ -70,7 +70,7 @@ export default function PortfolioPage() {
             <p className="text-sm text-mute">{positions.length} positions</p>
           </div>
 
-          <div className="mt-6 overflow-hidden rounded-2xl border border-rule bg-white">
+          <div className="mt-6 overflow-hidden rounded-2xl border border-rule bg-surface">
             <table className="w-full">
               <thead className="border-b border-rule bg-cream-2 text-xs font-medium uppercase tracking-wider text-ink-soft">
                 <tr>
@@ -143,7 +143,7 @@ export default function PortfolioPage() {
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
           <h2 className="font-display text-3xl text-ink">Recent orders</h2>
-          <ul className="mt-6 divide-y divide-rule rounded-xl border border-rule bg-white">
+          <ul className="mt-6 divide-y divide-rule rounded-xl border border-rule bg-surface">
             <Order side="buy" vehicle="Ferrari 296 GTB" type="Market" date="Apr 24" amount={formatUSD(54_127)} sub="1 share" />
             <Order side="buy" vehicle="McLaren 750S Spider" type="Limit @ $60,900" date="Apr 18" amount={formatUSD(60_900)} sub="1 share" />
             <Order side="sell" vehicle="Lamborghini Aventador Ultimae" type="Market" date="Apr 12" amount={formatUSD(99_500)} sub="1 share" />
@@ -165,7 +165,7 @@ export default function PortfolioPage() {
 
 function Card({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
-    <div className="rounded-2xl border border-rule bg-white p-6">
+    <div className="rounded-2xl border border-rule bg-surface p-6">
       <p className="text-xs text-mute">{label}</p>
       <p className="mt-2 font-display text-3xl text-ink tabular-nums">{value}</p>
       {sub && <p className="mt-1 text-xs text-ink-soft">{sub}</p>}

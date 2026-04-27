@@ -91,7 +91,7 @@ export default function HowItWorksPage() {
           <p className="mt-4 max-w-2xl text-base text-ink-soft">
             Real numbers for the Ferrari 296 GTB at $340,000.
           </p>
-          <div className="mt-10 overflow-hidden rounded-2xl border border-rule bg-white">
+          <div className="mt-10 overflow-hidden rounded-2xl border border-rule bg-surface">
             <table className="w-full text-sm">
               <thead className="border-b border-rule bg-cream-2 text-xs font-medium uppercase tracking-wider text-ink-soft">
                 <tr>
@@ -222,7 +222,7 @@ function Tr({
 
 function Faq({ q, a }: { q: string; a: string }) {
   return (
-    <details className="group rounded-xl border border-rule bg-white p-5">
+    <details className="group rounded-xl border border-rule bg-surface p-5">
       <summary className="cursor-pointer list-none font-display text-lg text-ink marker:hidden">
         <span className="flex items-center justify-between gap-4">
           <span>{q}</span>

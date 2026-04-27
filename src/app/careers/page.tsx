@@ -79,7 +79,7 @@ export default function CareersPage() {
             {ROLES.map((r) => (
               <li
                 key={r.title}
-                className="rounded-2xl border border-rule bg-white p-8 transition-shadow hover:shadow-md"
+                className="rounded-2xl border border-rule bg-surface p-8 transition-shadow hover:shadow-md"
               >
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <p className="font-display text-xl text-ink">{r.title}</p>

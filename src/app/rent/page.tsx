@@ -31,7 +31,7 @@ export default function RentPage() {
           </p>
 
           {/* Quick search */}
-          <div className="mt-10 flex flex-col gap-3 rounded-2xl border border-rule bg-white p-4 shadow-sm sm:flex-row sm:items-end">
+          <div className="mt-10 flex flex-col gap-3 rounded-2xl border border-rule bg-surface p-4 shadow-sm sm:flex-row sm:items-end">
             <Field label="Where" value="Miami" />
             <Field label="From" value="Apr 28, 2026" />
             <Field label="Until" value="May 1, 2026" />
@@ -63,7 +63,7 @@ export default function RentPage() {
                 className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                   i === 0
                     ? "bg-ink text-cream"
-                    : "bg-white text-ink-soft hover:text-ink"
+                    : "bg-surface text-ink-soft hover:text-ink"
                 }`}
               >
                 {c}
@@ -86,7 +86,7 @@ export default function RentPage() {
               <Link
                 key={v.symbol}
                 href={`/rent/${v.symbol.toLowerCase()}`}
-                className="group block overflow-hidden rounded-2xl border border-rule bg-white transition-shadow hover:shadow-lg"
+                className="group block overflow-hidden rounded-2xl border border-rule bg-surface transition-shadow hover:shadow-lg"
               >
                 <div className="relative aspect-[16/10] w-full overflow-hidden bg-cream-2">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -172,7 +172,7 @@ function Field({ label, value }: { label: string; value: string }) {
 
 function Pillar({ title, body }: { title: string; body: string }) {
   return (
-    <div className="rounded-xl bg-white p-6">
+    <div className="rounded-xl bg-surface p-6">
       <p className="font-display text-lg text-ink">{title}</p>
       <p className="mt-2 text-sm leading-relaxed text-ink-soft">{body}</p>
     </div>

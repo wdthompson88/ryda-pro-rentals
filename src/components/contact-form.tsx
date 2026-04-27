@@ -66,7 +66,7 @@ export function ContactForm() {
           required
           minLength={20}
           rows={5}
-          className="mt-2 w-full rounded-xl border border-rule bg-white px-4 py-3 text-sm text-ink placeholder:text-mute focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
+          className="mt-2 w-full rounded-xl border border-rule bg-surface px-4 py-3 text-sm text-ink placeholder:text-mute focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
           placeholder="Tell us a bit about what you're looking for..."
         />
       </div>
@@ -112,7 +112,7 @@ function Input({
         name={name}
         type={type}
         required={required}
-        className="mt-2 h-11 w-full rounded-xl border border-rule bg-white px-4 text-sm text-ink placeholder:text-mute focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
+        className="mt-2 h-11 w-full rounded-xl border border-rule bg-surface px-4 text-sm text-ink placeholder:text-mute focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
       />
     </div>
   );
@@ -126,7 +126,7 @@ function Select({ name, label, options }: { name: string; label: string; options
       </label>
       <select
         name={name}
-        className="mt-2 h-11 w-full rounded-xl border border-rule bg-white px-4 text-sm text-ink focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
+        className="mt-2 h-11 w-full rounded-xl border border-rule bg-surface px-4 text-sm text-ink focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
       >
         {options.map((o) => (
           <option key={o} value={o}>

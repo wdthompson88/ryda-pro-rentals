@@ -45,7 +45,7 @@ export default function Home() {
 
           {/* Mini market preview */}
           <div className="lg:col-span-5">
-            <div className="rounded-2xl border border-rule bg-white p-6 shadow-sm">
+            <div className="rounded-2xl border border-rule bg-surface p-6 shadow-sm">
               <div className="mb-4 flex items-center justify-between">
                 <p className="text-xs font-medium uppercase tracking-[0.2em] text-mute">
                   Live market
@@ -253,7 +253,7 @@ function ProductCard({
   cta: string;
   dark?: boolean;
 }) {
-  const bg = dark ? "bg-ink text-cream" : "bg-white text-ink";
+  const bg = dark ? "bg-ink text-cream" : "bg-surface text-ink";
   const sub = dark ? "text-cream/70" : "text-ink-soft";
   const ctaBg = dark
     ? "bg-cream text-ink hover:bg-red hover:text-cream"
@@ -287,7 +287,7 @@ function Step({ n, title, body }: { n: string; title: string; body: string }) {
 
 function Pillar({ title, body }: { title: string; body: string }) {
   return (
-    <div className="bg-white p-8">
+    <div className="bg-surface p-8">
       <p className="font-display text-xl text-ink">{title}</p>
       <p className="mt-3 text-sm leading-relaxed text-ink-soft">{body}</p>
     </div>

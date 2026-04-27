@@ -32,7 +32,7 @@ export default function MarketsPage() {
       {/* Market table */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
-          <div className="overflow-hidden rounded-2xl border border-rule bg-white">
+          <div className="overflow-hidden rounded-2xl border border-rule bg-surface">
             <table className="w-full">
               <thead className="border-b border-rule bg-cream-2 text-xs font-medium uppercase tracking-wider text-ink-soft">
                 <tr>

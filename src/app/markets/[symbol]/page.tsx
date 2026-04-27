@@ -139,7 +139,7 @@ export default async function VehicleMarketPage({
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-14 sm:px-10">
           <h2 className="font-display text-3xl text-ink">Recent activity</h2>
-          <ul className="mt-6 divide-y divide-rule rounded-xl border border-rule bg-white">
+          <ul className="mt-6 divide-y divide-rule rounded-xl border border-rule bg-surface">
             <Activity label="Member buy · Market" detail="Apr 24" amount={formatUSD(v.pricePerShare * 1)} sub="1 share at avg" />
             <Activity label="Member sell · Limit" detail="Apr 22" amount={formatUSD(v.prevClose * 1)} sub="1 share at limit" />
             <Activity label="Inspection report posted" detail="Apr 20" amount="—" sub="Mileage: 2,140 mi" />
@@ -159,7 +159,7 @@ export default async function VehicleMarketPage({
                 <Link
                   key={x.symbol}
                   href={`/markets/${x.symbol}`}
-                  className="block rounded-xl border border-rule bg-white p-5 transition-shadow hover:shadow-md"
+                  className="block rounded-xl border border-rule bg-surface p-5 transition-shadow hover:shadow-md"
                 >
                   <p className="text-xs text-mute">{x.brand}</p>
                   <p className="mt-1 font-display text-base text-ink">{x.name}</p>
@@ -208,7 +208,7 @@ function Stat({
   const subColor =
     tone === "up" ? "text-[#00C805]" : tone === "down" ? "text-[#DC2626]" : "text-mute";
   return (
-    <div className="rounded-xl border border-rule bg-white p-5">
+    <div className="rounded-xl border border-rule bg-surface p-5">
       <p className="text-xs text-mute">{label}</p>
       <p className="mt-2 font-display text-2xl text-ink tabular-nums">{value}</p>
       {sub && <p className={`mt-1 text-xs tabular-nums ${subColor}`}>{sub}</p>}

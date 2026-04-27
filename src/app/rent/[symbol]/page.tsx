@@ -87,7 +87,7 @@ export default async function RentDetailPage({
 
             {/* Booking card */}
             <div className="lg:col-span-4">
-              <div className="rounded-2xl border border-rule bg-white p-6 shadow-sm">
+              <div className="rounded-2xl border border-rule bg-surface p-6 shadow-sm">
                 <div className="flex items-baseline justify-between">
                   <p className="font-display text-3xl text-ink tabular-nums">
                     {formatUSD(v.rentalDailyRate)}
@@ -137,7 +137,7 @@ export default async function RentDetailPage({
           <h2 className="font-display text-3xl text-ink">Longer trips, better rates</h2>
           <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
             {ratesByDuration.map((r) => (
-              <div key={r.days} className="rounded-xl border border-rule bg-white p-5">
+              <div key={r.days} className="rounded-xl border border-rule bg-surface p-5">
                 <p className="text-xs text-mute">{r.days} days</p>
                 <p className="mt-2 font-display text-xl text-ink tabular-nums">
                   {formatUSD(r.total)}

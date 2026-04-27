@@ -114,7 +114,7 @@ export default function InsurancePage() {
 
 function Card({ title, body }: { title: string; body: string }) {
   return (
-    <div className="rounded-2xl border border-rule bg-white p-8">
+    <div className="rounded-2xl border border-rule bg-surface p-8">
       <p className="font-display text-lg text-ink">{title}</p>
       <p className="mt-3 text-sm leading-relaxed text-ink-soft">{body}</p>
     </div>

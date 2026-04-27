@@ -195,7 +195,7 @@ function Founder({
   ghost?: boolean;
 }) {
   return (
-    <div className={`rounded-2xl border border-rule p-8 ${ghost ? "bg-cream-2/40" : "bg-white"}`}>
+    <div className={`rounded-2xl border border-rule p-8 ${ghost ? "bg-cream-2/40" : "bg-surface"}`}>
       <div className="aspect-square w-24 rounded-full bg-ink/10" />
       <p className="mt-6 font-display text-xl text-ink">{name}</p>
       <p className="mt-1 text-xs uppercase tracking-wider text-red">{role}</p>

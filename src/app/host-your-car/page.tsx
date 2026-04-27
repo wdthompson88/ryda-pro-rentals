@@ -147,7 +147,7 @@ function Option({
   cta: string;
   dark?: boolean;
 }) {
-  const bg = dark ? "bg-ink text-cream" : "bg-white text-ink";
+  const bg = dark ? "bg-ink text-cream" : "bg-surface text-ink";
   const sub = dark ? "text-cream/70" : "text-ink-soft";
   const ctaCls = dark
     ? "bg-cream text-ink hover:bg-red hover:text-cream"

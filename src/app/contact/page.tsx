@@ -128,7 +128,7 @@ function ContactCard({
   href: string;
 }) {
   return (
-    <div className="flex flex-col rounded-2xl border border-rule bg-white p-6">
+    <div className="flex flex-col rounded-2xl border border-rule bg-surface p-6">
       <p className="text-xs font-medium uppercase tracking-wider text-red">{title}</p>
       <p className="mt-3 font-display text-lg text-ink">{subtitle}</p>
       <p className="mt-2 flex-1 text-sm text-ink-soft">{detail}</p>
