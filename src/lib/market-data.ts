@@ -154,7 +154,7 @@ export const VEHICLES: Vehicle[] = [
     milesPerYear: 3_000,
     effectiveDailyCost: 370,
     hero: "https://images.unsplash.com/photo-1631295868223-63265b40d9e4?auto=format&fit=crop&w=1920&q=80",
-    imagePosition: "center bottom",
+    imagePosition: "center 65%",
     description:
       "Black Badge Cullinan with Starlight Headliner and bespoke interior. Ideal for the long-distance gentleman driver.",
     specs: {
