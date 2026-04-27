@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+:root {
+  /* RYDA brand palette (per spec) */
+  --ryda-cream:     #F4F1EC;   /* off-white background */
+  --ryda-cream-2:   #EDE9E2;   /* slightly darker section bg */
+  --ryda-ink:       #1A1A1A;   /* near-black text */
+  --ryda-ink-soft:  #4A4A4A;   /* secondary text */
+  --ryda-mute:      #8B857C;   /* tertiary text / borders */
+  --ryda-rule:      #D8D2C8;   /* hairline borders */
+  --ryda-red:       #8B0000;   /* deep red accent */
+  --ryda-red-deep:  #6E0000;   /* hover red */
+  --ryda-gold:      #B8945C;   /* accent gold for premium tier */
+}
+
+@theme inline {
+  --color-cream:     var(--ryda-cream);
+  --color-cream-2:   var(--ryda-cream-2);
+  --color-ink:       var(--ryda-ink);
+  --color-ink-soft:  var(--ryda-ink-soft);
+  --color-mute:      var(--ryda-mute);
+  --color-rule:      var(--ryda-rule);
+  --color-red:       var(--ryda-red);
+  --color-red-deep:  var(--ryda-red-deep);
+  --color-gold:      var(--ryda-gold);
+
+  --font-display: var(--font-fraunces);
+  --font-sans:    var(--font-inter);
+}
+
+html, body {
+  background: var(--ryda-cream);
+  color: var(--ryda-ink);
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
