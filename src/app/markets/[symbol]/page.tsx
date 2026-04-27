@@ -38,8 +38,6 @@ export default async function VehicleMarketPage({
   if (!v) notFound();
 
   const { diff, pct, isUp } = changeFromPrev(v.pricePerShare, v.prevClose);
-  const color = isUp ? "#00C805" : "#DC2626";
-  const arrow = isUp ? "▲" : "▼";
 
   return (
     <>
@@ -56,28 +54,17 @@ export default async function VehicleMarketPage({
           </Link>
 
           <div className="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-12">
-            {/* Left column — title + chart */}
+            {/* Left column — title + chart (price + change live inside the chart) */}
             <div className="lg:col-span-8">
               <h1 className="font-display text-4xl font-light text-ink sm:text-5xl">
                 {v.name}
               </h1>
-              <div className="mt-3 flex items-baseline gap-4">
-                <p className="font-display text-5xl font-light text-ink tabular-nums sm:text-6xl">
-                  {formatUSD(v.pricePerShare)}
-                </p>
-              </div>
-              <p
-                className="mt-2 text-base font-medium tabular-nums"
-                style={{ color }}
-              >
-                {arrow} {formatUSD(Math.abs(diff))} ({pct.toFixed(2)}%) Today
-              </p>
               <p className="mt-1 text-xs text-mute">
                 {v.ticker} · {v.market} · {v.year} · {v.brand}
               </p>
 
-              <div className="mt-8">
-                <PriceChart vehicle={v} />
+              <div className="mt-6">
+                <PriceChart vehicle={v} showHeader />
               </div>
             </div>
 
