@@ -4,8 +4,86 @@ import { SiteHeader } from "@/components/site-header";
 export const metadata = {
   title: "Membership — RYDA",
   description:
-    "RYDA Core (free) and RYDA Black ($1,500/yr). Compare what each tier unlocks.",
+    "RYDA Core (free), Blue ($500/yr), and Black ($1,500/yr). Compare what each tier unlocks.",
 };
+
+// Single source of truth for the tier matrix.
+// Used for both the tier-card hero and the comparison table below.
+type CellValue = string | boolean;
+
+const FEATURES: { group: string; items: { label: string; core: CellValue; blue: CellValue; black: CellValue }[] }[] = [
+  {
+    group: "Access",
+    items: [
+      { label: "Browse all vehicles in every market", core: true, blue: true, black: true },
+      { label: "Rent any available vehicle", core: true, blue: true, black: true },
+      { label: "Buy shares · list shares for sale", core: true, blue: true, black: true },
+      { label: "In-app messaging with co-owners", core: true, blue: true, black: true },
+      { label: "Inspection reports + LLC documents", core: true, blue: true, black: true },
+      { label: "Member directory access", core: false, blue: true, black: true },
+      { label: "Member-only secondary market", core: false, blue: true, black: true },
+      { label: "Off-market vehicle pre-list visibility", core: false, blue: false, black: true },
+    ],
+  },
+  {
+    group: "Priority",
+    items: [
+      { label: "Priority access to new listings", core: false, blue: "24-hour", black: "48-hour" },
+      { label: "Share-purchase credit", core: false, blue: "$200", black: "$500" },
+      { label: "Acquisition fee discount", core: false, blue: "10% off", black: "Waived (1st share)" },
+    ],
+  },
+  {
+    group: "Concierge",
+    items: [
+      { label: "Free white-glove deliveries / year", core: false, blue: "1", black: "3" },
+      { label: "Free concierge hours / year", core: false, blue: "1", black: "3" },
+      { label: "Free pre-trip vehicle prep / year", core: false, blue: false, black: "1" },
+      { label: "24/7 roadside assistance", core: true, blue: true, black: true },
+      { label: "Standard handover (pickup)", core: true, blue: true, black: true },
+      { label: "Dedicated account contact", core: false, blue: false, black: true },
+    ],
+  },
+  {
+    group: "Events",
+    items: [
+      { label: "Quarterly Cars & Cuban Coffee", core: false, blue: true, black: true },
+      { label: "Member networking dinners", core: false, blue: true, black: true },
+      { label: "Quarterly flagship events (Pebble, GP weekend, Art Basel)", core: false, blue: false, black: true },
+      { label: "Annual founders' weekend", core: false, blue: false, black: true },
+      { label: "Travel programming (Keys road trip, Monterey, etc.)", core: false, blue: "Open to all (paid)", black: "Priority + included" },
+    ],
+  },
+];
+
+const TIERS = [
+  {
+    key: "core" as const,
+    name: "Core",
+    price: "Free",
+    priceSub: "",
+    tagline: "Browse, rent, and buy shares with everything you need to get started.",
+    cta: "Get started",
+  },
+  {
+    key: "blue" as const,
+    name: "Blue",
+    price: "$500",
+    priceSub: "/year",
+    tagline: "For active members. Priority on listings, monthly meetups, member-only market.",
+    cta: "Choose Blue",
+    badge: "Most chosen",
+  },
+  {
+    key: "black" as const,
+    name: "Black",
+    price: "$1,500",
+    priceSub: "/year",
+    tagline: "Concierge-grade everything. Travel programming, flagship events, dedicated contact.",
+    cta: "Choose Black",
+    dark: true,
+  },
+];
 
 export default function MembershipPage() {
   return (
@@ -19,109 +97,107 @@ export default function MembershipPage() {
             Membership
           </p>
           <h1 className="mt-4 max-w-4xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
-            Two tiers.{" "}
-            <span className="italic text-red">No subscription overload.</span>
+            Three tiers.{" "}
+            <span className="italic text-red">Pick the one that fits.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
-            Most RYDA members are on Core — free, full access to browse and
-            book. Black is for the active driver who wants priority,
-            concierge service, and the perks that make ownership feel
-            effortless.
+            Core is free and gets you the full platform. Blue is for the
+            active member who wants priority and member-only access at a
+            sane price. Black is for the driver who wants every concierge
+            convenience built in.
           </p>
         </div>
       </section>
 
-      {/* Tier comparison */}
+      {/* Tier cards */}
       <section className="border-b border-rule bg-cream-2">
+        <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            {TIERS.map((tier) => (
+              <TierCard key={tier.key} tier={tier} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Comparison table */}
+      <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-            <Tier
-              name="RYDA Core"
-              price="Free"
-              tagline="The foundation. Everything you need to drive and own."
-              features={[
-                "Browse all vehicles in every market",
-                "Buy shares, list shares for sale",
-                "Rent any available vehicle",
-                "In-app messaging with co-owners",
-                "Inspection reports + LLC documents",
-                "Standard handover (self-pickup)",
-                "24/7 roadside assistance",
-              ]}
+          <h2 className="font-display text-3xl text-ink sm:text-4xl">
+            Compare every benefit.
+          </h2>
+          <p className="mt-3 max-w-2xl text-base text-ink-soft">
+            Side-by-side, no fine print.
+          </p>
+
+          <div className="mt-12 overflow-hidden rounded-2xl border border-rule bg-surface">
+            <table className="w-full text-sm">
+              <thead className="border-b border-rule bg-cream-2">
+                <tr>
+                  <th className="px-6 py-5 text-left">
+                    <span className="text-xs uppercase tracking-wider text-mute">
+                      Benefit
+                    </span>
+                  </th>
+                  {TIERS.map((t) => (
+                    <th
+                      key={t.key}
+                      className={`px-6 py-5 text-center ${
+                        t.key === "blue" ? "bg-red/5" : ""
+                      }`}
+                    >
+                      <p
+                        className={`text-xs uppercase tracking-wider ${
+                          t.key === "blue" ? "text-red" : "text-mute"
+                        }`}
+                      >
+                        {t.name}
+                      </p>
+                      <p className="mt-1 font-display text-lg text-ink">
+                        {t.price}
+                        <span className="text-xs text-ink-soft">
+                          {t.priceSub}
+                        </span>
+                      </p>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {FEATURES.map((group) => (
+                  <Group key={group.group} group={group} />
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {/* Math */}
+      <section className="border-b border-rule bg-cream-2">
+        <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10">
+          <h2 className="font-display text-3xl text-ink sm:text-4xl">
+            When does each tier pay for itself?
+          </h2>
+          <p className="mt-4 text-base text-ink-soft">
+            The honest math:
+          </p>
+
+          <div className="mt-8 space-y-4">
+            <Math
+              tier="Blue · $500/yr"
+              detail="$200 share credit + 1 free delivery ($300 value) + member market access = breaks even on day 1 if you buy a share or use 1 delivery."
             />
-            <Tier
-              name="RYDA Black"
-              price="$1,500"
-              priceSub="/year"
-              tagline="The accelerator. Priority access, complimentary services, and member events."
-              features={[
-                "$500 share-purchase credit (recoups 1/3 of membership)",
-                "24-hour priority access to new listings",
-                "2 free white-glove deliveries / year",
-                "2 free concierge hours / year",
-                "Quarterly RYDA member events (Miami GP, Pebble Beach, etc.)",
-                "Off-market vehicle pre-list visibility",
-                "1 free pre-trip vehicle prep (worth $250)",
-                "Member directory + networking platform",
-                "Member-only secondary market early access",
-                "Annual flagship event invite",
-              ]}
-              dark
-              cta="Upgrade to Black"
+            <Math
+              tier="Black · $1,500/yr"
+              detail="$500 share credit + 3 deliveries ($900) + 3 concierge hours ($450) + flagship events (priceless) + waived first acquisition fee (~$2,000) = pays for itself for any active co-owner."
             />
           </div>
         </div>
       </section>
 
-      {/* Math: when Black pays for itself */}
-      <section className="border-b border-rule">
-        <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10">
-          <h2 className="font-display text-3xl text-ink sm:text-4xl">
-            When does Black pay for itself?
-          </h2>
-          <p className="mt-4 text-base text-ink-soft">
-            The math, transparently:
-          </p>
-          <ul className="mt-8 space-y-4 text-sm">
-            <Math
-              line="Share-purchase credit"
-              value="$500"
-              note="One-time, applied to first share you buy"
-            />
-            <Math
-              line="2 white-glove deliveries"
-              value="$600"
-              note="Normally $300/each — included"
-            />
-            <Math
-              line="2 concierge hours"
-              value="$300"
-              note="Travel + booking support, normally $150/hr"
-            />
-            <Math
-              line="Pre-trip preparation"
-              value="$250"
-              note="Premium detail + condition check, included"
-            />
-            <Math
-              line="Quarterly events"
-              value="Priceless"
-              note="Members-only, not for sale"
-            />
-            <li className="flex items-baseline justify-between border-t border-rule pt-4 font-display text-base text-ink">
-              <span>Tangible value</span>
-              <span className="tabular-nums">$1,650+</span>
-            </li>
-          </ul>
-          <p className="mt-6 text-xs text-mute">
-            For an active member who buys 1 share + uses 1 delivery in their
-            first year, Black is net-positive day one.
-          </p>
-        </div>
-      </section>
-
       {/* Eligibility */}
-      <section className="border-b border-rule bg-cream-2">
+      <section className="border-b border-rule">
         <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10">
           <h2 className="font-display text-3xl text-ink sm:text-4xl">Who can join?</h2>
           <ul className="mt-8 space-y-4 text-base text-ink-soft">
@@ -129,10 +205,12 @@ export default function MembershipPage() {
             <Bullet>Valid US driver's license, clean recent driving record</Bullet>
             <Bullet>Pass identity verification (KYC)</Bullet>
             <Bullet>
-              For share purchases: pass financial qualification (accredited investor self-cert reviewed by RYDA)
+              For share purchases: pass financial qualification (accredited
+              investor self-cert reviewed by RYDA)
             </Bullet>
             <Bullet>
-              No requirement to buy a share to join — Core members are welcome to browse and rent only
+              No requirement to buy a share — Core members are welcome to
+              browse and rent only
             </Bullet>
           </ul>
         </div>
@@ -145,8 +223,8 @@ export default function MembershipPage() {
             Founding members start in Miami.
           </h2>
           <p className="mx-auto mt-6 max-w-xl text-base text-cream/70">
-            We're vetting the first 100 members for Q3 2026 launch. Early
-            members get founding-member pricing on Black for life.
+            Apply by July 2026 to lock founding-member pricing on Blue or
+            Black for life.
           </p>
           <Link
             href="/founding-members"
@@ -160,63 +238,138 @@ export default function MembershipPage() {
   );
 }
 
-function Tier({
-  name,
-  price,
-  priceSub,
-  tagline,
-  features,
-  dark,
-  cta = "Get started",
-}: {
-  name: string;
-  price: string;
-  priceSub?: string;
-  tagline: string;
-  features: string[];
-  dark?: boolean;
-  cta?: string;
-}) {
-  const bg = dark ? "bg-ink text-cream" : "bg-surface text-ink";
-  const sub = dark ? "text-cream/70" : "text-ink-soft";
-  const ctaCls = dark
+// ── Tier card ───────────────────────────────────────────────────
+
+function TierCard({ tier }: { tier: typeof TIERS[number] }) {
+  const isBlue = tier.key === "blue";
+  const isBlack = tier.key === "black";
+
+  // Pull the items that this tier wins on (true / non-empty value)
+  const highlights = FEATURES.flatMap((g) =>
+    g.items.filter((i) => i[tier.key] !== false).slice(0, 0),
+  );
+
+  // Show top 6 things this tier gets that the lower tier doesn't.
+  const above = isBlack ? "blue" : isBlue ? "core" : null;
+  const exclusiveTop6 = above
+    ? FEATURES.flatMap((g) =>
+        g.items.filter(
+          (i) => i[tier.key] !== false && i[above] === false,
+        ),
+      ).slice(0, 6)
+    : null;
+
+  // For Core, just list the universal features (everyone gets these)
+  const coreFeatures = !above
+    ? FEATURES[0].items.filter((i) => i.core === true).slice(0, 5)
+    : null;
+
+  const bg = isBlack
+    ? "bg-ink text-cream"
+    : isBlue
+    ? "bg-surface text-ink ring-2 ring-red"
+    : "bg-surface text-ink";
+
+  const sub = isBlack ? "text-cream/70" : "text-ink-soft";
+  const ctaCls = isBlack
     ? "bg-cream text-ink hover:bg-red hover:text-cream"
+    : isBlue
+    ? "bg-red text-cream hover:bg-red-deep"
     : "bg-ink text-cream hover:bg-red";
+
   return (
-    <div className={`rounded-2xl border border-rule p-10 ${bg}`}>
-      <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">{name}</p>
-      <p className="mt-4 font-display text-5xl font-light">
-        {price}
-        {priceSub && <span className={`text-base ${sub}`}>{priceSub}</span>}
+    <div
+      className={`relative flex flex-col rounded-2xl border border-rule p-8 ${bg}`}
+    >
+      {tier.badge && (
+        <span className="absolute -top-3 left-8 rounded-full bg-red px-3 py-1 text-xs font-medium text-cream">
+          {tier.badge}
+        </span>
+      )}
+      <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+        RYDA {tier.name}
       </p>
-      <p className={`mt-3 text-base ${sub}`}>{tagline}</p>
-      <ul className="mt-8 space-y-3 text-sm">
-        {features.map((f) => (
-          <li key={f} className="flex items-start gap-3">
+      <p className="mt-4 font-display text-5xl font-light">
+        {tier.price}
+        {tier.priceSub && (
+          <span className={`text-base ${sub}`}>{tier.priceSub}</span>
+        )}
+      </p>
+      <p className={`mt-3 text-sm ${sub}`}>{tier.tagline}</p>
+
+      <ul className="mt-8 flex-1 space-y-3 text-sm">
+        {(coreFeatures || exclusiveTop6 || []).map((f) => (
+          <li key={f.label} className="flex items-start gap-3">
             <span className="mt-1 text-red">✓</span>
-            <span>{f}</span>
+            <span>
+              {f.label}
+              {typeof f[tier.key] === "string" && (
+                <span className="ml-1.5 text-xs italic opacity-80">
+                  ({f[tier.key]})
+                </span>
+              )}
+            </span>
           </li>
         ))}
       </ul>
+
       <Link
-        href="/founding-members"
-        className={`mt-10 inline-flex h-12 w-full items-center justify-center rounded-full px-7 text-sm font-medium transition-colors ${ctaCls}`}
+        href={tier.key === "core" ? "/signup" : "/founding-members"}
+        className={`mt-10 inline-flex h-12 items-center justify-center rounded-full px-7 text-sm font-medium transition-colors ${ctaCls}`}
       >
-        {cta}
+        {tier.cta} →
       </Link>
     </div>
   );
 }
 
-function Math({ line, value, note }: { line: string; value: string; note: string }) {
+// ── Comparison table ───────────────────────────────────────────
+
+function Group({ group }: { group: typeof FEATURES[number] }) {
   return (
-    <li className="flex flex-col border-b border-rule pb-3 sm:flex-row sm:items-baseline sm:justify-between">
-      <span>
-        <span className="text-ink">{line}</span>
-        <span className="ml-2 text-xs text-mute">{note}</span>
-      </span>
-      <span className="font-medium text-ink tabular-nums">{value}</span>
-    </li>
+    <>
+      <tr className="border-b border-rule bg-cream-2/40">
+        <td colSpan={4} className="px-6 py-3">
+          <span className="text-xs font-medium uppercase tracking-wider text-red">
+            {group.group}
+          </span>
+        </td>
+      </tr>
+      {group.items.map((f) => (
+        <tr key={f.label} className="border-b border-rule last:border-b-0">
+          <td className="px-6 py-4 text-ink">{f.label}</td>
+          <Cell value={f.core} />
+          <Cell value={f.blue} accent />
+          <Cell value={f.black} />
+        </tr>
+      ))}
+    </>
+  );
+}
+
+function Cell({ value, accent }: { value: CellValue; accent?: boolean }) {
+  const bg = accent ? "bg-red/5" : "";
+  let content: React.ReactNode;
+  if (value === true) {
+    content = <span className="text-[#00C805]">✓</span>;
+  } else if (value === false) {
+    content = <span className="text-mute">—</span>;
+  } else {
+    content = <span className="text-ink">{value}</span>;
+  }
+  return (
+    <td className={`px-6 py-4 text-center text-sm ${bg}`}>{content}</td>
+  );
+}
+
+// ── Math + bullets ─────────────────────────────────────────────
+
+function Math({ tier, detail }: { tier: string; detail: string }) {
+  return (
+    <div className="rounded-xl border border-rule bg-surface p-5">
+      <p className="font-display text-base text-ink">{tier}</p>
+      <p className="mt-2 text-sm leading-relaxed text-ink-soft">{detail}</p>
+    </div>
   );
 }
 

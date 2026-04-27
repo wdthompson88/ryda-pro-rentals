@@ -103,7 +103,8 @@ export default function ConciergePage() {
             <Price line="Photographer (half-day shoot)" value="$1,500" />
             <Price line="Service coordination" value="$150 / car movement" />
             <Price line="Custom hourly concierge" value="$150 / hour" />
-            <Price line="Black tier (annual included)" value="2 hours · 2 deliveries · 1 prep" />
+            <Price line="Blue tier (annual included)" value="1 hour · 1 delivery" />
+            <Price line="Black tier (annual included)" value="3 hours · 3 deliveries · 1 prep" />
           </ul>
         </div>
       </section>

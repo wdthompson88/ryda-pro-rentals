@@ -19,7 +19,7 @@ const SECTIONS: { title: string; questions: Q[] }[] = [
       },
       {
         q: "Does membership cost anything?",
-        a: "RYDA Core is free. RYDA Black is $1,500/year (or $1,000/year for founding members, locked for life). Black includes a $500 share-purchase credit, priority listing access, free deliveries, and event invitations.",
+        a: "Three tiers. Core is free. Blue is $500/year ($350 for founding members, locked for life). Black is $1,500/year ($1,000 for founding members, locked for life). Most active members start on Blue.",
       },
       {
         q: "Why 28+?",

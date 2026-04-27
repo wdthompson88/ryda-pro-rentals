@@ -159,7 +159,8 @@ export default function EventsPage() {
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
             Founding members get every event invitation 2 weeks before public.
-            Black members get priority on travel events with capacity caps.
+            Blue members get monthly meetups; Black members get flagship events
+            and priority on travel programming.
           </p>
           <Link
             href="/founding-members"

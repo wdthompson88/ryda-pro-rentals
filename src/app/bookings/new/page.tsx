@@ -223,7 +223,7 @@ function PickDetails({
         </p>
         <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
           {[
-            { k: "delivery", t: "White-glove delivery", s: "$0 (Black tier · 2 included/yr)" },
+            { k: "delivery", t: "White-glove delivery", s: "$0 (Blue tier · 1 included/yr remaining)" },
             { k: "pickup", t: "Self-pickup", s: "RYDA Miami facility" },
           ].map((opt) => (
             <button

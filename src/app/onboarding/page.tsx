@@ -211,14 +211,14 @@ function Financial({ onNext, onBack }: { onNext: () => void; onBack: () => void 
 }
 
 function Tier({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
-  const [tier, setTier] = useState<"core" | "black">("core");
+  const [tier, setTier] = useState<"core" | "blue" | "black">("blue");
   return (
     <div>
       <h2 className="font-display text-2xl text-ink">Pick a tier.</h2>
       <p className="mt-2 text-sm text-ink-soft">
-        Most members start on Core (free). You can upgrade to Black anytime.
+        Most active members start on Blue. Upgrade or downgrade anytime.
       </p>
-      <div className="mt-8 grid grid-cols-1 gap-4">
+      <div className="mt-8 grid grid-cols-1 gap-3">
         <TierOption
           name="RYDA Core"
           price="Free"
@@ -227,12 +227,19 @@ function Tier({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
           onClick={() => setTier("core")}
         />
         <TierOption
+          name="RYDA Blue"
+          price="$500 / yr"
+          tagline="$200 share credit · 1 free delivery · monthly meetups · member-only market."
+          selected={tier === "blue"}
+          onClick={() => setTier("blue")}
+          badge="Most chosen"
+        />
+        <TierOption
           name="RYDA Black"
           price="$1,500 / yr"
-          tagline="$500 share credit, priority listings, free deliveries, member events."
+          tagline="$500 share credit · 3 deliveries · 3 concierge hrs · flagship events · dedicated contact."
           selected={tier === "black"}
           onClick={() => setTier("black")}
-          badge="Recommended"
         />
       </div>
       <BackNext onBack={onBack} onNext={onNext} />

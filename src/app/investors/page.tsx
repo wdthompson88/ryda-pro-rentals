@@ -28,12 +28,18 @@ export default function InvestorsPage() {
             Miami in Q3 2026 and reach 20 vehicles + 120 co-owners +
             $1.2M ARR by Year 3.
           </p>
-          <div className="mt-10">
+          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <Link
-              href="mailto:investors@ryda.com?subject=Investor%20interest"
+              href="/investors/deck"
               className="inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-red hover:text-cream"
             >
-              Request the investor deck →
+              View the deck →
+            </Link>
+            <Link
+              href="mailto:investors@ryda.com?subject=Investor%20interest"
+              className="inline-flex h-12 items-center justify-center rounded-full border border-cream/30 px-7 text-sm font-medium text-cream hover:border-cream hover:bg-cream/5"
+            >
+              Email for data room
             </Link>
           </div>
         </div>

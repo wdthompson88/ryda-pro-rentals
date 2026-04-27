@@ -37,7 +37,7 @@ export default function FoundingMembersPage() {
           <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             <Benefit
               title="Founding-member pricing"
-              body="$1,000/yr Black tier for life (vs $1,500 for everyone after). Locks in for as long as your membership stays active."
+              body="$350/yr Blue or $1,000/yr Black for life (vs $500 / $1,500 for everyone after). Locks in for as long as your membership stays active."
             />
             <Benefit
               title="First-pick access"
@@ -115,7 +115,8 @@ export default function FoundingMembersPage() {
                 <Stat label="First-cohort size" value="100 members" />
                 <Stat label="Launch market" value="Miami, FL" />
                 <Stat label="Launch quarter" value="Q3 2026" />
-                <Stat label="Black tier (founders)" value="$1,000 / yr (locked)" />
+                <Stat label="Blue tier (founders)" value="$350 / yr (locked for life)" />
+                <Stat label="Black tier (founders)" value="$1,000 / yr (locked for life)" />
               </div>
             </div>
             <div className="lg:col-span-7">
