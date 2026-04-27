@@ -118,7 +118,7 @@ export const VEHICLES: Vehicle[] = [
     daysPerYear: 50,
     milesPerYear: 4_000,
     effectiveDailyCost: 230,
-    hero: "https://images.unsplash.com/photo-1614026480418-bd11fde2f0fd?auto=format&fit=crop&w=1920&q=80",
+    hero: "https://images.unsplash.com/photo-1525609004556-c46c7d6cf023?auto=format&fit=crop&w=1920&q=80",
     description:
       "The lightest, most powerful series-production McLaren ever. Spider configuration with carbon roof.",
     specs: {
