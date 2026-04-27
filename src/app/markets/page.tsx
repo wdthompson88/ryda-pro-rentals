@@ -101,6 +101,70 @@ export default function MarketsPage() {
         </div>
       </section>
 
+      {/* Try before you buy — small rentals teaser */}
+      <section className="border-t border-rule">
+        <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+                Try before you buy
+              </p>
+              <h2 className="mt-2 font-display text-2xl text-ink sm:text-3xl">
+                Rent any vehicle by the day.
+              </h2>
+              <p className="mt-2 max-w-xl text-sm text-ink-soft">
+                Drive it first. Then decide if you want to own a piece.
+                Members + prospective buyers welcome.
+              </p>
+            </div>
+            <Link
+              href="/rent"
+              className="inline-flex h-11 items-center justify-center rounded-full border border-rule px-5 text-sm font-medium text-ink hover:border-ink"
+            >
+              See all rentals →
+            </Link>
+          </div>
+
+          <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {VEHICLES.filter((v) => v.rentalAvailable)
+              .slice(0, 4)
+              .map((v) => (
+                <Link
+                  key={v.symbol}
+                  href={`/rent/${v.symbol.toLowerCase()}`}
+                  className="group block overflow-hidden rounded-xl border border-rule bg-surface transition-shadow hover:shadow-md"
+                >
+                  <div className="relative aspect-[16/10] w-full overflow-hidden bg-cream-2">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={v.hero}
+                      alt={v.name}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <p className="text-xs text-mute">{v.brand}</p>
+                    <p className="mt-1 font-display text-base text-ink">
+                      {v.name}
+                    </p>
+                    <div className="mt-2 flex items-baseline justify-between">
+                      <p>
+                        <span className="font-display text-xl text-ink tabular-nums">
+                          {formatUSD(v.rentalDailyRate)}
+                        </span>
+                        <span className="text-xs text-mute">/day</span>
+                      </p>
+                      <span className="text-xs font-medium text-red group-hover:text-red-deep">
+                        Rent →
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+          </div>
+        </div>
+      </section>
+
       {/* Disclaimer */}
       <section className="bg-cream-2">
         <div className="mx-auto max-w-3xl px-6 py-12 text-center text-sm text-ink-soft sm:px-10">
