@@ -238,59 +238,130 @@ export const VEHICLES: Vehicle[] = [
 export type Timeframe = "1D" | "1W" | "1M" | "3M" | "YTD" | "1Y" | "5Y" | "MAX";
 export type PricePoint = { t: string; price: number };
 
+const DAY_MS = 24 * 3600 * 1000;
+const BACKBONE_DAYS = 365 * 7; // 7 years
+const BACKBONE_VOL = 0.012;    // ~1.2% daily walk
+const BACKBONE_TREND = -0.0001; // slight backwards drift so target is "up" over 7 yrs
+
+const backboneCache = new Map<string, PricePoint[]>();
+
 /**
- * Generates a deterministic, realistic-looking price history for a vehicle.
- * Uses a seed derived from the symbol so the chart is stable across reloads.
+ * The single source of truth for a vehicle's price history. Every timeframe
+ * is derived from this one walk so that overlapping windows agree exactly:
+ * the last point of `1W` equals the value at "7 days ago" inside `1M`, etc.
+ *
+ * Walks BACKWARDS from the current price for stability — the latest point is
+ * always exactly `vehicle.pricePerShare`.
  */
-export function generateHistory(
-  vehicle: Vehicle,
-  timeframe: Timeframe,
-): PricePoint[] {
-  const now = Date.now();
+function getBackbone(vehicle: Vehicle): PricePoint[] {
+  const cached = backboneCache.get(vehicle.symbol);
+  if (cached) return cached;
+
   const seed = symbolToSeed(vehicle.symbol);
-
-  const tfConfig: Record<
-    Timeframe,
-    { points: number; spanMs: number; volatility: number }
-  > = {
-    "1D":  { points: 78,  spanMs: 6.5 * 3600 * 1000,        volatility: 0.004 },
-    "1W":  { points: 30,  spanMs: 7   * 24 * 3600 * 1000,    volatility: 0.012 },
-    "1M":  { points: 30,  spanMs: 30  * 24 * 3600 * 1000,    volatility: 0.025 },
-    "3M":  { points: 60,  spanMs: 90  * 24 * 3600 * 1000,    volatility: 0.04  },
-    "YTD": { points: 80,  spanMs: 120 * 24 * 3600 * 1000,    volatility: 0.05  },
-    "1Y":  { points: 120, spanMs: 365 * 24 * 3600 * 1000,    volatility: 0.07  },
-    "5Y":  { points: 180, spanMs: 5 * 365 * 24 * 3600 * 1000, volatility: 0.20 },
-    "MAX": { points: 200, spanMs: 7 * 365 * 24 * 3600 * 1000, volatility: 0.28 },
-  };
-
-  const { points, spanMs, volatility } = tfConfig[timeframe];
-  const trendBias = ((seed % 7) - 3) * 0.0008; // drift per step
-  const start = now - spanMs;
-
-  // Walk backwards from current price to determine starting price,
-  // then walk forwards generating intermediate points.
+  const rng = mulberry32(seed);
   const target = vehicle.pricePerShare;
-  const rng = mulberry32(seed + (timeframe.charCodeAt(0) || 1));
+  const now = Date.now();
 
-  // Compute a starting value such that after random walk we end near target.
-  const totalSteps = points;
-  const driftPerStep = (Math.random() < 0.5 ? -1 : 1) * volatility * 0.3;
-  let startPrice = target * (1 - driftPerStep * totalSteps - trendBias * totalSteps);
-  if (startPrice < target * 0.5) startPrice = target * 0.7;
-  if (startPrice > target * 1.5) startPrice = target * 1.3;
+  const points: PricePoint[] = new Array(BACKBONE_DAYS);
+  let p = target;
+  for (let i = BACKBONE_DAYS - 1; i >= 0; i--) {
+    points[i] = { t: new Date(now - (BACKBONE_DAYS - 1 - i) * DAY_MS).toISOString(), price: round2(p) };
+    // Walk backwards in time: subtract typical daily move + slight trend.
+    const move = (rng() - 0.5) * 2 * BACKBONE_VOL * p;
+    p = p - move - BACKBONE_TREND * p;
+    // Prevent unrealistic drifts.
+    if (p < target * 0.3) p = target * 0.4;
+    if (p > target * 2.5) p = target * 1.8;
+  }
+  // Force last point to match current price exactly.
+  points[BACKBONE_DAYS - 1] = { t: new Date(now).toISOString(), price: target };
+
+  backboneCache.set(vehicle.symbol, points);
+  return points;
+}
+
+/**
+ * Generates an intraday (today) walk going from yesterday's close to the
+ * current price across ~78 5-minute bars (6.5 trading hours).
+ * Independent of the daily backbone — markets-style intraday flavor.
+ */
+function intradayWalk(vehicle: Vehicle): PricePoint[] {
+  const seed = symbolToSeed(vehicle.symbol) + 7919; // offset so it doesn't collide
+  const rng = mulberry32(seed);
+  const target = vehicle.pricePerShare;
+  const open = vehicle.prevClose;
+  const points = 78;
+  const now = Date.now();
+  const spanMs = 6.5 * 3600 * 1000;
 
   const series: PricePoint[] = [];
-  let p = startPrice;
+  let p = open;
+  // Linear path from open to target plus noise.
   for (let i = 0; i < points; i++) {
-    const step = (rng() - 0.5) * 2 * volatility * p + trendBias * p;
-    p = Math.max(p + step, target * 0.4);
-    const t = new Date(start + (i / (points - 1)) * spanMs).toISOString();
-    series.push({ t, price: round2(p) });
+    const progress = i / (points - 1);
+    const trend = open + (target - open) * progress;
+    const noise = (rng() - 0.5) * 2 * 0.003 * p;
+    p = trend + noise;
+    series.push({
+      t: new Date(now - spanMs + (i / (points - 1)) * spanMs).toISOString(),
+      price: round2(p),
+    });
   }
-
-  // Force the last point to equal current price so the header always matches.
+  // Pin the endpoints exactly so the header math is clean.
+  series[0] = { t: series[0].t, price: open };
   series[series.length - 1] = { t: new Date(now).toISOString(), price: target };
   return series;
+}
+
+/** Number of points to display per timeframe (resampled from backbone). */
+const TF_POINTS: Record<Timeframe, number> = {
+  "1D": 78,
+  "1W": 56,
+  "1M": 60,
+  "3M": 90,
+  "YTD": 90,
+  "1Y": 120,
+  "5Y": 180,
+  "MAX": 200,
+};
+
+/** Number of *days* of history each timeframe should include. */
+function daysForTimeframe(tf: Timeframe): number {
+  if (tf === "1D") return 1;
+  if (tf === "1W") return 7;
+  if (tf === "1M") return 30;
+  if (tf === "3M") return 90;
+  if (tf === "YTD") {
+    const now = new Date();
+    const jan1 = new Date(now.getFullYear(), 0, 1);
+    return Math.max(1, Math.floor((now.getTime() - jan1.getTime()) / DAY_MS));
+  }
+  if (tf === "1Y") return 365;
+  if (tf === "5Y") return 365 * 5;
+  return BACKBONE_DAYS; // MAX
+}
+
+/** Resample a price series down to N evenly-spaced points (last point preserved). */
+function resample(points: PricePoint[], n: number): PricePoint[] {
+  if (points.length <= n) return points;
+  const out: PricePoint[] = [];
+  const step = (points.length - 1) / (n - 1);
+  for (let i = 0; i < n; i++) {
+    const idx = Math.round(i * step);
+    out.push(points[idx]);
+  }
+  // Always pin the last point exactly so the header price matches the backbone end.
+  out[out.length - 1] = points[points.length - 1];
+  return out;
+}
+
+export function generateHistory(vehicle: Vehicle, timeframe: Timeframe): PricePoint[] {
+  if (timeframe === "1D") return intradayWalk(vehicle);
+
+  const backbone = getBackbone(vehicle);
+  const days = daysForTimeframe(timeframe);
+  const slice = backbone.slice(Math.max(0, backbone.length - days));
+  return resample(slice, TF_POINTS[timeframe]);
 }
 
 function symbolToSeed(symbol: string): number {
