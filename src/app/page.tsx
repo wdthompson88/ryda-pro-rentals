@@ -16,16 +16,18 @@ export default function Home() {
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-12 px-6 py-20 sm:px-10 sm:py-28 lg:grid-cols-12">
           <div className="lg:col-span-7">
             <p className="mb-6 text-xs font-medium uppercase tracking-[0.2em] text-red">
-              Coming soon · Miami · Q3 2026
+              First in the US · Miami · Q3 2026
             </p>
             <h1 className="font-display text-5xl font-light leading-[1.05] tracking-tight text-ink sm:text-6xl lg:text-7xl">
-              Drive supercars.{" "}
-              <span className="italic text-red">Own them.</span>
+              A new way to own{" "}
+              <span className="italic text-red">the world's best cars.</span>
             </h1>
             <p className="mt-8 max-w-xl text-lg leading-relaxed text-ink-soft">
-              RYDA is two products in one. Rent a Ferrari for the weekend.
-              Or own a real share — like a stock — in a curated supercar held
-              by a Delaware LLC. Trade it any time after 12 months.
+              RYDA is the first US asset-backed supercar co-ownership platform.
+              Hold a real share in a Ferrari, Lamborghini, or McLaren — held
+              by a Delaware LLC, structured like Pacaso for real estate or
+              NetJets for aviation. Drive ~50 days a year. Sell on the
+              member-only market after twelve months.
             </p>
             <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
               <Link
@@ -35,10 +37,10 @@ export default function Home() {
                 See the market
               </Link>
               <Link
-                href="/rent"
+                href="/how-it-works"
                 className="inline-flex h-12 items-center justify-center rounded-full border border-ink/15 px-7 text-sm font-medium text-ink hover:border-ink"
               >
-                Rent for the weekend
+                How it works
               </Link>
             </div>
           </div>
@@ -91,25 +93,36 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Two products */}
+      {/* What this actually is — ownership-focused */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-24">
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-            <ProductCard
-              eyebrow="RENT"
-              title="By the day."
-              body="Curated supercars hand-prepared, fully insured, white-glove delivered. From $1,800/day."
-              href="/rent"
-              cta="Browse rentals"
-            />
-            <ProductCard
-              eyebrow="OWN"
-              title="By the share."
-              body="Real ownership in a single-purpose Delaware LLC. ~$236/day effective cost. Tradeable after 12 months."
-              href="/markets"
-              cta="See the market"
-              dark
-            />
+          <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
+            <div className="lg:col-span-5">
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+                What this is
+              </p>
+              <h2 className="mt-4 font-display text-4xl font-light leading-tight text-ink sm:text-5xl">
+                A new asset class.
+              </h2>
+              <p className="mt-6 text-lg leading-relaxed text-ink-soft">
+                Fractional ownership reshaped real estate (Pacaso, $1B+ GMV
+                in 2 years), aviation (NetJets, $3B+ AUM), and fine art
+                (Masterworks, $1B+ AUM). It's never been built for exotic
+                vehicles in the US — until now.
+              </p>
+              <p className="mt-4 text-lg leading-relaxed text-ink-soft">
+                This is not a rental marketplace. It's a structured,
+                asset-backed ownership platform — with the legal framework,
+                insurance, and member-only secondary market that's been
+                missing for the last twenty years.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-rule bg-rule sm:grid-cols-2 lg:col-span-7">
+              <DiffCard title="Real ownership" body="Each vehicle lives in a Delaware LLC. You hold a registered membership interest — not a club point, not a token, not a timeshare." />
+              <DiffCard title="Curated only" body="We don't list anyone's car. Every vehicle is hand-selected, vetted, and prepared by RYDA. Quality is consistent." />
+              <DiffCard title="Member-only market" body="Sell your share to verified members after 12 months. Settlement in 1–3 business days. Liquidity that didn't exist before." />
+              <DiffCard title="Concierge-grade ops" body="Storage, insurance, maintenance, scheduling, white-glove handover — all RYDA. You drive. We handle the rest." />
+            </div>
           </div>
         </div>
       </section>
@@ -253,39 +266,11 @@ export default function Home() {
   );
 }
 
-function ProductCard({
-  eyebrow,
-  title,
-  body,
-  href,
-  cta,
-  dark,
-}: {
-  eyebrow: string;
-  title: string;
-  body: string;
-  href: string;
-  cta: string;
-  dark?: boolean;
-}) {
-  const bg = dark ? "bg-ink text-cream" : "bg-surface text-ink";
-  const sub = dark ? "text-cream/70" : "text-ink-soft";
-  const ctaBg = dark
-    ? "bg-cream text-ink hover:bg-red hover:text-cream"
-    : "bg-ink text-cream hover:bg-red";
+function DiffCard({ title, body }: { title: string; body: string }) {
   return (
-    <div className={`rounded-2xl border border-rule p-10 ${bg}`}>
-      <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">{eyebrow}</p>
-      <p className="mt-4 font-display text-4xl font-light leading-tight sm:text-5xl">
-        {title}
-      </p>
-      <p className={`mt-4 max-w-md text-base leading-relaxed ${sub}`}>{body}</p>
-      <Link
-        href={href}
-        className={`mt-8 inline-flex h-12 items-center justify-center rounded-full px-7 text-sm font-medium transition-colors ${ctaBg}`}
-      >
-        {cta} →
-      </Link>
+    <div className="bg-surface p-8">
+      <p className="font-display text-xl text-ink">{title}</p>
+      <p className="mt-3 text-sm leading-relaxed text-ink-soft">{body}</p>
     </div>
   );
 }

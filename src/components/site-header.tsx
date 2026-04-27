@@ -14,8 +14,8 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
         </Link>
         <nav className={`hidden gap-8 text-sm font-medium sm:flex ${tone}`}>
           <Link href="/markets">Markets</Link>
-          <Link href="/rent">Rent</Link>
-          <Link href="/portfolio">Portfolio</Link>
+          <Link href="/how-it-works">How it works</Link>
+          <Link href="/membership">Membership</Link>
           <Link href="/about">About</Link>
         </nav>
         <Link

@@ -11,48 +11,6 @@ type Q = { q: string; a: string };
 
 const SECTIONS: { title: string; questions: Q[] }[] = [
   {
-    title: "Membership",
-    questions: [
-      {
-        q: "Who can join?",
-        a: "Verified individuals 28 years or older with a valid US driver's license, a clean recent driving record, and the ability to pass identity verification. For share purchases, members also complete a financial qualification step.",
-      },
-      {
-        q: "Does membership cost anything?",
-        a: "Three tiers. Core is free. Blue is $500/year ($350 for founding members, locked for life). Black is $1,500/year ($1,000 for founding members, locked for life). Most active members start on Blue.",
-      },
-      {
-        q: "Why 28+?",
-        a: "Insurance carriers price exotic-car policies very aggressively for younger drivers. The 28+ minimum keeps fleet premiums manageable and matches the European norm we modeled on (Supercar Sharing AG).",
-      },
-      {
-        q: "Can I join from anywhere in the US?",
-        a: "Yes — but the actual vehicles only operate in our launch markets. Miami first (Q3 2026), then LA (2027), then NY (2027). Members anywhere in the US can join early to lock in founding pricing.",
-      },
-    ],
-  },
-  {
-    title: "Renting",
-    questions: [
-      {
-        q: "How is RYDA different from Turo?",
-        a: "Two big differences. (1) Every RYDA vehicle is curated, prepared, and inspected by us — not by a stranger. (2) RYDA carries the insurance and provides the handover. There's no host you've never met handing you keys in a parking lot.",
-      },
-      {
-        q: "What's included in a rental?",
-        a: "Full insurance, 200 miles per day, 24/7 roadside, and white-glove delivery if you choose it. Track-eligible vehicles can be booked with a track-day rider for unlimited miles on track.",
-      },
-      {
-        q: "What's the cancellation policy?",
-        a: "Free cancellation up to 7 days before pickup. After that, the cancellation policy depends on lead time — full details are shown at booking and in the rental agreement.",
-      },
-      {
-        q: "Can I drive across state lines?",
-        a: "Yes, within the US. We require a return at the original pickup location unless you've arranged white-glove drop-off in advance.",
-      },
-    ],
-  },
-  {
     title: "Co-ownership",
     questions: [
       {
@@ -82,6 +40,27 @@ const SECTIONS: { title: string; questions: Q[] }[] = [
     ],
   },
   {
+    title: "Membership",
+    questions: [
+      {
+        q: "Who can join?",
+        a: "Verified individuals 28 years or older with a valid US driver's license, a clean recent driving record, and the ability to pass identity verification. For share purchases, members also complete a financial qualification step.",
+      },
+      {
+        q: "Does membership cost anything?",
+        a: "Three tiers. Core is free. Blue is $500/year ($350 for founding members, locked for life). Black is $1,500/year ($1,000 for founding members, locked for life). Most active members start on Blue.",
+      },
+      {
+        q: "Why 28+?",
+        a: "Insurance carriers price exotic-car policies very aggressively for younger drivers. The 28+ minimum keeps fleet premiums manageable and matches the European norm we modeled on (Supercar Sharing AG).",
+      },
+      {
+        q: "Can I join from anywhere in the US?",
+        a: "Yes — but the actual vehicles only operate in our launch markets. Miami first (Q3 2026), then LA (2027), then NY (2027). Members anywhere in the US can join early to lock in founding pricing.",
+      },
+    ],
+  },
+  {
     title: "Operations",
     questions: [
       {
@@ -99,6 +78,23 @@ const SECTIONS: { title: string; questions: Q[] }[] = [
       {
         q: "Can I drive on a track?",
         a: "Yes, on track-eligible vehicles, with our track-day rider. RYDA arranges the insurance, helmet drop, and post-track inspection. Some hypercars are not eligible by manufacturer warranty.",
+      },
+    ],
+  },
+  {
+    title: "Rentals (try-before-you-buy)",
+    questions: [
+      {
+        q: "Can I rent a RYDA car if I'm not a co-owner?",
+        a: "Yes — members and prospective buyers can rent any available vehicle by the day. Rentals are priced for the high end ($1,800–$8,500/day depending on the car) and are intended as a try-before-you-buy for share purchase.",
+      },
+      {
+        q: "What's included in a rental?",
+        a: "Full insurance, 200 miles per day, 24/7 roadside, and white-glove delivery if you choose it. Track-eligible vehicles can be booked with a track-day rider for unlimited miles on track.",
+      },
+      {
+        q: "Why rentals at all? Aren't you focused on ownership?",
+        a: "Yes — ownership is the core product. Rentals exist for two reasons: (1) prospective members get a real test-drive before committing six figures to a share, and (2) it supports vehicle utilization for owners who don't fully use their entitlement. We don't compete on price with generic rental marketplaces.",
       },
     ],
   },

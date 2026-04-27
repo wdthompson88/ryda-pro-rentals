@@ -19,57 +19,29 @@ export default function HowItWorksPage() {
             How it works
           </p>
           <h1 className="mt-4 max-w-4xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
-            Two ways to get behind the wheel.
+            Five steps to{" "}
+            <span className="italic text-red">a real share.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
-            Rent for the weekend. Own a real share that trades on a member-only
-            secondary market. Both share the same curated fleet, the same
-            white-glove operations, the same insurance.
+            RYDA is asset-backed fractional ownership for supercars — the
+            structure that built Pacaso, NetJets, and Masterworks, brought
+            to a new asset class for the first time in the US.
           </p>
         </div>
       </section>
 
-      {/* Path 1: Renting */}
-      <section className="border-b border-rule">
-        <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">Path 1</p>
-          <h2 className="mt-3 font-display text-4xl text-ink sm:text-5xl">
-            Rent a supercar.
-          </h2>
-          <p className="mt-4 max-w-2xl text-lg text-ink-soft">
-            Three steps. Three days. Done.
-          </p>
-
-          <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-3">
-            <Step
-              n="01"
-              title="Verify"
-              body="Sign up, upload your driver's license, complete a quick identity check. Members must be 28+ with a clean driving record."
-            />
-            <Step
-              n="02"
-              title="Reserve"
-              body="Pick a vehicle, dates, and handover (self-pickup or white-glove delivery). Pay at booking via card. Free cancellation up to 7 days before."
-            />
-            <Step
-              n="03"
-              title="Drive"
-              body="The car is delivered hand-prepared, fueled, and photo-documented. 200 miles/day baseline. Track-day eligible vehicles unlock unlimited miles on track."
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Path 2: Owning */}
+      {/* Owning — primary */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">Path 2</p>
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+            Co-ownership
+          </p>
           <h2 className="mt-3 font-display text-4xl text-ink sm:text-5xl">
-            Own a real share.
+            Own a piece of the world's best cars.
           </h2>
           <p className="mt-4 max-w-2xl text-lg text-ink-soft">
-            Five steps to a supercar in your name. Effective ${"~$236/day"} versus
-            $2,500+/day to rent. <span className="font-medium text-ink">90% cheaper.</span>
+            Effective ~$236/day on a co-owned Ferrari. Compare with $2,500+/day
+            to rent or $80,000+/yr to own outright.
           </p>
 
           <div className="mt-12 grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-5">
@@ -78,6 +50,30 @@ export default function HowItWorksPage() {
             <Step n="03" title="Acquire" body="3 to 8 co-owners form the LLC. Sign legal docs, fund your share via wire or ACH." />
             <Step n="04" title="Drive" body="Book your time on the RYDA app. ~50 days, ~4,000 miles per share, per year." />
             <Step n="05" title="Exit" body="Sell on the RYDA market after 12 months. We handle paperwork. 3% transfer fee." />
+          </div>
+        </div>
+      </section>
+
+      {/* Why this is new */}
+      <section className="border-b border-rule">
+        <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+            Why this is new
+          </p>
+          <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
+            What makes RYDA different.
+          </h2>
+          <p className="mt-4 max-w-2xl text-base text-ink-soft">
+            We're not selling timeshares. We're not running a rental
+            marketplace. We're the first US platform to apply the Pacaso /
+            NetJets structure to exotic vehicles, with the legal framework
+            and liquidity layer that's been missing.
+          </p>
+          <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <Diff title="Real LLCs" body="Each vehicle is owned by a Delaware single-purpose LLC. Your share is a registered membership interest, recorded with the state." />
+            <Diff title="Curated only" body="We hand-select every car. No marketplace listings. No surprises. Quality is consistent across the entire fleet." />
+            <Diff title="Member-only liquidity" body="A secondary market for shares, available only to verified members. 1–3 day settlement. Liquidity that didn't exist before." />
+            <Diff title="Concierge ops" body="Storage, insurance, maintenance, scheduling, white-glove handover — all RYDA. You drive. We handle the rest." />
           </div>
         </div>
       </section>
@@ -162,6 +158,29 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
+      {/* Try-before-you-buy aside */}
+      <section className="border-b border-rule bg-cream-2">
+        <div className="mx-auto max-w-3xl px-6 py-16 text-center sm:px-10">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+            Also for members
+          </p>
+          <h2 className="mt-3 font-display text-2xl text-ink sm:text-3xl">
+            Want to drive one before you commit?
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl text-base text-ink-soft">
+            Members and prospective buyers can rent any RYDA vehicle by the
+            day. It's the best way to know if the car fits your life before
+            you buy a share.
+          </p>
+          <Link
+            href="/rent"
+            className="mt-6 inline-flex h-11 items-center justify-center rounded-full border border-rule px-6 text-sm font-medium text-ink hover:border-ink"
+          >
+            See rentals →
+          </Link>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="bg-ink py-20 text-cream">
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
@@ -171,21 +190,30 @@ export default function HowItWorksPage() {
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link
-              href="/markets"
+              href="/founding-members"
               className="inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-red hover:text-cream"
             >
-              See the market
+              Apply for membership
             </Link>
             <Link
-              href="/rent"
+              href="/markets"
               className="inline-flex h-12 items-center justify-center rounded-full border border-cream/30 px-7 text-sm font-medium text-cream hover:border-cream hover:bg-cream/10"
             >
-              Browse rentals
+              See the market
             </Link>
           </div>
         </div>
       </section>
     </>
+  );
+}
+
+function Diff({ title, body }: { title: string; body: string }) {
+  return (
+    <div className="rounded-2xl border border-rule bg-surface p-6">
+      <p className="font-display text-lg text-ink">{title}</p>
+      <p className="mt-3 text-sm leading-relaxed text-ink-soft">{body}</p>
+    </div>
   );
 }
 

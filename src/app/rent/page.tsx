@@ -20,14 +20,16 @@ export default function RentPage() {
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            Rent
+            Try before you buy
           </p>
           <h1 className="mt-4 font-display text-5xl font-light leading-tight text-ink sm:text-6xl">
-            Drive a Ferrari this weekend.
+            Drive it before you own a piece of it.
           </h1>
           <p className="mt-6 max-w-2xl text-lg text-ink-soft">
-            Every RYDA rental is hand-prepared, fully insured, and white-glove
-            delivered. Pick a car, pick a date — we handle the rest.
+            Rentals are how members and prospective buyers experience a RYDA
+            vehicle before committing to a share. Hand-prepared, fully insured,
+            white-glove delivered. Same fleet, same operations team — just
+            paid by the day instead of by the share.
           </p>
 
           {/* Quick search */}
@@ -137,23 +139,25 @@ export default function RentPage() {
       </section>
 
       {/* CTA */}
-      <section className="border-b border-rule">
-        <div className="mx-auto max-w-3xl px-6 py-16 text-center sm:px-10">
+      <section className="border-b border-rule bg-ink py-20 text-cream">
+        <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            Why drive once
+            The real product
           </p>
-          <h2 className="mt-4 font-display text-3xl text-ink sm:text-4xl">
-            Rent it now. Own a piece of it later.
+          <h2 className="mt-4 font-display text-3xl sm:text-4xl">
+            Renting is the test drive. Ownership is the point.
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-base text-ink-soft">
-            Most RYDA rentals are also available as co-ownership shares. Drive
-            it, fall in love, then own a piece for ~10% of full price.
+          <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
+            Every RYDA vehicle is also available as a real share. Effective
+            ~$236/day on a co-owned Ferrari versus ~$2,500/day to rent it.
+            Sell on the member market after 12 months. That's where we want
+            you to land.
           </p>
           <Link
             href="/markets"
-            className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream transition-colors hover:bg-red"
+            className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-red hover:text-cream"
           >
-            See available shares →
+            See the market →
           </Link>
         </div>
       </section>
