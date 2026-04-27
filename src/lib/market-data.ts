@@ -57,7 +57,6 @@ export const VEHICLES: Vehicle[] = [
     milesPerYear: 4_000,
     effectiveDailyCost: 236,
     hero: "https://images.unsplash.com/photo-1592198084033-aade902d1aae?auto=format&fit=crop&w=1920&q=80",
-    flipImage: true,
     description:
       "The Ferrari 296 GTB redefines the modern V6, paired with a plug-in hybrid system delivering 830 hp. Our example is finished in Rosso Corsa with Nero Alcantara interior, full carbon package, and lift system.",
     specs: {
@@ -90,7 +89,6 @@ export const VEHICLES: Vehicle[] = [
     milesPerYear: 2_500,
     effectiveDailyCost: 473,
     hero: "https://images.unsplash.com/photo-1621135802920-133df287f89c?auto=format&fit=crop&w=1920&q=80",
-    flipImage: true,
     description:
       "The final naturally-aspirated V12 Aventador. Our Ultimae Roadster is one of 250 produced worldwide.",
     specs: {
@@ -156,7 +154,6 @@ export const VEHICLES: Vehicle[] = [
     milesPerYear: 3_000,
     effectiveDailyCost: 370,
     hero: "https://images.unsplash.com/photo-1631295868223-63265b40d9e4?auto=format&fit=crop&w=1920&q=80",
-    flipImage: true,
     description:
       "Black Badge Cullinan with Starlight Headliner and bespoke interior. Ideal for the long-distance gentleman driver.",
     specs: {
@@ -222,6 +219,7 @@ export const VEHICLES: Vehicle[] = [
     milesPerYear: 2_000,
     effectiveDailyCost: 886,
     hero: "/cars/aston-valhalla.webp",
+    flipImage: true,
     description:
       "Aston Martin's first true hypercar. Plug-in hybrid V8 with 1,080 hp. One of 999 worldwide.",
     specs: {
