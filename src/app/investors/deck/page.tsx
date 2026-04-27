@@ -565,18 +565,28 @@ function TeamSlide() {
   return (
     <div>
       <Eyebrow>Team</Eyebrow>
-      <H2>Founder-led. Hiring through Q4 2026.</H2>
-      <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2">
+      <H2>Three co-founders. Hiring through Q4 2026.</H2>
+      <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-3">
         <Person
           name="Ryan Galli"
-          role="Founder & CEO"
-          bio="Started RYDA after 3 years studying the European supercar-sharing model. Lifelong car enthusiast. Lives in Miami."
+          role="Co-Founder · CEO"
+          image="/team/ryan.jpg"
+          tags={["Odin Partners", "Bucknell '21"]}
+          bio="Runs Rates & FX executive search at Odin Partners — placing senior front-office talent at banks and macro hedge funds across the US, Canada, LatAm, and Asia. Bucknell."
         />
         <Person
-          name="Open"
-          role="Co-Founder · Operations"
-          bio="Hiring now. Background in luxury hospitality, fleet ops, or leadership at a venture-backed startup."
-          ghost
+          name="Dave Thompson"
+          role="Co-Founder · Capital & Ops"
+          image="/team/dave.jpg"
+          tags={["SolomonEdwards", "Series 79"]}
+          bio="Capital structuring + operational diligence. Manager, Private Equity Services at SolomonEdwards. 3+ years Healthcare M&A at Ziegler. SIE + Series 79. Bucknell Economics."
+        />
+        <Person
+          name="Stefano Galli"
+          role="Co-Founder · Strategic Advisor"
+          image="/team/stefano.jpg"
+          tags={["Evercore ISI", "Wharton MBA"]}
+          bio="30+ years in institutional equity markets. MD, Global Equity Sales at Evercore ISI. Prior: BofA ML (London), Artio Global ($75B AUM peak), 8 yrs at Merrill. Wharton MBA."
         />
       </div>
       <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-3">
@@ -592,11 +602,15 @@ function Person({
   name,
   role,
   bio,
+  image,
+  tags,
   ghost,
 }: {
   name: string;
   role: string;
   bio: string;
+  image?: string;
+  tags?: string[];
   ghost?: boolean;
 }) {
   return (
@@ -605,10 +619,32 @@ function Person({
         ghost ? "bg-cream-2/40 border-dashed" : "bg-cream-2/40"
       }`}
     >
-      <div className="aspect-square w-16 rounded-full bg-ink/10" />
+      <div className="aspect-square w-20 overflow-hidden rounded-full bg-ink/10">
+        {image && (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
+            src={image}
+            alt={name}
+            className="h-full w-full object-cover"
+            style={{ filter: "grayscale(100%) contrast(1.05)" }}
+          />
+        )}
+      </div>
       <p className="mt-4 font-display text-xl text-ink">{name}</p>
       <p className="mt-1 text-xs uppercase tracking-wider text-red">{role}</p>
-      <p className="mt-4 text-sm leading-relaxed text-ink-soft">{bio}</p>
+      {tags && tags.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {tags.map((t) => (
+            <span
+              key={t}
+              className="rounded-full border border-rule bg-cream-2/40 px-2 py-0.5 text-[10px] text-ink-soft"
+            >
+              {t}
+            </span>
+          ))}
+        </div>
+      )}
+      <p className="mt-3 text-sm leading-relaxed text-ink-soft">{bio}</p>
     </div>
   );
 }

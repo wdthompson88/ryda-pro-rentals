@@ -110,19 +110,30 @@ export default function AboutPage() {
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-24">
           <h2 className="font-display text-3xl text-ink sm:text-4xl">Founders</h2>
           <p className="mt-3 max-w-2xl text-base text-ink-soft">
-            Bios will appear here as the founding team is finalized.
+            Three co-founders combining executive search, investment
+            banking, and three decades of institutional equity markets.
           </p>
-          <div className="mt-12 grid grid-cols-1 gap-10 sm:grid-cols-2">
+          <div className="mt-12 grid grid-cols-1 gap-10 sm:grid-cols-3">
             <Founder
               name="Ryan Galli"
-              role="Founder & CEO"
-              bio="Founder of RYDA. Background in [TBD]. Lifelong car enthusiast. Lives in Miami."
+              role="Co-Founder · CEO"
+              image="/team/ryan.jpg"
+              tags={["Odin Partners", "Bucknell '21"]}
+              bio="Co-founder and CEO of RYDA. Currently runs Rates & FX executive search at Odin Partners, placing senior front-office talent at banks and macro hedge funds across the US, Canada, LatAm, and Asia. Prior: Maven Search, Jamesbeck, Signum Global Advisors. Bucknell University. Lifelong car enthusiast — RYDA started with a Ferrari he drove on a track day in Italy and spent three years thinking about."
             />
             <Founder
-              name="—"
-              role="Co-Founder & [Role TBD]"
-              bio="Position open. Looking for a co-founder with operations or product/tech background to scale RYDA across the US."
-              ghost
+              name="Dave Thompson"
+              role="Co-Founder · Capital & Operations"
+              image="/team/dave.jpg"
+              tags={["SolomonEdwards", "Series 79", "Bucknell '21"]}
+              bio="Co-founder leading capital structuring and operational diligence. Manager, Private Equity Services at SolomonEdwards. Previously spent 3+ years in Investment Banking at Ziegler covering Healthcare M&A — analyst through senior associate. Diamond Capital Advisors before that. SIE + Series 79 certified. Bucknell Economics."
+            />
+            <Founder
+              name="Stefano Galli"
+              role="Co-Founder · Strategic Advisor"
+              image="/team/stefano.jpg"
+              tags={["Evercore ISI", "Wharton MBA"]}
+              bio="Co-founder and strategic advisor with 30+ years in institutional equity markets. Managing Director, Global Equity Sales at Evercore ISI (9+ years). Previously Director of Global Equities Research Sales at Bank of America Merrill Lynch in London, Senior Portfolio Manager at Artio Global Management ($75B AUM at peak), and 8 years in research sales at Merrill Lynch. Wharton MBA, Civil Engineering and Economics at Delaware."
             />
           </div>
         </div>
@@ -187,18 +198,48 @@ function Founder({
   name,
   role,
   bio,
+  image,
+  tags,
   ghost,
 }: {
   name: string;
   role: string;
   bio: string;
+  image?: string;
+  tags?: string[];
   ghost?: boolean;
 }) {
   return (
-    <div className={`rounded-2xl border border-rule p-8 ${ghost ? "bg-cream-2/40" : "bg-surface"}`}>
-      <div className="aspect-square w-24 rounded-full bg-ink/10" />
+    <div
+      className={`rounded-2xl border border-rule p-8 ${
+        ghost ? "bg-cream-2/40" : "bg-surface"
+      }`}
+    >
+      <div className="aspect-square w-32 overflow-hidden rounded-full bg-ink/10">
+        {image && (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
+            src={image}
+            alt={name}
+            className="h-full w-full object-cover"
+            style={{ filter: "grayscale(100%) contrast(1.05)" }}
+          />
+        )}
+      </div>
       <p className="mt-6 font-display text-xl text-ink">{name}</p>
       <p className="mt-1 text-xs uppercase tracking-wider text-red">{role}</p>
+      {tags && tags.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {tags.map((t) => (
+            <span
+              key={t}
+              className="rounded-full border border-rule bg-cream-2/40 px-2.5 py-1 text-[10px] text-ink-soft"
+            >
+              {t}
+            </span>
+          ))}
+        </div>
+      )}
       <p className="mt-4 text-sm leading-relaxed text-ink-soft">{bio}</p>
     </div>
   );
