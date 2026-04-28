@@ -23,6 +23,7 @@ export type Vehicle = {
   hero: string;            // hero image URL
   flipImage?: boolean;     // mirror horizontally so the car faces right
   imagePosition?: string;  // CSS object-position to center the car in crops (default "center")
+  currentMiles: number;    // odometer at present moment
   description: string;
   specs: {
     engine: string;
@@ -57,6 +58,7 @@ export const VEHICLES: Vehicle[] = [
     milesPerYear: 4_000,
     effectiveDailyCost: 236,
     hero: "https://images.unsplash.com/photo-1592198084033-aade902d1aae?auto=format&fit=crop&w=1920&q=80",
+    currentMiles: 14_280,
     description:
       "The Ferrari 296 GTB redefines the modern V6, paired with a plug-in hybrid system delivering 830 hp. Our example is finished in Rosso Corsa with Nero Alcantara interior, full carbon package, and lift system.",
     specs: {
@@ -89,6 +91,7 @@ export const VEHICLES: Vehicle[] = [
     milesPerYear: 2_500,
     effectiveDailyCost: 473,
     hero: "https://images.unsplash.com/photo-1621135802920-133df287f89c?auto=format&fit=crop&w=1920&q=80",
+    currentMiles: 23_650,
     description:
       "The final naturally-aspirated V12 Aventador. Our Ultimae Roadster is one of 250 produced worldwide.",
     specs: {
@@ -121,6 +124,7 @@ export const VEHICLES: Vehicle[] = [
     milesPerYear: 4_000,
     effectiveDailyCost: 230,
     hero: "https://images.unsplash.com/photo-1740806417439-490dba0d926a?auto=format&fit=crop&w=1920&q=80",
+    currentMiles: 11_840,
     flipImage: true,
     description:
       "The lightest, most powerful series-production McLaren ever. Spider configuration with carbon roof.",
@@ -155,6 +159,7 @@ export const VEHICLES: Vehicle[] = [
     effectiveDailyCost: 370,
     hero: "https://images.unsplash.com/photo-1631295868223-63265b40d9e4?auto=format&fit=crop&w=1920&q=80",
     imagePosition: "center 65%",
+    currentMiles: 18_320,
     description:
       "Black Badge Cullinan with Starlight Headliner and bespoke interior. Ideal for the long-distance gentleman driver.",
     specs: {
@@ -187,6 +192,7 @@ export const VEHICLES: Vehicle[] = [
     milesPerYear: 3_000,
     effectiveDailyCost: 330,
     hero: "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&w=1920&q=80",
+    currentMiles: 16_450,
     flipImage: true,
     description:
       "The last front-engined V12 Ferrari. Roof-down, 800 horses on tap.",
@@ -221,6 +227,7 @@ export const VEHICLES: Vehicle[] = [
     effectiveDailyCost: 886,
     hero: "/cars/aston-valhalla.webp",
     flipImage: true,
+    currentMiles: 3_510,
     description:
       "Aston Martin's first true hypercar. Plug-in hybrid V8 with 1,080 hp. One of 999 worldwide.",
     specs: {
@@ -242,7 +249,16 @@ export const VEHICLES: Vehicle[] = [
 // ─────────────────────────────────────────────────────────────────────────
 
 export type Timeframe = "1D" | "1W" | "1M" | "3M" | "YTD" | "1Y" | "5Y" | "MAX";
-export type PricePoint = { t: string; price: number };
+export type PricePoint = { t: string; price: number; miles?: number; service?: ServiceEvent | null };
+
+export type ServiceEvent = {
+  date: string;     // ISO date when service happened
+  miles: number;    // Odometer at the time
+  type: "oil-change" | "tires" | "brakes" | "annual" | "inspection" | "detailing" | "track-prep";
+  title: string;
+  detail: string;
+  cost: number;
+};
 
 const DAY_MS = 24 * 3600 * 1000;
 const BACKBONE_DAYS = 365 * 7; // 7 years
@@ -362,12 +378,122 @@ function resample(points: PricePoint[], n: number): PricePoint[] {
 }
 
 export function generateHistory(vehicle: Vehicle, timeframe: Timeframe): PricePoint[] {
-  if (timeframe === "1D") return intradayWalk(vehicle);
+  const events = getServiceEvents(vehicle);
+
+  if (timeframe === "1D") {
+    // 1D doesn't show meaningful mileage variation — keep it flat at current.
+    return intradayWalk(vehicle).map((p) => ({
+      ...p,
+      miles: vehicle.currentMiles,
+      service: matchService(events, p.t),
+    }));
+  }
 
   const backbone = getBackbone(vehicle);
   const days = daysForTimeframe(timeframe);
   const slice = backbone.slice(Math.max(0, backbone.length - days));
-  return resample(slice, TF_POINTS[timeframe]);
+  const resampled = resample(slice, TF_POINTS[timeframe]);
+  // Attach mileage + any service event that landed on each point.
+  const totalSpan = resampled.length;
+  return resampled.map((p, i) => {
+    const progress = (i + 1) / totalSpan;
+    const miles = mileageAt(vehicle, progress);
+    return { ...p, miles, service: matchService(events, p.t) };
+  });
+}
+
+// Mileage grows along an S-curve from 0 → currentMiles across the visible
+// window. Light noise so it doesn't look perfectly synthetic. Always
+// monotonically non-decreasing (cars don't lose miles).
+function mileageAt(vehicle: Vehicle, progress: number): number {
+  // Slight ease so the line bends naturally rather than going pure-linear.
+  const eased = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+  return Math.round(vehicle.currentMiles * (0.05 + 0.95 * eased));
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Service events. Generated deterministically per vehicle from its current
+// mileage and symbol seed. Events span the past 12 months and are placed
+// at typical exotic-car service intervals.
+// ─────────────────────────────────────────────────────────────────────────
+
+const serviceCache = new Map<string, ServiceEvent[]>();
+
+export function getServiceEvents(vehicle: Vehicle): ServiceEvent[] {
+  const cached = serviceCache.get(vehicle.symbol);
+  if (cached) return cached;
+
+  const seed = symbolToSeed(vehicle.symbol);
+  const rng = mulberry32(seed + 12345);
+  const now = Date.now();
+  const events: ServiceEvent[] = [];
+
+  // Pre-purchase inspection: ~12 months back, ~5% of current miles
+  events.push({
+    date: new Date(now - 365 * DAY_MS).toISOString(),
+    miles: Math.round(vehicle.currentMiles * 0.05),
+    type: "inspection",
+    title: "Pre-purchase inspection",
+    detail: `Multi-point pre-purchase inspection at ${vehicle.brand} authorized dealer. Compression, leak-down, fluids, brake and suspension verified. Title and lien search clean.`,
+    cost: 1_650 + Math.floor(rng() * 800),
+  });
+
+  // First oil change: ~9 months back, ~25% miles
+  events.push({
+    date: new Date(now - 270 * DAY_MS).toISOString(),
+    miles: Math.round(vehicle.currentMiles * 0.25),
+    type: "oil-change",
+    title: "Scheduled oil + filter service",
+    detail: `Manufacturer-specified synthetic oil change, filter replacement, fluids top-up, multipoint inspection. Performed at ${vehicle.brand} of ${vehicle.market}.`,
+    cost: 1_200 + Math.floor(rng() * 600),
+  });
+
+  // Tires: ~6 months back, ~50% miles
+  events.push({
+    date: new Date(now - 180 * DAY_MS).toISOString(),
+    miles: Math.round(vehicle.currentMiles * 0.5),
+    type: "tires",
+    title: "Tire replacement (4) + alignment",
+    detail: `Manufacturer-spec Pirelli P Zero tires installed. Four-wheel alignment performed. Original tires retained for track-day rotation.`,
+    cost: 4_200 + Math.floor(rng() * 1_400),
+  });
+
+  // Annual service: ~3 months back, ~75% miles
+  events.push({
+    date: new Date(now - 90 * DAY_MS).toISOString(),
+    miles: Math.round(vehicle.currentMiles * 0.75),
+    type: "annual",
+    title: "Annual major service",
+    detail: `Full annual service: spark plugs, brake fluid flush, transmission fluid check, A/C system service, suspension inspection, software updates. Manufacturer warranty preserved.`,
+    cost: 3_800 + Math.floor(rng() * 2_400),
+  });
+
+  // Detailing: ~6 weeks back, ~88% miles (only some vehicles)
+  if (rng() > 0.4) {
+    events.push({
+      date: new Date(now - 42 * DAY_MS).toISOString(),
+      miles: Math.round(vehicle.currentMiles * 0.88),
+      type: "detailing",
+      title: "Concours-level detailing + ceramic top-up",
+      detail: `Full paint correction, ceramic coating top-up, deep interior detailing, leather conditioning. Performed before member event use.`,
+      cost: 2_200 + Math.floor(rng() * 800),
+    });
+  }
+
+  serviceCache.set(vehicle.symbol, events);
+  return events;
+}
+
+// Match a chart point's timestamp to a service event within ~3 days.
+// We only attach one event per chart point so two close-together events
+// don't overlap visually.
+function matchService(events: ServiceEvent[], pointIso: string): ServiceEvent | null {
+  const t = new Date(pointIso).getTime();
+  for (const e of events) {
+    const dt = Math.abs(new Date(e.date).getTime() - t);
+    if (dt < 3 * DAY_MS) return e;
+  }
+  return null;
 }
 
 function symbolToSeed(symbol: string): number {
