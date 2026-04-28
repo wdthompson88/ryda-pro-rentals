@@ -145,8 +145,8 @@ export default async function PurchasePage({
             />
             <Step
               n="3"
-              t="Membership certificate"
-              d="You'll receive your share certificate by email. The vehicle appears in /my-cars."
+              t="Member register entry"
+              d="You'll receive your signed Operating Agreement and your entry in the LLC's member register by email. The vehicle appears in /my-cars."
             />
             <Step
               n="4"

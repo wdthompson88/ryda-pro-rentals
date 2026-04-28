@@ -36,7 +36,7 @@ export const HELP: HelpCategory[] = [
         slug: "what-is-ryda",
         q: "What is RYDA, in one paragraph?",
         summary:
-          "Asset-backed supercar co-ownership. Each vehicle is owned by a single-purpose Delaware LLC and 3–8 verified members hold shares.",
+          "Member-managed supercar co-ownership. Each vehicle is held in a single-purpose Delaware LLC and 5–10 verified members co-own and manage it together.",
         body: [
           {
             type: "p",
@@ -161,9 +161,9 @@ export const HELP: HelpCategory[] = [
       },
       {
         slug: "rental-vs-ownership",
-        q: "Should I rent or buy a share?",
+        q: "Should I rent or claim a co-ownership seat?",
         summary:
-          "Rent first to test the experience and the specific vehicle. Buy a share when usage exceeds ~10 days a year and you want equity, priority, and lower per-day economics.",
+          "Rent first to test the experience and the specific vehicle. Claim a seat when usage exceeds ~10 days a year and you want priority and a relationship with the car.",
         body: [
           { type: "h3", text: "Rent if any of these apply" },
           {
@@ -171,11 +171,11 @@ export const HELP: HelpCategory[] = [
             items: [
               "You drive a supercar fewer than 10 days per year.",
               "You don't want long-term commitment to a specific vehicle.",
-              "You're testing whether the platform actually fits your life before committing capital.",
+              "You're testing whether the platform actually fits your life before committing.",
               "You want to swap between different makes (Ferrari one weekend, McLaren another) instead of holding one.",
             ],
           },
-          { type: "h3", text: "Buy a share if any of these apply" },
+          { type: "h3", text: "Claim a co-ownership seat if any of these apply" },
           {
             type: "ul",
             items: [
@@ -188,7 +188,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Per-day comparison" },
           {
             type: "p",
-            text: "On a co-owned Ferrari 296 GTB at $56K per share with 50 days entitlement, the effective daily cost works out to about $236/day. The rental rate on the same vehicle is $2,500/day. If you'll drive 15+ days a year, ownership pays for itself.",
+            text: "On a co-owned Ferrari 296 GTB at $56K per seat with 50 days entitlement, the effective daily cost works out to about $236/day. The rental rate on the same vehicle is $2,500/day. If you'll drive 15+ days a year, co-ownership pays for itself.",
           },
           {
             type: "callout",
@@ -264,13 +264,13 @@ export const HELP: HelpCategory[] = [
     ],
   },
 
-  // ── Buying & selling shares ──────────────────────────────────────
+  // ── Co-ownership ─────────────────────────────────────────────────
   {
     slug: "shares",
     icon: "$",
-    title: "Buying & selling shares",
+    title: "Co-ownership",
     blurb:
-      "Share purchases, the Operating Agreement, the 12-month minimum hold, secondary-market sales.",
+      "Claiming a co-ownership seat, the Operating Agreement, the 12-month minimum hold, member-to-member transfers.",
     articles: [
       {
         slug: "how-to-buy",
@@ -329,7 +329,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Annual documents" },
           {
             type: "p",
-            text: "Each year you'll receive an updated certificate of insurance for the vehicle, an annual condition and service report (mileage, maintenance, inspections), a fair-market valuation update used for insurance and member-to-member transfer reference, and an annual statement summarizing your contributions, fees paid, and usage.",
+            text: "Each year you'll receive an updated certificate of insurance for the vehicle, an annual condition and service report (mileage, maintenance, inspections), an updated insurance valuation (used for the LLC's policy renewal), and an annual statement summarizing your contributions, fees paid, and usage.",
           },
           {
             type: "callout",
@@ -340,30 +340,30 @@ export const HELP: HelpCategory[] = [
       },
       {
         slug: "entitlement",
-        q: "What does a share actually entitle me to?",
+        q: "What does a co-ownership seat actually entitle me to?",
         summary:
-          "On a 6-share split: ~50 days and ~4,000 miles per year, voting rights on material LLC decisions, and a pro-rata claim on the asset and any sale proceeds.",
+          "On a 6-seat split: ~50 days and ~4,000 miles per year of vehicle use, voting rights on material LLC decisions, and pro-rata participation in the LLC's assets at dissolution.",
         body: [
           { type: "h3", text: "Usage" },
           {
             type: "p",
-            text: "On the standard 6-share split, each share entitles you to roughly 50 days and 4,000 miles of vehicle usage per year. Days are booked on a shared calendar with the other co-owners. Fair-use rules cap consecutive days during peak season.",
+            text: "On the standard 6-seat split, each seat entitles you to roughly 50 days and 4,000 miles of vehicle usage per year. Days are booked on a shared calendar with the other co-owners. Fair-use rules cap consecutive days during peak season.",
           },
-          { type: "h3", text: "Ownership" },
+          { type: "h3", text: "Membership" },
           {
             type: "p",
-            text: "You own a registered LLC membership interest. If the LLC sells the vehicle (e.g., the group decides to replace it), proceeds are distributed pro-rata to all shareholders.",
+            text: "You hold a registered LLC membership interest. The LLC is member-managed — you and your co-owners run it together. If the LLC eventually winds down (e.g., the group decides to sell the car and dissolve), the LLC's remaining assets are distributed pro-rata to members per the Operating Agreement.",
           },
           { type: "h3", text: "Voting" },
           {
             type: "p",
-            text: "Material decisions — selling the vehicle, performing modifications, replacing the vehicle — require a vote per the Operating Agreement (typically a 75% majority of shares). Routine maintenance, scheduling, and operations are handled by RYDA without a vote.",
+            text: "Material decisions — selling the vehicle, performing modifications, replacing the vehicle — require a vote per the Operating Agreement (typically a 75% supermajority by member interest). Routine maintenance, scheduling, and operations are delegated to RYDA via the Management Services Agreement.",
           },
           { type: "h3", text: "What it does not include" },
           {
             type: "ul",
             items: [
-              "Title to the vehicle (the LLC holds title; you hold a share of the LLC).",
+              "Title to the vehicle (the LLC holds title; you hold a member interest in the LLC).",
               "Unilateral decision-making (you share authority with co-owners).",
               "Commercial use of the vehicle.",
             ],
@@ -452,8 +452,8 @@ export const HELP: HelpCategory[] = [
             type: "ul",
             items: [
               "Transfer paperwork and updated Operating Agreement signatures from the new co-owner.",
-              "KYC and accreditation verification of the buyer.",
-              "Updated certificates of insurance and reissued share certificate.",
+              "KYC verification and driving record check on the new co-owner.",
+              "Updated certificates of insurance and updated LLC member register entry for the new co-owner.",
               "Registry update with Delaware Division of Corporations.",
               "Onboarding of the new member into the booking calendar with the other co-owners.",
             ],
@@ -473,7 +473,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Lifetime gifts" },
           {
             type: "p",
-            text: "You can transfer a share to a family member as a gift, but the recipient has to clear RYDA's standard verification (KYC, accreditation, driving record) before the transfer completes. The 3% transfer fee is waived for first-degree family transfers (spouse, children, parents, siblings).",
+            text: "You can transfer a seat to a family member as a gift, but the recipient has to clear RYDA's standard verification (KYC + clean driving record) before the transfer completes. The 3% transfer fee is waived for first-degree family transfers (spouse, children, parents, siblings).",
           },
           { type: "h3", text: "Inheritance and estate transfer" },
           {
@@ -496,33 +496,33 @@ export const HELP: HelpCategory[] = [
         slug: "whole-vs-fractional",
         q: "How does this compare to buying a car outright?",
         summary:
-          "You give up exclusive use, but cut your capital outlay 6×, eliminate operational overhead entirely, and gain liquidity. The math works for owners who'd drive less than 50–80 days a year solo.",
+          "You give up exclusive use, but cut your one-time outlay 6×, eliminate operational overhead entirely, and avoid the carrying-cost math of solo ownership. Works for people who'd drive an exotic less than 50–80 days a year.",
         body: [
-          { type: "h3", text: "Capital" },
+          { type: "h3", text: "Capital outlay" },
           {
             type: "p",
-            text: "A solo Ferrari 296 GTB is $340,000 plus tax (~$365K all-in). A 1/6 share is roughly $57,000. Same vehicle, six times less capital tied up in a depreciating asset.",
+            text: "A solo Ferrari 296 GTB is $340,000 plus tax (~$365K all-in). A 1/6 seat is roughly $57,000. Same vehicle, six times less up-front cost. Either way, the car depreciates — co-ownership just lets you split the depreciation with other members.",
           },
           { type: "h3", text: "Annual carrying cost" },
           {
             type: "ul",
             items: [
               "Solo: $80,000+/year (insurance ~$15K, storage ~$8K, maintenance ~$10K, depreciation ~$45K, taxes/registration ~$2K).",
-              "Co-owned: ~$11,800/year per share — covers everything (your share of insurance, storage, scheduled maintenance, and reserves).",
+              "Co-owned: ~$11,800/year per seat — covers your share of insurance, storage, scheduled maintenance, and the LLC's reserves.",
             ],
           },
           { type: "h3", text: "What you trade away" },
           {
             type: "p",
-            text: "Three things: exclusive use of the vehicle (you share with 5–7 other co-owners), unilateral decision-making (modifications and sale require co-owner vote), and the 'always there' factor (the car isn't always physically yours).",
+            text: "Three things: exclusive use of the vehicle (you share with 5–9 other co-owners), unilateral decision-making (modifications and sale require co-owner vote), and the 'always there' factor (the car isn't always physically yours).",
           },
           { type: "h3", text: "What you gain" },
           {
             type: "ul",
             items: [
-              "Cleaner exit. Transfer your seat to another verified member rather than navigating the months-long process of selling a private exotic on Bring a Trailer or to a dealer.",
+              "Lower up-front cost and lower annual carry — more access for less commitment.",
               "Operational ease. RYDA handles every layer — insurance renewals, service appointments, storage, registration, claims.",
-              "Diversification. Same capital that buys one Ferrari can buy a Ferrari share, a McLaren share, and a Lamborghini share.",
+              "Variety. Some members hold seats in 2–3 different vehicles to vary their experience across the year.",
             ],
           },
           {
@@ -561,13 +561,13 @@ export const HELP: HelpCategory[] = [
       },
       {
         slug: "share-count-changes",
-        q: "Can a vehicle's share count change after launch?",
+        q: "Can a vehicle's seat count change after launch?",
         summary:
-          "No — share count is fixed at LLC formation. New shares cannot be added later. Existing co-owners can buy each other out, but the total share count stays the same.",
+          "No — seat count is fixed at LLC formation. New seats cannot be added later. Existing co-owners can buy each other out, but the total seat count stays the same.",
         body: [
           {
             type: "p",
-            text: "When a vehicle's LLC is formed, the share count is set permanently in the Operating Agreement (typically 6, sometimes 8 for higher-value vehicles). This is by design — letting RYDA issue more shares later would dilute existing co-owners.",
+            text: "When a vehicle's LLC is formed, the seat count is set permanently in the Operating Agreement (typically 6, sometimes 8 or 10 for higher-value vehicles). This is by design — letting the LLC add seats later would dilute existing co-owners' usage entitlement.",
           },
           { type: "h3", text: "Why it's fixed" },
           {
@@ -582,7 +582,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Buyouts within the same LLC" },
           {
             type: "p",
-            text: "Existing co-owners can buy each other out at any time. If one member sells two shares to another member, the total is still 6 — just held differently. This is how members consolidate larger positions in a vehicle they love.",
+            text: "Existing co-owners can transfer between each other at any time. If one member transfers two seats to another member, the total is still 6 — just held differently. This is how members consolidate more seats in a vehicle they love.",
           },
         ],
       },
@@ -1535,7 +1535,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Sharing" },
           {
             type: "p",
-            text: "We don't share KYC data with anyone except (a) insurance carriers when adding you to a policy, (b) state/federal regulators when legally required, and (c) the buyer's KYC system on a secondary-market share transfer (limited fields, with your consent).",
+            text: "We don't share KYC data with anyone except (a) insurance carriers when adding you to a policy, (b) state/federal regulators when legally required, and (c) the new co-owner's verification flow on a member-to-member seat transfer (limited fields, with your consent).",
           },
         ],
       },
@@ -1785,7 +1785,7 @@ export const HELP: HelpCategory[] = [
             items: [
               "Insurance carriers (when adding you to a policy).",
               "Federal/state regulators (when legally required).",
-              "Other co-owners on your specific LLC (limited: your name, contact, share count — for booking calendar coordination).",
+              "Other co-owners on your specific LLC (limited: your name, contact, seat count — for booking calendar coordination).",
               "Buyer KYC systems on secondary-market transfers (limited fields, with your consent).",
             ],
           },

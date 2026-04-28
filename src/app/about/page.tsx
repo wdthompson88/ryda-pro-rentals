@@ -151,7 +151,7 @@ export default function AboutPage() {
               <Fact label="Operating Markets" value="Miami, FL (2026) · Los Angeles, CA (2027) · New York, NY (2027)" />
               <Fact label="General" value="hello@ryda.com" />
               <Fact label="Press" value="press@ryda.com" />
-              <Fact label="Investors" value="investors@ryda.com" />
+              <Fact label="VC investors (in RYDA Inc.)" value="See /investors" />
               <Fact label="Partnerships" value="partners@ryda.com" />
             </dl>
             <div className="aspect-[16/10] w-full overflow-hidden rounded-2xl border border-rule bg-ink/5">

@@ -47,7 +47,7 @@ export function OrderPanel({ vehicle }: Props) {
           />
         </Field>
 
-        <Field label="Equity %">
+        <Field label="Of vehicle">
           <span className="font-medium text-ink tabular-nums">{sharesPercent}%</span>
         </Field>
 

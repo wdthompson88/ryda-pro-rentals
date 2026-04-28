@@ -227,14 +227,14 @@ function Tier({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
         <TierOption
           name="RYDA Core"
           price="Free"
-          tagline="Browse, rent, buy shares. Standard handover."
+          tagline="Browse, rent, and claim co-ownership seats. Standard handover."
           selected={tier === "core"}
           onClick={() => setTier("core")}
         />
         <TierOption
           name="RYDA Blue"
           price="$500 / yr"
-          tagline="$200 share credit · 1 free delivery · monthly meetups · member-only market."
+          tagline="$200 buy-in credit · 1 free delivery · monthly meetups · member-to-member transfers."
           selected={tier === "blue"}
           onClick={() => setTier("blue")}
           badge="Most chosen"

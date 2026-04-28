@@ -62,7 +62,7 @@ const TIERS = [
     name: "Core",
     price: "Free",
     priceSub: "",
-    tagline: "Browse, rent, and buy shares with everything you need to get started.",
+    tagline: "Browse, rent, and claim co-ownership seats with everything you need to get started.",
     cta: "Get started",
   },
   {
@@ -70,7 +70,7 @@ const TIERS = [
     name: "Blue",
     price: "$500",
     priceSub: "/year",
-    tagline: "For active members. Priority on listings, monthly meetups, member-only market.",
+    tagline: "For active members. Priority on new vehicles, monthly meetups, member-to-member seat transfers.",
     cta: "Choose Blue",
     badge: "Most chosen",
   },
@@ -186,7 +186,7 @@ export default function MembershipPage() {
           <div className="mt-8 space-y-4">
             <Math
               tier="Blue · $500/yr"
-              detail="$200 share credit + 1 free delivery ($300 value) + member market access = breaks even on day 1 if you buy a share or use 1 delivery."
+              detail="$200 buy-in credit + 1 free delivery ($300 value) + member-to-member transfer access = breaks even on day 1 if you claim a seat or use 1 delivery."
             />
             <Math
               tier="Black · $1,500/yr"

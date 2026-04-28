@@ -188,7 +188,7 @@ export function PriceChart({ vehicle, showHeader = false }: Props) {
       <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-mute">
         <span className="flex items-center gap-2">
           <span className="inline-block h-1 w-6 rounded" style={{ backgroundColor: lineColor }} />
-          Share price
+          Seat reference value
         </span>
         <span className="flex items-center gap-2">
           <span

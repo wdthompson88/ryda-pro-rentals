@@ -42,7 +42,7 @@ export default function PressPage() {
             <Fact label="Product" value="Daily supercar rentals + member-only fractional co-ownership" />
             <Fact
               label="Model"
-              value="Each vehicle is owned by a single-purpose Delaware LLC. 3–8 verified members hold shares."
+              value="Each vehicle is held in a member-managed single-purpose Delaware LLC. 5–10 verified members co-own and manage the LLC together; RYDA is hired as the operations service provider."
             />
             <Fact
               label="Effective customer cost"

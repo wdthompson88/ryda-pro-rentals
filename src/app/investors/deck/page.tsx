@@ -362,9 +362,9 @@ function ModelSlide() {
           detail="Blue ($500/yr) or Black ($1,500/yr). Recurring."
         />
         <Rev
-          line="Share Transfer Commission"
+          line="Seat Transfer Fee"
           rate="3%"
-          detail="Of transfer price on every share resale."
+          detail="Of agreed price on every member-to-member seat transfer."
         />
         <Rev
           line="Insurance Administration"
@@ -517,7 +517,7 @@ function FundsSlide() {
           line="Platform build"
           pct="20%"
           dollars="$500K"
-          detail="Engineering, design, secondary-market matching engine, integrations."
+          detail="Engineering, design, member dashboard, member-to-member transfer flow, integrations (Stripe, Persona, insurance)."
         />
         <Fund
           line="Insurance + legal"

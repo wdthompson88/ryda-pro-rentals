@@ -158,7 +158,7 @@ export function BuyFlow({ vehicle, initialShares }: Props) {
             </p>
             <p className="mt-1 font-display text-xl text-ink">{vehicle.name}</p>
             <dl className="mt-5 space-y-2 border-t border-rule pt-5 text-sm">
-              <SummaryRow label={`${shares} share${shares > 1 ? "s" : ""}`} value={formatUSD(totalPrice)} />
+              <SummaryRow label={`${shares} seat${shares > 1 ? "s" : ""}`} value={formatUSD(totalPrice)} />
               <SummaryRow label="Closing fee" value={formatUSD(closingFee)} />
               <div className="border-t border-rule pt-3">
                 <SummaryRow

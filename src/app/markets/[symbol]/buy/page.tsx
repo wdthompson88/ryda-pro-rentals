@@ -14,10 +14,10 @@ export async function generateMetadata({
 }) {
   const { symbol } = await params;
   const v = getVehicleBySymbol(symbol);
-  if (!v) return { title: "Buy a share — RYDA" };
+  if (!v) return { title: "Claim a co-ownership seat — RYDA" };
   return {
-    title: `Buy a share — ${v.name} | RYDA`,
-    description: `Purchase a share of the ${v.year} ${v.name}. ${formatUSD(v.pricePerShare)} per share.`,
+    title: `Claim a seat — ${v.name} | RYDA`,
+    description: `Become a co-owner of the ${v.year} ${v.name}. ${formatUSD(v.pricePerShare)} per seat.`,
   };
 }
 

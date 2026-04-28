@@ -108,7 +108,7 @@ export default function HostYourCarPage() {
             <Step n="01" title="Apply" body="Tell us about the car. We'll respond within 3 business days with a yes/no/request-more-info." />
             <Step n="02" title="Inspection" body="One of our certified inspectors evaluates the vehicle. ~2 hours, at your location or our facility." />
             <Step n="03" title="Onboarding" body="Storage, insurance, photos, and listing setup. ~5 business days end-to-end." />
-            <Step n="04" title="Live" body="Rental bookings or share offerings begin. You get monthly statements and 24/7 visibility." />
+            <Step n="04" title="Live" body="Rental bookings or member onboarding into the co-ownership LLC begin. You get monthly statements and 24/7 visibility." />
           </div>
         </div>
       </section>

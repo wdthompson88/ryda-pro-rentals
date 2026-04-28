@@ -63,7 +63,7 @@ export default async function MyVehiclePage({
                 </span>
               )}
               <div className="mt-6 grid grid-cols-2 gap-4 text-sm">
-                <Stat label="Your shares" value="1 of 6" />
+                <Stat label="Your seats" value="1 of 6" />
                 <Stat label="Status" value="In storage" />
                 <Stat label="Days used (yr)" value="8 / 50" />
                 <Stat label="Miles used (yr)" value="658 / 4,000" />
@@ -131,14 +131,14 @@ export default async function MyVehiclePage({
       {/* Costs */}
       <Section id="costs" title="Costs" alt>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <BigStat label="Annual cost / share" value={formatUSD(v.annualOpCost)} sub="All-in" />
+          <BigStat label="Annual cost / seat" value={formatUSD(v.annualOpCost)} sub="All-in" />
           <BigStat label="Effective $/day" value={formatUSD(v.effectiveDailyCost)} sub="50 days/yr usage" />
           <BigStat label="Maintenance reserve" value={formatUSD(8_400)} sub="LLC balance" />
         </div>
         <div className="mt-10">
-          <h3 className="font-display text-lg text-ink">Annual breakdown (your share)</h3>
+          <h3 className="font-display text-lg text-ink">Annual breakdown (your seat)</h3>
           <ul className="mt-4 space-y-2 text-sm">
-            <Line label="Share price (one-time)" value={formatUSD(v.pricePerShare)} note="Paid Mar 18, 2026" />
+            <Line label="Seat buy-in (one-time)" value={formatUSD(v.pricePerShare)} note="Paid Mar 18, 2026" />
             <Line label="Management fee" value={formatUSD(6_800)} note="Billed quarterly" />
             <Line label="Insurance" value={formatUSD(3_200)} note="Annual" />
             <Line label="Maintenance reserve" value={formatUSD(1_800)} note="Held at LLC" />
@@ -150,7 +150,7 @@ export default async function MyVehiclePage({
           <ul className="mt-4 divide-y divide-rule rounded-xl border border-rule bg-surface">
             <Pmt label="Q1 2026 management fee" value="$1,700" date="Apr 1" status="Paid" />
             <Pmt label="Annual insurance" value="$3,200" date="Mar 18" status="Paid" />
-            <Pmt label="Share purchase" value="$56,667" date="Mar 18" status="Paid" />
+            <Pmt label="Co-ownership buy-in" value="$56,667" date="Mar 18" status="Paid" />
           </ul>
         </div>
         <div className="mt-10">
@@ -212,7 +212,7 @@ export default async function MyVehiclePage({
           </div>
         </div>
         <p className="mt-4 text-xs text-mute">
-          Fair-use rules: max 7 consecutive days per share in high season,
+          Fair-use rules: max 7 consecutive days per seat in high season,
           14 in low season.
         </p>
       </Section>
@@ -240,7 +240,7 @@ export default async function MyVehiclePage({
         <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <Owner initials="RG" prof="Founder · Miami" badge="You" lead={isLead} />
           <Owner initials="ML" prof="Tech founder · Miami" />
-          <Owner initials="SK" prof="Investor · LA" />
+          <Owner initials="SK" prof="Founding member · LA" />
           <Owner initials="DM" prof="Real estate · NYC" />
           <Owner initials="JP" prof="Hospitality · Miami" />
           <Owner initials="TR" prof="Logistics · Miami" />
@@ -292,7 +292,7 @@ export default async function MyVehiclePage({
             />
             <SettingCard
               title="Co-owner management"
-              desc="View ownership map. Initiate share-listing for sale."
+              desc="View the LLC member register. Signal intent to transfer your seat."
             />
             <SettingCard
               title="Post an update"
