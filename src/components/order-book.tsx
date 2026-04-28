@@ -3,10 +3,10 @@ import { Vehicle, formatUSD } from "@/lib/market-data";
 type Order = { price: number; size: number };
 
 // Deterministic order book per vehicle. Real liquidity is sparse on a
-// 6-share LLC — we show 3 ask levels (sell side) and 3 bid levels (buy
-// side) clustered around the current price. Same vehicle always produces
-// the same book, so reloading doesn't reshuffle.
-function buildOrderBook(v: Vehicle): { asks: Order[]; bids: Order[] } {
+// 6-share LLC — we show 4 ask levels and 4 bid levels clustered around
+// the current price. Same vehicle always produces the same book, so
+// reloading doesn't reshuffle.
+function buildOrderBook(v: Vehicle): { asks: Order[]; bids: Order[]; last: number } {
   const mid = v.pricePerShare;
   const seed = symbolSeed(v.symbol);
 
@@ -16,85 +16,92 @@ function buildOrderBook(v: Vehicle): { asks: Order[]; bids: Order[] } {
 
   const asks: Order[] = [
     { price: roundPrice(mid * (1 + askJitter)), size: 1 },
-    { price: roundPrice(mid * (1 + askJitter + 0.006)), size: 1 },
-    { price: roundPrice(mid * (1 + askJitter + 0.014)), size: pickSize(seed, 3) },
+    { price: roundPrice(mid * (1 + askJitter + 0.005)), size: 1 },
+    { price: roundPrice(mid * (1 + askJitter + 0.012)), size: pickSize(seed, 3) },
+    { price: roundPrice(mid * (1 + askJitter + 0.022)), size: pickSize(seed, 4) },
   ];
 
   const bids: Order[] = [
     { price: roundPrice(mid * (1 - bidJitter)), size: 1 },
-    { price: roundPrice(mid * (1 - bidJitter - 0.006)), size: 1 },
-    { price: roundPrice(mid * (1 - bidJitter - 0.014)), size: pickSize(seed, 4) },
+    { price: roundPrice(mid * (1 - bidJitter - 0.005)), size: 1 },
+    { price: roundPrice(mid * (1 - bidJitter - 0.012)), size: pickSize(seed, 5) },
+    { price: roundPrice(mid * (1 - bidJitter - 0.022)), size: pickSize(seed, 6) },
   ];
 
-  return { asks, bids };
+  return { asks, bids, last: v.pricePerShare };
 }
 
 export function OrderBook({ vehicle }: { vehicle: Vehicle }) {
-  const { asks, bids } = buildOrderBook(vehicle);
+  const { asks, bids, last } = buildOrderBook(vehicle);
   const lowestAsk = asks[0].price;
   const highestBid = bids[0].price;
   const spread = lowestAsk - highestBid;
-  const spreadPct = (spread / lowestAsk) * 100;
 
-  // Max size across both sides drives the relative depth bar widths.
-  const maxSize = Math.max(...asks.map((a) => a.size), ...bids.map((b) => b.size));
+  // Max total$ across both sides drives the relative depth bar widths.
+  const allTotals = [...asks, ...bids].map((o) => o.price * o.size);
+  const maxTotal = Math.max(...allTotals);
+
+  // Render asks high → low so the lowest ask sits next to the spread.
+  const askRows = [...asks].reverse();
+  const bidRows = bids;
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-rule bg-surface">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-rule bg-cream-2/40 px-5 py-3">
-        <p className="font-display text-base text-ink">Order book</p>
-        <div className="flex items-center gap-3 text-[11px] text-mute">
-          <span className="flex items-center gap-1.5">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#00C805]" />
-            Live · member-to-member
+    <div className="relative overflow-hidden rounded-2xl border border-rule bg-surface">
+      {/* Column headers */}
+      <div className="grid grid-cols-12 border-b border-rule px-5 py-3 text-[10px] font-medium uppercase tracking-[0.15em] text-mute">
+        <div className="col-span-4">Price</div>
+        <div className="col-span-4 text-right">Shares</div>
+        <div className="col-span-4 text-right">Total</div>
+      </div>
+
+      {/* Asks */}
+      <div className="relative">
+        {/* Asks pill — floating on the left edge, vertically centered on the
+            row group, near the spread (bottom of the asks block). */}
+        <div className="pointer-events-none absolute bottom-2 left-3 z-10">
+          <span className="rounded-full bg-[#DC2626] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-white">
+            Asks
           </span>
         </div>
-      </div>
-
-      {/* Column headers */}
-      <div className="grid grid-cols-12 gap-2 border-b border-rule px-5 py-2 text-[10px] font-medium uppercase tracking-wider text-mute">
-        <div className="col-span-4">Price</div>
-        <div className="col-span-3 text-right">Shares</div>
-        <div className="col-span-5 text-right">Total</div>
-      </div>
-
-      {/* Asks (sell side) — high → low so the lowest ask sits next to the spread */}
-      <div className="divide-y divide-rule/60">
-        {[...asks].reverse().map((o, i) => (
+        {askRows.map((o, i) => (
           <BookRow
             key={`a-${i}`}
             order={o}
             side="ask"
-            depthPct={(o.size / maxSize) * 100}
+            depthPct={((o.price * o.size) / maxTotal) * 100}
           />
         ))}
       </div>
 
-      {/* Spread */}
-      <div className="flex items-center justify-between border-y border-rule bg-cream-2/40 px-5 py-3 text-[11px]">
-        <span className="font-medium uppercase tracking-wider text-mute">Spread</span>
-        <span className="tabular-nums text-ink-soft">
-          {formatUSD(Math.round(spread))} ({spreadPct.toFixed(2)}%)
+      {/* Spread / last */}
+      <div className="grid grid-cols-3 items-center border-y border-rule bg-cream-2/40 px-5 py-2.5 text-[11px] tracking-wider text-mute">
+        <span className="text-left">
+          Last: <span className="text-ink-soft tabular-nums">{formatUSD(last)}</span>
         </span>
+        <span className="text-center">
+          Spread:{" "}
+          <span className="text-ink-soft tabular-nums">{formatUSD(Math.round(spread))}</span>
+        </span>
+        <span />
       </div>
 
-      {/* Bids (buy side) — high → low so the highest bid sits next to the spread */}
-      <div className="divide-y divide-rule/60">
-        {bids.map((o, i) => (
+      {/* Bids */}
+      <div className="relative">
+        {/* Bids pill — floating on the left edge, near the spread (top of the
+            bids block). */}
+        <div className="pointer-events-none absolute left-3 top-2 z-10">
+          <span className="rounded-full bg-[#00A300] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-white">
+            Bids
+          </span>
+        </div>
+        {bidRows.map((o, i) => (
           <BookRow
             key={`b-${i}`}
             order={o}
             side="bid"
-            depthPct={(o.size / maxSize) * 100}
+            depthPct={((o.price * o.size) / maxTotal) * 100}
           />
         ))}
-      </div>
-
-      {/* Footer note */}
-      <div className="border-t border-rule bg-cream-2/40 px-5 py-3 text-[11px] text-mute">
-        {asks.reduce((n, o) => n + o.size, 0)} share{asks.reduce((n, o) => n + o.size, 0) !== 1 ? "s" : ""} offered ·{" "}
-        {bids.reduce((n, o) => n + o.size, 0)} bid · 12-month minimum hold applies to new buyers.
       </div>
     </div>
   );
@@ -111,23 +118,27 @@ function BookRow({
 }) {
   const total = order.price * order.size;
   const color = side === "ask" ? "#DC2626" : "#00A300";
-  const tintColor = side === "ask" ? "rgba(220, 38, 38, 0.08)" : "rgba(0, 200, 5, 0.08)";
+  const tintColor =
+    side === "ask" ? "rgba(220, 38, 38, 0.10)" : "rgba(0, 200, 5, 0.10)";
 
   return (
-    <div className="relative grid grid-cols-12 items-center gap-2 px-5 py-2 text-sm">
-      {/* Depth bar — anchored to the right, expands left */}
+    <div className="relative grid grid-cols-12 items-center px-5 py-2.5 text-sm">
+      {/* Depth bar — anchored LEFT, expands right */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-y-0 right-0"
+        className="pointer-events-none absolute inset-y-0 left-0"
         style={{ width: `${depthPct}%`, background: tintColor }}
       />
-      <div className="relative col-span-4 font-medium tabular-nums" style={{ color }}>
+      <div
+        className="relative col-span-4 pl-12 font-medium tabular-nums"
+        style={{ color }}
+      >
         {formatUSD(order.price)}
       </div>
-      <div className="relative col-span-3 text-right tabular-nums text-ink-soft">
-        {order.size}
+      <div className="relative col-span-4 text-right tabular-nums text-ink-soft">
+        {order.size.toFixed(0)}.00
       </div>
-      <div className="relative col-span-5 text-right tabular-nums text-ink-soft">
+      <div className="relative col-span-4 text-right tabular-nums text-ink-soft">
         {formatUSD(total)}
       </div>
     </div>
