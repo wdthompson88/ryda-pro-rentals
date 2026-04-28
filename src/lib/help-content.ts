@@ -158,6 +158,108 @@ export const HELP: HelpCategory[] = [
           },
         ],
       },
+      {
+        slug: "rental-vs-ownership",
+        q: "Should I rent or buy a share?",
+        summary:
+          "Rent first to test the experience and the specific vehicle. Buy a share when usage exceeds ~10 days a year and you want equity, priority, and lower per-day economics.",
+        body: [
+          { type: "h3", text: "Rent if any of these apply" },
+          {
+            type: "ul",
+            items: [
+              "You drive a supercar fewer than 10 days per year.",
+              "You don't want long-term commitment to a specific vehicle.",
+              "You're testing whether the platform actually fits your life before committing capital.",
+              "You want to swap between different makes (Ferrari one weekend, McLaren another) instead of holding one.",
+            ],
+          },
+          { type: "h3", text: "Buy a share if any of these apply" },
+          {
+            type: "ul",
+            items: [
+              "You want 30+ days a year of usage and the rental math no longer pencils.",
+              "You want priority access during peak season (F1, Art Basel, summer weekends).",
+              "You want a real claim on the asset — equity that participates in any appreciation.",
+              "You're a car enthusiast who wants the relationship with one specific vehicle.",
+            ],
+          },
+          { type: "h3", text: "Per-day comparison" },
+          {
+            type: "p",
+            text: "On a co-owned Ferrari 296 GTB at $56K per share with 50 days entitlement, the effective daily cost works out to about $236/day. The rental rate on the same vehicle is $2,500/day. If you'll drive 15+ days a year, ownership pays for itself.",
+          },
+          {
+            type: "callout",
+            tone: "info",
+            text: "Many members rent first, then convert that experience into a share purchase on the same vehicle. We credit a portion of recent rental payments toward the share purchase price, capped at 30 days.",
+          },
+        ],
+      },
+      {
+        slug: "founding-member-benefits",
+        q: "What do founding-100 members get?",
+        summary:
+          "Locked-for-life membership pricing ($350 Blue / $1,000 Black), founding-100 badge, priority on first vehicle launches, member-event access, and reduced share-purchase friction.",
+        body: [
+          { type: "h3", text: "Pricing locked for life" },
+          {
+            type: "p",
+            text: "The first 100 members lock in $350/year for Blue tier or $1,000/year for Black tier — for as long as they hold continuous membership. Standard pricing is $500 and $1,500 respectively, so over a 10-year horizon a Black founding member saves $5,000.",
+          },
+          { type: "h3", text: "Priority on launch fleet" },
+          {
+            type: "p",
+            text: "Founding-100 members get first-look on every new vehicle that joins the fleet. They see the listing 7 days before it goes public, with priority on share allocation. Particularly valuable for limited-production vehicles where shares move quickly.",
+          },
+          { type: "h3", text: "Other founding benefits" },
+          {
+            type: "ul",
+            items: [
+              "Founding-100 badge on member directory and event invitations.",
+              "Reduced KYC friction (single accreditation review carries across multiple share purchases).",
+              "Invitation to RYDA's annual founding-member dinner.",
+              "Direct line to RYDA founders for product feedback during the launch year.",
+            ],
+          },
+          {
+            type: "p",
+            text: "Founding-100 status is non-transferable. If you cancel and re-enroll, you re-enroll at standard pricing.",
+          },
+        ],
+      },
+      {
+        slug: "share-financing",
+        q: "Can I finance a share purchase?",
+        summary:
+          "Yes — through a third-party lender (Marcus, LightStream, or specialty exotic-car finance). RYDA itself doesn't lend. Shares are securities, so margin/securities lending rules apply.",
+        body: [
+          {
+            type: "p",
+            text: "RYDA does not finance share purchases directly. But shares are eligible collateral for several types of financing through third parties:",
+          },
+          { type: "h3", text: "Personal unsecured loan" },
+          {
+            type: "p",
+            text: "Many members use unsecured personal loans (Marcus, LightStream, SoFi) to fund a share. Rates are typically 7–14% APR for high-credit borrowers. The share itself isn't pledged — the loan is just personal credit.",
+          },
+          { type: "h3", text: "Securities-backed line of credit" },
+          {
+            type: "p",
+            text: "If you have a brokerage account at Schwab, Fidelity, or Morgan Stanley, you may already have access to a securities-backed line of credit at lower rates (5–8% APR). This is often the cheapest path. Talk to your wealth manager.",
+          },
+          { type: "h3", text: "Specialty exotic-car finance" },
+          {
+            type: "p",
+            text: "Putnam Leasing, Premier Financial, and a few specialty lenders offer purpose-built financing for fractional vehicle interests. Higher rates (8–15%) but they understand the asset class.",
+          },
+          {
+            type: "callout",
+            tone: "warn",
+            text: "Financing increases your risk. Vehicles depreciate; shares aren't guaranteed to hold value. Don't borrow more than you'd be comfortable losing if the vehicle resold below the purchase price.",
+          },
+        ],
+      },
     ],
   },
 
@@ -353,6 +455,128 @@ export const HELP: HelpCategory[] = [
           },
         ],
       },
+      {
+        slug: "gifting-and-inheritance",
+        q: "Can I gift a share or pass it to my heirs?",
+        summary:
+          "Gifts to a verified RYDA member: yes, with a transfer of the membership interest. Inheritance: yes — your share passes to your estate per your will or trust, then to your heirs after they verify.",
+        body: [
+          { type: "h3", text: "Lifetime gifts" },
+          {
+            type: "p",
+            text: "You can transfer a share to a family member as a gift, but the recipient has to clear RYDA's standard verification (KYC, accreditation, driving record) before the transfer completes. The 3% transfer fee is waived for first-degree family transfers (spouse, children, parents, siblings).",
+          },
+          { type: "h3", text: "Inheritance and estate transfer" },
+          {
+            type: "p",
+            text: "When a co-owner dies, the share is part of their estate and passes per their will or trust. The estate can either liquidate the share on the secondary market (transfer fee waived for estate liquidations) or transfer it to a named heir. Heirs must complete RYDA verification before the share transfers.",
+          },
+          { type: "h3", text: "If no heir wants it" },
+          {
+            type: "p",
+            text: "The estate can list the share on the secondary market for sale, or — at the estate's request — RYDA may bid in for liquidity at fair-market value.",
+          },
+          {
+            type: "callout",
+            tone: "info",
+            text: "Talk to your estate attorney about how to title the share. Many members hold shares through a revocable trust to simplify transfer at death — RYDA accepts trust ownership.",
+          },
+        ],
+      },
+      {
+        slug: "whole-vs-fractional",
+        q: "How does this compare to buying a car outright?",
+        summary:
+          "You give up exclusive use, but cut your capital outlay 6×, eliminate operational overhead entirely, and gain liquidity. The math works for owners who'd drive less than 50–80 days a year solo.",
+        body: [
+          { type: "h3", text: "Capital" },
+          {
+            type: "p",
+            text: "A solo Ferrari 296 GTB is $340,000 plus tax (~$365K all-in). A 1/6 share is roughly $57,000. Same vehicle, six times less capital tied up in a depreciating asset.",
+          },
+          { type: "h3", text: "Annual carrying cost" },
+          {
+            type: "ul",
+            items: [
+              "Solo: $80,000+/year (insurance ~$15K, storage ~$8K, maintenance ~$10K, depreciation ~$45K, taxes/registration ~$2K).",
+              "Co-owned: ~$11,800/year per share — covers everything (your share of insurance, storage, scheduled maintenance, and reserves).",
+            ],
+          },
+          { type: "h3", text: "What you trade away" },
+          {
+            type: "p",
+            text: "Three things: exclusive use of the vehicle (you share with 5–7 other co-owners), unilateral decision-making (modifications and sale require co-owner vote), and the 'always there' factor (the car isn't always physically yours).",
+          },
+          { type: "h3", text: "What you gain" },
+          {
+            type: "ul",
+            items: [
+              "Liquidity. Sell on the secondary market in days, not the months it takes to sell a private exotic.",
+              "Operational ease. RYDA handles every layer — insurance renewals, service appointments, storage, registration, claims.",
+              "Diversification. Same capital that buys one Ferrari can buy a Ferrari share, a McLaren share, and a Lamborghini share.",
+            ],
+          },
+          {
+            type: "p",
+            text: "Bottom line: if you'd drive a solo-owned exotic 50+ days a year and you love the operational responsibility, buy outright. If you'd drive 10–50 days a year and prefer to outsource the rest, share.",
+          },
+        ],
+      },
+      {
+        slug: "llc-default",
+        q: "What if a co-owner stops paying?",
+        summary:
+          "The Operating Agreement has remedies — typically a 30-day cure period, then forced sale of the delinquent share. RYDA's reserve covers operations during cure so other owners are unaffected.",
+        body: [
+          { type: "h3", text: "Cure period" },
+          {
+            type: "p",
+            text: "If a co-owner misses a quarterly management fee or a special assessment, the LLC's Operating Agreement triggers a 30-day cure period. The delinquent member receives written notice and has 30 days to make the payment plus a small late fee.",
+          },
+          { type: "h3", text: "If they don't cure" },
+          {
+            type: "p",
+            text: "The LLC can force sale of the delinquent share through the secondary market at fair-market value. Proceeds first cover the unpaid amount, then any LLC-level transaction costs, then the rest goes to the former member. The remaining co-owners aren't on the hook for the unpaid amount — the share itself secures the obligation.",
+          },
+          { type: "h3", text: "Why it doesn't disrupt operations" },
+          {
+            type: "p",
+            text: "RYDA maintains a vehicle-level operating reserve at the LLC (built into the 12% management fee) that covers ongoing operating costs during a delinquency-and-cure cycle. So while the legal process plays out, the vehicle stays insured, stored, and bookable for the other co-owners.",
+          },
+          {
+            type: "callout",
+            tone: "info",
+            text: "Forced sales are rare. Across comparable Swiss platforms (Supercar Sharing AG), default rates over 10+ years have been under 1%.",
+          },
+        ],
+      },
+      {
+        slug: "share-count-changes",
+        q: "Can a vehicle's share count change after launch?",
+        summary:
+          "No — share count is fixed at LLC formation. New shares cannot be added later. Existing co-owners can buy each other out, but the total share count stays the same.",
+        body: [
+          {
+            type: "p",
+            text: "When a vehicle's LLC is formed, the share count is set permanently in the Operating Agreement (typically 6, sometimes 8 for higher-value vehicles). This is by design — letting RYDA issue more shares later would dilute existing co-owners.",
+          },
+          { type: "h3", text: "Why it's fixed" },
+          {
+            type: "ul",
+            items: [
+              "Protects existing members from dilution.",
+              "Provides predictable usage entitlement (50 days = 365 ÷ 6 with margin for service and downtime).",
+              "Keeps the co-owner group small enough to coordinate.",
+              "Aligns with how the SEC views consistent terms in a Reg D 506(c) offering.",
+            ],
+          },
+          { type: "h3", text: "Buyouts within the same LLC" },
+          {
+            type: "p",
+            text: "Existing co-owners can buy each other out at any time. If one member sells two shares to another member, the total is still 6 — just held differently. This is how members consolidate larger positions in a vehicle they love.",
+          },
+        ],
+      },
     ],
   },
 
@@ -541,6 +765,127 @@ export const HELP: HelpCategory[] = [
           },
         ],
       },
+      {
+        slug: "out-of-state-travel",
+        q: "Can I take the car out of state?",
+        summary:
+          "Within the contiguous US, with notice. Inter-market transit between RYDA cities is built-in. Outside the operating market, advance approval and an extended-trip rider apply.",
+        body: [
+          { type: "h3", text: "Day trips and same-state travel" },
+          {
+            type: "p",
+            text: "Day trips and overnight travel within the home state of the vehicle are unrestricted — drive to the Keys from Miami, drive Pacific Coast Highway out of LA, take a vehicle from NYC up to the Hamptons. No special permission needed.",
+          },
+          { type: "h3", text: "Inter-market transit" },
+          {
+            type: "p",
+            text: "Members in good standing can request inter-market transit with 14+ days notice — say, taking a Miami-based Ferrari to LA for a week. RYDA arranges enclosed transport (member-paid) or escorts a road-trip drive. Insurance follows the vehicle automatically.",
+          },
+          { type: "h3", text: "Long-distance road trips" },
+          {
+            type: "p",
+            text: "Trips of 500+ miles or 5+ days outside the home market require an extended-trip rider on the insurance and a route filing with RYDA Operations. We don't restrict the trip — we just document it for coverage. Approval typically takes 2–3 days.",
+          },
+          {
+            type: "callout",
+            tone: "warn",
+            text: "Mexican and Canadian border crossings are not permitted on insurance. Period. If you want to cross either border, contact us — we may be able to arrange specific vehicle and rider combinations, but it's a separate process.",
+          },
+        ],
+      },
+      {
+        slug: "weather-and-storms",
+        q: "What if there's a hurricane during my booking?",
+        summary:
+          "If a NOAA-named storm tracks toward the operating market, RYDA recalls vehicles to indoor storage and issues full refunds for affected bookings. Members are not charged.",
+        body: [
+          { type: "h3", text: "Hurricane protocol" },
+          {
+            type: "p",
+            text: "Once NOAA issues a hurricane watch or warning for the operating market, RYDA Operations recalls all currently-booked vehicles to climate-controlled indoor storage. Pickup arrangements happen through Concierge — typically a transport driver picks up the vehicle from your location.",
+          },
+          { type: "h3", text: "Refunds and rebooking" },
+          {
+            type: "ul",
+            items: [
+              "Bookings during the storm window get full refund: days return to your annual budget, and you're not charged for any prep or delivery.",
+              "Rebooking priority post-storm: members affected by the recall get first-look on the rebooked dates within the same season.",
+              "If your home is in the storm path and you need to evacuate, the vehicle still has to be returned. We coordinate.",
+            ],
+          },
+          { type: "h3", text: "Other weather" },
+          {
+            type: "p",
+            text: "Standard rain, snow, hail are at member discretion — drive carefully or return early if conditions deteriorate. Hail damage during a booking is comprehensive coverage (low deductible). Salt-belt winter driving is allowed but creates extra detail and inspection cost on return.",
+          },
+        ],
+      },
+      {
+        slug: "airport-and-valet",
+        q: "Can I park it at an airport or hotel valet?",
+        summary:
+          "Indoor airport parking is fine. Hotel valet is fine for nice hotels. Off-airport surface lots and standard hotel self-park are not allowed under the policy.",
+        body: [
+          { type: "h3", text: "Airports" },
+          {
+            type: "p",
+            text: "Indoor (covered, secured) airport parking is allowed. Most major airports offer it — MIA Premium Parking, LAX Premier, JFK Premium Parking. Off-airport surface lots are not permitted because they lack security and weather protection.",
+          },
+          { type: "h3", text: "Hotels and restaurants" },
+          {
+            type: "ul",
+            items: [
+              "Hotel valet at four- or five-star hotels: yes, fine.",
+              "Restaurant valet at established venues: yes, fine.",
+              "Hotel self-park garages: depends on the facility. Indoor and secured = yes; outdoor = no.",
+              "Street parking: short-term only, monitored, in safe areas. Overnight street parking is not allowed under the policy.",
+            ],
+          },
+          { type: "h3", text: "What if something happens to it in valet" },
+          {
+            type: "p",
+            text: "Valet damage is covered by the venue's garage-keepers liability first, then by the RYDA insurance policy as backup. Photograph the vehicle's condition both at handover to valet and at retrieval — it makes any claim 10× easier.",
+          },
+        ],
+      },
+      {
+        slug: "lost-keys",
+        q: "What if I lose the key fob?",
+        summary:
+          "Call Concierge immediately. Replacement keys for exotics range $1,500–$8,000 and require dealer programming. The lost-key fee comes out of the responsible member.",
+        body: [
+          { type: "h3", text: "Immediately" },
+          {
+            type: "p",
+            text: "Call RYDA Concierge as soon as you realize the key is missing. We'll dispatch a spare via secured courier so you can complete or end your booking. If the vehicle is in a public location, we'll arrange retrieval first.",
+          },
+          { type: "h3", text: "Replacement cost" },
+          {
+            type: "p",
+            text: "Exotic key fobs are expensive and have to be programmed by the manufacturer dealer:",
+          },
+          {
+            type: "ul",
+            items: [
+              "Ferrari: $2,500–$4,000 per fob plus dealer programming.",
+              "Lamborghini: $1,500–$3,000.",
+              "McLaren: $2,000–$4,000.",
+              "Rolls-Royce: $3,000–$8,000 depending on model and trim.",
+              "Aston Martin: $1,500–$3,500.",
+            ],
+          },
+          { type: "h3", text: "Who pays" },
+          {
+            type: "p",
+            text: "The member responsible for the loss covers the replacement cost. We charge it via your default payment method. If you find the key after we've ordered the replacement, you keep the spare set — most members appreciate having one for future bookings.",
+          },
+          {
+            type: "callout",
+            tone: "info",
+            text: "Trick that helps: most fobs have a tile/airtag-style tracker compatibility. We'll happily attach an AirTag or Tile to any fob you're using on a long booking.",
+          },
+        ],
+      },
     ],
   },
 
@@ -699,6 +1044,109 @@ export const HELP: HelpCategory[] = [
           },
         ],
       },
+      {
+        slug: "unauthorized-driver",
+        q: "What if my friend drives the car?",
+        summary:
+          "Don't. Letting an unauthorized driver behind the wheel voids the insurance policy entirely. The financial liability is yours. It's also grounds for membership review.",
+        body: [
+          {
+            type: "p",
+            text: "The insurance policy specifies who is covered to drive each vehicle: the verified primary co-owner, plus any verified secondary household driver added to the policy. Anyone else is uninsured — including your friend, your business partner, your significant other unless they're added.",
+          },
+          { type: "h3", text: "If an unauthorized driver gets in an accident" },
+          {
+            type: "ul",
+            items: [
+              "The insurance policy doesn't pay. Period.",
+              "All third-party damages (other vehicles, property, injuries) are personally yours.",
+              "Vehicle damage is yours to pay for at full repair cost.",
+              "RYDA may review your membership and request you list your share for sale.",
+            ],
+          },
+          { type: "h3", text: "How to add an authorized driver legitimately" },
+          {
+            type: "p",
+            text: "Adding a household secondary driver (spouse, partner, adult child living with you) is a $250/year add-on. The secondary driver clears the same identity and driving record check as the primary. Once added, they can drive on the same coverage. Non-household drivers cannot be added.",
+          },
+          {
+            type: "callout",
+            tone: "warn",
+            text: "We mean it. The 'just for a quick drive around the block' moment is when one accident wipes out years of saved cost. If your buddy wants to drive, get them a RYDA rental booking — that takes 5 minutes, costs a daily rate, and is fully insured.",
+          },
+        ],
+      },
+      {
+        slug: "passenger-injury",
+        q: "What if a passenger gets hurt?",
+        summary:
+          "Passenger medical and bodily injury are covered by the $1M liability policy. Your personal auto medical-payments coverage (PIP/Medpay) may also apply.",
+        body: [
+          {
+            type: "p",
+            text: "Passenger injuries are a real risk in any vehicle, especially exotics where an at-fault crash can produce significant injury claims.",
+          },
+          { type: "h3", text: "What the RYDA policy covers" },
+          {
+            type: "ul",
+            items: [
+              "Passenger bodily injury caused by the vehicle owner's negligence: covered under the $1M third-party liability.",
+              "Passenger medical bills if at-fault: covered up to policy limits, claims filed by RYDA on behalf of the LLC.",
+              "Passenger UM/UIM if not at-fault and the other party is uninsured: covered up to $500K per the UM policy.",
+            ],
+          },
+          { type: "h3", text: "What it doesn't cover" },
+          {
+            type: "ul",
+            items: [
+              "Injuries caused by your own willful misuse (street racing, intoxication, etc.).",
+              "Pre-existing conditions of the passenger.",
+            ],
+          },
+          { type: "h3", text: "Practical advice" },
+          {
+            type: "p",
+            text: "If a passenger is hurt during a booking, call 911 first, then RYDA Concierge. Don't move them unless safety requires it. Don't admit fault. Document everything as you would any accident scene — the insurance carrier handles the rest.",
+          },
+        ],
+      },
+      {
+        slug: "voids-coverage",
+        q: "What voids my insurance coverage?",
+        summary:
+          "DUI, racing on public roads, unauthorized drivers, off-track motorsport, commercial use, intentional damage, fraud — anything outside the policy's stated use voids coverage.",
+        body: [
+          {
+            type: "p",
+            text: "The insurance is built on the assumption that the vehicle is being used for legitimate personal driving by a verified, sober, licensed driver. Step outside that frame and coverage stops.",
+          },
+          { type: "h3", text: "What automatically voids coverage" },
+          {
+            type: "ul",
+            items: [
+              "Driving under the influence of alcohol or drugs (any state's legal limit).",
+              "Street racing, drag racing, or aggressive contests on public roads.",
+              "Letting an unauthorized driver behind the wheel.",
+              "Off-track motorsport (drift events, autocross without proper rider, hill climbs).",
+              "Commercial use: ride-share, paid passenger transport, delivery, photoshoot for compensation without prior approval.",
+              "Driving outside the geographic area defined in the policy (Mexico, Canada, etc.).",
+              "Intentional damage to the vehicle or third-party property.",
+              "Failing to obtain medical attention when required at an accident scene (some carriers).",
+              "Fraudulent claims or misrepresentation of facts.",
+            ],
+          },
+          { type: "h3", text: "Track days are different" },
+          {
+            type: "p",
+            text: "Sanctioned track days WITH the track-day rider are explicitly covered. Track days without the rider void coverage for that booking. The rider has to be booked in advance — you can't add it the morning of an event.",
+          },
+          {
+            type: "callout",
+            tone: "warn",
+            text: "If you're not sure whether something voids coverage, ask Concierge first. The cost of a 5-minute conversation is much lower than a denied claim.",
+          },
+        ],
+      },
     ],
   },
 
@@ -848,6 +1296,95 @@ export const HELP: HelpCategory[] = [
           {
             type: "p",
             text: "Black tier members get included white-glove delivery — vehicle is delivered to your Miami address, fueled and prepped, and picked up at the end of the booking.",
+          },
+        ],
+      },
+      {
+        slug: "manufacturer-warranty",
+        q: "How is the manufacturer warranty preserved?",
+        summary:
+          "All scheduled service goes through the authorized manufacturer dealer, on-time, with full documentation. Warranty stays intact for the vehicle's full coverage period.",
+        body: [
+          { type: "h3", text: "Why it matters" },
+          {
+            type: "p",
+            text: "Manufacturer warranties cover major mechanical failures (engine, transmission, electronics) and are worth tens of thousands on exotic vehicles. They have strict requirements: scheduled service must happen on-time, at authorized dealers, with original-equipment parts.",
+          },
+          { type: "h3", text: "How RYDA preserves it" },
+          {
+            type: "ul",
+            items: [
+              "Every service appointment is at the authorized dealer (Ferrari of Miami, McLaren of Beverly Hills, etc.) — never independent shops or quick-lube chains.",
+              "Service intervals are tracked and scheduled proactively. Vehicles never go past the manufacturer's recommended interval.",
+              "Original-equipment parts only on warranty-covered components. No aftermarket substitutions.",
+              "All service records are retained in the LLC's permanent file and re-certified annually.",
+            ],
+          },
+          { type: "h3", text: "What can void warranty" },
+          {
+            type: "p",
+            text: "Track use without manufacturer-approved track-day documentation, aftermarket modifications to powertrain or electronics, or skipped service intervals. We don't allow any of these on RYDA fleet vehicles for this reason.",
+          },
+        ],
+      },
+      {
+        slug: "hurricane-prep",
+        q: "How does RYDA prepare vehicles for hurricane season?",
+        summary:
+          "All Miami fleet vehicles are stored in indoor, elevated, climate-controlled facilities. During named storms, additional storm shutters and continuous monitoring engage.",
+        body: [
+          { type: "h3", text: "Year-round" },
+          {
+            type: "p",
+            text: "All Miami vehicles are stored in indoor, climate-controlled facilities elevated above the FEMA flood zone. Standard storage conditions hold humidity at 45–55% and temperature at 68–72°F. Year-round, this protects against humidity-related corrosion, paint deterioration, and electronics issues.",
+          },
+          { type: "h3", text: "During hurricane season (June–November)" },
+          {
+            type: "ul",
+            items: [
+              "Daily NOAA monitoring; alerts trigger preparation protocols 96+ hours before landfall projections.",
+              "All vehicles relocated to interior bays, away from facility perimeter.",
+              "Storm shutters engage on all storage facility windows.",
+              "Backup generators tested and ready to maintain climate control during power outages.",
+              "Active member bookings during the warning window are recalled and refunded.",
+            ],
+          },
+          { type: "h3", text: "After the storm" },
+          {
+            type: "p",
+            text: "Each vehicle gets a post-storm inspection (humidity check, electronics test, full visual inspection) before bookings resume. Affected members get priority on rebooking.",
+          },
+        ],
+      },
+      {
+        slug: "ev-charging",
+        q: "How are EVs and hybrids charged and serviced?",
+        summary:
+          "Vehicles are returned to RYDA at 80%+ charge for EVs (or full fuel for hybrids). Members can opt in to home-delivered Level 2 charging during longer bookings.",
+        body: [
+          { type: "h3", text: "Standard EV handover" },
+          {
+            type: "p",
+            text: "Pure EVs (Porsche Taycan, Lucid Air Sapphire, Maserati GranTurismo Folgore) are delivered at 80–100% state of charge, prepped to the same standards as ICE vehicles. Members are asked to return them at 60% or higher to support the next member's experience.",
+          },
+          { type: "h3", text: "Hybrids" },
+          {
+            type: "p",
+            text: "Plug-in hybrids (Ferrari 296 GTB, McLaren Artura, Aston Valhalla) are delivered with a full battery and full fuel tank. Members can plug in at home overnight at any J1772 outlet — no special station required.",
+          },
+          { type: "h3", text: "Charging during longer bookings" },
+          {
+            type: "ul",
+            items: [
+              "RYDA can install a temporary Level 2 charger at your residence for stays of 7+ days. Removed at the end of the booking.",
+              "Public DC fast charging (Electrify America, EVgo) is paid via the vehicle's onboard credentials — no separate account needed.",
+              "Tesla Superchargers are available on most modern EVs via NACS adapter (provided in the trunk).",
+            ],
+          },
+          { type: "h3", text: "EV-specific service" },
+          {
+            type: "p",
+            text: "Battery health checks, software updates, and high-voltage component inspections happen on a separate annual schedule from the regular maintenance cycle. All performed at the manufacturer dealer.",
           },
         ],
       },
@@ -1017,6 +1554,78 @@ export const HELP: HelpCategory[] = [
           },
         ],
       },
+      {
+        slug: "referral-program",
+        q: "Is there a referral program?",
+        summary:
+          "Yes. Refer a member who completes membership: $500 credit. Refer a member who buys a share: $2,500 credit. Founding-100 members get 2× referral credits.",
+        body: [
+          { type: "h3", text: "Tiers" },
+          {
+            type: "ul",
+            items: [
+              "$500 credit when your referral becomes a paid member (Blue or Black).",
+              "$2,500 credit when your referral closes their first share purchase.",
+              "Founding-100 members earn 2× credits on every successful referral.",
+            ],
+          },
+          { type: "h3", text: "How to refer" },
+          {
+            type: "p",
+            text: "Account → Referral Program in your dashboard. Generate a unique link. Share it however you like — text, email, in person at a track day, social media (within RYDA's brand guidelines). When someone signs up through your link, the credit lands in your account at the qualifying milestone.",
+          },
+          { type: "h3", text: "What credits can be used for" },
+          {
+            type: "ul",
+            items: [
+              "Annual membership renewal.",
+              "Track-day rider fees.",
+              "Mileage overage charges.",
+              "Premium delivery upgrades.",
+              "Cannot be applied to share purchase price (Reg D 506(c) prohibits inducements that look like discounts on securities).",
+            ],
+          },
+          {
+            type: "p",
+            text: "Credits don't expire as long as you remain an active member. Cap of $25,000 in unused credits per account.",
+          },
+        ],
+      },
+      {
+        slug: "founding-pricing",
+        q: "What's the founding-100 pricing lock?",
+        summary:
+          "First 100 members lock in $350 Blue / $1,000 Black for life. As long as your membership stays active, the price never increases.",
+        body: [
+          {
+            type: "p",
+            text: "When RYDA launched, the first 100 members were eligible for permanently locked membership pricing at a $150–500 annual discount. The lock applies to the membership fee only — share purchase prices, management fees, and other charges are at standard rates.",
+          },
+          { type: "h3", text: "Locked rates" },
+          {
+            type: "ul",
+            items: [
+              "Founding Blue: $350/year, locked. (Standard $500/year.)",
+              "Founding Black: $1,000/year, locked. (Standard $1,500/year.)",
+              "10-year savings vs. standard pricing: $1,500 (Blue) or $5,000 (Black).",
+            ],
+          },
+          { type: "h3", text: "Status terms" },
+          {
+            type: "ul",
+            items: [
+              "The lock applies as long as your membership remains active and continuous.",
+              "If you cancel and re-enroll later, you re-enroll at standard pricing — founding status is non-recoverable.",
+              "Status is non-transferable. You can't sell or gift founding-100 status to another member.",
+              "Status carries through tier changes (e.g., upgrading from Blue to Black keeps your founding lock).",
+            ],
+          },
+          {
+            type: "p",
+            text: "All 100 founding seats are allocated by application order, with priority weighting for members in launch markets and members making early share commitments.",
+          },
+        ],
+      },
     ],
   },
 
@@ -1150,6 +1759,243 @@ export const HELP: HelpCategory[] = [
           },
         ],
       },
+      {
+        slug: "llc-dissolution",
+        q: "What if the LLC has to wind down?",
+        summary:
+          "Triggered by total loss, 75% co-owner vote, or insolvency. Vehicle is sold, debts paid, remaining proceeds distributed pro-rata. RYDA handles all paperwork.",
+        body: [
+          { type: "h3", text: "When dissolution happens" },
+          {
+            type: "ul",
+            items: [
+              "Total loss: vehicle is destroyed and the group doesn't elect to roll proceeds into a replacement.",
+              "Voluntary: a 75% co-owner vote elects to wind down (e.g., the group decides to exit the asset class).",
+              "Forced: the LLC becomes insolvent, or RYDA's manager finds operating the LLC no longer viable.",
+            ],
+          },
+          { type: "h3", text: "Sequence of events" },
+          {
+            type: "p",
+            text: "RYDA, as manager of the LLC, marshals assets (insurance proceeds or sale proceeds), pays outstanding liabilities (carrier balances, vendor invoices, taxes), and distributes the remainder pro-rata to co-owners according to their share count. Distribution happens within 60 days of the dissolution decision.",
+          },
+          { type: "h3", text: "Tax implications" },
+          {
+            type: "p",
+            text: "The dissolution generates a final K-1 for the year, including any gain or loss on the disposition. Co-owners report it on their personal tax returns. As always — talk to your CPA, RYDA does not provide tax advice.",
+          },
+        ],
+      },
+      {
+        slug: "dispute-resolution",
+        q: "How do disagreements between co-owners get resolved?",
+        summary:
+          "Most disagreements never escalate — RYDA Operations enforces the Operating Agreement consistently. For ones that do: mandatory mediation first, then arbitration in Delaware.",
+        body: [
+          { type: "h3", text: "Day-to-day governance" },
+          {
+            type: "p",
+            text: "RYDA acts as manager of the LLC, which means most operational decisions (scheduling, service, condition issues) are decided by the manager applying the Operating Agreement consistently. Co-owners aren't typically asked to settle disputes — RYDA does, by reference to the document.",
+          },
+          { type: "h3", text: "When co-owners disagree" },
+          {
+            type: "p",
+            text: "Material issues — sale, replacement, modification, or expulsion of a delinquent member — require a vote per the OA's threshold (typically 75%). If a vote fails to reach threshold, the status quo continues until a new vote is called.",
+          },
+          { type: "h3", text: "Formal disputes" },
+          {
+            type: "p",
+            text: "If a member believes the LLC, RYDA, or another member has materially breached the Operating Agreement, the OA requires:",
+          },
+          {
+            type: "ul",
+            items: [
+              "Written notice with 30 days for cure.",
+              "Mandatory mediation (60 days) with a Delaware-based mediator.",
+              "If mediation fails: binding arbitration in Wilmington, Delaware under AAA rules.",
+              "Litigation only as a last resort, with a Delaware forum-selection clause.",
+            ],
+          },
+          {
+            type: "callout",
+            tone: "info",
+            text: "Disputes are rare. The Operating Agreement is well-drafted, RYDA enforces consistently, and the small-group nature of co-ownership encourages co-owners to talk things out before formal escalation.",
+          },
+        ],
+      },
+    ],
+  },
+
+  // ── Vehicle use & etiquette ──────────────────────────────────────
+  {
+    slug: "vehicle-use",
+    icon: "★",
+    title: "Vehicle use & etiquette",
+    blurb:
+      "What you can and can't do behind the wheel. Aggressive driving, smoking, pets, road trips, car shows, kids in the cabin.",
+    articles: [
+      {
+        slug: "aggressive-driving",
+        q: "Can I track / drift / launch the car?",
+        summary:
+          "Sanctioned track days with the rider: yes. Drag strips, drift events, launch control on public roads: no. Spirited canyon driving: yes, within reason.",
+        body: [
+          { type: "h3", text: "What's allowed" },
+          {
+            type: "ul",
+            items: [
+              "Sanctioned track days (HPDE, club track day, manufacturer track event) on track-eligible vehicles WITH the track-day rider booked in advance.",
+              "Spirited driving on public roads — using the powerband, enjoying corners, normal performance driving within posted limits.",
+              "Launch control on a closed track. Multiple manufacturers (Ferrari, Lambo) actually require periodic use of launch control to keep transmission systems calibrated — but only on track or private property.",
+            ],
+          },
+          { type: "h3", text: "What's not allowed" },
+          {
+            type: "ul",
+            items: [
+              "Drag racing (sanctioned drag strips not eligible — manufacturer warranty issues + insurance coverage gap).",
+              "Drift events, gymkhana, autocross without proper rider and approval.",
+              "Sustained high-RPM driving on public roads (street racing, pace runs).",
+              "Launch control on public roads (insurance won't cover transmission damage from this).",
+              "Modifications to disable traction control, ABS, or stability systems.",
+            ],
+          },
+          { type: "h3", text: "Why we care" },
+          {
+            type: "p",
+            text: "Aggressive use damages the asset (clutch wear, brake wear, transmission stress) and the cost falls on all co-owners through the next round of valuations. Worse, it's a fast track to voiding warranty and insurance coverage. We're not anti-fun — we're pro-keeping-the-asset-valuable for everyone in the group.",
+          },
+        ],
+      },
+      {
+        slug: "smoking-pets-food",
+        q: "Smoking, pets, food — what's allowed?",
+        summary:
+          "No smoking, no vaping, no recreational substances. Small dogs in carriers OK with pre-approval. Food and drinks OK with care; spills are member-charged.",
+        body: [
+          { type: "h3", text: "Smoking and vaping" },
+          {
+            type: "p",
+            text: "No smoking, no vaping, no marijuana. Period. Smoke odor in an exotic interior is permanent — it requires full leather replacement to remove, which can run $15,000+. Detected smoking is a $5,000 cabin restoration fee plus potential membership review.",
+          },
+          { type: "h3", text: "Pets" },
+          {
+            type: "ul",
+            items: [
+              "Small dogs (under 25 lbs) in approved carriers: yes, with pre-booking notice.",
+              "Larger dogs, dogs not in carriers, or unrestrained pets: no.",
+              "Cats: case-by-case (most cats are stressed in cars and an anxious cat in a Ferrari is a bad outcome).",
+              "Other animals: no.",
+            ],
+          },
+          { type: "h3", text: "Food and drinks" },
+          {
+            type: "p",
+            text: "Food and drinks are allowed but discouraged — exotic interiors are typically Alcantara or hand-stitched leather, neither of which forgives spills. If you're going to eat or drink in the car, use sealed containers. Spills are charged at actual cleaning cost (typically $200–800).",
+          },
+          {
+            type: "callout",
+            tone: "info",
+            text: "Coffee in the cup holder: fine. Coffee from a paper cup with a flimsy lid going through a corner: bad idea. We've seen the receipts.",
+          },
+        ],
+      },
+      {
+        slug: "road-trips",
+        q: "Can I take the car on a road trip?",
+        summary:
+          "Yes — that's part of what these cars are for. Trips of 500+ miles or 5+ days file an extended-trip rider. Long-distance is a great use of a co-owned exotic.",
+        body: [
+          { type: "h3", text: "Why road trips work well" },
+          {
+            type: "p",
+            text: "Many of RYDA's most-used member experiences are road trips: Miami-to-Keys, LA-to-Sequoia, NYC-to-Newport. Modern exotics are surprisingly comfortable on long-distance — adaptive suspension, climate control, modern infotainment.",
+          },
+          { type: "h3", text: "What's needed" },
+          {
+            type: "ul",
+            items: [
+              "Trips of 500+ miles or 5+ days: file an extended-trip notification with Concierge 14 days in advance. Insurance documentation, route filing, mid-trip support pre-arranged.",
+              "Mileage budget: long road trips can eat into your annual 4,000-mile allotment. Plan accordingly or pay the $4/mile overage.",
+              "Cross-state borders: insurance covers all 50 contiguous states. Mexico and Canada need a separate process.",
+            ],
+          },
+          { type: "h3", text: "Practical advice from members" },
+          {
+            type: "ul",
+            items: [
+              "Plan fuel stops on premium-fuel station maps in advance — not every interstate exit has 93 octane.",
+              "Plan storage: hotels with secured indoor parking are dramatically nicer than hoping for street parking with a Lambo.",
+              "Bring a USB-C cable. Modern exotic infotainment is iPhone-default but cables are car-specific.",
+              "Tell Concierge ahead of time if you'll be far from cell coverage. They want to know if something happens.",
+            ],
+          },
+        ],
+      },
+      {
+        slug: "car-shows-photoshoots",
+        q: "Can I take the car to a car show or photoshoot?",
+        summary:
+          "Casual car meets and Sunday gatherings: yes. Featured display at major shows: pre-approval. Paid photoshoots or commercial use: requires approval and a separate rider.",
+        body: [
+          { type: "h3", text: "Casual car culture" },
+          {
+            type: "p",
+            text: "Bringing the car to a casual local meet, a coffee-and-cars Sunday, or a parking-lot gathering with friends: completely fine. This is part of why people own these cars. No special process.",
+          },
+          { type: "h3", text: "Major shows" },
+          {
+            type: "p",
+            text: "If the vehicle is going to be a featured display at a major event (Cars & Coffee Miami's main showcase, a manufacturer event, a museum exhibition), notify Concierge in advance. We'll coordinate a clean prep, possibly arrange transport, and confirm event-specific insurance considerations.",
+          },
+          { type: "h3", text: "Photoshoots — personal" },
+          {
+            type: "p",
+            text: "Personal photography (you, your friends, social media content) is fine. The car can be in the photo. We just ask you not to obscure RYDA branding if the vehicle has any (most don't).",
+          },
+          { type: "h3", text: "Photoshoots — paid or commercial" },
+          {
+            type: "ul",
+            items: [
+              "Paid photoshoots, brand collaborations, music video appearances, paid social posts: require advance approval and a commercial-use rider.",
+              "Commercial use voids the standard policy without the rider — meaning if the car is damaged during a paid shoot, the insurance won't pay.",
+              "RYDA Concierge can quote the commercial rider in 24 hours; cost is typically $750–2,500 per shoot day depending on use.",
+            ],
+          },
+        ],
+      },
+      {
+        slug: "kids-and-baby-seats",
+        q: "Can I install a child seat?",
+        summary:
+          "Yes, with care. Most modern exotics have ISOFIX/LATCH anchors. Don't damage the upholstery — use a seat protector. RYDA can install for you on Black tier.",
+        body: [
+          { type: "h3", text: "Where it works" },
+          {
+            type: "p",
+            text: "Most modern exotics (Ferrari 296 GTB, McLaren 720S, Lambo Urus, Aston DBX, Rolls-Royce Cullinan, Porsche Taycan) have ISOFIX/LATCH child-seat anchors in the rear seats or extended cabin. Some 2-seat configurations don't accommodate child seats safely — check the vehicle listing.",
+          },
+          { type: "h3", text: "What we ask" },
+          {
+            type: "ul",
+            items: [
+              "Use a seat protector underneath. The buckles and anchor points scratch leather/Alcantara on hundreds of dollars of upholstery.",
+              "Don't tighten anchors with full force — exotic interior trim can deform.",
+              "Remove the seat at end of booking. Don't leave it in the car for the next member.",
+            ],
+          },
+          { type: "h3", text: "Help installing" },
+          {
+            type: "p",
+            text: "Black tier members can request RYDA Operations to pre-install the child seat at handover. We use a clean, non-damaging installation method. Available for $50/booking, included in white-glove delivery.",
+          },
+          {
+            type: "callout",
+            tone: "info",
+            text: "Two-seat configurations (most McLarens, Ferrari 488 / 296 / F8, Aston Vantage) are typically NOT safe for child seats — the airbag system isn't designed for it and there's no rear seat to relocate to. The Cullinan, Urus, DBX, Taycan, and Bentley Bentayga work well for families.",
+          },
+        ],
+      },
     ],
   },
 ];
@@ -1174,54 +2020,82 @@ export function getArticle(categorySlug: string, articleSlug: string) {
 
 const ARTICLE_KEYWORDS: Record<string, string[]> = {
   // Getting started
-  "getting-started/what-is-ryda": ["overview", "introduction", "explain", "platform", "model", "company"],
-  "getting-started/vs-timeshare": ["timeshare", "different", "compare", "club", "points", "ownership"],
-  "getting-started/membership-tiers": ["pricing", "cost", "how much", "tier", "core", "blue", "black", "free", "subscription", "annual fee"],
-  "getting-started/accreditation": ["accredited", "qualify", "investor", "income requirement", "net worth", "sec", "wealthy", "rich", "qualified"],
-  "getting-started/markets": ["where", "miami", "los angeles", "la", "new york", "ny", "city", "location", "available"],
+  "getting-started/what-is-ryda": ["overview", "introduction", "explain", "platform", "model", "company", "what is", "tell me about", "summary", "elevator pitch"],
+  "getting-started/vs-timeshare": ["timeshare", "different", "compare", "club", "points", "ownership", "vs timeshare", "is this a timeshare"],
+  "getting-started/membership-tiers": ["pricing", "cost", "how much", "tier", "core", "blue", "black", "free", "subscription", "annual fee", "membership cost", "monthly", "yearly", "expensive", "cheap"],
+  "getting-started/accreditation": ["accredited", "qualify", "investor", "income requirement", "net worth", "sec", "wealthy", "rich", "qualified", "income", "$200k", "$1m", "net worth"],
+  "getting-started/markets": ["where", "miami", "los angeles", "la", "new york", "ny", "city", "location", "available", "operating cities", "states", "regions"],
+  "getting-started/rental-vs-ownership": ["rent or buy", "rental vs ownership", "should i rent", "should i buy", "test drive first", "try it out", "before commit", "compare rental"],
+  "getting-started/founding-member-benefits": ["founding", "first 100", "founding member", "early member", "what do founders get", "lifetime pricing", "locked rate", "perks"],
+  "getting-started/share-financing": ["finance", "loan", "borrow", "financing", "credit", "payment plan", "installments", "monthly payment", "afford"],
 
   // Shares
-  "shares/how-to-buy": ["buy", "purchase", "process", "steps", "onboard", "get started buying", "how do i invest"],
-  "shares/documents": ["paperwork", "operating agreement", "subscription", "sign", "contract", "legal docs", "k-1", "kyc docs"],
-  "shares/entitlement": ["what do i get", "rights", "days per year", "miles", "voting", "ownership rights", "what does a share include"],
-  "shares/selling": ["sell", "exit", "liquidate", "secondary market", "minimum hold", "lockup", "12 month", "resell", "transfer"],
-  "shares/pricing": ["price", "valuation", "worth", "value", "appraisal", "market price", "list price", "fair market"],
-  "shares/transfer-fee": ["fee", "commission", "3%", "transfer cost", "selling fee", "platform fee"],
+  "shares/how-to-buy": ["buy", "purchase", "process", "steps", "onboard", "get started buying", "how do i invest", "buying a share", "first share", "step by step"],
+  "shares/documents": ["paperwork", "operating agreement", "subscription", "sign", "contract", "legal docs", "k-1", "kyc docs", "what do i sign", "agreements", "forms"],
+  "shares/entitlement": ["what do i get", "rights", "days per year", "miles", "voting", "ownership rights", "what does a share include", "benefits", "perks", "entitled to"],
+  "shares/selling": ["sell", "exit", "liquidate", "secondary market", "minimum hold", "lockup", "12 month", "resell", "transfer", "get out", "cash out"],
+  "shares/pricing": ["price", "valuation", "worth", "value", "appraisal", "market price", "list price", "fair market", "how priced", "share price"],
+  "shares/transfer-fee": ["fee", "commission", "3%", "transfer cost", "selling fee", "platform fee", "what's the fee", "selling cost"],
+  "shares/gifting-and-inheritance": ["gift", "give", "transfer to family", "spouse", "inheritance", "heir", "inherit", "estate", "trust", "death", "die", "will", "probate", "pass to children"],
+  "shares/whole-vs-fractional": ["versus buying outright", "whole car", "buy outright", "compare to buying", "vs buying", "outright", "solo ownership", "alone"],
+  "shares/llc-default": ["default", "stops paying", "doesn't pay", "miss payment", "delinquent", "fail to pay", "what if someone doesn't pay", "deadbeat"],
+  "shares/share-count-changes": ["share count", "number of shares", "more shares", "dilution", "issue shares", "add shares", "change shares"],
 
   // Bookings
-  "bookings/how-to-book": ["book", "reserve", "schedule", "calendar", "availability", "drive", "use the car"],
-  "bookings/fair-use": ["fair use", "peak", "high season", "summer", "consecutive days", "limit", "weekly cap", "cap", "monopolize"],
-  "bookings/cancellations": ["cancel", "reschedule", "refund", "no show", "cancellation fee"],
-  "bookings/track-day": ["track", "racing", "race", "circuit", "hpde", "lap", "performance driving", "track event"],
-  "bookings/mileage": ["miles", "mileage", "overage", "kilometers", "limit", "annual miles", "$4 per mile"],
-  "bookings/passengers": ["passenger", "co-driver", "secondary driver", "spouse", "partner", "friend", "additional driver", "guests"],
+  "bookings/how-to-book": ["book", "reserve", "schedule", "calendar", "availability", "drive", "use the car", "make a booking", "reservation"],
+  "bookings/fair-use": ["fair use", "peak", "high season", "summer", "consecutive days", "limit", "weekly cap", "cap", "monopolize", "hog", "block out", "f1", "art basel"],
+  "bookings/cancellations": ["cancel", "reschedule", "refund", "no show", "cancellation fee", "change date", "back out", "withdraw"],
+  "bookings/track-day": ["track", "racing", "race", "circuit", "hpde", "lap", "performance driving", "track event", "track day", "porsche club", "ferrari challenge"],
+  "bookings/mileage": ["miles", "mileage", "overage", "kilometers", "limit", "annual miles", "$4 per mile", "exceed", "go over", "extra miles"],
+  "bookings/passengers": ["passenger", "co-driver", "secondary driver", "spouse", "partner", "friend", "additional driver", "guests", "wife", "husband", "kids ride"],
+  "bookings/out-of-state-travel": ["out of state", "another state", "state line", "border", "mexico", "canada", "long distance", "across country", "interstate", "transit"],
+  "bookings/weather-and-storms": ["weather", "rain", "storm", "hurricane", "tornado", "snow", "hail", "ice", "tropical storm", "evacuation", "evacuate", "noaa"],
+  "bookings/airport-and-valet": ["airport", "valet", "park at airport", "hotel", "parking lot", "leave the car", "overnight parking", "secured parking"],
+  "bookings/lost-keys": ["lost key", "lost fob", "key fob", "missing key", "can't find key", "replacement key", "spare key", "locked out"],
 
   // Insurance
-  "insurance/coverage": ["insurance", "covered", "policy", "liability", "comprehensive", "collision", "what's covered", "$1m"],
-  "insurance/deductible": ["deductible", "out of pocket", "i pay", "fault", "at-fault", "accident cost"],
-  "insurance/file-claim": ["claim", "accident", "crash", "collision", "what to do", "file a claim", "got in an accident"],
-  "insurance/roadside": ["roadside", "tow", "breakdown", "stuck", "flat tire", "battery", "lockout", "fuel"],
-  "insurance/total-loss": ["totaled", "wrecked", "destroyed", "write-off", "write off", "total loss", "destroyed", "irreparable"],
+  "insurance/coverage": ["insurance", "covered", "policy", "liability", "comprehensive", "collision", "what's covered", "$1m", "limits", "premium", "policy limits"],
+  "insurance/deductible": ["deductible", "out of pocket", "i pay", "fault", "at-fault", "accident cost", "what do i pay", "if i crash"],
+  "insurance/file-claim": ["claim", "accident", "crash", "collision", "what to do", "file a claim", "got in an accident", "rear ended", "hit by", "fender bender"],
+  "insurance/roadside": ["roadside", "tow", "breakdown", "stuck", "flat tire", "battery", "lockout", "fuel", "won't start", "stranded"],
+  "insurance/total-loss": ["totaled", "wrecked", "destroyed", "write-off", "write off", "total loss", "irreparable", "totally destroyed", "fire", "stolen and recovered"],
+  "insurance/unauthorized-driver": ["my friend", "let someone drive", "buddy drive", "girlfriend", "boyfriend", "uncle", "valet drive", "anyone else drive"],
+  "insurance/passenger-injury": ["passenger hurt", "passenger injured", "passenger injury", "got hurt", "injured", "medical bills", "ambulance", "hospital"],
+  "insurance/voids-coverage": ["void coverage", "no coverage", "won't be covered", "what voids", "dui", "drinking", "intoxicated", "impaired", "drugs", "racing"],
 
   // Maintenance
-  "maintenance/process": ["maintenance", "service", "repair", "upkeep", "how is it maintained"],
-  "maintenance/who-pays": ["pay for", "cost of maintenance", "who pays", "service cost", "management fee covers", "12% fee"],
-  "maintenance/report-damage": ["damage", "scratch", "dent", "scuff", "report", "i scratched", "i hit something"],
-  "maintenance/inspections": ["inspection", "ppi", "condition report", "annual inspection", "documentation", "service records"],
-  "maintenance/detailing": ["clean", "wash", "detail", "detailing", "interior", "wax", "polish"],
+  "maintenance/process": ["maintenance", "service", "repair", "upkeep", "how is it maintained", "who fixes", "service interval"],
+  "maintenance/who-pays": ["pay for", "cost of maintenance", "who pays", "service cost", "management fee covers", "12% fee", "maintenance bill"],
+  "maintenance/report-damage": ["damage", "scratch", "dent", "scuff", "report", "i scratched", "i hit something", "curbed wheel", "rim damage", "paint chip"],
+  "maintenance/inspections": ["inspection", "ppi", "condition report", "annual inspection", "documentation", "service records", "history"],
+  "maintenance/detailing": ["clean", "wash", "detail", "detailing", "interior", "wax", "polish", "ceramic coating", "presentation"],
+  "maintenance/manufacturer-warranty": ["warranty", "manufacturer warranty", "factory warranty", "void warranty", "ferrari warranty", "porsche warranty", "preserved"],
+  "maintenance/hurricane-prep": ["hurricane prep", "storm prep", "hurricane season", "evacuate vehicle", "indoor storage", "miami storm"],
+  "maintenance/ev-charging": ["ev", "electric", "charge", "charging", "plug in", "tesla", "supercharger", "battery", "level 2", "hybrid", "phev"],
 
   // Account
-  "account/payment-methods": ["pay", "payment", "card", "ach", "bank", "credit card", "wire", "billing method"],
-  "account/billing": ["bill", "invoice", "charged", "statement", "billing cycle", "when am i charged", "monthly", "quarterly", "annual"],
-  "account/taxes": ["tax", "k-1", "k1", "1099", "depreciation", "deduction", "irs", "cpa", "tax treatment", "income tax"],
-  "account/kyc": ["kyc", "id verification", "identity", "verify me", "documents required", "passport", "license", "selfie"],
-  "account/close": ["cancel account", "leave", "quit", "close account", "deactivate", "delete account", "unsubscribe"],
+  "account/payment-methods": ["pay", "payment", "card", "ach", "bank", "credit card", "wire", "billing method", "amex", "visa", "mastercard", "stripe"],
+  "account/billing": ["bill", "invoice", "charged", "statement", "billing cycle", "when am i charged", "monthly", "quarterly", "annual", "receipt", "auto pay"],
+  "account/taxes": ["tax", "k-1", "k1", "1099", "depreciation", "deduction", "irs", "cpa", "tax treatment", "income tax", "tax return", "schedule e"],
+  "account/kyc": ["kyc", "id verification", "identity", "verify me", "documents required", "passport", "license", "selfie", "persona", "background check"],
+  "account/close": ["cancel account", "leave", "quit", "close account", "deactivate", "delete account", "unsubscribe", "i'm done", "not interested"],
+  "account/referral-program": ["referral", "refer a friend", "credit", "rewards", "bonus", "earn", "invite code", "promo code", "incentive", "bring a friend"],
+  "account/founding-pricing": ["founding price", "founding pricing", "locked pricing", "lifetime price", "permanently locked", "founder rate"],
 
   // Legal
-  "legal/operating-agreement": ["operating agreement", "oa", "llc agreement", "governance", "voting", "decision rules"],
-  "legal/reg-d": ["reg d", "regulation d", "506c", "506(c)", "sec rule", "private placement", "general solicitation"],
-  "legal/securities": ["securities", "regulated", "stocks", "shares are stocks", "is this regulated", "sec"],
-  "legal/privacy": ["privacy", "data", "personal information", "what do you collect", "share my data", "third parties"],
+  "legal/operating-agreement": ["operating agreement", "oa", "llc agreement", "governance", "voting", "decision rules", "bylaws"],
+  "legal/reg-d": ["reg d", "regulation d", "506c", "506(c)", "sec rule", "private placement", "general solicitation", "exempt offering"],
+  "legal/securities": ["securities", "regulated", "stocks", "shares are stocks", "is this regulated", "sec", "registered", "broker dealer"],
+  "legal/privacy": ["privacy", "data", "personal information", "what do you collect", "share my data", "third parties", "gdpr", "ccpa"],
+  "legal/llc-dissolution": ["dissolve", "wind down", "shut down", "close llc", "dissolution", "exit", "wind up", "end of life"],
+  "legal/dispute-resolution": ["dispute", "disagree", "argument", "fight", "lawsuit", "sue", "arbitration", "mediation", "conflict", "co-owner conflict"],
+
+  // Vehicle use & etiquette
+  "vehicle-use/aggressive-driving": ["drift", "drag race", "burnout", "launch", "launch control", "redline", "aggressive", "spirited", "drive fast", "speed", "race"],
+  "vehicle-use/smoking-pets-food": ["smoke", "smoking", "vape", "vaping", "weed", "marijuana", "cigarette", "cigar", "pet", "dog", "cat", "food", "drink", "eat"],
+  "vehicle-use/road-trips": ["road trip", "long drive", "drive cross country", "weekend trip", "long distance drive", "vacation drive", "tour"],
+  "vehicle-use/car-shows-photoshoots": ["car show", "show car", "exhibition", "photoshoot", "photo shoot", "instagram", "social media", "youtube", "video", "filming", "music video", "brand deal"],
+  "vehicle-use/kids-and-baby-seats": ["kid", "child", "baby", "infant", "toddler", "child seat", "car seat", "isofix", "latch", "family", "stroller"],
 };
 
 // ── Search ─────────────────────────────────────────────────────────
