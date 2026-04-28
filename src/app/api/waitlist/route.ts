@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { notifyTeam, emailLayout, escapeHtml } from "@/lib/notify";
 
 const VALID_MARKETS = new Set(["Miami", "LA", "NY", "Other"]);
 
@@ -24,12 +25,29 @@ export async function POST(req: Request) {
       .insert({ email, name: name || null, market });
 
     if (error) {
+      // 23505 = unique violation (duplicate email). Don't email on duplicates;
+      // the lead is already in the table from a prior submission.
       if (error.code === "23505") {
         return NextResponse.json({ ok: true, persisted: true, duplicate: true });
       }
       console.error("[waitlist · supabase]", error);
       return NextResponse.json({ error: "Could not save." }, { status: 500 });
     }
+
+    void notifyTeam({
+      subject: `New waitlist signup: ${name || email}`,
+      replyTo: email,
+      html: emailLayout("New waitlist signup", `
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#7a7770;">From</div>
+        <div style="font-size:16px;font-weight:500;margin-top:2px;"><a href="mailto:${escapeHtml(email)}" style="color:#c03030;text-decoration:none;">${escapeHtml(email)}</a></div>
+        ${name ? `<div style="margin-top:14px;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#7a7770;">Name</div><div style="margin-top:2px;">${escapeHtml(name)}</div>` : ""}
+        <div style="margin-top:14px;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#7a7770;">Market</div>
+        <div style="margin-top:2px;">${escapeHtml(market)}</div>
+        <div style="margin-top:24px;padding-top:18px;border-top:1px solid #e5e1d8;font-size:13px;color:#3c3c3c;">
+          <strong>Hit reply</strong> to respond — this email's reply-to is set to ${escapeHtml(email)}.
+        </div>
+      `),
+    });
 
     return NextResponse.json({ ok: true, persisted: true });
   } catch {

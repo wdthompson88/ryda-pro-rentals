@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { notifyTeam, emailLayout, escapeHtml } from "@/lib/notify";
 
 const VALID_CHECK_SIZES = new Set([
   "$25K–$50K",
@@ -44,6 +45,22 @@ export async function POST(req: Request) {
       console.error("[investor-inquiry · supabase]", error);
       return NextResponse.json({ error: "Could not save." }, { status: 500 });
     }
+
+    void notifyTeam({
+      subject: `New investor inquiry: ${name}${check_size ? ` · ${check_size}` : ""}`,
+      replyTo: email,
+      html: emailLayout("New investor inquiry", `
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#7a7770;">From</div>
+        <div style="font-size:16px;font-weight:500;margin-top:2px;">${escapeHtml(name)}</div>
+        <div style="margin-top:2px;"><a href="mailto:${escapeHtml(email)}" style="color:#c03030;text-decoration:none;">${escapeHtml(email)}</a></div>
+        ${firm ? `<div style="margin-top:14px;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#7a7770;">Firm</div><div style="margin-top:2px;">${escapeHtml(firm)}</div>` : ""}
+        ${check_size ? `<div style="margin-top:14px;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#7a7770;">Anticipated check size</div><div style="margin-top:2px;font-weight:500;">${escapeHtml(check_size)}</div>` : ""}
+        ${notes ? `<div style="margin-top:18px;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#7a7770;margin-bottom:6px;">Notes</div><div style="white-space:pre-wrap;color:#1c1c1c;">${escapeHtml(notes)}</div>` : ""}
+        <div style="margin-top:24px;padding-top:18px;border-top:1px solid #e5e1d8;font-size:13px;color:#3c3c3c;">
+          <strong>Hit reply</strong> to respond — this email's reply-to is set to ${escapeHtml(email)}.
+        </div>
+      `),
+    });
 
     return NextResponse.json({ ok: true, persisted: true });
   } catch {
