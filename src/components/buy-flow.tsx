@@ -23,9 +23,8 @@ export function BuyFlow({ vehicle, initialShares }: Props) {
   const [step, setStep] = useState<StepKey>("review");
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [kycComplete, setKycComplete] = useState(false);
-  const [accreditationMethod, setAccreditationMethod] = useState<string | null>(null);
   const [oaSigned, setOaSigned] = useState(false);
-  const [subSigned, setSubSigned] = useState(false);
+  const [msaSigned, setMsaSigned] = useState(false);
   const [signature, setSignature] = useState("");
   const [fundingMethod, setFundingMethod] = useState<"wire" | "ach" | null>(null);
 
@@ -105,8 +104,6 @@ export function BuyFlow({ vehicle, initialShares }: Props) {
             <VerifyStep
               kycComplete={kycComplete}
               setKycComplete={setKycComplete}
-              accreditationMethod={accreditationMethod}
-              setAccreditationMethod={setAccreditationMethod}
               onBack={() => go("review")}
               onContinue={() => go("documents")}
             />
@@ -117,8 +114,8 @@ export function BuyFlow({ vehicle, initialShares }: Props) {
               shares={shares}
               oaSigned={oaSigned}
               setOaSigned={setOaSigned}
-              subSigned={subSigned}
-              setSubSigned={setSubSigned}
+              msaSigned={msaSigned}
+              setMsaSigned={setMsaSigned}
               signature={signature}
               setSignature={setSignature}
               onBack={() => go("verify")}
@@ -295,15 +292,11 @@ function ReviewStep({
 function VerifyStep({
   kycComplete,
   setKycComplete,
-  accreditationMethod,
-  setAccreditationMethod,
   onBack,
   onContinue,
 }: {
   kycComplete: boolean;
   setKycComplete: (v: boolean) => void;
-  accreditationMethod: string | null;
-  setAccreditationMethod: (v: string | null) => void;
   onBack: () => void;
   onContinue: () => void;
 }) {
@@ -317,7 +310,7 @@ function VerifyStep({
     }, 2200);
   }
 
-  const ready = kycComplete && accreditationMethod !== null;
+  const ready = kycComplete;
 
   return (
     <div className="space-y-8">
@@ -327,9 +320,9 @@ function VerifyStep({
           Verify your identity
         </h1>
         <p className="mt-3 text-base text-ink-soft">
-          Required by federal regulation. We use Persona for identity verification and a
-          third-party service for accredited-investor verification. RYDA never sees raw
-          documents.
+          Standard KYC. We use Persona for identity verification — government ID
+          and a selfie match. Required to be added to the LLC's insurance policy
+          and to drive the vehicle. RYDA never sees raw documents.
         </p>
       </div>
 
@@ -340,7 +333,8 @@ function VerifyStep({
             <p className="text-xs font-medium uppercase tracking-wider text-red">Identity (KYC)</p>
             <p className="mt-2 font-display text-xl text-ink">Verify your identity</p>
             <p className="mt-2 text-sm text-ink-soft">
-              Government-issued ID + selfie match. Powered by Persona. Typically takes 2–5 minutes.
+              Government-issued ID + selfie match. Powered by Persona. Typically
+              takes 2–5 minutes. We also pull a clean recent driving record check.
             </p>
           </div>
           {kycComplete && (
@@ -368,55 +362,14 @@ function VerifyStep({
         )}
       </div>
 
-      {/* Accreditation */}
-      <div className="rounded-2xl border border-rule bg-surface p-6">
-        <p className="text-xs font-medium uppercase tracking-wider text-red">Accreditation</p>
-        <p className="mt-2 font-display text-xl text-ink">
-          Confirm accredited-investor status
+      <div className="rounded-2xl border border-rule bg-cream-2/40 p-5 text-sm">
+        <p className="font-medium text-ink">A note on what this isn't.</p>
+        <p className="mt-2 text-ink-soft">
+          RYDA is a luxury access platform, not an investment product. We do
+          not require accredited-investor verification. Co-ownership stakes
+          are not registered securities and are not offered for investment
+          purposes — you're buying the right to use a real car you co-own.
         </p>
-        <p className="mt-2 text-sm text-ink-soft">
-          Required under SEC Rule 506(c). Pick the path that matches your situation.
-        </p>
-
-        <div className="mt-5 space-y-3">
-          <AccreditationOption
-            value="cpa"
-            label="CPA letter"
-            detail="Letter from a licensed CPA confirming your accredited status."
-            selected={accreditationMethod === "cpa"}
-            onSelect={() => setAccreditationMethod("cpa")}
-          />
-          <AccreditationOption
-            value="attorney"
-            label="Attorney letter"
-            detail="Letter from a licensed attorney confirming your accredited status."
-            selected={accreditationMethod === "attorney"}
-            onSelect={() => setAccreditationMethod("attorney")}
-          />
-          <AccreditationOption
-            value="broker"
-            label="Broker-dealer letter"
-            detail="Letter from a registered broker-dealer (Schwab, Fidelity, Morgan Stanley)."
-            selected={accreditationMethod === "broker"}
-            onSelect={() => setAccreditationMethod("broker")}
-          />
-          <AccreditationOption
-            value="verify"
-            label="Third-party verification (recommended)"
-            detail="We send your details to VerifyInvestor — they review and respond within 24 hours. No upload needed from you."
-            selected={accreditationMethod === "verify"}
-            onSelect={() => setAccreditationMethod("verify")}
-          />
-        </div>
-
-        {accreditationMethod && (
-          <div className="mt-5 rounded-xl border border-rule bg-cream-2/40 p-4 text-sm text-ink-soft">
-            <span className="font-medium text-ink">Got it.</span>{" "}
-            {accreditationMethod === "verify"
-              ? "We'll send the verification request after you complete the rest of this flow. You'll get an email from VerifyInvestor within 24 hours."
-              : "Upload your letter on the next screen — we handle the rest."}
-          </div>
-        )}
       </div>
 
       <ButtonRow
@@ -437,8 +390,8 @@ function DocumentsStep({
   shares,
   oaSigned,
   setOaSigned,
-  subSigned,
-  setSubSigned,
+  msaSigned,
+  setMsaSigned,
   signature,
   setSignature,
   onBack,
@@ -448,14 +401,14 @@ function DocumentsStep({
   shares: number;
   oaSigned: boolean;
   setOaSigned: (v: boolean) => void;
-  subSigned: boolean;
-  setSubSigned: (v: boolean) => void;
+  msaSigned: boolean;
+  setMsaSigned: (v: boolean) => void;
   signature: string;
   setSignature: (v: string) => void;
   onBack: () => void;
   onContinue: () => void;
 }) {
-  const ready = oaSigned && subSigned && signature.trim().length >= 4;
+  const ready = oaSigned && msaSigned && signature.trim().length >= 4;
 
   return (
     <div className="space-y-8">
@@ -465,21 +418,22 @@ function DocumentsStep({
           Sign your documents
         </h1>
         <p className="mt-3 text-base text-ink-soft">
-          Two documents to sign: the LLC Operating Agreement (governs how the LLC and co-owners
-          interact) and your Subscription Agreement (your specific share purchase). Both via
+          Two documents: the LLC Operating Agreement (governs how you and your
+          co-owners run the LLC together) and the Management Services Agreement
+          (the contract between the LLC and RYDA for operations). Both via
           secure e-signature.
         </p>
       </div>
 
       <DocCard
         title={`${vehicle.name} LLC — Operating Agreement`}
-        meta="34 pages · Reviewed by RYDA legal counsel · Last updated Q1 2026"
+        meta="34 pages · Reviewed by counsel · Member-managed structure"
         summary={[
-          "Governs decision-making (75% supermajority for material decisions).",
+          "The LLC is member-managed — you and your co-owners hold authority over material decisions.",
+          "Governs decision-making (75% supermajority for sale, replacement, modifications).",
           "Defines fair-use rules during peak and off-season.",
-          "Sets remedies if a co-owner stops paying (30-day cure, then forced sale).",
-          "Distribution waterfall on a sale or total loss.",
-          "12-month minimum hold; secondary market mechanics.",
+          "Sets remedies if a co-owner stops paying (30-day cure, then forced transfer).",
+          "12-month minimum hold; member-to-member transfer mechanics; 3% transfer fee.",
           "Mandatory mediation, then arbitration in Wilmington, Delaware.",
         ]}
         signed={oaSigned}
@@ -487,17 +441,18 @@ function DocumentsStep({
       />
 
       <DocCard
-        title={`Subscription Agreement — ${shares} Share${shares > 1 ? "s" : ""}`}
-        meta="8 pages · Specific to your share purchase"
+        title={`${vehicle.name} LLC — Management Services Agreement`}
+        meta={`12 pages · LLC ↔ RYDA · Your ${shares} seat${shares > 1 ? "s" : ""}`}
         summary={[
-          `${shares} of ${vehicle.shares} shares of ${vehicle.name} LLC.`,
-          `Purchase price: ${formatUSD(vehicle.pricePerShare * shares)}.`,
-          "Reg D 506(c) offering — accredited investors only.",
-          "Acknowledgment of securities risk and illiquidity.",
-          "Agreement to the 12-month minimum hold and 3% transfer fee on resale.",
+          `Engages RYDA as the operating service provider for the LLC.`,
+          `Your position: ${shares} of ${vehicle.shares} seats. Buy-in: ${formatUSD(vehicle.pricePerShare * shares)}.`,
+          "Defines RYDA's services: storage, insurance, scheduling, maintenance, concierge, member services.",
+          "Defines the 12% annual management fee charged to the LLC and paid pro-rata by members.",
+          "RYDA is a service provider — not a manager of the LLC. Members retain LLC governance.",
+          "Acknowledgment that co-ownership is for personal use, not investment.",
         ]}
-        signed={subSigned}
-        onSign={() => setSubSigned(true)}
+        signed={msaSigned}
+        onSign={() => setMsaSigned(true)}
       />
 
       {/* Signature */}
@@ -901,45 +856,6 @@ function DocCard({
         )}
       </div>
     </div>
-  );
-}
-
-function AccreditationOption({
-  value,
-  label,
-  detail,
-  selected,
-  onSelect,
-}: {
-  value: string;
-  label: string;
-  detail: string;
-  selected: boolean;
-  onSelect: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onSelect}
-      className={`flex w-full items-start gap-3 rounded-xl border p-4 text-left text-sm transition-colors ${
-        selected
-          ? "border-red bg-red/5"
-          : "border-rule bg-cream-2/40 hover:border-ink-soft"
-      }`}
-    >
-      <span
-        className={`mt-1 flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 ${
-          selected ? "border-red bg-red" : "border-rule"
-        }`}
-      >
-        {selected && <span className="h-1.5 w-1.5 rounded-full bg-cream" />}
-      </span>
-      <div>
-        <p className="font-medium text-ink">{label}</p>
-        <p className="mt-1 text-xs text-ink-soft">{detail}</p>
-      </div>
-      <span className="sr-only">{value}</span>
-    </button>
   );
 }
 

@@ -3,12 +3,10 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { OrderPanel } from "@/components/order-panel";
 import { PriceChart } from "@/components/price-chart";
-import { OrderBook } from "@/components/order-book";
 import {
   VEHICLES,
   getVehicleBySymbol,
   formatUSD,
-  changeFromPrev,
 } from "@/lib/market-data";
 
 export async function generateStaticParams() {
@@ -37,8 +35,6 @@ export default async function VehicleMarketPage({
   const { symbol } = await params;
   const v = getVehicleBySymbol(symbol);
   if (!v) notFound();
-
-  const { diff, pct, isUp } = changeFromPrev(v.pricePerShare, v.prevClose);
 
   return (
     <>
@@ -77,10 +73,6 @@ export default async function VehicleMarketPage({
               <div className="mt-6">
                 <PriceChart vehicle={v} showHeader />
               </div>
-
-              <div className="mt-8">
-                <OrderBook vehicle={v} />
-              </div>
             </div>
 
             {/* Right column — order panel */}
@@ -91,28 +83,30 @@ export default async function VehicleMarketPage({
         </div>
       </section>
 
-      {/* Sample holdings card (placeholder until auth ships) */}
+      {/* Your seat — sample co-ownership view */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
-          <h2 className="font-display text-2xl text-ink">Your position</h2>
+          <h2 className="font-display text-2xl text-ink">Your seat</h2>
           <p className="mt-1 text-sm text-mute">
-            Sample data — connect your account to see your real holdings.
+            Sample co-ownership view — sign in to see your actual seats.
           </p>
           <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-            <Stat label="Your market value" value={formatUSD(v.pricePerShare)} sub="1 share" />
+            <Stat label="Seats held" value="1" sub={`of ${v.shares}`} />
             <Stat
-              label="Today's return"
-              value={`${isUp ? "+" : "−"}${formatUSD(Math.abs(diff))}`}
-              sub={`${isUp ? "+" : "−"}${Math.abs(pct).toFixed(2)}%`}
-              tone={isUp ? "up" : "down"}
+              label="Days available"
+              value={`${v.daysPerYear}`}
+              sub="this year"
             />
             <Stat
-              label="Total return"
-              value={`+${formatUSD(2_540)}`}
-              sub="+4.69%"
-              tone="up"
+              label="Miles available"
+              value={(v.milesPerYear).toLocaleString()}
+              sub="this year"
             />
-            <Stat label="Average cost" value={formatUSD(54_127)} sub="1 share" />
+            <Stat
+              label="Annual cost"
+              value={formatUSD(v.annualOpCost)}
+              sub="management fee"
+            />
           </div>
         </div>
       </section>
@@ -166,30 +160,22 @@ export default async function VehicleMarketPage({
       {/* People also own */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-14 sm:px-10">
-          <h2 className="font-display text-3xl text-ink">Members also own</h2>
+          <h2 className="font-display text-3xl text-ink">Other cars in the fleet</h2>
           <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-            {VEHICLES.filter((x) => x.symbol !== v.symbol).slice(0, 4).map((x) => {
-              const c = changeFromPrev(x.pricePerShare, x.prevClose);
-              return (
-                <Link
-                  key={x.symbol}
-                  href={`/markets/${x.symbol}`}
-                  className="block rounded-xl border border-rule bg-surface p-5 transition-shadow hover:shadow-md"
-                >
-                  <p className="text-xs text-mute">{x.brand}</p>
-                  <p className="mt-1 font-display text-base text-ink">{x.name}</p>
-                  <p className="mt-3 font-display text-xl text-ink tabular-nums">
-                    {formatUSD(x.pricePerShare)}
-                  </p>
-                  <p
-                    className="mt-1 text-xs tabular-nums"
-                    style={{ color: c.isUp ? "#00C805" : "#DC2626" }}
-                  >
-                    {c.isUp ? "▲" : "▼"} {c.pct.toFixed(2)}%
-                  </p>
-                </Link>
-              );
-            })}
+            {VEHICLES.filter((x) => x.symbol !== v.symbol).slice(0, 4).map((x) => (
+              <Link
+                key={x.symbol}
+                href={`/markets/${x.symbol}`}
+                className="block rounded-xl border border-rule bg-surface p-5 transition-shadow hover:shadow-md"
+              >
+                <p className="text-xs text-mute">{x.brand}</p>
+                <p className="mt-1 font-display text-base text-ink">{x.name}</p>
+                <p className="mt-3 font-display text-xl text-ink tabular-nums">
+                  {formatUSD(x.pricePerShare)}
+                </p>
+                <p className="mt-1 text-xs text-mute">per seat</p>
+              </Link>
+            ))}
           </div>
         </div>
       </section>

@@ -4,143 +4,94 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Vehicle, formatUSD } from "@/lib/market-data";
 
-type Side = "buy" | "sell";
-type OrderType = "market" | "limit" | "stop";
-type BuyIn = "shares" | "dollars";
-
 type Props = { vehicle: Vehicle };
 
 export function OrderPanel({ vehicle }: Props) {
   const router = useRouter();
-  const [side, setSide] = useState<Side>("buy");
-  const [orderType, setOrderType] = useState<OrderType>("market");
-  const [buyIn, setBuyIn] = useState<BuyIn>("shares");
-  const [amount, setAmount] = useState("");
-  const [limitPrice, setLimitPrice] = useState("");
+  const [seats, setSeats] = useState("1");
 
-  const numericAmount = parseFloat(amount) || 0;
-  const numericLimit = parseFloat(limitPrice) || vehicle.pricePerShare;
-  const effectivePrice = orderType === "market" ? vehicle.pricePerShare : numericLimit;
+  const numericSeats = Math.max(1, Math.min(vehicle.sharesAvailable || 1, parseInt(seats || "1", 10) || 1));
+  const buyInCost = numericSeats * vehicle.pricePerShare;
+  const annualMgmtFee = numericSeats * vehicle.annualOpCost;
+  const daysPerYear = numericSeats * vehicle.daysPerYear;
+  const milesPerYear = numericSeats * vehicle.milesPerYear;
+  const sharesPercent = ((numericSeats / vehicle.shares) * 100).toFixed(1);
 
-  const estimatedShares = buyIn === "shares" ? numericAmount : numericAmount / effectivePrice;
-  const estimatedCost = buyIn === "shares" ? numericAmount * effectivePrice : numericAmount;
+  const sold = vehicle.sharesAvailable === 0;
 
-  const sideAccent = side === "buy" ? "#00C805" : "#DC2626";
-
-  function handleReview() {
-    if (side !== "buy") return;
-    const shares = Math.max(1, Math.round(estimatedShares || 1));
-    router.push(`/markets/${vehicle.symbol.toLowerCase()}/buy?shares=${shares}`);
+  function handleClaim() {
+    if (sold) return;
+    router.push(`/markets/${vehicle.symbol.toLowerCase()}/buy?shares=${numericSeats}`);
   }
 
   return (
     <div className="rounded-2xl border border-rule bg-surface p-6 shadow-sm">
-      {/* Side switcher */}
-      <div className="mb-5 flex gap-6 text-sm font-semibold">
-        <button
-          onClick={() => setSide("buy")}
-          className={`relative pb-2 transition-colors ${
-            side === "buy" ? "text-ink" : "text-mute hover:text-ink-soft"
-          }`}
-        >
-          Buy {vehicle.ticker}
-          {side === "buy" && (
-            <span
-              className="absolute -bottom-px left-0 h-0.5 w-full"
-              style={{ backgroundColor: sideAccent }}
-            />
-          )}
-        </button>
-        <button
-          onClick={() => setSide("sell")}
-          className={`relative pb-2 transition-colors ${
-            side === "sell" ? "text-ink" : "text-mute hover:text-ink-soft"
-          }`}
-        >
-          Sell {vehicle.ticker}
-          {side === "sell" && (
-            <span
-              className="absolute -bottom-px left-0 h-0.5 w-full"
-              style={{ backgroundColor: sideAccent }}
-            />
-          )}
-        </button>
-      </div>
+      <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+        Claim a seat
+      </p>
+      <p className="mt-2 font-display text-xl text-ink">{vehicle.name}</p>
+      <p className="mt-1 text-xs text-mute">
+        {vehicle.sharesAvailable} of {vehicle.shares} seats available
+      </p>
 
-      <Field label="Order type">
-        <select
-          value={orderType}
-          onChange={(e) => setOrderType(e.target.value as OrderType)}
-          className="w-full bg-transparent text-right font-medium text-ink focus:outline-none"
-        >
-          <option value="market">Market</option>
-          <option value="limit">Limit</option>
-          <option value="stop">Stop</option>
-        </select>
-      </Field>
-
-      <Field label={side === "buy" ? "Buy in" : "Sell in"}>
-        <select
-          value={buyIn}
-          onChange={(e) => setBuyIn(e.target.value as BuyIn)}
-          className="w-full bg-transparent text-right font-medium text-ink focus:outline-none"
-        >
-          <option value="shares">Shares</option>
-          <option value="dollars">Dollars</option>
-        </select>
-      </Field>
-
-      <Field label="Amount">
-        <input
-          type="number"
-          inputMode="decimal"
-          placeholder={buyIn === "shares" ? "0" : "$0.00"}
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          className="w-full bg-transparent text-right font-medium text-ink placeholder:text-mute focus:outline-none"
-        />
-      </Field>
-
-      {orderType !== "market" && (
-        <Field label={orderType === "limit" ? "Limit price" : "Stop price"}>
+      <div className="mt-5 border-t border-rule pt-4">
+        <Field label="Seats">
           <input
             type="number"
-            inputMode="decimal"
-            placeholder={formatUSD(vehicle.pricePerShare)}
-            value={limitPrice}
-            onChange={(e) => setLimitPrice(e.target.value)}
+            inputMode="numeric"
+            min={1}
+            max={vehicle.sharesAvailable || 1}
+            value={seats}
+            onChange={(e) => setSeats(e.target.value)}
             className="w-full bg-transparent text-right font-medium text-ink placeholder:text-mute focus:outline-none"
           />
         </Field>
-      )}
 
-      <div className="mt-4 flex items-center justify-between text-sm">
-        <span className="text-ink-soft">
-          Estimated {buyIn === "shares" ? "cost" : "shares"}
-        </span>
-        <span className="font-medium text-ink">
-          {buyIn === "shares"
-            ? formatUSD(estimatedCost)
-            : estimatedShares.toFixed(4)}
-        </span>
+        <Field label="Equity %">
+          <span className="font-medium text-ink tabular-nums">{sharesPercent}%</span>
+        </Field>
+
+        <Field label="Days / year">
+          <span className="font-medium text-ink tabular-nums">{daysPerYear}</span>
+        </Field>
+
+        <Field label="Miles / year">
+          <span className="font-medium text-ink tabular-nums">
+            {milesPerYear.toLocaleString()}
+          </span>
+        </Field>
+      </div>
+
+      <div className="mt-5 border-t border-rule pt-4 space-y-3 text-sm">
+        <div className="flex items-baseline justify-between">
+          <span className="text-ink-soft">Buy-in (today)</span>
+          <span className="font-medium text-ink tabular-nums">
+            {formatUSD(buyInCost)}
+          </span>
+        </div>
+        <div className="flex items-baseline justify-between">
+          <span className="text-ink-soft">Mgmt fee / year</span>
+          <span className="font-medium text-ink tabular-nums">
+            {formatUSD(annualMgmtFee)}
+          </span>
+        </div>
       </div>
 
       <button
         type="button"
-        onClick={handleReview}
-        disabled={side === "sell"}
-        className="mt-5 w-full rounded-full px-7 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-        style={{ backgroundColor: sideAccent }}
+        onClick={handleClaim}
+        disabled={sold}
+        className="mt-5 w-full rounded-full bg-ink px-7 py-3 text-sm font-semibold text-cream transition-colors hover:bg-red disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {side === "buy" ? "Review order" : "Sell coming soon"}
+        {sold ? "All seats taken" : `Reserve ${numericSeats} seat${numericSeats > 1 ? "s" : ""} →`}
       </button>
 
       <p className="mt-4 text-center text-xs text-mute">
-        {formatUSD(354_445)} buying power available
+        12-month minimum hold. Transferable to other verified members.
       </p>
 
       <div className="mt-5 border-t border-rule pt-4 text-center text-xs text-mute">
-        RYDA Markets · {vehicle.market}
+        Vehicle stored in {vehicle.market}
       </div>
     </div>
   );
