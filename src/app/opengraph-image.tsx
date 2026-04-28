@@ -23,11 +23,11 @@ export default async function OpenGraphImage() {
         {/* Eyebrow */}
         <div
           style={{
-            fontSize: 18,
-            letterSpacing: 6,
+            fontSize: 36,
+            letterSpacing: 8,
             color: "#C03030",
             textTransform: "uppercase",
-            fontWeight: 500,
+            fontWeight: 600,
           }}
         >
           Supercar Co-Ownership
@@ -68,15 +68,16 @@ export default async function OpenGraphImage() {
         <div
           style={{
             marginTop: "auto",
-            paddingTop: 24,
+            paddingTop: 28,
             borderTop: "1px solid rgba(244, 241, 236, 0.15)",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            color: "#7A7770",
-            fontSize: 16,
-            letterSpacing: 4,
+            color: "#A39F95",
+            fontSize: 26,
+            letterSpacing: 5,
             textTransform: "uppercase",
+            fontWeight: 500,
           }}
         >
           <div>Asset-backed · Delaware LLC</div>
