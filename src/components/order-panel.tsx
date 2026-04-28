@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Vehicle, formatUSD } from "@/lib/market-data";
 
 type Side = "buy" | "sell";
@@ -10,6 +11,7 @@ type BuyIn = "shares" | "dollars";
 type Props = { vehicle: Vehicle };
 
 export function OrderPanel({ vehicle }: Props) {
+  const router = useRouter();
   const [side, setSide] = useState<Side>("buy");
   const [orderType, setOrderType] = useState<OrderType>("market");
   const [buyIn, setBuyIn] = useState<BuyIn>("shares");
@@ -24,6 +26,12 @@ export function OrderPanel({ vehicle }: Props) {
   const estimatedCost = buyIn === "shares" ? numericAmount * effectivePrice : numericAmount;
 
   const sideAccent = side === "buy" ? "#00C805" : "#DC2626";
+
+  function handleReview() {
+    if (side !== "buy") return;
+    const shares = Math.max(1, Math.round(estimatedShares || 1));
+    router.push(`/markets/${vehicle.symbol.toLowerCase()}/buy?shares=${shares}`);
+  }
 
   return (
     <div className="rounded-2xl border border-rule bg-surface p-6 shadow-sm">
@@ -118,10 +126,13 @@ export function OrderPanel({ vehicle }: Props) {
       </div>
 
       <button
-        className="mt-5 w-full rounded-full px-7 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+        type="button"
+        onClick={handleReview}
+        disabled={side === "sell"}
+        className="mt-5 w-full rounded-full px-7 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
         style={{ backgroundColor: sideAccent }}
       >
-        Review order
+        {side === "buy" ? "Review order" : "Sell coming soon"}
       </button>
 
       <p className="mt-4 text-center text-xs text-mute">
