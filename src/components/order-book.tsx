@@ -37,10 +37,6 @@ export function OrderBook({ vehicle }: { vehicle: Vehicle }) {
   const highestBid = bids[0].price;
   const spread = lowestAsk - highestBid;
 
-  // Max total$ across both sides drives the relative depth bar widths.
-  const allTotals = [...asks, ...bids].map((o) => o.price * o.size);
-  const maxTotal = Math.max(...allTotals);
-
   // Render asks high → low so the lowest ask sits next to the spread.
   const askRows = [...asks].reverse();
   const bidRows = bids;
@@ -76,12 +72,7 @@ export function OrderBook({ vehicle }: { vehicle: Vehicle }) {
           </span>
         </div>
         {askRows.map((o, i) => (
-          <BookRow
-            key={`a-${i}`}
-            order={o}
-            side="ask"
-            depthPct={((o.price * o.size) / maxTotal) * 100}
-          />
+          <BookRow key={`a-${i}`} order={o} side="ask" />
         ))}
       </div>
 
@@ -107,12 +98,7 @@ export function OrderBook({ vehicle }: { vehicle: Vehicle }) {
           </span>
         </div>
         {bidRows.map((o, i) => (
-          <BookRow
-            key={`b-${i}`}
-            order={o}
-            side="bid"
-            depthPct={((o.price * o.size) / maxTotal) * 100}
-          />
+          <BookRow key={`b-${i}`} order={o} side="bid" />
         ))}
       </div>
     </div>
@@ -122,35 +108,22 @@ export function OrderBook({ vehicle }: { vehicle: Vehicle }) {
 function BookRow({
   order,
   side,
-  depthPct,
 }: {
   order: Order;
   side: "ask" | "bid";
-  depthPct: number;
 }) {
   const total = order.price * order.size;
   const color = side === "ask" ? "#DC2626" : "#00A300";
-  const tintColor =
-    side === "ask" ? "rgba(220, 38, 38, 0.10)" : "rgba(0, 200, 5, 0.10)";
 
   return (
-    <div className="relative grid grid-cols-12 items-center px-5 py-2.5 text-sm">
-      {/* Depth bar — anchored LEFT, expands right */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-y-0 left-0"
-        style={{ width: `${depthPct}%`, background: tintColor }}
-      />
-      <div
-        className="relative col-span-4 pl-12 font-medium tabular-nums"
-        style={{ color }}
-      >
+    <div className="grid grid-cols-12 items-center px-5 py-2.5 text-sm">
+      <div className="col-span-4 pl-12 font-medium tabular-nums" style={{ color }}>
         {formatUSD(order.price)}
       </div>
-      <div className="relative col-span-4 text-right tabular-nums text-ink-soft">
+      <div className="col-span-4 text-right tabular-nums text-ink-soft">
         {order.size.toFixed(0)}.00
       </div>
-      <div className="relative col-span-4 text-right tabular-nums text-ink-soft">
+      <div className="col-span-4 text-right tabular-nums text-ink-soft">
         {formatUSD(total)}
       </div>
     </div>
