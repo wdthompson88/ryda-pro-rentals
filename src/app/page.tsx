@@ -25,9 +25,9 @@ export default function Home() {
             <p className="mt-8 max-w-xl text-lg leading-relaxed text-ink-soft">
               RYDA is the first US asset-backed supercar co-ownership platform.
               Hold a real share in a Ferrari, Lamborghini, or McLaren — held
-              by a Delaware LLC, structured like Pacaso for real estate or
-              NetJets for aviation. Drive ~50 days a year. Sell on the
-              member-only market after twelve months.
+              by a Delaware LLC, structured the way fractional jets are.
+              Drive ~50 days a year. Sell on the member-only market after
+              twelve months.
             </p>
             <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
               <Link
@@ -105,10 +105,10 @@ export default function Home() {
                 A new asset class.
               </h2>
               <p className="mt-6 text-lg leading-relaxed text-ink-soft">
-                Fractional ownership reshaped real estate (Pacaso, $1B+ GMV
-                in 2 years), aviation (NetJets, $3B+ AUM), and fine art
-                (Masterworks, $1B+ AUM). It's never been built for exotic
-                vehicles in the US — until now.
+                Fractional ownership has matured into a multi-billion-dollar
+                category in private aviation (NetJets, $3B+ AUM), fine art
+                (Masterworks, $1B+ AUM), and vacation real estate. It's never
+                been built for exotic vehicles in the US — until now.
               </p>
               <p className="mt-4 text-lg leading-relaxed text-ink-soft">
                 This is not a rental marketplace. It's a structured,
@@ -156,9 +156,9 @@ export default function Home() {
               <p className="mt-6 text-lg leading-relaxed text-ink-soft">
                 Renting a Ferrari for the weekend builds nothing. Owning one
                 outright costs $80,000 a year before you turn the key. RYDA is
-                the third option — modeled on what works in real estate
-                (Pacaso) and aviation (NetJets), built for exotic cars in the
-                US for the first time.
+                the third option — built on the legal and operational
+                playbook that fractional aviation has used for decades, applied
+                to exotic cars in the US for the first time.
               </p>
             </div>
             <div className="grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-rule bg-rule sm:grid-cols-2 lg:col-span-7">

@@ -20,8 +20,8 @@ export default function InvestorsPage() {
             Investors
           </p>
           <h1 className="mt-4 max-w-4xl font-display text-5xl font-light leading-[1.05] sm:text-6xl">
-            Pacaso for supercars,{" "}
-            <span className="italic text-red">in the US.</span>
+            A new asset class,{" "}
+            <span className="italic text-red">finally legal in the US.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-cream/70">
             RYDA is the first asset-backed supercar co-ownership platform
@@ -78,10 +78,10 @@ export default function InvestorsPage() {
               forgettable.
             </p>
             <p>
-              Despite a proven fractional model in real estate (Pacaso),
-              aviation (NetJets, Wheels Up), and art (Masterworks), no US
-              platform has built the equivalent for exotic vehicles. RYDA
-              fills that gap.
+              Fractional ownership has matured into a multi-billion-dollar
+              category in aviation (NetJets, Wheels Up), fine art
+              (Masterworks), and vacation real estate. No US platform has
+              built the equivalent for exotic vehicles. RYDA fills that gap.
             </p>
           </div>
         </div>

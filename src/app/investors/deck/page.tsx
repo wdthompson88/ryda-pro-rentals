@@ -204,7 +204,7 @@ function TitleSlide() {
         RYDA
       </h1>
       <p className="mt-6 max-w-2xl font-display text-2xl font-light text-red sm:text-3xl">
-        Pacaso for supercars.
+        Own the world's best cars. Together.
       </p>
       <p className="mt-4 max-w-2xl text-base text-ink-soft sm:text-lg">
         The first US asset-backed supercar co-ownership platform.
@@ -321,7 +321,7 @@ function WhyNowSlide() {
       <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3">
         <Why
           title="Proof of model"
-          body="Pacaso (real estate), NetJets (aviation), Masterworks (art) all reached $1B+ GMV. The fractional playbook is known."
+          body="NetJets ($3B+ AUM), Masterworks ($1B+), and a decade of European supercar-sharing operators have proven the playbook in adjacent assets. The risk shifts from 'will it work' to execution."
         />
         <Why
           title="Reg D 506(c)"
@@ -400,9 +400,9 @@ function ComparablesSlide() {
       <H2>The model is proven. The asset class is new.</H2>
       <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2">
         <Comp
-          name="Pacaso"
-          asset="Vacation real estate"
-          outcome="$1B+ GMV in 2 years."
+          name="Fractional Vacation Real Estate"
+          asset="Second homes via LLC co-ownership"
+          outcome="A category that grew from $0 to $1B+ GMV in 2 years. Same legal pattern RYDA uses, applied to property."
         />
         <Comp
           name="NetJets"

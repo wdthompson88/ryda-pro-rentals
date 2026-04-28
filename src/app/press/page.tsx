@@ -84,9 +84,9 @@ export default function PressPage() {
           <h2 className="font-display text-3xl sm:text-4xl">Need a quote, an interview, or a comment?</h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
             We work with national and trade press. Founders are available for
-            interviews on the supercar co-ownership market, the Pacaso/NetJets
-            playbook applied to autos, and the legal structure of fractional
-            vehicle ownership in the US.
+            interviews on the supercar co-ownership market, the fractional-
+            ownership playbook applied to autos, and the legal structure of
+            fractional vehicle ownership in the US.
           </p>
           <a
             href="mailto:press@ryda.com?subject=Press%20inquiry"

@@ -9,8 +9,8 @@ export const metadata = {
 
 const POSTS = [
   {
-    slug: "why-pacaso-for-supercars",
-    title: "Why we're building Pacaso for supercars (and why now)",
+    slug: "why-fractional-supercars-now",
+    title: "Why fractional supercar ownership, and why now",
     excerpt:
       "The fractional ownership model has worked in real estate, aviation, and art. The math for exotic vehicles is the same — and the timing has never been better.",
     author: "Ryan Galli",

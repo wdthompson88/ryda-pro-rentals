@@ -24,7 +24,8 @@ export default function HowItWorksPage() {
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
             RYDA is asset-backed fractional ownership for supercars — the
-            structure that built Pacaso, NetJets, and Masterworks, brought
+            same legal and operational structure that has powered fractional
+            aviation, fine art, and vacation real estate for years, brought
             to a new asset class for the first time in the US.
           </p>
         </div>
@@ -65,9 +66,9 @@ export default function HowItWorksPage() {
           </h2>
           <p className="mt-4 max-w-2xl text-base text-ink-soft">
             We're not selling timeshares. We're not running a rental
-            marketplace. We're the first US platform to apply the Pacaso /
-            NetJets structure to exotic vehicles, with the legal framework
-            and liquidity layer that's been missing.
+            marketplace. We're the first US platform to apply proven
+            fractional-ownership structure to exotic vehicles, with the legal
+            framework and liquidity layer that's been missing.
           </p>
           <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             <Diff title="Real LLCs" body="Each vehicle is owned by a Delaware single-purpose LLC. Your share is a registered membership interest, recorded with the state." />
