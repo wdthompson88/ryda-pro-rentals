@@ -30,6 +30,8 @@ export function SiteFooter() {
             ["Storage", "/storage"],
             ["Track day", "/track-day"],
             ["List your car", "/host-your-car"],
+            ["Trust & Safety", "/trust-and-safety"],
+            ["Help center", "/help"],
             ["How it works", "/how-it-works"],
             ["FAQ", "/faq"],
           ]}
