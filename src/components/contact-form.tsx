@@ -23,12 +23,10 @@ export function ContactForm() {
     };
 
     try {
-      // Reuses the waitlist endpoint as a generic-inbox sink for now.
-      // Will get its own table when Supabase is wired up.
-      const res = await fetch("/api/waitlist", {
+      const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...payload, source: "contact" }),
+        body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error();
       setStatus("success");

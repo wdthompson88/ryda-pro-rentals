@@ -29,7 +29,7 @@ export default function DeckPage() {
           RYDA
         </Link>
         <p className="text-xs uppercase tracking-[0.2em] text-mute">
-          Investor Deck · Confidential
+          Investor Deck · Q2 2026
         </p>
         <div className="flex items-center gap-2 text-sm text-ink-soft">
           <span className="tabular-nums">
@@ -199,7 +199,7 @@ function StatGrid({ stats }: { stats: { label: string; value: string }[] }) {
 function TitleSlide() {
   return (
     <div className="text-left">
-      <Eyebrow>Confidential · Q2 2026</Eyebrow>
+      <Eyebrow>Seed round · Q2 2026</Eyebrow>
       <h1 className="mt-6 font-display text-7xl font-light leading-[1] tracking-tight text-ink sm:text-8xl lg:text-9xl">
         RYDA
       </h1>

@@ -19,7 +19,7 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
           <Link href="/about">About</Link>
         </nav>
         <Link
-          href="#waitlist"
+          href="/#waitlist"
           className={`rounded-full border px-5 py-2 text-sm font-medium transition-colors ${ctaBase}`}
         >
           Join the list

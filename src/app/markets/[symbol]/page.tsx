@@ -97,8 +97,8 @@ export default async function VehicleMarketPage({
             <Stat label="Your market value" value={formatUSD(v.pricePerShare)} sub="1 share" />
             <Stat
               label="Today's return"
-              value={`+${formatUSD(diff)}`}
-              sub={`+${pct.toFixed(2)}%`}
+              value={`${isUp ? "+" : "−"}${formatUSD(Math.abs(diff))}`}
+              sub={`${isUp ? "+" : "−"}${Math.abs(pct).toFixed(2)}%`}
               tone={isUp ? "up" : "down"}
             />
             <Stat
