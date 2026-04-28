@@ -2135,6 +2135,24 @@ function blockToText(b: HelpBlock): string {
   }
 }
 
+// Extract a 2–3 sentence conversational answer from an article. Uses the
+// article's own summary first (always crafted as a one-line answer), then
+// the first body paragraph for additional context. Skips lists, h3s, and
+// callouts because they don't read as conversational answers.
+export function extractAnswer(article: HelpArticle): string {
+  const summary = article.summary.trim();
+  const firstParagraph = article.body.find((b) => b.type === "p");
+  if (firstParagraph && firstParagraph.type === "p") {
+    const para = firstParagraph.text.trim();
+    // Don't repeat content if the summary already covers it
+    if (summary.length > 80 && para.startsWith(summary.slice(0, 40))) {
+      return summary;
+    }
+    return `${summary}\n\n${para}`;
+  }
+  return summary;
+}
+
 export function searchHelp(query: string, limit = 4): SearchResult[] {
   const tokens = tokenize(query);
   if (tokens.length === 0) return [];

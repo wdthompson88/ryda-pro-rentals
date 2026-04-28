@@ -2,31 +2,44 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { searchHelp, type SearchResult } from "@/lib/help-content";
+import { searchHelp, extractAnswer, type SearchResult } from "@/lib/help-content";
 
 type ChatMessage =
   | { id: string; role: "user"; text: string }
-  | { id: string; role: "bot"; text: string; results?: SearchResult[] };
+  | {
+      id: string;
+      role: "bot";
+      text: string;
+      answer?: { source: SearchResult; otherResults: SearchResult[] };
+    };
 
 const SUGGESTIONS = [
   "How do I buy a share?",
+  "Can I take it on a road trip?",
   "What's covered by insurance?",
-  "Can I sell my share whenever?",
-  "How is maintenance handled?",
   "What if I total the car?",
+  "Can I gift my share to my kids?",
 ];
 
 const GREETING: ChatMessage = {
   id: "greeting",
   role: "bot",
-  text: "Hi — I'm RYDA's help assistant. Ask me anything about membership, shares, bookings, insurance, or operations and I'll point you to the right article.",
+  text: "Hi — I'm RYDA's help assistant. Ask me anything about membership, shares, bookings, insurance, maintenance, or how the platform works. I'll do my best to answer directly and point you to the full article.",
 };
+
+// Pick a low-effort intro that fits any question. We rotate so consecutive
+// answers don't feel templated.
+const INTROS = ["Here's the gist:", "Quick answer:", "Short version:", "From the help docs:"];
+function pickIntro(seed: number) {
+  return INTROS[seed % INTROS.length];
+}
 
 export function HelpChat() {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([GREETING]);
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
+  const turnCount = useRef(0);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -44,24 +57,29 @@ export function HelpChat() {
       text: q,
     };
 
-    const results = searchHelp(q);
-    const botMsg: ChatMessage =
-      results.length > 0
-        ? {
-            id: `b-${Date.now()}`,
-            role: "bot",
-            text:
-              results.length === 1
-                ? "Here's the article that matches:"
-                : `I found ${results.length} articles that look relevant:`,
-            results,
-          }
-        : {
-            id: `b-${Date.now()}`,
-            role: "bot",
-            text: "I couldn't find a great match for that. Try rephrasing — or write our team directly and a real human will get back within one business day.",
-          };
+    const results = searchHelp(q, 4);
 
+    let botMsg: ChatMessage;
+    if (results.length === 0) {
+      botMsg = {
+        id: `b-${Date.now()}`,
+        role: "bot",
+        text: "I couldn't find a good answer for that one. Try rephrasing — or write our team directly and a real human will get back within one business day.",
+      };
+    } else {
+      const top = results[0];
+      const others = results.slice(1, 3); // up to 2 alternates
+      const intro = pickIntro(turnCount.current);
+      const answerText = extractAnswer(top.article);
+      botMsg = {
+        id: `b-${Date.now()}`,
+        role: "bot",
+        text: `${intro}\n\n${answerText}`,
+        answer: { source: top, otherResults: others },
+      };
+    }
+
+    turnCount.current += 1;
     setMessages((m) => [...m, userMsg, botMsg]);
     setInput("");
   }
@@ -90,13 +108,13 @@ export function HelpChat() {
 
       {/* Panel */}
       {open && (
-        <div className="fixed bottom-24 right-6 z-40 flex w-[min(380px,calc(100vw-3rem))] flex-col overflow-hidden rounded-2xl border border-rule bg-surface shadow-2xl">
+        <div className="fixed bottom-24 right-6 z-40 flex w-[min(420px,calc(100vw-3rem))] flex-col overflow-hidden rounded-2xl border border-rule bg-surface shadow-2xl">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-rule bg-ink px-5 py-4 text-cream">
             <div>
               <p className="font-display text-base">Ask RYDA</p>
               <p className="text-[11px] uppercase tracking-wider text-cream/50">
-                Help center · 35 articles
+                Answers from 61 help articles
               </p>
             </div>
           </div>
@@ -104,13 +122,13 @@ export function HelpChat() {
           {/* Messages */}
           <div
             ref={scrollRef}
-            className="flex max-h-[460px] flex-1 flex-col gap-3 overflow-y-auto px-4 py-4"
+            className="flex max-h-[480px] flex-1 flex-col gap-3 overflow-y-auto px-4 py-4"
           >
             {messages.map((m) =>
               m.role === "user" ? (
                 <UserBubble key={m.id} text={m.text} />
               ) : (
-                <BotBubble key={m.id} text={m.text} results={m.results} />
+                <BotBubble key={m.id} text={m.text} answer={m.answer} />
               ),
             )}
 
@@ -157,7 +175,7 @@ export function HelpChat() {
 
           {/* Footnote */}
           <p className="border-t border-rule bg-surface px-4 py-2 text-center text-[10px] text-mute">
-            Search across help articles. Need a real human?{" "}
+            Answers compiled from help articles. Need a real human?{" "}
             <Link href="/contact" className="text-red hover:text-red-deep">
               Contact us
             </Link>
@@ -178,32 +196,56 @@ function UserBubble({ text }: { text: string }) {
   );
 }
 
-function BotBubble({ text, results }: { text: string; results?: SearchResult[] }) {
+function BotBubble({
+  text,
+  answer,
+}: {
+  text: string;
+  answer?: { source: SearchResult; otherResults: SearchResult[] };
+}) {
+  const paragraphs = text.split("\n\n").filter((p) => p.trim().length > 0);
+
   return (
     <div className="flex justify-start">
-      <div className="max-w-[90%] space-y-2">
-        <div className="rounded-2xl rounded-bl-md border border-rule bg-cream-2/40 px-4 py-2.5 text-sm text-ink">
-          {text}
+      <div className="max-w-[92%] space-y-2">
+        {/* Main answer bubble */}
+        <div className="rounded-2xl rounded-bl-md border border-rule bg-cream-2/40 px-4 py-3 text-sm leading-relaxed text-ink">
+          {paragraphs.map((p, i) => (
+            <p key={i} className={i > 0 ? "mt-2" : ""}>
+              {p}
+            </p>
+          ))}
+          {answer && (
+            <Link
+              href={`/help/${answer.source.category.slug}/${answer.source.article.slug}`}
+              className="mt-3 inline-flex items-center gap-1 rounded-full border border-rule bg-surface px-3 py-1.5 text-[11px] font-medium text-red transition-colors hover:border-red"
+            >
+              <span className="text-mute">Source:</span>
+              <span>{answer.source.article.q}</span>
+              <span>→</span>
+            </Link>
+          )}
         </div>
-        {results && results.length > 0 && (
-          <ul className="space-y-1.5">
-            {results.map((r) => (
-              <li key={`${r.category.slug}/${r.article.slug}`}>
-                <Link
-                  href={`/help/${r.category.slug}/${r.article.slug}`}
-                  className="block rounded-xl border border-rule bg-surface p-3 transition-colors hover:border-red"
-                >
-                  <p className="text-[10px] uppercase tracking-wider text-red">
-                    {r.category.title}
-                  </p>
-                  <p className="mt-1 font-display text-sm text-ink">{r.article.q}</p>
-                  <p className="mt-1 line-clamp-2 text-xs text-ink-soft">
-                    {r.article.summary}
-                  </p>
-                </Link>
-              </li>
-            ))}
-          </ul>
+
+        {/* Related articles below the answer */}
+        {answer && answer.otherResults.length > 0 && (
+          <div>
+            <p className="px-1 text-[10px] uppercase tracking-wider text-mute">
+              Related
+            </p>
+            <ul className="mt-1.5 space-y-1.5">
+              {answer.otherResults.map((r) => (
+                <li key={`${r.category.slug}/${r.article.slug}`}>
+                  <Link
+                    href={`/help/${r.category.slug}/${r.article.slug}`}
+                    className="block rounded-xl border border-rule bg-surface px-3 py-2 text-xs text-ink-soft transition-colors hover:border-red hover:text-ink"
+                  >
+                    <span className="text-red">→</span> {r.article.q}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
         )}
       </div>
     </div>
