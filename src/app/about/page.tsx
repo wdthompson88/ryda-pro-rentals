@@ -4,7 +4,7 @@ import { SiteHeader } from "@/components/site-header";
 export const metadata = {
   title: "About — RYDA",
   description:
-    "The first US asset-backed supercar co-ownership platform. Our story, our team, our mission.",
+    "The first US member-managed supercar co-ownership platform. Our story, our team, our mission.",
 };
 
 export default function AboutPage() {
@@ -51,11 +51,11 @@ export default function AboutPage() {
               it existed in the US.
             </p>
             <p>
-              We built RYDA to fill that gap. An asset-backed, legally
-              structured, concierge-operated co-ownership platform for the US
-              market. We took the best of what works in Europe and rebuilt it
-              for American legal structures (Delaware LLCs), American
-              lifestyles, and the markets where the demand is concentrated.
+              We built RYDA to fill that gap. A member-managed, concierge-
+              operated co-ownership platform for the US market. We took the
+              best of what works in Europe and rebuilt it for American legal
+              structures (Delaware member-managed LLCs), American lifestyles,
+              and the markets where the demand is concentrated.
             </p>
             <p>
               We launched in Miami first because it is the most natural

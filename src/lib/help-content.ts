@@ -40,7 +40,7 @@ export const HELP: HelpCategory[] = [
         body: [
           {
             type: "p",
-            text: "RYDA is the first US asset-backed supercar co-ownership platform. Each vehicle in the fleet is owned by a single-purpose Delaware LLC. Three to eight verified members buy shares of that LLC, and those shares entitle them to usage of the underlying vehicle — typically 50 days and 4,000 miles per share per year.",
+            text: "RYDA is the first US member-managed supercar co-ownership platform. Each vehicle in the fleet is held in a single-purpose Delaware LLC. Five to ten verified members co-own and manage that LLC together, and each seat entitles its holder to usage of the underlying vehicle — typically 50 days and 4,000 miles per seat per year.",
           },
           {
             type: "p",
@@ -48,7 +48,7 @@ export const HELP: HelpCategory[] = [
           },
           {
             type: "p",
-            text: "It's not a timeshare, not a rental marketplace, not a fund. It's direct asset-backed ownership with a concierge layer on top.",
+            text: "It's not a timeshare, not a rental marketplace, not a fund, not an investment product. It's real member-managed co-ownership of a real car, with RYDA as your hired operations partner.",
           },
         ],
       },

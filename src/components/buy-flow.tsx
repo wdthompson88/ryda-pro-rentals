@@ -257,10 +257,11 @@ function ReviewStep({
       <div className="rounded-2xl border border-rule bg-cream-2/40 p-5 text-sm">
         <p className="font-medium text-ink">A few things to know</p>
         <ul className="mt-3 list-disc space-y-2 pl-5 text-ink-soft">
-          <li>12-month minimum hold from your closing date before selling on the secondary market.</li>
-          <li>Shares are LLC membership interests offered under Reg D 506(c) — accredited investors only.</li>
+          <li>12-month minimum hold from your closing date before transferring your seat.</li>
+          <li>The LLC is member-managed — you and your co-owners hold authority over material decisions.</li>
           <li>You'll be added to the vehicle's insurance policy at closing.</li>
           <li>Any vehicle modifications, sale, or replacement requires a 75% co-owner vote.</li>
+          <li>Co-ownership stakes are not investments and the car will depreciate over time.</li>
         </ul>
       </div>
 
@@ -665,11 +666,11 @@ function ConfirmStep({
           <Timeline
             n="03"
             title="Documents countersigned"
-            body="RYDA's manager and the LLC counter-sign your Operating Agreement and Subscription Agreement."
+            body="The LLC's existing co-owners counter-sign your addition to the Operating Agreement, and RYDA executes the Management Services Agreement on the LLC's behalf."
           />
           <Timeline
             n="04"
-            title="Share recorded; calendar opens"
+            title="Seat recorded; calendar opens"
             body="Your share is officially registered with the LLC. The booking calendar opens for your first reservation."
           />
           <Timeline

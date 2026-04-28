@@ -159,38 +159,43 @@ function Identity({ onNext, onBack }: { onNext: () => void; onBack: () => void }
 function Financial({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
   return (
     <div>
-      <h2 className="font-display text-2xl text-ink">Financial qualification.</h2>
+      <h2 className="font-display text-2xl text-ink">A bit about you.</h2>
       <p className="mt-2 text-sm text-ink-soft">
-        Required before you can buy a share. Not required to join Core or to
-        rent. RYDA shares are offered under Reg D 506(c) to accredited
-        investors.
+        Helps us match you to the right vehicles, markets, and member events.
+        No accredited-investor status or financial qualification required —
+        RYDA is a luxury access platform, not an investment platform.
       </p>
       <div className="mt-8 space-y-5">
         <Select
-          label="Annual income"
-          options={["Under $200K", "$200K – $500K", "$500K – $1M", "$1M+"]}
-        />
-        <Select
-          label="Net worth (approximate)"
+          label="Why are you interested in RYDA?"
           options={[
-            "Under $500K",
-            "$500K – $1M",
-            "$1M – $5M",
-            "$5M+",
+            "I love these cars and want to drive more of them",
+            "I want a Ferrari without buying one outright",
+            "I rent exotics now and the math no longer works",
+            "I'm exploring — not sure yet",
           ]}
         />
         <Select
-          label="Accredited investor"
-          options={["Yes — I self-certify", "No", "Not sure"]}
+          label="How often do you drive a supercar today?"
+          options={[
+            "Never — but I want to",
+            "A few days a year (rentals, friends' cars)",
+            "I own one already and want a second flavor",
+            "Regularly via track days or a club",
+          ]}
+        />
+        <Select
+          label="Primary market"
+          options={["Miami", "Los Angeles", "New York", "I travel between these cities", "Somewhere else"]}
         />
         <div>
           <label className="block text-xs font-medium uppercase tracking-wider text-mute">
-            Source of funds (optional)
+            Anything we should know? (optional)
           </label>
           <textarea
             rows={3}
             className="mt-2 w-full rounded-xl border border-rule bg-cream px-4 py-3 text-sm text-ink placeholder:text-mute focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
-            placeholder="Founder + operator at [Company]. Salary + equity..."
+            placeholder="Track-day enthusiast, prefer naturally aspirated V8s, occasional Aspen trips..."
           />
         </div>
         <label className="flex items-start gap-3 text-xs text-ink-soft">
@@ -198,10 +203,10 @@ function Financial({ onNext, onBack }: { onNext: () => void; onBack: () => void 
           <span>
             I acknowledge the{" "}
             <Link href="/legal/disclaimer" className="underline hover:text-ink">
-              Securities Disclaimer
+              Co-Ownership Disclaimer
             </Link>
-            . I understand RYDA shares are LLC membership interests, not
-            registered securities, and I may lose part or all of my investment.
+            . I understand co-ownership stakes are not investments and the
+            cars I co-own will depreciate over time.
           </span>
         </label>
       </div>

@@ -20,13 +20,14 @@ export default function HowItWorksPage() {
           </p>
           <h1 className="mt-4 max-w-4xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
             Five steps to{" "}
-            <span className="italic text-red">a real share.</span>
+            <span className="italic text-red">a key.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
-            RYDA is asset-backed fractional ownership for supercars — the
-            same legal and operational structure that has powered fractional
-            aviation, fine art, and vacation real estate for years, brought
-            to a new asset class for the first time in the US.
+            RYDA is a luxury access platform built on real ownership. Each
+            car is held in a Delaware LLC that you and 5–10 other verified
+            members manage together. RYDA is hired as the operations partner
+            via a separate management services agreement. Member-managed
+            governance, real co-ownership, no investment thesis.
           </p>
         </div>
       </section>
@@ -46,11 +47,11 @@ export default function HowItWorksPage() {
           </p>
 
           <div className="mt-12 grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-5">
-            <Step n="01" title="Verify" body="Apply, complete KYC + financial qualification. Members must be 28+." />
-            <Step n="02" title="Choose" body="Browse the market. Each vehicle is a single-purpose Delaware LLC." />
-            <Step n="03" title="Acquire" body="3 to 8 co-owners form the LLC. Sign legal docs, fund your share via wire or ACH." />
-            <Step n="04" title="Drive" body="Book your time on the RYDA app. ~50 days, ~4,000 miles per share, per year." />
-            <Step n="05" title="Exit" body="Sell on the RYDA market after 12 months. We handle paperwork. 3% transfer fee." />
+            <Step n="01" title="Verify" body="Apply, complete KYC. Valid US license, clean recent driving record, 28 or older. No accreditation required." />
+            <Step n="02" title="Choose" body="Browse the fleet. Each vehicle is a single-purpose Delaware LLC member-managed by 5–10 co-owners." />
+            <Step n="03" title="Co-own" body="Join the LLC alongside other members. Sign the Operating Agreement and Management Services Agreement. Fund your seat via wire or ACH." />
+            <Step n="04" title="Drive" body="Book your time on the RYDA app. ~50 days and ~4,000 miles per seat, per year." />
+            <Step n="05" title="Transfer" body="Transfer your seat to another verified member after the 12-month minimum hold. RYDA handles the LLC paperwork. 3% transfer fee." />
           </div>
         </div>
       </section>
@@ -66,15 +67,15 @@ export default function HowItWorksPage() {
           </h2>
           <p className="mt-4 max-w-2xl text-base text-ink-soft">
             We're not selling timeshares. We're not running a rental
-            marketplace. We're the first US platform to apply proven
-            fractional-ownership structure to exotic vehicles, with the legal
-            framework and liquidity layer that's been missing.
+            marketplace. We're the first US member-managed co-ownership
+            platform for exotic vehicles — real ownership, real governance,
+            no investment thesis.
           </p>
           <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            <Diff title="Real LLCs" body="Each vehicle is owned by a Delaware single-purpose LLC. Your share is a registered membership interest, recorded with the state." />
+            <Diff title="Real LLCs" body="Each vehicle is held in a Delaware single-purpose LLC that you and your co-owners manage together. The LLC is in your name on the state records." />
+            <Diff title="Member governance" body="You and 5–10 co-owners hold authority over material decisions. RYDA is hired as your service provider, not your decision-maker." />
             <Diff title="Curated only" body="We hand-select every car. No marketplace listings. No surprises. Quality is consistent across the entire fleet." />
-            <Diff title="Member-only liquidity" body="A secondary market for shares, available only to verified members. 1–3 day settlement. Liquidity that didn't exist before." />
-            <Diff title="Concierge ops" body="Storage, insurance, maintenance, scheduling, white-glove handover — all RYDA. You drive. We handle the rest." />
+            <Diff title="Concierge ops" body="Storage, insurance, maintenance, scheduling, white-glove handover — all RYDA via a separate Management Services Agreement. You drive." />
           </div>
         </div>
       </section>
@@ -94,7 +95,7 @@ export default function HowItWorksPage() {
                 <tr>
                   <th className="px-6 py-4 text-left">Cost</th>
                   <th className="px-6 py-4 text-right">Solo ownership</th>
-                  <th className="px-6 py-4 text-right">RYDA (1 share of 6)</th>
+                  <th className="px-6 py-4 text-right">RYDA (1 seat of 6)</th>
                 </tr>
               </thead>
               <tbody className="text-ink">
@@ -105,7 +106,7 @@ export default function HowItWorksPage() {
                 <Tr label="Annual depreciation reserve" solo="$22,000" ryda="$3,667" />
                 <Tr label="Annual management" solo="—" ryda="$4,134 (12% mgmt fee)" />
                 <Tr label="Total Year 1" solo="$386,000" ryda="$68,467" emphasis />
-                <Tr label="Days driven" solo="365 (in theory)" ryda="~50 / share" />
+                <Tr label="Days driven" solo="365 (in theory)" ryda="~50 / seat" />
                 <Tr label="Effective $/day" solo="$1,058" ryda="$236" emphasis />
               </tbody>
             </table>
@@ -124,16 +125,16 @@ export default function HowItWorksPage() {
           </h2>
           <div className="mt-10 space-y-6">
             <Faq
-              q="Are RYDA shares securities?"
-              a="They are LLC membership interests in single-purpose Delaware LLCs. Counsel is reviewing the share-purchase flow under Reg D 506(c) for the launch. RYDA is not a registered exchange. The full Securities Disclaimer will be published before any share purchase goes live."
+              q="Are RYDA co-ownership stakes securities?"
+              a="No. RYDA is a luxury access platform, not an investment platform. Each car is held in a member-managed Delaware LLC where you and your co-owners hold authority over material decisions; RYDA is hired as a service provider via a separate Management Services Agreement. Co-ownership stakes are not registered securities and are not offered for investment purposes."
             />
             <Faq
-              q="Can I sell my share whenever I want?"
-              a="After a 12-month minimum hold, yes — on the RYDA member-only secondary market. Settlement takes 1–3 business days. RYDA charges a 3% transfer fee on the sale price."
+              q="Can I transfer my seat whenever I want?"
+              a="After a 12-month minimum hold, yes — to another verified RYDA member. RYDA handles the LLC paperwork. Settlement takes 1–3 business days. RYDA charges a 3% transfer fee on the sale price."
             />
             <Faq
-              q="What if a co-owner stops paying their share?"
-              a="The vehicle LLC has remedies in the Operating Agreement, including forced sale of the delinquent share. RYDA also keeps a maintenance reserve at the LLC level so vehicle ops continue uninterrupted."
+              q="What if a co-owner stops paying?"
+              a="The vehicle LLC has remedies in the Operating Agreement, including forced transfer of the delinquent seat. RYDA also keeps a maintenance reserve at the LLC level so vehicle ops continue uninterrupted while it's resolved."
             />
             <Faq
               q="Where are the cars stored?"
@@ -153,7 +154,7 @@ export default function HowItWorksPage() {
             />
             <Faq
               q="Is there a membership fee?"
-              a="Two tiers. RYDA Core is free. RYDA Black is $1,500/year and unlocks $500 share-purchase credit, priority access to new listings, free white-glove deliveries, and other premium benefits."
+              a="Three tiers. RYDA Core is free. RYDA Blue is $500/year. RYDA Black is $1,500/year — priority booking during peak season, included white-glove delivery, complimentary track-day rider on eligible vehicles, dedicated concierge contact. Founding-100 lock in $350/$1,000 for life."
             />
           </div>
         </div>
@@ -171,7 +172,7 @@ export default function HowItWorksPage() {
           <p className="mx-auto mt-4 max-w-xl text-base text-ink-soft">
             Members and prospective buyers can rent any RYDA vehicle by the
             day. It's the best way to know if the car fits your life before
-            you buy a share.
+            you claim a co-ownership seat.
           </p>
           <Link
             href="/rent"

@@ -205,12 +205,13 @@ export default function MembershipPage() {
             <Bullet>Valid US driver's license, clean recent driving record</Bullet>
             <Bullet>Pass identity verification (KYC)</Bullet>
             <Bullet>
-              For share purchases: pass financial qualification (accredited
-              investor self-cert reviewed by RYDA)
+              No accredited-investor status or financial qualification
+              required — RYDA is a luxury access platform, not an investment
+              platform
             </Bullet>
             <Bullet>
-              No requirement to buy a share — Core members are welcome to
-              browse and rent only
+              No requirement to claim a co-ownership seat — Core members
+              are welcome to browse and rent only
             </Bullet>
           </ul>
         </div>

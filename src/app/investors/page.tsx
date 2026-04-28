@@ -3,9 +3,9 @@ import { SiteHeader } from "@/components/site-header";
 import { InvestorInquiryForm } from "@/components/investor-inquiry-form";
 
 export const metadata = {
-  title: "Investors — RYDA",
+  title: "Invest in RYDA — Seed Round",
   description:
-    "RYDA's seed round is open. The first US asset-backed supercar co-ownership platform. $2.5M target. Miami launch Q3 2026.",
+    "RYDA's $2.5M seed round is open. We're building the first US member-managed supercar co-ownership platform. Miami launch Q3 2026.",
 };
 
 export default function InvestorsPage() {
@@ -13,21 +13,37 @@ export default function InvestorsPage() {
     <>
       <SiteHeader />
 
+      {/* Audience-clarification banner */}
+      <section className="border-b border-rule bg-cream-2">
+        <div className="mx-auto flex max-w-7xl flex-col gap-2 px-6 py-4 text-xs sm:flex-row sm:items-center sm:justify-between sm:px-10">
+          <p className="text-mute">
+            <span className="font-medium text-ink">For venture investors</span> — interested in
+            funding RYDA Inc. (the operating company).
+          </p>
+          <p className="text-mute">
+            Looking to co-own a car instead?{" "}
+            <Link href="/markets" className="font-medium text-red hover:text-red-deep">
+              See the fleet →
+            </Link>
+          </p>
+        </div>
+      </section>
+
       {/* Hero */}
       <section className="border-b border-rule bg-ink text-cream">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-28">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            Investors
+            Seed round · Q2 2026
           </p>
           <h1 className="mt-4 max-w-4xl font-display text-5xl font-light leading-[1.05] sm:text-6xl">
-            A new asset class,{" "}
-            <span className="italic text-red">finally legal in the US.</span>
+            The luxury access category{" "}
+            <span className="italic text-red">supercars have been waiting for.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-cream/70">
-            RYDA is the first asset-backed supercar co-ownership platform
-            in the United States. We're raising a $2.5M seed to launch
-            Miami in Q3 2026 and reach 20 vehicles + 120 co-owners +
-            $1.2M ARR by Year 3.
+            RYDA is the first US member-managed supercar co-ownership
+            platform — Soho House for cars, structured around real ownership
+            of real vehicles. We're raising a $2.5M seed to launch Miami in
+            Q3 2026 and reach 20 vehicles + 120 co-owners + $1.2M ARR by Year 3.
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <Link
@@ -73,15 +89,18 @@ export default function InvestorsPage() {
             </p>
             <p>
               The alternative — renting at $2,500 to $5,000 per day —
-              offers no equity, no priority access, inconsistent vehicle
-              quality, and no community. It is transactional and
+              offers no priority, no community, inconsistent vehicle
+              quality, and no real ownership. It is transactional and
               forgettable.
             </p>
             <p>
-              Fractional ownership has matured into a multi-billion-dollar
-              category in aviation (NetJets, Wheels Up), fine art
-              (Masterworks), and vacation real estate. No US platform has
-              built the equivalent for exotic vehicles. RYDA fills that gap.
+              Member-managed access has matured into a billion-dollar
+              category in private aviation (NetJets jet card), luxury
+              hospitality (Soho House, Equinox Black), and country clubs.
+              No US platform has built the equivalent for exotic vehicles.
+              RYDA fills that gap with a real-ownership structure: each
+              car is held in a Delaware LLC that 5–10 verified members
+              manage together.
             </p>
           </div>
         </div>
@@ -96,10 +115,10 @@ export default function InvestorsPage() {
           </h2>
           <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-5">
             <Step n="01" title="Source" body="RYDA acquires curated supercars in target markets — Ferrari, Lamborghini, McLaren, Aston Martin, Rolls-Royce." />
-            <Step n="02" title="Structure" body="Each vehicle is owned by a single-purpose Delaware LLC. 3–8 verified accredited members hold shares." />
-            <Step n="03" title="Operate" body="RYDA handles storage, insurance, maintenance, scheduling, and concierge through partner facilities." />
-            <Step n="04" title="Use" body="Members book usage on the RYDA app — typically 50 days + 4,000 miles per share per year." />
-            <Step n="05" title="Exit" body="After 12 months, members can sell their share on RYDA's member-only secondary market." />
+            <Step n="02" title="Structure" body="Each vehicle is held in a single-purpose Delaware LLC. 5–10 verified members co-own and manage the LLC together." />
+            <Step n="03" title="Operate" body="RYDA contracts with each LLC as a service provider — storage, insurance, maintenance, scheduling, concierge." />
+            <Step n="04" title="Use" body="Members book usage on the RYDA app — typically 50 days + 4,000 miles per seat per year." />
+            <Step n="05" title="Transfer" body="After 12 months, members transfer their seat to another verified member. RYDA handles the LLC paperwork. 3% transfer fee." />
           </div>
         </div>
       </section>
@@ -123,8 +142,8 @@ export default function InvestorsPage() {
               tag="Recurring"
             />
             <Revenue
-              line="Share Transfer Commission"
-              detail="3% of transfer price on every secondary-market sale of a co-ownership share."
+              line="Seat Transfer Fee"
+              detail="3% of transfer price on every member-to-member transfer of a co-ownership seat."
               tag="Transactional"
             />
             <Revenue
@@ -177,13 +196,13 @@ export default function InvestorsPage() {
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">Comparables</p>
           <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
-            The model is proven. The asset class is new.
+            Access products at scale. Supercars are the gap.
           </h2>
           <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            <Comp name="Pacaso" asset="Vacation real estate" outcome="$1B+ GMV in 2 years. Now mature." />
-            <Comp name="NetJets" asset="Private aviation" outcome="$3B+ AUM in fractional aircraft. Berkshire-owned." />
-            <Comp name="Masterworks" asset="Fine art" outcome="$1B+ in fractional art. SEC-registered." />
-            <Comp name="Supercar Sharing AG" asset="Supercars (Switzerland)" outcome="1,300+ members. CHF 34.3M transactions. The model RYDA adapts." />
+            <Comp name="Supercar Sharing AG" asset="Supercars · Switzerland" outcome="1,300+ members. CHF 34M in transactions over 10 years. Direct precedent — same structure RYDA adapts." />
+            <Comp name="NetJets jet card" asset="Private aviation access" outcome="Multi-billion-dollar program. Depreciating-asset access product, no securities filing. Direct structural analog." />
+            <Comp name="Soho House / Equinox Black" asset="Luxury membership" outcome="Hundreds of thousands of members at $5–10K+/year. Proves luxury access has scale demand at this price band." />
+            <Comp name="Country club / yacht club" asset="Member-owned recreational asset" outcome="Centuries-old structure: members own a depreciating asset together, hire staff to operate it. The legal template RYDA uses." />
           </div>
         </div>
       </section>
@@ -198,8 +217,8 @@ export default function InvestorsPage() {
           <ul className="mt-10 space-y-4 text-sm">
             <Use line="Operations + first hires" pct="35%" detail="COO, Head of Acquisition, Head of Member Experience, ops staff for Miami launch." />
             <Use line="Fleet acquisition support" pct="25%" detail="Earnest deposits + bridge equity for first 5 vehicles before co-owner closings." />
-            <Use line="Platform build" pct="20%" detail="Engineering, design, secondary-market matching engine, integrations (Stripe, KYC, insurance)." />
-            <Use line="Insurance + legal" pct="10%" detail="Securities counsel, fleet insurance, founding LLC structures." />
+            <Use line="Platform build" pct="20%" detail="Engineering, design, member dashboard, integrations (Stripe, Persona KYC, insurance, DMV/title workflows)." />
+            <Use line="Legal + insurance setup" pct="10%" detail="Outside counsel for member-managed LLC structure, MSA template, multi-named-insured fleet policy negotiation." />
             <Use line="Marketing + member acquisition" pct="10%" detail="Founding-100 outreach, events, content, PR for launch." />
           </ul>
         </div>

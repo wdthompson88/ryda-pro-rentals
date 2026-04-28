@@ -7,7 +7,7 @@ export function SiteFooter() {
         <div className="col-span-2 sm:col-span-3 lg:col-span-2">
           <p className="font-display text-2xl text-ink">RYDA</p>
           <p className="mt-3 max-w-sm text-sm text-ink-soft">
-            The first US asset-backed supercar co-ownership platform.
+            The first US member-managed supercar co-ownership platform.
             Headquartered in Miami, FL. Delaware-incorporated.
           </p>
         </div>

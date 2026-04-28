@@ -207,7 +207,7 @@ function TitleSlide() {
         Own the world's best cars. Together.
       </p>
       <p className="mt-4 max-w-2xl text-base text-ink-soft sm:text-lg">
-        The first US asset-backed supercar co-ownership platform.
+        The first US member-managed supercar co-ownership platform.
         Miami launch Q3 2026.
       </p>
       <div className="mt-16 border-t border-rule pt-6">
