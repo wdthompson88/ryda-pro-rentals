@@ -3,7 +3,12 @@ import { Resend } from "resend";
 const apiKey = process.env.RESEND_API_KEY;
 const resend = apiKey ? new Resend(apiKey) : null;
 
-const FROM = "RYDA Notifications <notifications@uariiqueu.resend.app>";
+// onboarding@resend.dev is Resend's default test sender — works without
+// domain verification on the free tier. Limitation: it can only deliver
+// to the email used at Resend signup (ryangalli3@gmail.com here), which
+// is exactly our team-notification recipient, so this works for now.
+// Swap to a verified ryda.com sender once a custom domain is set up.
+const FROM = "RYDA Notifications <onboarding@resend.dev>";
 const TEAM_EMAIL = "ryangalli3@gmail.com";
 
 export type NotifyArgs = {
