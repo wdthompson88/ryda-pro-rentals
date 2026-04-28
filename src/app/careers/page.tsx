@@ -29,7 +29,7 @@ const ROLES = [
     title: "Senior Full-Stack Engineer",
     type: "Full-time · Equity",
     location: "Remote (US)",
-    body: "Take ownership of the platform. Next.js, Supabase, Stripe Connect, and a real-time matching engine for the secondary market. We need someone who's shipped marketplaces or fintech products before.",
+    body: "Take ownership of the platform. Next.js, Supabase, Stripe Connect, and the member-to-member transfer flow that handles LLC paperwork at scale. We need someone who's shipped consumer or fintech-adjacent products before.",
   },
   {
     title: "Brand Designer",

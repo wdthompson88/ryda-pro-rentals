@@ -17,11 +17,11 @@ const FEATURES: { group: string; items: { label: string; core: CellValue; blue: 
     items: [
       { label: "Browse all vehicles in every market", core: true, blue: true, black: true },
       { label: "Rent any available vehicle", core: true, blue: true, black: true },
-      { label: "Buy shares · list shares for sale", core: true, blue: true, black: true },
+      { label: "Claim co-ownership seats · transfer to other members", core: true, blue: true, black: true },
       { label: "In-app messaging with co-owners", core: true, blue: true, black: true },
       { label: "Inspection reports + LLC documents", core: true, blue: true, black: true },
       { label: "Member directory access", core: false, blue: true, black: true },
-      { label: "Member-only secondary market", core: false, blue: true, black: true },
+      { label: "Member-to-member seat transfers", core: false, blue: true, black: true },
       { label: "Off-market vehicle pre-list visibility", core: false, blue: false, black: true },
     ],
   },
@@ -29,7 +29,7 @@ const FEATURES: { group: string; items: { label: string; core: CellValue; blue: 
     group: "Priority",
     items: [
       { label: "Priority access to new listings", core: false, blue: "24-hour", black: "48-hour" },
-      { label: "Share-purchase credit", core: false, blue: "$200", black: "$500" },
+      { label: "Buy-in credit", core: false, blue: "$200", black: "$500" },
       { label: "Acquisition fee discount", core: false, blue: "10% off", black: "Waived (1st share)" },
     ],
   },

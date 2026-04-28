@@ -32,7 +32,7 @@ export default function TermsPage() {
         },
         {
           heading: "6. Co-ownership and legal interests",
-          body: "Co-ownership purchases are interests in single-purpose Delaware LLCs governed by the LLC Operating Agreement and Co-Owner Agreement. RYDA is not a registered securities broker, dealer, or exchange. See the Securities Disclaimer for more.",
+          body: "Co-ownership stakes are membership interests in member-managed single-purpose Delaware LLCs, governed by the LLC Operating Agreement and the Management Services Agreement between each LLC and RYDA. RYDA is not a registered broker, dealer, exchange, or investment adviser. Co-ownership stakes are not registered securities and are not offered for investment purposes. See the Co-Ownership Disclaimer for more.",
         },
         {
           heading: "7. Prohibited conduct",

@@ -288,14 +288,14 @@ function SolutionSlide() {
   return (
     <div>
       <Eyebrow>Solution</Eyebrow>
-      <H2>One car. 3–8 owners. Real LLC. Real shares.</H2>
+      <H2>One car. 5–10 co-owners. Member-managed LLC. Real keys.</H2>
       <ol className="mt-12 space-y-4">
         {[
           ["Source", "RYDA acquires curated supercars in target markets."],
-          ["Structure", "Each vehicle = single-purpose Delaware LLC. 3–8 verified members hold shares."],
-          ["Operate", "RYDA handles storage, insurance, maintenance, scheduling, concierge."],
-          ["Use", "Members book usage on the RYDA app — ~50 days, ~4,000 mi per share/yr."],
-          ["Exit", "After 12 months, members sell on a member-only secondary market."],
+          ["Structure", "Each vehicle = single-purpose Delaware LLC. 5–10 verified members co-own and manage the LLC together."],
+          ["Operate", "RYDA contracts with each LLC as a service provider — storage, insurance, maintenance, scheduling, concierge."],
+          ["Use", "Members book usage on the RYDA app — ~50 days, ~4,000 mi per seat per year."],
+          ["Transfer", "After 12 months, members transfer their seat to another verified member. RYDA handles LLC paperwork."],
         ].map(([title, body], i) => (
           <li key={title} className="flex gap-6">
             <span className="font-display text-2xl text-red">0{i + 1}</span>

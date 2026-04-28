@@ -27,7 +27,7 @@ const SECTIONS: { title: string; questions: Q[] }[] = [
       },
       {
         q: "Can I transfer my seat whenever I want?",
-        a: "After a 12-month minimum hold, yes — on the RYDA member-only secondary market. Settlement takes 1–3 business days. RYDA charges a 3% transfer fee on the sale price.",
+        a: "After a 12-month minimum hold, yes — directly to another verified RYDA member. RYDA facilitates the LLC paperwork. There is no public marketplace and no order book. Settlement takes 1–3 business days. RYDA charges a 3% transfer fee on the agreed price.",
       },
       {
         q: "What if a co-owner stops paying?",

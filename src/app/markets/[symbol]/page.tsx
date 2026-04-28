@@ -22,7 +22,7 @@ export async function generateMetadata({
   if (!v) return { title: "RYDA Markets" };
   return {
     title: `${v.name} — ${formatUSD(v.pricePerShare)} | RYDA Markets`,
-    description: `Trade shares in the ${v.year} ${v.name}. Member-only secondary market with full transparency.`,
+    description: `Co-own a ${v.year} ${v.name}. ${v.sharesAvailable} of ${v.shares} member-managed LLC seats available.`,
   };
 }
 
@@ -173,12 +173,12 @@ export default async function VehicleMarketPage({
       {/* Disclaimer footer */}
       <section className="bg-ink py-12 text-cream/60">
         <div className="mx-auto max-w-3xl px-6 text-center text-xs sm:px-10">
-          All trading involves risk, including loss of principal. Past
-          performance does not guarantee future results. RYDA shares are
-          membership interests in single-purpose Delaware LLCs and are not
-          registered securities. Settlement of accepted orders takes 1–3
-          business days. Membership is limited to verified individuals 28 years
-          or older. See full Securities Disclaimer (forthcoming).
+          RYDA is a luxury access platform. Co-ownership stakes are LLC
+          membership interests in member-managed Delaware LLCs and are
+          not registered securities. They are not offered for investment
+          purposes. Cars depreciate; seats are illiquid by design.
+          Membership is limited to verified individuals 28 years or older.
+          See the full Co-Ownership Disclaimer at /legal/disclaimer.
         </div>
       </section>
     </>

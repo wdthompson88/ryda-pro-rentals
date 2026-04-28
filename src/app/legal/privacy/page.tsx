@@ -16,11 +16,11 @@ export default function PrivacyPage() {
         },
         {
           heading: "2. What we collect",
-          body: "Account information you provide (name, email, phone, address, date of birth, driver's license).\n\nIdentity verification data (government ID, selfie liveness check) collected via our KYC partner.\n\nFinancial qualification information you submit to be eligible for share purchases.\n\nPayment information (handled by our payment processor; we never see full card numbers).\n\nUsage data (pages viewed, features used, device type, IP address) to operate and improve the platform.\n\nVehicle telematics, where applicable, to verify trip starts/ends and detect abuse.",
+          body: "Account information you provide (name, email, phone, address, date of birth, driver's license).\n\nIdentity verification data (government ID, selfie liveness check) and driving record check collected via our KYC partner.\n\nPayment information (handled by our payment processor; we never see full card numbers).\n\nUsage data (pages viewed, features used, device type, IP address) to operate and improve the platform.\n\nVehicle telematics, where applicable, to verify trip starts/ends and detect abuse.",
         },
         {
           heading: "3. How we use your information",
-          body: "To verify your identity and eligibility for membership.\n\nTo facilitate rentals and share purchases, including legal documents, payments, and ownership records.\n\nTo communicate about your account, bookings, billing, and changes to our service.\n\nTo prevent fraud, enforce our Terms of Service, and comply with the law.",
+          body: "To verify your identity and eligibility for membership.\n\nTo facilitate rentals and co-ownership seat onboarding, including LLC documents, payments, and member records.\n\nTo communicate about your account, bookings, billing, and changes to our service.\n\nTo prevent fraud, enforce our Terms of Service, and comply with the law.",
         },
         {
           heading: "4. How we share your information",

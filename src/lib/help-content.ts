@@ -44,7 +44,7 @@ export const HELP: HelpCategory[] = [
           },
           {
             type: "p",
-            text: "RYDA handles every operational layer: acquisition, storage, insurance, scheduling, maintenance, member services, and the secondary market when a member wants to exit their share after the 12-month minimum hold.",
+            text: "RYDA, as the LLC's hired service provider, handles every operational layer: acquisition support, storage, insurance, scheduling, maintenance, and member services. RYDA also facilitates the LLC paperwork when a member transfers their seat to another verified member after the 12-month minimum hold.",
           },
           {
             type: "p",
@@ -70,7 +70,7 @@ export const HELP: HelpCategory[] = [
             type: "ul",
             items: [
               "If the LLC sells the vehicle, the LLC's proceeds are distributed pro-rata to members per the Operating Agreement.",
-              "You can sell your share to another verified RYDA member on the secondary market after 12 months.",
+              "You can transfer your seat to another verified RYDA member after the 12-month minimum hold. RYDA facilitates the LLC paperwork.",
               "You have voting rights on material decisions (sale, modifications, replacement) defined in the Operating Agreement.",
             ],
           },
@@ -84,17 +84,17 @@ export const HELP: HelpCategory[] = [
         slug: "membership-tiers",
         q: "Membership tiers explained: Core, Blue, Black",
         summary:
-          "Core is free and lets you watch markets. Blue ($500/yr) unlocks share purchases. Black ($1,500/yr) adds priority and concierge perks.",
+          "Core is free and lets you browse the fleet. Blue ($500/yr) unlocks co-ownership and rentals. Black ($1,500/yr) adds priority and concierge perks.",
         body: [
           { type: "h3", text: "Core — Free" },
           {
             type: "p",
-            text: "Free, no commitment. You can browse the markets, see vehicle data, and read all marketing materials. You cannot purchase shares, book vehicles, or access the secondary market on Core.",
+            text: "Free, no commitment. You can browse the fleet, see vehicle data, and read all marketing materials. You cannot claim a co-ownership seat, book vehicles, or transfer between members on Core.",
           },
           { type: "h3", text: "Blue — $500/year ($350 founding)" },
           {
             type: "p",
-            text: "The standard tier for active co-owners. Includes share purchases, secondary-market access, member event invitations, and standard concierge services. Founding-100 members lock in $350/year for life.",
+            text: "The standard tier for active co-owners. Includes co-ownership seats, member-to-member transfers, member event invitations, and standard concierge services. Founding-100 members lock in $350/year for life.",
           },
           { type: "h3", text: "Black — $1,500/year ($1,000 founding)" },
           {
@@ -193,7 +193,7 @@ export const HELP: HelpCategory[] = [
           {
             type: "callout",
             tone: "info",
-            text: "Many members rent first, then convert that experience into a share purchase on the same vehicle. We credit a portion of recent rental payments toward the share purchase price, capped at 30 days.",
+            text: "Many members rent first, then convert that experience into a co-ownership seat on the same vehicle. We credit a portion of recent rental payments toward the buy-in, capped at 30 days.",
           },
         ],
       },
@@ -201,7 +201,7 @@ export const HELP: HelpCategory[] = [
         slug: "founding-member-benefits",
         q: "What do founding-100 members get?",
         summary:
-          "Locked-for-life membership pricing ($350 Blue / $1,000 Black), founding-100 badge, priority on first vehicle launches, member-event access, and reduced share-purchase friction.",
+          "Locked-for-life membership pricing ($350 Blue / $1,000 Black), founding-100 badge, priority on first vehicle launches, member-event access, and faster onboarding for additional seats.",
         body: [
           { type: "h3", text: "Pricing locked for life" },
           {
@@ -218,7 +218,7 @@ export const HELP: HelpCategory[] = [
             type: "ul",
             items: [
               "Founding-100 badge on member directory and event invitations.",
-              "Reduced KYC friction (single accreditation review carries across multiple share purchases).",
+              "Reduced KYC friction (single identity verification carries across multiple co-ownership seats).",
               "Invitation to RYDA's annual founding-member dinner.",
               "Direct line to RYDA founders for product feedback during the launch year.",
             ],
@@ -372,9 +372,9 @@ export const HELP: HelpCategory[] = [
       },
       {
         slug: "selling",
-        q: "Can I sell my share whenever I want?",
+        q: "Can I transfer my seat whenever I want?",
         summary:
-          "After a 12-month minimum hold, yes — on the RYDA member-only secondary market. Settlement in 1–3 business days. RYDA charges a 3% transfer fee.",
+          "After a 12-month minimum hold, yes — directly to another verified RYDA member. RYDA facilitates the LLC paperwork. 3% transfer fee.",
         body: [
           {
             type: "p",
@@ -383,49 +383,57 @@ export const HELP: HelpCategory[] = [
           {
             type: "ul",
             items: [
-              "12-month minimum hold from your purchase date. This is in the Operating Agreement to keep co-owner groups stable through at least one full year of use.",
-              "The buyer must be a verified RYDA member who has cleared KYC. Co-ownership seats can only transfer between RYDA members under the Operating Agreement.",
+              "12-month minimum hold from your closing date. This is in the Operating Agreement to keep co-owner groups stable through at least one full year of use.",
+              "The new co-owner must be a verified RYDA member who has cleared KYC. Seats can only transfer between RYDA members under the Operating Agreement.",
             ],
           },
           {
             type: "p",
-            text: "Once the hold period clears, list your share on the member secondary market through your dashboard. Set the asking price (we provide a fair-market reference based on recent comparable transactions and an updated vehicle valuation). Matching is automatic when a buyer accepts.",
+            text: "Once the hold period clears, signal your intent to transfer through your dashboard. RYDA helps you negotiate directly with another interested verified member — there's no public marketplace, no order book, and no auction. You and the new co-owner agree on a price; RYDA handles the LLC paperwork to update the member register and Operating Agreement.",
+          },
+          { type: "h3", text: "How pricing usually works" },
+          {
+            type: "p",
+            text: "Members typically reference RYDA's quarterly valuation update for the vehicle (auction comparables and an independent appraisal) as a starting point and negotiate from there. There's no obligation to use the reference price — it's just context.",
           },
           {
             type: "p",
-            text: "RYDA charges a 3% transfer fee on the sale price, deducted at settlement. Settlement is 1–3 business days; funds are wired to your account on file.",
+            text: "RYDA charges a 3% transfer fee on the agreed price, deducted at settlement. Settlement is typically 1–3 business days once both parties have signed updated documents.",
           },
           {
             type: "callout",
             tone: "info",
-            text: "If no buyer matches at your asking price, you can lower it, hold and re-list, or — in rare cases — RYDA may bid in to provide liquidity.",
+            text: "Co-ownership seats are illiquid by design. Cars depreciate, transfer requires another verified member to want your seat, and timing isn't guaranteed. Don't claim a seat expecting on-demand exit — claim it because you want to drive the car.",
           },
         ],
       },
       {
         slug: "pricing",
-        q: "How is a share priced on the secondary market?",
+        q: "How is a transfer price determined?",
         summary:
-          "Reference price based on the current vehicle valuation (auction-adjusted) divided by share count, plus a recent-transaction adjustment. Sellers set their actual ask.",
+          "Two members negotiate directly. RYDA publishes a quarterly vehicle valuation as context, but co-owners agree on the actual transfer price between themselves.",
         body: [
           {
             type: "p",
-            text: "Two inputs determine the reference price you'll see on the markets page for any vehicle:",
+            text: "There is no marketplace, no order book, and no auction. Transfers happen by direct negotiation between two verified RYDA members.",
           },
+          { type: "h3", text: "What RYDA provides as context" },
           {
             type: "ul",
             items: [
-              "Current vehicle valuation. We pull from auction comparables (Bring a Trailer, RM Sotheby's, Mecum) and certified independent appraisals on a quarterly cadence. This sets the base value of the underlying asset.",
-              "Recent member-to-member transactions. The most recent secondary-market trades on similar shares adjust the reference up or down.",
+              "A quarterly vehicle valuation: an estimate based on auction comparables (Bring a Trailer, RM Sotheby's, Mecum) and a certified independent appraisal.",
+              "An estimate of the seat's reference value: (current vehicle valuation + accrued LLC reserves) ÷ seat count.",
+              "A summary of any prior transfers on the same vehicle for transparency.",
             ],
           },
           {
             type: "p",
-            text: "Reference price = (current vehicle valuation + accrued reserves) ÷ share count, then adjusted by recent transaction premium or discount. Actual transactions can clear above or below the reference based on supply and demand.",
+            text: "These are reference values only. Co-owners negotiating a transfer can use them as a starting point or ignore them. There is no automatic matching engine — the transfer happens at whatever price the two members agree to.",
           },
           {
-            type: "p",
-            text: "You set your actual ask when listing. The reference is just a starting point — sellers in a hurry list below, sellers willing to wait list above.",
+            type: "callout",
+            tone: "info",
+            text: "Cars depreciate. Reference values typically decline over time. Don't claim a seat expecting it to hold or grow in value — claim it for the use you'll get from the car.",
           },
         ],
       },
@@ -433,11 +441,11 @@ export const HELP: HelpCategory[] = [
         slug: "transfer-fee",
         q: "What's the 3% transfer fee?",
         summary:
-          "A flat 3% of the sale price on every secondary-market share transfer, paid to RYDA. Covers transfer paperwork, KYC re-verification of the buyer, and registry updates.",
+          "A flat 3% of the agreed price on every member-to-member seat transfer, paid to RYDA. Covers LLC paperwork, KYC re-verification of the new co-owner, and registry updates.",
         body: [
           {
             type: "p",
-            text: "Every share transfer through the RYDA secondary market carries a 3% fee on the sale price. It's deducted from seller proceeds at settlement.",
+            text: "Every member-to-member seat transfer that RYDA facilitates carries a 3% fee on the agreed price. It's deducted from seller proceeds at settlement.",
           },
           { type: "h3", text: "What the fee covers" },
           {
@@ -470,12 +478,12 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Inheritance and estate transfer" },
           {
             type: "p",
-            text: "When a co-owner dies, the share is part of their estate and passes per their will or trust. The estate can either liquidate the share on the secondary market (transfer fee waived for estate liquidations) or transfer it to a named heir. Heirs must complete RYDA verification before the share transfers.",
+            text: "When a co-owner dies, the seat is part of their estate and passes per their will or trust. The estate can either transfer the seat to another verified member (transfer fee waived for estate transfers) or hand it to a named heir. Heirs must complete RYDA verification before the seat transfers.",
           },
           { type: "h3", text: "If no heir wants it" },
           {
             type: "p",
-            text: "The estate can list the share on the secondary market for sale, or — at the estate's request — RYDA may bid in for liquidity at fair-market value.",
+            text: "The estate can list the seat through RYDA for transfer to another verified member. Transfers can take 30–90 days depending on member demand. There's no guaranteed buyer.",
           },
           {
             type: "callout",
@@ -512,7 +520,7 @@ export const HELP: HelpCategory[] = [
           {
             type: "ul",
             items: [
-              "Liquidity. Sell on the secondary market in days, not the months it takes to sell a private exotic.",
+              "Cleaner exit. Transfer your seat to another verified member rather than navigating the months-long process of selling a private exotic on Bring a Trailer or to a dealer.",
               "Operational ease. RYDA handles every layer — insurance renewals, service appointments, storage, registration, claims.",
               "Diversification. Same capital that buys one Ferrari can buy a Ferrari share, a McLaren share, and a Lamborghini share.",
             ],
@@ -537,7 +545,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "If they don't cure" },
           {
             type: "p",
-            text: "The LLC can force sale of the delinquent share through the secondary market at fair-market value. Proceeds first cover the unpaid amount, then any LLC-level transaction costs, then the rest goes to the former member. The remaining co-owners aren't on the hook for the unpaid amount — the share itself secures the obligation.",
+            text: "The LLC can force transfer of the delinquent seat to another verified member at the most recent reference value. Proceeds first cover the unpaid amount, then any LLC-level transaction costs, then the rest goes to the former member. The remaining co-owners aren't on the hook for the unpaid amount — the seat itself secures the obligation.",
           },
           { type: "h3", text: "Why it doesn't disrupt operations" },
           {
@@ -1404,7 +1412,7 @@ export const HELP: HelpCategory[] = [
         slug: "payment-methods",
         q: "Updating payment methods",
         summary:
-          "Through your dashboard. ACH for membership and large transactions, card for incidentals. Wire instructions are issued per share purchase.",
+          "Through your dashboard. ACH for membership and large transactions, card for incidentals. Wire instructions are issued per co-ownership buy-in.",
         body: [
           { type: "h3", text: "Where" },
           {
@@ -1502,7 +1510,7 @@ export const HELP: HelpCategory[] = [
         slug: "kyc",
         q: "KYC verification — what we collect and why",
         summary:
-          "Government ID, selfie match, address proof. Required before any share purchase or member booking. Verified through Persona — RYDA never sees raw documents.",
+          "Government ID, selfie match, address proof, clean recent driving record. Required before any co-ownership buy-in or member booking. Verified through Persona — RYDA never sees raw documents.",
         body: [
           { type: "h3", text: "What we collect" },
           {
@@ -1535,7 +1543,7 @@ export const HELP: HelpCategory[] = [
         slug: "close",
         q: "Closing my account",
         summary:
-          "If you hold no shares: instant. If you hold shares: sell them on the secondary market first, then close. Settlement of any open obligations happens at closure.",
+          "If you hold no co-ownership seats: instant. If you hold seats: transfer them to other verified members first, then close. Settlement of any open obligations happens at closure.",
         body: [
           { type: "h3", text: "If you hold no shares" },
           {
@@ -1545,13 +1553,13 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "If you hold one or more shares" },
           {
             type: "p",
-            text: "You'll need to exit your shares before closing the account. Two paths:",
+            text: "You'll need to transfer your seats to other verified members before closing. The process:",
           },
           {
             type: "ul",
             items: [
-              "List on the secondary market and wait for a buyer (typical resolution: 30–90 days, depending on vehicle and ask).",
-              "Request RYDA bid-in for liquidity (case-by-case, typically at a 5–10% discount to fair-market reference).",
+              "Signal your intent to transfer through your dashboard. Typical resolution: 30–90 days depending on vehicle and price.",
+              "If no member is interested at your price, you can lower it, hold and wait, or — in some cases — RYDA may help facilitate a transfer to a member on the waitlist.",
             ],
           },
           {
@@ -1571,7 +1579,7 @@ export const HELP: HelpCategory[] = [
             type: "ul",
             items: [
               "$500 credit when your referral becomes a paid member (Blue or Black).",
-              "$2,500 credit when your referral closes their first share purchase.",
+              "$2,500 credit when your referral closes their first co-ownership seat.",
               "Founding-100 members earn 2× credits on every successful referral.",
             ],
           },
@@ -1605,7 +1613,7 @@ export const HELP: HelpCategory[] = [
         body: [
           {
             type: "p",
-            text: "When RYDA launched, the first 100 members were eligible for permanently locked membership pricing at a $150–500 annual discount. The lock applies to the membership fee only — share purchase prices, management fees, and other charges are at standard rates.",
+            text: "When RYDA launched, the first 100 members were eligible for permanently locked membership pricing at a $150–500 annual discount. The lock applies to the membership fee only — co-ownership buy-in prices, management fees, and other charges are at standard rates.",
           },
           { type: "h3", text: "Locked rates" },
           {
@@ -1686,7 +1694,7 @@ export const HELP: HelpCategory[] = [
           {
             type: "ul",
             items: [
-              "Manager-managed: a designated manager runs the LLC. Members are passive — like shareholders. This is what most fractional investment platforms (Rally, Masterworks) use.",
+              "Manager-managed: a designated manager runs the LLC. Members are passive — like shareholders. This is what most fractional investment platforms use, which is what makes those products securities.",
               "Member-managed: the members themselves run the LLC, vote on material decisions, and hire service providers as needed. This is what RYDA uses.",
             ],
           },
@@ -1799,14 +1807,14 @@ export const HELP: HelpCategory[] = [
             type: "ul",
             items: [
               "Total loss: vehicle is destroyed and the group doesn't elect to roll proceeds into a replacement.",
-              "Voluntary: a 75% co-owner vote elects to wind down (e.g., the group decides to exit the asset class).",
-              "Forced: the LLC becomes insolvent, or RYDA's manager finds operating the LLC no longer viable.",
+              "Voluntary: a 75% co-owner vote elects to wind down (e.g., the group decides to sell the car and end the LLC).",
+              "Forced: the LLC becomes insolvent, or the members determine continued operation is no longer viable.",
             ],
           },
           { type: "h3", text: "Sequence of events" },
           {
             type: "p",
-            text: "RYDA, as manager of the LLC, marshals assets (insurance proceeds or sale proceeds), pays outstanding liabilities (carrier balances, vendor invoices, taxes), and distributes the remainder pro-rata to co-owners according to their share count. Distribution happens within 60 days of the dissolution decision.",
+            text: "Per the Operating Agreement and the Management Services Agreement, RYDA performs the wind-down operations: marshalling assets (insurance proceeds or sale proceeds), paying outstanding liabilities (carrier balances, vendor invoices, taxes), and distributing the remainder pro-rata to co-owners according to their seats held. The dissolution decision itself is a member vote; RYDA executes it. Distribution happens within 60 days of the decision.",
           },
           { type: "h3", text: "Tax implications" },
           {
@@ -1824,7 +1832,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Day-to-day governance" },
           {
             type: "p",
-            text: "RYDA acts as manager of the LLC, which means most operational decisions (scheduling, service, condition issues) are decided by the manager applying the Operating Agreement consistently. Co-owners aren't typically asked to settle disputes — RYDA does, by reference to the document.",
+            text: "RYDA, as the LLC's hired service provider, performs most operational decisions (scheduling, service, condition issues) by applying the Operating Agreement consistently. The LLC remains member-managed — co-owners hold authority over material decisions — but day-to-day operations are delegated to RYDA via the Management Services Agreement. RYDA's authority is bounded by what the Operating Agreement and MSA explicitly delegate.",
           },
           { type: "h3", text: "When co-owners disagree" },
           {

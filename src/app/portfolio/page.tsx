@@ -1,37 +1,32 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
-import { VEHICLES, formatUSD, changeFromPrev } from "@/lib/market-data";
+import { VEHICLES, formatUSD } from "@/lib/market-data";
 
 export const metadata = {
-  title: "Portfolio — RYDA",
-  description: "Your RYDA holdings, returns, and recent trades.",
+  title: "Your seats — RYDA",
+  description: "Your co-ownership seats, usage, and upcoming bookings.",
 };
 
-// Sample portfolio for the demo phase.
-const HOLDINGS = [
-  { symbol: "F296", shares: 1, avgCost: 54_127 },
-  { symbol: "MC75", shares: 1, avgCost: 60_900 },
+// Sample co-ownership view for the demo phase. Real version pulls from
+// authenticated member records in Supabase.
+const SEATS = [
+  { symbol: "F296", seats: 1, daysUsed: 18 },
+  { symbol: "MC75", seats: 1, daysUsed: 7 },
 ];
 
 export default function PortfolioPage() {
-  const positions = HOLDINGS.map((h) => {
-    const v = VEHICLES.find((vv) => vv.symbol === h.symbol)!;
-    const value = v.pricePerShare * h.shares;
-    const cost = h.avgCost * h.shares;
-    const gain = value - cost;
-    const gainPct = (gain / cost) * 100;
-    const today = changeFromPrev(v.pricePerShare, v.prevClose);
-    return { v, h, value, cost, gain, gainPct, today };
+  const positions = SEATS.map((s) => {
+    const v = VEHICLES.find((vv) => vv.symbol === s.symbol)!;
+    const daysAvailable = v.daysPerYear * s.seats;
+    const milesAvailable = v.milesPerYear * s.seats;
+    const annualMgmt = v.annualOpCost * s.seats;
+    return { v, s, daysAvailable, milesAvailable, annualMgmt };
   });
 
-  const totalValue = positions.reduce((s, p) => s + p.value, 0);
-  const totalCost = positions.reduce((s, p) => s + p.cost, 0);
-  const totalGain = totalValue - totalCost;
-  const totalPct = totalCost > 0 ? (totalGain / totalCost) * 100 : 0;
-  const todayGain = positions.reduce((s, p) => s + p.today.diff * p.h.shares, 0);
-  const todayPct = totalValue > 0 ? (todayGain / totalValue) * 100 : 0;
-  const isUpToday = todayGain >= 0;
-  const isUpTotal = totalGain >= 0;
+  const totalSeats = positions.reduce((n, p) => n + p.s.seats, 0);
+  const totalDays = positions.reduce((n, p) => n + p.daysAvailable, 0);
+  const totalDaysUsed = positions.reduce((n, p) => n + p.s.daysUsed, 0);
+  const totalAnnualMgmt = positions.reduce((n, p) => n + p.annualMgmt, 0);
 
   return (
     <>
@@ -41,84 +36,69 @@ export default function PortfolioPage() {
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-14 sm:px-10 sm:py-20">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            Portfolio
+            Your seats
           </p>
-          <h1 className="mt-4 font-display text-2xl text-ink">Total value</h1>
-          <p className="mt-2 font-display text-5xl font-light text-ink tabular-nums sm:text-6xl">
-            {formatUSD(totalValue)}
-          </p>
-          <p
-            className="mt-2 text-base font-medium tabular-nums"
-            style={{ color: isUpToday ? "#00C805" : "#DC2626" }}
-          >
-            {isUpToday ? "▲" : "▼"} {formatUSD(Math.abs(todayGain))} ({todayPct.toFixed(2)}%) Today
-          </p>
-          <p
-            className="mt-1 text-sm tabular-nums"
-            style={{ color: isUpTotal ? "#00C805" : "#DC2626" }}
-          >
-            {isUpTotal ? "▲" : "▼"} {formatUSD(Math.abs(totalGain))} ({totalPct.toFixed(2)}%) All-time
-          </p>
+          <h1 className="mt-4 font-display text-4xl font-light text-ink sm:text-5xl">
+            {totalSeats} seat{totalSeats !== 1 ? "s" : ""} across {positions.length} car{positions.length !== 1 ? "s" : ""}.
+          </h1>
+          <div className="mt-8 grid grid-cols-2 gap-6 sm:grid-cols-4">
+            <Stat label="Days available this year" value={String(totalDays)} sub={`${totalDaysUsed} used`} />
+            <Stat label="Days remaining" value={String(totalDays - totalDaysUsed)} sub="across all cars" />
+            <Stat label="Annual mgmt fees" value={formatUSD(totalAnnualMgmt)} sub="per year, total" />
+            <Stat label="Member tier" value="Blue" sub="Founding-100 locked" />
+          </div>
         </div>
       </section>
 
-      {/* Holdings table */}
-      <section className="border-b border-rule">
-        <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
-          <div className="flex items-end justify-between">
-            <h2 className="font-display text-3xl text-ink">Holdings</h2>
-            <p className="text-sm text-mute">{positions.length} positions</p>
-          </div>
-
+      {/* Holdings */}
+      <section className="border-b border-rule bg-cream-2">
+        <div className="mx-auto max-w-7xl px-6 py-14 sm:px-10">
+          <h2 className="font-display text-2xl text-ink">Cars you co-own</h2>
           <div className="mt-6 overflow-hidden rounded-2xl border border-rule bg-surface">
             <table className="w-full">
               <thead className="border-b border-rule bg-cream-2 text-xs font-medium uppercase tracking-wider text-ink-soft">
                 <tr>
                   <th className="px-6 py-4 text-left">Vehicle</th>
-                  <th className="px-6 py-4 text-right">Shares</th>
-                  <th className="hidden px-6 py-4 text-right md:table-cell">Avg cost</th>
-                  <th className="px-6 py-4 text-right">Market price</th>
-                  <th className="px-6 py-4 text-right">Today</th>
-                  <th className="hidden px-6 py-4 text-right lg:table-cell">Value</th>
-                  <th className="px-6 py-4 text-right">Total return</th>
+                  <th className="px-6 py-4 text-right">Seats</th>
+                  <th className="hidden px-6 py-4 text-right md:table-cell">Days / yr</th>
+                  <th className="hidden px-6 py-4 text-right md:table-cell">Days used</th>
+                  <th className="hidden px-6 py-4 text-right lg:table-cell">Mgmt / yr</th>
+                  <th className="px-6 py-4 text-right" aria-hidden />
                 </tr>
               </thead>
               <tbody>
                 {positions.map((p) => (
                   <tr
                     key={p.v.symbol}
-                    className="border-b border-rule last:border-b-0 transition-colors hover:bg-cream-2/40"
+                    className="border-b border-rule last:border-b-0 hover:bg-cream-2/40"
                   >
                     <td className="px-6 py-5">
                       <Link href={`/markets/${p.v.symbol}`} className="block">
-                        <p className="font-display text-base text-ink">{p.v.name}</p>
+                        <p className="font-display text-lg text-ink">{p.v.name}</p>
                         <p className="mt-1 text-xs text-mute">
-                          {p.v.ticker} · {p.v.market}
+                          {p.v.year} · {p.v.market}
                         </p>
                       </Link>
                     </td>
-                    <td className="px-6 py-5 text-right text-ink tabular-nums">{p.h.shares}</td>
-                    <td className="hidden px-6 py-5 text-right text-ink-soft tabular-nums md:table-cell">
-                      {formatUSD(p.h.avgCost)}
+                    <td className="px-6 py-5 text-right tabular-nums text-ink">
+                      {p.s.seats} of {p.v.shares}
                     </td>
-                    <td className="px-6 py-5 text-right text-ink tabular-nums">
-                      {formatUSD(p.v.pricePerShare)}
+                    <td className="hidden px-6 py-5 text-right tabular-nums text-ink-soft md:table-cell">
+                      {p.daysAvailable}
                     </td>
-                    <td
-                      className="px-6 py-5 text-right tabular-nums"
-                      style={{ color: p.today.isUp ? "#00C805" : "#DC2626" }}
-                    >
-                      {p.today.isUp ? "▲" : "▼"} {p.today.pct.toFixed(2)}%
+                    <td className="hidden px-6 py-5 text-right tabular-nums text-ink-soft md:table-cell">
+                      {p.s.daysUsed}
                     </td>
-                    <td className="hidden px-6 py-5 text-right text-ink tabular-nums lg:table-cell">
-                      {formatUSD(p.value)}
+                    <td className="hidden px-6 py-5 text-right tabular-nums text-ink-soft lg:table-cell">
+                      {formatUSD(p.annualMgmt)}
                     </td>
-                    <td
-                      className="px-6 py-5 text-right tabular-nums"
-                      style={{ color: p.gain >= 0 ? "#00C805" : "#DC2626" }}
-                    >
-                      {p.gain >= 0 ? "+" : "-"}{formatUSD(Math.abs(p.gain))}
-                      <span className="ml-2 text-xs">({p.gainPct.toFixed(2)}%)</span>
+                    <td className="px-6 py-5 text-right">
+                      <Link
+                        href={`/my-cars/${p.v.symbol.toLowerCase()}`}
+                        className="text-sm font-medium text-red hover:text-red-deep"
+                      >
+                        Manage →
+                      </Link>
                     </td>
                   </tr>
                 ))}
@@ -128,81 +108,70 @@ export default function PortfolioPage() {
         </div>
       </section>
 
-      {/* Buying power */}
-      <section className="border-b border-rule bg-cream-2">
-        <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-            <Card label="Buying power" value={formatUSD(354_445)} sub="Available" />
-            <Card label="Cash on hand" value={formatUSD(123_405)} sub="Settled" />
-            <Card label="Pending settlement" value={formatUSD(0)} sub="From recent sells" />
-          </div>
-        </div>
-      </section>
-
-      {/* Recent orders */}
+      {/* Recent activity */}
       <section className="border-b border-rule">
-        <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
-          <h2 className="font-display text-3xl text-ink">Recent orders</h2>
+        <div className="mx-auto max-w-7xl px-6 py-14 sm:px-10">
+          <h2 className="font-display text-2xl text-ink">Recent activity</h2>
           <ul className="mt-6 divide-y divide-rule rounded-xl border border-rule bg-surface">
-            <Order side="buy" vehicle="Ferrari 296 GTB" type="Market" date="Apr 24" amount={formatUSD(54_127)} sub="1 share" />
-            <Order side="buy" vehicle="McLaren 750S Spider" type="Limit @ $60,900" date="Apr 18" amount={formatUSD(60_900)} sub="1 share" />
-            <Order side="sell" vehicle="Lamborghini Aventador Ultimae" type="Market" date="Apr 12" amount={formatUSD(99_500)} sub="1 share" />
+            <Activity label="Booking confirmed" detail="Ferrari 296 GTB · Apr 28 – May 1" date="2 hours ago" />
+            <Activity label="Inspection report posted" detail="McLaren 750S Spider · 2,140 mi" date="Yesterday" />
+            <Activity label="Quarterly mgmt fee paid" detail="$1,700 — Ferrari 296 LLC" date="3 days ago" />
+            <Activity label="New co-owner joined" detail="McLaren 750S LLC — welcome Jordan" date="2 weeks ago" />
+            <Activity label="Welcome to RYDA Blue" detail="Annual membership active" date="3 weeks ago" />
           </ul>
         </div>
       </section>
 
-      {/* Footer disclaimer */}
-      <section className="bg-ink py-12 text-cream/60">
-        <div className="mx-auto max-w-3xl px-6 text-center text-xs sm:px-10">
-          Sample portfolio shown. Sign in to see your real holdings. RYDA
-          shares are LLC membership interests; settlement takes 1–3 business
-          days. Past performance does not guarantee future results.
+      {/* CTA — explore more */}
+      <section className="bg-ink py-16 text-cream">
+        <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
+          <h2 className="font-display text-3xl sm:text-4xl">
+            Add another car to your collection.
+          </h2>
+          <p className="mx-auto mt-3 max-w-xl text-base text-cream/70">
+            Most members hold seats in 2–3 different vehicles to vary their
+            experience across the year. Browse what's currently available.
+          </p>
+          <Link
+            href="/markets"
+            className="mt-6 inline-flex h-12 items-center justify-center rounded-full bg-cream px-6 text-sm font-medium text-ink hover:bg-red hover:text-cream"
+          >
+            See the fleet →
+          </Link>
         </div>
       </section>
     </>
   );
 }
 
-function Card({ label, value, sub }: { label: string; value: string; sub?: string }) {
+function Stat({ label, value, sub }: { label: string; value: string; sub: string }) {
   return (
-    <div className="rounded-2xl border border-rule bg-surface p-6">
-      <p className="text-xs text-mute">{label}</p>
-      <p className="mt-2 font-display text-3xl text-ink tabular-nums">{value}</p>
-      {sub && <p className="mt-1 text-xs text-ink-soft">{sub}</p>}
+    <div>
+      <p className="text-xs uppercase tracking-wider text-mute">{label}</p>
+      <p className="mt-1 font-display text-2xl text-ink tabular-nums sm:text-3xl">
+        {value}
+      </p>
+      <p className="mt-1 text-xs text-ink-soft">{sub}</p>
     </div>
   );
 }
 
-function Order({
-  side,
-  vehicle,
-  type,
+function Activity({
+  label,
+  detail,
   date,
-  amount,
-  sub,
 }: {
-  side: "buy" | "sell";
-  vehicle: string;
-  type: string;
+  label: string;
+  detail: string;
   date: string;
-  amount: string;
-  sub: string;
 }) {
-  const tone = side === "buy" ? "text-[#00C805]" : "text-[#DC2626]";
   return (
-    <li className="flex items-center justify-between px-5 py-4">
+    <li className="flex flex-col gap-1 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <p className="text-sm font-medium text-ink">
-          <span className={tone}>{side === "buy" ? "Buy" : "Sell"}</span> · {vehicle}
-        </p>
-        <p className="mt-0.5 text-xs text-mute">
-          {type} · {date}
-        </p>
+        <p className="text-sm font-medium text-ink">{label}</p>
+        <p className="mt-1 text-xs text-ink-soft">{detail}</p>
       </div>
-      <div className="text-right">
-        <p className="text-sm font-medium text-ink tabular-nums">{amount}</p>
-        <p className="mt-0.5 text-xs text-mute">{sub}</p>
-      </div>
+      <p className="text-xs text-mute">{date}</p>
     </li>
   );
 }

@@ -4,7 +4,7 @@ import { SiteHeader } from "@/components/site-header";
 export const metadata = {
   title: "List your car — RYDA",
   description:
-    "Have a supercar sitting in storage? List it on RYDA — earn from rentals, or sell shares to vetted co-owners. We handle insurance, ops, and concierge.",
+    "Have a supercar sitting in storage? List it on RYDA — earn from rentals, or contribute it to a member-managed LLC and share it with vetted co-owners. We handle insurance, ops, and concierge.",
 };
 
 export default function HostYourCarPage() {
@@ -50,13 +50,13 @@ export default function HostYourCarPage() {
             />
             <Option
               eyebrow="OPTION 2"
-              title="Sell shares."
-              body="Liquidate part or all of the car. RYDA forms a Delaware LLC, you sell shares to vetted co-owners at the price you set, and you can keep one share for yourself."
+              title="Bring it into a co-ownership LLC."
+              body="Contribute your car into a member-managed Delaware LLC alongside 4–9 other vetted co-owners. You keep one or more seats, the rest are filled by RYDA-vetted members. You and your co-owners run the LLC together; RYDA handles operations."
               points={[
-                "Walk away with cash, or stay in as a co-owner",
-                "Full price discovery via the RYDA secondary market",
-                "RYDA handles legal docs, share certificates, transfers",
-                "Insurance + storage transfer to the LLC at closing",
+                "Recover most of your capital while keeping access to the car",
+                "Stay involved as a co-owner, or step away after closing",
+                "RYDA handles the LLC formation, Operating Agreement, and member onboarding",
+                "Insurance + storage move to the LLC at closing",
                 "3% transaction fee — far less than dealer markup",
               ]}
               cta="Talk to an advisor"

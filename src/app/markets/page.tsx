@@ -5,7 +5,7 @@ import { VEHICLES, formatUSD } from "@/lib/market-data";
 export const metadata = {
   title: "Markets — RYDA",
   description:
-    "Live trading interface for RYDA supercar shares. Buy and sell ownership in curated luxury vehicles.",
+    "Browse the RYDA fleet. Each car is held in a member-managed Delaware LLC; claim a co-ownership seat alongside other verified members.",
 };
 
 export default function MarketsPage() {

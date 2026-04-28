@@ -241,7 +241,7 @@ function ReviewStep({
 
       <Section title="What it costs">
         <Bullet label="Today (one-time)" value={formatUSD(grandTotal)} bold />
-        <Bullet label="—  Share price" value={formatUSD(totalPrice)} />
+        <Bullet label="—  Seat buy-in" value={formatUSD(totalPrice)} />
         <Bullet label="—  Closing & paperwork fee" value={formatUSD(closingFee)} />
         <Bullet
           label={`Ongoing (per share, year)`}
@@ -273,9 +273,10 @@ function ReviewStep({
           className="mt-1 h-4 w-4 accent-red"
         />
         <span className="text-ink">
-          I understand I'm buying an LLC membership interest, not a registered security; that
-          shares are illiquid for the first 12 months; and that vehicle valuations can move down
-          as well as up.
+          I understand I'm joining a member-managed Delaware LLC alongside other co-owners;
+          that this is not an investment and is not offered for investment purposes; that
+          co-ownership seats are illiquid for the first 12 months; and that the car will
+          depreciate over time.
         </span>
       </label>
 
@@ -552,7 +553,7 @@ function FundStep({
             <KvRow label="Beneficiary" value={`${vehicle.name} LLC, Delaware`} />
             <KvRow
               label="Reference / memo"
-              value={`Subscription · ${vehicle.symbol} · [your name]`}
+              value={`Co-ownership buy-in · ${vehicle.symbol} · [your name]`}
               mono
             />
             <KvRow label="Amount" value={formatUSD(grandTotal)} mono />
@@ -634,19 +635,19 @@ function ConfirmStep({
           Welcome to RYDA.
         </h1>
         <p className="mt-3 text-lg text-ink-soft">
-          Your subscription is in. We'll send a confirmation email and a copy of your signed
-          documents within the next few minutes.
+          Your co-ownership is in process. We'll send a confirmation email and a copy of your
+          signed documents within the next few minutes.
         </p>
       </div>
 
       <div className="rounded-2xl border border-rule bg-surface p-6">
-        <p className="text-xs font-medium uppercase tracking-wider text-red">Subscription</p>
+        <p className="text-xs font-medium uppercase tracking-wider text-red">Your co-ownership</p>
         <dl className="mt-4 space-y-3 text-sm">
           <KvRow label="Vehicle" value={`${vehicle.year} ${vehicle.name}`} />
-          <KvRow label="Position" value={`${shares} of ${vehicle.shares} shares`} />
+          <KvRow label="Position" value={`${shares} of ${vehicle.shares} seats`} />
           <KvRow label="Amount" value={formatUSD(grandTotal)} />
-          <KvRow label="LLC" value={`${vehicle.name} LLC, Delaware`} />
-          <KvRow label="Status" value="Pending — funds & verifications clearing" />
+          <KvRow label="LLC" value={`${vehicle.name} LLC, Delaware (member-managed)`} />
+          <KvRow label="Status" value="Pending — funds & verification clearing" />
         </dl>
       </div>
 
@@ -655,8 +656,8 @@ function ConfirmStep({
         <ol className="mt-4 space-y-3">
           <Timeline
             n="01"
-            title="Verifications clear (typically 24h)"
-            body="Persona returns identity verification, accreditation evidence is reviewed."
+            title="Verification clears (typically 24h)"
+            body="Persona returns identity verification and driving-record check."
           />
           <Timeline
             n="02"

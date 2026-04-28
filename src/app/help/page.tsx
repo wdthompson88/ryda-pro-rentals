@@ -5,7 +5,7 @@ import { HELP } from "@/lib/help-content";
 export const metadata = {
   title: "Help Center — RYDA",
   description:
-    "Answers about RYDA membership, share purchases, bookings, insurance, maintenance, and account management.",
+    "Answers about RYDA membership, co-ownership, bookings, insurance, maintenance, and account management.",
 };
 
 const TOP_TOPICS: { label: string; href: string }[] = [
