@@ -3,6 +3,7 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { OrderPanel } from "@/components/order-panel";
 import { PriceChart } from "@/components/price-chart";
+import { OrderBook } from "@/components/order-book";
 import {
   VEHICLES,
   getVehicleBySymbol,
@@ -75,6 +76,10 @@ export default async function VehicleMarketPage({
 
               <div className="mt-6">
                 <PriceChart vehicle={v} showHeader />
+              </div>
+
+              <div className="mt-8">
+                <OrderBook vehicle={v} />
               </div>
             </div>
 
