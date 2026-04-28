@@ -18,12 +18,14 @@ const fraunces = Fraunces({
   weight: ["300", "400", "500", "600"],
 });
 
-// Resolve absolute URLs in metadata (OG image, etc). Uses NEXT_PUBLIC_SITE_URL
-// when set (e.g. once a custom domain like ryda.com is wired up); otherwise
-// falls back to the current Vercel deployment URL.
+// Resolve absolute URLs in metadata (OG image, etc). Always uses the
+// canonical public domain — NOT the per-deployment URL like
+// `ryda-xxxxxx-moocow4844s-projects.vercel.app`, which is gated by
+// Vercel deployment protection and unreachable to OG scrapers.
+// Set NEXT_PUBLIC_SITE_URL on Vercel once a custom domain (ryda.com)
+// is wired up.
 const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ??
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://ryda-web-teal.vercel.app");
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://ryda-web-teal.vercel.app";
 
 export const metadata: Metadata = {
   title: "RYDA — Supercar Co-Ownership",
