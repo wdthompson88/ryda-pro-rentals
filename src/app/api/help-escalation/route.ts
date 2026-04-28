@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { notifyTeam, emailLayout, escapeHtml } from "@/lib/notify";
+
+type ConversationTurn = { role: "user" | "bot"; text: string };
 
 export async function POST(req: Request) {
   try {
@@ -7,8 +10,8 @@ export async function POST(req: Request) {
     const email = String(body.email || "").trim().toLowerCase();
     const note = String(body.note || "").trim().slice(0, 5000);
     const trigger_message = String(body.trigger_message || "").trim().slice(0, 2000);
-    const conversation = Array.isArray(body.conversation)
-      ? body.conversation.slice(-12) // keep last 12 turns max
+    const conversation: ConversationTurn[] | null = Array.isArray(body.conversation)
+      ? body.conversation.slice(-12)
       : null;
 
     if (!email || !email.includes("@")) {
@@ -34,8 +37,81 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Could not save." }, { status: 500 });
     }
 
+    // Best-effort email notification — fire and don't block the response.
+    // The DB write is the source of truth; email is the alert layer.
+    void notifyTeam({
+      subject: `New help-chat escalation from ${email}`,
+      replyTo: email,
+      html: emailLayout(
+        "Someone wants to talk to a human",
+        renderEscalationHtml({ email, note, trigger_message, conversation }),
+      ),
+    });
+
     return NextResponse.json({ ok: true, persisted: true });
   } catch {
     return NextResponse.json({ error: "Bad request." }, { status: 400 });
   }
+}
+
+function renderEscalationHtml({
+  email,
+  note,
+  trigger_message,
+  conversation,
+}: {
+  email: string;
+  note: string;
+  trigger_message: string;
+  conversation: ConversationTurn[] | null;
+}): string {
+  const conversationHtml =
+    conversation && conversation.length > 0
+      ? `<div style="margin-top:18px;">
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#7a7770;margin-bottom:8px;">Conversation context</div>
+          <div style="border:1px solid #e5e1d8;border-radius:8px;padding:12px;background:#faf7f2;">
+            ${conversation
+              .map(
+                (t) =>
+                  `<div style="margin:6px 0;"><span style="font-weight:600;color:${
+                    t.role === "user" ? "#c03030" : "#1c1c1c"
+                  };">${t.role === "user" ? "User" : "Bot"}:</span> <span style="color:#3c3c3c;">${escapeHtml(
+                    t.text,
+                  )}</span></div>`,
+              )
+              .join("")}
+          </div>
+        </div>`
+      : "";
+
+  return `
+    <div>
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#7a7770;">From</div>
+      <div style="font-size:16px;font-weight:500;margin-top:2px;"><a href="mailto:${escapeHtml(email)}" style="color:#c03030;text-decoration:none;">${escapeHtml(email)}</a></div>
+    </div>
+
+    ${
+      note
+        ? `<div style="margin-top:18px;">
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#7a7770;margin-bottom:6px;">Their note</div>
+            <div style="white-space:pre-wrap;color:#1c1c1c;">${escapeHtml(note)}</div>
+          </div>`
+        : ""
+    }
+
+    ${
+      trigger_message
+        ? `<div style="margin-top:18px;">
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#7a7770;margin-bottom:6px;">Trigger phrase</div>
+            <div style="font-style:italic;color:#3c3c3c;">"${escapeHtml(trigger_message)}"</div>
+          </div>`
+        : ""
+    }
+
+    ${conversationHtml}
+
+    <div style="margin-top:24px;padding-top:18px;border-top:1px solid #e5e1d8;font-size:13px;color:#3c3c3c;">
+      <strong>Hit reply</strong> to respond — this email's reply-to is set to ${escapeHtml(email)}.
+    </div>
+  `;
 }
