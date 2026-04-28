@@ -1165,3 +1165,155 @@ export function getArticle(categorySlug: string, articleSlug: string) {
   if (!article) return null;
   return { category: cat, article };
 }
+
+// ── Search keywords ────────────────────────────────────────────────
+// Synonyms and common phrasings keyed by `${categorySlug}/${articleSlug}`.
+// These widen the search net so e.g. someone typing "totaled" finds the
+// "What if the car is totaled?" article even if they don't use that exact
+// phrase. Append to these when you notice common queries that miss.
+
+const ARTICLE_KEYWORDS: Record<string, string[]> = {
+  // Getting started
+  "getting-started/what-is-ryda": ["overview", "introduction", "explain", "platform", "model", "company"],
+  "getting-started/vs-timeshare": ["timeshare", "different", "compare", "club", "points", "ownership"],
+  "getting-started/membership-tiers": ["pricing", "cost", "how much", "tier", "core", "blue", "black", "free", "subscription", "annual fee"],
+  "getting-started/accreditation": ["accredited", "qualify", "investor", "income requirement", "net worth", "sec", "wealthy", "rich", "qualified"],
+  "getting-started/markets": ["where", "miami", "los angeles", "la", "new york", "ny", "city", "location", "available"],
+
+  // Shares
+  "shares/how-to-buy": ["buy", "purchase", "process", "steps", "onboard", "get started buying", "how do i invest"],
+  "shares/documents": ["paperwork", "operating agreement", "subscription", "sign", "contract", "legal docs", "k-1", "kyc docs"],
+  "shares/entitlement": ["what do i get", "rights", "days per year", "miles", "voting", "ownership rights", "what does a share include"],
+  "shares/selling": ["sell", "exit", "liquidate", "secondary market", "minimum hold", "lockup", "12 month", "resell", "transfer"],
+  "shares/pricing": ["price", "valuation", "worth", "value", "appraisal", "market price", "list price", "fair market"],
+  "shares/transfer-fee": ["fee", "commission", "3%", "transfer cost", "selling fee", "platform fee"],
+
+  // Bookings
+  "bookings/how-to-book": ["book", "reserve", "schedule", "calendar", "availability", "drive", "use the car"],
+  "bookings/fair-use": ["fair use", "peak", "high season", "summer", "consecutive days", "limit", "weekly cap", "cap", "monopolize"],
+  "bookings/cancellations": ["cancel", "reschedule", "refund", "no show", "cancellation fee"],
+  "bookings/track-day": ["track", "racing", "race", "circuit", "hpde", "lap", "performance driving", "track event"],
+  "bookings/mileage": ["miles", "mileage", "overage", "kilometers", "limit", "annual miles", "$4 per mile"],
+  "bookings/passengers": ["passenger", "co-driver", "secondary driver", "spouse", "partner", "friend", "additional driver", "guests"],
+
+  // Insurance
+  "insurance/coverage": ["insurance", "covered", "policy", "liability", "comprehensive", "collision", "what's covered", "$1m"],
+  "insurance/deductible": ["deductible", "out of pocket", "i pay", "fault", "at-fault", "accident cost"],
+  "insurance/file-claim": ["claim", "accident", "crash", "collision", "what to do", "file a claim", "got in an accident"],
+  "insurance/roadside": ["roadside", "tow", "breakdown", "stuck", "flat tire", "battery", "lockout", "fuel"],
+  "insurance/total-loss": ["totaled", "wrecked", "destroyed", "write-off", "write off", "total loss", "destroyed", "irreparable"],
+
+  // Maintenance
+  "maintenance/process": ["maintenance", "service", "repair", "upkeep", "how is it maintained"],
+  "maintenance/who-pays": ["pay for", "cost of maintenance", "who pays", "service cost", "management fee covers", "12% fee"],
+  "maintenance/report-damage": ["damage", "scratch", "dent", "scuff", "report", "i scratched", "i hit something"],
+  "maintenance/inspections": ["inspection", "ppi", "condition report", "annual inspection", "documentation", "service records"],
+  "maintenance/detailing": ["clean", "wash", "detail", "detailing", "interior", "wax", "polish"],
+
+  // Account
+  "account/payment-methods": ["pay", "payment", "card", "ach", "bank", "credit card", "wire", "billing method"],
+  "account/billing": ["bill", "invoice", "charged", "statement", "billing cycle", "when am i charged", "monthly", "quarterly", "annual"],
+  "account/taxes": ["tax", "k-1", "k1", "1099", "depreciation", "deduction", "irs", "cpa", "tax treatment", "income tax"],
+  "account/kyc": ["kyc", "id verification", "identity", "verify me", "documents required", "passport", "license", "selfie"],
+  "account/close": ["cancel account", "leave", "quit", "close account", "deactivate", "delete account", "unsubscribe"],
+
+  // Legal
+  "legal/operating-agreement": ["operating agreement", "oa", "llc agreement", "governance", "voting", "decision rules"],
+  "legal/reg-d": ["reg d", "regulation d", "506c", "506(c)", "sec rule", "private placement", "general solicitation"],
+  "legal/securities": ["securities", "regulated", "stocks", "shares are stocks", "is this regulated", "sec"],
+  "legal/privacy": ["privacy", "data", "personal information", "what do you collect", "share my data", "third parties"],
+};
+
+// ── Search ─────────────────────────────────────────────────────────
+
+export type SearchResult = {
+  category: HelpCategory;
+  article: HelpArticle;
+  score: number;
+};
+
+const STOPWORDS = new Set([
+  "a", "an", "the", "is", "are", "was", "were", "be", "been", "being",
+  "do", "does", "did", "to", "of", "in", "on", "at", "for", "with",
+  "and", "or", "but", "if", "then", "than", "as", "by", "from",
+  "i", "me", "my", "you", "your", "we", "our", "it", "its",
+  "this", "that", "these", "those", "what", "how", "why", "when", "where",
+  "can", "should", "would", "could", "will", "shall", "may", "might",
+  "ryda", // every article is about RYDA — no signal
+]);
+
+function tokenize(s: string): string[] {
+  return s
+    .toLowerCase()
+    .replace(/[^a-z0-9'$%\s]/g, " ")
+    .split(/\s+/)
+    .filter((t) => t.length > 1 && !STOPWORDS.has(t));
+}
+
+function blockToText(b: HelpBlock): string {
+  switch (b.type) {
+    case "p":
+    case "h3":
+    case "callout":
+      return b.text;
+    case "ul":
+      return b.items.join(" ");
+  }
+}
+
+export function searchHelp(query: string, limit = 4): SearchResult[] {
+  const tokens = tokenize(query);
+  if (tokens.length === 0) return [];
+
+  const results: SearchResult[] = [];
+
+  for (const category of HELP) {
+    for (const article of category.articles) {
+      const key = `${category.slug}/${article.slug}`;
+      const keywords = ARTICLE_KEYWORDS[key] ?? [];
+
+      const fields = {
+        q: article.q.toLowerCase(),
+        keywords: keywords.join(" ").toLowerCase(),
+        summary: article.summary.toLowerCase(),
+        body: article.body.map(blockToText).join(" ").toLowerCase(),
+        category: category.title.toLowerCase(),
+      };
+
+      let score = 0;
+      let exactPhraseHit = false;
+
+      // Exact-phrase match in question or keywords is high signal
+      const phrase = query.toLowerCase().trim();
+      if (phrase.length > 4 && (fields.q.includes(phrase) || fields.keywords.includes(phrase))) {
+        score += 30;
+        exactPhraseHit = true;
+      }
+
+      for (const token of tokens) {
+        if (fields.q.includes(token)) score += 10;
+        if (fields.keywords.includes(token)) score += 8;
+        if (fields.summary.includes(token)) score += 4;
+        if (fields.body.includes(token)) score += 1;
+        if (fields.category.includes(token)) score += 3;
+      }
+
+      // Penalize matches where only one of many tokens hit (low recall)
+      if (!exactPhraseHit && tokens.length >= 3) {
+        const hitCount = tokens.filter(
+          (t) =>
+            fields.q.includes(t) ||
+            fields.keywords.includes(t) ||
+            fields.summary.includes(t),
+        ).length;
+        if (hitCount === 1) score = Math.floor(score / 2);
+      }
+
+      if (score > 0) {
+        results.push({ category, article, score });
+      }
+    }
+  }
+
+  return results.sort((a, b) => b.score - a.score).slice(0, limit);
+}
