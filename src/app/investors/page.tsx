@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
+import { InvestorInquiryForm } from "@/components/investor-inquiry-form";
 
 export const metadata = {
   title: "Investors — RYDA",
@@ -36,10 +37,10 @@ export default function InvestorsPage() {
               View the deck →
             </Link>
             <Link
-              href="mailto:investors@ryda.com?subject=Investor%20interest"
+              href="#request-deck"
               className="inline-flex h-12 items-center justify-center rounded-full border border-cream/30 px-7 text-sm font-medium text-cream hover:border-cream hover:bg-cream/5"
             >
-              Email for data room
+              Request the deck
             </Link>
           </div>
         </div>
@@ -205,21 +206,20 @@ export default function InvestorsPage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-ink py-20 text-cream">
+      <section id="request-deck" className="bg-ink py-20 text-cream">
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
           <h2 className="font-display text-4xl font-light sm:text-5xl">
             Want the deck and the data room?
           </h2>
           <p className="mx-auto mt-6 max-w-xl text-base text-cream/70">
-            Email <a href="mailto:investors@ryda.com" className="text-red hover:text-red-deep">investors@ryda.com</a> with a brief intro.
-            We send the deck to qualified investors within 24 hours and follow up with a call.
+            Tell us a little about you. We send the deck to qualified investors within 24 hours
+            and follow up with a call. Or email{" "}
+            <a href="mailto:investors@ryda.com" className="text-red hover:text-red-deep">
+              investors@ryda.com
+            </a>{" "}
+            directly.
           </p>
-          <a
-            href="mailto:investors@ryda.com?subject=Investor%20interest"
-            className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-red hover:text-cream"
-          >
-            Request the deck
-          </a>
+          <InvestorInquiryForm />
         </div>
       </section>
     </>
