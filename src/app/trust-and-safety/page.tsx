@@ -37,7 +37,7 @@ export default function TrustAndSafetyPage() {
             <Pillar
               eyebrow="Members"
               title="Verified before they touch the keys"
-              body="Every co-owner clears KYC identity verification, accredited-investor verification (for share purchases under Reg D 506(c)), a clean recent driving record, and a 28+ minimum age. Membership is earned, not bought."
+              body="Every co-owner clears KYC identity verification, a clean recent driving record check, and a 28+ minimum age. Members are added as named insureds on the LLC's vehicle policy. Membership is earned, not bought."
             />
             <Pillar
               eyebrow="Vehicles"

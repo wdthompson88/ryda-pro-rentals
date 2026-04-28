@@ -9,13 +9,13 @@ export const metadata = {
 };
 
 const TOP_TOPICS: { label: string; href: string }[] = [
-  { label: "How to buy a share", href: "/help/shares/how-to-buy" },
+  { label: "How to claim a co-ownership seat", href: "/help/shares/how-to-buy" },
+  { label: "Is this an investment?", href: "/help/legal/securities" },
+  { label: "Member-managed LLC explained", href: "/help/legal/member-managed-llc" },
   { label: "Fair-use rules", href: "/help/bookings/fair-use" },
   { label: "File an insurance claim", href: "/help/insurance/file-claim" },
-  { label: "Operating Agreement", href: "/help/legal/operating-agreement" },
-  { label: "Track day eligibility", href: "/help/bookings/track-day" },
   { label: "Tax treatment", href: "/help/account/taxes" },
-  { label: "Sell on secondary market", href: "/help/shares/selling" },
+  { label: "Transfer your seat", href: "/help/shares/selling" },
 ];
 
 export default function HelpCenterPage() {

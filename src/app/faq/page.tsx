@@ -4,7 +4,7 @@ import { SiteHeader } from "@/components/site-header";
 export const metadata = {
   title: "FAQ — RYDA",
   description:
-    "Answers to the most common questions about RYDA membership, share purchases, rentals, and operations.",
+    "Answers to the most common questions about RYDA membership, co-ownership, rentals, and operations.",
 };
 
 type Q = { q: string; a: string };
@@ -18,20 +18,20 @@ const SECTIONS: { title: string; questions: Q[] }[] = [
         a: "A membership interest in a single-purpose Delaware LLC that owns a specific vehicle. The LLC's only assets are the vehicle, its insurance/operating reserves, and a management contract with RYDA. You hold a registered legal interest, not a club point.",
       },
       {
-        q: "How many shares per vehicle?",
-        a: "Typically 6 to 10, depending on the car. Each share entitles you to roughly 50 days and 4,000 miles of usage per year on a 6-share split.",
+        q: "How many co-ownership seats per vehicle?",
+        a: "Typically 6 to 10, depending on the car. Each seat entitles you to roughly 50 days and 4,000 miles of usage per year on a 6-seat split.",
       },
       {
-        q: "Are RYDA shares securities?",
-        a: "They're LLC membership interests offered under Reg D 506(c). Counsel reviews the share-purchase flow before launch. Membership is limited to verified accredited investors. The full Securities Disclaimer will be published before any purchase goes live.",
+        q: "Are RYDA co-ownership stakes securities?",
+        a: "No. RYDA is a luxury access platform, not an investment platform. Each car is held in a member-managed Delaware LLC where you and 5–10 other co-owners hold authority over material decisions; RYDA is hired as a service provider via a separate management agreement. Co-ownership stakes are not registered securities and are not offered for investment purposes. No accredited-investor verification required.",
       },
       {
-        q: "Can I sell my share whenever I want?",
+        q: "Can I transfer my seat whenever I want?",
         a: "After a 12-month minimum hold, yes — on the RYDA member-only secondary market. Settlement takes 1–3 business days. RYDA charges a 3% transfer fee on the sale price.",
       },
       {
         q: "What if a co-owner stops paying?",
-        a: "The LLC's Operating Agreement has remedies, including forced sale of the delinquent share. RYDA also keeps a maintenance reserve at the LLC level so vehicle ops continue uninterrupted while it's resolved.",
+        a: "The LLC's Operating Agreement has remedies, including forced transfer of the delinquent seat. RYDA also keeps a maintenance reserve at the LLC level so vehicle ops continue uninterrupted while it's resolved.",
       },
       {
         q: "What if the car gets totaled?",
@@ -44,7 +44,7 @@ const SECTIONS: { title: string; questions: Q[] }[] = [
     questions: [
       {
         q: "Who can join?",
-        a: "Verified individuals 28 years or older with a valid US driver's license, a clean recent driving record, and the ability to pass identity verification. For share purchases, members also complete a financial qualification step.",
+        a: "Verified individuals 28 years or older with a valid US driver's license, a clean recent driving record, and the ability to pass identity verification (KYC). No accredited-investor status or financial qualification required — RYDA is a luxury access platform, not an investment platform.",
       },
       {
         q: "Does membership cost anything?",
@@ -73,7 +73,7 @@ const SECTIONS: { title: string; questions: Q[] }[] = [
       },
       {
         q: "How do I book my time?",
-        a: "Through the RYDA app, on a shared calendar with the other co-owners. Fair-use rules cap consecutive days during high season (May–September) at 7 per share, with 14 days allowed in low season.",
+        a: "Through the RYDA app, on a shared calendar with the other co-owners. Fair-use rules cap consecutive days during high season (May–September) at 7 per seat, with 14 days allowed in low season.",
       },
       {
         q: "Can I drive on a track?",
@@ -86,7 +86,7 @@ const SECTIONS: { title: string; questions: Q[] }[] = [
     questions: [
       {
         q: "Can I rent a RYDA car if I'm not a co-owner?",
-        a: "Yes — members and prospective buyers can rent any available vehicle by the day. Rentals are priced for the high end ($1,800–$8,500/day depending on the car) and are intended as a try-before-you-buy for share purchase.",
+        a: "Yes — members and prospective buyers can rent any available vehicle by the day. Rentals are priced for the high end ($1,800–$8,500/day depending on the car) and are intended as a try-before-you-buy for co-ownership.",
       },
       {
         q: "What's included in a rental?",
@@ -94,7 +94,7 @@ const SECTIONS: { title: string; questions: Q[] }[] = [
       },
       {
         q: "Why rentals at all? Aren't you focused on ownership?",
-        a: "Yes — ownership is the core product. Rentals exist for two reasons: (1) prospective members get a real test-drive before committing six figures to a share, and (2) it supports vehicle utilization for owners who don't fully use their entitlement. We don't compete on price with generic rental marketplaces.",
+        a: "Yes — co-ownership is the core product. Rentals exist for two reasons: (1) prospective members get a real test-drive before committing six figures to a seat, and (2) it supports vehicle utilization for co-owners who don't fully use their entitlement. We don't compete on price with generic rental marketplaces.",
       },
     ],
   },

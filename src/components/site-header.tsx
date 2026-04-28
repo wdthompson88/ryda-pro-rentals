@@ -13,7 +13,7 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
           RYDA
         </Link>
         <nav className={`hidden gap-8 text-sm font-medium sm:flex ${tone}`}>
-          <Link href="/markets">Markets</Link>
+          <Link href="/markets">Fleet</Link>
           <Link href="/how-it-works">How it works</Link>
           <Link href="/membership">Membership</Link>
           <Link href="/about">About</Link>

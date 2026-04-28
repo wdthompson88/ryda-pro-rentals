@@ -69,7 +69,7 @@ export const HELP: HelpCategory[] = [
           {
             type: "ul",
             items: [
-              "If the LLC sells the vehicle, you receive your pro-rata share of the proceeds — including any appreciation.",
+              "If the LLC sells the vehicle, the LLC's proceeds are distributed pro-rata to members per the Operating Agreement.",
               "You can sell your share to another verified RYDA member on the secondary market after 12 months.",
               "You have voting rights on material decisions (sale, modifications, replacement) defined in the Operating Agreement.",
             ],
@@ -112,25 +112,26 @@ export const HELP: HelpCategory[] = [
         slug: "accreditation",
         q: "Do I need to be an accredited investor?",
         summary:
-          "For share purchases, yes — RYDA offers shares under Reg D 506(c). Membership and rentals do not require accreditation.",
+          "No. RYDA is a luxury access platform, not an investment platform. Co-ownership is open to anyone who clears KYC verification and the standard membership requirements.",
         body: [
           {
             type: "p",
-            text: "Two different things to keep separate.",
+            text: "No accredited-investor status required. RYDA does not offer investments — co-ownership stakes are not registered securities and are not offered for investment purposes. They're a way to share the cost and use of a real car with a small group of other verified members.",
           },
-          { type: "h3", text: "Membership and rentals — no" },
+          { type: "h3", text: "What you do need" },
+          {
+            type: "ul",
+            items: [
+              "Be 28 years or older.",
+              "Hold a valid US driver's license with a clean recent driving record.",
+              "Pass standard KYC (government ID + selfie match through Persona).",
+              "Be willing to be added to the LLC's insurance policy.",
+            ],
+          },
+          { type: "h3", text: "Why the structure works without accreditation" },
           {
             type: "p",
-            text: "Joining RYDA, browsing the markets, and renting a vehicle does not require accredited-investor status. Anyone who passes our standard membership verification (28+, valid US license, clean recent driving record) can rent any available vehicle.",
-          },
-          { type: "h3", text: "Share purchases — yes" },
-          {
-            type: "p",
-            text: "Buying a share in a RYDA vehicle LLC requires accredited-investor verification because shares are offered under SEC Reg D 506(c). Accreditation is verified through a third-party service before any share purchase closes — typically a letter from a CPA, attorney, or registered broker-dealer, or evidence of qualifying income/net worth. We don't require you to upload tax returns or bank statements directly to RYDA.",
-          },
-          {
-            type: "p",
-            text: "If you want to drive but not own, rentals are the path. If you want to own, accreditation is the gate.",
+            text: "Each car is held in a Delaware LLC that you and 5–10 other verified members manage together. RYDA operates the car under a separate management services agreement — but the LLC itself is yours. You're not buying a passive investment product; you're buying the right to use a car you and your co-owners actually own. Because the structure is consumption-first (real ownership, real usage rights, no profit expectation), it falls outside SEC investment-contract classification.",
           },
         ],
       },
@@ -180,7 +181,7 @@ export const HELP: HelpCategory[] = [
             items: [
               "You want 30+ days a year of usage and the rental math no longer pencils.",
               "You want priority access during peak season (F1, Art Basel, summer weekends).",
-              "You want a real claim on the asset — equity that participates in any appreciation.",
+              "You want real ownership and member governance, not a paid usage right.",
               "You're a car enthusiast who wants the relationship with one specific vehicle.",
             ],
           },
@@ -230,33 +231,33 @@ export const HELP: HelpCategory[] = [
       },
       {
         slug: "share-financing",
-        q: "Can I finance a share purchase?",
+        q: "Can I finance my co-ownership buy-in?",
         summary:
-          "Yes — through a third-party lender (Marcus, LightStream, or specialty exotic-car finance). RYDA itself doesn't lend. Shares are securities, so margin/securities lending rules apply.",
+          "Yes — through your own personal credit (Marcus, LightStream, SoFi) or a securities-backed line of credit if you have a brokerage account. RYDA itself doesn't lend.",
         body: [
           {
             type: "p",
-            text: "RYDA does not finance share purchases directly. But shares are eligible collateral for several types of financing through third parties:",
+            text: "RYDA does not finance buy-ins directly. Members usually use one of three personal-credit paths:",
           },
           { type: "h3", text: "Personal unsecured loan" },
           {
             type: "p",
-            text: "Many members use unsecured personal loans (Marcus, LightStream, SoFi) to fund a share. Rates are typically 7–14% APR for high-credit borrowers. The share itself isn't pledged — the loan is just personal credit.",
+            text: "Many members use unsecured personal loans (Marcus, LightStream, SoFi) to fund a buy-in. Rates are typically 7–14% APR for high-credit borrowers. The LLC seat isn't pledged — the loan is just personal credit on your name.",
           },
           { type: "h3", text: "Securities-backed line of credit" },
           {
             type: "p",
-            text: "If you have a brokerage account at Schwab, Fidelity, or Morgan Stanley, you may already have access to a securities-backed line of credit at lower rates (5–8% APR). This is often the cheapest path. Talk to your wealth manager.",
+            text: "If you have a brokerage account at Schwab, Fidelity, or Morgan Stanley, you may already have access to a securities-backed line of credit (against your stocks/bonds, not against the LLC seat) at lower rates (5–8% APR). This is often the cheapest path. Talk to your wealth manager.",
           },
-          { type: "h3", text: "Specialty exotic-car finance" },
+          { type: "h3", text: "Specialty leisure-asset finance" },
           {
             type: "p",
-            text: "Putnam Leasing, Premier Financial, and a few specialty lenders offer purpose-built financing for fractional vehicle interests. Higher rates (8–15%) but they understand the asset class.",
+            text: "Putnam Leasing and a few specialty lenders offer financing for fractional vehicle interests and luxury memberships. Higher rates (8–15%) but they understand the structure.",
           },
           {
             type: "callout",
             tone: "warn",
-            text: "Financing increases your risk. Vehicles depreciate; shares aren't guaranteed to hold value. Don't borrow more than you'd be comfortable losing if the vehicle resold below the purchase price.",
+            text: "Cars depreciate. Co-ownership is a luxury access expense, not an investment that's expected to appreciate. Don't borrow more than you'd be comfortable spending — your buy-in funds a depreciating consumption product, like a country-club membership or a jet card.",
           },
         ],
       },
@@ -273,39 +274,39 @@ export const HELP: HelpCategory[] = [
     articles: [
       {
         slug: "how-to-buy",
-        q: "How do I buy a share?",
+        q: "How do I claim a co-ownership seat?",
         summary:
-          "Pick a vehicle, complete identity and accreditation checks, sign the Operating Agreement and Subscription Agreement, fund the share, you're closed.",
+          "Pick a vehicle, complete KYC, sign the Operating Agreement and Management Services Agreement, fund your seat, you're a co-owner. No accreditation required.",
         body: [
           { type: "h3", text: "1. Pick the vehicle" },
           {
             type: "p",
-            text: "Browse markets at /markets, pick a vehicle and a share. Each vehicle is a different LLC with its own Operating Agreement and capital structure.",
+            text: "Browse the fleet at /markets, pick a vehicle and the number of seats you want. Each vehicle is held in a separate Delaware LLC. Most vehicles have 6 total seats; some hypercar-tier vehicles have up to 10.",
           },
           { type: "h3", text: "2. Identity verification (KYC)" },
           {
             type: "p",
-            text: "We verify identity through Persona or an equivalent third-party. Government ID upload, selfie match, and address confirmation. Typically takes 5–10 minutes.",
+            text: "We verify identity through Persona or an equivalent third-party. Government ID upload, selfie match, and a clean recent driving record check. Typically takes 5–10 minutes. Required to be added to the LLC's insurance policy.",
           },
-          { type: "h3", text: "3. Accreditation verification" },
+          { type: "h3", text: "3. Documents" },
           {
             type: "p",
-            text: "Required by Reg D 506(c). You provide a letter from a CPA, attorney, or registered broker-dealer attesting to your accredited status. We accept most common formats.",
+            text: "Two documents to sign electronically. The LLC Operating Agreement (governs how you and your co-owners run the LLC together — voting, fair-use, transfers, dissolution) and the Management Services Agreement (the contract between the LLC and RYDA covering operations, insurance, storage, scheduling, maintenance). Both are sent via secure e-signature.",
           },
-          { type: "h3", text: "4. Documents" },
+          { type: "h3", text: "4. Funding" },
           {
             type: "p",
-            text: "You'll review and sign two documents electronically: the LLC Operating Agreement (governs how the LLC and the co-owners interact) and the Subscription Agreement (your purchase of the specific share). Both are sent via secure e-signature.",
+            text: "Wire or ACH your buy-in into the LLC's escrow account. RYDA holds funds in escrow until all signatures are collected, then releases to the LLC and your seat is officially recorded in the LLC's member register.",
           },
-          { type: "h3", text: "5. Funding" },
-          {
-            type: "p",
-            text: "Wire or ACH the share price into the LLC's escrow account. RYDA holds funds in escrow until all signatures are collected, then releases to the LLC and your share is officially recorded.",
-          },
-          { type: "h3", text: "6. Onboarding" },
+          { type: "h3", text: "5. Onboarding" },
           {
             type: "p",
             text: "First booking can be scheduled the day funds clear. We schedule a 30-minute walkthrough on the vehicle (controls, etiquette, condition baseline) before your first drive.",
+          },
+          {
+            type: "callout",
+            tone: "info",
+            text: "No accredited-investor status required. RYDA is a luxury access platform, not an investment platform. Co-ownership stakes are not registered securities and are not offered for investment purposes.",
           },
         ],
       },
@@ -313,22 +314,22 @@ export const HELP: HelpCategory[] = [
         slug: "documents",
         q: "What documents will I sign?",
         summary:
-          "Operating Agreement (governance) + Subscription Agreement (your specific purchase). Both via e-signature, both reviewed by counsel.",
+          "Operating Agreement (governs how you and your co-owners run the LLC) + Management Services Agreement (the LLC's contract with RYDA for operations). Both via e-signature, both reviewed by counsel.",
         body: [
           { type: "h3", text: "Operating Agreement" },
           {
             type: "p",
-            text: "The Operating Agreement governs the LLC: how decisions get made, fair-use rules, what happens if a co-owner stops paying, how the vehicle gets sold or replaced, voting thresholds, and dispute resolution. Standard length: 30–40 pages. We provide a 2-page plain-English summary alongside the full document.",
+            text: "The Operating Agreement governs the LLC. The LLC is member-managed — meaning you and your co-owners hold authority over material decisions. Covers: voting thresholds (typically 75% supermajority for sale, replacement, modifications), fair-use rules during peak and off-season, what happens if a co-owner stops paying, how the vehicle gets sold or replaced, transfer mechanics, and dispute resolution. Standard length: 30–40 pages. We provide a 2-page plain-English summary alongside the full document.",
           },
-          { type: "h3", text: "Subscription Agreement" },
+          { type: "h3", text: "Management Services Agreement (MSA)" },
           {
             type: "p",
-            text: "Your specific share purchase: the share price, what you're getting, the 12-month minimum hold, the 3% transfer fee on resale, and your acknowledgment of the Reg D 506(c) offering and securities risks.",
+            text: "The MSA is between the LLC and RYDA. It defines the services RYDA provides — storage, insurance procurement, scheduling, maintenance, concierge, member services — and the 12% annual management fee charged to the LLC. RYDA is a service provider engaged by the LLC's members, not a manager of the LLC itself. The MSA can be renewed or terminated by member vote per the Operating Agreement.",
           },
           { type: "h3", text: "Annual documents" },
           {
             type: "p",
-            text: "Each year you'll receive an updated certificate of insurance, K-1 (for tax filing), an annual condition and service report on the vehicle, and a fair-market valuation update used for insurance and (when relevant) secondary-market pricing.",
+            text: "Each year you'll receive an updated certificate of insurance for the vehicle, an annual condition and service report (mileage, maintenance, inspections), a fair-market valuation update used for insurance and member-to-member transfer reference, and an annual statement summarizing your contributions, fees paid, and usage.",
           },
           {
             type: "callout",
@@ -383,7 +384,7 @@ export const HELP: HelpCategory[] = [
             type: "ul",
             items: [
               "12-month minimum hold from your purchase date. This is in the Operating Agreement to keep co-owner groups stable through at least one full year of use.",
-              "The buyer must be a verified RYDA member with completed accreditation. We can't sell shares to outside parties because the offering is Reg D 506(c).",
+              "The buyer must be a verified RYDA member who has cleared KYC. Co-ownership seats can only transfer between RYDA members under the Operating Agreement.",
             ],
           },
           {
@@ -451,7 +452,7 @@ export const HELP: HelpCategory[] = [
           },
           {
             type: "p",
-            text: "It's competitive with — usually below — comparable structures (Pacaso charges 5%, fractional jet programs charge 5–10%). The fee is fixed and disclosed in the Subscription Agreement.",
+            text: "It's competitive with — usually below — comparable structures (jet card transfer fees run 5–10%). The fee is fixed and disclosed in the Operating Agreement and Management Services Agreement.",
           },
         ],
       },
@@ -567,7 +568,7 @@ export const HELP: HelpCategory[] = [
               "Protects existing members from dilution.",
               "Provides predictable usage entitlement (50 days = 365 ÷ 6 with margin for service and downtime).",
               "Keeps the co-owner group small enough to coordinate.",
-              "Aligns with how the SEC views consistent terms in a Reg D 506(c) offering.",
+              "Keeps the LLC's member-managed governance simple and stable.",
             ],
           },
           { type: "h3", text: "Buyouts within the same LLC" },
@@ -1416,7 +1417,7 @@ export const HELP: HelpCategory[] = [
             items: [
               "ACH (recommended for membership renewals and management fees — no card processing fee).",
               "Credit / debit card (Visa, Mastercard, Amex) — used for incidentals, deductibles, mileage overages.",
-              "Wire transfer — used only for share purchases. Wire instructions are issued per transaction with the Subscription Agreement.",
+              "Wire transfer — used only for buy-ins. Wire instructions are issued per transaction with the Operating Agreement and MSA.",
             ],
           },
           { type: "h3", text: "What we don't accept" },
@@ -1455,40 +1456,45 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Statements" },
           {
             type: "p",
-            text: "Monthly account statement summarizes membership status, all charges, all bookings, and all per-share LLC obligations. Annual K-1 (for tax filing) is issued each year by March 15.",
+            text: "Monthly account statement summarizes membership status, all charges, all bookings, and all per-seat LLC obligations. Annual statement issued each year by March 15.",
           },
         ],
       },
       {
         slug: "taxes",
-        q: "Tax treatment of share ownership",
+        q: "Tax treatment of co-ownership",
         summary:
-          "RYDA shares are LLC membership interests. Most members receive a K-1 each year. Talk to your CPA — RYDA isn't tax counsel.",
+          "Co-ownership is a personal-use luxury expense, not an income-producing investment. No K-1 in normal cases. Some members receive an informational K-1 if the LLC has incidental rental income.",
         body: [
           {
             type: "callout",
             tone: "warn",
             text: "RYDA does not provide tax advice. Always consult your CPA or tax professional for your specific situation. The information below is educational, not advisory.",
           },
-          { type: "h3", text: "What you receive" },
+          { type: "h3", text: "Default treatment: personal-use expense" },
           {
             type: "p",
-            text: "Each LLC issues an annual K-1 to all members by March 15 of the following year. The K-1 reports your pro-rata share of the LLC's income, expenses, gains, and losses for the year.",
+            text: "RYDA co-ownership is structured as a personal-use luxury product. Cars are depreciating consumption goods, like a country-club membership or a jet card. Under IRS rules (Pub. 946 / IRC §280F), members generally cannot deduct depreciation on luxury vehicles used for personal access, because the asset is not in business or income-producing use.",
           },
-          { type: "h3", text: "What's typically reportable" },
+          { type: "h3", text: "What you'll receive" },
           {
             type: "ul",
             items: [
-              "Depreciation (typically the largest item — vehicles depreciate faster than real estate).",
-              "Operating expenses (insurance, storage, maintenance reserves).",
-              "Any gain or loss on sale of the vehicle (when the LLC sells or you sell your share on the secondary market).",
-              "Mileage overage charges and other personal-use add-ons.",
+              "Annual statement summarizing your contributions, fees paid, and usage for the year.",
+              "Member directory entries for each LLC you co-own (Delaware LLC records).",
+              "If applicable, a state sales/use tax statement on your buy-in (varies by state).",
+              "If the LLC has incidental rental income (e.g., off-utilized days rented to non-members), an informational K-1 reflecting your pro-rata share. Most members will not have this.",
             ],
           },
-          { type: "h3", text: "The personal-use angle" },
+          { type: "h3", text: "Sales and use tax" },
           {
             type: "p",
-            text: "Because shares carry usage rights, IRS rules around personal use of an LLC-owned asset apply. Most members treat their personal usage as a non-deductible distribution. Your CPA can structure this correctly for your situation.",
+            text: "Vehicle purchases and some inter-member transfers may be subject to state sales/use tax. Florida is 6%; California is ~7.25%; New York varies by county. RYDA collects and remits where required. Your annual statement will reflect anything paid on your behalf.",
+          },
+          { type: "h3", text: "If you use the vehicle for actual business" },
+          {
+            type: "p",
+            text: "Members who use a co-owned vehicle for genuine business purposes may have different treatment — including potential deductibility of operating costs allocable to business mileage. This requires recordkeeping that goes beyond what RYDA's normal reporting captures. Talk to your CPA before relying on it.",
           },
         ],
       },
@@ -1504,14 +1510,14 @@ export const HELP: HelpCategory[] = [
             items: [
               "Government-issued photo ID (US driver's license, passport, or state ID).",
               "Selfie image for biometric match against the ID photo.",
-              "Address verification (mailing address — used for billing, statements, K-1).",
+              "Address verification (mailing address — used for billing, statements, and DMV records).",
               "Date of birth and SSN last-4 (for OFAC sanctions screening).",
             ],
           },
           { type: "h3", text: "Why we collect it" },
           {
             type: "p",
-            text: "Two reasons: (1) regulatory — Reg D 506(c) and standard KYC/AML obligations require us to verify member identity for share purchases; (2) operational — we insure vehicles based on member verification, so misrepresenting identity voids coverage.",
+            text: "Two reasons: (1) insurance — we add you as a named insured to the vehicle's policy, and carriers require verified identity and a clean recent driving record; (2) operational — misrepresenting identity voids coverage and breaches the Operating Agreement.",
           },
           { type: "h3", text: "Where it's stored" },
           {
@@ -1582,7 +1588,7 @@ export const HELP: HelpCategory[] = [
               "Track-day rider fees.",
               "Mileage overage charges.",
               "Premium delivery upgrades.",
-              "Cannot be applied to share purchase price (Reg D 506(c) prohibits inducements that look like discounts on securities).",
+              "Cannot be applied directly to a co-ownership buy-in (referrals are credits against fees and incidentals, not discounts on the buy-in itself).",
             ],
           },
           {
@@ -1635,7 +1641,7 @@ export const HELP: HelpCategory[] = [
     icon: "§",
     title: "Legal & compliance",
     blurb:
-      "Operating Agreement, Reg D 506(c), securities disclaimer, data privacy.",
+      "Operating Agreement, member-managed LLC, co-ownership disclaimer, data privacy.",
     articles: [
       {
         slug: "operating-agreement",
@@ -1667,61 +1673,84 @@ export const HELP: HelpCategory[] = [
         ],
       },
       {
-        slug: "reg-d",
-        q: "Reg D 506(c) and what it means",
+        slug: "member-managed-llc",
+        q: "What is a member-managed LLC, and why does RYDA use it?",
         summary:
-          "An SEC framework that lets us offer shares publicly without a full registration, as long as buyers are verified accredited investors.",
+          "It's a Delaware LLC where the members (the co-owners) hold authority over material decisions — not an outside manager. This is what keeps RYDA a luxury access platform, not an investment product.",
         body: [
-          { type: "h3", text: "What Reg D 506(c) is" },
+          { type: "h3", text: "Two types of LLC governance" },
           {
             type: "p",
-            text: "Rule 506(c) of SEC Regulation D, established by the JOBS Act and amended in 2020, allows companies to publicly advertise a private securities offering — but every buyer must be a verified accredited investor. It's the framework that lets RYDA market share availability on its public website while still operating as a private offering.",
+            text: "Delaware LLCs come in two flavors: manager-managed and member-managed.",
           },
-          { type: "h3", text: "Why it matters for RYDA" },
           {
             type: "ul",
             items: [
-              "We can list available shares on /markets without violating SEC general-solicitation rules.",
-              "Every share buyer must complete accreditation verification before closing — no exceptions.",
-              "RYDA must keep accreditation evidence on file for at least 6 years.",
+              "Manager-managed: a designated manager runs the LLC. Members are passive — like shareholders. This is what most fractional investment platforms (Rally, Masterworks) use.",
+              "Member-managed: the members themselves run the LLC, vote on material decisions, and hire service providers as needed. This is what RYDA uses.",
             ],
           },
-          { type: "h3", text: "What 'accredited' means (basic)" },
+          { type: "h3", text: "Why this matters for RYDA" },
           {
             type: "p",
-            text: "An accredited investor under SEC rules is generally one of: $200K+ individual income (or $300K joint) for the past two years; net worth over $1M excluding primary residence; or holds certain professional certifications (Series 7, 65, or 82). The full SEC definition is broader.",
+            text: "Member-managed structure is a cornerstone of RYDA's non-investment positioning. The SEC's Howey test for what counts as a security asks whether members expect to profit from the efforts of others. In a member-managed LLC, you and your co-owners ARE the others — you hold authority. RYDA is hired to perform specific services, not to run the LLC. This is structurally similar to how a country club, condo association, or vacation-home co-ownership group operates — none of which are securities.",
+          },
+          { type: "h3", text: "What you actually decide as a member" },
+          {
+            type: "ul",
+            items: [
+              "Whether to sell the vehicle (75% supermajority).",
+              "Whether to perform modifications (75% supermajority).",
+              "Whether to replace the vehicle on a total loss (75% supermajority).",
+              "Whether to renew or terminate the management services agreement with RYDA.",
+              "Day-to-day operations are delegated to RYDA — but you can revoke that delegation by member vote.",
+            ],
+          },
+          {
+            type: "callout",
+            tone: "info",
+            text: "This is fundamental to the structure, not a marketing angle. If RYDA were the manager of the LLC making the operational and financial decisions on behalf of passive members, the arrangement would be a security and require Reg D / Reg A registration. Member governance is what keeps the structure consumption-first.",
           },
         ],
       },
       {
         slug: "securities",
-        q: "Are RYDA shares securities?",
+        q: "Are RYDA co-ownership stakes securities?",
         summary:
-          "Yes — they're LLC membership interests offered under Reg D 506(c). The full Securities Disclaimer is on the legal page.",
+          "No. They are LLC membership interests in a member-managed Delaware LLC where you actually co-own and use the vehicle. Not registered securities. Not offered for investment purposes.",
         body: [
           {
             type: "p",
-            text: "Yes. RYDA shares are LLC membership interests offered under SEC Regulation D, Rule 506(c). They are securities under federal law.",
+            text: "No. RYDA is a luxury access platform, not an investment platform. Each car is held in a member-managed Delaware LLC that you and your co-owners run together. RYDA provides operations under a separate management services agreement. The arrangement is consumption-first — real ownership of a real car, with real usage rights — not a passive investment product.",
           },
-          { type: "h3", text: "What that means in practice" },
+          { type: "h3", text: "Why this isn't a security" },
+          {
+            type: "p",
+            text: "Under the SEC's Howey test, an investment contract requires (1) investment of money, (2) in a common enterprise, (3) with expectation of profit, (4) derived from the efforts of others. RYDA's structure breaks the third and fourth prongs:",
+          },
           {
             type: "ul",
             items: [
-              "Buyers must be verified accredited investors at the time of purchase.",
-              "Shares are subject to a 12-month minimum hold (Rule 144 / Operating Agreement).",
-              "Resale is restricted to other verified RYDA members (the secondary market).",
-              "RYDA files Form D with the SEC for each offering.",
+              "Cars depreciate. Co-owners aren't buying with appreciation expectation — the asset is a depreciating consumption good, like a jet card or a country-club membership.",
+              "The LLC is member-managed. You and your co-owners hold authority over material decisions (sale, modifications, replacement). RYDA is a hired service provider, not the LLC's decision-maker.",
+              "No income distribution. Members get usage; they don't earn yield from the LLC's operations.",
+              "Resale is member-to-member transfer of an LLC seat, not a public marketplace trade.",
             ],
           },
-          { type: "h3", text: "What it doesn't mean" },
+          { type: "h3", text: "What this means in practice" },
           {
-            type: "p",
-            text: "RYDA is not a registered broker-dealer or investment adviser. We don't provide investment advice and we don't guarantee any return. Vehicle ownership carries depreciation risk; secondary-market liquidity is not guaranteed.",
+            type: "ul",
+            items: [
+              "No accredited-investor verification required.",
+              "No SEC filings, no Form D, no Reg D 506(c) restrictions.",
+              "Open to anyone 28+ who clears KYC and the standard membership requirements.",
+              "12-month minimum hold still applies (Operating Agreement) — but this is a co-ownership stability rule, not a securities lock-up.",
+            ],
           },
           {
             type: "callout",
-            tone: "warn",
-            text: "Read the full Securities Disclaimer at /legal/disclaimer before purchasing any share. If you're unsure, talk to securities counsel.",
+            tone: "info",
+            text: "RYDA is not a broker-dealer, investment adviser, or fund manager. Co-ownership stakes are not offered for investment purposes. If you're considering this primarily for financial return, this is the wrong product — buy a Ferrari outright or look at a registered fund instead.",
           },
         ],
       },
@@ -2084,8 +2113,8 @@ const ARTICLE_KEYWORDS: Record<string, string[]> = {
 
   // Legal
   "legal/operating-agreement": ["operating agreement", "oa", "llc agreement", "governance", "voting", "decision rules", "bylaws"],
-  "legal/reg-d": ["reg d", "regulation d", "506c", "506(c)", "sec rule", "private placement", "general solicitation", "exempt offering"],
-  "legal/securities": ["securities", "regulated", "stocks", "shares are stocks", "is this regulated", "sec", "registered", "broker dealer"],
+  "legal/member-managed-llc": ["member managed", "member-managed", "llc structure", "who manages", "governance", "manager", "decision making", "control", "vote", "voting"],
+  "legal/securities": ["securities", "regulated", "stocks", "is this regulated", "sec", "registered", "broker dealer", "investment", "investments", "is this an investment"],
   "legal/privacy": ["privacy", "data", "personal information", "what do you collect", "share my data", "third parties", "gdpr", "ccpa"],
   "legal/llc-dissolution": ["dissolve", "wind down", "shut down", "close llc", "dissolution", "exit", "wind up", "end of life"],
   "legal/dispute-resolution": ["dispute", "disagree", "argument", "fight", "lawsuit", "sue", "arbitration", "mediation", "conflict", "co-owner conflict"],

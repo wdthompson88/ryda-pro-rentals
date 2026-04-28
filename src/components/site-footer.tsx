@@ -62,7 +62,7 @@ export function SiteFooter() {
             ["Sign in", "/signin"],
             ["Privacy Policy", "/legal/privacy"],
             ["Terms of Service", "/legal/terms"],
-            ["Securities Disclaimer", "/legal/disclaimer"],
+            ["Co-Ownership Disclaimer", "/legal/disclaimer"],
             ["Cookie Policy", "/legal/cookies"],
             ["Accessibility", "/legal/accessibility"],
           ]}

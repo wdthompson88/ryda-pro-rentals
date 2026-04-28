@@ -314,22 +314,22 @@ function WhyNowSlide() {
   return (
     <div>
       <Eyebrow>Why now</Eyebrow>
-      <H2>The model is proven. The wrapper is finally legal in the US.</H2>
+      <H2>The structure works. The market wants it. Nobody has built it.</H2>
       <Lede>
         Three things had to be true for RYDA to work — and now all three are.
       </Lede>
       <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3">
         <Why
-          title="Proof of model"
-          body="NetJets ($3B+ AUM), Masterworks ($1B+), and a decade of European supercar-sharing operators have proven the playbook in adjacent assets. The risk shifts from 'will it work' to execution."
+          title="Proven access model"
+          body="NetJets jet card has shown that depreciating-asset access products scale to billions. Supercar Sharing AG has run member-managed supercar co-ownership in Switzerland for a decade. The structural playbook exists."
         />
         <Why
-          title="Reg D 506(c)"
-          body="2013 JOBS Act + 2020 amendments make general solicitation of accredited investors viable for asset-backed offerings."
+          title="Member-managed LLC"
+          body="Delaware's member-managed LLC framework lets us run member co-ownership outside SEC investment-product classification. No accreditation gate, no Reg D, no Form D — RYDA is a service provider to LLCs that members own."
         />
         <Why
           title="Insurance carriers"
-          body="Hagerty, Travelers (Turo's carrier), and CHUBB now write multi-driver fleet policies for vehicles >$300K. This was impossible 5 years ago."
+          body="Hagerty, Travelers, and CHUBB now write multi-driver fleet policies for vehicles >$300K. This was impossible 5 years ago. We have insurer signoff on the multi-named-insured LLC structure."
         />
       </div>
     </div>
@@ -397,27 +397,27 @@ function ComparablesSlide() {
   return (
     <div>
       <Eyebrow>Comparables</Eyebrow>
-      <H2>The model is proven. The asset class is new.</H2>
+      <H2>Access products at scale. Supercars are the gap.</H2>
       <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2">
-        <Comp
-          name="Fractional Vacation Real Estate"
-          asset="Second homes via LLC co-ownership"
-          outcome="A category that grew from $0 to $1B+ GMV in 2 years. Same legal pattern RYDA uses, applied to property."
-        />
-        <Comp
-          name="NetJets"
-          asset="Private aviation"
-          outcome="$3B+ AUM in fractional aircraft."
-        />
-        <Comp
-          name="Masterworks"
-          asset="Fine art"
-          outcome="$1B+ in fractional art. SEC-registered."
-        />
         <Comp
           name="Supercar Sharing AG"
           asset="Supercars · Switzerland"
-          outcome="1,300+ members. CHF 34.3M in transactions. The model RYDA adapts for the US."
+          outcome="1,300+ members. CHF 34M in transactions over a decade. Direct precedent — same member co-ownership structure RYDA adapts for the US."
+        />
+        <Comp
+          name="NetJets jet card"
+          asset="Private aviation access"
+          outcome="Multi-billion-dollar program. Depreciating-asset access product, no securities filing. Direct structural analog for what we're building."
+        />
+        <Comp
+          name="Soho House / Equinox Black"
+          asset="Luxury membership"
+          outcome="Hundreds of thousands of members at $5–10K+/year. Proves luxury access has scale demand at this price band."
+        />
+        <Comp
+          name="Country club / yacht club"
+          asset="Member-owned recreational asset"
+          outcome="Centuries-old structure: members own a depreciating asset together, hire staff to operate it, vote on material decisions. The legal template RYDA uses."
         />
       </div>
     </div>

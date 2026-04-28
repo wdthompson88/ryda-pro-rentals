@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { OrderPanel } from "@/components/order-panel";
-import { PriceChart } from "@/components/price-chart";
 import {
   VEHICLES,
   getVehicleBySymbol,
@@ -67,12 +66,20 @@ export default async function VehicleMarketPage({
                 {v.name}
               </h1>
               <p className="mt-1 text-xs text-mute">
-                {v.ticker} · {v.market} · {v.year} · {v.brand}
+                {v.year} · {v.brand} · Stored in {v.market}
+              </p>
+              <p className="mt-6 max-w-2xl text-base leading-relaxed text-ink-soft">
+                {v.description}
               </p>
 
-              <div className="mt-6">
-                <PriceChart vehicle={v} showHeader />
-              </div>
+              <dl className="mt-8 grid grid-cols-2 gap-x-8 gap-y-5 sm:grid-cols-3">
+                <Fact label="Vehicle price" value={formatUSD(v.fullPrice)} />
+                <Fact label="Per seat" value={formatUSD(v.pricePerShare)} />
+                <Fact label="Total seats" value={String(v.shares)} />
+                <Fact label="Days / seat" value={`${v.daysPerYear}/yr`} />
+                <Fact label="Miles / seat" value={`${v.milesPerYear.toLocaleString()}/yr`} />
+                <Fact label="Annual mgmt" value={`${formatUSD(v.annualOpCost)} per seat`} />
+              </dl>
             </div>
 
             {/* Right column — order panel */}
@@ -111,23 +118,6 @@ export default async function VehicleMarketPage({
         </div>
       </section>
 
-      {/* Vehicle facts (the "About QQQ" equivalent) */}
-      <section className="border-b border-rule">
-        <div className="mx-auto max-w-7xl px-6 py-14 sm:px-10">
-          <h2 className="font-display text-3xl text-ink">About this vehicle</h2>
-          <p className="mt-4 max-w-3xl text-base leading-relaxed text-ink-soft">
-            {v.description}
-          </p>
-          <dl className="mt-10 grid grid-cols-2 gap-x-10 gap-y-6 sm:grid-cols-3 lg:grid-cols-6">
-            <Fact label="Vehicle price" value={formatUSD(v.fullPrice)} />
-            <Fact label="Total shares" value={String(v.shares)} />
-            <Fact label="Available" value={`${v.sharesAvailable} of ${v.shares}`} />
-            <Fact label="Annual cost / share" value={formatUSD(v.annualOpCost)} />
-            <Fact label="Days / year" value={`${v.daysPerYear}`} />
-            <Fact label="Effective $/day" value={formatUSD(v.effectiveDailyCost)} />
-          </dl>
-        </div>
-      </section>
 
       {/* Specs */}
       <section className="border-b border-rule bg-cream-2">
@@ -149,10 +139,10 @@ export default async function VehicleMarketPage({
         <div className="mx-auto max-w-7xl px-6 py-14 sm:px-10">
           <h2 className="font-display text-3xl text-ink">Recent activity</h2>
           <ul className="mt-6 divide-y divide-rule rounded-xl border border-rule bg-surface">
-            <Activity label="Member buy · Market" detail="Apr 24" amount={formatUSD(v.pricePerShare * 1)} sub="1 share at avg" />
-            <Activity label="Member sell · Limit" detail="Apr 22" amount={formatUSD(v.prevClose * 1)} sub="1 share at limit" />
+            <Activity label="New co-owner joined" detail="Apr 24" amount={formatUSD(v.pricePerShare * 1)} sub="1 seat" />
+            <Activity label="Seat transferred to new member" detail="Apr 22" amount={formatUSD(v.prevClose * 1)} sub="1 seat" />
             <Activity label="Inspection report posted" detail="Apr 20" amount="—" sub="Mileage: 2,140 mi" />
-            <Activity label="Member buy · Market" detail="Apr 18" amount={formatUSD(v.pricePerShare * 2)} sub="2 shares at avg" />
+            <Activity label="New co-owners joined" detail="Apr 18" amount={formatUSD(v.pricePerShare * 2)} sub="2 seats" />
           </ul>
         </div>
       </section>
