@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
+import { HELP } from "@/lib/help-content";
 
 export const metadata = {
   title: "Help Center — RYDA",
@@ -7,112 +8,18 @@ export const metadata = {
     "Answers about RYDA membership, share purchases, bookings, insurance, maintenance, and account management.",
 };
 
-type Article = { q: string; href: string };
-type Category = {
-  slug: string;
-  icon: string;
-  title: string;
-  blurb: string;
-  articles: Article[];
-};
-
-const CATEGORIES: Category[] = [
-  {
-    slug: "getting-started",
-    icon: "→",
-    title: "Getting started",
-    blurb: "New to RYDA. How membership works, what tier to pick, what happens after you apply.",
-    articles: [
-      { q: "What is RYDA, in one paragraph?", href: "/help/getting-started/what-is-ryda" },
-      { q: "How is co-ownership different from a timeshare?", href: "/help/getting-started/vs-timeshare" },
-      { q: "Membership tiers explained: Core, Blue, Black", href: "/help/getting-started/membership-tiers" },
-      { q: "Do I need to be an accredited investor?", href: "/help/getting-started/accreditation" },
-      { q: "What markets is RYDA in?", href: "/help/getting-started/markets" },
-    ],
-  },
-  {
-    slug: "shares",
-    icon: "$",
-    title: "Buying & selling shares",
-    blurb: "Share purchases, the Operating Agreement, the 12-month minimum hold, secondary-market sales.",
-    articles: [
-      { q: "How do I buy a share?", href: "/help/shares/how-to-buy" },
-      { q: "What documents will I sign?", href: "/help/shares/documents" },
-      { q: "What does a share actually entitle me to?", href: "/help/shares/entitlement" },
-      { q: "Can I sell my share whenever I want?", href: "/help/shares/selling" },
-      { q: "How is a share priced on the secondary market?", href: "/help/shares/pricing" },
-      { q: "What's the 3% transfer fee?", href: "/help/shares/transfer-fee" },
-    ],
-  },
-  {
-    slug: "bookings",
-    icon: "◷",
-    title: "Bookings & usage",
-    blurb: "Reserving days, fair-use rules, peak-season caps, cancellations, no-shows, track days.",
-    articles: [
-      { q: "How do I book my time on a vehicle?", href: "/help/bookings/how-to-book" },
-      { q: "Fair-use rules during high season", href: "/help/bookings/fair-use" },
-      { q: "Cancellations and rebooking", href: "/help/bookings/cancellations" },
-      { q: "Booking a track day", href: "/help/bookings/track-day" },
-      { q: "Mileage limits and overages", href: "/help/bookings/mileage" },
-      { q: "Bringing a passenger or co-driver", href: "/help/bookings/passengers" },
-    ],
-  },
-  {
-    slug: "insurance-claims",
-    icon: "⛨",
-    title: "Insurance & claims",
-    blurb: "What's covered, deductibles, how to file a claim, replacement vehicles.",
-    articles: [
-      { q: "What does the insurance cover?", href: "/help/insurance/coverage" },
-      { q: "What's my deductible if I'm at fault?", href: "/help/insurance/deductible" },
-      { q: "How to file a claim — step by step", href: "/help/insurance/file-claim" },
-      { q: "Roadside assistance & replacement vehicle", href: "/help/insurance/roadside" },
-      { q: "What if the car is totaled?", href: "/help/insurance/total-loss" },
-    ],
-  },
-  {
-    slug: "maintenance",
-    icon: "⚙",
-    title: "Maintenance & care",
-    blurb: "Service schedule, inspections, who pays for what, reporting damage, condition reports.",
-    articles: [
-      { q: "How is maintenance handled?", href: "/help/maintenance/process" },
-      { q: "Who pays for routine service?", href: "/help/maintenance/who-pays" },
-      { q: "How do I report new damage?", href: "/help/maintenance/report-damage" },
-      { q: "Inspection reports and condition documentation", href: "/help/maintenance/inspections" },
-      { q: "Detailing and pre-booking preparation", href: "/help/maintenance/detailing" },
-    ],
-  },
-  {
-    slug: "account",
-    icon: "◉",
-    title: "Account & billing",
-    blurb: "Membership renewals, payment methods, taxes, statements, KYC verification.",
-    articles: [
-      { q: "Updating payment methods", href: "/help/account/payment-methods" },
-      { q: "How am I billed?", href: "/help/account/billing" },
-      { q: "Tax treatment of share ownership", href: "/help/account/taxes" },
-      { q: "KYC verification — what we collect and why", href: "/help/account/kyc" },
-      { q: "Closing my account", href: "/help/account/close" },
-    ],
-  },
-  {
-    slug: "legal",
-    icon: "§",
-    title: "Legal & compliance",
-    blurb: "Operating Agreement, Reg D 506(c), securities disclaimer, data privacy.",
-    articles: [
-      { q: "The Operating Agreement, explained", href: "/help/legal/operating-agreement" },
-      { q: "Reg D 506(c) and what it means", href: "/help/legal/reg-d" },
-      { q: "Are RYDA shares securities?", href: "/help/legal/securities" },
-      { q: "Data privacy & member information", href: "/help/legal/privacy" },
-    ],
-  },
+const TOP_TOPICS: { label: string; href: string }[] = [
+  { label: "How to buy a share", href: "/help/shares/how-to-buy" },
+  { label: "Fair-use rules", href: "/help/bookings/fair-use" },
+  { label: "File an insurance claim", href: "/help/insurance/file-claim" },
+  { label: "Operating Agreement", href: "/help/legal/operating-agreement" },
+  { label: "Track day eligibility", href: "/help/bookings/track-day" },
+  { label: "Tax treatment", href: "/help/account/taxes" },
+  { label: "Sell on secondary market", href: "/help/shares/selling" },
 ];
 
 export default function HelpCenterPage() {
-  const totalArticles = CATEGORIES.reduce((n, c) => n + c.articles.length, 0);
+  const totalArticles = HELP.reduce((n, c) => n + c.articles.length, 0);
 
   return (
     <>
@@ -143,7 +50,7 @@ export default function HelpCenterPage() {
               />
             </div>
             <p className="mt-3 text-xs text-mute">
-              {totalArticles} articles across {CATEGORIES.length} categories
+              {totalArticles} articles across {HELP.length} categories
             </p>
           </div>
         </div>
@@ -156,21 +63,14 @@ export default function HelpCenterPage() {
             Top topics
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
-            {[
-              "How to buy a share",
-              "Fair-use rules",
-              "File an insurance claim",
-              "Operating Agreement",
-              "Track day eligibility",
-              "Tax treatment",
-              "Sell on secondary market",
-            ].map((t) => (
-              <span
-                key={t}
+            {TOP_TOPICS.map((t) => (
+              <Link
+                key={t.href}
+                href={t.href}
                 className="rounded-full border border-rule bg-surface px-4 py-2 text-sm text-ink-soft hover:text-ink"
               >
-                {t}
-              </span>
+                {t.label}
+              </Link>
             ))}
           </div>
         </div>
@@ -180,7 +80,7 @@ export default function HelpCenterPage() {
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {CATEGORIES.map((cat) => (
+            {HELP.map((cat) => (
               <Link
                 key={cat.slug}
                 href={`/help/${cat.slug}`}
@@ -193,7 +93,7 @@ export default function HelpCenterPage() {
                 <p className="mt-2 text-sm text-ink-soft">{cat.blurb}</p>
                 <ul className="mt-5 space-y-2 text-sm">
                   {cat.articles.slice(0, 3).map((a) => (
-                    <li key={a.href} className="text-ink-soft">
+                    <li key={a.slug} className="text-ink-soft">
                       <span className="text-red">→</span>{" "}
                       <span className="group-hover:text-ink">{a.q}</span>
                     </li>
