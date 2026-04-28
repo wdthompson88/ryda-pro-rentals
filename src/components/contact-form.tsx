@@ -1,11 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
+const VALID_TYPES = ["Membership", "Press", "Partnership", "Investor", "Other"] as const;
+type InquiryType = (typeof VALID_TYPES)[number];
+
 export function ContactForm() {
   const [status, setStatus] = useState<Status>("idle");
+  const [type, setType] = useState<InquiryType>("Membership");
+
+  // Read ?type= from the URL after mount so deep-linked CTAs from elsewhere
+  // on the site (e.g. /press, /investors, /contact?type=Press) pre-select
+  // the right inquiry type. Done in useEffect to avoid Next.js static-
+  // prerender bail-outs from useSearchParams.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const param = new URLSearchParams(window.location.search).get("type");
+    if (param && (VALID_TYPES as readonly string[]).includes(param)) {
+      setType(param as InquiryType);
+    }
+  }, []);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -52,7 +68,13 @@ export function ContactForm() {
       <Input name="name" label="Full name" required />
       <Input name="email" label="Email" type="email" required />
       <Input name="phone" label="Phone (optional)" />
-      <Select name="type" label="Inquiry type" options={["Membership", "Press", "Partnership", "Investor", "Other"]} />
+      <Select
+        name="type"
+        label="Inquiry type"
+        options={VALID_TYPES as unknown as string[]}
+        value={type}
+        onChange={(v) => setType(v as InquiryType)}
+      />
       <Select name="market" label="Market" options={["Miami", "Los Angeles", "New York", "Not sure"]} />
       <div className="hidden sm:block" />
       <div className="sm:col-span-2">
@@ -116,7 +138,19 @@ function Input({
   );
 }
 
-function Select({ name, label, options }: { name: string; label: string; options: string[] }) {
+function Select({
+  name,
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  name: string;
+  label: string;
+  options: string[];
+  value?: string;
+  onChange?: (v: string) => void;
+}) {
   return (
     <div>
       <label className="block text-xs font-medium uppercase tracking-wider text-mute">
@@ -124,6 +158,9 @@ function Select({ name, label, options }: { name: string; label: string; options
       </label>
       <select
         name={name}
+        value={value}
+        onChange={onChange ? (e) => onChange(e.target.value) : undefined}
+        defaultValue={value === undefined ? options[0] : undefined}
         className="mt-2 h-11 w-full rounded-xl border border-rule bg-surface px-4 text-sm text-ink focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
       >
         {options.map((o) => (

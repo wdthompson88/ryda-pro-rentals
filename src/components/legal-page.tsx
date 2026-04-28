@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 
 export type LegalSection = {
@@ -55,10 +56,9 @@ export function LegalPage({
           <div className="mt-16 border-t border-rule pt-10 text-sm text-ink-soft">
             <p className="font-medium text-ink">Questions?</p>
             <p className="mt-2">
-              Email{" "}
-              <a href="mailto:legal@ryda.com" className="text-red hover:text-red-deep">
-                legal@ryda.com
-              </a>{" "}
+              <Link href="/contact?type=Other#form" className="text-red hover:text-red-deep">
+                Send us a message
+              </Link>{" "}
               and a member of our team will respond within one business day.
             </p>
           </div>

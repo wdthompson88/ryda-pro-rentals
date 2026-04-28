@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 
 export const metadata = {
@@ -87,12 +88,12 @@ export default function CareersPage() {
                 </div>
                 <p className="mt-1 text-xs uppercase tracking-wider text-red">{r.location}</p>
                 <p className="mt-4 text-sm leading-relaxed text-ink-soft">{r.body}</p>
-                <a
-                  href={`mailto:careers@ryda.com?subject=Application%20%E2%80%94%20${encodeURIComponent(r.title)}`}
+                <Link
+                  href={`/contact?type=Other#form`}
                   className="mt-5 inline-flex items-center text-sm font-medium text-ink hover:text-red"
                 >
                   Apply →
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
@@ -104,10 +105,9 @@ export default function CareersPage() {
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
           <h2 className="font-display text-3xl sm:text-4xl">Don't see your role?</h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
-            Email{" "}
-            <a href="mailto:careers@ryda.com" className="text-red hover:text-red-deep">
-              careers@ryda.com
-            </a>{" "}
+            <Link href="/contact?type=Other#form" className="text-red hover:text-red-deep">
+              Send us a message
+            </Link>{" "}
             with what you'd build at RYDA. The best applications make a
             specific case for the role you should be hired into.
           </p>

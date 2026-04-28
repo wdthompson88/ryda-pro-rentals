@@ -213,11 +213,7 @@ export default function InvestorsPage() {
           </h2>
           <p className="mx-auto mt-6 max-w-xl text-base text-cream/70">
             Tell us a little about you. We send the deck to qualified investors within 24 hours
-            and follow up with a call. Or email{" "}
-            <a href="mailto:investors@ryda.com" className="text-red hover:text-red-deep">
-              investors@ryda.com
-            </a>{" "}
-            directly.
+            and follow up with a call.
           </p>
           <InvestorInquiryForm />
         </div>

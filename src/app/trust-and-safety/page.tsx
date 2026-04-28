@@ -101,12 +101,11 @@ export default function TrustAndSafetyPage() {
           </div>
           <p className="mt-10 rounded-2xl border border-rule bg-cream-2 p-6 text-sm leading-relaxed text-ink-soft">
             Full policy documents and certificates of insurance are
-            distributed to every co-owner on closing and re-issued annually.
-            Email{" "}
-            <a href="mailto:insurance@ryda.com" className="text-red hover:text-red-deep">
-              insurance@ryda.com
-            </a>{" "}
-            for a sample policy.
+            distributed to every co-owner on closing and re-issued annually.{" "}
+            <Link href="/contact?type=Other#form" className="text-red hover:text-red-deep">
+              Request a sample policy
+            </Link>
+            .
           </p>
         </div>
       </section>

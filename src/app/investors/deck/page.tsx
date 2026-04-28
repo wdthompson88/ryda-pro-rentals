@@ -703,30 +703,33 @@ function ContactSlide() {
       <div className="mt-12 space-y-3 text-base text-ink-soft">
         <p>
           <span className="text-mute">Investor relations:</span>{" "}
-          <a
-            href="mailto:investors@ryda.com"
+          <Link
+            href="/contact?type=Investor#form"
+            target="_blank"
             className="font-medium text-red hover:text-red-deep"
           >
-            investors@ryda.com
-          </a>
+            ryda.com/contact (investor)
+          </Link>
         </p>
         <p>
           <span className="text-mute">Press:</span>{" "}
-          <a
-            href="mailto:press@ryda.com"
+          <Link
+            href="/contact?type=Press#form"
+            target="_blank"
             className="font-medium text-red hover:text-red-deep"
           >
-            press@ryda.com
-          </a>
+            ryda.com/contact (press)
+          </Link>
         </p>
         <p>
           <span className="text-mute">General:</span>{" "}
-          <a
-            href="mailto:hello@ryda.com"
+          <Link
+            href="/contact#form"
+            target="_blank"
             className="font-medium text-red hover:text-red-deep"
           >
-            hello@ryda.com
-          </a>
+            ryda.com/contact
+          </Link>
         </p>
       </div>
       <p className="mt-16 text-xs uppercase tracking-[0.2em] text-mute">

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 
 export const metadata = {
@@ -19,10 +20,10 @@ export default function PressPage() {
             Brand assets, fact sheet, and a real human to talk to.
           </h1>
           <p className="mt-8 max-w-2xl text-lg text-ink-soft">
-            For all media inquiries, email{" "}
-            <a href="mailto:press@ryda.com" className="text-red hover:text-red-deep">
-              press@ryda.com
-            </a>
+            For all media inquiries,{" "}
+            <Link href="/contact?type=Press#form" className="text-red hover:text-red-deep">
+              send a press request
+            </Link>
             . We respond within one business day.
           </p>
         </div>
@@ -47,8 +48,8 @@ export default function PressPage() {
               label="Effective customer cost"
               value="~$236/day on a co-owned Ferrari vs. $2,500+/day to rent the equivalent"
             />
-            <Fact label="Press" value="press@ryda.com" />
-            <Fact label="Investors" value="investors@ryda.com" />
+            <Fact label="Press contact" value="Send a press inquiry via /contact" />
+            <Fact label="Investor contact" value="Send an investor inquiry via /contact" />
           </dl>
         </div>
       </section>
@@ -59,10 +60,10 @@ export default function PressPage() {
           <h2 className="font-display text-3xl text-ink sm:text-4xl">Brand assets</h2>
           <p className="mt-4 max-w-2xl text-base text-ink-soft">
             Logos, vehicle photography, and approved marketing imagery.
-            Available on request — email{" "}
-            <a href="mailto:press@ryda.com" className="text-red hover:text-red-deep">
-              press@ryda.com
-            </a>{" "}
+            Available on request —{" "}
+            <Link href="/contact?type=Press#form" className="text-red hover:text-red-deep">
+              send us a request
+            </Link>{" "}
             with the publication and intended use.
           </p>
           <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
@@ -88,12 +89,12 @@ export default function PressPage() {
             ownership playbook applied to autos, and the legal structure of
             fractional vehicle ownership in the US.
           </p>
-          <a
-            href="mailto:press@ryda.com?subject=Press%20inquiry"
+          <Link
+            href="/contact?type=Press#form"
             className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-red hover:text-cream"
           >
-            Email press team
-          </a>
+            Send a press inquiry
+          </Link>
         </div>
       </section>
     </>

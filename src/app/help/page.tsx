@@ -119,10 +119,10 @@ export default function HelpCenterPage() {
               href="tel:+13055550100"
             />
             <Strip
-              title="Email a specialist"
-              detail="hello@ryda.com for general questions. We answer everything within one business day."
-              cta="hello@ryda.com →"
-              href="mailto:hello@ryda.com"
+              title="Send us a message"
+              detail="For general questions, send a message and we'll route it to the right person within one business day."
+              cta="Open contact form →"
+              href="/contact#form"
             />
             <Strip
               title="Book a 30-minute call"

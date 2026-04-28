@@ -113,11 +113,11 @@ export default function FaqPage() {
             Everything we get asked, answered honestly.
           </h1>
           <p className="mt-8 max-w-2xl text-lg text-ink-soft">
-            Questions we haven't covered? Email{" "}
-            <a href="mailto:hello@ryda.com" className="text-red hover:text-red-deep">
-              hello@ryda.com
-            </a>{" "}
-            — we add new questions here when they come up.
+            Questions we haven't covered?{" "}
+            <Link href="/contact#form" className="text-red hover:text-red-deep">
+              Send us a question
+            </Link>{" "}
+            — we add new ones here when they come up.
           </p>
         </div>
       </section>

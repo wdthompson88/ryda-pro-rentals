@@ -39,30 +39,30 @@ export default function ContactPage() {
             <ContactCard
               title="Press"
               subtitle="Media inquiries"
-              detail="press@ryda.com — response within 1 business day."
-              cta="Email press team"
-              href="mailto:press@ryda.com"
+              detail="Response within 1 business day."
+              cta="Send a press inquiry"
+              href="/contact?type=Press#form"
             />
             <ContactCard
               title="Partnerships"
               subtitle="Dealers, insurance & partners"
-              detail="partners@ryda.com — open to strategic intros."
-              cta="Email partnerships"
-              href="mailto:partners@ryda.com"
+              detail="Open to strategic intros."
+              cta="Send a partnership inquiry"
+              href="/contact?type=Partnership#form"
             />
             <ContactCard
               title="Investors"
               subtitle="Investor relations"
-              detail="investors@ryda.com — data room available on request."
-              cta="Email investor relations"
-              href="mailto:investors@ryda.com"
+              detail="Data room available on request."
+              cta="Send an investor inquiry"
+              href="/contact?type=Investor#form"
             />
           </div>
         </div>
       </section>
 
       {/* General contact form */}
-      <section className="border-b border-rule">
+      <section id="form" className="border-b border-rule">
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-12 px-6 py-20 sm:px-10 lg:grid-cols-12">
           <div className="lg:col-span-5">
             <h2 className="font-display text-3xl text-ink sm:text-4xl">
@@ -102,10 +102,10 @@ export default function ContactPage() {
               Calendly embed will appear here once a booking link is set up.
             </p>
             <a
-              href="mailto:hello@ryda.com?subject=Membership%20consultation"
+              href="/contact?type=Membership#form"
               className="mt-6 inline-flex h-11 items-center justify-center rounded-full bg-cream px-6 text-sm font-medium text-ink hover:bg-red hover:text-cream"
             >
-              Email to schedule
+              Send a message instead
             </a>
           </div>
         </div>
