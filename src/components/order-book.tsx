@@ -47,6 +47,18 @@ export function OrderBook({ vehicle }: { vehicle: Vehicle }) {
 
   return (
     <div className="relative overflow-hidden rounded-2xl border border-rule bg-surface">
+      {/* Live status strip */}
+      <div className="flex items-center justify-between border-b border-rule px-5 py-2.5">
+        <p className="font-display text-sm text-ink">Order book</p>
+        <span className="flex items-center gap-2 text-[11px] text-mute">
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#00C805]/60" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#00C805]" />
+          </span>
+          Live · member-to-member
+        </span>
+      </div>
+
       {/* Column headers */}
       <div className="grid grid-cols-12 border-b border-rule px-5 py-3 text-[10px] font-medium uppercase tracking-[0.15em] text-mute">
         <div className="col-span-4">Price</div>
