@@ -11,6 +11,8 @@ type ChatMessage =
       role: "bot";
       text: string;
       answer?: { source: SearchResult; otherResults: SearchResult[] };
+      escalation?: "prompt" | "submitted";
+      submittedEmail?: string;
     };
 
 const SUGGESTIONS = [
@@ -24,14 +26,32 @@ const SUGGESTIONS = [
 const GREETING: ChatMessage = {
   id: "greeting",
   role: "bot",
-  text: "Hi — I'm RYDA's help assistant. Ask me anything about membership, shares, bookings, insurance, maintenance, or how the platform works. I'll do my best to answer directly and point you to the full article.",
+  text: "Hi — I'm RYDA's help assistant. Ask me anything about membership, shares, bookings, insurance, maintenance, or how the platform works. I'll do my best to answer directly and point you to the full article. Need a real human? Just say so.",
 };
 
-// Pick a low-effort intro that fits any question. We rotate so consecutive
-// answers don't feel templated.
 const INTROS = ["Here's the gist:", "Quick answer:", "Short version:", "From the help docs:"];
 function pickIntro(seed: number) {
   return INTROS[seed % INTROS.length];
+}
+
+// Detect "talk to a human" intents. Cast a wide net; false positives just
+// prompt the user with the escalation form which they can ignore.
+const HUMAN_HELP_PATTERNS = [
+  /\b(?:speak|talk|chat)\s+(?:to|with)\s+(?:a\s+)?(?:human|person|agent|someone|representative|rep|specialist)\b/i,
+  /\b(?:human|real\s+person|live\s+person|real\s+human)\s+(?:help|support|please)?\b/i,
+  /\b(?:get|connect|reach)\s+(?:me\s+)?(?:to\s+)?(?:a\s+)?(?:human|person|agent|someone|specialist)\b/i,
+  /\b(?:customer\s+service|customer\s+support)\b/i,
+  /\bsupport\s+(?:agent|rep|representative|team)\b/i,
+  /\b(?:can|could|will|would)\s+(?:i|someone|you)\s+(?:call|email)\s+(?:me|us)\b/i,
+  /\b(?:i\s+)?(?:want|need|would\s+like)\s+to\s+(?:speak|talk|chat)\b/i,
+  /\bcall\s+me\b/i,
+  /\bemail\s+me\b/i,
+  /\bnot\s+(?:helpful|helping)\b/i,
+  /\bthis\s+isn(?:'|')?t\s+working\b/i,
+];
+
+function isAskingForHuman(text: string): boolean {
+  return HUMAN_HELP_PATTERNS.some((p) => p.test(text));
 }
 
 export function HelpChat() {
@@ -40,6 +60,7 @@ export function HelpChat() {
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
   const turnCount = useRef(0);
+  const lastTriggerMessage = useRef<string>("");
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -57,26 +78,36 @@ export function HelpChat() {
       text: q,
     };
 
-    const results = searchHelp(q, 4);
-
     let botMsg: ChatMessage;
-    if (results.length === 0) {
+
+    if (isAskingForHuman(q)) {
+      lastTriggerMessage.current = q;
       botMsg = {
         id: `b-${Date.now()}`,
         role: "bot",
-        text: "I couldn't find a good answer for that one. Try rephrasing — or write our team directly and a real human will get back within one business day.",
+        text: "Of course. Drop your email and a short note about what you're looking for, and someone from RYDA will reach out within one business day.",
+        escalation: "prompt",
       };
     } else {
-      const top = results[0];
-      const others = results.slice(1, 3); // up to 2 alternates
-      const intro = pickIntro(turnCount.current);
-      const answerText = extractAnswer(top.article);
-      botMsg = {
-        id: `b-${Date.now()}`,
-        role: "bot",
-        text: `${intro}\n\n${answerText}`,
-        answer: { source: top, otherResults: others },
-      };
+      const results = searchHelp(q, 4);
+      if (results.length === 0) {
+        botMsg = {
+          id: `b-${Date.now()}`,
+          role: "bot",
+          text: "I couldn't find a good answer for that. Want me to put you in touch with a real human at RYDA? Just type 'talk to a human' and I'll grab your email so we can follow up.",
+        };
+      } else {
+        const top = results[0];
+        const others = results.slice(1, 3);
+        const intro = pickIntro(turnCount.current);
+        const answerText = extractAnswer(top.article);
+        botMsg = {
+          id: `b-${Date.now()}`,
+          role: "bot",
+          text: `${intro}\n\n${answerText}`,
+          answer: { source: top, otherResults: others },
+        };
+      }
     }
 
     turnCount.current += 1;
@@ -87,6 +118,51 @@ export function HelpChat() {
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     handleAsk(input);
+  }
+
+  async function handleEscalate(payload: { email: string; note: string }) {
+    const conversation = messages
+      .map((m) =>
+        m.role === "user"
+          ? { role: "user" as const, text: m.text }
+          : { role: "bot" as const, text: m.text },
+      );
+
+    try {
+      const res = await fetch("/api/help-escalation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: payload.email,
+          note: payload.note,
+          trigger_message: lastTriggerMessage.current,
+          conversation,
+        }),
+      });
+      if (!res.ok) throw new Error();
+      // Replace the prompt bubble with a confirmation
+      setMessages((all) =>
+        all.map((m) =>
+          m.role === "bot" && m.escalation === "prompt"
+            ? {
+                ...m,
+                escalation: "submitted",
+                submittedEmail: payload.email,
+                text: `Got it — we'll email ${payload.email} within one business day. Anything else I can help with in the meantime?`,
+              }
+            : m,
+        ),
+      );
+    } catch {
+      setMessages((all) => [
+        ...all,
+        {
+          id: `b-err-${Date.now()}`,
+          role: "bot",
+          text: "Something went wrong sending that. Email hello@ryda.com directly and we'll pick it up from there.",
+        },
+      ]);
+    }
   }
 
   return (
@@ -114,7 +190,7 @@ export function HelpChat() {
             <div>
               <p className="font-display text-base">Ask RYDA</p>
               <p className="text-[11px] uppercase tracking-wider text-cream/50">
-                Answers from 61 help articles
+                Answers from 61 help articles · Real human on request
               </p>
             </div>
           </div>
@@ -128,7 +204,13 @@ export function HelpChat() {
               m.role === "user" ? (
                 <UserBubble key={m.id} text={m.text} />
               ) : (
-                <BotBubble key={m.id} text={m.text} answer={m.answer} />
+                <BotBubble
+                  key={m.id}
+                  text={m.text}
+                  answer={m.answer}
+                  escalation={m.escalation}
+                  onEscalate={handleEscalate}
+                />
               ),
             )}
 
@@ -199,9 +281,13 @@ function UserBubble({ text }: { text: string }) {
 function BotBubble({
   text,
   answer,
+  escalation,
+  onEscalate,
 }: {
   text: string;
   answer?: { source: SearchResult; otherResults: SearchResult[] };
+  escalation?: "prompt" | "submitted";
+  onEscalate: (payload: { email: string; note: string }) => Promise<void>;
 }) {
   const paragraphs = text.split("\n\n").filter((p) => p.trim().length > 0);
 
@@ -227,6 +313,9 @@ function BotBubble({
           )}
         </div>
 
+        {/* Escalation form */}
+        {escalation === "prompt" && <EscalationForm onSubmit={onEscalate} />}
+
         {/* Related articles below the answer */}
         {answer && answer.otherResults.length > 0 && (
           <div>
@@ -249,5 +338,64 @@ function BotBubble({
         )}
       </div>
     </div>
+  );
+}
+
+function EscalationForm({
+  onSubmit,
+}: {
+  onSubmit: (payload: { email: string; note: string }) => Promise<void>;
+}) {
+  const [email, setEmail] = useState("");
+  const [note, setNote] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email.includes("@")) {
+      setError("Please enter a valid email.");
+      return;
+    }
+    setSubmitting(true);
+    setError(null);
+    try {
+      await onSubmit({ email: email.trim(), note: note.trim() });
+    } catch {
+      setError("Something went wrong. Try again.");
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-2 rounded-2xl border border-rule bg-surface p-3"
+    >
+      <input
+        type="email"
+        required
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="Your email"
+        autoComplete="email"
+        className="h-9 w-full rounded-lg border border-rule bg-cream-2/40 px-3 text-xs text-ink placeholder:text-mute focus:border-red focus:outline-none"
+      />
+      <textarea
+        value={note}
+        onChange={(e) => setNote(e.target.value)}
+        placeholder="What's on your mind? (optional)"
+        rows={3}
+        className="w-full rounded-lg border border-rule bg-cream-2/40 px-3 py-2 text-xs text-ink placeholder:text-mute focus:border-red focus:outline-none"
+      />
+      <button
+        type="submit"
+        disabled={submitting}
+        className="h-9 w-full rounded-full bg-red text-xs font-medium text-cream hover:bg-red-deep disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {submitting ? "Sending…" : "Send to RYDA team"}
+      </button>
+      {error && <p className="text-[11px] text-red">{error}</p>}
+    </form>
   );
 }
