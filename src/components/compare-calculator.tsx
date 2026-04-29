@@ -12,7 +12,7 @@ import {
 } from "@/lib/market-data";
 
 const RENTAL_FALLBACK = 2_500;
-const DEFAULT_RESIDUAL_PCT = 100 - TARGET_DEPRECIATION_PCT; // 95% of buy-in
+const DEFAULT_RESIDUAL_PCT = 100 - TARGET_DEPRECIATION_PCT; // 90% of buy-in
 
 export function CompareCalculator() {
   // Educational tool — let users model 1..vehicle.shares regardless of

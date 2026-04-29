@@ -296,14 +296,20 @@ export function formatUSD(n: number, opts: { decimals?: number } = {}) {
 // ─────────────────────────────────────────────────────────────────────────
 // We curate Certified Pre-Owned vehicles and hold each one for ~2 years.
 // At exit, the LLC sells the car and proceeds are distributed pro-rata.
-// Modeled assumption: the curated fleet depreciates ~5% over the 2-year
-// hold (low mileage, kept-condition CPO exotics often clear this bar).
+// Modeled assumption: the curated fleet depreciates ~10% over the
+// 2-year hold. We use a flat 10% across drive-only AND rental-opt-in
+// scenarios — the number already absorbs the heavier mileage profile
+// of the rental path (50% pool occupancy + 100 mi/day shareholder
+// allowance + ~150 mi/day rental wear). Per-vehicle depreciation
+// curves vary in reality (Aventador Ultimae appreciates, Cullinan
+// depreciates faster) but a flat rate keeps the calculator honest
+// and simple.
 // Members can still transfer their share to another verified member at
 // any time after the 12-month minimum hold; the 2-year sale is the
 // default exit baseline shown in pricing and calculators.
 
 export const HOLDING_YEARS = 2;
-export const TARGET_DEPRECIATION_PCT = 5; // % over the full 2-year hold
+export const TARGET_DEPRECIATION_PCT = 10; // % over the full 2-year hold
 
 // Standard shareholder mileage allowance — matches GM LUXE & industry
 // norm. 34 days × 100 mi/day = 3,400 mi/yr per share.
@@ -326,7 +332,7 @@ export type ShareEconomics = {
 
 /**
  * Two-year share economics with the resale baked in. Defaults to one
- * share, the doctrinal 2-year hold, and the 5% depreciation model.
+ * share, the doctrinal 2-year hold, and the 10% depreciation model.
  */
 // ─────────────────────────────────────────────────────────────────────────
 // Rental opt-in (shareholders can pool unused days into the rental program)

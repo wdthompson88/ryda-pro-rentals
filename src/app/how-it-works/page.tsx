@@ -50,7 +50,7 @@ export default function HowItWorksPage() {
             <Step n="02" title="Choose" body="Browse the curated, CPO-only fleet. Every car passes a multi-point Pre-Purchase Inspection before a single share is sold — co-owners are protected from inheriting major powertrain or mechanical issues." />
             <Step n="03" title="Co-own" body="Join the LLC alongside other members. Sign the Operating Agreement and Management Services Agreement. Fund your share via wire or ACH." />
             <Step n="04" title="Drive" body="Book your time on the RYDA app. Each share unlocks ~34 days and ~3,400 miles per year (100 mi/day allowance). Hold multiple shares to scale linearly — 5 ≈ 170 days, all 10 ≈ year-round access." />
-            <Step n="05" title="Exit" body="Default: RYDA sells the car at year 2 and distributes proceeds pro-rata (we model a ~5% depreciation assumption). Want out sooner? Transfer your share to another verified member after the 12-month minimum hold. RYDA handles the LLC paperwork. 3% transfer fee on member-to-member transfers." />
+            <Step n="05" title="Exit" body="Default: RYDA sells the car at year 2 and distributes proceeds pro-rata (we model a ~10% depreciation assumption). Want out sooner? Transfer your share to another verified member after the 12-month minimum hold. RYDA handles the LLC paperwork. 3% transfer fee on member-to-member transfers." />
           </div>
         </div>
       </section>
@@ -118,15 +118,16 @@ export default function HowItWorksPage() {
               The bigger number is net cost over the full hold. RYDA's
               doctrine is a 2-year planned exit: each curated CPO car is held
               for ~2 years, then the LLC sells it and proceeds are
-              distributed pro-rata. We model a 5% depreciation hit over the
-              full hold — a bar that low-mileage, kept-condition CPO exotics
-              consistently clear, but the calculator lets you stress-test it.
+              distributed pro-rata. We model a 10% depreciation hit over the
+              full hold — a conservative middle that absorbs both the
+              drive-only and rental-opt-in usage profiles, given the
+              100 mi/day shareholder allowance and rental-pool wear.
             </p>
             <p>
               For the F296 at one share over 2 years: $34K buy-in + $7,080 ×
-              2 carrying = $48,160 spent. Resale at 95% of buy-in returns
-              ~$32,300. <strong>Net cost ~$15,860</strong> for 68 driving
-              days = <strong>~$233 per actual driving day</strong>. That's
+              2 carrying = $48,160 spent. Resale at 90% of buy-in returns
+              ~$30,600. <strong>Net cost ~$17,560</strong> for 68 driving
+              days = <strong>~$258 per actual driving day</strong>. That's
               the apples-to-apples number to use against rental ($2,400/day
               × 68 = $163,200). You also exit with cash from the sale, not
               a stack of receipts.
@@ -195,7 +196,7 @@ export default function HowItWorksPage() {
                 Honest tradeoffs
               </p>
               <ul className="mt-3 space-y-2 text-sm leading-relaxed text-ink-soft">
-                <li>· Same 5% depreciation assumption applies — CPO maintenance + curated mileage caps keep the resale story consistent.</li>
+                <li>· Same 10% depreciation assumption applies — our flat-rate model already absorbs the heavier rental-pool wear.</li>
                 <li>· Rental days are pooled across all shares — no individual day-of priority guaranteed.</li>
                 <li>· Members keep first-call on owner-priority weeks. Renters fill the gaps.</li>
                 <li>· Track-day cars come out of the pool when you take them on track.</li>
@@ -229,7 +230,7 @@ export default function HowItWorksPage() {
             />
             <Faq
               q="Can I rent out my share days for income?"
-              a="Yes — opting into RYDA's rental pool is voluntary, share-by-share. We list the car on /rent, handle bookings, insurance, screening, and condition checks. Revenue splits 65/35 (you / RYDA) and is distributed pro-rata across the days each share contributes. The pool is whatever days members don't reserve, so realistic pool occupancy is ~50% (full-control fleets clock 60–70%). On that basis, a single Ferrari 296 share can earn ~$15–18K/yr — typically 2–2.5× your annual carrying cost, and often enough to flip your two-year hold from a net cost into a net positive return. Same 5% depreciation assumption applies in both scenarios — our 100 mi/day shareholder allowance, CPO maintenance, and curated mileage caps keep the resale story consistent."
+              a="Yes — opting into RYDA's rental pool is voluntary, share-by-share. We list the car on /rent, handle bookings, insurance, screening, and condition checks. Revenue splits 65/35 (you / RYDA) and is distributed pro-rata across the days each share contributes. The pool is whatever days members don't reserve, so realistic pool occupancy is ~50% (full-control fleets clock 60–70%). On that basis, a single Ferrari 296 share can earn ~$15–18K/yr — typically 2–2.5× your annual carrying cost, and often enough to flip your two-year hold from a net cost into a net positive return. Same flat 10% depreciation assumption applies in both scenarios — that one number already absorbs the heavier rental-pool wear, so we don't need to bump it for the rental path."
             />
             <Faq
               q="What if a co-owner stops paying?"
