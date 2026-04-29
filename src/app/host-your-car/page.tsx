@@ -37,16 +37,16 @@ export default function HostYourCarPage() {
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
             <Option
               eyebrow="OPTION 1"
-              title="Rent it out."
-              body="Keep 100% ownership. List your car for daily rentals to verified RYDA members. We handle insurance, prep, handover, and damage claims. You set blackout dates."
+              title="Lease it to a vehicle LLC."
+              body="Keep 100% ownership. Lease your vehicle to one of RYDA's vehicle LLCs under a counsel-reviewed lease. The LLC handles insurance, prep, handover, damage claims, and pays you a monthly lease fee. You set blackout dates and can end the lease."
               points={[
-                "Keep 70-85% of every rental booking",
-                "RYDA handles insurance, ops, customer support",
-                "You approve every renter (or use auto-accept)",
+                "Predictable monthly lease fee from the vehicle LLC",
+                "LLC handles insurance, ops, member services",
+                "RYDA's underwriting screens every member who drives",
                 "Free storage in RYDA partner facility (optional)",
-                "You can pull the car off the platform anytime",
+                "Pull the car back at any notice period defined in the lease",
               ]}
-              cta="Apply to host"
+              cta="Apply to lease"
             />
             <Option
               eyebrow="OPTION 2"

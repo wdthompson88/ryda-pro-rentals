@@ -30,7 +30,7 @@ const siteUrl =
 export const metadata: Metadata = {
   title: "RYDA — Supercar Co-Ownership",
   description:
-    "The first US member-managed supercar co-ownership platform. Co-own a Ferrari, Lamborghini, or McLaren together with verified members.",
+    "Member-managed supercar co-ownership in the US. Co-own a Ferrari, Lamborghini, or McLaren together with verified members.",
   metadataBase: new URL(siteUrl),
   openGraph: {
     title: "RYDA — Supercar Co-Ownership",

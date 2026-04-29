@@ -5,7 +5,7 @@ import { InvestorInquiryForm } from "@/components/investor-inquiry-form";
 export const metadata = {
   title: "Invest in RYDA — Seed Round",
   description:
-    "RYDA is the first US member-managed supercar co-ownership platform, raising a seed round to launch Miami.",
+    "RYDA is a US member-managed supercar co-ownership platform, raising a seed round to launch Miami.",
 };
 
 export default function InvestorsPage() {
@@ -40,7 +40,7 @@ export default function InvestorsPage() {
             <span className="italic text-red">supercars have been waiting for.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-cream/70">
-            RYDA is the first US member-managed supercar co-ownership
+            RYDA is a US member-managed supercar co-ownership
             platform — Soho House for cars, structured around real ownership
             of real vehicles. We're raising a $2.5M seed to launch Miami in
             Q3 2026 and reach 20 vehicles + 120 co-owners + $1.2M ARR by Year 3.
@@ -231,10 +231,16 @@ export default function InvestorsPage() {
             Want the deck and the data room?
           </h2>
           <p className="mx-auto mt-6 max-w-xl text-base text-cream/70">
-            Tell us a little about you. We send the deck to qualified investors within 24 hours
-            and follow up with a call.
+            Tell us a little about you. We follow up within one business day to
+            confirm fit and send the deck and data room directly.
           </p>
           <InvestorInquiryForm />
+          <p className="mx-auto mt-6 max-w-xl text-xs leading-relaxed text-cream/50">
+            This page is informational and is not an offer to sell or a
+            solicitation of an offer to buy any security. Any future financing
+            in RYDA Inc. would be conducted through definitive offering
+            documents and applicable exemptions from registration.
+          </p>
         </div>
       </section>
     </>

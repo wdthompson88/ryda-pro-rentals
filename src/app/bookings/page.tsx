@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
+import { DemoBanner } from "@/components/demo-banner";
 
 export const metadata = { title: "Bookings — RYDA" };
 
 const UPCOMING = [
   { vehicle: "Ferrari 296 GTB", dates: "Apr 28 – May 1", duration: "3 days", status: "Confirmed", handover: "White-glove delivery", miles: "200 / day" },
   { vehicle: "McLaren 750S Spider", dates: "May 12 – May 14", duration: "2 days", status: "Confirmed", handover: "Self-pickup · Miami facility", miles: "200 / day" },
-  { vehicle: "Ferrari 296 GTB", dates: "Jun 5 – Jun 8", duration: "3 days", status: "Pending Lead Owner", handover: "White-glove delivery", miles: "Unlimited (track day rider)" },
+  { vehicle: "Ferrari 296 GTB", dates: "Jun 5 – Jun 8", duration: "3 days", status: "Pending Proposal Coordinator", handover: "White-glove delivery", miles: "Unlimited (track day rider)" },
 ];
 
 const PAST = [
@@ -19,6 +20,7 @@ export default function BookingsPage() {
   return (
     <>
       <SiteHeader />
+      <DemoBanner />
 
       {/* Hero / entitlement */}
       <section className="border-b border-rule">

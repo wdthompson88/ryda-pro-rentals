@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
+import { DemoBanner } from "@/components/demo-banner";
 import { VEHICLES, getVehicleBySymbol, formatUSD } from "@/lib/market-data";
 
 const OWNED = ["F296", "MC75"];
@@ -33,6 +34,7 @@ export default async function MyVehiclePage({
   return (
     <>
       <SiteHeader />
+      <DemoBanner />
 
       {/* Hero */}
       <section className="border-b border-rule">
@@ -59,7 +61,7 @@ export default async function MyVehiclePage({
               </h1>
               {isLead && (
                 <span className="mt-3 inline-block rounded-full bg-red px-3 py-1 text-xs font-medium text-cream">
-                  ★ Lead Owner
+                  ★ Proposal Coordinator
                 </span>
               )}
               <div className="mt-6 grid grid-cols-2 gap-4 text-sm">
@@ -122,7 +124,7 @@ export default async function MyVehiclePage({
           <ul className="mt-4 divide-y divide-rule rounded-xl border border-rule bg-surface">
             <Activity label="Booking confirmed" sub="Apr 28 – May 1" date="2 hr ago" />
             <Activity label="Inspection report posted" sub="2,140 mi · Excellent condition" date="1 day ago" />
-            <Activity label="Message from Mike" sub='"Booked Pebble Beach hotels..."' date="2 days ago" />
+            <Activity label="Message from a co-owner" sub='"Booked Pebble Beach hotels..."' date="2 days ago" />
             <Activity label="Q1 mgmt fee paid" sub="$1,700" date="3 days ago" />
           </ul>
         </div>
@@ -275,14 +277,14 @@ export default async function MyVehiclePage({
         </div>
       </Section>
 
-      {/* Member proposals (Lead Owner posts on behalf of co-owners) */}
+      {/* Member proposals (Proposal Coordinator posts on behalf of co-owners) */}
       {isLead && (
-        <Section id="settings" title="Member proposals · Lead Owner">
+        <Section id="settings" title="Member proposals · Proposal Coordinator">
           <p className="mb-6 inline-block rounded-full bg-red/10 px-3 py-1 text-xs font-medium text-red">
-            ★ Lead Owner — your role is to facilitate co-owner votes
+            ★ Proposal Coordinator — your role is to facilitate co-owner votes
           </p>
           <p className="mb-6 max-w-2xl text-sm text-ink-soft">
-            As Lead Owner you post proposals on behalf of the LLC's
+            As Proposal Coordinator you post proposals on behalf of the LLC's
             members. Material decisions — booking rules, vehicle
             modifications, transfers, document additions — go to a
             co-owner vote per the Operating Agreement. RYDA executes
@@ -462,9 +464,7 @@ function Doc({ title, date, size }: { title: string; date: string; size: string 
           {date} · {size}
         </p>
       </div>
-      <button className="text-xs font-medium text-red hover:text-red-deep">
-        Download →
-      </button>
+      <span className="text-xs font-medium text-mute">Sample</span>
     </li>
   );
 }

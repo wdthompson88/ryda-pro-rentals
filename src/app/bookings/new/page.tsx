@@ -15,7 +15,16 @@ const VEHICLES = [
 export default function NewBookingPage() {
   const [step, setStep] = useState(0);
   const [vehicle, setVehicle] = useState(VEHICLES[0]);
-  const [dates, setDates] = useState({ start: "Apr 28", end: "May 1", days: 3 });
+  const [dates, setDates] = useState(() => {
+    // Default to "two weeks from today, 3 days" so the demo doesn't go stale
+    // as the calendar moves forward.
+    const start = new Date();
+    start.setDate(start.getDate() + 14);
+    const end = new Date(start);
+    end.setDate(end.getDate() + 3);
+    const fmt = (d: Date) => d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    return { start: fmt(start), end: fmt(end), days: 3 };
+  });
   const [details, setDetails] = useState({
     type: "standard" as "standard" | "track" | "event",
     handover: "delivery" as "delivery" | "pickup",
@@ -244,7 +253,7 @@ function PickDetails({
 
       <div className="mt-6">
         <label className="block text-xs font-medium uppercase tracking-wider text-mute">
-          Notes for Lead Owner / RYDA (optional)
+          Notes for Proposal Coordinator / RYDA (optional)
         </label>
         <textarea
           rows={3}
@@ -317,10 +326,10 @@ function Confirmed({
         {vehicle.name} · {dates.start} – {dates.end}
       </p>
       <div className="mt-8 rounded-xl border border-rule bg-cream-2/40 p-5 text-left text-sm">
-        <p className="font-medium text-ink">Booking #BK-00428</p>
+        <p className="font-medium text-ink">Booking confirmation</p>
         <ul className="mt-3 space-y-2 text-ink-soft">
           <li>· Confirmation email sent</li>
-          <li>· 24h pickup-prep reminder will go out Apr 27</li>
+          <li>· 24h pickup-prep reminder goes out the day before</li>
           <li>· Pre-trip checklist available 24h before</li>
           <li>· Day-of contact: RYDA concierge in your inbox</li>
         </ul>

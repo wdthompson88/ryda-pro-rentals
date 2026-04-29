@@ -67,7 +67,7 @@ export default function HowItWorksPage() {
           </h2>
           <p className="mt-4 max-w-2xl text-base text-ink-soft">
             We're not selling timeshares. We're not running a rental
-            marketplace. We're the first US member-managed co-ownership
+            marketplace. We're a US member-managed co-ownership
             platform for exotic vehicles — real ownership, real governance,
             no investment thesis.
           </p>

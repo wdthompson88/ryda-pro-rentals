@@ -151,19 +151,15 @@ export default function JournalPage() {
             One email per post. No marketing, no upsells, no daily digest.
             Unsubscribe whenever.
           </p>
-          <form className="mx-auto mt-8 flex max-w-md flex-col gap-3 sm:flex-row">
-            <input
-              type="email"
-              placeholder="you@email.com"
-              className="h-12 flex-1 rounded-full border border-cream/20 bg-cream/5 px-5 text-cream placeholder:text-cream/50 focus:border-red focus:outline-none"
-            />
-            <button
-              type="button"
-              className="h-12 rounded-full bg-red px-7 text-sm font-medium text-cream hover:bg-red-deep"
-            >
-              Subscribe
-            </button>
-          </form>
+          <Link
+            href="/contact?type=Other#form"
+            className="mx-auto mt-8 inline-flex h-12 items-center justify-center rounded-full bg-red px-7 text-sm font-medium text-cream hover:bg-red-deep"
+          >
+            Email us to subscribe
+          </Link>
+          <p className="mx-auto mt-3 max-w-xs text-xs text-cream/40">
+            Newsletter signup ships with the Miami launch.
+          </p>
         </div>
       </section>
     </>

@@ -1,7 +1,7 @@
+"use client";
+
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
-
-export const metadata = { title: "Sign in — RYDA" };
 
 export default function SignInPage() {
   return (
@@ -14,7 +14,13 @@ export default function SignInPage() {
             Welcome back. Members only.
           </p>
 
-          <form className="mt-8 space-y-4">
+          <form
+            className="mt-8 space-y-4"
+            onSubmit={(e) => {
+              e.preventDefault();
+              window.location.href = "/contact?type=Membership#form";
+            }}
+          >
             <Field label="Email" type="email" placeholder="you@email.com" />
             <Field label="Password" type="password" placeholder="••••••••" />
           </form>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
+import { DemoBanner } from "@/components/demo-banner";
 import { VEHICLES, formatUSD } from "@/lib/market-data";
 
 export const metadata = {
@@ -31,6 +32,7 @@ export default function PortfolioPage() {
   return (
     <>
       <SiteHeader />
+      <DemoBanner />
 
       {/* Hero */}
       <section className="border-b border-rule">

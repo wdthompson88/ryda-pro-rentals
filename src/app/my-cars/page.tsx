@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
+import { DemoBanner } from "@/components/demo-banner";
 import { VEHICLES, formatUSD } from "@/lib/market-data";
 
 export const metadata = { title: "My Cars — RYDA" };
@@ -13,6 +14,7 @@ export default function MyCarsPage() {
   return (
     <>
       <SiteHeader />
+      <DemoBanner />
 
       {/* Hero */}
       <section className="border-b border-rule">
@@ -24,7 +26,7 @@ export default function MyCarsPage() {
             Your vehicles.
           </h1>
           <p className="mt-2 text-sm text-mute">
-            {HOLDINGS.length} vehicles · 1 as Lead Owner
+            {HOLDINGS.length} vehicles · 1 as Proposal Coordinator
           </p>
         </div>
       </section>
@@ -51,7 +53,7 @@ export default function MyCarsPage() {
                     />
                     {h.isLeadOwner && (
                       <span className="absolute left-3 top-3 rounded-full bg-red px-3 py-1 text-xs font-medium text-cream">
-                        ★ Lead Owner
+                        ★ Proposal Coordinator
                       </span>
                     )}
                     <span className="absolute right-3 top-3 rounded-full bg-ink/80 px-3 py-1 text-xs font-medium text-cream">

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
+import { DemoBanner } from "@/components/demo-banner";
 import { formatUSD } from "@/lib/market-data";
 
 export async function generateStaticParams() {
@@ -26,6 +27,7 @@ export default async function PurchasePage({
   return (
     <>
       <SiteHeader />
+      <DemoBanner />
 
       <section className="border-b border-rule">
         <div className="mx-auto max-w-3xl px-6 py-12 sm:px-10 sm:py-16">

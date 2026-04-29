@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
-const VALID_TYPES = ["Membership", "Press", "Partnership", "Investor", "Other"] as const;
+const VALID_TYPES = ["Membership", "Rental", "Press", "Partnership", "Investor", "Other"] as const;
 type InquiryType = (typeof VALID_TYPES)[number];
 
 export function ContactForm() {

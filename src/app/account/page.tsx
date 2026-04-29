@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
+import { DemoBanner } from "@/components/demo-banner";
 
 export const metadata = { title: "My Account — RYDA" };
 
@@ -7,6 +8,7 @@ export default function AccountPage() {
   return (
     <>
       <SiteHeader />
+      <DemoBanner />
 
       {/* Hero / status */}
       <section className="border-b border-rule">

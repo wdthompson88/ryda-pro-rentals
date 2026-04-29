@@ -206,8 +206,8 @@ function ReviewStep({
   onContinue: () => void;
 }) {
   const sharesPercent = Math.round((shares / vehicle.shares) * 1000) / 10;
-  const usageDays = Math.round(50 * shares);
-  const usageMiles = (4000 * shares).toLocaleString();
+  const usageDays = vehicle.daysPerYear * shares;
+  const usageMiles = (vehicle.milesPerYear * shares).toLocaleString();
 
   return (
     <div className="space-y-8">

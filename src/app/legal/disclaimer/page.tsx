@@ -26,8 +26,8 @@ export default function DisclaimerPage() {
           body: "After a 12-month minimum holding period, members may transfer their seat to another verified RYDA member. RYDA facilitates the LLC paperwork. Settlement is typically 1–3 business days. RYDA charges a 3% transfer fee on completed transfers. There is no public marketplace, no order book, and no broker-dealer or alternative trading system.",
         },
         {
-          heading: "5. Indicative valuations",
-          body: "Vehicle valuations displayed on the RYDA platform reflect RYDA's good-faith estimate based on auction comparables and recent member-to-member transactions. They are not bids, offers, or quoted prices on any exchange. Members negotiating a transfer set their own price.",
+          heading: "5. Indicative reference numbers",
+          body: "Any reference numbers displayed on the RYDA platform — including the LLC's annual insurance agreed value and a current condition/comparable-cost summary — are indicative context, not bids, offers, or quoted prices on any exchange. RYDA does not publish a transfer price for any seat. Members negotiating a transfer set their own price.",
         },
         {
           heading: "6. Risk factors (non-exhaustive)",

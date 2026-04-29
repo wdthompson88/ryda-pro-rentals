@@ -16,14 +16,14 @@ export default function Home() {
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-12 px-6 py-20 sm:px-10 sm:py-28 lg:grid-cols-12">
           <div className="lg:col-span-7">
             <p className="mb-6 text-xs font-medium uppercase tracking-[0.2em] text-red">
-              First in the US · Miami · Q3 2026
+              Member-managed supercar co-ownership · Miami · Q3 2026
             </p>
             <h1 className="font-display text-5xl font-light leading-[1.05] tracking-tight text-ink sm:text-6xl lg:text-7xl">
               Co-own the world's{" "}
               <span className="italic text-red">most exceptional cars.</span>
             </h1>
             <p className="mt-8 max-w-xl text-lg leading-relaxed text-ink-soft">
-              RYDA is the first US member-managed supercar co-ownership
+              RYDA is a US member-managed supercar co-ownership
               platform. Become a co-owner of a real Ferrari, Lamborghini, or
               McLaren — held in a Delaware LLC that you and 5–10 other
               verified members manage together. Drive up to ~50 days a year,

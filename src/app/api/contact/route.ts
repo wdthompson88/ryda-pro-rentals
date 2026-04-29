@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { notifyTeam, emailLayout, escapeHtml } from "@/lib/notify";
 
-const VALID_TYPES = new Set(["Membership", "Press", "Partnership", "Investor", "Other"]);
+const VALID_TYPES = new Set(["Membership", "Rental", "Press", "Partnership", "Investor", "Other"]);
 const VALID_MARKETS = new Set(["Miami", "Los Angeles", "New York", "Not sure"]);
 
 export async function POST(req: Request) {
@@ -24,9 +24,16 @@ export async function POST(req: Request) {
     }
 
     if (!supabase) {
-      console.log("[contact · no-db]", {
-        name, email, phone, inquiry_type, market, message, ts: new Date().toISOString(),
-      });
+      // Fail closed in production — never tell the user "we got it" if we
+      // didn't actually persist. Dev mode logs metadata only (no PII).
+      if (process.env.NODE_ENV === "production") {
+        console.error("[contact · misconfigured]");
+        return NextResponse.json(
+          { error: "Service temporarily unavailable. Please email us directly." },
+          { status: 503 },
+        );
+      }
+      console.log("[contact · dev no-db]", { inquiry_type, market, ts: new Date().toISOString() });
       return NextResponse.json({ ok: true, persisted: false });
     }
 

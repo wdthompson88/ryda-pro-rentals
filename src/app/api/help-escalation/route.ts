@@ -19,9 +19,14 @@ export async function POST(req: Request) {
     }
 
     if (!supabase) {
-      console.log("[help-escalation · no-db]", {
-        email, note, trigger_message, conversation, ts: new Date().toISOString(),
-      });
+      if (process.env.NODE_ENV === "production") {
+        console.error("[help-escalation · misconfigured]");
+        return NextResponse.json(
+          { error: "Service temporarily unavailable. Please email us directly." },
+          { status: 503 },
+        );
+      }
+      console.log("[help-escalation · dev no-db]", { ts: new Date().toISOString() });
       return NextResponse.json({ ok: true, persisted: false });
     }
 

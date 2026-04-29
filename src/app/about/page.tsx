@@ -4,7 +4,7 @@ import { SiteHeader } from "@/components/site-header";
 export const metadata = {
   title: "About — RYDA",
   description:
-    "The first US member-managed supercar co-ownership platform. Our story, our team, our mission.",
+    "A US member-managed supercar co-ownership platform. Our story, our team, our mission.",
 };
 
 export default function AboutPage() {

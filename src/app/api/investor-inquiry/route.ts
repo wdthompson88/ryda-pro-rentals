@@ -27,9 +27,14 @@ export async function POST(req: Request) {
     }
 
     if (!supabase) {
-      console.log("[investor-inquiry · no-db]", {
-        email, name, firm, check_size, notes, ts: new Date().toISOString(),
-      });
+      if (process.env.NODE_ENV === "production") {
+        console.error("[investor-inquiry · misconfigured]");
+        return NextResponse.json(
+          { error: "Service temporarily unavailable. Please email us directly." },
+          { status: 503 },
+        );
+      }
+      console.log("[investor-inquiry · dev no-db]", { check_size, ts: new Date().toISOString() });
       return NextResponse.json({ ok: true, persisted: false });
     }
 

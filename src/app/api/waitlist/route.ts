@@ -16,7 +16,14 @@ export async function POST(req: Request) {
     }
 
     if (!supabase) {
-      console.log("[waitlist · no-db]", { email, name, market, ts: new Date().toISOString() });
+      if (process.env.NODE_ENV === "production") {
+        console.error("[waitlist · misconfigured]");
+        return NextResponse.json(
+          { error: "Service temporarily unavailable. Please email us directly." },
+          { status: 503 },
+        );
+      }
+      console.log("[waitlist · dev no-db]", { market, ts: new Date().toISOString() });
       return NextResponse.json({ ok: true, persisted: false });
     }
 

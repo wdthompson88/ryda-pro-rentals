@@ -40,7 +40,7 @@ export const HELP: HelpCategory[] = [
         body: [
           {
             type: "p",
-            text: "RYDA is the first US member-managed supercar co-ownership platform. Each vehicle in the fleet is held in a single-purpose Delaware LLC. Five to ten verified members co-own and manage that LLC together, and each seat entitles its holder to usage of the underlying vehicle — typically 50 days and 4,000 miles per seat per year.",
+            text: "RYDA is a US member-managed supercar co-ownership platform. Each vehicle in the fleet is held in a single-purpose Delaware LLC. Five to ten verified members co-own and manage that LLC together, and each seat entitles its holder to usage of the underlying vehicle — typically 50 days and 4,000 miles per seat per year.",
           },
           {
             type: "p",
@@ -411,7 +411,7 @@ export const HELP: HelpCategory[] = [
         slug: "pricing",
         q: "How is a transfer price determined?",
         summary:
-          "Two members negotiate directly. RYDA publishes a quarterly vehicle valuation as context, but co-owners agree on the actual transfer price between themselves.",
+          "Two members negotiate directly. RYDA shares each LLC's current insurance agreed value and a condition/comparable-cost summary as context, but co-owners agree on the actual transfer price between themselves.",
         body: [
           {
             type: "p",

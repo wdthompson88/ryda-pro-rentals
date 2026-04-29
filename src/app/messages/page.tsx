@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
+import { DemoBanner } from "@/components/demo-banner";
 
 export const metadata = { title: "Messages — RYDA" };
 
@@ -7,14 +8,14 @@ const CONVERSATIONS = [
   {
     name: "Ferrari 296 GTB · Group",
     type: "Group · 6 members",
-    last: "Mike: Pebble Beach is locked for the August trip. Anyone want to caravan?",
+    last: "Co-owner A: Pebble Beach is locked for the August trip. Anyone want to caravan?",
     time: "12 min ago",
     unread: 2,
     active: true,
   },
   {
-    name: "Lead Owner · Ferrari 296",
-    type: "Lead Owner channel",
+    name: "Proposal Coordinator · Ferrari 296",
+    type: "Proposal Coordinator channel",
     last: "Booking request — Jun 5 to Jun 8 — track day rider",
     time: "1 hr ago",
     unread: 1,
@@ -22,7 +23,7 @@ const CONVERSATIONS = [
   {
     name: "McLaren 750S Spider · Group",
     type: "Group · 4 members",
-    last: "Sarah: Inspection report from the Apr 8 trip is up.",
+    last: "Co-owner C: Inspection report from the Apr 8 trip is up.",
     time: "Yesterday",
   },
   {
@@ -32,7 +33,7 @@ const CONVERSATIONS = [
     time: "2 days ago",
   },
   {
-    name: "Direct · Mike Lou",
+    name: "Direct · Co-owner A",
     type: "Direct message",
     last: "I'll send the route across PCH for Saturday morning.",
     time: "3 days ago",
@@ -52,6 +53,7 @@ export default function MessagesPage() {
   return (
     <>
       <SiteHeader />
+      <DemoBanner />
 
       <section className="mx-auto max-w-7xl px-6 py-8 sm:px-10">
         <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
@@ -108,7 +110,7 @@ export default function MessagesPage() {
               {/* Thread header */}
               <div className="border-b border-rule px-6 py-4">
                 <p className="font-display text-lg text-ink">Ferrari 296 GTB · Group</p>
-                <p className="mt-0.5 text-xs text-mute">6 members · Ryan, Mike, Sarah, +3</p>
+                <p className="mt-0.5 text-xs text-mute">6 members · You + 5 co-owners</p>
               </div>
 
               {/* Messages */}

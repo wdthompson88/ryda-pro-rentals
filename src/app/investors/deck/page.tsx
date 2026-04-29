@@ -29,7 +29,7 @@ export default function DeckPage() {
           RYDA
         </Link>
         <p className="text-xs uppercase tracking-[0.2em] text-mute">
-          Investor Deck · Q2 2026
+          Investor Deck · Confidential
         </p>
         <div className="flex items-center gap-2 text-sm text-ink-soft">
           <span className="tabular-nums">
@@ -199,7 +199,7 @@ function StatGrid({ stats }: { stats: { label: string; value: string }[] }) {
 function TitleSlide() {
   return (
     <div className="text-left">
-      <Eyebrow>Seed round · Q2 2026</Eyebrow>
+      <Eyebrow>Seed round · open</Eyebrow>
       <h1 className="mt-6 font-display text-7xl font-light leading-[1] tracking-tight text-ink sm:text-8xl lg:text-9xl">
         RYDA
       </h1>
@@ -207,7 +207,7 @@ function TitleSlide() {
         Own the world's best cars. Together.
       </p>
       <p className="mt-4 max-w-2xl text-base text-ink-soft sm:text-lg">
-        The first US member-managed supercar co-ownership platform.
+        A US member-managed supercar co-ownership platform.
         Miami launch Q3 2026.
       </p>
       <div className="mt-16 border-t border-rule pt-6">
@@ -277,7 +277,7 @@ function MarketSlide() {
           { value: "$14.8B", label: "US luxury auto market" },
           { value: "2.4M", label: "Target HHs (HNW + interest)" },
           { value: "120", label: "Members for Y3 plan" },
-          { value: "0", label: "Direct US competitors" },
+          { value: "0", label: "Member-managed US competitors" },
         ]}
       />
     </div>
@@ -523,7 +523,7 @@ function FundsSlide() {
           line="Insurance + legal"
           pct="10%"
           dollars="$250K"
-          detail="Securities counsel, fleet insurance, founding LLC structures."
+          detail="Outside counsel for LLC / MSA / insurance structure, fleet insurance, founding LLC formations."
         />
         <Fund
           line="Marketing + member acquisition"

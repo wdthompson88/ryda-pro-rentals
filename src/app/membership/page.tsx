@@ -62,7 +62,7 @@ const TIERS = [
     name: "Core",
     price: "Free",
     priceSub: "",
-    tagline: "Browse, rent, and claim co-ownership seats with everything you need to get started.",
+    tagline: "Browse the fleet and rent any available vehicle. Upgrade to Blue or Black to claim a co-ownership seat.",
     cta: "Get started",
   },
   {
