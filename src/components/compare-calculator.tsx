@@ -6,9 +6,11 @@ import { VEHICLES, formatUSD, type Vehicle } from "@/lib/market-data";
 const RENTAL_FALLBACK = 2_500;
 
 export function CompareCalculator() {
-  const eligible = VEHICLES.filter((v) => v.sharesAvailable > 0);
-  const initial = eligible.find((v) => v.symbol === "F296") ?? eligible[0];
+  // Educational tool — let users model 1..vehicle.shares regardless of
+  // current inventory. Real availability lives on each vehicle's listing.
+  const initial = VEHICLES.find((v) => v.symbol === "F296") ?? VEHICLES[0];
   const [vehicleSymbol, setVehicleSymbol] = useState(initial.symbol);
+  const [shares, setShares] = useState(1);
   const [days, setDays] = useState(20);
   const [holdYears, setHoldYears] = useState(3);
   const [residualPct, setResidualPct] = useState(80);
@@ -16,32 +18,44 @@ export function CompareCalculator() {
   const vehicle: Vehicle =
     VEHICLES.find((v) => v.symbol === vehicleSymbol) ?? initial;
 
+  const maxShares = vehicle.shares; // total shares per LLC (educational cap)
+  const safeShares = Math.min(shares, maxShares);
+  const maxDays = vehicle.daysPerYear * safeShares; // scales with share count
+
   const numbers = useMemo(() => {
-    const buyIn = vehicle.pricePerShare;
-    const annualOps = vehicle.annualOpCost;
+    const buyIn = vehicle.pricePerShare * safeShares;
+    const annualOps = vehicle.annualOpCost * safeShares;
     const rentalDaily = vehicle.rentalDailyRate || RENTAL_FALLBACK;
 
-    // Multi-year cash flows
-    const totalDays = days * holdYears;
+    // Cap days to what this share count actually unlocks
+    const cappedDays = Math.min(days, maxDays);
+    const totalDays = cappedDays * holdYears;
     const totalOps = annualOps * holdYears;
     const totalCash = buyIn + totalOps;
 
-    // Residual: what you'd get back transferring the share at hold end
+    // Residual: what you'd get back transferring shares at hold end
     const residual = Math.round(buyIn * (residualPct / 100));
     const economicCost = totalCash - residual;
 
     // Rental: pay-per-day for the same total days
     const rentalCost = rentalDaily * totalDays;
 
-    // Per-day metrics
+    // Utilization — how much of the entitled days you'd actually use
+    const utilizationPct =
+      maxDays === 0 ? 0 : Math.round((cappedDays / maxDays) * 100);
+    const unusedDaysPerYear = Math.max(0, maxDays - cappedDays);
+
     const ryda = {
       buyIn,
+      annualOps,
       totalCash,
       totalDays,
       residual,
       economicCost,
       perDayCash: totalDays === 0 ? 0 : Math.round(totalCash / totalDays),
       perDayEconomic: totalDays === 0 ? 0 : Math.round(economicCost / totalDays),
+      utilizationPct,
+      unusedDaysPerYear,
     };
     const rental = {
       total: rentalCost,
@@ -51,8 +65,8 @@ export function CompareCalculator() {
     const savings = rental.total - ryda.economicCost;
     const savingsPct = rental.total === 0 ? 0 : Math.round((savings / rental.total) * 100);
 
-    return { ryda, rental, savings, savingsPct };
-  }, [vehicle, days, holdYears, residualPct]);
+    return { ryda, rental, savings, savingsPct, cappedDays };
+  }, [vehicle, safeShares, days, holdYears, residualPct, maxDays]);
 
   return (
     <div
@@ -87,27 +101,45 @@ export function CompareCalculator() {
             onChange={(e) => setVehicleSymbol(e.target.value)}
             className="mt-2 h-12 w-full rounded-xl border border-rule bg-cream-2 px-4 text-sm text-ink focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
           >
-            {eligible.map((v) => (
+            {VEHICLES.map((v) => (
               <option key={v.symbol} value={v.symbol}>
                 {v.year} {v.name}
               </option>
             ))}
           </select>
           <p className="mt-2 text-xs text-mute">
-            {formatUSD(vehicle.pricePerShare)} per share · {formatUSD(vehicle.annualOpCost)}/yr ops
+            {formatUSD(vehicle.pricePerShare)} per share ·{" "}
+            {formatUSD(vehicle.annualOpCost)}/yr ops · ~{vehicle.daysPerYear}{" "}
+            days/share
           </p>
         </div>
 
         <Slider
+          id="calc-shares"
+          label="Shares you'd hold"
+          value={safeShares}
+          onChange={setShares}
+          min={1}
+          max={maxShares}
+          step={1}
+          valueLabel={`${safeShares} of ${vehicle.shares}`}
+          subLabel={`Unlocks ~${maxDays} days/yr · buy-in ${formatUSD(
+            vehicle.pricePerShare * safeShares,
+          )}`}
+        />
+
+        <Slider
           id="calc-days"
-          label={`Days you'd actually drive per year`}
-          value={days}
+          label="Days you'd actually drive per year"
+          value={Math.min(days, maxDays)}
           onChange={setDays}
           min={5}
-          max={Math.min(34, vehicle.daysPerYear)}
+          max={maxDays}
           step={1}
-          valueLabel={`${days} ${days === 1 ? "day" : "days"}`}
-          subLabel={`Cap: ${vehicle.daysPerYear}/share/year`}
+          valueLabel={`${Math.min(days, maxDays)} ${
+            Math.min(days, maxDays) === 1 ? "day" : "days"
+          }`}
+          subLabel={`Cap: ${maxDays} (your share entitlement at ${safeShares} share${safeShares > 1 ? "s" : ""})`}
         />
 
         <Slider
@@ -141,7 +173,7 @@ export function CompareCalculator() {
           label="RYDA cash outlay"
           value={formatUSD(numbers.ryda.totalCash)}
           sub={`${formatUSD(numbers.ryda.buyIn)} buy-in + ${formatUSD(
-            vehicle.annualOpCost,
+            numbers.ryda.annualOps,
           )}/yr × ${holdYears}`}
         />
         <ResultCard
@@ -159,15 +191,15 @@ export function CompareCalculator() {
         />
       </div>
 
-      <div className="mt-6 rounded-2xl border border-red/30 bg-red/5 p-6">
+      <div className="mt-6 rounded-2xl border border-rule bg-cream-2/40 p-6">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <p className="text-xs font-medium uppercase tracking-wider text-red">
+          <p className="text-xs font-medium uppercase tracking-wider text-mute">
             Versus renting
           </p>
-          <p className="font-display text-3xl text-red sm:text-4xl">
+          <p className="font-display text-3xl text-ink sm:text-4xl">
             {numbers.savings >= 0 ? "" : "−"}
             {formatUSD(Math.abs(numbers.savings))}
-            <span className="ml-2 text-base text-red/70">
+            <span className="ml-2 text-base text-ink-soft">
               ({numbers.savings >= 0 ? "+" : ""}
               {numbers.savingsPct}%)
             </span>
@@ -182,9 +214,21 @@ export function CompareCalculator() {
           <span className="font-medium text-ink tabular-nums">
             {formatUSD(numbers.rental.perDay)}
           </span>{" "}
-          renting. Numbers assume you transfer your share at the residual you
+          renting. Numbers assume you transfer your shares at the residual you
           set above; actual exits depend on member-to-member negotiation.
         </p>
+        {numbers.ryda.unusedDaysPerYear > 0 && numbers.ryda.utilizationPct < 80 && (
+          <p className="mt-3 rounded-xl border border-rule bg-cream-2/60 p-3 text-xs text-ink-soft">
+            <span className="font-medium text-ink">Heads up:</span> at{" "}
+            {numbers.ryda.utilizationPct}% utilization, you'd leave{" "}
+            <span className="tabular-nums">
+              {numbers.ryda.unusedDaysPerYear}
+            </span>{" "}
+            entitled days/yr unused. RYDA still wins on cost per actually-driven
+            day, but if your real usage is much lower than your share count
+            unlocks, fewer shares is the more honest economic answer.
+          </p>
+        )}
       </div>
     </div>
   );

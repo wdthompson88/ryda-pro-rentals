@@ -23,8 +23,9 @@ export default function HowItWorksPage() {
             <span className="italic text-red">a key.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
-            Each car is held in a Delaware LLC that 5–10 verified members
-            manage together. RYDA is hired as the operations partner.
+            Each car is held in a Delaware LLC with 10 shares. Verified
+            members hold one share or several — typically a small group.
+            RYDA is hired as the operations partner.
           </p>
         </div>
       </section>
@@ -39,15 +40,16 @@ export default function HowItWorksPage() {
             Own a piece of the world's best cars.
           </h2>
           <p className="mt-4 max-w-2xl text-lg text-ink-soft">
-            Effective ~$208/day on a co-owned Ferrari for $34K up front.
-            Compare with $2,500+/day to rent or $40–80K/yr to own outright.
+            One Ferrari 296 share: $34K up front, ~$7,080/year all-in,
+            ~34 days/year — roughly $208/day in steady-state ops. Compare
+            with $2,500+/day to rent or $40–80K/yr to own outright.
           </p>
 
           <div className="mt-12 grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-5">
             <Step n="01" title="Verify" body="Apply, complete KYC. Valid US license, clean recent driving record, 28 or older. No accreditation required." />
             <Step n="02" title="Choose" body="Browse the curated, CPO-only fleet. Every car passes a multi-point Pre-Purchase Inspection before a single share is sold — co-owners are protected from inheriting major powertrain or mechanical issues." />
             <Step n="03" title="Co-own" body="Join the LLC alongside other members. Sign the Operating Agreement and Management Services Agreement. Fund your share via wire or ACH." />
-            <Step n="04" title="Drive" body="Book your time on the RYDA app. ~34 days and up to ~4,000 miles per share, per year — exact entitlement depends on the vehicle." />
+            <Step n="04" title="Drive" body="Book your time on the RYDA app. Each share unlocks ~34 days and ~4,000 miles per year. Hold multiple shares to scale linearly — 5 ≈ 170 days, all 10 ≈ year-round access." />
             <Step n="05" title="Transfer" body="Transfer your share to another verified member after the 12-month minimum hold. RYDA handles the LLC paperwork. 3% transfer fee." />
           </div>
         </div>

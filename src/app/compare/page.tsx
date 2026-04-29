@@ -48,14 +48,14 @@ const ROWS: Row[] = [
     ryda: formatUSD(RYDA_ANNUAL_OPS),
   },
   {
-    label: "Days of access included",
+    label: "Days of access per year",
     solo: "365 (in theory)",
     rental: "Pay-per-day",
     club: `~${CLUB_DAYS_INCLUDED}`,
-    ryda: `~${RYDA_DAYS}`,
+    ryda: `~${RYDA_DAYS} per share (hold 1–10)`,
   },
   {
-    label: "Year 1 cash, driven 34 days",
+    label: "Year 1 cash, 34 days driven",
     solo: formatUSD(STICKER + CARRYING_SOLO),
     rental: formatUSD(RENTAL_DAILY * ASSUMED_DRIVE_DAYS),
     club: formatUSD(CLUB_ANNUAL),
@@ -101,11 +101,39 @@ const ROWS: Row[] = [
     ryda: "Transfer share after 12-month hold (3% fee)",
   },
   {
-    label: "Asset goes up if used heavily",
-    solo: "No (depreciates)",
-    rental: "No",
-    club: "No",
-    ryda: "No (depreciates)",
+    label: "Insurance + maintenance bundled",
+    solo: "No",
+    rental: "Yes",
+    club: "Yes",
+    ryda: "Yes",
+  },
+  {
+    label: "Pick a different car each trip",
+    solo: "No",
+    rental: "Yes",
+    club: "Yes (rotating)",
+    ryda: "Not within one share — hold shares across multiple LLCs",
+  },
+  {
+    label: "Booking priority on the vehicle",
+    solo: "100% — it's yours",
+    rental: "First-come-first-served",
+    club: "Calendar-based (limited)",
+    ryda: "Pro-rata to your share count",
+  },
+  {
+    label: "Damage / deductible exposure",
+    solo: "All of it",
+    rental: "Per-rental deductible (varies)",
+    club: "Capped per booking",
+    ryda: "Low deductible; LLC absorbs at-fault below threshold",
+  },
+  {
+    label: "Tax / title / admin friction",
+    solo: "On you",
+    rental: "None",
+    club: "None",
+    ryda: "On the LLC; RYDA handles paperwork",
   },
 ];
 
@@ -121,15 +149,16 @@ export default function ComparePage() {
             Compare
           </p>
           <h1 className="mt-4 max-w-3xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
-            Three ways to think about{" "}
-            <span className="italic text-red">$34,000.</span>
+            Four ways to think about{" "}
+            <span className="italic text-red">a Ferrari.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
             Wealthy enthusiasts have three real options for getting into an
             exotic: buy outright, rent by the day, or join a club. RYDA is a
-            fourth — structured co-ownership of a real car. Here's the math
-            for the Ferrari 296 GTB at $340,000, assuming you'd drive it ~34
-            days a year either way.
+            fourth — structured co-ownership of a real car. The math below
+            anchors on the Ferrari 296 GTB and a single share (~34 days a
+            year of driving). Most members start there; high-use buyers add
+            shares to scale entitlement on the same car.
           </p>
         </div>
       </section>
@@ -157,24 +186,32 @@ export default function ComparePage() {
                         r.emphasis ? "bg-cream-2/60" : ""
                       }`}
                     >
-                      <td className="px-6 py-4 text-ink-soft">{r.label}</td>
+                      <td
+                        className={`px-6 py-4 ${
+                          r.emphasis
+                            ? "font-medium text-ink"
+                            : "text-ink-soft"
+                        }`}
+                      >
+                        {r.label}
+                      </td>
                       <td
                         className={`px-6 py-4 text-right tabular-nums ${
-                          r.emphasis ? "font-display text-base" : ""
+                          r.emphasis ? "font-display text-base text-ink" : ""
                         }`}
                       >
                         {r.solo}
                       </td>
                       <td
                         className={`px-6 py-4 text-right tabular-nums ${
-                          r.emphasis ? "font-display text-base" : ""
+                          r.emphasis ? "font-display text-base text-ink" : ""
                         }`}
                       >
                         {r.rental}
                       </td>
                       <td
                         className={`px-6 py-4 text-right tabular-nums ${
-                          r.emphasis ? "font-display text-base" : ""
+                          r.emphasis ? "font-display text-base text-ink" : ""
                         }`}
                       >
                         {r.club}
@@ -182,7 +219,7 @@ export default function ComparePage() {
                       <td
                         className={`px-6 py-4 text-right tabular-nums ${
                           r.emphasis
-                            ? "bg-red/10 font-display text-base text-red"
+                            ? "font-display text-base text-ink"
                             : ""
                         }`}
                       >
@@ -196,11 +233,14 @@ export default function ComparePage() {
           </div>
           <p className="mt-4 max-w-3xl text-xs text-mute">
             Numbers shown for illustration on the Ferrari 296 GTB at $340K
-            sticker. Solo ownership carrying assumes industry averages for
-            insurance, storage, maintenance, and depreciation reserve. Club
-            figure represents a typical UK / EU supercar club annual
-            membership; US clubs vary. Daily rental assumes Miami market rate
-            for a base 296 GTB.
+            sticker, modeled around a single co-ownership share. Multi-share
+            holders scale linearly: a 5-share holder pays ~$170K up front +
+            ~$35K/yr in ops for ~170 days/yr; a 10-share holder is
+            essentially a solo owner at ~$340K + $71K/yr. Solo carrying
+            assumes industry averages for insurance, storage, maintenance,
+            and depreciation reserve. Club figure represents a typical UK /
+            EU supercar club annual membership; US clubs vary. Daily rental
+            assumes Miami market rate for a base 296 GTB.
           </p>
         </div>
       </section>
@@ -234,8 +274,8 @@ export default function ComparePage() {
             />
             <Take
               title="RYDA"
-              good="You'd drive 10–35 days a year on a specific car you've chosen. You want real ownership without the operational burden. You're comfortable with a 12-month minimum hold."
-              tradeoff="You don't pick the car each booking — you co-own one. Transfers are negotiated member-to-member, no guaranteed buyer."
+              good="You'd drive ~30–60 days a year on a specific car (1–2 shares is the typical buy). You want real ownership without the operational burden, you're comfortable with a 12-month minimum hold, and you'd rather scale entitlement by adding shares than buying a second car."
+              tradeoff="You commit to a specific car for the hold. Transfers are negotiated member-to-member, no guaranteed buyer or price."
               highlight
             />
           </div>

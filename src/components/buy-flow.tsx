@@ -31,7 +31,10 @@ export function BuyFlow({ vehicle, initialShares }: Props) {
 
   const shares = initialShares;
   const totalPrice = vehicle.pricePerShare * shares;
-  const annualMgmtFee = (vehicle.fullPrice * 0.12 * shares) / vehicle.shares;
+  // All-in annual contribution: insurance + storage + maintenance + reserves
+  // + RYDA service fee, scaled per share. The 12% management fee is bundled
+  // into annualOpCost — don't show only that piece as the total.
+  const annualContribution = vehicle.annualOpCost * shares;
   const closingFee = 1500;
   const grandTotal = totalPrice + closingFee;
 
@@ -95,7 +98,7 @@ export function BuyFlow({ vehicle, initialShares }: Props) {
               totalPrice={totalPrice}
               closingFee={closingFee}
               grandTotal={grandTotal}
-              annualMgmtFee={annualMgmtFee}
+              annualContribution={annualContribution}
               termsAccepted={termsAccepted}
               setTermsAccepted={setTermsAccepted}
               onContinue={() => go("verify")}
@@ -174,7 +177,7 @@ export function BuyFlow({ vehicle, initialShares }: Props) {
               </div>
             </dl>
             <p className="mt-5 rounded-xl border border-rule bg-cream-2/40 p-3 text-[11px] leading-relaxed text-mute">
-              Plus ~{formatUSD(annualMgmtFee)}/year in management fees (paid quarterly to the LLC).
+              Plus ~{formatUSD(annualContribution)}/year in management fees (paid quarterly to the LLC).
               Locked in at signing for the first year.
             </p>
           </div>
@@ -192,7 +195,7 @@ function ReviewStep({
   totalPrice,
   closingFee,
   grandTotal,
-  annualMgmtFee,
+  annualContribution,
   termsAccepted,
   setTermsAccepted,
   onContinue,
@@ -202,7 +205,7 @@ function ReviewStep({
   totalPrice: number;
   closingFee: number;
   grandTotal: number;
-  annualMgmtFee: number;
+  annualContribution: number;
   termsAccepted: boolean;
   setTermsAccepted: (v: boolean) => void;
   onContinue: () => void;
@@ -247,7 +250,7 @@ function ReviewStep({
         <Bullet label="—  Closing & paperwork fee" value={formatUSD(closingFee)} />
         <Bullet
           label={`Ongoing (per share, year)`}
-          value={`~${formatUSD(annualMgmtFee)}`}
+          value={`~${formatUSD(annualContribution)}`}
           bold
         />
         <Bullet

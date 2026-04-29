@@ -40,7 +40,7 @@ export const HELP: HelpCategory[] = [
         body: [
           {
             type: "p",
-            text: "RYDA is a US member-managed supercar co-ownership platform. Each vehicle in the fleet is held in a single-purpose Delaware LLC. Up to ten verified members co-own and manage that LLC together, and each share entitles its holder to usage of the underlying vehicle — typically ~34 days and ~4,000 miles per share per year.",
+            text: "RYDA is a US member-managed supercar co-ownership platform. Each vehicle in the fleet is held in a single-purpose Delaware LLC with 10 shares. Each share entitles its holder to ~34 days and ~4,000 miles per year. Members can hold one share or several — usage and cost scale linearly. A 5-share holder gets ~170 days; a 10-share holder is essentially the solo owner with concierge ops.",
           },
           {
             type: "p",
@@ -342,12 +342,12 @@ export const HELP: HelpCategory[] = [
         slug: "entitlement",
         q: "What does a co-ownership share actually entitle me to?",
         summary:
-          "~34 days and up to ~4,000 miles per year of vehicle use (depending on the vehicle), voting rights on material LLC decisions, and pro-rata participation in the LLC's assets at dissolution.",
+          "~34 days and up to ~4,000 miles per share per year (members can hold 1–10 shares), voting rights on material LLC decisions, and pro-rata participation in the LLC's assets at dissolution.",
         body: [
           { type: "h3", text: "Usage" },
           {
             type: "p",
-            text: "Each share entitles you to ~34 days and up to ~4,000 miles of vehicle usage per year, with the exact entitlement set per vehicle when the LLC is formed. Days are booked on a shared calendar with the other co-owners. Fair-use rules cap consecutive days during peak season.",
+            text: "Each share entitles you to ~34 days and up to ~4,000 miles of vehicle usage per year, with the exact entitlement set per vehicle when the LLC is formed. Members can hold one share or several — usage scales linearly (5 shares ≈ 170 days; 10 shares ≈ year-round access). Days are booked on a shared calendar with the other co-owners. Fair-use rules cap consecutive days during peak season.",
           },
           { type: "h3", text: "Membership" },
           {
@@ -507,8 +507,8 @@ export const HELP: HelpCategory[] = [
           {
             type: "ul",
             items: [
-              "Solo: $80,000+/year (insurance ~$15K, storage ~$8K, maintenance ~$10K, depreciation ~$45K, taxes/registration ~$2K).",
-              "Co-owned: ~$11,800/year per share — covers your share of insurance, storage, scheduled maintenance, and the LLC's reserves.",
+              "Solo: $40-80K+/year, depending on the car (insurance, storage, maintenance, depreciation reserve, taxes/registration).",
+              "Co-owned (Ferrari 296 example): ~$7,080/year per share, all-in. Covers your share of insurance, storage, scheduled maintenance, LLC reserves, and RYDA's service fee. Other vehicles vary — see the order panel on each listing.",
             ],
           },
           { type: "h3", text: "What you trade away" },

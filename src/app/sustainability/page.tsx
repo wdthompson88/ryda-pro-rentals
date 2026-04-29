@@ -19,12 +19,14 @@ export default function SustainabilityPage() {
             Sustainability
           </p>
           <h1 className="mt-4 max-w-3xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
-            Ten owners.{" "}
+            Ten shares.{" "}
             <span className="italic text-red">One Ferrari.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
-            Not a climate solution. But the math is honest: ten members
-            sharing one car beats ten cars sitting idle in ten garages.
+            Not a climate solution. But the math is honest: a single LLC
+            with 10 shares beats up to 10 separately-owned cars sitting idle
+            in 10 separate garages — whether those shares are held by ten
+            members or a smaller group.
           </p>
         </div>
       </section>

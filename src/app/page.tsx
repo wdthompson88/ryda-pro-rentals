@@ -26,9 +26,9 @@ export default function Home() {
               <span className="italic text-red">most exceptional cars.</span>
             </h1>
             <p className="mt-8 max-w-xl text-lg leading-relaxed text-ink-soft">
-              Co-own a CPO Ferrari, Lamborghini, or McLaren together with
-              up to 9 other verified members in a Delaware LLC. Drive it
-              ~34 days a year. Transfer your share when you're done.
+              Co-own a CPO Ferrari, Lamborghini, or McLaren in a Delaware
+              LLC. Each share is ~34 days a year — hold one or several.
+              Transfer your shares when you're done.
             </p>
             <div className="mt-10 flex justify-center sm:justify-start">
               <Link
@@ -141,7 +141,7 @@ export default function Home() {
             <Step n="01" title="Verify" body="Apply, complete identity verification, and confirm RYDA membership requirements." />
             <Step n="02" title="Choose" body="Browse the curated, CPO-only fleet. Every car passes a multi-point Pre-Purchase Inspection before a single share is sold — co-owners are protected from inheriting major powertrain or mechanical issues." />
             <Step n="03" title="Co-own" body="Up to 10 members form a Delaware LLC together to hold the vehicle. You sign the operating agreement and fund your share." />
-            <Step n="04" title="Drive" body="Book your time on the RYDA app. ~34 days and ~4,000 miles per share, per year — exact entitlement depends on the vehicle." />
+            <Step n="04" title="Drive" body="Book your time on the RYDA app. Each share unlocks ~34 days and ~4,000 miles a year. Most members hold 1–2 shares; high-use members can buy more entitlement on the same car." />
             <Step n="05" title="Transfer" body="After 12 months, transfer your share to another verified member. RYDA handles the LLC paperwork. 3% transfer fee." />
           </div>
           <div className="mt-16 flex justify-center">

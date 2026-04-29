@@ -23,8 +23,9 @@ export default function MarketsPage() {
             Co-own the world's most exceptional cars.
           </h1>
           <p className="mt-6 max-w-2xl text-lg text-ink-soft">
-            Claim a share in any vehicle's Delaware LLC. Drive ~34 days
-            a year. Transfer after the 12-month minimum hold.
+            Claim shares in any vehicle's Delaware LLC. Each share unlocks
+            ~34 days/year — hold one or several. Transfer after the
+            12-month minimum hold.
           </p>
         </div>
       </section>
