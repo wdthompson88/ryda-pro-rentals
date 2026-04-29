@@ -340,6 +340,11 @@ function VehicleCard({ vehicle: v }: { vehicle: Vehicle }) {
   const stickerSavings = v.fullPrice - v.pricePerShare;
   const econ = computeShareEconomics(v);
   const rental = computeRentalEconomics(v);
+  // Net cost / surplus when shareholders opt into the rental pool
+  const rentalIncome2yr = rental.perShareTotalIncome;
+  const rentedNet = econ.netCost - rentalIncome2yr;
+  const rentedIsSurplus = rentedNet < 0;
+  const rentedShown = Math.abs(rentedNet);
 
   return (
     <Link
@@ -469,17 +474,30 @@ function VehicleCard({ vehicle: v }: { vehicle: Vehicle }) {
             days/yr per share
           </p>
           {v.rentalAvailable && rental.perShareAnnualIncome > 0 ? (
-            <p className="mt-2 text-[11px] text-ink-soft">
-              <span className="font-medium text-ink">Opt in to rent:</span>{" "}
-              ~{formatUSD(rental.perShareAnnualIncome)}/yr per share — covers{" "}
-              {Math.min(
-                100,
-                Math.round(
-                  (rental.perShareAnnualIncome / v.annualOpCost) * 100,
-                ),
-              )}
-              % of carrying.
-            </p>
+            <div
+              className={`mt-3 rounded-lg border px-3 py-2 ${
+                rentedIsSurplus
+                  ? "border-emerald-500/40 bg-emerald-500/5"
+                  : "border-rule bg-cream-2/40"
+              }`}
+            >
+              <p className="text-[10px] uppercase tracking-[0.14em] text-mute">
+                With rental opt-in (2 yrs)
+              </p>
+              <p
+                className={`mt-0.5 font-display text-base tabular-nums ${
+                  rentedIsSurplus ? "text-emerald-600" : "text-ink"
+                }`}
+              >
+                {rentedIsSurplus
+                  ? `+ ${formatUSD(rentedShown)} surplus`
+                  : `${formatUSD(rentedShown)} net cost`}
+              </p>
+              <p className="mt-0.5 text-[10px] text-mute">
+                ~{formatUSD(rental.perShareAnnualIncome)}/yr rental income
+                per share
+              </p>
+            </div>
           ) : null}
         </div>
 

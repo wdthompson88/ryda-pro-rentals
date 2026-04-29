@@ -192,7 +192,7 @@ export default function HowItWorksPage() {
                 Honest tradeoffs
               </p>
               <ul className="mt-3 space-y-2 text-sm leading-relaxed text-ink-soft">
-                <li>· Heavier use → faster depreciation. We model 12% over the 2-yr hold (vs 5% drive-only) for the rented scenario.</li>
+                <li>· Same 5% depreciation assumption applies — CPO maintenance + curated mileage caps keep the resale story consistent.</li>
                 <li>· Rental days are pooled across all shares — no individual day-of priority guaranteed.</li>
                 <li>· Members keep first-call on owner-priority weeks. Renters fill the gaps.</li>
                 <li>· Track-day cars come out of the pool when you take them on track.</li>
@@ -226,7 +226,7 @@ export default function HowItWorksPage() {
             />
             <Faq
               q="Can I rent out my share days for income?"
-              a="Yes — opting into RYDA's rental pool is voluntary, share-by-share. We list the car on /rent, handle bookings, insurance, screening, and condition checks. Revenue splits 65/35 (you / RYDA) and is distributed pro-rata across the days each share contributes. On a Miami exotic running 200–240 days/yr at fleet average, a single share can earn $15–25K/yr — typically 2–3× your annual carrying cost. Heavier use does run faster depreciation; we model 12% over the 2-yr hold for the rental scenario (vs 5% drive-only)."
+              a="Yes — opting into RYDA's rental pool is voluntary, share-by-share. We list the car on /rent, handle bookings, insurance, screening, and condition checks. Revenue splits 65/35 (you / RYDA) and is distributed pro-rata across the days each share contributes. On a Miami exotic running 200–240 days/yr at fleet average, a single share can earn $15–25K/yr — typically 2–3× your annual carrying cost, and often enough to flip your two-year hold from a net cost into a net surplus. Same 5% depreciation assumption applies in both scenarios — our CPO maintenance + curated mileage caps keep the resale story consistent."
             />
             <Faq
               q="What if a co-owner stops paying?"

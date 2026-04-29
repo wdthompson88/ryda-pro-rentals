@@ -9,7 +9,6 @@ import {
   formatUSD,
   HOLDING_YEARS,
   TARGET_DEPRECIATION_PCT,
-  RENTAL_DEFAULTS,
   type Vehicle,
 } from "@/lib/market-data";
 
@@ -26,19 +25,13 @@ export function CostBreakdown({
 }) {
   const e = computeShareEconomics(vehicle, { shares });
 
-  // Rental scenario uses bumped depreciation to reflect heavier wear.
-  const rentedDepPct = RENTAL_DEFAULTS.rentedDepreciationPct;
-  const eRented = computeShareEconomics(vehicle, {
-    shares,
-    depreciationPct: rentedDepPct,
-  });
+  // Same depreciation assumption applies whether driven or rented.
   const rental = computeRentalEconomics(vehicle, { holdYears: e.holdYears });
   const rentalIncomeForShares = rental.perShareTotalIncome * shares;
-  const rentedNet = eRented.netCost - rentalIncomeForShares;
+  const rentedNet = e.netCost - rentalIncomeForShares;
+  const rentedSurplus = rentedNet < 0; // true = net positive
   const rentedPerDay =
-    eRented.totalDays === 0
-      ? 0
-      : Math.round(rentedNet / eRented.totalDays);
+    e.totalDays === 0 ? 0 : Math.round(rentedNet / e.totalDays);
 
   return (
     <div
@@ -107,29 +100,42 @@ export function CostBreakdown({
               <p className="text-[10px] uppercase tracking-wider text-mute">
                 Rental income · {e.holdYears}yr
               </p>
-              <p className="mt-0.5 font-display text-base text-ink tabular-nums">
+              <p className="mt-0.5 font-display text-base text-emerald-600 tabular-nums">
                 + {formatUSD(rentalIncomeForShares)}
               </p>
             </div>
-            <div className="rounded-lg border border-red bg-red/5 px-3 py-2">
+            <div
+              className={`rounded-lg px-3 py-2 ${
+                rentedSurplus
+                  ? "border border-emerald-500 bg-emerald-500/5"
+                  : "border border-red bg-red/5"
+              }`}
+            >
               <p className="text-[10px] uppercase tracking-wider text-mute">
-                Net cost · rental scenario
+                {rentedSurplus
+                  ? `Net surplus · ${e.holdYears}yr`
+                  : `Net cost · rental scenario`}
               </p>
-              <p className="mt-0.5 font-display text-base text-red tabular-nums">
-                {rentedNet < 0 ? "− " : ""}
-                {formatUSD(Math.abs(rentedNet))}
+              <p
+                className={`mt-0.5 font-display text-base tabular-nums ${
+                  rentedSurplus ? "text-emerald-600" : "text-red"
+                }`}
+              >
+                {rentedSurplus
+                  ? `+ ${formatUSD(Math.abs(rentedNet))}`
+                  : formatUSD(rentedNet)}
               </p>
               <p className="mt-0.5 text-[10px] text-mute tabular-nums">
-                {rentedNet < 0
-                  ? `Net positive ≈ ${formatUSD(Math.abs(rentedPerDay))}/day surplus`
+                {rentedSurplus
+                  ? `≈ ${formatUSD(Math.abs(rentedPerDay))}/day surplus`
                   : `≈ ${formatUSD(rentedPerDay)}/day`}
               </p>
             </div>
           </div>
           <p className="mt-2 text-[11px] text-mute">
-            Heavier use → faster depreciation. We model {rentedDepPct}% over
-            the {e.holdYears}-year hold for the rental path (vs{" "}
-            {TARGET_DEPRECIATION_PCT}% drive-only).
+            Same {TARGET_DEPRECIATION_PCT}% depreciation assumption applies —
+            our CPO maintenance + curated mileage caps keep the resale
+            story consistent whether you drive or rent it out.
           </p>
         </div>
       ) : null}

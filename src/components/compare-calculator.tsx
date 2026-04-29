@@ -13,7 +13,6 @@ import {
 
 const RENTAL_FALLBACK = 2_500;
 const DEFAULT_RESIDUAL_PCT = 100 - TARGET_DEPRECIATION_PCT; // 95% of buy-in
-const RENTED_RESIDUAL_PCT = 100 - RENTAL_DEFAULTS.rentedDepreciationPct; // 88%
 
 export function CompareCalculator() {
   // Educational tool — let users model 1..vehicle.shares regardless of
@@ -48,15 +47,11 @@ export function CompareCalculator() {
     const totalOps = annualOps * holdYears;
     const totalCash = buyIn + totalOps;
 
-    // If opted into the rental pool, depreciation runs higher (heavier
-    // wear). Otherwise the user's chosen residual stands.
-    const effectiveResidualPct = optInRental
-      ? Math.min(residualPct, RENTED_RESIDUAL_PCT)
-      : residualPct;
-
     // Residual: what proceeds you'd get back at exit (LLC sale or
-    // member-to-member transfer). Same % applies to share value.
-    const residual = Math.round(buyIn * (effectiveResidualPct / 100));
+    // member-to-member transfer). Held constant across drive-only and
+    // rental scenarios — CPO maintenance + curated mileage caps keep
+    // the resale story consistent regardless of utilization.
+    const residual = Math.round(buyIn * (residualPct / 100));
 
     // Rental income for shareholders if opted in. Owner-use days come
     // from what THIS user actually drives (cappedDays per year per their
@@ -98,7 +93,6 @@ export function CompareCalculator() {
       totalDays,
       residual,
       economicCost,
-      effectiveResidualPct,
       perDayCash: totalDays === 0 ? 0 : Math.round(totalCash / totalDays),
       perDayEconomic: totalDays === 0 ? 0 : Math.round(economicCost / totalDays),
       utilizationPct,
@@ -266,10 +260,10 @@ export function CompareCalculator() {
               (you / RYDA), distributed pro-rata across shares.
             </p>
             <p className="mt-2 text-xs text-mute">
-              Heads up: heavier rental utilization runs faster
-              depreciation. We bump the resale assumption to{" "}
-              {RENTED_RESIDUAL_PCT}% (~{RENTAL_DEFAULTS.rentedDepreciationPct}%
-              hit) when this is on.
+              Same {TARGET_DEPRECIATION_PCT}% depreciation assumption
+              applies — our CPO maintenance + curated mileage caps keep
+              the resale story consistent whether you drive or rent it
+              out.
             </p>
           </div>
           <label className="inline-flex cursor-pointer items-center gap-3 self-start">
@@ -362,17 +356,24 @@ export function CompareCalculator() {
           />
           <ResultCard
             label={
-              optInRental
-                ? "Net cost (after sale + rental income)"
-                : "Net cost (after share sale)"
+              numbers.ryda.economicCost < 0
+                ? "Net surplus (after sale + rental income)"
+                : optInRental
+                  ? "Net cost (after sale + rental income)"
+                  : "Net cost (after share sale)"
             }
-            value={formatUSD(numbers.ryda.economicCost)}
+            value={
+              numbers.ryda.economicCost < 0
+                ? `+ ${formatUSD(Math.abs(numbers.ryda.economicCost))}`
+                : formatUSD(numbers.ryda.economicCost)
+            }
             sub={
               optInRental
-                ? `Less ${formatUSD(numbers.ryda.residual)} share sale (${numbers.ryda.effectiveResidualPct}%) and ${formatUSD(numbers.ryda.rentalIncomePerShare)} rental income`
+                ? `Less ${formatUSD(numbers.ryda.residual)} share sale (${residualPct}%) and ${formatUSD(numbers.ryda.rentalIncomePerShare)} rental income`
                 : `Less ${formatUSD(numbers.ryda.residual)} estimated share sale (${residualPct}% of buy-in)`
             }
             accent
+            positive={numbers.ryda.economicCost < 0}
           />
         </div>
       </div>
@@ -517,24 +518,29 @@ function ResultCard({
   value,
   sub,
   accent,
+  positive,
 }: {
   label: string;
   value: string;
   sub: string;
   accent?: boolean;
+  positive?: boolean;
 }) {
+  const borderColor = positive
+    ? "border-emerald-500 bg-emerald-500/5"
+    : accent
+      ? "border-red bg-red/5"
+      : "border-rule bg-cream-2/40";
+  const textColor = positive
+    ? "text-emerald-600"
+    : accent
+      ? "text-red"
+      : "text-ink";
+
   return (
-    <div
-      className={`rounded-2xl border p-6 ${
-        accent ? "border-red bg-red/5" : "border-rule bg-cream-2/40"
-      }`}
-    >
+    <div className={`rounded-2xl border p-6 ${borderColor}`}>
       <p className="text-xs uppercase tracking-wider text-mute">{label}</p>
-      <p
-        className={`mt-2 font-display text-3xl tabular-nums ${
-          accent ? "text-red" : "text-ink"
-        }`}
-      >
+      <p className={`mt-2 font-display text-3xl tabular-nums ${textColor}`}>
         {value}
       </p>
       <p className="mt-2 text-xs text-ink-soft">{sub}</p>

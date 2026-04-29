@@ -333,9 +333,9 @@ export type ShareEconomics = {
 // admin + a damage reserve), shareholders keep the rest, distributed
 // pro-rata to the days each share contributes.
 //
-// Heavy rental utilization correlates with faster depreciation, so the
-// model also lets the caller bump the depreciation assumption when
-// estimating net cost on a rented-out scenario.
+// Depreciation is held constant at TARGET_DEPRECIATION_PCT across both
+// drive-only and rental scenarios — our CPO maintenance + curated mileage
+// caps keep the resale story consistent.
 
 export const RENTAL_DEFAULTS = {
   // Total non-service days available in a year
@@ -348,9 +348,6 @@ export const RENTAL_DEFAULTS = {
   // RYDA's cut covers operations, booking, insurance admin, damage
   // reserve. Members net the rest.
   defaultManagementFeePct: 35,
-  // When a car is rented heavily, depreciation runs higher than the
-  // CPO baseline. Bumped scenario for the calculator's rental path.
-  rentedDepreciationPct: 12,
 };
 
 export type RentalEconomics = {
