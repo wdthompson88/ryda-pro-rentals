@@ -473,7 +473,7 @@ function VehicleCard({ vehicle: v }: { vehicle: Vehicle }) {
             </div>
           </div>
           <p className="mt-2 text-[11px] text-mute">
-            You save {formatUSD(stickerSavings)} vs full ownership · ~34
+            You save {formatUSD(stickerSavings)} vs full ownership · ~30
             days/yr per share
           </p>
           {v.rentalAvailable && rental.perShareAnnualIncome > 0 ? (

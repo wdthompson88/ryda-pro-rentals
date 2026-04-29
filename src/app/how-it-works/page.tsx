@@ -41,7 +41,7 @@ export default function HowItWorksPage() {
           </h2>
           <p className="mt-4 max-w-2xl text-lg text-ink-soft">
             One Ferrari 296 share: $34K up front, ~$7,080/year all-in,
-            ~34 days/year — roughly $208/day in steady-state ops. Compare
+            ~30 days/year — roughly $236/day in steady-state ops. Compare
             with $2,500+/day to rent or $40–80K/yr to own outright.
           </p>
 
@@ -49,7 +49,7 @@ export default function HowItWorksPage() {
             <Step n="01" title="Verify" body="Apply, complete KYC. Valid US license, clean recent driving record, 28 or older. No accreditation required." />
             <Step n="02" title="Choose" body="Browse the curated, CPO-only fleet. Every car passes a multi-point Pre-Purchase Inspection before a single share is sold — co-owners are protected from inheriting major powertrain or mechanical issues." />
             <Step n="03" title="Co-own" body="Join the LLC alongside other members. Sign the Operating Agreement and Management Services Agreement. Fund your share via wire or ACH." />
-            <Step n="04" title="Drive" body="Book your time on the RYDA app. Each share unlocks ~34 days and ~3,400 miles per year (100 mi/day allowance). Hold multiple shares to scale linearly — 5 ≈ 170 days, all 10 ≈ year-round access." />
+            <Step n="04" title="Drive" body="Book your time on the RYDA app. Each share unlocks ~30 days and ~3,000 miles per year (100 mi/day allowance). Hold multiple shares to scale linearly — 5 ≈ 150 days, all 10 ≈ 300 days." />
             <Step n="05" title="Exit" body="Default: RYDA sells the car at year 2 and distributes proceeds pro-rata (we model a ~10% depreciation assumption). Want out sooner? Transfer your share to another verified member after the 12-month minimum hold. RYDA handles the LLC paperwork. 3% transfer fee on member-to-member transfers." />
           </div>
         </div>
@@ -81,8 +81,8 @@ export default function HowItWorksPage() {
                 <Tr label="Annual depreciation reserve" solo="$22,000" ryda="$2,200" />
                 <Tr label="RYDA service fee" solo="—" ryda="$2,480" />
                 <Tr label="Total Year 1" solo="$386,000" ryda="$41,080" emphasis />
-                <Tr label="Days driven" solo="365 (in theory)" ryda="~34 / share" />
-                <Tr label="Effective $/day" solo="$1,058" ryda="$208" emphasis />
+                <Tr label="Days driven" solo="365 (in theory)" ryda="~30 / share" />
+                <Tr label="Effective $/day, ops only" solo="$1,058" ryda="$236" emphasis />
               </tbody>
             </table>
           </div>
@@ -91,8 +91,9 @@ export default function HowItWorksPage() {
             The all-in annual contribution covers RYDA's service component
             plus pass-through insurance, storage, maintenance, and reserves
             (combined: ~7–9% of vehicle value). The fleet calendar reserves
-            25 days/yr per vehicle for service and downtime (10 shares × 34
-            days = 340 days used; 365 − 340 = 25).
+            ~65 days/yr per vehicle for service, downtime, and the optional
+            rental pool (10 shares × 30 days = 300 days member-allocated;
+            365 − 300 = 65).
           </p>
         </div>
       </section>
@@ -104,12 +105,12 @@ export default function HowItWorksPage() {
             How to read the price
           </p>
           <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
-            $208/day is operating cost. Net cost is the real number.
+            $236/day is operating cost. Net cost is the real number.
           </h2>
           <div className="mt-8 space-y-5 text-base leading-relaxed text-ink-soft">
             <p>
-              The $208/day figure is steady-state operating cost: $7,080 of
-              annual ops divided by 34 driving days. It's what every day
+              The $236/day figure is steady-state operating cost: $7,080 of
+              annual ops divided by 30 driving days. It's what every day
               behind the wheel costs you{" "}
               <span className="italic">while you hold the share</span>, ignoring
               the buy-in.
@@ -126,10 +127,10 @@ export default function HowItWorksPage() {
             <p>
               For the F296 at one share over 2 years: $34K buy-in + $7,080 ×
               2 carrying = $48,160 spent. Resale at 90% of buy-in returns
-              ~$30,600. <strong>Net cost ~$17,560</strong> for 68 driving
-              days = <strong>~$258 per actual driving day</strong>. That's
+              ~$30,600. <strong>Net cost ~$17,560</strong> for 60 driving
+              days = <strong>~$293 per actual driving day</strong>. That's
               the apples-to-apples number to use against rental ($2,400/day
-              × 68 = $163,200). You also exit with cash from the sale, not
+              × 60 = $144,000). You also exit with cash from the sale, not
               a stack of receipts.
             </p>
           </div>

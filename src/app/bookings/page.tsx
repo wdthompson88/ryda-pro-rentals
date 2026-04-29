@@ -41,13 +41,13 @@ export default function BookingsPage() {
           <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
             <Entitlement
               vehicle="Ferrari 296 GTB"
-              days={{ used: 8, total: 34 }}
-              miles={{ used: 658, total: 4_000 }}
+              days={{ used: 8, total: 30 }}
+              miles={{ used: 658, total: 3_000 }}
             />
             <Entitlement
               vehicle="McLaren 750S Spider"
-              days={{ used: 6, total: 34 }}
-              miles={{ used: 432, total: 4_000 }}
+              days={{ used: 6, total: 30 }}
+              miles={{ used: 432, total: 3_000 }}
             />
           </div>
         </div>

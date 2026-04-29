@@ -8,12 +8,12 @@ import { PARTNER_VEHICLES } from "@/lib/partner-fleet";
 export const metadata = {
   title: "Rent — RYDA",
   description:
-    "Rent a curated supercar by the day. The RYDA fleet plus our Miami partner GM LUXE — hand-prepared, fully insured, white-glove delivery.",
+    "Rent a curated supercar by the day. Hand-prepared, fully insured, white-glove delivery available.",
 };
 
 export default function RentPage() {
   const rentable = VEHICLES.filter((v) => v.rentalAvailable);
-  const partnerCount = PARTNER_VEHICLES.length;
+  const totalRentals = rentable.length + PARTNER_VEHICLES.length;
 
   return (
     <>
@@ -29,38 +29,36 @@ export default function RentPage() {
             Drive it before you own a piece of it.
           </h1>
           <p className="mt-6 max-w-2xl text-lg text-ink-soft">
-            Rentals are how members and prospective buyers experience a RYDA
-            vehicle before committing to a share. Hand-prepared, fully insured,
-            white-glove delivered.
+            Rentals are how members and prospective buyers experience a
+            RYDA vehicle before committing to a share. Hand-prepared,
+            fully insured, white-glove delivered.
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
             <Link
-              href="#ryda-fleet"
+              href="#available"
               className="inline-flex h-12 items-center justify-center rounded-full bg-red px-7 text-sm font-medium text-cream transition-colors hover:bg-red-deep"
             >
-              See the RYDA fleet →
-            </Link>
-            <Link
-              href="#partner-fleet"
-              className="inline-flex h-12 items-center justify-center rounded-full border border-rule px-7 text-sm font-medium text-ink hover:border-ink"
-            >
-              Browse {partnerCount} partner vehicles →
+              See {totalRentals} available cars →
             </Link>
           </div>
         </div>
       </section>
 
-      {/* RYDA Vehicle grid */}
-      <section id="ryda-fleet" className="border-b border-rule">
+      {/* RYDA fleet — featured at the top */}
+      <section id="available" className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
           <div className="mb-6 flex items-end justify-between">
             <div>
               <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-                RYDA fleet
+                Featured fleet
               </p>
               <h2 className="mt-2 font-display text-3xl text-ink">
-                Available now
+                Co-ownership cars · also available to rent
               </h2>
+              <p className="mt-2 max-w-2xl text-sm text-ink-soft">
+                Each of these is held in a member-managed Delaware LLC.
+                Rent first, buy a share if it fits.
+              </p>
             </div>
             <p className="text-sm text-mute">
               {rentable.length} vehicles · Miami · LA · NYC
@@ -111,41 +109,21 @@ export default function RentPage() {
         </div>
       </section>
 
-      {/* Partner fleet — GM LUXE */}
-      <section id="partner-fleet" className="border-b border-rule">
-        <div className="mx-auto max-w-7xl px-6 pt-16 pb-2 sm:px-10">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div className="max-w-2xl">
-              <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-                Partner fleet · Miami
-              </p>
-              <h2 className="mt-2 font-display text-3xl text-ink sm:text-4xl">
-                Plus {partnerCount} more cars from GM LUXE.
-              </h2>
-              <p className="mt-3 text-base text-ink-soft">
-                We've partnered with{" "}
-                <a
-                  href="https://www.gmluxe.net/?utm_source=ryda&utm_medium=partner_listing&utm_campaign=fleet_2026"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-medium text-ink underline-offset-4 hover:underline"
-                >
-                  GM LUXE
-                </a>
-                , a Miami exotic and luxury rental house, to broaden what you
-                can drive while you decide on a share. Click any card to book
-                directly with GM LUXE — RYDA earns a referral, you keep their
-                rates.
-              </p>
-            </div>
-            <a
-              href="https://www.gmluxe.net/?utm_source=ryda&utm_medium=partner_listing&utm_campaign=fleet_2026"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex h-11 items-center justify-center rounded-full border border-rule px-5 text-sm font-medium text-ink hover:border-ink"
-            >
-              GM LUXE site ↗
-            </a>
+      {/* Full rental fleet — extended Miami inventory */}
+      <section className="border-b border-rule">
+        <div className="mx-auto max-w-7xl px-6 pt-14 pb-2 sm:px-10">
+          <div className="max-w-2xl">
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+              Extended Miami fleet
+            </p>
+            <h2 className="mt-2 font-display text-3xl text-ink sm:text-4xl">
+              The rest of the lineup.
+            </h2>
+            <p className="mt-3 text-base text-ink-soft">
+              From everyday luxury SUVs to top-tier exotics — all hand-prepared,
+              fully insured, and inquiry-to-book through RYDA. Members and
+              non-members welcome.
+            </p>
           </div>
         </div>
         <PartnerListings />
@@ -155,13 +133,8 @@ export default function RentPage() {
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10">
           <h2 className="font-display text-3xl text-ink">
-            What every RYDA-fleet rental includes
+            What every RYDA rental includes
           </h2>
-          <p className="mt-2 max-w-2xl text-sm text-ink-soft">
-            These standards apply to RYDA-owned vehicles. Partner rentals
-            (GM LUXE) are operated by the partner under their terms — see
-            their site for specifics.
-          </p>
           <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
             <Pillar
               title="Full insurance"
@@ -176,8 +149,8 @@ export default function RentPage() {
               body="Single number, single call. Replacement vehicle if anything goes wrong on the road."
             />
             <Pillar
-              title="200 miles / day"
-              body="Generous baseline included. Extra miles available; track day mode unlocks unlimited."
+              title="100 miles / day"
+              body="Industry-standard included mileage. Overage at $4/mile. Track day mode unlocks unlimited."
             />
           </div>
         </div>
@@ -193,10 +166,11 @@ export default function RentPage() {
             Renting is your test drive. Ownership is the relationship.
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
-            Every RYDA vehicle is also available as a co-ownership share.
-            Effective ~$208/day on a co-owned Ferrari versus ~$2,500/day to
-            rent it. Transfer your share to another verified member after the
-            12-month minimum hold. That's where we want you to land.
+            Every featured car is also available as a co-ownership share.
+            Effective ~$236/day in steady-state ops on a co-owned Ferrari
+            versus ~$2,400/day to rent it. RYDA holds each car for 2
+            years, then sells and distributes proceeds. That's where we
+            want you to land.
           </p>
           <Link
             href="/markets"

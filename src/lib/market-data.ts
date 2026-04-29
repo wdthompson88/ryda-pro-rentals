@@ -57,9 +57,9 @@ export const VEHICLES: Vehicle[] = [
     pricePerShare: 34_000,
     annualOpCost: 7_080,
     annualSoloCarrying: 46_000,
-    daysPerYear: 34,
-    milesPerYear: 3_400,
-    effectiveDailyCost: 208,
+    daysPerYear: 30,
+    milesPerYear: 3_000,
+    effectiveDailyCost: 236,
     cylinders: 6,
     drive: "AWD",
     listingStart: "2026-04-15",
@@ -94,9 +94,9 @@ export const VEHICLES: Vehicle[] = [
     pricePerShare: 90_000,
     annualOpCost: 14_200,
     annualSoloCarrying: 48_000,
-    daysPerYear: 34,
-    milesPerYear: 3_400,
-    effectiveDailyCost: 418,
+    daysPerYear: 30,
+    milesPerYear: 3_000,
+    effectiveDailyCost: 473,
     cylinders: 12,
     drive: "AWD",
     listingStart: "2026-03-30",
@@ -131,9 +131,9 @@ export const VEHICLES: Vehicle[] = [
     pricePerShare: 37_600,
     annualOpCost: 6_900,
     annualSoloCarrying: 50_000,
-    daysPerYear: 34,
-    milesPerYear: 3_400,
-    effectiveDailyCost: 203,
+    daysPerYear: 30,
+    milesPerYear: 3_000,
+    effectiveDailyCost: 230,
     cylinders: 8,
     drive: "RWD",
     listingStart: "2026-04-22",
@@ -169,9 +169,9 @@ export const VEHICLES: Vehicle[] = [
     pricePerShare: 48_000,
     annualOpCost: 11_840,
     annualSoloCarrying: 58_000,
-    daysPerYear: 34,
-    milesPerYear: 3_400,
-    effectiveDailyCost: 348,
+    daysPerYear: 30,
+    milesPerYear: 3_000,
+    effectiveDailyCost: 395,
     cylinders: 12,
     drive: "AWD",
     listingStart: "2026-04-10",
@@ -207,9 +207,9 @@ export const VEHICLES: Vehicle[] = [
     pricePerShare: 51_000,
     annualOpCost: 10_560,
     annualSoloCarrying: 36_000,
-    daysPerYear: 34,
-    milesPerYear: 3_400,
-    effectiveDailyCost: 311,
+    daysPerYear: 30,
+    milesPerYear: 3_000,
+    effectiveDailyCost: 352,
     cylinders: 12,
     drive: "RWD",
     listingStart: "2026-03-15",
@@ -245,9 +245,9 @@ export const VEHICLES: Vehicle[] = [
     pricePerShare: 119_000,
     annualOpCost: 26_580,
     annualSoloCarrying: 62_000,
-    daysPerYear: 34,
-    milesPerYear: 3_400,
-    effectiveDailyCost: 782,
+    daysPerYear: 30,
+    milesPerYear: 3_000,
+    effectiveDailyCost: 886,
     cylinders: 8,
     drive: "AWD",
     listingStart: "2026-04-25",
@@ -299,8 +299,8 @@ export function formatUSD(n: number, opts: { decimals?: number } = {}) {
 // Modeled assumption: the curated fleet depreciates ~10% over the
 // 2-year hold. We use a flat 10% across drive-only AND rental-opt-in
 // scenarios — the number already absorbs the heavier mileage profile
-// of the rental path (50% pool occupancy + 100 mi/day shareholder
-// allowance + ~150 mi/day rental wear). Per-vehicle depreciation
+// of the rental path (50% pool occupancy + 100 mi/day allowance
+// across both shareholder and rental usage). Per-vehicle depreciation
 // curves vary in reality (Aventador Ultimae appreciates, Cullinan
 // depreciates faster) but a flat rate keeps the calculator honest
 // and simple.
@@ -312,8 +312,9 @@ export const HOLDING_YEARS = 2;
 export const TARGET_DEPRECIATION_PCT = 10; // % over the full 2-year hold
 
 // Standard shareholder mileage allowance — matches GM LUXE & industry
-// norm. 34 days × 100 mi/day = 3,400 mi/yr per share.
+// norm. 30 days × 100 mi/day = 3,000 mi/yr per share.
 export const MILES_PER_DAY_PER_SHARE = 100;
+export const DAYS_PER_SHARE = 30;
 
 export type ShareEconomics = {
   shares: number;

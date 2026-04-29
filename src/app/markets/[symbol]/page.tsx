@@ -4,6 +4,7 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { OrderPanel } from "@/components/order-panel";
 import { CostBreakdown } from "@/components/cost-breakdown";
+import { ShareValueChart } from "@/components/share-value-chart";
 import {
   VEHICLES,
   getVehicleBySymbol,
@@ -173,6 +174,38 @@ export default async function VehicleMarketPage({
             </div>
             <div className="lg:col-span-7">
               <CostBreakdown vehicle={v} shares={1} />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Share value chart — year-by-year depreciation visualization */}
+      <section className="border-b border-rule bg-cream-2">
+        <div className="mx-auto max-w-7xl px-6 py-14 sm:px-10">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+            <div className="lg:col-span-4">
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+                Share value over time
+              </p>
+              <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
+                The depreciation curve, visualized.
+              </h2>
+              <p className="mt-4 text-sm leading-relaxed text-ink-soft">
+                Every {HOLDING_YEARS} years RYDA sells the car and
+                distributes proceeds pro-rata to shareholders. The chart
+                tracks vehicle value, per-share value, and cumulative
+                miles across the hold so you see exactly what your share
+                is worth on the way out.
+              </p>
+              <p className="mt-4 text-sm leading-relaxed text-ink-soft">
+                Linear 10% depreciation modeled for chart simplicity —
+                actual curves vary by model and condition. Aventador
+                Ultimaes and 812 GTSes routinely beat the curve;
+                higher-volume sports cars track closer to it.
+              </p>
+            </div>
+            <div className="lg:col-span-8">
+              <ShareValueChart vehicle={v} />
             </div>
           </div>
         </div>

@@ -7,8 +7,8 @@ const NAV = [
   { href: "/markets", label: "Fleet" },
   { href: "/how-it-works", label: "How it works" },
   { href: "/compare", label: "Compare" },
+  { href: "/concierge-ownership", label: "Concierge" },
   { href: "/membership", label: "Membership" },
-  { href: "/about", label: "About" },
 ];
 
 export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {

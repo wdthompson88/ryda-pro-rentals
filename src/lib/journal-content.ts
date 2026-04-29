@@ -44,7 +44,7 @@ export const POSTS: JournalPost[] = [
       "We also did one thing they didn't: every RYDA vehicle is Certified Pre-Owned with an active manufacturer or independent CPO warranty. The LLC is buying a known asset, not a maintenance gamble.",
       "## Where this lands",
       "The product is quiet on purpose. RYDA isn't a fund, isn't a marketplace, isn't a club. Each vehicle is a Delaware LLC. You're a registered co-owner of a real car alongside up to nine other verified members. We're hired by the LLC to run operations — sourcing, storage, insurance, scheduling, maintenance, transfers — under a separate Management Services Agreement.",
-      "Members drive ~34 days a year on a 10-share split. The math comes out to roughly $208 per day all-in once buy-in is amortized — about an order of magnitude below daily rental at $2,500 a day. We bake 25 days of service and downtime into the calendar so the cars don't burn out.",
+      "Members drive ~30 days a year on a 10-share split. The math comes out to roughly $236 per day in steady-state ops cost once buy-in is amortized — about an order of magnitude below daily rental at $2,400 a day. The remaining 65 days each year are reserved for service and the optional rental pool so the cars don't burn out.",
       "## What's next",
       "Miami launches Q3 2026. We're vetting our first 100 founding members now. If you've ever stared at a Ferrari in your driveway and known you'd drive it ten times a year, this was built for you.",
     ],

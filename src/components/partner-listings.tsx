@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import {
   PARTNER_VEHICLES,
@@ -176,7 +177,7 @@ export function PartnerListings() {
               {totalListed}
             </span>
             <span className="ml-2">
-              {totalListed === 1 ? "vehicle" : "vehicles"} from GM LUXE Miami
+              {totalListed === 1 ? "vehicle" : "vehicles"} available · Miami
             </span>
           </p>
           {totalListed > 0 ? (
@@ -200,7 +201,7 @@ export function PartnerListings() {
         {visible.length === 0 ? (
           <div className="rounded-2xl border border-rule bg-surface p-12 text-center">
             <p className="font-display text-xl text-ink">
-              No partner vehicles match those filters.
+              No vehicles match those filters.
             </p>
             <p className="mt-2 text-sm text-ink-soft">
               Try widening your search or{" "}
@@ -262,11 +263,16 @@ function PartnerCard({ vehicle: v }: { vehicle: PartnerVehicle }) {
   const savingsPct = Math.round((savings / v.regularRate) * 100);
   const tint = brandTint(v.make);
 
+  // Internal inquiry URL — keeps the customer relationship with RYDA.
+  // White-label arrangement: RYDA brand, RYDA inquiry, RYDA handles the
+  // booking with operations partner behind the scenes.
+  const inquiryHref = `/contact?type=Rental&note=${encodeURIComponent(
+    `Rental inquiry: ${v.make} ${v.model}${v.year ? ` (${v.year})` : ""} · ${v.market}`,
+  )}#form`;
+
   return (
-    <a
-      href={v.partnerUrl}
-      target="_blank"
-      rel="noopener noreferrer"
+    <Link
+      href={inquiryHref}
       className="group flex flex-col overflow-hidden rounded-2xl border border-rule bg-surface transition-all hover:-translate-y-0.5 hover:border-ink/40 hover:shadow-lg"
     >
       {/* Image with badges */}
@@ -299,16 +305,13 @@ function PartnerCard({ vehicle: v }: { vehicle: PartnerVehicle }) {
                 {v.make}
               </p>
               <p className="mt-1 font-display text-xl">{v.model}</p>
-              <p className="mt-3 text-[10px] uppercase tracking-[0.18em] opacity-60">
-                Photo on partner site
-              </p>
             </div>
           </div>
         )}
 
-        {/* Partner badge top-left */}
+        {/* Brand badge top-left */}
         <span className="absolute left-3 top-3 rounded-full bg-cream/95 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] text-ink backdrop-blur">
-          GM LUXE · Partner
+          {v.make}
         </span>
 
         {/* Discount badge top-right (if meaningful) */}
@@ -390,9 +393,9 @@ function PartnerCard({ vehicle: v }: { vehicle: PartnerVehicle }) {
 
         {/* CTA */}
         <div className="mt-5 flex items-center justify-between">
-          <p className="text-xs text-ink-soft">Booked through GM LUXE</p>
+          <p className="text-xs text-ink-soft">100 mi/day included</p>
           <span className="inline-flex items-center gap-1.5 text-sm font-medium text-red transition-colors group-hover:text-red-deep">
-            Book on GM LUXE
+            Inquire to book
             <span
               aria-hidden
               className="transition-transform group-hover:translate-x-0.5"
@@ -402,6 +405,6 @@ function PartnerCard({ vehicle: v }: { vehicle: PartnerVehicle }) {
           </span>
         </div>
       </div>
-    </a>
+    </Link>
   );
 }
