@@ -58,7 +58,7 @@ const ROWS: Row[] = [
   {
     label: "Annual carrying / fees",
     regular: formatUSD(CARRYING_REGULAR),
-    rental: "—",
+    rental: "$0",
     club: "Included",
     ryda: formatUSD(RYDA_ANNUAL_OPS),
   },
@@ -99,8 +99,8 @@ const ROWS: Row[] = [
   {
     label: `Recover at exit (${100 - TARGET_DEPRECIATION_PCT}% resale)`,
     regular: `+ ${formatUSD(REGULAR_RESALE)}`,
-    rental: "—",
-    club: "—",
+    rental: "$0",
+    club: "$0",
     ryda: `+ ${formatUSD(RYDA_RESALE)}`,
   },
   {

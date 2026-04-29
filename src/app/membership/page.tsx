@@ -253,18 +253,29 @@ function TierCard({ tier }: { tier: typeof TIERS[number] }) {
   const items = FEATURES.flatMap((g) => g.items.filter(isUpgrade)).slice(0, 7);
   const previousLabel = isBlack ? "Everything in Blue, plus" : isBlue ? "Everything in Core, plus" : null;
 
+  // Tier colorways:
+  //   Core  → cream (light card, ink text — the entry tier)
+  //   Blue  → deep sapphire blue (cream text — the active-member tier)
+  //   Black → ink/near-black (cream text — the concierge tier)
   const bg = isBlack
-    ? "bg-ink text-cream"
+    ? "bg-ink text-cream border-ink"
     : isBlue
-    ? "bg-surface text-ink ring-2 ring-red"
-    : "bg-surface text-ink";
+      ? "bg-[#1e40af] text-cream border-[#1e40af]"
+      : "bg-cream text-ink";
 
-  const sub = isBlack ? "text-cream/70" : "text-ink-soft";
+  const sub = isBlack || isBlue ? "text-cream/75" : "text-ink-soft";
+
+  // Eyebrow ("RYDA Core / Blue / Black") and check icons stay red on
+  // the cream card for brand pop; switch to cream on the dark cards
+  // so they sit cleanly against the deep blue / black backgrounds.
+  const accent = isBlack || isBlue ? "text-cream" : "text-red";
+  const checkColor = isBlack || isBlue ? "text-cream" : "text-red";
+
   const ctaCls = isBlack
     ? "bg-cream text-ink hover:bg-red hover:text-cream"
     : isBlue
-    ? "bg-red text-cream hover:bg-red-deep"
-    : "bg-ink text-cream hover:bg-red";
+      ? "bg-cream text-[#1e40af] hover:bg-red hover:text-cream"
+      : "bg-ink text-cream hover:bg-red";
 
   return (
     <div
@@ -275,7 +286,7 @@ function TierCard({ tier }: { tier: typeof TIERS[number] }) {
           {tier.badge}
         </span>
       )}
-      <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+      <p className={`text-xs font-medium uppercase tracking-[0.2em] ${accent}`}>
         RYDA {tier.name}
       </p>
       <p className="mt-4 font-display text-5xl font-light">
@@ -295,7 +306,7 @@ function TierCard({ tier }: { tier: typeof TIERS[number] }) {
       <ul className={`${previousLabel ? "mt-3" : "mt-8"} flex-1 space-y-3 text-sm`}>
         {items.map((f) => (
           <li key={f.label} className="flex items-start gap-3">
-            <span className="mt-1 text-red">✓</span>
+            <span className={`mt-1 ${checkColor}`}>✓</span>
             <span>
               {f.label}
               {typeof f[tier.key] === "string" && (
