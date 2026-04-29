@@ -19,6 +19,10 @@ export type Vehicle = {
   daysPerYear: number;     // entitlement
   milesPerYear: number;    // entitlement
   effectiveDailyCost: number;
+  cylinders: number;       // 0 for fully electric
+  drive: "RWD" | "AWD";    // drivetrain
+  listingStart: string;    // ISO date — "period listing" start
+  listingEnd: string;      // ISO date — "period listing" end
   hero: string;            // hero image URL
   flipImage?: boolean;     // mirror horizontally so the car faces right
   imagePosition?: string;  // CSS object-position to center the car in crops (default "center")
@@ -56,6 +60,10 @@ export const VEHICLES: Vehicle[] = [
     daysPerYear: 34,
     milesPerYear: 4_000,
     effectiveDailyCost: 208,
+    cylinders: 6,
+    drive: "AWD",
+    listingStart: "2026-04-15",
+    listingEnd: "2026-10-15",
     hero: "https://images.unsplash.com/photo-1592198084033-aade902d1aae?auto=format&fit=crop&w=1920&q=80",
     currentMiles: 14_280,
     description:
@@ -89,6 +97,10 @@ export const VEHICLES: Vehicle[] = [
     daysPerYear: 34,
     milesPerYear: 2_500,
     effectiveDailyCost: 418,
+    cylinders: 12,
+    drive: "AWD",
+    listingStart: "2026-03-30",
+    listingEnd: "2026-09-30",
     hero: "https://images.unsplash.com/photo-1621135802920-133df287f89c?auto=format&fit=crop&w=1920&q=80",
     currentMiles: 23_650,
     description:
@@ -122,6 +134,10 @@ export const VEHICLES: Vehicle[] = [
     daysPerYear: 34,
     milesPerYear: 4_000,
     effectiveDailyCost: 203,
+    cylinders: 8,
+    drive: "RWD",
+    listingStart: "2026-04-22",
+    listingEnd: "2026-10-22",
     hero: "https://images.unsplash.com/photo-1740806417439-490dba0d926a?auto=format&fit=crop&w=1920&q=80",
     currentMiles: 11_840,
     flipImage: true,
@@ -156,6 +172,10 @@ export const VEHICLES: Vehicle[] = [
     daysPerYear: 34,
     milesPerYear: 3_000,
     effectiveDailyCost: 348,
+    cylinders: 12,
+    drive: "AWD",
+    listingStart: "2026-04-10",
+    listingEnd: "2026-10-10",
     hero: "https://images.unsplash.com/photo-1631295868223-63265b40d9e4?auto=format&fit=crop&w=1920&q=80",
     imagePosition: "center 65%",
     currentMiles: 18_320,
@@ -190,6 +210,10 @@ export const VEHICLES: Vehicle[] = [
     daysPerYear: 34,
     milesPerYear: 3_000,
     effectiveDailyCost: 311,
+    cylinders: 12,
+    drive: "RWD",
+    listingStart: "2026-03-15",
+    listingEnd: "2026-09-15",
     hero: "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&w=1920&q=80",
     currentMiles: 16_450,
     flipImage: true,
@@ -224,6 +248,10 @@ export const VEHICLES: Vehicle[] = [
     daysPerYear: 34,
     milesPerYear: 2_000,
     effectiveDailyCost: 782,
+    cylinders: 8,
+    drive: "AWD",
+    listingStart: "2026-04-25",
+    listingEnd: "2026-10-25",
     hero: "/cars/aston-valhalla.webp",
     flipImage: true,
     currentMiles: 3_510,

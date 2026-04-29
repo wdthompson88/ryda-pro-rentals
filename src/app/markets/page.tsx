@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
+import { MarketsListings } from "@/components/markets-listings";
 import { VEHICLES, formatUSD } from "@/lib/market-data";
 
 export const metadata = {
@@ -30,83 +31,8 @@ export default function MarketsPage() {
         </div>
       </section>
 
-      {/* Fleet table */}
-      <section className="border-b border-rule">
-        <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
-          <div className="overflow-hidden rounded-2xl border border-rule bg-surface">
-            <div className="overflow-x-auto">
-            <table className="w-full min-w-[560px]">
-              <thead className="border-b border-rule bg-cream-2 text-xs font-medium uppercase tracking-wider text-ink-soft">
-                <tr>
-                  <th className="px-6 py-4 text-left">Vehicle</th>
-                  <th className="px-6 py-4 text-right">Per share</th>
-                  <th className="hidden px-6 py-4 text-right lg:table-cell">Available</th>
-                  <th className="hidden px-6 py-4 text-right lg:table-cell">Market</th>
-                  <th className="px-6 py-4 text-right" aria-hidden />
-                </tr>
-              </thead>
-              <tbody>
-                {VEHICLES.map((v) => (
-                  <tr
-                    key={v.symbol}
-                    className="border-b border-rule transition-colors last:border-b-0 hover:bg-cream-2/40"
-                  >
-                    <td className="px-6 py-5">
-                      <Link href={`/markets/${v.symbol}`} className="flex items-center gap-4">
-                        <div className="relative aspect-[4/3] w-20 shrink-0 overflow-hidden rounded-lg bg-cream-2 sm:w-24">
-                          <Image
-                            src={v.hero}
-                            alt={`${v.year} ${v.name}`}
-                            fill
-                            sizes="96px"
-                            className={`object-cover ${v.flipImage ? "-scale-x-100" : ""}`}
-                            style={{ objectPosition: v.imagePosition ?? "center" }}
-                          />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="font-display text-lg text-ink">{v.name}</p>
-                          <p className="mt-1 text-xs text-mute">
-                            {v.year} · {v.brand}
-                          </p>
-                        </div>
-                      </Link>
-                    </td>
-                    <td className="px-6 py-5 text-right">
-                      <p className="font-medium text-ink tabular-nums">
-                        {formatUSD(v.pricePerShare)}
-                      </p>
-                      <p className="mt-1 text-xs text-mute">per share</p>
-                    </td>
-                    <td className="hidden px-6 py-5 text-right text-ink-soft lg:table-cell">
-                      {v.sharesAvailable === 0 ? (
-                        <span className="rounded-full bg-rule/40 px-3 py-1 text-xs font-medium text-mute">
-                          Sold out
-                        </span>
-                      ) : (
-                        <span className="text-sm">
-                          {v.sharesAvailable} of {v.shares} shares
-                        </span>
-                      )}
-                    </td>
-                    <td className="hidden px-6 py-5 text-right text-sm text-ink-soft lg:table-cell">
-                      {v.market}
-                    </td>
-                    <td className="px-6 py-5 text-right">
-                      <Link
-                        href={`/markets/${v.symbol}`}
-                        className="text-sm font-medium text-red hover:text-red-deep"
-                      >
-                        View →
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Filterable card grid */}
+      <MarketsListings />
 
       {/* Try before you buy — small rentals teaser */}
       <section className="border-t border-rule">
