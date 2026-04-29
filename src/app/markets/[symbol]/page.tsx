@@ -85,7 +85,7 @@ export default async function VehicleMarketPage({
                 <Fact
                   label="Per share"
                   value={formatUSD(v.pricePerShare)}
-                  sub={`Net ~${formatUSD(econ.netCost)} after ${HOLDING_YEARS}-yr sale`}
+                  sub={`Net cost: ~${formatUSD(econ.netCost)} after ${HOLDING_YEARS}-yr sale of vehicle`}
                 />
                 <Fact label="Total shares" value={String(v.shares)} />
                 <Fact label="Days / share" value={`${v.daysPerYear}/yr`} />
@@ -230,7 +230,7 @@ export default async function VehicleMarketPage({
                   </p>
                   <p className="mt-1 text-xs text-mute">per share</p>
                   <p className="mt-2 text-[11px] text-red tabular-nums">
-                    Net ~{formatUSD(xEcon.netCost)} after {HOLDING_YEARS} yrs
+                    Net cost: ~{formatUSD(xEcon.netCost)} after {HOLDING_YEARS}-yr sale
                   </p>
                 </Link>
               );
