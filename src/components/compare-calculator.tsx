@@ -357,10 +357,8 @@ export function CompareCalculator() {
           <ResultCard
             label={
               numbers.ryda.economicCost < 0
-                ? "Net surplus (after sale + rental income)"
-                : optInRental
-                  ? "Net cost (after sale + rental income)"
-                  : "Net cost (after share sale)"
+                ? `Net in your pocket (${holdYears} yrs)`
+                : `Net cost (${holdYears} yrs)`
             }
             value={
               numbers.ryda.economicCost < 0
@@ -369,12 +367,79 @@ export function CompareCalculator() {
             }
             sub={
               optInRental
-                ? `Less ${formatUSD(numbers.ryda.residual)} share sale (${residualPct}%) and ${formatUSD(numbers.ryda.rentalIncomePerShare)} rental income`
-                : `Less ${formatUSD(numbers.ryda.residual)} estimated share sale (${residualPct}% of buy-in)`
+                ? `${formatUSD(numbers.ryda.rentalIncomePerShare)} rental income + ${formatUSD(numbers.ryda.residual)} sale − ${formatUSD(numbers.ryda.buyIn)} buy-in − ${formatUSD(numbers.ryda.totalCash - numbers.ryda.buyIn)} carrying`
+                : `${formatUSD(numbers.ryda.residual)} sale − ${formatUSD(numbers.ryda.buyIn)} buy-in − ${formatUSD(numbers.ryda.totalCash - numbers.ryda.buyIn)} carrying`
             }
             accent
             positive={numbers.ryda.economicCost < 0}
           />
+        </div>
+
+        {/* The math — explicit breakdown */}
+        <div
+          className={`mt-4 rounded-2xl border p-5 ${
+            numbers.ryda.economicCost < 0
+              ? "border-emerald-500/40 bg-emerald-500/5"
+              : "border-rule bg-cream-2/40"
+          }`}
+        >
+          <p className="text-xs font-medium uppercase tracking-[0.18em] text-mute">
+            The {holdYears}-year math
+          </p>
+          <dl className="mt-3 space-y-1.5 text-sm tabular-nums">
+            {optInRental ? (
+              <CalcMathRow
+                sign="+"
+                label={`Projected rental income (${holdYears} yrs)`}
+                value={formatUSD(numbers.ryda.rentalIncomePerShare)}
+                positive
+              />
+            ) : null}
+            <CalcMathRow
+              sign="+"
+              label={`Projected sale at exit (${residualPct}% of buy-in)`}
+              value={formatUSD(numbers.ryda.residual)}
+              positive
+            />
+            <CalcMathRow
+              sign="−"
+              label="Share price (your buy-in)"
+              value={formatUSD(numbers.ryda.buyIn)}
+            />
+            <CalcMathRow
+              sign="−"
+              label={`${holdYears}-yr carrying cost`}
+              value={formatUSD(
+                numbers.ryda.totalCash - numbers.ryda.buyIn,
+              )}
+            />
+          </dl>
+          <div
+            className={`mt-3 flex items-baseline justify-between gap-4 border-t pt-3 ${
+              numbers.ryda.economicCost < 0
+                ? "border-emerald-500/30"
+                : "border-rule"
+            }`}
+          >
+            <span className="text-sm font-medium text-ink">
+              ={" "}
+              {numbers.ryda.economicCost < 0
+                ? "Net in your pocket"
+                : "Net cost"}{" "}
+              ({holdYears} yrs)
+            </span>
+            <span
+              className={`font-display text-2xl tabular-nums ${
+                numbers.ryda.economicCost < 0
+                  ? "text-emerald-600"
+                  : "text-ink"
+              }`}
+            >
+              {numbers.ryda.economicCost < 0
+                ? `+ ${formatUSD(Math.abs(numbers.ryda.economicCost))}`
+                : formatUSD(numbers.ryda.economicCost)}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -509,6 +574,40 @@ function Slider({
         className="mt-3 h-2 w-full cursor-pointer appearance-none rounded-full bg-rule accent-red"
       />
       {subLabel && <p className="mt-2 text-xs text-mute">{subLabel}</p>}
+    </div>
+  );
+}
+
+function CalcMathRow({
+  sign,
+  label,
+  value,
+  positive,
+}: {
+  sign: "+" | "−";
+  label: string;
+  value: string;
+  positive?: boolean;
+}) {
+  return (
+    <div className="flex items-baseline justify-between gap-3">
+      <span className="flex items-baseline gap-2">
+        <span
+          className={`w-3 text-center font-medium ${
+            positive ? "text-emerald-600" : "text-mute"
+          }`}
+        >
+          {sign}
+        </span>
+        <span className="text-ink">{label}</span>
+      </span>
+      <span
+        className={`tabular-nums ${
+          positive ? "text-emerald-600" : "text-ink"
+        }`}
+      >
+        {value}
+      </span>
     </div>
   );
 }

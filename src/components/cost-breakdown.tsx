@@ -77,7 +77,7 @@ export function CostBreakdown({
       </dl>
 
       {showRentalScenario && rental.perShareAnnualIncome > 0 ? (
-        <div className="border-t border-rule bg-ink/[0.03] px-6 py-4">
+        <div className="border-t border-rule bg-ink/[0.03] px-6 py-5">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
             Or — opt into the rental pool
           </p>
@@ -89,50 +89,79 @@ export function CostBreakdown({
             <span className="font-medium text-ink tabular-nums">
               {formatUSD(rental.perShareAnnualIncome)}
             </span>{" "}
-            /yr — offsetting{" "}
-            <span className="font-medium text-ink">
-              {Math.min(100, Math.round((rental.perShareAnnualIncome / e.annualCarrying) * 100))}%
-            </span>{" "}
-            of your carrying cost.
+            /yr in rental income.
           </p>
-          <div className="mt-3 grid grid-cols-2 gap-3 text-xs">
-            <div className="rounded-lg border border-rule bg-surface px-3 py-2">
-              <p className="text-[10px] uppercase tracking-wider text-mute">
-                Rental income · {e.holdYears}yr
-              </p>
-              <p className="mt-0.5 font-display text-base text-emerald-600 tabular-nums">
-                + {formatUSD(rentalIncomeForShares)}
-              </p>
-            </div>
+
+          <div
+            className={`mt-4 rounded-xl border p-4 ${
+              rentedSurplus
+                ? "border-emerald-500/40 bg-emerald-500/5"
+                : "border-rule bg-surface"
+            }`}
+          >
+            <p className="text-[11px] uppercase tracking-[0.18em] text-mute">
+              The {e.holdYears}-year math
+            </p>
+            <dl className="mt-3 space-y-1.5 text-sm tabular-nums text-ink-soft">
+              <BreakdownRow
+                sign="+"
+                label={`Projected rental income (${e.holdYears} yrs)`}
+                value={formatUSD(rentalIncomeForShares)}
+                sub={`${formatUSD(rental.perShareAnnualIncome)}/yr per share × ${e.holdYears} × ${shares} share${shares > 1 ? "s" : ""}`}
+                positive
+              />
+              <BreakdownRow
+                sign="+"
+                label={`Projected sale at exit (${100 - e.depreciationPct}% of buy-in)`}
+                value={formatUSD(e.estimatedResale)}
+                sub={`Modeled at ${TARGET_DEPRECIATION_PCT}% depreciation over ${e.holdYears} yrs`}
+                positive
+              />
+              <BreakdownRow
+                sign="−"
+                label="Share price (your buy-in)"
+                value={formatUSD(e.buyIn)}
+                sub={`${formatUSD(vehicle.pricePerShare)} × ${shares}`}
+              />
+              <BreakdownRow
+                sign="−"
+                label={`${e.holdYears}-yr carrying cost`}
+                value={formatUSD(e.totalCarrying)}
+                sub={`${formatUSD(e.annualCarrying)}/yr × ${e.holdYears}`}
+              />
+            </dl>
             <div
-              className={`rounded-lg px-3 py-2 ${
-                rentedSurplus
-                  ? "border border-emerald-500 bg-emerald-500/5"
-                  : "border border-red bg-red/5"
+              className={`mt-3 flex items-baseline justify-between gap-4 border-t pt-3 ${
+                rentedSurplus ? "border-emerald-500/30" : "border-rule"
               }`}
             >
-              <p className="text-[10px] uppercase tracking-wider text-mute">
-                {rentedSurplus
-                  ? `Net surplus · ${e.holdYears}yr`
-                  : `Net cost · rental scenario`}
-              </p>
+              <div>
+                <p className="text-sm font-medium text-ink">
+                  ={" "}
+                  {rentedSurplus
+                    ? "Net in your pocket"
+                    : "Net cost"}{" "}
+                  ({e.holdYears} yrs)
+                </p>
+                <p className="mt-0.5 text-[11px] text-mute">
+                  {rentedSurplus
+                    ? `≈ ${formatUSD(Math.abs(rentedPerDay))}/day "kept" across ${e.totalDays} driving days`
+                    : `≈ ${formatUSD(rentedPerDay)}/day across ${e.totalDays} driving days`}
+                </p>
+              </div>
               <p
-                className={`mt-0.5 font-display text-base tabular-nums ${
-                  rentedSurplus ? "text-emerald-600" : "text-red"
+                className={`shrink-0 font-display text-2xl tabular-nums ${
+                  rentedSurplus ? "text-emerald-600" : "text-ink"
                 }`}
               >
                 {rentedSurplus
                   ? `+ ${formatUSD(Math.abs(rentedNet))}`
                   : formatUSD(rentedNet)}
               </p>
-              <p className="mt-0.5 text-[10px] text-mute tabular-nums">
-                {rentedSurplus
-                  ? `≈ ${formatUSD(Math.abs(rentedPerDay))}/day surplus`
-                  : `≈ ${formatUSD(rentedPerDay)}/day`}
-              </p>
             </div>
           </div>
-          <p className="mt-2 text-[11px] text-mute">
+
+          <p className="mt-3 text-[11px] text-mute">
             Same {TARGET_DEPRECIATION_PCT}% depreciation assumption applies —
             our CPO maintenance + curated mileage caps keep the resale
             story consistent whether you drive or rent it out.
@@ -148,6 +177,45 @@ export function CostBreakdown({
           by model, mileage, and market conditions.
         </p>
       </div>
+    </div>
+  );
+}
+
+function BreakdownRow({
+  sign,
+  label,
+  value,
+  sub,
+  positive,
+}: {
+  sign: "+" | "−";
+  label: string;
+  value: string;
+  sub?: string;
+  positive?: boolean;
+}) {
+  return (
+    <div className="flex items-baseline justify-between gap-3">
+      <div className="flex items-baseline gap-2 min-w-0">
+        <span
+          className={`w-3 shrink-0 text-center font-medium ${
+            positive ? "text-emerald-600" : "text-mute"
+          }`}
+        >
+          {sign}
+        </span>
+        <div className="min-w-0">
+          <p className="text-sm text-ink">{label}</p>
+          {sub ? <p className="text-[11px] text-mute">{sub}</p> : null}
+        </div>
+      </div>
+      <span
+        className={`shrink-0 tabular-nums ${
+          positive ? "text-emerald-600" : "text-ink"
+        }`}
+      >
+        {value}
+      </span>
     </div>
   );
 }

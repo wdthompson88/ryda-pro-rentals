@@ -475,28 +475,62 @@ function VehicleCard({ vehicle: v }: { vehicle: Vehicle }) {
           </p>
           {v.rentalAvailable && rental.perShareAnnualIncome > 0 ? (
             <div
-              className={`mt-3 rounded-lg border px-3 py-2 ${
+              className={`mt-3 rounded-lg border p-3 ${
                 rentedIsSurplus
                   ? "border-emerald-500/40 bg-emerald-500/5"
                   : "border-rule bg-cream-2/40"
               }`}
             >
               <p className="text-[10px] uppercase tracking-[0.14em] text-mute">
-                With rental opt-in (2 yrs)
+                With rental opt-in · 2-yr math
               </p>
-              <p
-                className={`mt-0.5 font-display text-base tabular-nums ${
-                  rentedIsSurplus ? "text-emerald-600" : "text-ink"
+              <dl className="mt-2 space-y-1 text-[11px] tabular-nums text-ink-soft">
+                <MathRow
+                  sign="+"
+                  label={`Projected rental income (2 yrs)`}
+                  value={formatUSD(rentalIncome2yr)}
+                  positive
+                />
+                <MathRow
+                  sign="+"
+                  label={`Projected sale price (${100 - econ.depreciationPct}% of buy-in)`}
+                  value={formatUSD(econ.estimatedResale)}
+                  positive
+                />
+                <MathRow
+                  sign="−"
+                  label="Share price (your buy-in)"
+                  value={formatUSD(econ.buyIn)}
+                />
+                <MathRow
+                  sign="−"
+                  label="2-yr carrying cost"
+                  value={formatUSD(econ.totalCarrying)}
+                />
+              </dl>
+              <div
+                className={`mt-2 flex items-baseline justify-between border-t pt-2 text-xs ${
+                  rentedIsSurplus
+                    ? "border-emerald-500/30"
+                    : "border-rule"
                 }`}
               >
-                {rentedIsSurplus
-                  ? `+ ${formatUSD(rentedShown)} surplus`
-                  : `${formatUSD(rentedShown)} net cost`}
-              </p>
-              <p className="mt-0.5 text-[10px] text-mute">
-                ~{formatUSD(rental.perShareAnnualIncome)}/yr rental income
-                per share
-              </p>
+                <span className="font-medium text-ink">
+                  {rentedIsSurplus
+                    ? "= Net in your pocket"
+                    : "= Net cost"}{" "}
+                  (2 yrs)
+                </span>
+                <span
+                  className={`font-display text-base tabular-nums ${
+                    rentedIsSurplus ? "text-emerald-600" : "text-ink"
+                  }`}
+                >
+                  {rentedIsSurplus
+                    ? `+ ${formatUSD(rentedShown)}`
+                    : formatUSD(rentedShown)}
+                </span>
+              </div>
             </div>
           ) : null}
         </div>
@@ -527,6 +561,40 @@ function Spec({ label, value }: { label: string; value: string }) {
         {label}
       </p>
       <p className="mt-0.5 text-sm font-medium text-ink">{value}</p>
+    </div>
+  );
+}
+
+function MathRow({
+  sign,
+  label,
+  value,
+  positive,
+}: {
+  sign: "+" | "−";
+  label: string;
+  value: string;
+  positive?: boolean;
+}) {
+  return (
+    <div className="flex items-baseline justify-between gap-2">
+      <span className="flex items-baseline gap-1.5">
+        <span
+          className={`w-2 text-center font-medium ${
+            positive ? "text-emerald-600" : "text-mute"
+          }`}
+        >
+          {sign}
+        </span>
+        <span>{label}</span>
+      </span>
+      <span
+        className={`tabular-nums ${
+          positive ? "text-emerald-600" : "text-ink"
+        }`}
+      >
+        {value}
+      </span>
     </div>
   );
 }
