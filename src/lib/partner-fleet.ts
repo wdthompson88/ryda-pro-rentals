@@ -1,10 +1,12 @@
-// Partner rental fleet — GM LUXE Miami.
-// Listed under our partner agreement: RYDA earns 20% on rentals booked via
-// our referral. Booking flow links out to gmluxe.net with a UTM tag for
-// attribution. Source of truth for inventory + rates: https://www.gmluxe.net/
+// Partner rental fleet — operations partner inventory (currently GM LUXE
+// Miami). Source of truth for inventory + rates: https://www.gmluxe.net/
 //
-// Images: high-tier exotics use real photos from GM LUXE's CDN (Wix). The
-// rest fall back to a solid-color placeholder until real photos are added.
+// Photos: full galleries scraped from each product page and stored in
+// partner-photos.ts. The `hero` and `gallery` fields below are
+// auto-populated from PARTNER_PHOTOS by slug; explicit hero values can
+// still be set per-entry to override the scraped first photo.
+
+import { PARTNER_PHOTOS } from "./partner-photos";
 
 export type PartnerCategory =
   | "Exotic"
@@ -16,7 +18,7 @@ export type PartnerCategory =
 
 export type PartnerVehicle = {
   slug: string;            // url-safe identifier
-  partner: "GM LUXE";      // partner brand
+  partner: "GM LUXE";      // partner brand (kept for ops attribution; not user-facing)
   partnerUrl: string;      // direct link to partner's product page
   year?: number;           // year if known
   make: string;            // "Lamborghini"
@@ -24,10 +26,38 @@ export type PartnerVehicle = {
   category: PartnerCategory;
   dailyRate: number;       // discounted rate currently shown
   regularRate: number;     // sticker rate
-  market: "Miami";         // GM LUXE is Miami only
-  hero?: string;           // image URL (Wix CDN). undefined → use placeholder
+  market: "Miami";         // operations partner is Miami only today
+  hero?: string;           // primary image (auto-resolved if omitted)
+  gallery?: string[];      // additional images (auto-resolved if omitted)
   milesIncluded?: string;  // e.g., "100 mi/day"
 };
+
+/** Resolve the primary photo for a partner vehicle. Prefers the explicit
+ *  `hero` field, falls back to the first scraped photo, then undefined. */
+export function getPartnerHero(v: PartnerVehicle): string | undefined {
+  if (v.hero) return v.hero;
+  const scraped = PARTNER_PHOTOS[v.slug];
+  return scraped && scraped.length > 0 ? scraped[0] : undefined;
+}
+
+/** Resolve the full gallery for a partner vehicle: hero first, then any
+ *  additional scraped photos that don't duplicate the hero. */
+export function getPartnerGallery(v: PartnerVehicle): string[] {
+  const scraped = PARTNER_PHOTOS[v.slug] ?? [];
+  const explicit: string[] = [];
+  if (v.hero) explicit.push(v.hero);
+  if (v.gallery) explicit.push(...v.gallery);
+  // Combine in order: explicit first, then any scraped not already in explicit.
+  const seen = new Set(explicit);
+  const merged = [...explicit];
+  for (const url of scraped) {
+    if (!seen.has(url)) {
+      merged.push(url);
+      seen.add(url);
+    }
+  }
+  return merged;
+}
 
 const GM_LUXE_BASE = "https://www.gmluxe.net";
 

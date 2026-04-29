@@ -16,6 +16,7 @@ import {
 import {
   PARTNER_VEHICLES,
   brandTint,
+  getPartnerHero,
   type PartnerVehicle,
 } from "@/lib/partner-fleet";
 
@@ -71,7 +72,7 @@ function partnerToListing(p: PartnerVehicle): RentalListing {
     dailyRate: p.dailyRate,
     regularRate: p.regularRate,
     market: p.market,
-    hero: p.hero,
+    hero: getPartnerHero(p),
     isCoOwnable: false,
   };
 }

@@ -12,6 +12,7 @@ import {
   PARTNER_VEHICLES,
   brandTint,
   getPartnerVehicleBySlug,
+  getPartnerGallery,
   type PartnerVehicle,
 } from "@/lib/partner-fleet";
 
@@ -106,6 +107,10 @@ export default async function RentDetailPage({
   const endLabel = fmt(end);
 
   const tint = r.kind === "partner" ? brandTint(r.vehicle.make) : undefined;
+  const partnerGallery =
+    r.kind === "partner" ? getPartnerGallery(r.vehicle) : [];
+  const partnerHero = partnerGallery[0];
+  const partnerThumbs = partnerGallery.slice(1);
 
   return (
     <>
@@ -126,7 +131,7 @@ export default async function RentDetailPage({
             <div className="lg:col-span-8">
               <div
                 className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-cream-2"
-                style={tint ? { backgroundColor: tint } : undefined}
+                style={tint && !partnerHero ? { backgroundColor: tint } : undefined}
               >
                 {r.kind === "ryda" ? (
                   <Image
@@ -142,9 +147,9 @@ export default async function RentDetailPage({
                       objectPosition: r.vehicle.imagePosition ?? "center",
                     }}
                   />
-                ) : r.vehicle.hero ? (
+                ) : partnerHero ? (
                   <Image
-                    src={r.vehicle.hero}
+                    src={partnerHero}
                     alt={`${r.vehicle.year ?? ""} ${title}`}
                     fill
                     priority
@@ -173,6 +178,27 @@ export default async function RentDetailPage({
                   </div>
                 )}
               </div>
+
+              {/* Partner gallery — additional photos in a grid below the hero */}
+              {r.kind === "partner" && partnerThumbs.length > 0 ? (
+                <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
+                  {partnerThumbs.map((src, i) => (
+                    <div
+                      key={src}
+                      className="relative aspect-[4/3] overflow-hidden rounded-lg bg-cream-2"
+                    >
+                      <Image
+                        src={src}
+                        alt={`${title} — view ${i + 2}`}
+                        fill
+                        sizes="(min-width: 768px) 20vw, 33vw"
+                        className="object-cover"
+                        unoptimized
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : null}
 
               <div className="mt-8">
                 <p className="text-xs text-mute">
