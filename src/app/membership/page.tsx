@@ -253,29 +253,28 @@ function TierCard({ tier }: { tier: typeof TIERS[number] }) {
   const items = FEATURES.flatMap((g) => g.items.filter(isUpgrade)).slice(0, 7);
   const previousLabel = isBlack ? "Everything in Blue, plus" : isBlue ? "Everything in Core, plus" : null;
 
-  // Tier colorways:
-  //   Core  → cream (light card, ink text — the entry tier)
-  //   Blue  → deep sapphire blue (cream text — the active-member tier)
-  //   Black → ink/near-black (cream text — the concierge tier)
+  // Tier colorways — distinct color per tier so they read as a ladder:
+  //   Core  → RYDA red (the entry tier, brand-loud and inviting)
+  //   Blue  → deep sapphire blue (the active-member tier)
+  //   Black → pure black (the concierge tier, premium)
   const bg = isBlack
-    ? "bg-ink text-cream border-ink"
+    ? "bg-black text-cream border-black"
     : isBlue
       ? "bg-[#1e40af] text-cream border-[#1e40af]"
-      : "bg-cream text-ink";
+      : "bg-red text-cream border-red";
 
-  const sub = isBlack || isBlue ? "text-cream/75" : "text-ink-soft";
+  // All three cards now have light text on dark bg, so sub + accents
+  // are uniform.
+  const sub = "text-cream/75";
+  const accent = "text-cream";
+  const checkColor = "text-cream";
 
-  // Eyebrow ("RYDA Core / Blue / Black") and check icons stay red on
-  // the cream card for brand pop; switch to cream on the dark cards
-  // so they sit cleanly against the deep blue / black backgrounds.
-  const accent = isBlack || isBlue ? "text-cream" : "text-red";
-  const checkColor = isBlack || isBlue ? "text-cream" : "text-red";
-
+  // CTA buttons: cream on every card, hover lifts to white.
   const ctaCls = isBlack
-    ? "bg-cream text-ink hover:bg-red hover:text-cream"
+    ? "bg-cream text-black hover:bg-white"
     : isBlue
-      ? "bg-cream text-[#1e40af] hover:bg-red hover:text-cream"
-      : "bg-ink text-cream hover:bg-red";
+      ? "bg-cream text-[#1e40af] hover:bg-white"
+      : "bg-cream text-red hover:bg-white";
 
   return (
     <div
