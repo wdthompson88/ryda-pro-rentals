@@ -6,7 +6,7 @@ export async function generateStaticParams() {
   return [{ id: "PUR-00428" }];
 }
 
-export const metadata = { title: "Share Purchase — RYDA" };
+export const metadata = { title: "Co-Ownership Buy-In — RYDA" };
 
 const STAGES = [
   { name: "Eligibility", status: "done" },
@@ -36,12 +36,12 @@ export default async function PurchasePage({
             ← My account
           </Link>
 
-          <p className="mt-6 text-xs text-mute">Purchase {id}</p>
+          <p className="mt-6 text-xs text-mute">Buy-in {id}</p>
           <h1 className="mt-2 font-display text-3xl text-ink sm:text-4xl">
             Ferrari 296 GTB
           </h1>
           <p className="mt-1 text-sm text-ink-soft">
-            1 share · {formatUSD(56_667)} + {formatUSD(2_834)} acquisition fee
+            1 seat · {formatUSD(56_667)} + {formatUSD(2_834)} acquisition fee
           </p>
 
           <div className="mt-3 inline-block rounded-full bg-red/10 px-3 py-1 text-xs font-medium text-red">

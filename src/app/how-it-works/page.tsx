@@ -72,7 +72,7 @@ export default function HowItWorksPage() {
             no investment thesis.
           </p>
           <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            <Diff title="Real LLCs" body="Each vehicle is held in a Delaware single-purpose LLC that you and your co-owners manage together. The LLC is in your name on the state records." />
+            <Diff title="Real LLCs" body="Each vehicle is held in a Delaware single-purpose LLC that you and your co-owners manage together. Your membership is recorded in the LLC's signed Operating Agreement and member register." />
             <Diff title="Member governance" body="You and 5–10 co-owners hold authority over material decisions. RYDA is hired as your service provider, not your decision-maker." />
             <Diff title="Curated only" body="We hand-select every car. No marketplace listings. No surprises. Quality is consistent across the entire fleet." />
             <Diff title="Concierge ops" body="Storage, insurance, maintenance, scheduling, white-glove handover — all RYDA via a separate Management Services Agreement. You drive." />

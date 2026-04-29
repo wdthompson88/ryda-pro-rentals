@@ -214,7 +214,7 @@ function ReviewStep({
       <div>
         <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">Step 1 of 5</p>
         <h1 className="mt-3 font-display text-4xl font-light text-ink sm:text-5xl">
-          Review your share
+          Review your seat
         </h1>
         <p className="mt-3 text-base text-ink-soft">
           Confirm what you're buying, what it entitles you to, and what it costs to operate
@@ -224,7 +224,7 @@ function ReviewStep({
 
       <Section title="What you're buying">
         <Bullet label="Vehicle" value={`${vehicle.year} ${vehicle.name}`} />
-        <Bullet label="Position" value={`${shares} of ${vehicle.shares} shares (${sharesPercent}%)`} />
+        <Bullet label="Position" value={`${shares} of ${vehicle.shares} seats (${sharesPercent}%)`} />
         <Bullet label="Legal entity" value={`Single-purpose Delaware LLC`} />
         <Bullet label="Stored in" value={vehicle.market} />
       </Section>
@@ -244,7 +244,7 @@ function ReviewStep({
         <Bullet label="—  Seat buy-in" value={formatUSD(totalPrice)} />
         <Bullet label="—  Closing & paperwork fee" value={formatUSD(closingFee)} />
         <Bullet
-          label={`Ongoing (per share, year)`}
+          label={`Ongoing (per seat, year)`}
           value={`~${formatUSD(annualMgmtFee)}`}
           bold
         />
@@ -510,11 +510,11 @@ function FundStep({
       <div>
         <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">Step 4 of 5</p>
         <h1 className="mt-3 font-display text-4xl font-light text-ink sm:text-5xl">
-          Fund your share
+          Fund your seat
         </h1>
         <p className="mt-3 text-base text-ink-soft">
           Send {formatUSD(grandTotal)} to the LLC's escrow account. Funds are held until your
-          documents and verifications clear, then released to the LLC and your share is recorded.
+          documents and verifications clear, then released to the LLC and your seat is recorded in the LLC's member register.
         </p>
       </div>
 
@@ -560,7 +560,7 @@ function FundStep({
           </dl>
           <p className="mt-5 rounded-xl border border-rule bg-cream-2/40 p-4 text-xs leading-relaxed text-ink-soft">
             <strong className="text-ink">Important:</strong> include your full legal name in the
-            wire memo so we can match the transfer to your subscription. Wires received without a
+            wire memo so we can match the transfer to your buy-in. Wires received without a
             matching memo are returned.
           </p>
         </div>
@@ -667,7 +667,7 @@ function ConfirmStep({
           <Timeline
             n="03"
             title="Documents countersigned"
-            body="The LLC's existing co-owners counter-sign your addition to the Operating Agreement, and RYDA executes the Management Services Agreement on the LLC's behalf."
+            body="The LLC's existing co-owners (acting collectively, per the Operating Agreement) counter-sign your addition. The Management Services Agreement is executed between the LLC's members and RYDA — RYDA does not bind the LLC unilaterally."
           />
           <Timeline
             n="04"

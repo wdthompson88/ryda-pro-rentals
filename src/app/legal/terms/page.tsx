@@ -8,7 +8,7 @@ export default function TermsPage() {
       title="Terms of Service"
       lastUpdated="April 27, 2026"
       intro="These Terms govern your use of the RYDA platform. They are separate from the Co-Owner Agreement and LLC Operating Agreement, which apply only after you purchase a share and which take precedence on the topics they cover."
-      counselNote="This is a placeholder draft. Final language will be drafted and adopted by RYDA's outside counsel before launch."
+      counselNote="This page is in draft and subject to revision before public launch. For questions, contact us at /contact."
       sections={[
         {
           heading: "1. Acceptance of these Terms",
@@ -24,7 +24,7 @@ export default function TermsPage() {
         },
         {
           heading: "4. Membership tiers and fees",
-          body: "RYDA offers two membership tiers (Core, free; Black, $1,500/yr). Tier benefits are described on our Membership page and may change with notice.",
+          body: "RYDA offers three membership tiers (Core, free; Blue, $500/yr; Black, $1,500/yr). Founding-100 members lock $350/$1,000 for life. Tier benefits are described on our Membership page and may change with notice.",
         },
         {
           heading: "5. Rentals",

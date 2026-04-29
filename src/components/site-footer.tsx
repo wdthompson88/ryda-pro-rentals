@@ -8,7 +8,7 @@ export function SiteFooter() {
           <p className="font-display text-2xl text-ink">RYDA</p>
           <p className="mt-3 max-w-sm text-sm text-ink-soft">
             The first US member-managed supercar co-ownership platform.
-            Headquartered in Miami, FL. Delaware-incorporated.
+            Headquartered in Miami, FL. RYDA LLC is formed under Delaware law.
           </p>
         </div>
         <FooterCol

@@ -228,8 +228,8 @@ function ProblemSlide() {
         A 2024 Ferrari 296 GTB costs $320,000 to buy and $80,000+ a year in
         carrying costs. The math for solo ownership has never worked for the
         people who actually want these cars. The alternative — renting at
-        $2,500–$5,000 per day — is hollow, transactional, and builds zero
-        equity.
+        $2,500–$5,000 per day — is hollow, transactional, with no priority
+        access, no community, and no relationship with the vehicle.
       </Lede>
       <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-3">
         <Pain
@@ -245,7 +245,7 @@ function ProblemSlide() {
         <Pain
           stat="$2,500/day"
           label="Rental"
-          body="No equity. No priority. No community."
+          body="No priority. No community. No relationship with the car."
         />
       </div>
     </div>
@@ -325,7 +325,7 @@ function WhyNowSlide() {
         />
         <Why
           title="Member-managed LLC"
-          body="Delaware's member-managed LLC framework lets us run member co-ownership outside SEC investment-product classification. No accreditation gate, no Reg D, no Form D — RYDA is a service provider to LLCs that members own."
+          body="Delaware's member-managed LLC framework supports a structurally different product than fractional investment platforms. Members co-own and manage the LLC; RYDA is hired as a service provider. No accreditation gate, no order book, mass-market access. Final structure subject to securities counsel review."
         />
         <Why
           title="Insurance carriers"

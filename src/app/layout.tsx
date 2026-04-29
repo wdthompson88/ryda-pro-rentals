@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "RYDA — Supercar Co-Ownership",
     description:
-      "Own a curated supercar at a fraction of the cost. Asset-backed, legally structured, concierge-operated. Launching in Miami.",
+      "Co-own a curated supercar with verified members. Member-managed Delaware LLC, concierge-operated. Launching in Miami.",
     siteName: "RYDA",
     type: "website",
   },
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "RYDA — Supercar Co-Ownership",
     description:
-      "Own a curated supercar at a fraction of the cost. Asset-backed, legally structured, concierge-operated. Launching in Miami.",
+      "Co-own a curated supercar with verified members. Member-managed Delaware LLC, concierge-operated. Launching in Miami.",
   },
 };
 

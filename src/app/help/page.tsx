@@ -45,7 +45,7 @@ export default function HelpCenterPage() {
               <input
                 id="help-search"
                 type="search"
-                placeholder="Search bookings, insurance, share transfer, KYC…"
+                placeholder="Search bookings, insurance, seat transfer, KYC…"
                 className="h-full flex-1 bg-transparent text-base text-ink placeholder:text-mute focus:outline-none"
               />
             </div>
