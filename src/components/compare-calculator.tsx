@@ -448,6 +448,12 @@ export function CompareCalculator() {
                   {formatUSD(Math.abs(profit))}
                 </span>
               </div>
+              <p className="mt-3 text-[11px] text-mute">
+                Illustrative usage-economics only. Co-ownership shares
+                are member-managed LLC interests, not securities;
+                modeled outcomes are not guaranteed and not an
+                investment offer.
+              </p>
             </div>
           );
         })()}

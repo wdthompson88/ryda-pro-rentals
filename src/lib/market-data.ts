@@ -58,7 +58,7 @@ export const VEHICLES: Vehicle[] = [
     annualOpCost: 7_080,
     annualSoloCarrying: 46_000,
     daysPerYear: 34,
-    milesPerYear: 4_000,
+    milesPerYear: 3_400,
     effectiveDailyCost: 208,
     cylinders: 6,
     drive: "AWD",
@@ -95,7 +95,7 @@ export const VEHICLES: Vehicle[] = [
     annualOpCost: 14_200,
     annualSoloCarrying: 48_000,
     daysPerYear: 34,
-    milesPerYear: 2_500,
+    milesPerYear: 3_400,
     effectiveDailyCost: 418,
     cylinders: 12,
     drive: "AWD",
@@ -132,7 +132,7 @@ export const VEHICLES: Vehicle[] = [
     annualOpCost: 6_900,
     annualSoloCarrying: 50_000,
     daysPerYear: 34,
-    milesPerYear: 4_000,
+    milesPerYear: 3_400,
     effectiveDailyCost: 203,
     cylinders: 8,
     drive: "RWD",
@@ -170,7 +170,7 @@ export const VEHICLES: Vehicle[] = [
     annualOpCost: 11_840,
     annualSoloCarrying: 58_000,
     daysPerYear: 34,
-    milesPerYear: 3_000,
+    milesPerYear: 3_400,
     effectiveDailyCost: 348,
     cylinders: 12,
     drive: "AWD",
@@ -208,7 +208,7 @@ export const VEHICLES: Vehicle[] = [
     annualOpCost: 10_560,
     annualSoloCarrying: 36_000,
     daysPerYear: 34,
-    milesPerYear: 3_000,
+    milesPerYear: 3_400,
     effectiveDailyCost: 311,
     cylinders: 12,
     drive: "RWD",
@@ -246,7 +246,7 @@ export const VEHICLES: Vehicle[] = [
     annualOpCost: 26_580,
     annualSoloCarrying: 62_000,
     daysPerYear: 34,
-    milesPerYear: 2_000,
+    milesPerYear: 3_400,
     effectiveDailyCost: 782,
     cylinders: 8,
     drive: "AWD",
@@ -305,6 +305,10 @@ export function formatUSD(n: number, opts: { decimals?: number } = {}) {
 export const HOLDING_YEARS = 2;
 export const TARGET_DEPRECIATION_PCT = 5; // % over the full 2-year hold
 
+// Standard shareholder mileage allowance — matches GM LUXE & industry
+// norm. 34 days × 100 mi/day = 3,400 mi/yr per share.
+export const MILES_PER_DAY_PER_SHARE = 100;
+
 export type ShareEconomics = {
   shares: number;
   holdYears: number;
@@ -340,9 +344,14 @@ export type ShareEconomics = {
 export const RENTAL_DEFAULTS = {
   // Total non-service days available in a year
   daysAvailablePerYear: 340,
-  // What % of available days a typical Miami exotic rental fleet actually
-  // books. Conservative middle of the 200–240 day published range.
-  defaultOccupancyPct: 65,
+  // What % of POOLED days actually book. Members get first call on the
+  // calendar, so the pool is the leftover (mostly weekday/off-peak)
+  // days — harder to fill than a fully-controlled rental fleet's
+  // calendar. Industry fleet averages run 200–240 booked days/yr on
+  // 340 available days (~60–70%); the leftover-pool reality is lower.
+  // 50% on a 220-day pool = 110 booked days = ~230 active days/yr
+  // total when combined with member-driven days. Honest middle.
+  defaultOccupancyPct: 50,
   // Owners realistically keep some days for themselves before pooling.
   defaultOwnerUseDaysPerShare: 12,
   // RYDA's cut covers operations, booking, insurance admin, damage

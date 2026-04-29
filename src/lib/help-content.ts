@@ -40,7 +40,7 @@ export const HELP: HelpCategory[] = [
         body: [
           {
             type: "p",
-            text: "RYDA is a US member-managed supercar co-ownership platform. Each vehicle in the fleet is held in a single-purpose Delaware LLC with 10 shares. Each share entitles its holder to ~34 days and ~4,000 miles per year. Members can hold one share or several — usage and cost scale linearly. A 5-share holder gets ~170 days; a 10-share holder is essentially the solo owner with concierge ops.",
+            text: "RYDA is a US member-managed supercar co-ownership platform. Each vehicle in the fleet is held in a single-purpose Delaware LLC with 10 shares. Each share entitles its holder to ~34 days and ~3,400 miles per year (100 mi/day allowance). Members can hold one share or several — usage and cost scale linearly. A 5-share holder gets ~170 days; a 10-share holder is essentially the solo owner with concierge ops.",
           },
           {
             type: "p",
@@ -188,7 +188,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Per-day comparison" },
           {
             type: "p",
-            text: "On a co-owned Ferrari 296 GTB at $34K per share (1 of 10) with ~34 days entitlement, the effective daily cost works out to about $208/day. The rental rate on the same vehicle is $2,500/day. If you'll drive 15+ days a year, co-ownership pays for itself.",
+            text: "On a co-owned Ferrari 296 GTB at $34K per share (1 of 10) with ~34 days entitlement, the effective daily cost works out to about $208/day. The rental rate on the same vehicle is $2,400/day. If you'll drive 15+ days a year, co-ownership pays for itself.",
           },
           {
             type: "callout",
@@ -342,12 +342,12 @@ export const HELP: HelpCategory[] = [
         slug: "entitlement",
         q: "What does a co-ownership share actually entitle me to?",
         summary:
-          "~34 days and up to ~4,000 miles per share per year (members can hold 1–10 shares), voting rights on material LLC decisions, and pro-rata participation in the LLC's assets at dissolution.",
+          "~34 days and up to ~3,400 miles per share per year (100 mi/day allowance; members can hold 1–10 shares), voting rights on material LLC decisions, and pro-rata participation in the LLC's assets at dissolution.",
         body: [
           { type: "h3", text: "Usage" },
           {
             type: "p",
-            text: "Each share entitles you to ~34 days and up to ~4,000 miles of vehicle usage per year, with the exact entitlement set per vehicle when the LLC is formed. Members can hold one share or several — usage scales linearly (5 shares ≈ 170 days; 10 shares ≈ year-round access). Days are booked on a shared calendar with the other co-owners. Fair-use rules cap consecutive days during peak season.",
+            text: "Each share entitles you to ~34 days and up to ~3,400 miles of vehicle usage per year (100 mi/day allowance), with the exact entitlement set per vehicle when the LLC is formed. Members can hold one share or several — usage scales linearly (5 shares ≈ 170 days; 10 shares ≈ year-round access). Days are booked on a shared calendar with the other co-owners. Fair-use rules cap consecutive days during peak season.",
           },
           { type: "h3", text: "Membership" },
           {
@@ -724,11 +724,11 @@ export const HELP: HelpCategory[] = [
         slug: "mileage",
         q: "Mileage limits and overages",
         summary:
-          "Standard share = 4,000 miles/year. Overages billed at $4/mile. Track miles excluded under the track-day rider.",
+          "Standard share = 3,400 miles/year (100 mi/day × 34 days). Overages billed at $4/mile. Track miles excluded under the track-day rider.",
         body: [
           {
             type: "p",
-            text: "Each share gets ~4,000 miles per year on the standard 6-share split. Tracking is automatic from vehicle telemetry — you'll see real-time mileage status in your dashboard.",
+            text: "Each share gets ~3,400 miles per year (100 mi/day × ~34 days). Tracking is automatic from vehicle telemetry — you'll see real-time mileage status in your dashboard.",
           },
           { type: "h3", text: "Why a cap exists" },
           {
@@ -1953,7 +1953,7 @@ export const HELP: HelpCategory[] = [
             type: "ul",
             items: [
               "Trips of 500+ miles or 5+ days: file an extended-trip notification with Concierge 14 days in advance. Insurance documentation, route filing, mid-trip support pre-arranged.",
-              "Mileage budget: long road trips can eat into your annual 4,000-mile allotment. Plan accordingly or pay the $4/mile overage.",
+              "Mileage budget: long road trips can eat into your annual 3,400-mile allotment (100 mi/day × 34 days). Plan accordingly or pay the $4/mile overage.",
               "Cross-state borders: insurance covers all 50 contiguous states. Mexico and Canada need a separate process.",
             ],
           },

@@ -164,8 +164,13 @@ export function CostBreakdown({
 
           <p className="mt-3 text-[11px] text-mute">
             Same {TARGET_DEPRECIATION_PCT}% depreciation assumption applies —
-            our CPO maintenance + curated mileage caps keep the resale
-            story consistent whether you drive or rent it out.
+            our CPO maintenance + 100 mi/day shareholder allowance keep
+            the resale story consistent whether you drive or rent it out.
+          </p>
+          <p className="mt-1 text-[11px] text-mute">
+            Illustrative usage-economics only. Co-ownership shares are
+            member-managed LLC interests, not securities; modeled
+            outcomes are not guaranteed and not an investment offer.
           </p>
         </div>
       ) : null}

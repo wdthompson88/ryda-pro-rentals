@@ -89,7 +89,11 @@ export default async function VehicleMarketPage({
                 />
                 <Fact label="Total shares" value={String(v.shares)} />
                 <Fact label="Days / share" value={`${v.daysPerYear}/yr`} />
-                <Fact label="Miles / share" value={`${v.milesPerYear.toLocaleString()}/yr`} />
+                <Fact
+                  label="Miles / share"
+                  value={`${v.milesPerYear.toLocaleString()}/yr`}
+                  sub="100 mi/day allowance"
+                />
                 <Fact label="Annual contribution" value={`${formatUSD(v.annualOpCost)} per share`} />
               </dl>
             </div>

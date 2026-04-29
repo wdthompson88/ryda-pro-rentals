@@ -49,7 +49,7 @@ export default function HowItWorksPage() {
             <Step n="01" title="Verify" body="Apply, complete KYC. Valid US license, clean recent driving record, 28 or older. No accreditation required." />
             <Step n="02" title="Choose" body="Browse the curated, CPO-only fleet. Every car passes a multi-point Pre-Purchase Inspection before a single share is sold — co-owners are protected from inheriting major powertrain or mechanical issues." />
             <Step n="03" title="Co-own" body="Join the LLC alongside other members. Sign the Operating Agreement and Management Services Agreement. Fund your share via wire or ACH." />
-            <Step n="04" title="Drive" body="Book your time on the RYDA app. Each share unlocks ~34 days and ~4,000 miles per year. Hold multiple shares to scale linearly — 5 ≈ 170 days, all 10 ≈ year-round access." />
+            <Step n="04" title="Drive" body="Book your time on the RYDA app. Each share unlocks ~34 days and ~3,400 miles per year (100 mi/day allowance). Hold multiple shares to scale linearly — 5 ≈ 170 days, all 10 ≈ year-round access." />
             <Step n="05" title="Exit" body="Default: RYDA sells the car at year 2 and distributes proceeds pro-rata (we model a ~5% depreciation assumption). Want out sooner? Transfer your share to another verified member after the 12-month minimum hold. RYDA handles the LLC paperwork. 3% transfer fee on member-to-member transfers." />
           </div>
         </div>
@@ -153,10 +153,13 @@ export default function HowItWorksPage() {
           </h2>
           <p className="mt-4 max-w-3xl text-base leading-relaxed text-ink-soft">
             Miami&apos;s exotic-rental fleets average 200–240 booked days a
-            year. Shareholders can opt their unused entitlement into the
-            RYDA rental pool — we handle the bookings, insurance, condition
-            checks, and damage reserve. Revenue splits 65/35 (you / RYDA),
-            distributed pro-rata across the days each share contributes.
+            year on full-control calendars. RYDA&apos;s pool is the leftover
+            days after members book first — so realistic occupancy on the
+            pool runs lower (~50%). Shareholders can opt their unused
+            entitlement into the rental pool — we handle the bookings,
+            insurance, condition checks, and damage reserve. Revenue splits
+            65/35 (you / RYDA), distributed pro-rata across the days each
+            share contributes.
           </p>
 
           <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -169,10 +172,10 @@ export default function HowItWorksPage() {
               </p>
               <p className="mt-3 text-sm leading-relaxed text-ink-soft">
                 Owners reserve 12 days each (120 total). 220 days enter the
-                pool. At 65% occupancy = ~143 booked days @ $2,400/day =
-                $343,200/yr gross. After RYDA&apos;s 35% management fee,
-                shareholders split ~$223,080. <span className="font-medium text-ink">~$22,300/share/yr</span> —
-                roughly 3× your $7,080/yr carrying cost.
+                pool. At 50% occupancy = ~110 booked days @ $2,400/day =
+                $264,000/yr gross. After RYDA&apos;s 35% management fee,
+                shareholders split ~$171,600. <span className="font-medium text-ink">~$17,160/share/yr</span> —
+                roughly 2.4× your $7,080/yr carrying cost.
               </p>
             </div>
             <div className="rounded-2xl border border-rule bg-surface p-6">
@@ -226,7 +229,7 @@ export default function HowItWorksPage() {
             />
             <Faq
               q="Can I rent out my share days for income?"
-              a="Yes — opting into RYDA's rental pool is voluntary, share-by-share. We list the car on /rent, handle bookings, insurance, screening, and condition checks. Revenue splits 65/35 (you / RYDA) and is distributed pro-rata across the days each share contributes. On a Miami exotic running 200–240 days/yr at fleet average, a single share can earn $15–25K/yr — typically 2–3× your annual carrying cost, and often enough to flip your two-year hold from a net cost into a net surplus. Same 5% depreciation assumption applies in both scenarios — our CPO maintenance + curated mileage caps keep the resale story consistent."
+              a="Yes — opting into RYDA's rental pool is voluntary, share-by-share. We list the car on /rent, handle bookings, insurance, screening, and condition checks. Revenue splits 65/35 (you / RYDA) and is distributed pro-rata across the days each share contributes. The pool is whatever days members don't reserve, so realistic pool occupancy is ~50% (full-control fleets clock 60–70%). On that basis, a single Ferrari 296 share can earn ~$15–18K/yr — typically 2–2.5× your annual carrying cost, and often enough to flip your two-year hold from a net cost into a net positive return. Same 5% depreciation assumption applies in both scenarios — our 100 mi/day shareholder allowance, CPO maintenance, and curated mileage caps keep the resale story consistent."
             />
             <Faq
               q="What if a co-owner stops paying?"
