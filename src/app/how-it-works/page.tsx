@@ -39,15 +39,15 @@ export default function HowItWorksPage() {
             Own a piece of the world's best cars.
           </h2>
           <p className="mt-4 max-w-2xl text-lg text-ink-soft">
-            Effective ~$236/day on a co-owned Ferrari. Compare with $2,500+/day
-            to rent or $80,000+/yr to own outright.
+            Effective ~$182/day on a co-owned Ferrari. Compare with $2,500+/day
+            to rent or $40–80K/yr to own outright.
           </p>
 
           <div className="mt-12 grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-5">
             <Step n="01" title="Verify" body="Apply, complete KYC. Valid US license, clean recent driving record, 28 or older. No accreditation required." />
             <Step n="02" title="Choose" body="Browse the fleet. Each vehicle is a single-purpose Delaware LLC member-managed by 5–10 co-owners." />
             <Step n="03" title="Co-own" body="Join the LLC alongside other members. Sign the Operating Agreement and Management Services Agreement. Fund your seat via wire or ACH." />
-            <Step n="04" title="Drive" body="Book your time on the RYDA app. Up to ~50 days and ~4,000 miles per seat, per year — exact entitlement depends on the vehicle." />
+            <Step n="04" title="Drive" body="Book your time on the RYDA app. Up to ~65 days and ~4,000 miles per seat, per year — exact entitlement depends on the vehicle." />
             <Step n="05" title="Transfer" body="Transfer your seat to another verified member after the 12-month minimum hold. RYDA handles the LLC paperwork. 3% transfer fee." />
           </div>
         </div>
@@ -79,8 +79,8 @@ export default function HowItWorksPage() {
                 <Tr label="Annual depreciation reserve" solo="$22,000" ryda="$3,667" />
                 <Tr label="RYDA service fee" solo="—" ryda="$4,134" />
                 <Tr label="Total Year 1" solo="$386,000" ryda="$68,467" emphasis />
-                <Tr label="Days driven" solo="365 (in theory)" ryda="~50 / seat" />
-                <Tr label="Effective $/day" solo="$1,058" ryda="$236" emphasis />
+                <Tr label="Days driven" solo="365 (in theory)" ryda="~65 / seat" />
+                <Tr label="Effective $/day" solo="$1,058" ryda="$182" emphasis />
               </tbody>
             </table>
           </div>

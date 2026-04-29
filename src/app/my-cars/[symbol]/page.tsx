@@ -134,7 +134,7 @@ export default async function MyVehiclePage({
       <Section id="costs" title="Costs" alt>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <BigStat label="Annual cost / seat" value={formatUSD(v.annualOpCost)} sub="All-in" />
-          <BigStat label="Effective $/day" value={formatUSD(v.effectiveDailyCost)} sub="50 days/yr usage" />
+          <BigStat label="Effective $/day" value={formatUSD(v.effectiveDailyCost)} sub={`${v.daysPerYear} days/yr usage`} />
           <BigStat label="Maintenance reserve" value={formatUSD(8_400)} sub="LLC balance" />
         </div>
         <div className="mt-10">

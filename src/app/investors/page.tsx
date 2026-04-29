@@ -106,7 +106,7 @@ export default function InvestorsPage() {
             <Step n="01" title="Source" body="RYDA sources curated supercars on behalf of each vehicle LLC in target markets — Ferrari, Lamborghini, McLaren, Aston Martin, Rolls-Royce." />
             <Step n="02" title="Structure" body="Each vehicle is held in a single-purpose Delaware LLC. 5–10 verified members co-own and manage the LLC together." />
             <Step n="03" title="Operate" body="RYDA contracts with each LLC as a service provider — storage, insurance, maintenance, scheduling, concierge." />
-            <Step n="04" title="Use" body="Members book usage on the RYDA app — typically 50 days + 4,000 miles per seat per year." />
+            <Step n="04" title="Use" body="Members book usage on the RYDA app — up to ~65 days and ~4,000 miles per seat per year, depending on the vehicle." />
             <Step n="05" title="Transfer" body="After 12 months, members transfer their seat to another verified member. RYDA handles the LLC paperwork. 3% transfer fee." />
           </div>
         </div>

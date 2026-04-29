@@ -25,7 +25,7 @@ export default function Home() {
             <p className="mt-8 max-w-xl text-lg leading-relaxed text-ink-soft">
               Co-own a real Ferrari, Lamborghini, or McLaren together with
               5–10 other verified members in a Delaware LLC. Drive it up to
-              ~50 days a year. Transfer your seat when you're done.
+              ~65 days a year. Transfer your seat when you're done.
             </p>
             <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
               <Link
@@ -85,34 +85,33 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Why RYDA — consolidated */}
-      <section className="border-b border-rule bg-cream-2">
+      {/* Why RYDA — consolidated into 5-step block */}
+      <section id="how-it-works" className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-28">
-          <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
-            <div className="lg:col-span-5">
-              <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-                Why RYDA
-              </p>
-              <h2 className="mt-4 font-display text-4xl font-light leading-tight text-ink sm:text-5xl">
-                Owned by you. Operated by us.
-              </h2>
-              <p className="mt-6 text-lg leading-relaxed text-ink-soft">
-                Renting builds nothing. Owning outright costs $80K a year
-                before you turn the key. RYDA is the third option.
-              </p>
-              <Link
-                href="/how-it-works"
-                className="mt-8 inline-flex h-11 items-center justify-center rounded-full border border-ink/15 px-6 text-sm font-medium text-ink hover:border-ink"
-              >
-                How it works →
-              </Link>
-            </div>
-            <div className="grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-rule bg-rule sm:grid-cols-2 lg:col-span-7">
-              <Pillar title="Real ownership" body="Each car is held in a Delaware LLC that you and 5–10 co-owners manage together. You vote on material decisions." />
-              <Pillar title="All costs included" body="Insurance, storage, maintenance, and reserves are bundled into one annual management fee paid to the LLC." />
-              <Pillar title="Curated fleet" body="Every vehicle is hand-selected and prepped by RYDA. No marketplace listings, no surprises." />
-              <Pillar title="Transfer when you're done" body="After 12 months, transfer your seat to another verified member at the price you negotiate." />
-            </div>
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+            Why RYDA
+          </p>
+          <h2 className="mt-4 max-w-3xl font-display text-4xl font-light leading-tight text-ink sm:text-5xl">
+            Owned by you. Operated by us.
+          </h2>
+          <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink-soft">
+            Renting builds nothing. Owning an exotic car outright costs
+            ~$40–80K a year before you turn the key. RYDA is the third option.
+          </p>
+          <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-3 lg:grid-cols-5">
+            <Step n="01" title="Verify" body="Apply, complete identity verification, and confirm RYDA membership requirements." />
+            <Step n="02" title="Choose" body="Browse the curated fleet. Rent any vehicle by the day, or claim a co-ownership seat." />
+            <Step n="03" title="Co-own" body="5–10 members form a Delaware LLC together to hold the vehicle. You sign the operating agreement and fund your seat." />
+            <Step n="04" title="Drive" body="Book your time on the RYDA app. Up to ~65 days and ~4,000 miles per seat, per year — exact entitlement depends on the vehicle." />
+            <Step n="05" title="Transfer" body="After 12 months, transfer your seat to another verified member. RYDA handles the LLC paperwork. 3% transfer fee." />
+          </div>
+          <div className="mt-16 flex justify-center">
+            <Link
+              href="/how-it-works"
+              className="inline-flex h-12 items-center justify-center rounded-full border border-ink/15 px-7 text-sm font-medium text-ink hover:border-ink"
+            >
+              Learn more →
+            </Link>
           </div>
         </div>
       </section>
@@ -143,10 +142,11 @@ export default function Home() {
   );
 }
 
-function Pillar({ title, body }: { title: string; body: string }) {
+function Step({ n, title, body }: { n: string; title: string; body: string }) {
   return (
-    <div className="bg-surface p-8">
-      <p className="font-display text-xl text-ink">{title}</p>
+    <div>
+      <p className="font-display text-sm text-red">{n}</p>
+      <p className="mt-3 font-display text-xl text-ink">{title}</p>
       <p className="mt-3 text-sm leading-relaxed text-ink-soft">{body}</p>
     </div>
   );

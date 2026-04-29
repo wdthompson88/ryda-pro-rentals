@@ -19,7 +19,7 @@ const SECTIONS: { title: string; questions: Q[] }[] = [
       },
       {
         q: "How many co-ownership seats per vehicle?",
-        a: "Typically 5 to 10, depending on the car. Each seat entitles you to roughly 50 days and 4,000 miles of usage per year on a 6-seat split.",
+        a: "Typically 5 to 10, depending on the car. Each seat entitles you to up to ~65 days and ~4,000 miles of usage per year, depending on the vehicle.",
       },
       {
         q: "Are RYDA co-ownership stakes securities?",

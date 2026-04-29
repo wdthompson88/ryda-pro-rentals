@@ -188,7 +188,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Per-day comparison" },
           {
             type: "p",
-            text: "On a co-owned Ferrari 296 GTB at $56K per seat with 50 days entitlement, the effective daily cost works out to about $236/day. The rental rate on the same vehicle is $2,500/day. If you'll drive 15+ days a year, co-ownership pays for itself.",
+            text: "On a co-owned Ferrari 296 GTB at $56K per seat with up to 65 days entitlement, the effective daily cost works out to about $182/day. The rental rate on the same vehicle is $2,500/day. If you'll drive 15+ days a year, co-ownership pays for itself.",
           },
           {
             type: "callout",
@@ -342,12 +342,12 @@ export const HELP: HelpCategory[] = [
         slug: "entitlement",
         q: "What does a co-ownership seat actually entitle me to?",
         summary:
-          "On a 6-seat split: ~50 days and ~4,000 miles per year of vehicle use, voting rights on material LLC decisions, and pro-rata participation in the LLC's assets at dissolution.",
+          "Up to ~65 days and ~4,000 miles per year of vehicle use (depending on the vehicle), voting rights on material LLC decisions, and pro-rata participation in the LLC's assets at dissolution.",
         body: [
           { type: "h3", text: "Usage" },
           {
             type: "p",
-            text: "On the standard 6-seat split, each seat entitles you to roughly 50 days and 4,000 miles of vehicle usage per year. Days are booked on a shared calendar with the other co-owners. Fair-use rules cap consecutive days during peak season.",
+            text: "Each seat entitles you to up to ~65 days and ~4,000 miles of vehicle usage per year, with the exact entitlement set per vehicle when the LLC is formed. Days are booked on a shared calendar with the other co-owners. Fair-use rules cap consecutive days during peak season.",
           },
           { type: "h3", text: "Membership" },
           {
@@ -574,7 +574,7 @@ export const HELP: HelpCategory[] = [
             type: "ul",
             items: [
               "Protects existing members from dilution.",
-              "Provides predictable usage entitlement (50 days = 365 ÷ 6 with margin for service and downtime).",
+              "Provides predictable usage entitlement (e.g. 5 seats × 65 days = 325 days/yr, with ~40 days reserved for service and downtime).",
               "Keeps the co-owner group small enough to coordinate.",
               "Keeps the LLC's member-managed governance simple and stable.",
             ],
