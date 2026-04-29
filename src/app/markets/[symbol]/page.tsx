@@ -201,7 +201,7 @@ function Stat({
   tone?: "up" | "down" | "neutral";
 }) {
   const subColor =
-    tone === "up" ? "text-[#00C805]" : tone === "down" ? "text-[#DC2626]" : "text-mute";
+    tone === "up" ? "text-red" : tone === "down" ? "text-red" : "text-mute";
   return (
     <div className="rounded-xl border border-rule bg-surface p-5">
       <p className="text-xs text-mute">{label}</p>

@@ -318,7 +318,7 @@ function Confirmed({
 }) {
   return (
     <div className="text-center">
-      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#00C805]/10 text-3xl text-[#00C805]">
+      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-cream-2 text-3xl text-red">
         ✓
       </div>
       <h2 className="mt-6 font-display text-3xl text-ink">Booking confirmed.</h2>

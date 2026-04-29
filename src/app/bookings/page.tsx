@@ -5,9 +5,9 @@ import { DemoBanner } from "@/components/demo-banner";
 export const metadata = { title: "Bookings — RYDA" };
 
 const UPCOMING = [
-  { vehicle: "Ferrari 296 GTB", dates: "Apr 28 – May 1", duration: "3 days", status: "Confirmed", handover: "White-glove delivery", miles: "200 / day" },
   { vehicle: "McLaren 750S Spider", dates: "May 12 – May 14", duration: "2 days", status: "Confirmed", handover: "Self-pickup · Miami facility", miles: "200 / day" },
   { vehicle: "Ferrari 296 GTB", dates: "Jun 5 – Jun 8", duration: "3 days", status: "Pending Proposal Coordinator", handover: "White-glove delivery", miles: "Unlimited (track day rider)" },
+  { vehicle: "Ferrari 296 GTB", dates: "Jul 18 – Jul 21", duration: "3 days", status: "Confirmed", handover: "White-glove delivery", miles: "200 / day" },
 ];
 
 const PAST = [
@@ -41,12 +41,12 @@ export default function BookingsPage() {
           <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
             <Entitlement
               vehicle="Ferrari 296 GTB"
-              days={{ used: 8, total: 50 }}
+              days={{ used: 8, total: 34 }}
               miles={{ used: 658, total: 4_000 }}
             />
             <Entitlement
               vehicle="McLaren 750S Spider"
-              days={{ used: 6, total: 50 }}
+              days={{ used: 6, total: 34 }}
               miles={{ used: 432, total: 4_000 }}
             />
           </div>
@@ -134,7 +134,7 @@ export default function BookingsPage() {
                   <span
                     className={`rounded-full px-3 py-1 text-xs font-medium ${
                       b.status === "Confirmed"
-                        ? "bg-[#00C805]/10 text-[#00C805]"
+                        ? "bg-ink/5 text-ink"
                         : "bg-[#C03030]/10 text-red"
                     }`}
                   >
@@ -221,7 +221,6 @@ function Bar({
   pct: number;
   suffix: string;
 }) {
-  const color = pct < 50 ? "#00C805" : pct < 80 ? "#C9A66B" : "#C03030";
   return (
     <div className="mt-4">
       <div className="flex items-baseline justify-between text-xs">
@@ -231,7 +230,7 @@ function Bar({
         </span>
       </div>
       <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-rule">
-        <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: color }} />
+        <div className="h-full rounded-full bg-ink" style={{ width: `${pct}%` }} />
       </div>
     </div>
   );

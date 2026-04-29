@@ -30,9 +30,9 @@ export default function AccountPage() {
         <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             <Stat label="Cars co-owned" value="2" sub="Ferrari 296 + McLaren 750S" />
-            <Stat label="Days used this year" value="14" sub="Of 100 entitled" />
-            <Stat label="Days remaining" value="86" sub="Across all shares" />
-            <Stat label="Upcoming bookings" value="3" sub="Next: Apr 28" />
+            <Stat label="Days used this year" value="14" sub="Of 68 entitled" />
+            <Stat label="Days remaining" value="54" sub="Across all shares" />
+            <Stat label="Upcoming bookings" value="3" sub="Next: May 12" />
           </div>
         </div>
       </section>
@@ -43,7 +43,7 @@ export default function AccountPage() {
           <h2 className="font-display text-2xl text-ink">Your account</h2>
           <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <Card title="My Cars" desc="2 vehicles · 1 share each" href="/portfolio" />
-            <Card title="Bookings" desc="3 upcoming · next Apr 28" href="/bookings" />
+            <Card title="Bookings" desc="3 upcoming · next May 12" href="/bookings" />
             <Card title="Messages" desc="2 unread" href="/messages" />
             <Card title="Membership" desc="RYDA Blue · renews Apr 27, 2027" href="/membership" />
             <Card title="Payment methods" desc="Visa ••• 4729 · Bank ACH" />
@@ -60,11 +60,11 @@ export default function AccountPage() {
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10">
           <h2 className="font-display text-2xl text-ink">Recent activity</h2>
           <ul className="mt-6 divide-y divide-rule rounded-xl border border-rule bg-surface">
-            <Activity label="Booking confirmed" detail="Ferrari 296 GTB · Apr 28 – May 1" date="2 hours ago" />
+            <Activity label="Booking confirmed" detail="Ferrari 296 GTB · May 12 – May 14" date="2 hours ago" />
             <Activity label="Inspection report posted" detail="McLaren 750S Spider · 2,140 mi" date="Yesterday" />
             <Activity label="Quarterly mgmt fee paid" detail="$1,700 — Ferrari 296 LLC" date="3 days ago" />
             <Activity label="Welcome to RYDA Blue" detail="Annual membership active" date="2 weeks ago" />
-            <Activity label="Co-ownership share confirmed" detail="McLaren 750S — 1 of 6 shares" date="3 weeks ago" />
+            <Activity label="Co-ownership share confirmed" detail="McLaren 750S — 1 of 10 shares" date="3 weeks ago" />
           </ul>
         </div>
       </section>
@@ -105,7 +105,7 @@ function Stat({
   tone?: "up" | "down";
 }) {
   const subColor =
-    tone === "up" ? "text-[#00C805]" : tone === "down" ? "text-[#DC2626]" : "text-mute";
+    tone === "up" ? "text-red" : tone === "down" ? "text-red" : "text-mute";
   return (
     <div className="rounded-xl border border-rule bg-surface p-5">
       <p className="text-xs uppercase tracking-wider text-mute">{label}</p>

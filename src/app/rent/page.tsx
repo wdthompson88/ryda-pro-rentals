@@ -31,50 +31,12 @@ export default function RentPage() {
             white-glove delivered. Same fleet, same operations team — just
             paid by the day instead of by the share.
           </p>
-
-          {/* Quick search */}
-          <div className="mt-10 flex flex-col gap-3 rounded-2xl border border-rule bg-surface p-4 shadow-sm sm:flex-row sm:items-end">
-            <Field label="Where" value="Miami" />
-            <Field label="From" value="Apr 28, 2026" />
-            <Field label="Until" value="May 1, 2026" />
-            <Link
-              href="#available"
-              className="inline-flex h-12 items-center justify-center rounded-full bg-red px-7 text-sm font-medium text-cream transition-colors hover:bg-red-deep"
-            >
-              See available
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Filter chips */}
-      <section className="border-b border-rule bg-cream-2">
-        <div className="mx-auto max-w-7xl px-6 py-6 sm:px-10">
-          <div className="flex flex-wrap gap-2">
-            {[
-              "All",
-              "Ferrari",
-              "Lamborghini",
-              "McLaren",
-              "Rolls-Royce",
-              "Convertibles",
-              "SUVs",
-              "Hypercars",
-              "Track-ready",
-              "Delivered",
-            ].map((c, i) => (
-              <button
-                key={c}
-                className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-                  i === 0
-                    ? "bg-ink text-cream"
-                    : "bg-surface text-ink-soft hover:text-ink"
-                }`}
-              >
-                {c}
-              </button>
-            ))}
-          </div>
+          <Link
+            href="#available"
+            className="mt-10 inline-flex h-12 items-center justify-center rounded-full bg-red px-7 text-sm font-medium text-cream transition-colors hover:bg-red-deep"
+          >
+            See what's available →
+          </Link>
         </div>
       </section>
 
@@ -146,10 +108,10 @@ export default function RentPage() {
       <section className="border-b border-rule bg-ink py-20 text-cream">
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            The real product
+            Beyond the rental
           </p>
           <h2 className="mt-4 font-display text-3xl sm:text-4xl">
-            Renting is the test drive. Ownership is the point.
+            Renting is your test drive. Ownership is the relationship.
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
             Every RYDA vehicle is also available as a co-ownership share.
@@ -166,15 +128,6 @@ export default function RentPage() {
         </div>
       </section>
     </>
-  );
-}
-
-function Field({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex flex-1 flex-col rounded-xl border border-rule px-4 py-3 sm:border-0 sm:border-r sm:last-of-type:border-r-0">
-      <span className="text-xs uppercase tracking-wider text-mute">{label}</span>
-      <span className="mt-1 font-medium text-ink">{value}</span>
-    </div>
   );
 }
 

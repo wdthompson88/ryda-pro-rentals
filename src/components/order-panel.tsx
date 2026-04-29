@@ -8,20 +8,20 @@ type Props = { vehicle: Vehicle };
 
 export function OrderPanel({ vehicle }: Props) {
   const router = useRouter();
-  const [shares, setSeats] = useState("1");
+  const [shares, setShares] = useState("1");
 
-  const numericSeats = Math.max(1, Math.min(vehicle.sharesAvailable || 1, parseInt(shares || "1", 10) || 1));
-  const buyInCost = numericSeats * vehicle.pricePerShare;
-  const annualContribution = numericSeats * vehicle.annualOpCost;
-  const daysPerYear = numericSeats * vehicle.daysPerYear;
-  const milesPerYear = numericSeats * vehicle.milesPerYear;
-  const sharesPercent = ((numericSeats / vehicle.shares) * 100).toFixed(1);
+  const numericShares = Math.max(1, Math.min(vehicle.sharesAvailable || 1, parseInt(shares || "1", 10) || 1));
+  const buyInCost = numericShares * vehicle.pricePerShare;
+  const annualContribution = numericShares * vehicle.annualOpCost;
+  const daysPerYear = numericShares * vehicle.daysPerYear;
+  const milesPerYear = numericShares * vehicle.milesPerYear;
+  const sharesPercent = ((numericShares / vehicle.shares) * 100).toFixed(1);
 
   const sold = vehicle.sharesAvailable === 0;
 
   function handleClaim() {
     if (sold) return;
-    router.push(`/markets/${vehicle.symbol.toLowerCase()}/buy?shares=${numericSeats}`);
+    router.push(`/markets/${vehicle.symbol.toLowerCase()}/buy?shares=${numericShares}`);
   }
 
   return (
@@ -42,7 +42,7 @@ export function OrderPanel({ vehicle }: Props) {
             min={1}
             max={vehicle.sharesAvailable || 1}
             value={shares}
-            onChange={(e) => setSeats(e.target.value)}
+            onChange={(e) => setShares(e.target.value)}
             className="w-full bg-transparent text-right font-medium text-ink placeholder:text-mute focus:outline-none"
           />
         </Field>
@@ -83,7 +83,7 @@ export function OrderPanel({ vehicle }: Props) {
         disabled={sold}
         className="mt-5 w-full rounded-full bg-ink px-7 py-3 text-sm font-semibold text-cream transition-colors hover:bg-red disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {sold ? "All shares taken" : `Reserve ${numericSeats} share${numericSeats > 1 ? "s" : ""} →`}
+        {sold ? "All shares taken" : `Reserve ${numericShares} share${numericShares > 1 ? "s" : ""} →`}
       </button>
 
       <p className="mt-4 text-center text-xs text-mute">

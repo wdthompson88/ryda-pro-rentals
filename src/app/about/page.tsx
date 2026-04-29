@@ -123,24 +123,16 @@ export default function AboutPage() {
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-24">
           <h2 className="font-display text-3xl text-ink sm:text-4xl">Headquarters</h2>
-          <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-2">
-            <dl className="space-y-5 text-sm">
-              <Fact label="Legal Entity" value="RYDA LLC" />
-              <Fact label="State of Incorporation" value="Delaware" />
-              <Fact label="Headquarters" value="Miami, FL (address TBD)" />
-              <Fact label="Operating Markets" value="Miami, FL (2026) · Los Angeles, CA (2027) · New York, NY (2027)" />
-              <Fact label="General" value="hello@ryda.com" />
-              <Fact label="Press" value="press@ryda.com" />
-              <Fact label="VC investors (in RYDA Inc.)" value="See /investors" />
-              <Fact label="Partnerships" value="partners@ryda.com" />
-            </dl>
-            <div className="aspect-[16/10] w-full overflow-hidden rounded-2xl border border-rule bg-ink/5">
-              {/* Placeholder for HQ map */}
-              <div className="flex h-full items-center justify-center text-sm text-mute">
-                Map of HQ — embed once address is finalized
-              </div>
-            </div>
-          </div>
+          <dl className="mt-8 grid max-w-2xl grid-cols-1 gap-5 text-sm sm:grid-cols-2">
+            <Fact label="Legal entity" value="RYDA LLC" />
+            <Fact label="Formed under" value="Delaware law" />
+            <Fact label="Headquarters" value="Miami, FL — by appointment" />
+            <Fact label="Operating markets" value="Miami (2026) · LA (2027) · NY (2027)" />
+            <Fact label="General" value="hello@ryda.com" />
+            <Fact label="Press" value="press@ryda.com" />
+            <Fact label="Partnerships" value="partners@ryda.com" />
+            <Fact label="Investors (RYDA Inc.)" value="See /investors" />
+          </dl>
         </div>
       </section>
 
@@ -154,7 +146,7 @@ export default function AboutPage() {
             We're vetting the first 100 founding members for the Miami launch.
           </p>
           <Link
-            href="/#waitlist"
+            href="/founding-members"
             className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-red hover:text-cream"
           >
             Apply now →

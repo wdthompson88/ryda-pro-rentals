@@ -71,7 +71,7 @@ export default async function PurchasePage({
                 <span
                   className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-medium ${
                     s.status === "done"
-                      ? "bg-[#00C805] text-cream"
+                      ? "bg-ink text-cream"
                       : s.status === "current"
                       ? "border-2 border-red bg-cream text-red"
                       : "border border-rule bg-cream text-mute"

@@ -178,7 +178,7 @@ function Option({
 function Yes({ children }: { children: React.ReactNode }) {
   return (
     <li className="flex items-start gap-3 leading-relaxed text-ink-soft">
-      <span className="mt-1 text-[#00C805]">✓</span>
+      <span className="mt-1 text-red">✓</span>
       <span>{children}</span>
     </li>
   );

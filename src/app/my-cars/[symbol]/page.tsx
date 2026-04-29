@@ -65,10 +65,10 @@ export default async function MyVehiclePage({
                 </span>
               )}
               <div className="mt-6 grid grid-cols-2 gap-4 text-sm">
-                <Stat label="Your shares" value="1 of 6" />
+                <Stat label="Your shares" value={`1 of ${v.shares}`} />
                 <Stat label="Status" value="In storage" />
-                <Stat label="Days used (yr)" value="8 / 50" />
-                <Stat label="Miles used (yr)" value="658 / 4,000" />
+                <Stat label="Days used (yr)" value={`8 / ${v.daysPerYear}`} />
+                <Stat label="Miles used (yr)" value={`658 / ${v.milesPerYear.toLocaleString()}`} />
               </div>
               <div className="mt-6 flex flex-col gap-2">
                 <Link
@@ -443,7 +443,7 @@ function Pmt({
         <span
           className={`rounded-full px-3 py-1 text-xs font-medium ${
             status === "Paid"
-              ? "bg-[#00C805]/10 text-[#00C805]"
+              ? "bg-ink/5 text-ink"
               : "bg-red/10 text-red"
           }`}
         >

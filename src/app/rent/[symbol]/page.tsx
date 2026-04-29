@@ -9,6 +9,10 @@ export async function generateStaticParams() {
   }));
 }
 
+// Revalidate hourly so the booking-card default dates ("2 weeks out") stay
+// fresh — never shows past dates after a few days in the wild.
+export const revalidate = 3600;
+
 export async function generateMetadata({
   params,
 }: {
@@ -38,6 +42,21 @@ export default async function RentDetailPage({
     { days: 14, total: v.rentalDailyRate * 14 * 0.92, save: 8 },
     { days: 30, total: v.rentalDailyRate * 30 * 0.88, save: 12 },
   ];
+
+  // Default dates: 2 weeks out, 3-day window. Dynamic so the page never
+  // shows past dates.
+  const fmt = (d: Date) =>
+    d.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }) + " · 10:00 AM";
+  const start = new Date();
+  start.setDate(start.getDate() + 14);
+  const end = new Date(start);
+  end.setDate(end.getDate() + 3);
+  const startLabel = fmt(start);
+  const endLabel = fmt(end);
 
   return (
     <>
@@ -100,8 +119,8 @@ export default async function RentDetailPage({
                 </p>
 
                 <div className="mt-5 space-y-3">
-                  <Field label="Start" value="Apr 28, 2026 · 10:00 AM" />
-                  <Field label="End" value="May 1, 2026 · 10:00 AM" />
+                  <Field label="Start" value={startLabel} />
+                  <Field label="End" value={endLabel} />
                   <Field label="Duration" value="3 days" />
                   <Field label="Handover" value="White-glove delivery" />
                 </div>
@@ -148,7 +167,7 @@ export default async function RentDetailPage({
                   {formatUSD(r.total)}
                 </p>
                 {r.save > 0 && (
-                  <p className="mt-1 text-xs font-medium text-[#00C805]">
+                  <p className="mt-1 text-xs font-medium text-red">
                     Save {r.save}%
                   </p>
                 )}

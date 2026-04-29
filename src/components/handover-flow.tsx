@@ -13,9 +13,9 @@ const PHOTO_SHOTS = [
   "Front straight-on",
   "Rear straight-on",
   "Interior dashboard",
-  "Interior driver share",
-  "Interior passenger share",
-  "Interior rear shares",
+  "Interior driver seat",
+  "Interior passenger seat",
+  "Interior rear seats",
   "Trunk / cargo",
   "Odometer (clear reading)",
   "Fuel / charge gauge",
@@ -104,13 +104,13 @@ export function HandoverFlow({
                     }
                     className={`flex items-center gap-3 rounded-xl border p-3 text-left transition-colors ${
                       done
-                        ? "border-[#00C805] bg-[#00C805]/5"
+                        ? "border-red bg-red/5"
                         : "border-rule bg-cream hover:border-ink-soft"
                     }`}
                   >
                     <span
                       className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-medium ${
-                        done ? "bg-[#00C805] text-cream" : "border border-rule text-mute"
+                        done ? "bg-red text-cream" : "border border-rule text-mute"
                       }`}
                     >
                       {done ? "✓" : i + 1}
@@ -153,7 +153,7 @@ export function HandoverFlow({
                 onClick={() => setConditionGood(true)}
                 className={`rounded-xl border p-5 text-left transition-colors ${
                   conditionGood === true
-                    ? "border-[#00C805] bg-[#00C805]/5"
+                    ? "border-red bg-red/5"
                     : "border-rule bg-cream hover:border-ink-soft"
                 }`}
               >
@@ -260,7 +260,7 @@ export function HandoverFlow({
         {/* Done */}
         {stage === "done" && (
           <div className="text-center">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#00C805]/10 text-3xl text-[#00C805]">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-cream-2 text-3xl text-ink">
               ✓
             </div>
             <h2 className="mt-6 font-display text-3xl text-ink">

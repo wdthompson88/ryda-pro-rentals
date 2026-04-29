@@ -128,7 +128,8 @@ export default function MembershipPage() {
           </p>
 
           <div className="mt-12 overflow-hidden rounded-2xl border border-rule bg-surface">
-            <table className="w-full text-sm">
+            <div className="overflow-x-auto">
+            <table className="w-full min-w-[640px] text-sm">
               <thead className="border-b border-rule bg-cream-2">
                 <tr>
                   <th className="px-6 py-5 text-left">
@@ -166,6 +167,7 @@ export default function MembershipPage() {
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         </div>
       </section>
@@ -174,20 +176,20 @@ export default function MembershipPage() {
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10">
           <h2 className="font-display text-3xl text-ink sm:text-4xl">
-            When does each tier pay for itself?
+            What each tier includes.
           </h2>
           <p className="mt-4 text-base text-ink-soft">
-            The honest math:
+            Membership is structured around access and service, not coupons.
           </p>
 
           <div className="mt-8 space-y-4">
             <Math
               tier="Blue · $500/yr"
-              detail="$200 buy-in credit + 1 free delivery ($300 value) + member-to-member transfer access = breaks even on day 1 if you claim a share or use 1 delivery."
+              detail="Active membership: a $200 buy-in credit, one complimentary white-glove delivery, member-to-member share transfers, member directory, and priority access to new vehicles."
             />
             <Math
               tier="Black · $1,500/yr"
-              detail="$500 share credit + 3 deliveries ($900) + 3 concierge hours ($450) + flagship events (priceless) + waived first acquisition fee (~$2,000) = pays for itself for any active co-owner."
+              detail="Concierge-grade everything: a $500 buy-in credit, three deliveries, three concierge hours, waived first acquisition fee, flagship event programming (Pebble, Miami GP, Art Basel), and a dedicated account contact."
             />
           </div>
         </div>
@@ -344,7 +346,7 @@ function Cell({ value, accent }: { value: CellValue; accent?: boolean }) {
   const bg = accent ? "bg-red/5" : "";
   let content: React.ReactNode;
   if (value === true) {
-    content = <span className="text-[#00C805]">✓</span>;
+    content = <span className="text-red">✓</span>;
   } else if (value === false) {
     content = <span className="text-mute">—</span>;
   } else {

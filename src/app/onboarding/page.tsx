@@ -319,7 +319,7 @@ function Select({ label, options }: { label: string; options: string[] }) {
 function Bullet({ children, ok }: { children: React.ReactNode; ok?: boolean }) {
   return (
     <li className="flex items-start gap-3 text-sm text-ink-soft">
-      <span className={`mt-0.5 ${ok ? "text-[#00C805]" : "text-red"}`}>
+      <span className={`mt-0.5 ${ok ? "text-red" : "text-red"}`}>
         {ok ? "✓" : "·"}
       </span>
       <span>{children}</span>

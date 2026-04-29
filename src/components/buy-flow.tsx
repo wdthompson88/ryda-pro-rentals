@@ -340,7 +340,7 @@ function VerifyStep({
             </p>
           </div>
           {kycComplete && (
-            <span className="shrink-0 rounded-full bg-[#00C805]/15 px-3 py-1 text-xs font-medium text-[#00A300]">
+            <span className="shrink-0 rounded-full bg-ink/5 px-3 py-1 text-xs font-medium text-ink">
               Verified ✓
             </span>
           )}
@@ -610,7 +610,7 @@ function ConfirmStep({
   return (
     <div className="space-y-8">
       <div>
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#00C805]/15 text-3xl text-[#00A300]">
+        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-cream-2 text-3xl text-ink">
           ✓
         </div>
         <h1 className="mt-6 font-display text-4xl font-light text-ink sm:text-5xl">
@@ -809,7 +809,7 @@ function DocCard({
           <p className="mt-1 text-xs text-mute">{meta}</p>
         </div>
         {signed && (
-          <span className="shrink-0 rounded-full bg-[#00C805]/15 px-3 py-1 text-xs font-medium text-[#00A300]">
+          <span className="shrink-0 rounded-full bg-ink/5 px-3 py-1 text-xs font-medium text-ink">
             Reviewed ✓
           </span>
         )}

@@ -19,12 +19,12 @@ export default function SustainabilityPage() {
             Sustainability
           </p>
           <h1 className="mt-4 max-w-3xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
-            Six owners.{" "}
+            Ten owners.{" "}
             <span className="italic text-red">One Ferrari.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
-            Not a climate solution. But the math is honest: six members
-            sharing one car beats six cars sitting idle in six garages.
+            Not a climate solution. But the math is honest: ten members
+            sharing one car beats ten cars sitting idle in ten garages.
           </p>
         </div>
       </section>
@@ -34,29 +34,29 @@ export default function SustainabilityPage() {
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
           <h2 className="font-display text-3xl text-ink sm:text-4xl">The math.</h2>
           <p className="mt-4 max-w-2xl text-base text-ink-soft">
-            How a single shared Ferrari compares to six individually-owned
+            How a single shared Ferrari compares to ten individually-owned
             ones.
           </p>
           <div className="mt-12 grid grid-cols-2 gap-8 sm:grid-cols-4">
             <Stat
-              number="83%"
+              number="90%"
               label="Reduction in vehicles built"
-              detail="6 cars become 1"
+              detail="10 cars become 1"
             />
             <Stat
-              number="~200 tons"
+              number="~360 tons"
               label="CO2 avoided in manufacturing"
-              detail="Per shared 6-share vehicle vs. 6 individuals (~40 tons each)"
+              detail="Per shared 10-share vehicle vs. 9 additional buyers (~40 tons each)"
             />
             <Stat
-              number="3x"
+              number="5×"
               label="Higher utilization"
               detail="Average driven days per year"
             />
             <Stat
               number="0"
               label="Idle storage acres"
-              detail="vs. 6 separate garages"
+              detail="vs. 10 separate garages"
             />
           </div>
           <p className="mt-8 max-w-3xl text-xs text-mute">
