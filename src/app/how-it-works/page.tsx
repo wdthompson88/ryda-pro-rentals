@@ -39,7 +39,7 @@ export default function HowItWorksPage() {
             Own a piece of the world's best cars.
           </h2>
           <p className="mt-4 max-w-2xl text-lg text-ink-soft">
-            Effective ~$236/day on a co-owned Ferrari for $34K up front.
+            Effective ~$208/day on a co-owned Ferrari for $34K up front.
             Compare with $2,500+/day to rent or $40–80K/yr to own outright.
           </p>
 
@@ -47,7 +47,7 @@ export default function HowItWorksPage() {
             <Step n="01" title="Verify" body="Apply, complete KYC. Valid US license, clean recent driving record, 28 or older. No accreditation required." />
             <Step n="02" title="Choose" body="Browse the curated, CPO-only fleet. Every car passes a multi-point Pre-Purchase Inspection before a single share is sold — co-owners are protected from inheriting major powertrain or mechanical issues." />
             <Step n="03" title="Co-own" body="Join the LLC alongside other members. Sign the Operating Agreement and Management Services Agreement. Fund your share via wire or ACH." />
-            <Step n="04" title="Drive" body="Book your time on the RYDA app. ~30 days and ~4,000 miles per share, per year — exact entitlement depends on the vehicle." />
+            <Step n="04" title="Drive" body="Book your time on the RYDA app. ~34 days and up to ~4,000 miles per share, per year — exact entitlement depends on the vehicle." />
             <Step n="05" title="Transfer" body="Transfer your share to another verified member after the 12-month minimum hold. RYDA handles the LLC paperwork. 3% transfer fee." />
           </div>
         </div>
@@ -79,15 +79,17 @@ export default function HowItWorksPage() {
                 <Tr label="Annual depreciation reserve" solo="$22,000" ryda="$2,200" />
                 <Tr label="RYDA service fee" solo="—" ryda="$2,480" />
                 <Tr label="Total Year 1" solo="$386,000" ryda="$41,080" emphasis />
-                <Tr label="Days driven" solo="365 (in theory)" ryda="~30 / share" />
-                <Tr label="Effective $/day" solo="$1,058" ryda="$236" emphasis />
+                <Tr label="Days driven" solo="365 (in theory)" ryda="~34 / share" />
+                <Tr label="Effective $/day" solo="$1,058" ryda="$208" emphasis />
               </tbody>
             </table>
           </div>
           <p className="mt-4 text-center text-xs text-mute">
             Numbers shown for illustration. Final pricing varies by vehicle. The
             LLC pays a 12% annual management fee bundled into its operating
-            budget; what you see above is the per-share allocation.
+            budget; what you see above is the per-share allocation. The fleet
+            calendar reserves 25 days/yr per vehicle for service and downtime
+            (10 shares × 34 days = 340 days used; 365 − 340 = 25).
           </p>
         </div>
       </section>

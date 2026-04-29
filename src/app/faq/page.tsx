@@ -19,7 +19,7 @@ const SECTIONS: { title: string; questions: Q[] }[] = [
       },
       {
         q: "How many co-ownership shares per vehicle?",
-        a: "10 shares per vehicle by default. Each share entitles you to ~30 days and up to ~4,000 miles of usage per year, depending on the vehicle. A single member can hold one share or several.",
+        a: "10 shares per vehicle by default. Each share entitles you to ~34 days and up to ~4,000 miles of usage per year, depending on the vehicle. A single member can hold one share or several.",
       },
       {
         q: "Are RYDA co-ownership stakes securities?",

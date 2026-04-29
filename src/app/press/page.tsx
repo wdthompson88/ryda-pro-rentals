@@ -46,7 +46,7 @@ export default function PressPage() {
             />
             <Fact
               label="Effective customer cost"
-              value="~$236/day on a co-owned Ferrari vs. $2,500+/day to rent the equivalent"
+              value="~$208/day on a co-owned Ferrari vs. $2,500+/day to rent the equivalent"
             />
             <Fact label="Press contact" value="Send a press inquiry via /contact" />
             <Fact label="Investor contact" value="Send an investor inquiry via /contact" />

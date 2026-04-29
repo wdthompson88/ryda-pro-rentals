@@ -294,7 +294,7 @@ function SolutionSlide() {
           ["Source", "RYDA sources curated supercars on behalf of each vehicle LLC in target markets."],
           ["Structure", "Each vehicle = single-purpose Delaware LLC. 5–10 verified members co-own and manage the LLC together."],
           ["Operate", "RYDA contracts with each LLC as a service provider — storage, insurance, maintenance, scheduling, concierge."],
-          ["Use", "Members book usage on the RYDA app — ~30 days, ~4,000 mi per share per year."],
+          ["Use", "Members book usage on the RYDA app — ~34 days, ~4,000 mi per share per year."],
           ["Transfer", "After 12 months, members transfer their share to another verified member. RYDA handles LLC paperwork."],
         ].map(([title, body], i) => (
           <li key={title} className="flex gap-6">

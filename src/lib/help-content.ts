@@ -40,7 +40,7 @@ export const HELP: HelpCategory[] = [
         body: [
           {
             type: "p",
-            text: "RYDA is a US member-managed supercar co-ownership platform. Each vehicle in the fleet is held in a single-purpose Delaware LLC. Up to ten verified members co-own and manage that LLC together, and each share entitles its holder to usage of the underlying vehicle — typically ~30 days and ~4,000 miles per share per year.",
+            text: "RYDA is a US member-managed supercar co-ownership platform. Each vehicle in the fleet is held in a single-purpose Delaware LLC. Up to ten verified members co-own and manage that LLC together, and each share entitles its holder to usage of the underlying vehicle — typically ~34 days and ~4,000 miles per share per year.",
           },
           {
             type: "p",
@@ -188,7 +188,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Per-day comparison" },
           {
             type: "p",
-            text: "On a co-owned Ferrari 296 GTB at $34K per share (1 of 10) with ~30 days entitlement, the effective daily cost works out to about $236/day. The rental rate on the same vehicle is $2,500/day. If you'll drive 15+ days a year, co-ownership pays for itself.",
+            text: "On a co-owned Ferrari 296 GTB at $34K per share (1 of 10) with ~34 days entitlement, the effective daily cost works out to about $208/day. The rental rate on the same vehicle is $2,500/day. If you'll drive 15+ days a year, co-ownership pays for itself.",
           },
           {
             type: "callout",
@@ -342,12 +342,12 @@ export const HELP: HelpCategory[] = [
         slug: "entitlement",
         q: "What does a co-ownership share actually entitle me to?",
         summary:
-          "~30 days and up to ~4,000 miles per year of vehicle use (depending on the vehicle), voting rights on material LLC decisions, and pro-rata participation in the LLC's assets at dissolution.",
+          "~34 days and up to ~4,000 miles per year of vehicle use (depending on the vehicle), voting rights on material LLC decisions, and pro-rata participation in the LLC's assets at dissolution.",
         body: [
           { type: "h3", text: "Usage" },
           {
             type: "p",
-            text: "Each share entitles you to ~30 days and up to ~4,000 miles of vehicle usage per year, with the exact entitlement set per vehicle when the LLC is formed. Days are booked on a shared calendar with the other co-owners. Fair-use rules cap consecutive days during peak season.",
+            text: "Each share entitles you to ~34 days and up to ~4,000 miles of vehicle usage per year, with the exact entitlement set per vehicle when the LLC is formed. Days are booked on a shared calendar with the other co-owners. Fair-use rules cap consecutive days during peak season.",
           },
           { type: "h3", text: "Membership" },
           {
@@ -574,7 +574,7 @@ export const HELP: HelpCategory[] = [
             type: "ul",
             items: [
               "Protects existing members from dilution.",
-              "Provides predictable usage entitlement (10 shares × 30 days = 300 days/yr, with ~65 days reserved for service and downtime).",
+              "Provides predictable usage entitlement (10 shares × 34 days = 340 days/yr, with 25 days reserved for service and downtime).",
               "Keeps the co-owner group small enough to coordinate.",
               "Keeps the LLC's member-managed governance simple and stable.",
             ],
