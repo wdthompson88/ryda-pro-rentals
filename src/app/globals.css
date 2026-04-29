@@ -1,17 +1,22 @@
 @import "tailwindcss";
 
 :root {
-  /* RYDA dark palette — luxury black with warm cream text */
-  --ryda-cream:     #0E0E10;   /* page background (was the light cream) */
+  /* RYDA dark palette — luxury black with warm cream text.
+   * Contrast targets (WCAG AA, normal text 4.5:1):
+   *  - red    on cream  (#0E0E10): ~4.6:1
+   *  - mute   on cream  (#0E0E10): ~5.4:1
+   *  - ink-soft on cream:          ~12:1
+   */
+  --ryda-cream:     #0E0E10;   /* page background */
   --ryda-cream-2:   #161618;   /* section variant — slightly lighter than page */
-  --ryda-surface:   #1B1B1F;   /* cards (was white) */
+  --ryda-surface:   #1B1B1F;   /* cards */
   --ryda-surface-2: #232328;   /* card hover / elevated */
   --ryda-ink:       #F4F1EC;   /* primary text (the warm cream) */
   --ryda-ink-soft:  #B8B2A8;   /* secondary text */
-  --ryda-mute:      #7A7570;   /* tertiary text / borders */
+  --ryda-mute:      #9A9590;   /* tertiary text / borders — bumped from #7A7570 for AA */
   --ryda-rule:      #2A2A2E;   /* hairline borders */
-  --ryda-red:       #C03030;   /* deep red accent — brighter on dark for legibility */
-  --ryda-red-deep:  #E04040;   /* hover red */
+  --ryda-red:       #DC4747;   /* brand red — bumped from #C03030 to clear AA on dark */
+  --ryda-red-deep:  #ED5C5C;   /* hover red */
   --ryda-gold:      #C9A66B;   /* premium accent for Black tier */
 }
 

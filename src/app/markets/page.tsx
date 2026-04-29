@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { VEHICLES, formatUSD } from "@/lib/market-data";
@@ -52,11 +53,12 @@ export default function MarketsPage() {
                     <td className="px-6 py-5">
                       <Link href={`/markets/${v.symbol}`} className="flex items-center gap-4">
                         <div className="relative aspect-[4/3] w-20 shrink-0 overflow-hidden rounded-lg bg-cream-2 sm:w-24">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
+                          <Image
                             src={v.hero}
-                            alt={v.name}
-                            className={`h-full w-full object-cover ${v.flipImage ? "-scale-x-100" : ""}`}
+                            alt={`${v.year} ${v.name}`}
+                            fill
+                            sizes="96px"
+                            className={`object-cover ${v.flipImage ? "-scale-x-100" : ""}`}
                             style={{ objectPosition: v.imagePosition ?? "center" }}
                           />
                         </div>
@@ -139,11 +141,12 @@ export default function MarketsPage() {
                   className="group block overflow-hidden rounded-xl border border-rule bg-surface transition-shadow hover:shadow-md"
                 >
                   <div className="relative aspect-[16/10] w-full overflow-hidden bg-cream-2">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    <Image
                       src={v.hero}
-                      alt={v.name}
-                      className={`h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 ${v.flipImage ? "-scale-x-100" : ""}`}
+                      alt={`${v.year} ${v.name}`}
+                      fill
+                      sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                      className={`object-cover transition-transform duration-500 group-hover:scale-105 ${v.flipImage ? "-scale-x-100" : ""}`}
                       style={{ objectPosition: v.imagePosition ?? "center" }}
                     />
                   </div>

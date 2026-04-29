@@ -6,6 +6,17 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.join(__dirname),
   },
+  // Allow next/image to optimize the Unsplash hero placeholders we ship
+  // with the demo fleet. Replace with our own CDN once licensed assets land.
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        pathname: "/**",
+      },
+    ],
+  },
 };
 
 export default nextConfig;

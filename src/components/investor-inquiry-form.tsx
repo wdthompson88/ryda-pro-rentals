@@ -67,29 +67,41 @@ export function InvestorInquiryForm() {
 
   return (
     <form onSubmit={onSubmit} className="mx-auto mt-10 grid max-w-xl grid-cols-1 gap-3 text-left sm:grid-cols-2">
-      <Input name="name" placeholder="Your name" autoComplete="name" required />
-      <Input name="email" type="email" placeholder="Email address" autoComplete="email" required />
-      <Input name="firm" placeholder="Firm (optional)" className="sm:col-span-2" />
-      <select
-        name="check_size"
-        defaultValue=""
-        className="h-12 rounded-full border border-cream/20 bg-cream/5 px-5 text-sm text-cream focus:border-red focus:outline-none focus:ring-2 focus:ring-red/30 sm:col-span-2"
-      >
-        <option value="" disabled>
+      <Input id="investor-name" name="name" label="Your name" autoComplete="name" required />
+      <Input id="investor-email" name="email" type="email" label="Email address" autoComplete="email" required />
+      <Input id="investor-firm" name="firm" label="Firm (optional)" className="sm:col-span-2" />
+      <div className="sm:col-span-2">
+        <label htmlFor="investor-check-size" className="sr-only">
           Anticipated check size
-        </option>
-        {CHECK_SIZES.map((s) => (
-          <option key={s} value={s} className="bg-ink">
-            {s}
+        </label>
+        <select
+          id="investor-check-size"
+          name="check_size"
+          defaultValue=""
+          className="h-12 w-full rounded-full border border-cream/20 bg-cream/5 px-5 text-sm text-cream focus:border-red focus:outline-none focus:ring-2 focus:ring-red/30"
+        >
+          <option value="" disabled>
+            Anticipated check size
           </option>
-        ))}
-      </select>
-      <textarea
-        name="notes"
-        placeholder="Anything we should know? (optional)"
-        rows={4}
-        className="rounded-2xl border border-cream/20 bg-cream/5 px-5 py-3 text-sm text-cream placeholder:text-cream/50 focus:border-red focus:outline-none focus:ring-2 focus:ring-red/30 sm:col-span-2"
-      />
+          {CHECK_SIZES.map((s) => (
+            <option key={s} value={s} className="bg-ink">
+              {s}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="sm:col-span-2">
+        <label htmlFor="investor-notes" className="sr-only">
+          Anything we should know
+        </label>
+        <textarea
+          id="investor-notes"
+          name="notes"
+          placeholder="Anything we should know? (optional)"
+          rows={4}
+          className="w-full rounded-2xl border border-cream/20 bg-cream/5 px-5 py-3 text-sm text-cream placeholder:text-cream/50 focus:border-red focus:outline-none focus:ring-2 focus:ring-red/30"
+        />
+      </div>
       <button
         type="submit"
         disabled={status === "submitting"}
@@ -98,20 +110,33 @@ export function InvestorInquiryForm() {
         {status === "submitting" ? "Submitting…" : "Request the deck"}
       </button>
       {status === "error" && error && (
-        <p className="text-sm text-red sm:col-span-2">{error}</p>
+        <p className="text-sm text-red sm:col-span-2" role="alert">
+          {error}
+        </p>
       )}
     </form>
   );
 }
 
 function Input({
+  id,
+  label,
   className = "",
   ...props
-}: React.InputHTMLAttributes<HTMLInputElement>) {
+}: React.InputHTMLAttributes<HTMLInputElement> & { id: string; label: string }) {
   return (
-    <input
-      {...props}
-      className={`h-12 rounded-full border border-cream/20 bg-cream/5 px-5 text-cream placeholder:text-cream/50 focus:border-red focus:outline-none focus:ring-2 focus:ring-red/30 ${className}`}
-    />
+    <div className={className}>
+      <label htmlFor={id} className="sr-only">
+        {label}
+        {props.required ? " (required)" : ""}
+      </label>
+      <input
+        {...props}
+        id={id}
+        placeholder={label}
+        aria-required={props.required || undefined}
+        className="h-12 w-full rounded-full border border-cream/20 bg-cream/5 px-5 text-cream placeholder:text-cream/50 focus:border-red focus:outline-none focus:ring-2 focus:ring-red/30"
+      />
+    </div>
   );
 }

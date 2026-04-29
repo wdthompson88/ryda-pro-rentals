@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { WaitlistForm } from "@/components/waitlist-form";
@@ -6,15 +7,17 @@ import { VEHICLES, formatUSD } from "@/lib/market-data";
 export default function Home() {
   // Use the first 4 vehicles as the "featured market" carousel.
   const featured = VEHICLES.slice(0, 4);
+  // Hero image: lead with the Ferrari 296 as the visual anchor.
+  const heroVehicle = VEHICLES.find((v) => v.symbol === "F296") ?? VEHICLES[0];
 
   return (
     <>
       <SiteHeader />
 
-      {/* Hero */}
+      {/* Hero — copy on left, editorial vehicle image on right */}
       <section className="border-b border-rule">
-        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-12 px-6 py-20 sm:px-10 sm:py-28 lg:grid-cols-12">
-          <div className="lg:col-span-7">
+        <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-6 py-20 sm:px-10 sm:py-24 lg:grid-cols-12 lg:gap-12">
+          <div className="lg:col-span-6">
             <p className="mb-6 text-xs font-medium uppercase tracking-[0.2em] text-red">
               Member-managed supercar co-ownership · Miami · Q3 2026
             </p>
@@ -37,45 +40,78 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Mini fleet preview */}
-          <div className="lg:col-span-5">
-            <div className="rounded-2xl border border-rule bg-surface p-6 shadow-sm">
-              <div className="mb-4 flex items-center justify-between">
-                <p className="text-xs font-medium uppercase tracking-[0.2em] text-mute">
-                  Featured fleet
+          {/* Editorial vehicle image */}
+          <div className="lg:col-span-6">
+            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-cream-2 lg:aspect-[5/4]">
+              <Image
+                src={heroVehicle.hero}
+                alt={`${heroVehicle.year} ${heroVehicle.name}`}
+                fill
+                priority
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                className={`object-cover ${heroVehicle.flipImage ? "-scale-x-100" : ""}`}
+                style={{ objectPosition: heroVehicle.imagePosition ?? "center" }}
+              />
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-cream/90 via-cream/30 to-transparent p-5 sm:p-6">
+                <p className="text-xs uppercase tracking-[0.2em] text-red">
+                  In the fleet
                 </p>
-                <Link href="/markets" className="text-xs font-medium text-red hover:text-red-deep">
-                  All →
-                </Link>
+                <p className="mt-1 font-display text-xl text-ink sm:text-2xl">
+                  {heroVehicle.year} {heroVehicle.name}
+                </p>
+                <p className="mt-1 text-xs text-ink-soft">
+                  {formatUSD(heroVehicle.pricePerShare)} per share ·{" "}
+                  {heroVehicle.sharesAvailable} of {heroVehicle.shares} shares
+                  available
+                </p>
               </div>
-              <ul className="divide-y divide-rule">
-                {featured.map((v) => (
-                  <li key={v.symbol}>
-                    <Link
-                      href={`/markets/${v.symbol}`}
-                      className="flex items-center justify-between gap-4 py-3 transition-colors hover:bg-cream-2/40"
-                    >
-                      <div>
-                        <p className="font-display text-base text-ink">{v.name}</p>
-                        <p className="text-xs text-mute">
-                          {v.year} · {v.brand}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-medium text-ink tabular-nums">
-                          {formatUSD(v.pricePerShare)}
-                        </p>
-                        <p className="text-xs text-mute">per share</p>
-                      </div>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
             </div>
-            <p className="mt-3 text-center text-xs text-mute">
-              Co-ownership shares. {featured.length} of {VEHICLES.length} vehicles shown.
-            </p>
           </div>
+        </div>
+      </section>
+
+      {/* Featured fleet — quick price/availability ticker */}
+      <section className="border-b border-rule bg-cream-2">
+        <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10 sm:py-16">
+          <div className="mb-6 flex items-end justify-between">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+                Featured fleet
+              </p>
+              <h2 className="mt-2 font-display text-2xl text-ink sm:text-3xl">
+                {featured.length} of {VEHICLES.length} vehicles
+              </h2>
+            </div>
+            <Link
+              href="/markets"
+              className="text-sm font-medium text-red hover:text-red-deep"
+            >
+              See all →
+            </Link>
+          </div>
+          <ul className="divide-y divide-rule overflow-hidden rounded-2xl border border-rule bg-surface">
+            {featured.map((v) => (
+              <li key={v.symbol}>
+                <Link
+                  href={`/markets/${v.symbol}`}
+                  className="flex items-center justify-between gap-4 px-5 py-4 transition-colors hover:bg-surface-2"
+                >
+                  <div>
+                    <p className="font-display text-base text-ink">{v.name}</p>
+                    <p className="text-xs text-mute">
+                      {v.year} · {v.brand} · {v.market}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-medium text-ink tabular-nums">
+                      {formatUSD(v.pricePerShare)}
+                    </p>
+                    <p className="text-xs text-mute">per share</p>
+                  </div>
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 

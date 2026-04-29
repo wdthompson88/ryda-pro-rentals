@@ -58,22 +58,35 @@ export function WaitlistForm() {
 
   return (
     <form onSubmit={onSubmit} className="mx-auto flex max-w-xl flex-col gap-3">
+      <label htmlFor="waitlist-name" className="sr-only">
+        Your name
+      </label>
       <input
+        id="waitlist-name"
         type="text"
         name="name"
         placeholder="Your name"
         autoComplete="name"
         className="h-12 rounded-full border border-cream/20 bg-cream/5 px-5 text-cream placeholder:text-cream/50 focus:border-red focus:outline-none focus:ring-2 focus:ring-red/30"
       />
+      <label htmlFor="waitlist-email" className="sr-only">
+        Email address (required)
+      </label>
       <input
+        id="waitlist-email"
         type="email"
         name="email"
         placeholder="Email address"
         autoComplete="email"
         required
+        aria-required="true"
         className="h-12 rounded-full border border-cream/20 bg-cream/5 px-5 text-cream placeholder:text-cream/50 focus:border-red focus:outline-none focus:ring-2 focus:ring-red/30"
       />
+      <label htmlFor="waitlist-market" className="sr-only">
+        Primary market
+      </label>
       <select
+        id="waitlist-market"
         name="market"
         defaultValue="Miami"
         className="h-12 rounded-full border border-cream/20 bg-cream/5 px-5 text-cream focus:border-red focus:outline-none focus:ring-2 focus:ring-red/30"
@@ -91,7 +104,9 @@ export function WaitlistForm() {
         {status === "submitting" ? "Submitting…" : "Request membership"}
       </button>
       {status === "error" && error && (
-        <p className="mt-2 text-sm text-red">{error}</p>
+        <p className="mt-2 text-sm text-red" role="alert">
+          {error}
+        </p>
       )}
     </form>
   );

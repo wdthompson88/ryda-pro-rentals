@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { OrderPanel } from "@/components/order-panel";
@@ -53,11 +54,13 @@ export default async function VehicleMarketPage({
             {/* Left column — title + chart (price + change live inside the chart) */}
             <div className="lg:col-span-8">
               <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl bg-cream-2">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   src={v.hero}
-                  alt={v.name}
-                  className={`h-full w-full object-cover ${v.flipImage ? "-scale-x-100" : ""}`}
+                  alt={`${v.year} ${v.name}`}
+                  fill
+                  priority
+                  sizes="(min-width: 1024px) 66vw, 100vw"
+                  className={`object-cover ${v.flipImage ? "-scale-x-100" : ""}`}
                   style={{ objectPosition: v.imagePosition ?? "center" }}
                 />
               </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Vehicle, formatUSD } from "@/lib/market-data";
 
@@ -144,12 +145,13 @@ export function BuyFlow({ vehicle, initialShares }: Props) {
         {/* Sticky summary */}
         <aside className="lg:col-span-4">
           <div className="sticky top-32 rounded-2xl border border-rule bg-surface p-6">
-            <div className="aspect-[16/9] w-full overflow-hidden rounded-xl bg-cream-2">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+            <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl bg-cream-2">
+              <Image
                 src={vehicle.hero}
-                alt={vehicle.name}
-                className={`h-full w-full object-cover ${vehicle.flipImage ? "-scale-x-100" : ""}`}
+                alt={`${vehicle.year} ${vehicle.name}`}
+                fill
+                sizes="(min-width: 1024px) 33vw, 100vw"
+                className={`object-cover ${vehicle.flipImage ? "-scale-x-100" : ""}`}
                 style={{ objectPosition: vehicle.imagePosition ?? "center" }}
               />
             </div>

@@ -78,14 +78,20 @@ export function ContactForm() {
       <Select name="market" label="Market" options={["Miami", "Los Angeles", "New York", "Not sure"]} />
       <div className="hidden sm:block" />
       <div className="sm:col-span-2">
-        <label className="block text-xs font-medium uppercase tracking-wider text-mute">
-          Message
+        <label
+          htmlFor="contact-message"
+          className="block text-xs font-medium uppercase tracking-wider text-mute"
+        >
+          Message <span aria-hidden="true" className="text-red">*</span>
+          <span className="sr-only">required</span>
         </label>
         <textarea
+          id="contact-message"
           name="message"
           required
           minLength={20}
           rows={5}
+          aria-required="true"
           className="mt-2 w-full rounded-xl border border-rule bg-surface px-4 py-3 text-sm text-ink placeholder:text-mute focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
           placeholder="Tell us a bit about what you're looking for..."
         />
@@ -123,16 +129,38 @@ function Input({
   type?: string;
   required?: boolean;
 }) {
+  const id = `contact-${name}`;
   return (
     <div>
-      <label className="block text-xs font-medium uppercase tracking-wider text-mute">
+      <label
+        htmlFor={id}
+        className="block text-xs font-medium uppercase tracking-wider text-mute"
+      >
         {label}
+        {required && (
+          <>
+            {" "}
+            <span aria-hidden="true" className="text-red">*</span>
+            <span className="sr-only">required</span>
+          </>
+        )}
       </label>
       <input
+        id={id}
         name={name}
         type={type}
         required={required}
-        className="mt-2 h-11 w-full rounded-xl border border-rule bg-surface px-4 text-sm text-ink placeholder:text-mute focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
+        aria-required={required || undefined}
+        autoComplete={
+          name === "name"
+            ? "name"
+            : name === "email"
+              ? "email"
+              : name === "phone"
+                ? "tel"
+                : undefined
+        }
+        className="mt-2 h-12 w-full rounded-xl border border-rule bg-surface px-4 text-sm text-ink placeholder:text-mute focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
       />
     </div>
   );
@@ -151,17 +179,22 @@ function Select({
   value?: string;
   onChange?: (v: string) => void;
 }) {
+  const id = `contact-${name}`;
   return (
     <div>
-      <label className="block text-xs font-medium uppercase tracking-wider text-mute">
+      <label
+        htmlFor={id}
+        className="block text-xs font-medium uppercase tracking-wider text-mute"
+      >
         {label}
       </label>
       <select
+        id={id}
         name={name}
         value={value}
         onChange={onChange ? (e) => onChange(e.target.value) : undefined}
         defaultValue={value === undefined ? options[0] : undefined}
-        className="mt-2 h-11 w-full rounded-xl border border-rule bg-surface px-4 text-sm text-ink focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
+        className="mt-2 h-12 w-full rounded-xl border border-rule bg-surface px-4 text-sm text-ink focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
       >
         {options.map((o) => (
           <option key={o} value={o}>

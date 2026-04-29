@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { DemoBanner } from "@/components/demo-banner";
@@ -47,9 +48,16 @@ export default async function MyVehiclePage({
           </Link>
           <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-12">
             <div className="lg:col-span-7">
-              <div className="aspect-[16/10] w-full overflow-hidden rounded-2xl bg-cream-2">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={v.hero} alt={v.name} className={`h-full w-full object-cover ${v.flipImage ? "-scale-x-100" : ""}`} style={{ objectPosition: v.imagePosition ?? "center" }} />
+              <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-cream-2">
+                <Image
+                  src={v.hero}
+                  alt={`${v.year} ${v.name}`}
+                  fill
+                  priority
+                  sizes="(min-width: 1024px) 58vw, 100vw"
+                  className={`object-cover ${v.flipImage ? "-scale-x-100" : ""}`}
+                  style={{ objectPosition: v.imagePosition ?? "center" }}
+                />
               </div>
             </div>
             <div className="lg:col-span-5">

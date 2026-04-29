@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
@@ -75,12 +76,14 @@ export default async function RentDetailPage({
           <div className="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-12">
             {/* Hero + meta */}
             <div className="lg:col-span-8">
-              <div className="aspect-[16/10] w-full overflow-hidden rounded-2xl bg-cream-2">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+              <div className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-cream-2">
+                <Image
                   src={v.hero}
-                  alt={v.name}
-                  className={`h-full w-full object-cover ${v.flipImage ? "-scale-x-100" : ""}`}
+                  alt={`${v.year} ${v.name}`}
+                  fill
+                  priority
+                  sizes="(min-width: 1024px) 66vw, 100vw"
+                  className={`object-cover ${v.flipImage ? "-scale-x-100" : ""}`}
                   style={{ objectPosition: v.imagePosition ?? "center" }}
                 />
               </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 
 export default function DeckPage() {
@@ -619,13 +620,14 @@ function Person({
         ghost ? "bg-cream-2/40 border-dashed" : "bg-cream-2/40"
       }`}
     >
-      <div className="aspect-square w-20 overflow-hidden rounded-full bg-ink/10">
+      <div className="relative aspect-square w-20 overflow-hidden rounded-full bg-ink/10">
         {image && (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img
+          <Image
             src={image}
             alt={name}
-            className="h-full w-full object-cover"
+            fill
+            sizes="80px"
+            className="object-cover"
             style={{ filter: "grayscale(100%) contrast(1.05)" }}
           />
         )}

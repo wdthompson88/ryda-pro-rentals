@@ -56,11 +56,12 @@ export default function RentPage() {
                 className="group block overflow-hidden rounded-2xl border border-rule bg-surface transition-shadow hover:shadow-lg"
               >
                 <div className="relative aspect-[16/10] w-full overflow-hidden bg-cream-2">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  <Image
                     src={v.hero}
-                    alt={v.name}
-                    className={`h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 ${v.flipImage ? "-scale-x-100" : ""}`}
+                    alt={`${v.year} ${v.name}`}
+                    fill
+                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    className={`object-cover transition-transform duration-500 group-hover:scale-105 ${v.flipImage ? "-scale-x-100" : ""}`}
                     style={{ objectPosition: v.imagePosition ?? "center" }}
                   />
                   {v.trackEligible && (

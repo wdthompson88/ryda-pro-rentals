@@ -59,6 +59,8 @@ export function HelpChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([GREETING]);
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const launcherRef = useRef<HTMLButtonElement>(null);
   const turnCount = useRef(0);
   const lastTriggerMessage = useRef<string>("");
 
@@ -67,6 +69,29 @@ export function HelpChat() {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages, open]);
+
+  // Open: focus the input. Close: return focus to the launcher button.
+  useEffect(() => {
+    if (open) {
+      inputRef.current?.focus();
+    } else {
+      // Use a microtask so the launcher is mounted again before we focus it.
+      Promise.resolve().then(() => launcherRef.current?.focus());
+    }
+  }, [open]);
+
+  // Escape closes the panel when it is open.
+  useEffect(() => {
+    if (!open) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        e.stopPropagation();
+        setOpen(false);
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
 
   function handleAsk(question: string) {
     const q = question.trim();
@@ -169,9 +194,12 @@ export function HelpChat() {
     <>
       {/* Floating launcher */}
       <button
+        ref={launcherRef}
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-label={open ? "Close help chat" : "Open help chat"}
+        aria-expanded={open}
+        aria-controls="ryda-help-chat-panel"
         className={`fixed bottom-6 right-6 z-40 flex h-14 items-center gap-2 rounded-full px-5 text-sm font-medium shadow-lg transition-all ${
           open
             ? "bg-cream text-ink hover:bg-cream/90"
@@ -184,15 +212,31 @@ export function HelpChat() {
 
       {/* Panel */}
       {open && (
-        <div className="fixed bottom-24 right-6 z-40 flex w-[min(420px,calc(100vw-3rem))] flex-col overflow-hidden rounded-2xl border border-rule bg-surface shadow-2xl">
+        <div
+          id="ryda-help-chat-panel"
+          role="dialog"
+          aria-modal="false"
+          aria-labelledby="ryda-help-chat-title"
+          className="fixed bottom-24 right-6 z-40 flex w-[min(420px,calc(100vw-3rem))] flex-col overflow-hidden rounded-2xl border border-rule bg-surface shadow-2xl"
+        >
           {/* Header */}
           <div className="flex items-center justify-between border-b border-rule bg-ink px-5 py-4 text-cream">
             <div>
-              <p className="font-display text-base">Ask RYDA</p>
+              <p id="ryda-help-chat-title" className="font-display text-base">
+                Ask RYDA
+              </p>
               <p className="text-[11px] uppercase tracking-wider text-cream/50">
                 Answers from 61 help articles · Real human on request
               </p>
             </div>
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              aria-label="Close help chat"
+              className="ml-3 inline-flex h-8 w-8 items-center justify-center rounded-full text-cream/70 hover:bg-cream/10 hover:text-cream"
+            >
+              <span aria-hidden="true">×</span>
+            </button>
           </div>
 
           {/* Messages */}
@@ -239,7 +283,12 @@ export function HelpChat() {
             onSubmit={onSubmit}
             className="flex items-center gap-2 border-t border-rule bg-cream-2/40 px-3 py-3"
           >
+            <label htmlFor="ryda-help-chat-input" className="sr-only">
+              Ask RYDA a question
+            </label>
             <input
+              id="ryda-help-chat-input"
+              ref={inputRef}
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}

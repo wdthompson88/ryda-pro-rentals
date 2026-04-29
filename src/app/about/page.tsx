@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 
@@ -187,13 +188,14 @@ function Founder({
         ghost ? "bg-cream-2/40" : "bg-surface"
       }`}
     >
-      <div className="aspect-square w-32 overflow-hidden rounded-full bg-ink/10">
+      <div className="relative aspect-square w-32 overflow-hidden rounded-full bg-ink/10">
         {image && (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img
+          <Image
             src={image}
             alt={name}
-            className="h-full w-full object-cover"
+            fill
+            sizes="128px"
+            className="object-cover"
             style={{ filter: "grayscale(100%) contrast(1.05)" }}
           />
         )}
