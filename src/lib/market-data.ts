@@ -228,7 +228,7 @@ export const VEHICLES: Vehicle[] = [
       color: "Rosso Maranello / Crema",
     },
     rentalDailyRate: 3_200,
-    rentalAvailable: false,
+    rentalAvailable: true,
     trackEligible: false,
   },
   {
@@ -266,7 +266,7 @@ export const VEHICLES: Vehicle[] = [
       color: "Lunar White / Carbon Onyx",
     },
     rentalDailyRate: 8_500,
-    rentalAvailable: false,
+    rentalAvailable: true,
     trackEligible: true,
   },
 ];
@@ -294,7 +294,8 @@ export function formatUSD(n: number, opts: { decimals?: number } = {}) {
 // ─────────────────────────────────────────────────────────────────────────
 // CPO doctrine — 2-year planned exit
 // ─────────────────────────────────────────────────────────────────────────
-// We curate Certified Pre-Owned vehicles and hold each one for ~2 years.
+// We curate Certified Pre-Owned vehicles and hold each one for ~2 years
+// OR until the odometer crosses ~50,000 miles, whichever comes first.
 // At exit, the LLC sells the car and proceeds are distributed pro-rata.
 // Modeled assumption: the curated fleet depreciates ~10% over the
 // 2-year hold. We use a flat 10% across drive-only AND rental-opt-in
@@ -305,10 +306,11 @@ export function formatUSD(n: number, opts: { decimals?: number } = {}) {
 // depreciates faster) but a flat rate keeps the calculator honest
 // and simple.
 // Members can still transfer their share to another verified member at
-// any time after the 12-month minimum hold; the 2-year sale is the
-// default exit baseline shown in pricing and calculators.
+// any time after the 12-month minimum hold; the 2-year (or 50K-mile)
+// sale is the default exit baseline shown in pricing and calculators.
 
 export const HOLDING_YEARS = 2;
+export const HOLDING_MILES_CAP = 50_000; // alt sale trigger: whichever comes first
 export const TARGET_DEPRECIATION_PCT = 10; // % over the full 2-year hold
 
 // Standard shareholder mileage allowance — matches GM LUXE & industry

@@ -5,6 +5,7 @@ import { SiteHeader } from "@/components/site-header";
 import { OrderPanel } from "@/components/order-panel";
 import { CostBreakdown } from "@/components/cost-breakdown";
 import { ShareValueChart } from "@/components/share-value-chart";
+import { CompareCalculator } from "@/components/compare-calculator";
 import {
   VEHICLES,
   getVehicleBySymbol,
@@ -166,7 +167,7 @@ export default async function VehicleMarketPage({
                 per day actually behind the wheel.
               </p>
               <Link
-                href="/compare#calculator"
+                href="#calculator"
                 className="mt-6 inline-flex h-11 items-center justify-center rounded-full border border-rule bg-surface px-5 text-sm font-medium text-ink hover:border-ink"
               >
                 Run your own numbers →
@@ -208,6 +209,37 @@ export default async function VehicleMarketPage({
               <ShareValueChart vehicle={v} />
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Per-listing calculator — locked to this vehicle. Lets buyers run
+          their own scenario without leaving the listing. */}
+      <section id="calculator" className="border-b border-rule">
+        <div className="mx-auto max-w-5xl px-6 py-14 sm:px-10">
+          <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+                Run the math on this {v.brand}
+              </p>
+              <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
+                Your scenario, your numbers.
+              </h2>
+              <p className="mt-3 max-w-2xl text-sm text-ink-soft">
+                Move the sliders to model your own usage on the {v.name}{" "}
+                — buy-in, days driven, hold years, and the optional
+                rental opt-in. Live math anchored to this car's actual
+                pricing.
+              </p>
+            </div>
+            <Link
+              href={`/markets/${v.symbol}/cost-sheet`}
+              target="_blank"
+              className="inline-flex h-11 items-center justify-center rounded-full border border-rule bg-surface px-5 text-sm font-medium text-ink hover:border-ink"
+            >
+              Download cost sheet ↓
+            </Link>
+          </div>
+          <CompareCalculator lockedVehicle={v} />
         </div>
       </section>
 

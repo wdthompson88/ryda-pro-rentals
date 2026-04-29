@@ -5,8 +5,8 @@ import { useState } from "react";
 
 const NAV = [
   { href: "/markets", label: "Fleet" },
+  { href: "/rent", label: "Rent" },
   { href: "/how-it-works", label: "How it works" },
-  { href: "/compare", label: "Compare" },
   { href: "/concierge-ownership", label: "Concierge" },
   { href: "/membership", label: "Membership" },
 ];

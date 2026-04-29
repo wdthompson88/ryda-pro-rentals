@@ -1,11 +1,125 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
+import {
+  formatUSD,
+  HOLDING_YEARS,
+  TARGET_DEPRECIATION_PCT,
+  HOLDING_MILES_CAP,
+} from "@/lib/market-data";
 
 export const metadata = {
   title: "How it works — RYDA",
   description:
-    "How RYDA co-ownership works: from vehicle selection to legal LLC formation to driving and exit. Plus the rental side.",
+    "Asset-backed co-ownership of curated CPO supercars. Five steps to a key, side-by-side comparison vs solo / rental / club, the 2-year exit doctrine, and the optional rental opt-in.",
 };
+
+// 4-way comparison anchor numbers — same Ferrari 296 GTB illustration
+// used across the site so the doctrine stays consistent.
+const STICKER = 340_000;
+const CARRYING_REGULAR = 46_000;
+const RENTAL_DAILY = 2_400;
+const CLUB_ANNUAL = 48_000;
+const CLUB_DAYS_INCLUDED = 30;
+const RYDA_SHARE_BUYIN = 34_000;
+const RYDA_ANNUAL_OPS = 7_080;
+const RYDA_DAYS = 30;
+const ASSUMED_DRIVE_DAYS = 30;
+const ASSUMED_DRIVE_DAYS_2YR = ASSUMED_DRIVE_DAYS * HOLDING_YEARS;
+const RESIDUAL_PCT = (100 - TARGET_DEPRECIATION_PCT) / 100;
+
+const REGULAR_TOTAL_2YR = STICKER + CARRYING_REGULAR * HOLDING_YEARS;
+const REGULAR_RESALE = Math.round(STICKER * RESIDUAL_PCT);
+const REGULAR_NET_2YR = REGULAR_TOTAL_2YR - REGULAR_RESALE;
+const RYDA_TOTAL_2YR =
+  RYDA_SHARE_BUYIN + RYDA_ANNUAL_OPS * HOLDING_YEARS;
+const RYDA_RESALE = Math.round(RYDA_SHARE_BUYIN * RESIDUAL_PCT);
+const RYDA_NET_2YR = RYDA_TOTAL_2YR - RYDA_RESALE;
+const RENTAL_TOTAL_2YR = RENTAL_DAILY * ASSUMED_DRIVE_DAYS_2YR;
+const CLUB_TOTAL_2YR = CLUB_ANNUAL * HOLDING_YEARS;
+const CLUB_DAYS_2YR = CLUB_DAYS_INCLUDED * HOLDING_YEARS;
+
+type Row = {
+  label: string;
+  regular: string;
+  rental: string;
+  club: string;
+  ryda: string;
+  emphasis?: boolean;
+};
+
+const ROWS: Row[] = [
+  {
+    label: "Up-front cost",
+    regular: formatUSD(STICKER),
+    rental: "$0",
+    club: formatUSD(CLUB_ANNUAL) + " (annual)",
+    ryda: formatUSD(RYDA_SHARE_BUYIN),
+  },
+  {
+    label: "Annual carrying / fees",
+    regular: formatUSD(CARRYING_REGULAR),
+    rental: "—",
+    club: "Included",
+    ryda: formatUSD(RYDA_ANNUAL_OPS),
+  },
+  {
+    label: `Year 1 spend (${ASSUMED_DRIVE_DAYS} days driven)`,
+    regular: formatUSD(STICKER + CARRYING_REGULAR),
+    rental: formatUSD(RENTAL_DAILY * ASSUMED_DRIVE_DAYS),
+    club: formatUSD(CLUB_ANNUAL),
+    ryda: formatUSD(RYDA_SHARE_BUYIN + RYDA_ANNUAL_OPS),
+    emphasis: true,
+  },
+  {
+    label: "Effective $/day, year 1",
+    regular: formatUSD(
+      Math.round((STICKER + CARRYING_REGULAR) / ASSUMED_DRIVE_DAYS),
+    ),
+    rental: formatUSD(RENTAL_DAILY),
+    club: formatUSD(Math.round(CLUB_ANNUAL / CLUB_DAYS_INCLUDED)),
+    ryda: formatUSD(
+      Math.round((RYDA_SHARE_BUYIN + RYDA_ANNUAL_OPS) / ASSUMED_DRIVE_DAYS),
+    ),
+  },
+  {
+    label: "Effective $/day, ops only (after Y1)",
+    regular: formatUSD(Math.round(CARRYING_REGULAR / ASSUMED_DRIVE_DAYS)),
+    rental: formatUSD(RENTAL_DAILY),
+    club: formatUSD(Math.round(CLUB_ANNUAL / CLUB_DAYS_INCLUDED)),
+    ryda: formatUSD(Math.round(RYDA_ANNUAL_OPS / RYDA_DAYS)),
+    emphasis: true,
+  },
+  {
+    label: `Total cash, ${HOLDING_YEARS}-yr hold (${ASSUMED_DRIVE_DAYS_2YR} days driven)`,
+    regular: formatUSD(REGULAR_TOTAL_2YR),
+    rental: formatUSD(RENTAL_TOTAL_2YR),
+    club: formatUSD(CLUB_TOTAL_2YR),
+    ryda: formatUSD(RYDA_TOTAL_2YR),
+  },
+  {
+    label: `Recover at exit (${100 - TARGET_DEPRECIATION_PCT}% resale)`,
+    regular: `+ ${formatUSD(REGULAR_RESALE)}`,
+    rental: "—",
+    club: "—",
+    ryda: `+ ${formatUSD(RYDA_RESALE)}`,
+  },
+  {
+    label: `Net cost over ${HOLDING_YEARS} years`,
+    regular: formatUSD(REGULAR_NET_2YR),
+    rental: formatUSD(RENTAL_TOTAL_2YR),
+    club: formatUSD(CLUB_TOTAL_2YR),
+    ryda: formatUSD(RYDA_NET_2YR),
+    emphasis: true,
+  },
+  {
+    label: `Effective $/day after exit (over ${ASSUMED_DRIVE_DAYS_2YR} days)`,
+    regular: formatUSD(Math.round(REGULAR_NET_2YR / ASSUMED_DRIVE_DAYS_2YR)),
+    rental: formatUSD(RENTAL_DAILY),
+    club: formatUSD(Math.round(CLUB_TOTAL_2YR / CLUB_DAYS_2YR)),
+    ryda: formatUSD(Math.round(RYDA_NET_2YR / ASSUMED_DRIVE_DAYS_2YR)),
+    emphasis: true,
+  },
+];
 
 export default function HowItWorksPage() {
   return (
@@ -16,33 +130,36 @@ export default function HowItWorksPage() {
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-28">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            How it works
+            How it works · Asset-backed co-ownership
           </p>
           <h1 className="mt-4 max-w-4xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
-            Five steps to{" "}
-            <span className="italic text-red">a key.</span>
+            Asset-backed co-ownership in{" "}
+            <span className="italic text-red">five steps.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
-            Each car is held in a Delaware LLC with 10 shares. Verified
-            members hold one share or several — typically a small group.
-            RYDA is hired as the operations partner.
+            Each car is held in a single-purpose Delaware LLC with 10
+            shares. Your share is backed by a real, titled vehicle —
+            not by a subscription, lease, or rental contract. Verified
+            members hold one share or several; RYDA is hired as the
+            operations partner.
           </p>
         </div>
       </section>
 
-      {/* Owning — primary */}
+      {/* 5-step lifecycle */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
             Co-ownership
           </p>
           <h2 className="mt-3 font-display text-4xl text-ink sm:text-5xl">
-            Own a piece of the world's best cars.
+            Own a piece of the world&apos;s best cars.
           </h2>
           <p className="mt-4 max-w-2xl text-lg text-ink-soft">
             One Ferrari 296 share: $34K up front, ~$7,080/year all-in,
-            ~30 days/year — roughly $236/day in steady-state ops. Compare
-            with $2,500+/day to rent or $40–80K/yr to own outright.
+            ~30 days/year — roughly $236/day in steady-state ops.
+            Compare with $2,400+/day to rent or $40–80K/yr to own
+            outright.
           </p>
 
           <div className="mt-12 grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-5">
@@ -50,56 +167,256 @@ export default function HowItWorksPage() {
             <Step n="02" title="Choose" body="Browse the curated, CPO-only fleet. Every car passes a multi-point Pre-Purchase Inspection before a single share is sold — co-owners are protected from inheriting major powertrain or mechanical issues." />
             <Step n="03" title="Co-own" body="Join the LLC alongside other members. Sign the Operating Agreement and Management Services Agreement. Fund your share via wire or ACH." />
             <Step n="04" title="Drive" body="Book your time on the RYDA app. Each share unlocks ~30 days and ~3,000 miles per year (100 mi/day allowance). Hold multiple shares to scale linearly — 5 ≈ 150 days, all 10 ≈ 300 days." />
-            <Step n="05" title="Exit" body="Default: RYDA sells the car at year 2 and distributes proceeds pro-rata (we model a ~10% depreciation assumption). Want out sooner? Transfer your share to another verified member after the 12-month minimum hold. RYDA handles the LLC paperwork. 3% transfer fee on member-to-member transfers." />
+            <Step n="05" title="Exit" body="Default: RYDA sells the car at year 2 OR 50,000 miles — whichever comes first — and distributes proceeds pro-rata (we model a ~10% depreciation assumption). Want out sooner? Transfer your share to another verified member after the 12-month minimum hold. RYDA handles the LLC paperwork. 3% transfer fee on member-to-member transfers." />
           </div>
         </div>
       </section>
 
-      {/* Cost-math comparison */}
+      {/* 4-way comparison — money only */}
       <section className="border-b border-rule">
-        <div className="mx-auto max-w-5xl px-6 py-20 sm:px-10">
+        <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+            Compare · Three are usage rights. Only RYDA is asset-backed.
+          </p>
+          <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
+            Four ways to think about a Ferrari.
+          </h2>
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-soft">
+            Wealthy enthusiasts have three real options for getting into
+            an exotic: buy outright, rent by the day, or join a club.
+            RYDA is a fourth — structured co-ownership of a real car.
+            The math below anchors on the Ferrari 296 GTB and a single
+            share over the {HOLDING_YEARS}-year planned exit.
+          </p>
+
+          <div className="mt-10 overflow-hidden rounded-2xl border border-rule bg-surface">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[840px] text-sm">
+                <thead className="border-b border-rule bg-cream-2 text-xs font-medium uppercase tracking-wider text-ink-soft">
+                  <tr>
+                    <th className="px-6 py-5 text-left">&nbsp;</th>
+                    <th className="px-6 py-5 text-right">Solo ownership</th>
+                    <th className="px-6 py-5 text-right">Daily rental</th>
+                    <th className="px-6 py-5 text-right">Supercar club</th>
+                    <th className="px-6 py-5 text-right text-red">RYDA</th>
+                  </tr>
+                </thead>
+                <tbody className="text-ink">
+                  {ROWS.map((r) => (
+                    <tr
+                      key={r.label}
+                      className={`border-b border-rule last:border-b-0 ${
+                        r.emphasis ? "bg-cream-2/60" : ""
+                      }`}
+                    >
+                      <td
+                        className={`px-6 py-4 ${
+                          r.emphasis
+                            ? "font-medium text-ink"
+                            : "text-ink-soft"
+                        }`}
+                      >
+                        {r.label}
+                      </td>
+                      <td
+                        className={`px-6 py-4 text-right tabular-nums ${
+                          r.emphasis ? "font-display text-base text-ink" : ""
+                        }`}
+                      >
+                        {r.regular}
+                      </td>
+                      <td
+                        className={`px-6 py-4 text-right tabular-nums ${
+                          r.emphasis ? "font-display text-base text-ink" : ""
+                        }`}
+                      >
+                        {r.rental}
+                      </td>
+                      <td
+                        className={`px-6 py-4 text-right tabular-nums ${
+                          r.emphasis ? "font-display text-base text-ink" : ""
+                        }`}
+                      >
+                        {r.club}
+                      </td>
+                      <td
+                        className={`px-6 py-4 text-right tabular-nums text-ink ${
+                          r.emphasis
+                            ? "font-display text-base font-medium"
+                            : ""
+                        }`}
+                      >
+                        {r.ryda}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <p className="mt-4 max-w-3xl text-xs text-mute">
+            Numbers shown for illustration on the Ferrari 296 GTB at $340K
+            sticker, modeled around a single co-ownership share over a
+            {" "}{HOLDING_YEARS}-year hold. Multi-share holders scale
+            linearly: a 5-share holder pays ~$170K up front + ~$35K/yr
+            in ops for ~150 days/yr. Solo-ownership carrying assumes
+            industry averages for insurance, storage, maintenance, and
+            depreciation reserve (range: $40–80K/yr depending on the
+            car). Club figure represents a mid-tier US/UK supercar club
+            annual membership; tiers run ~$30K–$80K/yr. Daily rental
+            assumes Miami market rate. Resale assumes
+            {" "}{TARGET_DEPRECIATION_PCT}% depreciation over the hold for
+            both solo ownership and RYDA — applied symmetrically.
+          </p>
+          <p className="mt-3 text-sm text-ink-soft">
+            Want the math on a specific car?{" "}
+            <Link href="/markets" className="font-medium text-red hover:text-red-deep">
+              Open any listing
+            </Link>{" "}
+            to run a calculator anchored to that vehicle, or download a
+            printable cost-comparison sheet from the same page.
+          </p>
+        </div>
+      </section>
+
+      {/* When each option makes sense */}
+      <section className="border-b border-rule bg-cream-2">
+        <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
           <h2 className="font-display text-3xl text-ink sm:text-4xl">
-            The math, one Ferrari at a time.
+            When each option actually makes sense.
           </h2>
           <p className="mt-4 max-w-2xl text-base text-ink-soft">
-            Real numbers for the Ferrari 296 GTB at $340,000 — split 10 ways.
+            We&apos;ll be honest about the trade-offs. Different buyers
+            want different things.
           </p>
-          <div className="mt-10 overflow-hidden rounded-2xl border border-rule bg-surface">
-            <table className="w-full text-sm">
-              <thead className="border-b border-rule bg-cream-2 text-xs font-medium uppercase tracking-wider text-ink-soft">
-                <tr>
-                  <th className="px-6 py-4 text-left">Cost</th>
-                  <th className="px-6 py-4 text-right">Solo ownership</th>
-                  <th className="px-6 py-4 text-right">RYDA (1 share of 10)</th>
-                </tr>
-              </thead>
-              <tbody className="text-ink">
-                <Tr label="Acquisition" solo="$340,000" ryda="$34,000" />
-                <Tr label="Annual insurance" solo="$11,000" ryda="$1,100" />
-                <Tr label="Annual storage" solo="$5,000" ryda="$500" />
-                <Tr label="Annual maintenance" solo="$8,000" ryda="$800" />
-                <Tr label="Annual depreciation reserve" solo="$22,000" ryda="$2,200" />
-                <Tr label="RYDA service fee" solo="—" ryda="$2,480" />
-                <Tr label="Total Year 1" solo="$386,000" ryda="$41,080" emphasis />
-                <Tr label="Days driven" solo="365 (in theory)" ryda="~30 / share" />
-                <Tr label="Effective $/day, ops only" solo="$1,058" ryda="$236" emphasis />
-              </tbody>
-            </table>
+
+          <div className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-4">
+            <Take
+              title="Solo ownership"
+              good="You'd drive 60+ days a year, you love the operational responsibility (storage, insurance, maintenance, registration), and you have the capital and tolerance for $40–80K/yr in carrying."
+              tradeoff="The asset sits idle 90% of the time. Carrying costs accrue whether you drive or not. Selling takes weeks to months."
+            />
+            <Take
+              title="Daily rental"
+              good="You drive once or twice a year, you don't want any commitment, and the per-day price is not your primary concern."
+              tradeoff="$2,400+/day adds up fast. No priority on the vehicle you want, no relationship with it, no ownership upside."
+            />
+            <Take
+              title="Supercar club"
+              good="You want rotating access to many cars, you don't care which specific car, and you don't want to own anything."
+              tradeoff="Annual fees rival co-ownership without an ownership stake. You're a customer of the club, not a co-owner."
+            />
+            <Take
+              title="RYDA"
+              good="You'd drive ~30–60 days a year on a specific car (1–2 shares is the typical buy). You want real ownership without the operational burden, you're comfortable with the 2-year planned exit, and you'd rather scale entitlement by adding shares than buying a second car."
+              tradeoff="You commit to a specific car for the hold. Earlier exits are possible by transferring to another verified member after the 12-month minimum hold; transfer prices are member-to-member."
+              highlight
+            />
           </div>
-          <p className="mt-4 text-center text-xs text-mute">
-            Numbers shown for illustration. Final pricing varies by vehicle.
-            The all-in annual contribution covers RYDA's service component
-            plus pass-through insurance, storage, maintenance, and reserves
-            (combined: ~7–9% of vehicle value). The fleet calendar reserves
-            ~65 days/yr per vehicle for service, downtime, and the optional
-            rental pool (10 shares × 30 days = 300 days member-allocated;
-            365 − 300 = 65).
-          </p>
         </div>
       </section>
 
-      {/* Honest math, expanded */}
+      {/* Why asset-backed co-ownership — 9 reasons */}
+      <section className="border-b border-rule">
+        <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+            Why asset-backed co-ownership
+          </p>
+          <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
+            Nine reasons it makes more sense than the alternatives.
+          </h2>
+          <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <Reason
+              n="01"
+              title="A real asset, not a subscription"
+              body="You're not buying a usage right or a monthly contract. Each share is a registered legal interest in a Delaware LLC that holds title to a specific physical vehicle. Substance, not subscription."
+            />
+            <Reason
+              n="02"
+              title="Financial security through tangible ownership"
+              body="Unlike speculative investments, an exotic in storage can't go bankrupt. The car is always there. Even if RYDA the company disappeared, the LLC still owns the asset and you still own your share."
+            />
+            <Reason
+              n="03"
+              title="Shared costs, not the full burden"
+              body="Insurance, maintenance, tires, detailing, storage, and depreciation reserve all split across up to 10 co-owners. A 1-share holder pays roughly 1/10 of what the solo owner of the same car would."
+            />
+            <Reason
+              n="04"
+              title="Built for travelers and multi-residence owners"
+              body="Your car is operated by a professional team and ready when you need it. No worrying about cold-start trickle-chargers, lapsed registration, or missed inspection windows while you're abroad."
+            />
+            <Reason
+              n="05"
+              title="No hidden costs — all-inclusive packages"
+              body="One transparent annual contribution covers insurance, taxes, service, maintenance, tires, detailing, seasonal storage, fleet management, and prep. Predictable. No surprise invoices."
+            />
+            <Reason
+              n="06"
+              title="Bigger share = more usage time"
+              body="1 share ≈ 30 days + 3,000 mi/yr. 5 shares ≈ 150 days. 10 shares ≈ year-round access — effectively solo ownership with concierge ops on top. Linear scaling, no premium for size."
+            />
+            <Reason
+              n="07"
+              title="Flexible buying & selling of shares"
+              body="Member-to-member transfers after the 12-month minimum hold. RYDA handles the paperwork. The LLC's planned exit at year 2 (or 50K miles) gives every shareholder a clean liquidity event by default."
+            />
+            <Reason
+              n="08"
+              title="Depreciation risk shared, not solo"
+              body="A new Ferrari 296 typically loses $50–60K over the first 18 months. Solo, you eat all of that. With 1 share at 10%, your exposure is $5–6K — and the share-resale at exit cushions even that."
+            />
+            <Reason
+              n="09"
+              title="Community over solitary ownership"
+              body="Verified members, shared track days, member events, off-market sourcing. The car is a passion asset; the network around it is what makes the asset useful when you're not driving."
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Trust grid — 6 buyer protections + 6 advantages */}
       <section className="border-b border-rule bg-cream-2">
+        <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+            Buyer protection &amp; further advantages
+          </p>
+          <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
+            Twelve guardrails on the way in and the way out.
+          </h2>
+
+          <div className="mt-12">
+            <p className="text-xs font-medium uppercase tracking-wider text-mute">
+              Buyer protection
+            </p>
+            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+              <Pillar label="Tested vehicles" body="CPO + multi-point PPI before any share sells." />
+              <Pillar label="Verified members" body="28+, KYC, license &amp; record check before joining." />
+              <Pillar label="Encrypted data" body="Member docs &amp; payment info secured in transit and at rest." />
+              <Pillar label="Vehicle warranty" body="Manufacturer or independent CPO warranty in force at handover." />
+              <Pillar label="Transparent costs" body="Pass-through ops invoiced at cost; service fee disclosed up front." />
+              <Pillar label="Flexible share sale" body="Member-to-member transfers after 12 months; LLC sale at year 2 / 50K mi." />
+            </div>
+          </div>
+
+          <div className="mt-10">
+            <p className="text-xs font-medium uppercase tracking-wider text-mute">
+              Further advantages
+            </p>
+            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+              <Pillar label="Several locations" body="Miami first; LA + NYC online by 2027." />
+              <Pillar label="Resource conservation" body="Cars get driven instead of garaged 350 days a year." />
+              <Pillar label="Fair-use rules" body="Calendar caps consecutive peak-season days so no one corners the car." />
+              <Pillar label="Professional storage" body="Climate-controlled, 24/7 monitored, insured partner facilities." />
+              <Pillar label="Like-minded community" body="Verified members + shared track days + off-market access." />
+              <Pillar label="Online live booking" body="Reserve days from the app; live availability across the calendar." />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* The deeper math — consolidated honest-math + 2-yr exit story */}
+      <section className="border-b border-rule">
         <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
             How to read the price
@@ -109,42 +426,54 @@ export default function HowItWorksPage() {
           </h2>
           <div className="mt-8 space-y-5 text-base leading-relaxed text-ink-soft">
             <p>
-              The $236/day figure is steady-state operating cost: $7,080 of
-              annual ops divided by 30 driving days. It's what every day
-              behind the wheel costs you{" "}
-              <span className="italic">while you hold the share</span>, ignoring
-              the buy-in.
+              The $236/day figure is steady-state operating cost: $7,080
+              of annual ops divided by 30 driving days. It&apos;s what
+              every day behind the wheel costs you{" "}
+              <span className="italic">while you hold the share</span>,
+              ignoring the buy-in. Roughly $7,080 ÷ 30 days.
             </p>
             <p>
-              The bigger number is net cost over the full hold. RYDA's
-              doctrine is a 2-year planned exit: each curated CPO car is held
-              for ~2 years, then the LLC sells it and proceeds are
-              distributed pro-rata. We model a 10% depreciation hit over the
-              full hold — a conservative middle that absorbs both the
-              drive-only and rental-opt-in usage profiles, given the
-              100 mi/day shareholder allowance and rental-pool wear.
+              Year 1 includes the buy-in as real cash. $34K share +
+              $7,080 ops = $41,080 spent (the table number above; a
+              one-time $1,500 closing fee is added at signing). At 30
+              days driven that&apos;s ~$1,369 per driving day in Year 1
+              — still below the cost of renting the same Ferrari for
+              the same 30 days ($2,400/day × 30 = $72,000). And you
+              exit with a transferable share, not a stack of receipts.
             </p>
             <p>
-              For the F296 at one share over 2 years: $34K buy-in + $7,080 ×
-              2 carrying = $48,160 spent. Resale at 90% of buy-in returns
-              ~$30,600. <strong>Net cost ~$17,560</strong> for 60 driving
-              days = <strong>~$293 per actual driving day</strong>. That's
-              the apples-to-apples number to use against rental ($2,400/day
-              × 60 = $144,000). You also exit with cash from the sale, not
-              a stack of receipts.
+              The bigger number is net cost over the full hold.
+              RYDA&apos;s doctrine is a 2-year planned exit (or
+              {" "}{(HOLDING_MILES_CAP / 1000).toFixed(0)}K-mile cap,
+              whichever comes first): each curated CPO car is held for
+              ~2 years, then the LLC sells it and proceeds are
+              distributed pro-rata. We model {TARGET_DEPRECIATION_PCT}%
+              depreciation over the hold — a conservative middle that
+              absorbs both the drive-only and rental-opt-in usage
+              profiles, given the 100 mi/day shareholder allowance.
+            </p>
+            <p>
+              For the F296 at one share over 2 years: $34K buy-in +
+              $7,080 × 2 carrying = $48,160 spent. Resale at 90% of
+              buy-in returns ~$30,600.{" "}
+              <strong>Net cost ~$17,560</strong> for 60 driving days ={" "}
+              <strong>~$293 per actual driving day</strong>. That&apos;s
+              the apples-to-apples number to use against rental
+              ($2,400/day × 60 = $144,000). You also exit with cash
+              from the sale, not a stack of receipts.
             </p>
           </div>
           <Link
-            href="/compare#calculator"
+            href="/markets"
             className="mt-10 inline-flex h-12 items-center justify-center rounded-full border border-rule px-7 text-sm font-medium text-ink hover:border-ink"
           >
-            Run the numbers on your own usage →
+            Run the math on a specific car →
           </Link>
         </div>
       </section>
 
       {/* Rental opt-in for shareholders */}
-      <section className="border-b border-rule">
+      <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-5xl px-6 py-20 sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
             Optional · Rental opt-in
@@ -176,8 +505,9 @@ export default function HowItWorksPage() {
                 Owners reserve 12 days each (120 total). 220 days enter the
                 pool. At 50% occupancy = ~110 booked days @ $2,400/day =
                 $264,000/yr gross. After RYDA&apos;s 35% management fee,
-                shareholders split ~$171,600. <span className="font-medium text-ink">~$17,160/share/yr</span> —
-                roughly 2.4× your $7,080/yr carrying cost.
+                shareholders split ~$171,600.{" "}
+                <span className="font-medium text-ink">~$17,160/share/yr</span>{" "}
+                — roughly 2.4× your $7,080/yr carrying cost.
               </p>
             </div>
             <div className="rounded-2xl border border-rule bg-surface p-6">
@@ -197,7 +527,7 @@ export default function HowItWorksPage() {
                 Honest tradeoffs
               </p>
               <ul className="mt-3 space-y-2 text-sm leading-relaxed text-ink-soft">
-                <li>· Same 10% depreciation assumption applies — our flat-rate model already absorbs the heavier rental-pool wear.</li>
+                <li>· Same {TARGET_DEPRECIATION_PCT}% depreciation assumption applies — our flat-rate model already absorbs the heavier rental-pool wear.</li>
                 <li>· Rental days are pooled across all shares — no individual day-of priority guaranteed.</li>
                 <li>· Members keep first-call on owner-priority weeks. Renters fill the gaps.</li>
                 <li>· Track-day cars come out of the pool when you take them on track.</li>
@@ -206,16 +536,16 @@ export default function HowItWorksPage() {
           </div>
 
           <Link
-            href="/compare#calculator"
+            href="/markets"
             className="mt-10 inline-flex h-12 items-center justify-center rounded-full bg-red px-7 text-sm font-medium text-cream hover:bg-red-deep"
           >
-            Toggle rental income in the calculator →
+            Toggle rental income on a specific car →
           </Link>
         </div>
       </section>
 
       {/* FAQ */}
-      <section className="border-b border-rule bg-cream-2">
+      <section className="border-b border-rule">
         <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10">
           <h2 className="font-display text-3xl text-ink sm:text-4xl">
             Frequently asked questions.
@@ -231,7 +561,7 @@ export default function HowItWorksPage() {
             />
             <Faq
               q="Can I rent out my share days for income?"
-              a="Yes — opting into RYDA's rental pool is voluntary, share-by-share. We list the car on /rent, handle bookings, insurance, screening, and condition checks. Revenue splits 65/35 (you / RYDA) and is distributed pro-rata across the days each share contributes. The pool is whatever days members don't reserve, so realistic pool occupancy is ~50% (full-control fleets clock 60–70%). On that basis, a single Ferrari 296 share can earn ~$15–18K/yr — typically 2–2.5× your annual carrying cost, and often enough to flip your two-year hold from a net cost into a net positive return. Same flat 10% depreciation assumption applies in both scenarios — that one number already absorbs the heavier rental-pool wear, so we don't need to bump it for the rental path."
+              a={`Yes — opting into RYDA's rental pool is voluntary, share-by-share. We list the car on /rent, handle bookings, insurance, screening, and condition checks. Revenue splits 65/35 (you / RYDA) and is distributed pro-rata across the days each share contributes. The pool is whatever days members don't reserve, so realistic pool occupancy is ~50% (full-control fleets clock 60–70%). On that basis, a single Ferrari 296 share can earn ~$15–18K/yr — typically 2–2.5× your annual carrying cost, and often enough to flip your two-year hold from a net cost into a net positive return. Same flat ${TARGET_DEPRECIATION_PCT}% depreciation assumption applies in both scenarios — that one number already absorbs the heavier rental-pool wear.`}
             />
             <Faq
               q="What if a co-owner stops paying?"
@@ -260,53 +590,6 @@ export default function HowItWorksPage() {
           </div>
         </div>
       </section>
-
-      {/* Try-before-you-buy aside */}
-      <section className="border-b border-rule bg-cream-2">
-        <div className="mx-auto max-w-3xl px-6 py-16 text-center sm:px-10">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            Also for members
-          </p>
-          <h2 className="mt-3 font-display text-2xl text-ink sm:text-3xl">
-            Want to drive one before you commit?
-          </h2>
-          <p className="mx-auto mt-4 max-w-xl text-base text-ink-soft">
-            Members and prospective buyers can rent any RYDA vehicle by the
-            day. It's the best way to know if the car fits your life before
-            you claim a co-ownership share.
-          </p>
-          <Link
-            href="/rent"
-            className="mt-6 inline-flex h-11 items-center justify-center rounded-full border border-rule px-6 text-sm font-medium text-ink hover:border-ink"
-          >
-            See rentals →
-          </Link>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="bg-ink py-20 text-cream">
-        <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
-          <h2 className="font-display text-4xl font-light sm:text-5xl">Ready?</h2>
-          <p className="mx-auto mt-6 max-w-xl text-base text-cream/70">
-            Join the founding members list for Miami launch.
-          </p>
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link
-              href="/founding-members"
-              className="inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-red hover:text-cream"
-            >
-              Apply for membership
-            </Link>
-            <Link
-              href="/markets"
-              className="inline-flex h-12 items-center justify-center rounded-full border border-cream/30 px-7 text-sm font-medium text-cream hover:border-cream hover:bg-cream/10"
-            >
-              See the fleet
-            </Link>
-          </div>
-        </div>
-      </section>
     </>
   );
 }
@@ -314,44 +597,77 @@ export default function HowItWorksPage() {
 function Step({ n, title, body }: { n: string; title: string; body: string }) {
   return (
     <div>
-      <p className="font-display text-sm text-red">{n}</p>
-      <p className="mt-3 font-display text-xl text-ink">{title}</p>
-      <p className="mt-3 text-base leading-relaxed text-ink-soft">{body}</p>
+      <p className="font-display text-2xl text-red">{n}</p>
+      <p className="mt-2 font-display text-xl text-ink">{title}</p>
+      <p className="mt-3 text-sm leading-relaxed text-ink-soft">{body}</p>
     </div>
   );
 }
 
-function Tr({
-  label,
-  solo,
-  ryda,
-  emphasis,
+function Take({
+  title,
+  good,
+  tradeoff,
+  highlight,
 }: {
-  label: string;
-  solo: string;
-  ryda: string;
-  emphasis?: boolean;
+  title: string;
+  good: string;
+  tradeoff: string;
+  highlight?: boolean;
 }) {
-  const cls = emphasis ? "font-display text-base text-ink" : "text-ink-soft";
   return (
-    <tr className="border-b border-rule last:border-b-0">
-      <td className="px-6 py-4 text-sm">{label}</td>
-      <td className={`px-6 py-4 text-right tabular-nums ${cls}`}>{solo}</td>
-      <td className={`px-6 py-4 text-right tabular-nums ${cls}`}>{ryda}</td>
-    </tr>
+    <div
+      className={`rounded-2xl border p-6 ${
+        highlight ? "border-red bg-red/5" : "border-rule bg-surface"
+      }`}
+    >
+      <p
+        className={`font-display text-xl ${
+          highlight ? "text-red" : "text-ink"
+        }`}
+      >
+        {title}
+      </p>
+      <p className="mt-4 text-xs font-medium uppercase tracking-wider text-mute">
+        Right for you if
+      </p>
+      <p className="mt-2 text-sm leading-relaxed text-ink-soft">{good}</p>
+      <p className="mt-5 text-xs font-medium uppercase tracking-wider text-mute">
+        The trade-off
+      </p>
+      <p className="mt-2 text-sm leading-relaxed text-ink-soft">{tradeoff}</p>
+    </div>
+  );
+}
+
+function Reason({ n, title, body }: { n: string; title: string; body: string }) {
+  return (
+    <div className="rounded-2xl border border-rule bg-surface p-6">
+      <p className="font-display text-2xl text-red">{n}</p>
+      <p className="mt-2 font-display text-lg text-ink">{title}</p>
+      <p className="mt-3 text-sm leading-relaxed text-ink-soft">{body}</p>
+    </div>
+  );
+}
+
+function Pillar({ label, body }: { label: string; body: string }) {
+  return (
+    <div className="rounded-xl border border-rule bg-surface p-4">
+      <p className="text-xs font-medium uppercase tracking-wider text-red">
+        {label}
+      </p>
+      <p className="mt-1.5 text-xs leading-relaxed text-ink-soft">{body}</p>
+    </div>
   );
 }
 
 function Faq({ q, a }: { q: string; a: string }) {
   return (
-    <details className="group rounded-xl border border-rule bg-surface p-5">
-      <summary className="cursor-pointer list-none font-display text-lg text-ink marker:hidden">
-        <span className="flex items-center justify-between gap-4">
-          <span>{q}</span>
-          <span className="text-2xl text-red transition-transform group-open:rotate-45">+</span>
-        </span>
+    <details className="rounded-2xl border border-rule bg-surface p-6 open:bg-cream-2/40">
+      <summary className="cursor-pointer text-base font-medium text-ink">
+        {q}
       </summary>
-      <p className="mt-4 text-sm leading-relaxed text-ink-soft">{a}</p>
+      <p className="mt-3 text-sm leading-relaxed text-ink-soft">{a}</p>
     </details>
   );
 }

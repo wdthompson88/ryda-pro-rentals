@@ -142,7 +142,7 @@ export default function Home() {
             <Step n="02" title="Choose" body="Browse the curated, CPO-only fleet. Every car passes a multi-point Pre-Purchase Inspection before a single share is sold — co-owners are protected from inheriting major powertrain or mechanical issues." />
             <Step n="03" title="Co-own" body="Up to 10 members form a Delaware LLC together to hold the vehicle. You sign the operating agreement and fund your share." />
             <Step n="04" title="Drive" body="Book your time on the RYDA app. Each share unlocks ~30 days and ~3,000 miles a year (100 mi/day). Most members hold 1–2 shares; high-use members can buy more entitlement on the same car." />
-            <Step n="05" title="Exit" body="Default exit: RYDA sells the car at year 2 and proceeds split pro-rata (we model a ~10% depreciation hit). Need out earlier? Transfer your share to another verified member after the 12-month minimum hold." />
+            <Step n="05" title="Exit" body="Default exit: RYDA sells the car at year 2 OR 50,000 miles — whichever comes first. Proceeds split pro-rata (we model a ~10% depreciation hit). Need out earlier? Transfer your share to another verified member after the 12-month minimum hold." />
           </div>
           <div className="mt-16 flex justify-center">
             <Link

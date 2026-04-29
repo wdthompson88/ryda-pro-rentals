@@ -21,7 +21,7 @@ export default function MarketsPage() {
             The fleet
           </p>
           <h1 className="mt-4 font-display text-5xl font-light leading-tight text-ink sm:text-6xl">
-            Co-own the world's most exceptional cars.
+            Asset-backed shares of the world's most exceptional cars.
           </h1>
           <p className="mt-6 max-w-2xl text-lg text-ink-soft">
             Claim shares in any vehicle's Delaware LLC. Each share unlocks

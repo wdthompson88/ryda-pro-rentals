@@ -454,7 +454,7 @@ function VehicleCard({ vehicle: v }: { vehicle: Vehicle }) {
               </p>
               <p className="mt-1 text-[11px] text-ink-soft tabular-nums">
                 Net cost:{" "}
-                <span className="font-medium text-red">
+                <span className="font-medium text-ink">
                   ~{formatUSD(econ.netCost)}
                 </span>{" "}
                 after {HOLDING_YEARS}-yr sale of vehicle

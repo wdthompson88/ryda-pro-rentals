@@ -266,6 +266,25 @@ export default async function RentDetailPage({
                   </div>
                 </div>
 
+                {/* Deposit + driver requirements */}
+                <div className="mt-4 space-y-2 rounded-xl border border-rule bg-cream-2/40 p-3 text-[11px] text-ink-soft">
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-mute">Cash deposit (refundable)</span>
+                    <span className="font-medium text-ink tabular-nums">
+                      {formatUSD(Math.max(5_000, Math.round(dailyRate * 2)))}
+                      <span className="ml-1 text-mute">· half for members</span>
+                    </span>
+                  </div>
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-mute">Min. driver age</span>
+                    <span className="font-medium text-ink">28+</span>
+                  </div>
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-mute">Driving experience</span>
+                    <span className="font-medium text-ink">5+ years</span>
+                  </div>
+                </div>
+
                 <Link
                   href={`/contact?type=Rental&note=${encodeURIComponent(
                     `Rental request: ${title} · ${market}`,
@@ -279,6 +298,121 @@ export default async function RentDetailPage({
                   cancellation up to 7 days before pickup.
                 </p>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Trust strip — hosted by, response time, badges */}
+      <section className="border-b border-rule">
+        <div className="mx-auto max-w-7xl px-6 py-10 sm:px-10">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+            {/* Hosted by RYDA */}
+            <div className="lg:col-span-4">
+              <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-mute">
+                Hosted by
+              </p>
+              <div className="mt-3 flex items-center gap-3">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-ink text-cream font-display text-lg">
+                  R
+                </div>
+                <div>
+                  <p className="font-display text-base text-ink">RYDA</p>
+                  <p className="text-[11px] text-ink-soft">
+                    Typically responds within 30 min · business hours
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Trust badges grid */}
+            <div className="lg:col-span-8">
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                <TrustBadge label="Min driver age" value="28+" />
+                <TrustBadge label="Experience" value="5+ years" />
+                <TrustBadge label="Booking" value="Secured" />
+                <TrustBadge label="Insurance" value="$1M liability" />
+                <TrustBadge label="Mileage" value="100 mi/day incl." />
+                <TrustBadge label="Availability" value="Live calendar" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Deliverable to + Payment options */}
+      <section className="border-b border-rule bg-cream-2">
+        <div className="mx-auto max-w-7xl px-6 py-10 sm:px-10">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+            <div className="lg:col-span-7">
+              <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-red">
+                Deliverable to
+              </p>
+              <p className="mt-2 font-display text-2xl text-ink">
+                White-glove delivery across the region.
+              </p>
+              <p className="mt-2 text-sm text-ink-soft">
+                We deliver and collect the vehicle to any address. Min 3-day
+                rental for in-market delivery; 7-day minimum for cross-state.
+                Delivery and pick-up rates from $450.
+              </p>
+              <ul className="mt-4 grid grid-cols-2 gap-y-2 text-sm text-ink-soft sm:grid-cols-3">
+                {(market === "Miami"
+                  ? [
+                      "Miami",
+                      "Miami Beach",
+                      "Fort Lauderdale",
+                      "Palm Beach",
+                      "Naples",
+                      "The Keys",
+                    ]
+                  : market === "Los Angeles"
+                    ? [
+                        "Los Angeles",
+                        "Beverly Hills",
+                        "Malibu",
+                        "Newport Beach",
+                        "Palm Springs",
+                        "Pasadena",
+                      ]
+                    : [
+                        "New York",
+                        "Hamptons",
+                        "Greenwich",
+                        "Hudson Valley",
+                        "Newport",
+                        "Cape Cod",
+                      ]
+                ).map((city) => (
+                  <li key={city} className="flex items-center gap-2">
+                    <span className="inline-block h-1 w-1 rounded-full bg-red" />
+                    {city}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="lg:col-span-5">
+              <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-red">
+                Payment options
+              </p>
+              <p className="mt-2 font-display text-2xl text-ink">
+                Multiple ways to settle.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {["Wire", "ACH", "Credit card", "Debit card"].map((p) => (
+                  <span
+                    key={p}
+                    className="rounded-full border border-rule bg-surface px-3 py-1 text-xs font-medium text-ink"
+                  >
+                    {p}
+                  </span>
+                ))}
+              </div>
+              <p className="mt-4 text-[11px] text-mute">
+                Members on RYDA Blue or Black get reduced deposits and
+                priority booking on peak weekends.
+              </p>
             </div>
           </div>
         </div>
@@ -423,6 +557,17 @@ function Pillar({ title, body }: { title: string; body: string }) {
     <div>
       <p className="font-display text-lg text-ink">{title}</p>
       <p className="mt-2 text-sm leading-relaxed text-ink-soft">{body}</p>
+    </div>
+  );
+}
+
+function TrustBadge({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl border border-rule bg-cream-2/40 px-4 py-3">
+      <p className="text-[10px] uppercase tracking-[0.16em] text-mute">
+        {label}
+      </p>
+      <p className="mt-1 font-display text-base text-ink">{value}</p>
     </div>
   );
 }

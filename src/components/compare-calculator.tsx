@@ -14,11 +14,18 @@ import {
 const RENTAL_FALLBACK = 2_500;
 const DEFAULT_RESIDUAL_PCT = 100 - TARGET_DEPRECIATION_PCT; // 90% of buy-in
 
-export function CompareCalculator() {
+export function CompareCalculator({
+  lockedVehicle,
+}: {
+  /** When set, hides the vehicle picker and locks math to this vehicle.
+   *  Used on /markets/[symbol] so each listing has its own calculator. */
+  lockedVehicle?: Vehicle;
+} = {}) {
   // Educational tool — let users model 1..vehicle.shares regardless of
   // current inventory. Real availability lives on each vehicle's listing.
   // Defaults reflect the doctrinal CPO 2-year planned exit.
-  const initial = VEHICLES.find((v) => v.symbol === "F296") ?? VEHICLES[0];
+  const initial =
+    lockedVehicle ?? VEHICLES.find((v) => v.symbol === "F296") ?? VEHICLES[0];
   const [vehicleSymbol, setVehicleSymbol] = useState(initial.symbol);
   const [shares, setShares] = useState(1);
   const [days, setDays] = useState(20);
@@ -29,8 +36,9 @@ export function CompareCalculator() {
     RENTAL_DEFAULTS.defaultOccupancyPct,
   );
 
-  const vehicle: Vehicle =
-    VEHICLES.find((v) => v.symbol === vehicleSymbol) ?? initial;
+  const vehicle: Vehicle = lockedVehicle
+    ?? VEHICLES.find((v) => v.symbol === vehicleSymbol)
+    ?? initial;
 
   const maxShares = vehicle.shares; // total shares per LLC (educational cap)
   const safeShares = Math.min(shares, maxShares);
@@ -170,18 +178,24 @@ export function CompareCalculator() {
           >
             Vehicle
           </label>
-          <select
-            id="calc-vehicle"
-            value={vehicleSymbol}
-            onChange={(e) => setVehicleSymbol(e.target.value)}
-            className="mt-2 h-12 w-full rounded-xl border border-rule bg-cream-2 px-4 text-sm text-ink focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
-          >
-            {VEHICLES.map((v) => (
-              <option key={v.symbol} value={v.symbol}>
-                {v.year} {v.name}
-              </option>
-            ))}
-          </select>
+          {lockedVehicle ? (
+            <div className="mt-2 flex h-12 w-full items-center rounded-xl border border-rule bg-cream-2 px-4 text-sm font-medium text-ink">
+              {lockedVehicle.year} {lockedVehicle.name}
+            </div>
+          ) : (
+            <select
+              id="calc-vehicle"
+              value={vehicleSymbol}
+              onChange={(e) => setVehicleSymbol(e.target.value)}
+              className="mt-2 h-12 w-full rounded-xl border border-rule bg-cream-2 px-4 text-sm text-ink focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
+            >
+              {VEHICLES.map((v) => (
+                <option key={v.symbol} value={v.symbol}>
+                  {v.year} {v.name}
+                </option>
+              ))}
+            </select>
+          )}
           <p className="mt-2 text-xs text-mute">
             {formatUSD(vehicle.pricePerShare)} per share ·{" "}
             {formatUSD(vehicle.annualOpCost)}/yr ops · ~{vehicle.daysPerYear}{" "}
@@ -242,56 +256,66 @@ export function CompareCalculator() {
         />
       </div>
 
-      {/* Rental opt-in */}
-      <div className="mt-10 rounded-2xl border border-rule bg-cream-2/40 p-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
+      {/* Rental opt-in — promoted to a stronger card with prominent toggle */}
+      <div
+        className={`mt-10 rounded-2xl border-2 p-6 transition-colors ${
+          optInRental
+            ? "border-red bg-red/5"
+            : "border-red/30 bg-cream-2"
+        }`}
+      >
+        <div className="flex flex-wrap items-start justify-between gap-6">
           <div className="max-w-xl">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-red">
               Optional · Rent your unused days
             </p>
-            <h4 className="mt-2 font-display text-xl text-ink">
-              Pool unused days into the RYDA rental program.
+            <h4 className="mt-2 font-display text-2xl text-ink">
+              Toggle on to add rental income to your math.
             </h4>
-            <p className="mt-2 text-sm text-ink-soft">
+            <p className="mt-3 text-sm leading-relaxed text-ink-soft">
               Miami exotic-rental fleets average 200–240 booked days/yr.
               Shareholders can opt their unused entitlement into the
-              rental pool — RYDA handles the bookings, insurance, and
-              cleaning. Revenue splits {100 - RENTAL_DEFAULTS.defaultManagementFeePct}/{RENTAL_DEFAULTS.defaultManagementFeePct}{" "}
-              (you / RYDA), distributed pro-rata across shares.
+              rental pool — RYDA handles bookings, insurance, and
+              cleaning. Revenue splits{" "}
+              {100 - RENTAL_DEFAULTS.defaultManagementFeePct}/
+              {RENTAL_DEFAULTS.defaultManagementFeePct} (you / RYDA),
+              distributed pro-rata across shares.
             </p>
             <p className="mt-2 text-xs text-mute">
               Same {TARGET_DEPRECIATION_PCT}% depreciation assumption
-              applies — our CPO maintenance + curated mileage caps keep
+              applies — our 100 mi/day allowance + CPO maintenance keep
               the resale story consistent whether you drive or rent it
               out.
             </p>
           </div>
-          <label className="inline-flex cursor-pointer items-center gap-3 self-start">
-            <span className="text-xs font-medium uppercase tracking-wider text-mute">
-              {optInRental ? "Opted in" : "Opt in"}
-            </span>
+
+          {/* Larger, higher-contrast toggle with explicit ON/OFF labels */}
+          <button
+            type="button"
+            role="switch"
+            aria-checked={optInRental}
+            onClick={() => setOptInRental((v) => !v)}
+            className={`group flex shrink-0 items-center gap-3 rounded-full border-2 px-5 py-3 text-sm font-bold uppercase tracking-wider transition-all hover:scale-105 ${
+              optInRental
+                ? "border-red bg-red text-cream shadow-lg shadow-red/30"
+                : "border-red bg-cream text-red shadow-md hover:bg-red/5"
+            }`}
+          >
+            <span>{optInRental ? "Opted in" : "Opt in"}</span>
             <span
-              role="switch"
-              aria-checked={optInRental}
-              tabIndex={0}
-              onClick={() => setOptInRental((v) => !v)}
-              onKeyDown={(e) => {
-                if (e.key === " " || e.key === "Enter") {
-                  e.preventDefault();
-                  setOptInRental((v) => !v);
-                }
-              }}
-              className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors ${
-                optInRental ? "bg-red" : "bg-rule"
+              className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${
+                optInRental ? "bg-cream" : "bg-red"
               }`}
             >
               <span
-                className={`inline-block h-5 w-5 transform rounded-full bg-cream transition-transform ${
-                  optInRental ? "translate-x-6" : "translate-x-1"
+                className={`inline-block h-4 w-4 transform rounded-full transition-transform ${
+                  optInRental
+                    ? "translate-x-6 bg-red"
+                    : "translate-x-1 bg-cream"
                 }`}
               />
             </span>
-          </label>
+          </button>
         </div>
 
         {optInRental && (
@@ -441,7 +465,7 @@ export function CompareCalculator() {
                 </span>
                 <span
                   className={`font-display text-2xl tabular-nums ${
-                    isPositive ? "text-emerald-600" : "text-red"
+                    isPositive ? "text-emerald-600" : "text-ink"
                   }`}
                 >
                   {isPositive ? "+ " : "− "}
@@ -641,11 +665,7 @@ function ResultCard({
     : accent
       ? "border-red bg-red/5"
       : "border-rule bg-cream-2/40";
-  const textColor = positive
-    ? "text-emerald-600"
-    : accent
-      ? "text-red"
-      : "text-ink";
+  const textColor = positive ? "text-emerald-600" : "text-ink";
 
   return (
     <div className={`rounded-2xl border p-6 ${borderColor}`}>

@@ -65,8 +65,74 @@ export default function MemberProtectionPage() {
         </div>
       </section>
 
-      {/* Asset custody */}
+      {/* What "asset-backed" actually means — the comparison block */}
       <section className="border-b border-rule">
+        <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+            What asset-backed actually means
+          </p>
+          <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
+            Three of the four are usage rights. Only one is an asset.
+          </h2>
+          <p className="mt-4 max-w-3xl text-base text-ink-soft">
+            "Asset-backed" is the difference between a contract with an
+            operator and a legal interest in a real, titled vehicle.
+            What happens to your access — and your money — if the
+            platform behind it disappears?
+          </p>
+          <div className="mt-10 overflow-hidden rounded-2xl border border-rule bg-surface">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[640px] text-sm">
+                <thead className="border-b border-rule bg-cream-2 text-xs font-medium uppercase tracking-wider text-ink-soft">
+                  <tr>
+                    <th className="px-6 py-5 text-left">Model</th>
+                    <th className="px-6 py-5 text-left">Backed by</th>
+                    <th className="px-6 py-5 text-left">If the platform fails</th>
+                  </tr>
+                </thead>
+                <tbody className="text-ink">
+                  <tr className="border-b border-rule">
+                    <td className="px-6 py-4 text-ink-soft">Subscription / club</td>
+                    <td className="px-6 py-4">A contract with the operator</td>
+                    <td className="px-6 py-4">Lose access immediately</td>
+                  </tr>
+                  <tr className="border-b border-rule">
+                    <td className="px-6 py-4 text-ink-soft">Lease</td>
+                    <td className="px-6 py-4">A contract with the lessor</td>
+                    <td className="px-6 py-4">Lessor reclaims the car</td>
+                  </tr>
+                  <tr className="border-b border-rule">
+                    <td className="px-6 py-4 text-ink-soft">Daily rental</td>
+                    <td className="px-6 py-4">A single-day contract</td>
+                    <td className="px-6 py-4">Walk away</td>
+                  </tr>
+                  <tr className="bg-cream-2/60">
+                    <td className="px-6 py-4 font-display text-base text-red">
+                      RYDA co-ownership
+                    </td>
+                    <td className="px-6 py-4 font-medium text-ink">
+                      LLC ownership of the physical car
+                    </td>
+                    <td className="px-6 py-4 font-medium text-ink">
+                      The LLC and the car still belong to the members
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <p className="mt-4 max-w-3xl text-xs text-mute">
+            Co-ownership shares are member-managed Delaware LLC interests.
+            The vehicle is held on title in the LLC's name; you hold a
+            registered legal interest in the LLC. Real asset, real
+            ownership — not a financial instrument and not an
+            investment offering.
+          </p>
+        </div>
+      </section>
+
+      {/* Asset custody */}
+      <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
             Who controls what
