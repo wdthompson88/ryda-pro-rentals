@@ -340,11 +340,14 @@ function VehicleCard({ vehicle: v }: { vehicle: Vehicle }) {
   const stickerSavings = v.fullPrice - v.pricePerShare;
   const econ = computeShareEconomics(v);
   const rental = computeRentalEconomics(v);
-  // Net cost / surplus when shareholders opt into the rental pool
+  // Rental opt-in: profit when inflows (rental + sale) exceed outflows
+  // (share price + carrying). Return % is profit / capital deployed.
   const rentalIncome2yr = rental.perShareTotalIncome;
-  const rentedNet = econ.netCost - rentalIncome2yr;
-  const rentedIsSurplus = rentedNet < 0;
-  const rentedShown = Math.abs(rentedNet);
+  const rentedNet = econ.netCost - rentalIncome2yr;       // < 0 when you profit
+  const rentedProfit = -rentedNet;                        // positive when you profit
+  const rentedReturnPct =
+    econ.totalSpend === 0 ? 0 : (rentedProfit / econ.totalSpend) * 100;
+  const rentedIsPositive = rentedProfit > 0;
 
   return (
     <Link
@@ -476,7 +479,7 @@ function VehicleCard({ vehicle: v }: { vehicle: Vehicle }) {
           {v.rentalAvailable && rental.perShareAnnualIncome > 0 ? (
             <div
               className={`mt-3 rounded-lg border p-3 ${
-                rentedIsSurplus
+                rentedIsPositive
                   ? "border-emerald-500/40 bg-emerald-500/5"
                   : "border-rule bg-cream-2/40"
               }`}
@@ -486,8 +489,20 @@ function VehicleCard({ vehicle: v }: { vehicle: Vehicle }) {
               </p>
               <dl className="mt-2 space-y-1 text-[11px] tabular-nums text-ink-soft">
                 <MathRow
+                  sign="−"
+                  label="Share price (your buy-in)"
+                  value={formatUSD(econ.buyIn)}
+                  cost
+                />
+                <MathRow
+                  sign="−"
+                  label="2-yr carrying cost"
+                  value={formatUSD(econ.totalCarrying)}
+                  cost
+                />
+                <MathRow
                   sign="+"
-                  label={`Projected rental income (2 yrs)`}
+                  label="Projected rental income (2 yrs)"
                   value={formatUSD(rentalIncome2yr)}
                   positive
                 />
@@ -497,38 +512,25 @@ function VehicleCard({ vehicle: v }: { vehicle: Vehicle }) {
                   value={formatUSD(econ.estimatedResale)}
                   positive
                 />
-                <MathRow
-                  sign="−"
-                  label="Share price (your buy-in)"
-                  value={formatUSD(econ.buyIn)}
-                />
-                <MathRow
-                  sign="−"
-                  label="2-yr carrying cost"
-                  value={formatUSD(econ.totalCarrying)}
-                />
               </dl>
               <div
                 className={`mt-2 flex items-baseline justify-between border-t pt-2 text-xs ${
-                  rentedIsSurplus
+                  rentedIsPositive
                     ? "border-emerald-500/30"
                     : "border-rule"
                 }`}
               >
                 <span className="font-medium text-ink">
-                  {rentedIsSurplus
-                    ? "= Net in your pocket"
-                    : "= Net cost"}{" "}
-                  (2 yrs)
+                  Projected return ({rentedIsPositive ? "+" : ""}
+                  {rentedReturnPct.toFixed(2)}%)
                 </span>
                 <span
                   className={`font-display text-base tabular-nums ${
-                    rentedIsSurplus ? "text-emerald-600" : "text-ink"
+                    rentedIsPositive ? "text-emerald-600" : "text-red"
                   }`}
                 >
-                  {rentedIsSurplus
-                    ? `+ ${formatUSD(rentedShown)}`
-                    : formatUSD(rentedShown)}
+                  {rentedIsPositive ? "+ " : "− "}
+                  {formatUSD(Math.abs(rentedProfit))}
                 </span>
               </div>
             </div>
@@ -570,31 +572,26 @@ function MathRow({
   label,
   value,
   positive,
+  cost,
 }: {
   sign: "+" | "−";
   label: string;
   value: string;
   positive?: boolean;
+  cost?: boolean;
 }) {
+  const tone = positive
+    ? "text-emerald-600"
+    : cost
+      ? "text-red"
+      : "text-ink";
   return (
     <div className="flex items-baseline justify-between gap-2">
       <span className="flex items-baseline gap-1.5">
-        <span
-          className={`w-2 text-center font-medium ${
-            positive ? "text-emerald-600" : "text-mute"
-          }`}
-        >
-          {sign}
-        </span>
+        <span className={`w-2 text-center font-medium ${tone}`}>{sign}</span>
         <span>{label}</span>
       </span>
-      <span
-        className={`tabular-nums ${
-          positive ? "text-emerald-600" : "text-ink"
-        }`}
-      >
-        {value}
-      </span>
+      <span className={`tabular-nums ${tone}`}>{value}</span>
     </div>
   );
 }

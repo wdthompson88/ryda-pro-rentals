@@ -29,7 +29,10 @@ export function CostBreakdown({
   const rental = computeRentalEconomics(vehicle, { holdYears: e.holdYears });
   const rentalIncomeForShares = rental.perShareTotalIncome * shares;
   const rentedNet = e.netCost - rentalIncomeForShares;
-  const rentedSurplus = rentedNet < 0; // true = net positive
+  const rentedProfit = -rentedNet;                // > 0 when you profit
+  const rentedIsPositive = rentedProfit > 0;
+  const rentedReturnPct =
+    e.totalSpend === 0 ? 0 : (rentedProfit / e.totalSpend) * 100;
   const rentedPerDay =
     e.totalDays === 0 ? 0 : Math.round(rentedNet / e.totalDays);
 
@@ -94,7 +97,7 @@ export function CostBreakdown({
 
           <div
             className={`mt-4 rounded-xl border p-4 ${
-              rentedSurplus
+              rentedIsPositive
                 ? "border-emerald-500/40 bg-emerald-500/5"
                 : "border-rule bg-surface"
             }`}
@@ -103,6 +106,20 @@ export function CostBreakdown({
               The {e.holdYears}-year math
             </p>
             <dl className="mt-3 space-y-1.5 text-sm tabular-nums text-ink-soft">
+              <BreakdownRow
+                sign="−"
+                label="Share price (your buy-in)"
+                value={formatUSD(e.buyIn)}
+                sub={`${formatUSD(vehicle.pricePerShare)} × ${shares}`}
+                cost
+              />
+              <BreakdownRow
+                sign="−"
+                label={`${e.holdYears}-yr carrying cost`}
+                value={formatUSD(e.totalCarrying)}
+                sub={`${formatUSD(e.annualCarrying)}/yr × ${e.holdYears}`}
+                cost
+              />
               <BreakdownRow
                 sign="+"
                 label={`Projected rental income (${e.holdYears} yrs)`}
@@ -117,46 +134,30 @@ export function CostBreakdown({
                 sub={`Modeled at ${TARGET_DEPRECIATION_PCT}% depreciation over ${e.holdYears} yrs`}
                 positive
               />
-              <BreakdownRow
-                sign="−"
-                label="Share price (your buy-in)"
-                value={formatUSD(e.buyIn)}
-                sub={`${formatUSD(vehicle.pricePerShare)} × ${shares}`}
-              />
-              <BreakdownRow
-                sign="−"
-                label={`${e.holdYears}-yr carrying cost`}
-                value={formatUSD(e.totalCarrying)}
-                sub={`${formatUSD(e.annualCarrying)}/yr × ${e.holdYears}`}
-              />
             </dl>
             <div
               className={`mt-3 flex items-baseline justify-between gap-4 border-t pt-3 ${
-                rentedSurplus ? "border-emerald-500/30" : "border-rule"
+                rentedIsPositive ? "border-emerald-500/30" : "border-rule"
               }`}
             >
               <div>
                 <p className="text-sm font-medium text-ink">
-                  ={" "}
-                  {rentedSurplus
-                    ? "Net in your pocket"
-                    : "Net cost"}{" "}
-                  ({e.holdYears} yrs)
+                  Projected return ({rentedIsPositive ? "+" : ""}
+                  {rentedReturnPct.toFixed(2)}%)
                 </p>
                 <p className="mt-0.5 text-[11px] text-mute">
-                  {rentedSurplus
-                    ? `≈ ${formatUSD(Math.abs(rentedPerDay))}/day "kept" across ${e.totalDays} driving days`
-                    : `≈ ${formatUSD(rentedPerDay)}/day across ${e.totalDays} driving days`}
+                  {rentedIsPositive
+                    ? `${formatUSD(Math.abs(rentedPerDay))}/day "kept" across ${e.totalDays} driving days`
+                    : `${formatUSD(rentedPerDay)}/day across ${e.totalDays} driving days`}
                 </p>
               </div>
               <p
                 className={`shrink-0 font-display text-2xl tabular-nums ${
-                  rentedSurplus ? "text-emerald-600" : "text-ink"
+                  rentedIsPositive ? "text-emerald-600" : "text-red"
                 }`}
               >
-                {rentedSurplus
-                  ? `+ ${formatUSD(Math.abs(rentedNet))}`
-                  : formatUSD(rentedNet)}
+                {rentedIsPositive ? "+ " : "− "}
+                {formatUSD(Math.abs(rentedProfit))}
               </p>
             </div>
           </div>
@@ -187,21 +188,24 @@ function BreakdownRow({
   value,
   sub,
   positive,
+  cost,
 }: {
   sign: "+" | "−";
   label: string;
   value: string;
   sub?: string;
   positive?: boolean;
+  cost?: boolean;
 }) {
+  const tone = positive
+    ? "text-emerald-600"
+    : cost
+      ? "text-red"
+      : "text-ink";
   return (
     <div className="flex items-baseline justify-between gap-3">
       <div className="flex items-baseline gap-2 min-w-0">
-        <span
-          className={`w-3 shrink-0 text-center font-medium ${
-            positive ? "text-emerald-600" : "text-mute"
-          }`}
-        >
+        <span className={`w-3 shrink-0 text-center font-medium ${tone}`}>
           {sign}
         </span>
         <div className="min-w-0">
@@ -209,13 +213,7 @@ function BreakdownRow({
           {sub ? <p className="text-[11px] text-mute">{sub}</p> : null}
         </div>
       </div>
-      <span
-        className={`shrink-0 tabular-nums ${
-          positive ? "text-emerald-600" : "text-ink"
-        }`}
-      >
-        {value}
-      </span>
+      <span className={`shrink-0 tabular-nums ${tone}`}>{value}</span>
     </div>
   );
 }
