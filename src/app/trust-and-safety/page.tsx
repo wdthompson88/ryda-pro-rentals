@@ -97,14 +97,29 @@ export default function TrustAndSafetyPage() {
               detail="Track-eligible vehicles can be booked with the track-day insurance rider — covers driving on a sanctioned course. Some hypercars are not track-eligible by manufacturer warranty; we flag these in the listing."
             />
           </div>
-          <p className="mt-10 rounded-2xl border border-rule bg-cream-2 p-6 text-sm leading-relaxed text-ink-soft">
-            Full policy documents and certificates of insurance are
-            distributed to every co-owner on closing and re-issued annually.{" "}
-            <Link href="/contact?type=Other#form" className="text-red hover:text-red-deep">
-              Request a sample policy
+          <div className="mt-10 rounded-2xl border border-rule bg-cream-2 p-6">
+            <p className="text-xs font-medium uppercase tracking-wider text-red">
+              Sample documents on request
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-ink-soft">
+              Reviewable by your counsel or accountant before any commitment.
+              Email request — typical turnaround under 24 hours.
+            </p>
+            <ul className="mt-4 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
+              <li>· Sample LLC Operating Agreement</li>
+              <li>· Sample Management Services Agreement</li>
+              <li>· Sample Pre-Purchase Inspection report</li>
+              <li>· Sample insurance certificate</li>
+              <li>· Sample condition report</li>
+              <li>· Sample annual member statement</li>
+            </ul>
+            <Link
+              href="/contact?type=Membership&note=Sample%20document%20packet#form"
+              className="mt-6 inline-flex h-11 items-center justify-center rounded-full bg-ink px-6 text-sm font-medium text-cream hover:bg-red"
+            >
+              Request the document packet →
             </Link>
-            .
-          </p>
+          </div>
         </div>
       </section>
 

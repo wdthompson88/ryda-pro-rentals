@@ -411,9 +411,9 @@ function ComparablesSlide() {
           outcome="Multi-billion-dollar program. Depreciating-asset access product, no securities filing. Direct structural analog for what we're building."
         />
         <Comp
-          name="Soho House / Equinox Black"
-          asset="Luxury membership"
-          outcome="Hundreds of thousands of members at $5–10K+/year. Proves luxury access has scale demand at this price band."
+          name="Freedom Supercars"
+          asset="UK supercar club"
+          outcome="Members pay an annual fee for rotating access, no ownership. Validates demand for structured exotic access at scale; RYDA's ownership model is the upgrade."
         />
         <Comp
           name="Country club / yacht club"

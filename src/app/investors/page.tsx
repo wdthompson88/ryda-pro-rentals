@@ -40,9 +40,12 @@ export default function InvestorsPage() {
             <span className="italic text-red">supercars have been waiting for.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-cream/70">
-            RYDA is a US member-managed supercar co-ownership
-            platform — Soho House for cars, structured around real ownership
-            of real vehicles. We're raising a $2.5M seed to launch Miami in
+            RYDA is a US member-managed supercar co-ownership platform —
+            structured around real LLC ownership of real vehicles, with
+            concierge operations under a separate Management Services
+            Agreement. The closest model is Switzerland's Supercar Sharing
+            AG, adapted to American legal structures. We're raising a $2.5M
+            seed to launch Miami in
             Q3 2026 and reach 20 vehicles + 120 co-owners + $1.2M ARR by Year 3.
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
@@ -87,9 +90,11 @@ export default function InvestorsPage() {
               at $2,500–5,000/day: no priority, no community, no ownership.
             </p>
             <p>
-              Member-managed access has scaled to billions in jets (NetJets),
-              hospitality (Soho House), and clubs. No US platform has built
-              the equivalent for supercars. RYDA fills that gap.
+              Structured fractional access has scaled to billions in jets
+              (NetJets) and decades in European supercars (Supercar Sharing
+              AG, since 2014). No US platform has built the operational
+              backbone for member-managed exotic ownership. RYDA fills
+              that gap.
             </p>
           </div>
         </div>
@@ -190,7 +195,7 @@ export default function InvestorsPage() {
           <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             <Comp name="Supercar Sharing AG" asset="Supercars · Switzerland" outcome="1,300+ members. CHF 34M in transactions over 10 years. Direct precedent — same structure RYDA adapts." />
             <Comp name="NetJets jet card" asset="Private aviation access" outcome="Multi-billion-dollar program. Depreciating-asset access product, no securities filing. Direct structural analog." />
-            <Comp name="Soho House / Equinox Black" asset="Luxury membership" outcome="Hundreds of thousands of members at $5–10K+/year. Proves luxury access has scale demand at this price band." />
+            <Comp name="Freedom Supercars" asset="UK supercar club" outcome="Members pay an annual fee for rotating access, no ownership. Validates demand for structured exotic access; RYDA's ownership model is the upgrade." />
             <Comp name="Country club / yacht club" asset="Member-owned recreational asset" outcome="Centuries-old structure: members own a depreciating asset together, hire staff to operate it. The legal template RYDA uses." />
           </div>
         </div>

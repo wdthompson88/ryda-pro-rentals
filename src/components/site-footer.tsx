@@ -25,6 +25,7 @@ export function SiteFooter() {
               ["Rent", "/rent"],
               ["Membership", "/membership"],
               ["How it works", "/how-it-works"],
+              ["Compare", "/compare"],
               ["FAQ", "/faq"],
             ]}
           />
@@ -36,12 +37,14 @@ export function SiteFooter() {
               ["Storage", "/storage"],
               ["Track day", "/track-day"],
               ["Trust & safety", "/trust-and-safety"],
+              ["Member protection", "/member-protection"],
             ]}
           />
           <FooterCol
             title="Company"
             links={[
               ["About", "/about"],
+              ["Journal", "/journal"],
               ["Careers", "/careers"],
               ["Press", "/press"],
               ["Investors", "/investors"],

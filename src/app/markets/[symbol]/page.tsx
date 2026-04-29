@@ -177,6 +177,53 @@ export default async function VehicleMarketPage({
         </div>
       </section>
 
+      {/* Pre-decision documents + call CTA */}
+      <section className="border-b border-rule bg-cream-2">
+        <div className="mx-auto max-w-5xl px-6 py-16 sm:px-10">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+            <div className="rounded-2xl border border-rule bg-surface p-6">
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+                Read before you wire
+              </p>
+              <p className="mt-3 font-display text-xl text-ink">
+                Sample documents
+              </p>
+              <p className="mt-3 text-sm leading-relaxed text-ink-soft">
+                We&apos;ll send you the LLC Operating Agreement, Management
+                Services Agreement, sample PPI report, sample insurance
+                certificate, and condition report — reviewable by your
+                counsel before any commitment.
+              </p>
+              <Link
+                href={`/contact?type=Membership&note=Sample%20documents%20for%20${v.symbol}#form`}
+                className="mt-5 inline-flex h-11 items-center justify-center rounded-full border border-rule px-6 text-sm font-medium text-ink hover:border-ink"
+              >
+                Request the packet →
+              </Link>
+            </div>
+            <div className="rounded-2xl border border-rule bg-ink p-6 text-cream">
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+                Talk to a founder
+              </p>
+              <p className="mt-3 font-display text-xl">
+                Schedule a 30-minute call
+              </p>
+              <p className="mt-3 text-sm leading-relaxed text-cream/70">
+                Real money, real conversation. We&apos;ll walk you through
+                the LLC structure, insurance, the actual ownership process,
+                and any questions your counsel raised. No commitment.
+              </p>
+              <Link
+                href={`/contact?type=Membership&note=Schedule%20call%20about%20${v.symbol}#form`}
+                className="mt-5 inline-flex h-11 items-center justify-center rounded-full bg-cream px-6 text-sm font-medium text-ink hover:bg-red hover:text-cream"
+              >
+                Schedule a call →
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Disclaimer footer */}
       <section className="bg-ink py-12 text-cream/60">
         <div className="mx-auto max-w-3xl px-6 text-center text-xs sm:px-10">

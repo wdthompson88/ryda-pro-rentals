@@ -94,6 +94,46 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
+      {/* Honest math, expanded */}
+      <section className="border-b border-rule bg-cream-2">
+        <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+            How to read $208/day
+          </p>
+          <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
+            That's the steady-state ops number. Year 1 is different.
+          </h2>
+          <div className="mt-8 space-y-5 text-base leading-relaxed text-ink-soft">
+            <p>
+              The $208/day figure on the table above is the steady-state
+              cost: $7,080 in annual ops divided across 34 driving days. That
+              is what every driving day costs you in years 2 and beyond,
+              after the buy-in is amortized.
+            </p>
+            <p>
+              Year 1 includes the buy-in as real cash. With acquisition + ops,
+              Year-1 cash on a 1-of-10 share is roughly $42,000, or $1,235 per
+              driving day if you actually drive 34. Still ~50% under daily
+              rental ($2,500/day for 34 days = $85,000) — and you exit with a
+              transferable share, not a stack of receipts.
+            </p>
+            <p>
+              At year 3, assuming you transfer your share at ~80% of buy-in
+              (typical for CPO-warranty exotics over a 24–36 month hold), the
+              economic cost of co-ownership works out to roughly $560 per
+              driving day all-in. That is the apples-to-apples number to
+              use against rental.
+            </p>
+          </div>
+          <Link
+            href="/compare#calculator"
+            className="mt-10 inline-flex h-12 items-center justify-center rounded-full border border-rule px-7 text-sm font-medium text-ink hover:border-ink"
+          >
+            Run the numbers on your own usage →
+          </Link>
+        </div>
+      </section>
+
       {/* FAQ */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10">
