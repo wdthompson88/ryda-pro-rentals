@@ -1,7 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
+import { PhotoGallery } from "@/components/photo-gallery";
 import {
   VEHICLES,
   getVehicleBySymbol,
@@ -109,8 +109,6 @@ export default async function RentDetailPage({
   const tint = r.kind === "partner" ? brandTint(r.vehicle.make) : undefined;
   const partnerGallery =
     r.kind === "partner" ? getPartnerGallery(r.vehicle) : [];
-  const partnerHero = partnerGallery[0];
-  const partnerThumbs = partnerGallery.slice(1);
 
   return (
     <>
@@ -129,35 +127,24 @@ export default async function RentDetailPage({
           <div className="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-12">
             {/* Hero + meta */}
             <div className="lg:col-span-8">
-              <div
-                className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl bg-cream-2"
-                style={tint && !partnerHero ? { backgroundColor: tint } : undefined}
-              >
-                {r.kind === "ryda" ? (
-                  <Image
-                    src={r.vehicle.hero}
-                    alt={`${r.vehicle.year} ${title}`}
-                    fill
-                    priority
-                    sizes="(min-width: 1024px) 66vw, 100vw"
-                    className={`object-cover ${
-                      r.vehicle.flipImage ? "-scale-x-100" : ""
-                    }`}
-                    style={{
-                      objectPosition: r.vehicle.imagePosition ?? "center",
-                    }}
-                  />
-                ) : partnerHero ? (
-                  <Image
-                    src={partnerHero}
-                    alt={`${r.vehicle.year ?? ""} ${title}`}
-                    fill
-                    priority
-                    sizes="(min-width: 1024px) 66vw, 100vw"
-                    className="object-cover"
-                    unoptimized
-                  />
-                ) : (
+              {r.kind === "ryda" ? (
+                <PhotoGallery
+                  photos={[r.vehicle.hero]}
+                  alt={`${r.vehicle.year} ${title}`}
+                  flipFirst={r.vehicle.flipImage}
+                  imagePosition={r.vehicle.imagePosition}
+                  optimize
+                />
+              ) : partnerGallery.length > 0 ? (
+                <PhotoGallery
+                  photos={partnerGallery}
+                  alt={`${r.vehicle.year ?? ""} ${title}`.trim()}
+                />
+              ) : (
+                <div
+                  className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl"
+                  style={tint ? { backgroundColor: tint } : undefined}
+                >
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div
                       aria-hidden
@@ -176,29 +163,8 @@ export default async function RentDetailPage({
                       </p>
                     </div>
                   </div>
-                )}
-              </div>
-
-              {/* Partner gallery — additional photos in a grid below the hero */}
-              {r.kind === "partner" && partnerThumbs.length > 0 ? (
-                <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
-                  {partnerThumbs.map((src, i) => (
-                    <div
-                      key={src}
-                      className="relative aspect-[4/3] overflow-hidden rounded-lg bg-cream-2"
-                    >
-                      <Image
-                        src={src}
-                        alt={`${title} — view ${i + 2}`}
-                        fill
-                        sizes="(min-width: 768px) 20vw, 33vw"
-                        className="object-cover"
-                        unoptimized
-                      />
-                    </div>
-                  ))}
                 </div>
-              ) : null}
+              )}
 
               <div className="mt-8">
                 <p className="text-xs text-mute">
