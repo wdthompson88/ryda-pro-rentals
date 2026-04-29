@@ -28,7 +28,7 @@ export default function NotFound() {
               href="/markets"
               className="inline-flex h-12 items-center justify-center rounded-full border border-rule px-7 text-sm font-medium text-ink hover:border-ink"
             >
-              See the market
+              See the fleet
             </Link>
             <Link
               href="/contact"

@@ -8,7 +8,6 @@ export default function CookiesPage() {
       title="Cookie Policy"
       lastUpdated="April 27, 2026"
       intro="We use a small number of cookies — only what's needed to run the site and to understand how it's used. We don't sell your data. We don't run ad-tracker cookies."
-      counselNote="Final cookie inventory will be generated automatically once analytics + CMS providers are connected. The list below is the planned minimum."
       sections={[
         {
           heading: "1. What cookies are",

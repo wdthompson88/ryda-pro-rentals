@@ -17,7 +17,7 @@ const FEATURES: { group: string; items: { label: string; core: CellValue; blue: 
     items: [
       { label: "Browse all vehicles in every market", core: true, blue: true, black: true },
       { label: "Rent any available vehicle", core: true, blue: true, black: true },
-      { label: "Claim co-ownership seats · transfer to other members", core: true, blue: true, black: true },
+      { label: "Claim co-ownership seats · transfer to other members", core: false, blue: true, black: true },
       { label: "In-app messaging with co-owners", core: true, blue: true, black: true },
       { label: "Inspection reports + LLC documents", core: true, blue: true, black: true },
       { label: "Member directory access", core: false, blue: true, black: true },

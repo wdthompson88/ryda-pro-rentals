@@ -33,7 +33,7 @@ export default function InsurancePage() {
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
           <h2 className="font-display text-3xl text-ink sm:text-4xl">Coverage at a glance</h2>
           <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <Card title="Third-party liability" body="Up to $2,000,000 combined single limit. Covers bodily injury and property damage to others." />
+            <Card title="Third-party liability" body="$1,000,000 combined single limit. Covers bodily injury and property damage to others." />
             <Card title="Agreed-value physical damage" body="Pre-set replacement value for each vehicle. No haircuts at total-loss settlement." />
             <Card title="Multi-driver coverage" body="Every approved RYDA member is named insured during their booking window." />
             <Card title="Roadside assistance" body="24/7 dispatch and replacement vehicle for any covered breakdown." />

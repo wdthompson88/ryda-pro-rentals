@@ -7,8 +7,7 @@ export default function TermsPage() {
     <LegalPage
       title="Terms of Service"
       lastUpdated="April 27, 2026"
-      intro="These Terms govern your use of the RYDA platform. They are separate from the Co-Owner Agreement and LLC Operating Agreement, which apply only after you purchase a share and which take precedence on the topics they cover."
-      counselNote="This page is in draft and subject to revision before public launch. For questions, contact us at /contact."
+      intro="These Terms govern your use of the RYDA platform. They are separate from the Co-Owner Agreement and LLC Operating Agreement, which apply only after you claim a co-ownership seat and which take precedence on the topics they cover."
       sections={[
         {
           heading: "1. Acceptance of these Terms",

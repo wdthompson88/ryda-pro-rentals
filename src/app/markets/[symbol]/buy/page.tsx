@@ -31,11 +31,11 @@ export default async function BuyPage({
   const { symbol } = await params;
   const { shares: sharesParam } = await searchParams;
   const v = getVehicleBySymbol(symbol);
-  if (!v) notFound();
+  if (!v || v.sharesAvailable <= 0) notFound();
 
   const requestedShares = Math.max(
     1,
-    Math.min(v.sharesAvailable || 1, parseInt(sharesParam || "1", 10) || 1),
+    Math.min(v.sharesAvailable, parseInt(sharesParam || "1", 10) || 1),
   );
 
   return (

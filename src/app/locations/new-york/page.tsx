@@ -17,7 +17,7 @@ export default function NewYorkPage() {
         "Highest concentration of US wealth — the densest population of high-net-worth households in the country.",
         "RYDA's Black-tier services (concierge, white-glove, member events) match how NY UHNW families already buy services.",
         "Driving culture is weekend-and-summer, not daily — fits the share model perfectly.",
-        "F1 returns to NJ in 2027 (announced); RYDA programming ties to Miami GP, F1 NJ, and Pebble Beach.",
+        "RYDA programming ties to marquee East Coast events — Miami GP, Watkins Glen, and Pebble Beach.",
         "Insurance carriers price NY-stored, not NY-driven; significant savings vs. Manhattan-resident exotic policies.",
       ]}
       vehiclePreview={[

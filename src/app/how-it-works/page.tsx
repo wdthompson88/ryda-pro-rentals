@@ -50,7 +50,7 @@ export default function HowItWorksPage() {
             <Step n="01" title="Verify" body="Apply, complete KYC. Valid US license, clean recent driving record, 28 or older. No accreditation required." />
             <Step n="02" title="Choose" body="Browse the fleet. Each vehicle is a single-purpose Delaware LLC member-managed by 5–10 co-owners." />
             <Step n="03" title="Co-own" body="Join the LLC alongside other members. Sign the Operating Agreement and Management Services Agreement. Fund your seat via wire or ACH." />
-            <Step n="04" title="Drive" body="Book your time on the RYDA app. ~50 days and ~4,000 miles per seat, per year." />
+            <Step n="04" title="Drive" body="Book your time on the RYDA app. Up to ~50 days and ~4,000 miles per seat, per year — exact entitlement depends on the vehicle." />
             <Step n="05" title="Transfer" body="Transfer your seat to another verified member after the 12-month minimum hold. RYDA handles the LLC paperwork. 3% transfer fee." />
           </div>
         </div>
@@ -104,7 +104,7 @@ export default function HowItWorksPage() {
                 <Tr label="Annual storage" solo="$5,000" ryda="$833" />
                 <Tr label="Annual maintenance" solo="$8,000" ryda="$1,333" />
                 <Tr label="Annual depreciation reserve" solo="$22,000" ryda="$3,667" />
-                <Tr label="Annual management" solo="—" ryda="$4,134 (12% mgmt fee)" />
+                <Tr label="RYDA service fee" solo="—" ryda="$4,134" />
                 <Tr label="Total Year 1" solo="$386,000" ryda="$68,467" emphasis />
                 <Tr label="Days driven" solo="365 (in theory)" ryda="~50 / seat" />
                 <Tr label="Effective $/day" solo="$1,058" ryda="$236" emphasis />
@@ -112,7 +112,9 @@ export default function HowItWorksPage() {
             </table>
           </div>
           <p className="mt-4 text-center text-xs text-mute">
-            Numbers shown for illustration. Final pricing varies by vehicle.
+            Numbers shown for illustration. Final pricing varies by vehicle. The
+            LLC pays a 12% annual management fee bundled into its operating
+            budget; what you see above is the per-seat allocation.
           </p>
         </div>
       </section>
@@ -201,7 +203,7 @@ export default function HowItWorksPage() {
               href="/markets"
               className="inline-flex h-12 items-center justify-center rounded-full border border-cream/30 px-7 text-sm font-medium text-cream hover:border-cream hover:bg-cream/10"
             >
-              See the market
+              See the fleet
             </Link>
           </div>
         </div>

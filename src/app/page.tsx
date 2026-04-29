@@ -26,8 +26,9 @@ export default function Home() {
               RYDA is the first US member-managed supercar co-ownership
               platform. Become a co-owner of a real Ferrari, Lamborghini, or
               McLaren — held in a Delaware LLC that you and 5–10 other
-              verified members manage together. Drive ~50 days a year. Transfer
-              your seat to another member when you're ready to move on.
+              verified members manage together. Drive up to ~50 days a year,
+              depending on the vehicle. Transfer your seat to another member
+              when you're ready to move on.
             </p>
             <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
               <Link
@@ -135,7 +136,7 @@ export default function Home() {
             <Step n="01" title="Verify" body="Apply, complete identity verification, and confirm RYDA membership requirements." />
             <Step n="02" title="Choose" body="Browse the curated fleet. Rent any vehicle by the day, or claim a co-ownership seat." />
             <Step n="03" title="Co-own" body="5–10 members form a Delaware LLC together to hold the vehicle. You sign the operating agreement and fund your seat." />
-            <Step n="04" title="Drive" body="Book your time on the RYDA app. ~50 days and ~4,000 miles per seat, per year." />
+            <Step n="04" title="Drive" body="Book your time on the RYDA app. Up to ~50 days and ~4,000 miles per seat, per year — exact entitlement depends on the vehicle." />
             <Step n="05" title="Transfer" body="After 12 months, transfer your seat to another verified member. RYDA handles the LLC paperwork. 3% transfer fee." />
           </div>
         </div>
@@ -155,7 +156,7 @@ export default function Home() {
                 outright costs $80,000 a year before you turn the key. RYDA
                 is the third option — a member-managed co-ownership club
                 where 5–10 verified people share a real Delaware LLC that
-                holds a real car. You drive ~50 days a year. We handle every
+                holds a real car. You drive up to ~50 days a year. We handle every
                 operational detail. You're a co-owner, not a customer.
               </p>
             </div>

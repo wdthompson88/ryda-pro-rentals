@@ -1,7 +1,6 @@
-// Mock market data for the demo phase.
-// When the secondary-market matching engine ships (post-securities counsel),
-// this file gets replaced by real Supabase queries. Keep the same shape so
-// nothing else has to change.
+// Mock fleet data for the demo phase.
+// When the live fleet ships, this file gets replaced by real Supabase
+// queries. Keep the same shape so nothing else has to change.
 
 export type Vehicle = {
   symbol: string;          // e.g. "F296" for Ferrari 296
@@ -245,7 +244,7 @@ export const VEHICLES: Vehicle[] = [
 ];
 
 // ─────────────────────────────────────────────────────────────────────────
-// Mock price history. Real version pulls from a `share_trades` table.
+// Mock seat reference history. Real version pulls from a `seat_transfers` table.
 // ─────────────────────────────────────────────────────────────────────────
 
 export type Timeframe = "1D" | "1W" | "1M" | "3M" | "YTD" | "1Y" | "5Y" | "MAX";

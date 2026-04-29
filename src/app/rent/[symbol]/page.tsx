@@ -120,11 +120,15 @@ export default async function RentDetailPage({
                   </div>
                 </div>
 
-                <button className="mt-5 w-full rounded-full bg-red px-7 py-3 text-sm font-semibold text-cream transition-colors hover:bg-red-deep">
-                  Reserve for Apr 28
-                </button>
+                <Link
+                  href="/contact?type=Rental#form"
+                  className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-red px-7 py-3 text-sm font-semibold text-cream transition-colors hover:bg-red-deep"
+                >
+                  Request rental
+                </Link>
                 <p className="mt-3 text-center text-xs text-mute">
-                  Free cancellation up to 7 days before pickup
+                  We'll confirm availability within one business day. Free
+                  cancellation up to 7 days before pickup.
                 </p>
               </div>
             </div>
@@ -188,7 +192,7 @@ export default async function RentDetailPage({
               href={`/markets/${v.symbol}`}
               className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-red hover:text-cream"
             >
-              See on the market →
+              See in the fleet →
             </Link>
           </div>
         </section>

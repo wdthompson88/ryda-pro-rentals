@@ -26,7 +26,7 @@ export default function SignInPage() {
           </form>
 
           <div className="mt-6 flex items-center justify-between text-xs">
-            <Link href="/forgot-password" className="text-ink-soft hover:text-ink">
+            <Link href="/contact" className="text-ink-soft hover:text-ink">
               Forgot password?
             </Link>
             <Link href="/" className="text-ink-soft hover:text-ink">

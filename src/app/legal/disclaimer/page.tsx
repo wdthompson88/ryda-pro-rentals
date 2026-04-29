@@ -8,7 +8,6 @@ export default function DisclaimerPage() {
       title="Co-Ownership Disclaimer"
       lastUpdated="April 28, 2026"
       intro="RYDA is a luxury access platform. Co-ownership stakes are LLC membership interests in member-managed Delaware LLCs that hold specific vehicles. They are NOT shares of RYDA LLC, NOT registered securities, and NOT offered for investment purposes. This page explains the legal framework for what co-owners are buying, how the LLCs are governed, and what RYDA's role is."
-      counselNote="This page is in draft and subject to revision before public launch. For questions, contact us at /contact."
       sections={[
         {
           heading: "1. What you are buying",

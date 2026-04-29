@@ -90,14 +90,13 @@ export default function MyCarsPage() {
         <div className="mx-auto max-w-3xl px-6 py-16 text-center sm:px-10">
           <h2 className="font-display text-2xl text-ink">Add another vehicle.</h2>
           <p className="mt-2 text-sm text-ink-soft">
-            Browse curated supercars on the market. New vehicles come online
-            every quarter.
+            Browse the curated fleet. New vehicles come online every quarter.
           </p>
           <Link
             href="/markets"
             className="mt-6 inline-flex h-12 items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream hover:bg-red"
           >
-            Browse the market →
+            Browse the fleet →
           </Link>
         </div>
       </section>

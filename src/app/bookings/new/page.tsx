@@ -162,7 +162,7 @@ function PickDates({
       </div>
       <div className="mt-6 rounded-xl border border-rule bg-cream-2/40 p-4 text-sm">
         <p className="text-ink">
-          <span className="font-medium">{dates.days} days</span> · ~~~ 360 estimated miles
+          <span className="font-medium">{dates.days} days</span> · ~360 estimated miles
         </p>
         <p className="mt-1 text-xs text-mute">
           Uses 3 of {vehicle.daysLeft} days. Within your annual entitlement.

@@ -80,7 +80,7 @@ export default function RentPage() {
         <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
           <div className="mb-6 flex items-end justify-between">
             <h2 className="font-display text-3xl text-ink">Available now</h2>
-            <p className="text-sm text-mute">{rentable.length} vehicles · Miami</p>
+            <p className="text-sm text-mute">{rentable.length} vehicles · Miami · LA · NYC</p>
           </div>
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -149,16 +149,16 @@ export default function RentPage() {
             Renting is the test drive. Ownership is the point.
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
-            Every RYDA vehicle is also available as a real share. Effective
-            ~$236/day on a co-owned Ferrari versus ~$2,500/day to rent it.
-            Sell on the member market after 12 months. That's where we want
-            you to land.
+            Every RYDA vehicle is also available as a co-ownership seat.
+            Effective ~$236/day on a co-owned Ferrari versus ~$2,500/day to
+            rent it. Transfer your seat to another verified member after the
+            12-month minimum hold. That's where we want you to land.
           </p>
           <Link
             href="/markets"
             className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-red hover:text-cream"
           >
-            See the market →
+            See the fleet →
           </Link>
         </div>
       </section>

@@ -44,11 +44,11 @@ export default function AccountPage() {
             <Card title="Bookings" desc="3 upcoming · next Apr 28" href="/bookings" />
             <Card title="Messages" desc="2 unread" href="/messages" />
             <Card title="Membership" desc="RYDA Blue · renews Apr 27, 2027" href="/membership" />
-            <Card title="Payment methods" desc="Visa ••• 4729 · Bank ACH" href="#" />
-            <Card title="Verification" desc="KYC verified · Driving record clean" href="#" />
-            <Card title="Documents" desc="Operating Agreement · MSA · insurance certificates" href="#" />
-            <Card title="Notifications" desc="Push: on · Email: weekly digest" href="#" />
-            <Card title="Security" desc="2FA on · 1 active session" href="#" />
+            <Card title="Payment methods" desc="Visa ••• 4729 · Bank ACH" />
+            <Card title="Verification" desc="KYC verified · Driving record clean" />
+            <Card title="Documents" desc="Operating Agreement · MSA · insurance certificates" />
+            <Card title="Notifications" desc="Push: on · Email: weekly digest" />
+            <Card title="Security" desc="2FA on · 1 active session" />
           </div>
         </div>
       </section>
@@ -113,7 +113,16 @@ function Stat({
   );
 }
 
-function Card({ title, desc, href }: { title: string; desc: string; href: string }) {
+function Card({ title, desc, href }: { title: string; desc: string; href?: string }) {
+  if (!href) {
+    return (
+      <div className="block rounded-2xl border border-rule bg-surface p-6">
+        <p className="font-display text-lg text-ink">{title}</p>
+        <p className="mt-2 text-sm text-ink-soft">{desc}</p>
+        <p className="mt-4 text-xs font-medium text-mute">Available at launch</p>
+      </div>
+    );
+  }
   return (
     <Link
       href={href}

@@ -23,8 +23,9 @@ export default function MarketsPage() {
           </h1>
           <p className="mt-6 max-w-2xl text-lg text-ink-soft">
             Each car is held in a Delaware LLC managed by 5–10 verified
-            members. Claim a seat in the LLC, drive ~50 days a year, transfer
-            to another member after the 12-month minimum hold.
+            members. Claim a seat in the LLC, drive up to ~50 days a year
+            depending on the vehicle, transfer to another member after the
+            12-month minimum hold.
           </p>
         </div>
       </section>

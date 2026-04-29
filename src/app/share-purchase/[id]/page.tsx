@@ -86,8 +86,8 @@ export default async function PurchasePage({
                     {s.name}
                   </p>
                   <p className="text-xs text-ink-soft">
-                    {s.name === "Eligibility" && "KYC + financial qualification verified"}
-                    {s.name === "Documents" && "Co-Owner Agreement, LLC OA, Securities Disclosure signed"}
+                    {s.name === "Eligibility" && "KYC + driving-record verification complete"}
+                    {s.name === "Documents" && "Co-Owner Agreement, LLC Operating Agreement, Management Services Agreement signed"}
                     {s.name === "Payment" && "Wire transfer initiated · awaiting bank confirmation"}
                     {s.name === "LLC amendment" && "RYDA legal will amend the LLC operating agreement"}
                     {s.name === "Welcome" && "Membership certificate + first booking access"}

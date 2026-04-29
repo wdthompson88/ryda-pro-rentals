@@ -12,7 +12,7 @@ export function OrderPanel({ vehicle }: Props) {
 
   const numericSeats = Math.max(1, Math.min(vehicle.sharesAvailable || 1, parseInt(seats || "1", 10) || 1));
   const buyInCost = numericSeats * vehicle.pricePerShare;
-  const annualMgmtFee = numericSeats * vehicle.annualOpCost;
+  const annualContribution = numericSeats * vehicle.annualOpCost;
   const daysPerYear = numericSeats * vehicle.daysPerYear;
   const milesPerYear = numericSeats * vehicle.milesPerYear;
   const sharesPercent = ((numericSeats / vehicle.shares) * 100).toFixed(1);
@@ -70,9 +70,9 @@ export function OrderPanel({ vehicle }: Props) {
           </span>
         </div>
         <div className="flex items-baseline justify-between">
-          <span className="text-ink-soft">Mgmt fee / year</span>
+          <span className="text-ink-soft">Annual contribution</span>
           <span className="font-medium text-ink tabular-nums">
-            {formatUSD(annualMgmtFee)}
+            {formatUSD(annualContribution)}
           </span>
         </div>
       </div>

@@ -8,7 +8,6 @@ export default function PrivacyPage() {
       title="Privacy Policy"
       lastUpdated="April 27, 2026"
       intro="This page describes how RYDA LLC (&ldquo;RYDA&rdquo;, &ldquo;we&rdquo;) collects, uses, and protects your personal information. We treat your data the way we'd want our own treated — only what we need, only for as long as we need it, never sold."
-      counselNote="This page is in draft and subject to revision before public launch. Sections below cover the topics required by CCPA, the Virginia CDPA, and (where applicable) GDPR. For questions, contact us at /contact."
       sections={[
         {
           heading: "1. Who we are",

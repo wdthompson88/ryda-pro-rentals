@@ -394,7 +394,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "How pricing usually works" },
           {
             type: "p",
-            text: "Members typically reference RYDA's quarterly valuation update for the vehicle (auction comparables and an independent appraisal) as a starting point and negotiate from there. There's no obligation to use the reference price — it's just context.",
+            text: "Members typically reference a quarterly condition report and comparable-cost context for the vehicle (auction comparables, current retail offers) as a starting point and negotiate from there. This is not an exit price, a published bid, or a guaranteed transfer value — it's plain market context to help two co-owners agree on a number.",
           },
           {
             type: "p",
@@ -421,19 +421,19 @@ export const HELP: HelpCategory[] = [
           {
             type: "ul",
             items: [
-              "A quarterly vehicle valuation: an estimate based on auction comparables (Bring a Trailer, RM Sotheby's, Mecum) and a certified independent appraisal.",
-              "An estimate of the seat's reference value: (current vehicle valuation + accrued LLC reserves) ÷ seat count.",
+              "A quarterly vehicle condition report and comparable-cost summary (auction comparables on Bring a Trailer, RM Sotheby's, Mecum; current retail offers).",
+              "A simple reference number for the seat: (current comparable-cost estimate + accrued LLC reserves) ÷ seat count.",
               "A summary of any prior transfers on the same vehicle for transparency.",
             ],
           },
           {
             type: "p",
-            text: "These are reference values only. Co-owners negotiating a transfer can use them as a starting point or ignore them. There is no automatic matching engine — the transfer happens at whatever price the two members agree to.",
+            text: "These are reference numbers only — not exit prices, not published bids, not guaranteed transfer values. Co-owners negotiating a transfer can use them as a starting point or ignore them. There is no automatic matching engine — the transfer happens at whatever price the two members agree to.",
           },
           {
             type: "callout",
             tone: "info",
-            text: "Cars depreciate. Reference values typically decline over time. Don't claim a seat expecting it to hold or grow in value — claim it for the use you'll get from the car.",
+            text: "Cars depreciate. Reference numbers typically decline over time. Don't claim a seat expecting it to hold or grow in value — claim it for the use you'll get from the car.",
           },
         ],
       },
@@ -1449,7 +1449,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Vehicle management fee" },
           {
             type: "p",
-            text: "12% of the vehicle's annual value, billed quarterly to the LLC, paid pro-rata by co-owners. So on a $340K Ferrari with 6 shares, your quarterly contribution is roughly $1,700.",
+            text: "12% of the vehicle's annual value, billed quarterly to the LLC, paid pro-rata by co-owners. So on a $340K Ferrari with 6 seats, your quarterly contribution is roughly $1,700.",
           },
           { type: "h3", text: "Per-booking charges" },
           {
@@ -1669,7 +1669,7 @@ export const HELP: HelpCategory[] = [
               "Decision thresholds (75% supermajority for material decisions like sale, modification, replacement).",
               "Default remedies (what happens if a member stops paying or repeatedly causes damage).",
               "Distribution waterfall (how proceeds flow on a sale or total loss).",
-              "Exit terms (12-month minimum hold, secondary-market mechanics, RYDA's bid-in option).",
+              "Exit terms (12-month minimum hold, member-to-member transfer process, no guaranteed buyer or price).",
               "Dispute resolution (mandatory mediation, then arbitration in Delaware).",
             ],
           },
@@ -1786,7 +1786,7 @@ export const HELP: HelpCategory[] = [
               "Insurance carriers (when adding you to a policy).",
               "Federal/state regulators (when legally required).",
               "Other co-owners on your specific LLC (limited: your name, contact, seat count — for booking calendar coordination).",
-              "Buyer KYC systems on secondary-market transfers (limited fields, with your consent).",
+              "Buyer KYC systems on member-to-member seat transfers (limited fields, with your consent).",
             ],
           },
           { type: "h3", text: "Who we don't share with" },
@@ -2070,7 +2070,7 @@ const ARTICLE_KEYWORDS: Record<string, string[]> = {
   "shares/how-to-buy": ["buy", "purchase", "process", "steps", "onboard", "get started buying", "how do i invest", "buying a share", "first share", "step by step"],
   "shares/documents": ["paperwork", "operating agreement", "subscription", "sign", "contract", "legal docs", "k-1", "kyc docs", "what do i sign", "agreements", "forms"],
   "shares/entitlement": ["what do i get", "rights", "days per year", "miles", "voting", "ownership rights", "what does a share include", "benefits", "perks", "entitled to"],
-  "shares/selling": ["sell", "exit", "liquidate", "secondary market", "minimum hold", "lockup", "12 month", "resell", "transfer", "get out", "cash out"],
+  "shares/selling": ["sell", "exit", "liquidate", "minimum hold", "lockup", "12 month", "resell", "transfer", "get out", "cash out"],
   "shares/pricing": ["price", "valuation", "worth", "value", "appraisal", "market price", "list price", "fair market", "how priced", "share price"],
   "shares/transfer-fee": ["fee", "commission", "3%", "transfer cost", "selling fee", "platform fee", "what's the fee", "selling cost"],
   "shares/gifting-and-inheritance": ["gift", "give", "transfer to family", "spouse", "inheritance", "heir", "inherit", "estate", "trust", "death", "die", "will", "probate", "pass to children"],

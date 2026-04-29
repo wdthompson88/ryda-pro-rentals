@@ -78,7 +78,7 @@ export default async function VehicleMarketPage({
                 <Fact label="Total seats" value={String(v.shares)} />
                 <Fact label="Days / seat" value={`${v.daysPerYear}/yr`} />
                 <Fact label="Miles / seat" value={`${v.milesPerYear.toLocaleString()}/yr`} />
-                <Fact label="Annual mgmt" value={`${formatUSD(v.annualOpCost)} per seat`} />
+                <Fact label="Annual contribution" value={`${formatUSD(v.annualOpCost)} per seat`} />
               </dl>
             </div>
 
@@ -112,7 +112,7 @@ export default async function VehicleMarketPage({
             <Stat
               label="Annual cost"
               value={formatUSD(v.annualOpCost)}
-              sub="management fee"
+              sub="all-in per seat"
             />
           </div>
         </div>
