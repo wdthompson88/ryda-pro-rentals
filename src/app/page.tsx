@@ -40,32 +40,41 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Editorial vehicle image */}
+          {/* Editorial vehicle image — links to the listing */}
           <div className="lg:col-span-6">
-            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-cream-2 lg:aspect-[5/4]">
+            <Link
+              href={`/markets/${heroVehicle.symbol}`}
+              aria-label={`Open ${heroVehicle.year} ${heroVehicle.name} listing`}
+              className="group relative block aspect-[4/3] w-full overflow-hidden rounded-2xl bg-cream-2 lg:aspect-[5/4]"
+            >
               <Image
                 src={heroVehicle.hero}
                 alt={`${heroVehicle.year} ${heroVehicle.name}`}
                 fill
                 priority
                 sizes="(min-width: 1024px) 50vw, 100vw"
-                className={`object-cover ${heroVehicle.flipImage ? "-scale-x-100" : ""}`}
+                className={`object-cover transition-transform duration-700 group-hover:scale-105 ${heroVehicle.flipImage ? "-scale-x-100" : ""}`}
                 style={{ objectPosition: heroVehicle.imagePosition ?? "center" }}
               />
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-cream/90 via-cream/30 to-transparent p-5 sm:p-6">
-                <p className="text-xs uppercase tracking-[0.2em] text-red">
-                  In the fleet
-                </p>
-                <p className="mt-1 font-display text-xl text-ink sm:text-2xl">
-                  {heroVehicle.year} {heroVehicle.name}
-                </p>
-                <p className="mt-1 text-xs text-ink-soft">
-                  {formatUSD(heroVehicle.pricePerShare)} per share ·{" "}
-                  {heroVehicle.sharesAvailable} of {heroVehicle.shares} shares
-                  available
-                </p>
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 bg-gradient-to-t from-cream/90 via-cream/30 to-transparent p-5 sm:p-6">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.2em] text-red">
+                    In the fleet
+                  </p>
+                  <p className="mt-1 font-display text-xl text-ink sm:text-2xl">
+                    {heroVehicle.year} {heroVehicle.name}
+                  </p>
+                  <p className="mt-1 text-xs text-ink-soft">
+                    {formatUSD(heroVehicle.pricePerShare)} per share ·{" "}
+                    {heroVehicle.sharesAvailable} of {heroVehicle.shares} shares
+                    available
+                  </p>
+                </div>
+                <span className="hidden text-sm font-medium text-red sm:inline">
+                  View →
+                </span>
               </div>
-            </div>
+            </Link>
           </div>
         </div>
       </section>

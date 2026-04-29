@@ -36,7 +36,7 @@ export const HELP: HelpCategory[] = [
         slug: "what-is-ryda",
         q: "What is RYDA, in one paragraph?",
         summary:
-          "Member-managed supercar co-ownership. Each vehicle is held in a single-purpose Delaware LLC and 5–10 verified members co-own and manage it together.",
+          "Member-managed supercar co-ownership. Each vehicle is held in a single-purpose Delaware LLC; up to 10 verified members co-own and manage it together.",
         body: [
           {
             type: "p",
@@ -281,7 +281,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "1. Pick the vehicle" },
           {
             type: "p",
-            text: "Browse the fleet at /markets, pick a vehicle and the number of shares you want. Each vehicle is held in a separate Delaware LLC. Most vehicles have 6 total shares; some hypercar-tier vehicles have up to 10.",
+            text: "Browse the fleet at /markets, pick a vehicle and the number of shares you want. Each vehicle is held in a separate Delaware LLC. RYDA's default share count is 10 per vehicle.",
           },
           { type: "h3", text: "2. Identity verification (KYC)" },
           {
@@ -1449,7 +1449,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Vehicle management fee" },
           {
             type: "p",
-            text: "12% of the vehicle's annual value, billed quarterly to the LLC, paid pro-rata by co-owners. So on a $340K Ferrari with 6 shares, your quarterly contribution is roughly $1,700.",
+            text: "12% of the vehicle's annual value, billed quarterly to the LLC, paid pro-rata by co-owners. On a $340K Ferrari with 10 shares, the LLC's $40,800/yr fee divides into roughly $1,020 per share each quarter (one share holder pays ~$1,020/Q; a two-share holder pays ~$2,040/Q).",
           },
           { type: "h3", text: "Per-booking charges" },
           {
@@ -2002,15 +2002,15 @@ export const HELP: HelpCategory[] = [
         ],
       },
       {
-        slug: "kids-and-baby-shares",
-        q: "Can I install a child share?",
+        slug: "kids-and-baby-seats",
+        q: "Can I install a child seat?",
         summary:
           "Yes, with care. Most modern exotics have ISOFIX/LATCH anchors. Don't damage the upholstery — use a share protector. RYDA can install for you on Black tier.",
         body: [
           { type: "h3", text: "Where it works" },
           {
             type: "p",
-            text: "Most modern exotics (Ferrari 296 GTB, McLaren 720S, Lambo Urus, Aston DBX, Rolls-Royce Cullinan, Porsche Taycan) have ISOFIX/LATCH child-share anchors in the rear shares or extended cabin. Some 2-share configurations don't accommodate child shares safely — check the vehicle listing.",
+            text: "Most modern exotics (Ferrari 296 GTB, McLaren 720S, Lambo Urus, Aston DBX, Rolls-Royce Cullinan, Porsche Taycan) have ISOFIX/LATCH child-seat anchors in the rear seats or extended cabin. Some 2-seat configurations don't accommodate child seats safely — check the vehicle listing.",
           },
           { type: "h3", text: "What we ask" },
           {
@@ -2018,18 +2018,18 @@ export const HELP: HelpCategory[] = [
             items: [
               "Use a share protector underneath. The buckles and anchor points scratch leather/Alcantara on hundreds of dollars of upholstery.",
               "Don't tighten anchors with full force — exotic interior trim can deform.",
-              "Remove the share at end of booking. Don't leave it in the car for the next member.",
+              "Remove the seat at end of booking. Don't leave it in the car for the next member.",
             ],
           },
           { type: "h3", text: "Help installing" },
           {
             type: "p",
-            text: "Black tier members can request RYDA Operations to pre-install the child share at handover. We use a clean, non-damaging installation method. Available for $50/booking, included in white-glove delivery.",
+            text: "Black tier members can request RYDA Operations to pre-install the child seat at handover. We use a clean, non-damaging installation method. Available for $50/booking, included in white-glove delivery.",
           },
           {
             type: "callout",
             tone: "info",
-            text: "Two-share configurations (most McLarens, Ferrari 488 / 296 / F8, Aston Vantage) are typically NOT safe for child shares — the airbag system isn't designed for it and there's no rear share to relocate to. The Cullinan, Urus, DBX, Taycan, and Bentley Bentayga work well for families.",
+            text: "Two-seat configurations (most McLarens, Ferrari 488 / 296 / F8, Aston Vantage) are typically NOT safe for child seats — the airbag system isn't designed for it and there's no rear seat to relocate to. The Cullinan, Urus, DBX, Taycan, and Bentley Bentayga work well for families.",
           },
         ],
       },
@@ -2132,7 +2132,7 @@ const ARTICLE_KEYWORDS: Record<string, string[]> = {
   "vehicle-use/smoking-pets-food": ["smoke", "smoking", "vape", "vaping", "weed", "marijuana", "cigarette", "cigar", "pet", "dog", "cat", "food", "drink", "eat"],
   "vehicle-use/road-trips": ["road trip", "long drive", "drive cross country", "weekend trip", "long distance drive", "vacation drive", "tour"],
   "vehicle-use/car-shows-photoshoots": ["car show", "show car", "exhibition", "photoshoot", "photo shoot", "instagram", "social media", "youtube", "video", "filming", "music video", "brand deal"],
-  "vehicle-use/kids-and-baby-shares": ["kid", "child", "baby", "infant", "toddler", "child share", "car share", "isofix", "latch", "family", "stroller"],
+  "vehicle-use/kids-and-baby-seats": ["kid", "child", "baby", "infant", "toddler", "child seat", "car seat", "isofix", "latch", "family", "stroller"],
 };
 
 // ── Search ─────────────────────────────────────────────────────────

@@ -25,7 +25,7 @@ export default async function OpenGraphImage() {
           style={{
             fontSize: 36,
             letterSpacing: 8,
-            color: "#C03030",
+            color: "#DC4747",
             textTransform: "uppercase",
             fontWeight: 600,
           }}
@@ -61,7 +61,7 @@ export default async function OpenGraphImage() {
           <span style={{ color: "#D4CFC4" }}>
             Own a Ferrari, Lamborghini, or McLaren —&nbsp;
           </span>
-          <span style={{ color: "#C03030" }}>for a fraction of the cost.</span>
+          <span style={{ color: "#DC4747" }}>for a fraction of the cost.</span>
         </div>
 
         {/* Footer rule + meta */}
@@ -73,7 +73,7 @@ export default async function OpenGraphImage() {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            color: "#A39F95",
+            color: "#9A9590",
             fontSize: 26,
             letterSpacing: 5,
             textTransform: "uppercase",

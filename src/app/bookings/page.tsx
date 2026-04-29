@@ -88,9 +88,9 @@ export default function BookingsPage() {
                 const valid = dayNum >= 1 && dayNum <= 31;
                 let badge: { color: string; label: string } | null = null;
                 if (valid) {
-                  if (dayNum === 12 || dayNum === 13) badge = { color: "#C03030", label: "MC75" };
-                  else if (dayNum >= 1 && dayNum <= 1) badge = { color: "#7A7570", label: "Other" };
-                  else if (dayNum === 28 || dayNum === 29 || dayNum === 30) badge = { color: "#7A7570", label: "Other" };
+                  if (dayNum === 12 || dayNum === 13) badge = { color: "#DC4747", label: "MC75" };
+                  else if (dayNum >= 1 && dayNum <= 1) badge = { color: "#9A9590", label: "Other" };
+                  else if (dayNum === 28 || dayNum === 29 || dayNum === 30) badge = { color: "#9A9590", label: "Other" };
                 }
                 return (
                   <div
@@ -114,8 +114,8 @@ export default function BookingsPage() {
             </div>
           </div>
           <div className="mt-4 flex flex-wrap gap-4 text-xs text-mute">
-            <Legend color="#C03030" label="Your booking" />
-            <Legend color="#7A7570" label="Other co-owner" />
+            <Legend color="#DC4747" label="Your booking" />
+            <Legend color="#9A9590" label="Other co-owner" />
             <Legend color="#3A3A3E" label="Service / blackout" />
             <Legend color="transparent" border label="Available" />
           </div>
@@ -135,7 +135,7 @@ export default function BookingsPage() {
                     className={`rounded-full px-3 py-1 text-xs font-medium ${
                       b.status === "Confirmed"
                         ? "bg-ink/5 text-ink"
-                        : "bg-[#C03030]/10 text-red"
+                        : "bg-red/10 text-red"
                     }`}
                   >
                     {b.status}

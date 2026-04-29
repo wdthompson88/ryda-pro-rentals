@@ -462,16 +462,26 @@ function DocumentsStep({
       {/* Signature */}
       <div className="rounded-2xl border border-rule bg-surface p-6">
         <p className="text-xs font-medium uppercase tracking-wider text-red">E-signature</p>
-        <p className="mt-2 font-display text-xl text-ink">Type your full legal name to sign</p>
+        <label
+          htmlFor="buy-flow-signature"
+          className="mt-2 block font-display text-xl text-ink"
+        >
+          Type your full legal name to sign
+        </label>
         <p className="mt-2 text-sm text-ink-soft">
           By typing your name and clicking Continue, you agree this is your legally binding
           electronic signature on both documents above.
         </p>
         <input
+          id="buy-flow-signature"
+          name="signature"
           type="text"
           value={signature}
           onChange={(e) => setSignature(e.target.value)}
           placeholder="Full legal name"
+          autoComplete="name"
+          required
+          aria-required="true"
           className="mt-5 h-12 w-full rounded-xl border border-rule bg-cream-2/40 px-4 font-display text-xl italic text-ink placeholder:text-mute focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
         />
       </div>

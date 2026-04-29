@@ -196,8 +196,8 @@ export default async function MyVehiclePage({
               const valid = day >= 1 && day <= 31;
               let badge: { color: string; label: string } | null = null;
               if (valid) {
-                if (day === 12 || day === 13) badge = { color: "#C03030", label: "You" };
-                else if (day === 23 || day === 24 || day === 25) badge = { color: "#7A7570", label: "Other" };
+                if (day === 12 || day === 13) badge = { color: "#DC4747", label: "You" };
+                else if (day === 23 || day === 24 || day === 25) badge = { color: "#9A9590", label: "Other" };
                 else if (day === 1) badge = { color: "#3A3A3E", label: "Service" };
               }
               return (

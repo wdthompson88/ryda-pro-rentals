@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { ContactForm } from "@/components/contact-form";
 
@@ -102,12 +103,12 @@ export default function ContactPage() {
               Send a quick note and a RYDA membership advisor will reply
               within one business day with a calendar link.
             </p>
-            <a
+            <Link
               href="/contact?type=Membership#form"
               className="mt-6 inline-flex h-11 items-center justify-center rounded-full bg-cream px-6 text-sm font-medium text-ink hover:bg-red hover:text-cream"
             >
               Request a call
-            </a>
+            </Link>
           </div>
         </div>
       </section>
@@ -133,12 +134,12 @@ function ContactCard({
       <p className="text-xs font-medium uppercase tracking-wider text-red">{title}</p>
       <p className="mt-3 font-display text-lg text-ink">{subtitle}</p>
       <p className="mt-2 flex-1 text-sm text-ink-soft">{detail}</p>
-      <a
+      <Link
         href={href}
         className="mt-5 inline-flex items-center text-sm font-medium text-ink hover:text-red"
       >
         {cta} →
-      </a>
+      </Link>
     </div>
   );
 }

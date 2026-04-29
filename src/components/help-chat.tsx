@@ -210,12 +210,10 @@ export function HelpChat() {
         <span>{open ? "Close" : "Ask RYDA"}</span>
       </button>
 
-      {/* Panel */}
+      {/* Panel — non-modal: doesn't trap focus or block the page */}
       {open && (
-        <div
+        <section
           id="ryda-help-chat-panel"
-          role="dialog"
-          aria-modal="false"
           aria-labelledby="ryda-help-chat-title"
           className="fixed bottom-24 right-6 z-40 flex w-[min(420px,calc(100vw-3rem))] flex-col overflow-hidden rounded-2xl border border-rule bg-surface shadow-2xl"
         >
@@ -311,7 +309,7 @@ export function HelpChat() {
               Contact us
             </Link>
           </p>
-        </div>
+        </section>
       )}
     </>
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useEffect } from "react";
 
 type Status = "idle" | "submitting" | "success" | "error";
@@ -99,7 +100,7 @@ export function ContactForm() {
       <div className="sm:col-span-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-xs text-mute">
           By submitting you agree to RYDA&apos;s{" "}
-          <a href="/legal/privacy" className="underline hover:text-ink">Privacy Policy</a>.
+          <Link href="/legal/privacy" className="underline hover:text-ink">Privacy Policy</Link>.
         </p>
         <button
           type="submit"

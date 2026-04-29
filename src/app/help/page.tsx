@@ -167,16 +167,27 @@ function Strip({
   cta: string;
   href: string;
 }) {
+  // tel: links must stay as raw <a>; internal paths get <Link> for prefetch.
+  const isExternal = href.startsWith("tel:") || href.startsWith("mailto:") || href.startsWith("http");
   return (
     <div className="flex flex-col rounded-xl border border-rule bg-surface p-6">
       <p className="font-display text-lg text-ink">{title}</p>
       <p className="mt-2 flex-1 text-sm leading-relaxed text-ink-soft">{detail}</p>
-      <a
-        href={href}
-        className="mt-4 text-sm font-medium text-red hover:text-red-deep"
-      >
-        {cta}
-      </a>
+      {isExternal ? (
+        <a
+          href={href}
+          className="mt-4 text-sm font-medium text-red hover:text-red-deep"
+        >
+          {cta}
+        </a>
+      ) : (
+        <Link
+          href={href}
+          className="mt-4 text-sm font-medium text-red hover:text-red-deep"
+        >
+          {cta}
+        </Link>
+      )}
     </div>
   );
 }

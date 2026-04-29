@@ -66,7 +66,7 @@ export default function InvestorsPage() {
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
-            <Stat number="$14.8B" label="US luxury auto market (2025)" />
+            <Stat number="$14.8B" label="US luxury auto market (2026)" />
             <Stat number="$2.5M" label="Seed round target" />
             <Stat number="$1.2M" label="Year 3 ARR target" />
             <Stat number="16.1%" label="Year 3 EBITDA target" />

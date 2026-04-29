@@ -35,14 +35,16 @@ export function OrderPanel({ vehicle }: Props) {
       </p>
 
       <div className="mt-5 border-t border-rule pt-4">
-        <Field label="Shares">
+        <Field label="Shares" htmlFor={`shares-${vehicle.symbol}`}>
           <input
+            id={`shares-${vehicle.symbol}`}
             type="number"
             inputMode="numeric"
             min={1}
             max={vehicle.sharesAvailable || 1}
             value={shares}
             onChange={(e) => setShares(e.target.value)}
+            aria-label={`Shares to claim — between 1 and ${vehicle.sharesAvailable || 1}`}
             className="w-full bg-transparent text-right font-medium text-ink placeholder:text-mute focus:outline-none"
           />
         </Field>
@@ -97,10 +99,24 @@ export function OrderPanel({ vehicle }: Props) {
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  children,
+  htmlFor,
+}: {
+  label: string;
+  children: React.ReactNode;
+  htmlFor?: string;
+}) {
   return (
     <div className="flex items-center justify-between border-b border-rule py-3 last:border-b-0">
-      <span className="text-sm text-ink-soft">{label}</span>
+      {htmlFor ? (
+        <label htmlFor={htmlFor} className="text-sm text-ink-soft">
+          {label}
+        </label>
+      ) : (
+        <span className="text-sm text-ink-soft">{label}</span>
+      )}
       <div className="flex-1 pl-4">{children}</div>
     </div>
   );

@@ -61,12 +61,12 @@ export function emailLayout(title: string, innerHtml: string): string {
   <table role="presentation" width="100%" style="max-width:600px;margin:0 auto;background:#ffffff;border:1px solid #e5e1d8;border-radius:12px;overflow:hidden;">
     <tr>
       <td style="background:#0e0e10;color:#f4f1ec;padding:18px 24px;">
-        <div style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#c03030;">RYDA</div>
+        <div style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#DC4747;">RYDA</div>
         <div style="font-size:18px;margin-top:4px;font-weight:500;">${escapeHtml(title)}</div>
       </td>
     </tr>
     <tr><td style="padding:24px;font-size:14px;line-height:1.55;">${innerHtml}</td></tr>
-    <tr><td style="background:#faf7f2;padding:14px 24px;color:#7a7770;font-size:11px;border-top:1px solid #e5e1d8;">Sent by RYDA system. Reply to this email to respond directly to the member.</td></tr>
+    <tr><td style="background:#faf7f2;padding:14px 24px;color:#9A9590;font-size:11px;border-top:1px solid #e5e1d8;">Sent by RYDA system. Reply to this email to respond directly to the member.</td></tr>
   </table>
 </body>
 </html>`;

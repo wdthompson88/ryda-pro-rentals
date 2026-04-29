@@ -45,10 +45,10 @@ export async function POST(req: Request) {
       subject: `New waitlist signup: ${name || email}`,
       replyTo: email,
       html: emailLayout("New waitlist signup", `
-        <div style="font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#7a7770;">From</div>
-        <div style="font-size:16px;font-weight:500;margin-top:2px;"><a href="mailto:${escapeHtml(email)}" style="color:#c03030;text-decoration:none;">${escapeHtml(email)}</a></div>
-        ${name ? `<div style="margin-top:14px;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#7a7770;">Name</div><div style="margin-top:2px;">${escapeHtml(name)}</div>` : ""}
-        <div style="margin-top:14px;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#7a7770;">Market</div>
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#9A9590;">From</div>
+        <div style="font-size:16px;font-weight:500;margin-top:2px;"><a href="mailto:${escapeHtml(email)}" style="color:#DC4747;text-decoration:none;">${escapeHtml(email)}</a></div>
+        ${name ? `<div style="margin-top:14px;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#9A9590;">Name</div><div style="margin-top:2px;">${escapeHtml(name)}</div>` : ""}
+        <div style="margin-top:14px;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#9A9590;">Market</div>
         <div style="margin-top:2px;">${escapeHtml(market)}</div>
         <div style="margin-top:24px;padding-top:18px;border-top:1px solid #e5e1d8;font-size:13px;color:#3c3c3c;">
           <strong>Hit reply</strong> to respond — this email's reply-to is set to ${escapeHtml(email)}.

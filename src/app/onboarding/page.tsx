@@ -59,10 +59,10 @@ function Basic({ onNext }: { onNext: () => void }) {
         We'll start with the basics. Takes 30 seconds.
       </p>
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Field label="First name" />
-        <Field label="Last name" />
-        <Field label="Email" type="email" />
-        <Field label="Phone" type="tel" placeholder="+1" />
+        <Field label="First name" autoComplete="given-name" />
+        <Field label="Last name" autoComplete="family-name" />
+        <Field label="Email" type="email" autoComplete="email" />
+        <Field label="Phone" type="tel" placeholder="+1" autoComplete="tel" />
       </div>
       <NextButton onClick={onNext} />
     </div>
@@ -76,22 +76,30 @@ function Phone({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
       <p className="mt-2 text-sm text-ink-soft">
         We sent a 6-digit code to your number. Type it below.
       </p>
-      <div className="mt-8">
+      <fieldset className="mt-8 border-0 p-0">
+        <legend className="sr-only">6-digit phone verification code</legend>
         <div className="mx-auto flex max-w-sm justify-between gap-2">
           {Array.from({ length: 6 }, (_, i) => (
             <input
               key={i}
+              id={`onboarding-otp-${i + 1}`}
+              name={`otp-${i + 1}`}
               type="text"
+              inputMode="numeric"
               maxLength={1}
+              autoComplete={i === 0 ? "one-time-code" : "off"}
+              aria-label={`Verification code digit ${i + 1} of 6`}
               className="h-14 w-12 rounded-xl border border-rule bg-cream text-center font-display text-2xl text-ink focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
             />
           ))}
         </div>
         <p className="mt-4 text-center text-xs text-mute">
           Didn't get it?{" "}
-          <button className="text-red hover:text-red-deep">Resend</button>
+          <button type="button" className="text-red hover:text-red-deep">
+            Resend
+          </button>
         </p>
-      </div>
+      </fieldset>
       <BackNext onBack={onBack} onNext={onNext} />
     </div>
   );
@@ -109,11 +117,11 @@ function Personal({ onNext, onBack }: { onNext: () => void; onBack: () => void }
           <Field label="Date of birth" type="date" />
           <Field label="Driver's license #" />
         </div>
-        <Field label="Street address" />
+        <Field label="Street address" autoComplete="street-address" />
         <div className="grid grid-cols-3 gap-4">
-          <Field label="City" />
-          <Field label="State" />
-          <Field label="ZIP" />
+          <Field label="City" autoComplete="address-level2" />
+          <Field label="State" autoComplete="address-level1" />
+          <Field label="ZIP" autoComplete="postal-code" />
         </div>
       </div>
       <BackNext onBack={onBack} onNext={onNext} />
@@ -278,23 +286,38 @@ function Done() {
 
 // ── Sub-components ───────────────────────────────────────────────
 
+// Slugifies a label into a stable id ("First name" → "first-name") so each
+// onboarding field gets a unique, meaningful id paired with its label.
+function fieldId(label: string) {
+  return `onboarding-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`;
+}
+
 function Field({
   label,
   type = "text",
   placeholder,
+  autoComplete,
 }: {
   label: string;
   type?: string;
   placeholder?: string;
+  autoComplete?: string;
 }) {
+  const id = fieldId(label);
   return (
     <div>
-      <label className="block text-xs font-medium uppercase tracking-wider text-mute">
+      <label
+        htmlFor={id}
+        className="block text-xs font-medium uppercase tracking-wider text-mute"
+      >
         {label}
       </label>
       <input
+        id={id}
+        name={id}
         type={type}
         placeholder={placeholder}
+        autoComplete={autoComplete}
         className="mt-2 h-12 w-full rounded-xl border border-rule bg-cream px-4 text-sm text-ink placeholder:text-mute focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
       />
     </div>
@@ -302,12 +325,20 @@ function Field({
 }
 
 function Select({ label, options }: { label: string; options: string[] }) {
+  const id = fieldId(label);
   return (
     <div>
-      <label className="block text-xs font-medium uppercase tracking-wider text-mute">
+      <label
+        htmlFor={id}
+        className="block text-xs font-medium uppercase tracking-wider text-mute"
+      >
         {label}
       </label>
-      <select className="mt-2 h-12 w-full rounded-xl border border-rule bg-cream px-4 text-sm text-ink focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20">
+      <select
+        id={id}
+        name={id}
+        className="mt-2 h-12 w-full rounded-xl border border-rule bg-cream px-4 text-sm text-ink focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
+      >
         {options.map((o) => (
           <option key={o}>{o}</option>
         ))}
