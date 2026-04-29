@@ -18,20 +18,24 @@ const SECTIONS: { title: string; questions: Q[] }[] = [
         a: "A membership interest in a single-purpose Delaware LLC that owns a specific vehicle. The LLC's only assets are the vehicle, its insurance/operating reserves, and a management contract with RYDA. You hold a registered legal interest, not a club point.",
       },
       {
-        q: "How many co-ownership seats per vehicle?",
-        a: "Typically 5 to 10, depending on the car. Each seat entitles you to up to ~65 days and ~4,000 miles of usage per year, depending on the vehicle.",
+        q: "How many co-ownership shares per vehicle?",
+        a: "10 shares per vehicle by default. Each share entitles you to ~30 days and up to ~4,000 miles of usage per year, depending on the vehicle. A single member can hold one share or several.",
       },
       {
         q: "Are RYDA co-ownership stakes securities?",
         a: "No. RYDA is a luxury access platform, not an investment platform. Each car is held in a member-managed Delaware LLC where you and 5–10 other co-owners hold authority over material decisions; RYDA is hired as a service provider via a separate management agreement. Co-ownership stakes are not registered securities and are not offered for investment purposes. No accredited-investor verification required.",
       },
       {
-        q: "Can I transfer my seat whenever I want?",
+        q: "Can I transfer my share whenever I want?",
         a: "After a 12-month minimum hold, yes — directly to another verified RYDA member. RYDA facilitates the LLC paperwork. There is no public marketplace and no order book. Settlement takes 1–3 business days. RYDA charges a 3% transfer fee on the agreed price.",
       },
       {
         q: "What if a co-owner stops paying?",
-        a: "The LLC's Operating Agreement has remedies, including forced transfer of the delinquent seat. RYDA also keeps a maintenance reserve at the LLC level so vehicle ops continue uninterrupted while it's resolved.",
+        a: "The LLC's Operating Agreement has remedies, including forced transfer of the delinquent share. RYDA also keeps a maintenance reserve at the LLC level so vehicle ops continue uninterrupted while it's resolved.",
+      },
+      {
+        q: "What if a major mechanical issue comes up?",
+        a: "RYDA only acquires Certified Pre-Owned vehicles, and every car gets a documented multi-point Pre-Purchase Inspection by a marque specialist before the LLC closes on it. Powertrain and major mechanical systems are covered by an active CPO warranty during the LLC's first ownership period. Out-of-warranty repairs come from the LLC's maintenance reserve — not from co-owners' pockets. Co-owners aren't on the hook for surprise engine, transmission, or driveline bills.",
       },
       {
         q: "What if the car gets totaled?",
@@ -73,7 +77,7 @@ const SECTIONS: { title: string; questions: Q[] }[] = [
       },
       {
         q: "How do I book my time?",
-        a: "Through the RYDA app, on a shared calendar with the other co-owners. Fair-use rules cap consecutive days during high season (May–September) at 7 per seat, with 14 days allowed in low season.",
+        a: "Through the RYDA app, on a shared calendar with the other co-owners. Fair-use rules cap consecutive days during high season (May–September) at 7 per share, with 14 days allowed in low season.",
       },
       {
         q: "Can I drive on a track?",
@@ -94,7 +98,7 @@ const SECTIONS: { title: string; questions: Q[] }[] = [
       },
       {
         q: "Why rentals at all? Aren't you focused on ownership?",
-        a: "Yes — co-ownership is the core product. Rentals exist for two reasons: (1) prospective members get a real test-drive before committing six figures to a seat, and (2) it supports vehicle utilization for co-owners who don't fully use their entitlement. We don't compete on price with generic rental marketplaces.",
+        a: "Yes — co-ownership is the core product. Rentals exist for two reasons: (1) prospective members get a real test-drive before committing six figures to a share, and (2) it supports vehicle utilization for co-owners who don't fully use their entitlement. We don't compete on price with generic rental marketplaces.",
       },
     ],
   },

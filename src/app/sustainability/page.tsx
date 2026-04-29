@@ -46,7 +46,7 @@ export default function SustainabilityPage() {
             <Stat
               number="~200 tons"
               label="CO2 avoided in manufacturing"
-              detail="Per shared 6-seat vehicle vs. 6 individuals (~40 tons each)"
+              detail="Per shared 6-share vehicle vs. 6 individuals (~40 tons each)"
             />
             <Stat
               number="3x"

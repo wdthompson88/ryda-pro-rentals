@@ -5,7 +5,7 @@ import { VEHICLES, formatUSD } from "@/lib/market-data";
 export const metadata = {
   title: "Markets — RYDA",
   description:
-    "Browse the RYDA fleet. Each car is held in a member-managed Delaware LLC; claim a co-ownership seat alongside other verified members.",
+    "Browse the RYDA fleet. Each car is held in a member-managed Delaware LLC; claim a co-ownership share alongside other verified members.",
 };
 
 export default function MarketsPage() {
@@ -22,7 +22,7 @@ export default function MarketsPage() {
             Co-own the world's most exceptional cars.
           </h1>
           <p className="mt-6 max-w-2xl text-lg text-ink-soft">
-            Claim a seat in any vehicle's Delaware LLC. Drive up to ~65 days
+            Claim a share in any vehicle's Delaware LLC. Drive ~30 days
             a year. Transfer after the 12-month minimum hold.
           </p>
         </div>
@@ -36,7 +36,7 @@ export default function MarketsPage() {
               <thead className="border-b border-rule bg-cream-2 text-xs font-medium uppercase tracking-wider text-ink-soft">
                 <tr>
                   <th className="px-6 py-4 text-left">Vehicle</th>
-                  <th className="px-6 py-4 text-right">Per seat</th>
+                  <th className="px-6 py-4 text-right">Per share</th>
                   <th className="hidden px-6 py-4 text-right lg:table-cell">Available</th>
                   <th className="hidden px-6 py-4 text-right lg:table-cell">Market</th>
                   <th className="px-6 py-4 text-right" aria-hidden />
@@ -71,7 +71,7 @@ export default function MarketsPage() {
                       <p className="font-medium text-ink tabular-nums">
                         {formatUSD(v.pricePerShare)}
                       </p>
-                      <p className="mt-1 text-xs text-mute">per seat</p>
+                      <p className="mt-1 text-xs text-mute">per share</p>
                     </td>
                     <td className="hidden px-6 py-5 text-right text-ink-soft lg:table-cell">
                       {v.sharesAvailable === 0 ? (
@@ -80,7 +80,7 @@ export default function MarketsPage() {
                         </span>
                       ) : (
                         <span className="text-sm">
-                          {v.sharesAvailable} of {v.shares} seats
+                          {v.sharesAvailable} of {v.shares} shares
                         </span>
                       )}
                     </td>

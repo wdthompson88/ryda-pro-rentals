@@ -294,8 +294,8 @@ function SolutionSlide() {
           ["Source", "RYDA sources curated supercars on behalf of each vehicle LLC in target markets."],
           ["Structure", "Each vehicle = single-purpose Delaware LLC. 5–10 verified members co-own and manage the LLC together."],
           ["Operate", "RYDA contracts with each LLC as a service provider — storage, insurance, maintenance, scheduling, concierge."],
-          ["Use", "Members book usage on the RYDA app — up to ~65 days, ~4,000 mi per seat per year."],
-          ["Transfer", "After 12 months, members transfer their seat to another verified member. RYDA handles LLC paperwork."],
+          ["Use", "Members book usage on the RYDA app — ~30 days, ~4,000 mi per share per year."],
+          ["Transfer", "After 12 months, members transfer their share to another verified member. RYDA handles LLC paperwork."],
         ].map(([title, body], i) => (
           <li key={title} className="flex gap-6">
             <span className="font-display text-2xl text-red">0{i + 1}</span>
@@ -362,9 +362,9 @@ function ModelSlide() {
           detail="Blue ($500/yr) or Black ($1,500/yr). Recurring."
         />
         <Rev
-          line="Seat Transfer Fee"
+          line="Share Transfer Fee"
           rate="3%"
-          detail="Of agreed price on every member-to-member seat transfer."
+          detail="Of agreed price on every member-to-member share transfer."
         />
         <Rev
           line="Insurance Administration"

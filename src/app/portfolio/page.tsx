@@ -4,27 +4,27 @@ import { DemoBanner } from "@/components/demo-banner";
 import { VEHICLES, formatUSD } from "@/lib/market-data";
 
 export const metadata = {
-  title: "Your seats — RYDA",
-  description: "Your co-ownership seats, usage, and upcoming bookings.",
+  title: "Your shares — RYDA",
+  description: "Your co-ownership shares, usage, and upcoming bookings.",
 };
 
 // Sample co-ownership view for the demo phase. Real version pulls from
 // authenticated member records in Supabase.
 const SEATS = [
-  { symbol: "F296", seats: 1, daysUsed: 18 },
-  { symbol: "MC75", seats: 1, daysUsed: 7 },
+  { symbol: "F296", shares: 1, daysUsed: 18 },
+  { symbol: "MC75", shares: 1, daysUsed: 7 },
 ];
 
 export default function PortfolioPage() {
   const positions = SEATS.map((s) => {
     const v = VEHICLES.find((vv) => vv.symbol === s.symbol)!;
-    const daysAvailable = v.daysPerYear * s.seats;
-    const milesAvailable = v.milesPerYear * s.seats;
-    const annualMgmt = v.annualOpCost * s.seats;
+    const daysAvailable = v.daysPerYear * s.shares;
+    const milesAvailable = v.milesPerYear * s.shares;
+    const annualMgmt = v.annualOpCost * s.shares;
     return { v, s, daysAvailable, milesAvailable, annualMgmt };
   });
 
-  const totalSeats = positions.reduce((n, p) => n + p.s.seats, 0);
+  const totalSeats = positions.reduce((n, p) => n + p.s.shares, 0);
   const totalDays = positions.reduce((n, p) => n + p.daysAvailable, 0);
   const totalDaysUsed = positions.reduce((n, p) => n + p.s.daysUsed, 0);
   const totalAnnualMgmt = positions.reduce((n, p) => n + p.annualMgmt, 0);
@@ -38,10 +38,10 @@ export default function PortfolioPage() {
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-14 sm:px-10 sm:py-20">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            Your seats
+            Your shares
           </p>
           <h1 className="mt-4 font-display text-4xl font-light text-ink sm:text-5xl">
-            {totalSeats} seat{totalSeats !== 1 ? "s" : ""} across {positions.length} car{positions.length !== 1 ? "s" : ""}.
+            {totalSeats} share{totalSeats !== 1 ? "s" : ""} across {positions.length} car{positions.length !== 1 ? "s" : ""}.
           </h1>
           <div className="mt-8 grid grid-cols-2 gap-6 sm:grid-cols-4">
             <Stat label="Days available this year" value={String(totalDays)} sub={`${totalDaysUsed} used`} />
@@ -61,7 +61,7 @@ export default function PortfolioPage() {
               <thead className="border-b border-rule bg-cream-2 text-xs font-medium uppercase tracking-wider text-ink-soft">
                 <tr>
                   <th className="px-6 py-4 text-left">Vehicle</th>
-                  <th className="px-6 py-4 text-right">Seats</th>
+                  <th className="px-6 py-4 text-right">Shares</th>
                   <th className="hidden px-6 py-4 text-right md:table-cell">Days / yr</th>
                   <th className="hidden px-6 py-4 text-right md:table-cell">Days used</th>
                   <th className="hidden px-6 py-4 text-right lg:table-cell">Mgmt / yr</th>
@@ -83,7 +83,7 @@ export default function PortfolioPage() {
                       </Link>
                     </td>
                     <td className="px-6 py-5 text-right tabular-nums text-ink">
-                      {p.s.seats} of {p.v.shares}
+                      {p.s.shares} of {p.v.shares}
                     </td>
                     <td className="hidden px-6 py-5 text-right tabular-nums text-ink-soft md:table-cell">
                       {p.daysAvailable}
@@ -131,7 +131,7 @@ export default function PortfolioPage() {
             Add another car to your collection.
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-base text-cream/70">
-            Most members hold seats in 2–3 different vehicles to vary their
+            Most members hold shares in 2–3 different vehicles to vary their
             experience across the year. Browse what's currently available.
           </p>
           <Link

@@ -158,7 +158,7 @@ export function BuyFlow({ vehicle, initialShares }: Props) {
             </p>
             <p className="mt-1 font-display text-xl text-ink">{vehicle.name}</p>
             <dl className="mt-5 space-y-2 border-t border-rule pt-5 text-sm">
-              <SummaryRow label={`${shares} seat${shares > 1 ? "s" : ""}`} value={formatUSD(totalPrice)} />
+              <SummaryRow label={`${shares} share${shares > 1 ? "s" : ""}`} value={formatUSD(totalPrice)} />
               <SummaryRow label="Closing fee" value={formatUSD(closingFee)} />
               <div className="border-t border-rule pt-3">
                 <SummaryRow
@@ -214,7 +214,7 @@ function ReviewStep({
       <div>
         <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">Step 1 of 5</p>
         <h1 className="mt-3 font-display text-4xl font-light text-ink sm:text-5xl">
-          Review your seat
+          Review your share
         </h1>
         <p className="mt-3 text-base text-ink-soft">
           Confirm what you're buying, what it entitles you to, and what it costs to operate
@@ -224,7 +224,7 @@ function ReviewStep({
 
       <Section title="What you're buying">
         <Bullet label="Vehicle" value={`${vehicle.year} ${vehicle.name}`} />
-        <Bullet label="Position" value={`${shares} of ${vehicle.shares} seats (${sharesPercent}%)`} />
+        <Bullet label="Position" value={`${shares} of ${vehicle.shares} shares (${sharesPercent}%)`} />
         <Bullet label="Legal entity" value={`Single-purpose Delaware LLC`} />
         <Bullet label="Stored in" value={vehicle.market} />
       </Section>
@@ -241,10 +241,10 @@ function ReviewStep({
 
       <Section title="What it costs">
         <Bullet label="Today (one-time)" value={formatUSD(grandTotal)} bold />
-        <Bullet label="—  Seat buy-in" value={formatUSD(totalPrice)} />
+        <Bullet label="—  Share buy-in" value={formatUSD(totalPrice)} />
         <Bullet label="—  Closing & paperwork fee" value={formatUSD(closingFee)} />
         <Bullet
-          label={`Ongoing (per seat, year)`}
+          label={`Ongoing (per share, year)`}
           value={`~${formatUSD(annualMgmtFee)}`}
           bold
         />
@@ -257,7 +257,7 @@ function ReviewStep({
       <div className="rounded-2xl border border-rule bg-cream-2/40 p-5 text-sm">
         <p className="font-medium text-ink">A few things to know</p>
         <ul className="mt-3 list-disc space-y-2 pl-5 text-ink-soft">
-          <li>12-month minimum hold from your closing date before transferring your seat.</li>
+          <li>12-month minimum hold from your closing date before transferring your share.</li>
           <li>The LLC is member-managed — you and your co-owners hold authority over material decisions.</li>
           <li>You'll be added to the vehicle's insurance policy at closing.</li>
           <li>Any vehicle modifications, sale, or replacement requires a 75% co-owner vote.</li>
@@ -275,7 +275,7 @@ function ReviewStep({
         <span className="text-ink">
           I understand I'm joining a member-managed Delaware LLC alongside other co-owners;
           that this is not an investment and is not offered for investment purposes; that
-          co-ownership seats are illiquid for the first 12 months; and that the car will
+          co-ownership shares are illiquid for the first 12 months; and that the car will
           depreciate over time.
         </span>
       </label>
@@ -444,10 +444,10 @@ function DocumentsStep({
 
       <DocCard
         title={`${vehicle.name} LLC — Management Services Agreement`}
-        meta={`12 pages · LLC ↔ RYDA · Your ${shares} seat${shares > 1 ? "s" : ""}`}
+        meta={`12 pages · LLC ↔ RYDA · Your ${shares} share${shares > 1 ? "s" : ""}`}
         summary={[
           `Engages RYDA as the operating service provider for the LLC.`,
-          `Your position: ${shares} of ${vehicle.shares} seats. Buy-in: ${formatUSD(vehicle.pricePerShare * shares)}.`,
+          `Your position: ${shares} of ${vehicle.shares} shares. Buy-in: ${formatUSD(vehicle.pricePerShare * shares)}.`,
           "Defines RYDA's services: storage, insurance, scheduling, maintenance, concierge, member services.",
           "Defines the 12% annual management fee charged to the LLC and paid pro-rata by members.",
           "RYDA is a service provider — not a manager of the LLC. Members retain LLC governance.",
@@ -510,11 +510,11 @@ function FundStep({
       <div>
         <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">Step 4 of 5</p>
         <h1 className="mt-3 font-display text-4xl font-light text-ink sm:text-5xl">
-          Fund your seat
+          Fund your share
         </h1>
         <p className="mt-3 text-base text-ink-soft">
           Send {formatUSD(grandTotal)} to the LLC's escrow account. Funds are held until your
-          documents and verifications clear, then released to the LLC and your seat is recorded in the LLC's member register.
+          documents and verifications clear, then released to the LLC and your share is recorded in the LLC's member register.
         </p>
       </div>
 
@@ -626,7 +626,7 @@ function ConfirmStep({
         <p className="text-xs font-medium uppercase tracking-wider text-red">Your co-ownership</p>
         <dl className="mt-4 space-y-3 text-sm">
           <KvRow label="Vehicle" value={`${vehicle.year} ${vehicle.name}`} />
-          <KvRow label="Position" value={`${shares} of ${vehicle.shares} seats`} />
+          <KvRow label="Position" value={`${shares} of ${vehicle.shares} shares`} />
           <KvRow label="Amount" value={formatUSD(grandTotal)} />
           <KvRow label="LLC" value={`${vehicle.name} LLC, Delaware (member-managed)`} />
           <KvRow label="Status" value="Pending — funds & verification clearing" />
@@ -653,7 +653,7 @@ function ConfirmStep({
           />
           <Timeline
             n="04"
-            title="Seat recorded; calendar opens"
+            title="Share recorded; calendar opens"
             body="Your share is officially registered with the LLC. The booking calendar opens for your first reservation."
           />
           <Timeline

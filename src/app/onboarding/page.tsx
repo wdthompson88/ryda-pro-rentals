@@ -221,7 +221,7 @@ function Tier({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
         <TierOption
           name="RYDA Core"
           price="Free"
-          tagline="Browse, rent, and claim co-ownership seats. Standard handover."
+          tagline="Browse, rent, and claim co-ownership shares. Standard handover."
           selected={tier === "core"}
           onClick={() => setTier("core")}
         />

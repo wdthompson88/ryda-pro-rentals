@@ -65,7 +65,7 @@ export default async function MyVehiclePage({
                 </span>
               )}
               <div className="mt-6 grid grid-cols-2 gap-4 text-sm">
-                <Stat label="Your seats" value="1 of 6" />
+                <Stat label="Your shares" value="1 of 6" />
                 <Stat label="Status" value="In storage" />
                 <Stat label="Days used (yr)" value="8 / 50" />
                 <Stat label="Miles used (yr)" value="658 / 4,000" />
@@ -133,14 +133,14 @@ export default async function MyVehiclePage({
       {/* Costs */}
       <Section id="costs" title="Costs" alt>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <BigStat label="Annual cost / seat" value={formatUSD(v.annualOpCost)} sub="All-in" />
+          <BigStat label="Annual cost / share" value={formatUSD(v.annualOpCost)} sub="All-in" />
           <BigStat label="Effective $/day" value={formatUSD(v.effectiveDailyCost)} sub={`${v.daysPerYear} days/yr usage`} />
           <BigStat label="Maintenance reserve" value={formatUSD(8_400)} sub="LLC balance" />
         </div>
         <div className="mt-10">
-          <h3 className="font-display text-lg text-ink">Annual breakdown (your seat)</h3>
+          <h3 className="font-display text-lg text-ink">Annual breakdown (your share)</h3>
           <ul className="mt-4 space-y-2 text-sm">
-            <Line label="Seat buy-in (one-time)" value={formatUSD(v.pricePerShare)} note="Paid Mar 18, 2026" />
+            <Line label="Share buy-in (one-time)" value={formatUSD(v.pricePerShare)} note="Paid Mar 18, 2026" />
             <Line label="Management fee" value={formatUSD(6_800)} note="Billed quarterly" />
             <Line label="Insurance" value={formatUSD(3_200)} note="Annual" />
             <Line label="Maintenance reserve" value={formatUSD(1_800)} note="Held at LLC" />
@@ -214,7 +214,7 @@ export default async function MyVehiclePage({
           </div>
         </div>
         <p className="mt-4 text-xs text-mute">
-          Fair-use rules: max 7 consecutive days per seat in high season,
+          Fair-use rules: max 7 consecutive days per share in high season,
           14 in low season.
         </p>
       </Section>
@@ -301,7 +301,7 @@ export default async function MyVehiclePage({
             />
             <SettingCard
               title="LLC member register"
-              desc="View current co-owners. Members signal intent to transfer their own seat individually."
+              desc="View current co-owners. Members signal intent to transfer their own share individually."
             />
             <SettingCard
               title="Post an update"

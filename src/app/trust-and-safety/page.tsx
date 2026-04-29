@@ -39,8 +39,8 @@ export default function TrustAndSafetyPage() {
             />
             <Pillar
               eyebrow="Vehicles"
-              title="Vetted before they enter the fleet"
-              body="Every vehicle gets a multi-point pre-purchase inspection by an independent specialist, full title and lien search, service history audit, and a baseline condition report photographed at handover. Documented before any share is sold."
+              title="CPO-only, PPI-inspected before any share is sold"
+              body="Every RYDA vehicle is Certified Pre-Owned with a manufacturer or independent CPO program. Before the LLC closes on a car, a multi-point Pre-Purchase Inspection by a marque specialist documents engine, transmission, suspension, electronics, and body condition — plus full title and lien search. Co-owners aren't buying surprises; they're buying a documented car."
             />
             <Pillar
               eyebrow="Insurance"
@@ -108,8 +108,45 @@ export default function TrustAndSafetyPage() {
         </div>
       </section>
 
-      {/* Claims section */}
+      {/* Mechanical & powertrain protection */}
       <section className="border-b border-rule bg-cream-2">
+        <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+            CPO + powertrain protection
+          </p>
+          <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
+            You're not buying a stranger's mechanical problems.
+          </h2>
+          <p className="mt-6 text-base leading-relaxed text-ink-soft">
+            RYDA only acquires Certified Pre-Owned vehicles. Before the LLC
+            closes on any car, three things happen — every time, no exceptions:
+          </p>
+          <ul className="mt-8 space-y-5 text-base">
+            <Coverage
+              line="Independent Pre-Purchase Inspection (PPI)"
+              detail="A marque specialist (Ferrari Master Tech, McLaren-certified shop, etc.) performs a documented multi-point inspection: engine compression and leak-down, transmission, suspension, brakes, electronics, fluid analysis, body and frame integrity. The full report becomes part of the LLC's permanent record."
+            />
+            <Coverage
+              line="Active CPO warranty"
+              detail="Every vehicle ships with an active manufacturer or independent CPO warranty covering the powertrain and major mechanical systems for the LLC's first ownership period. Co-owners aren't on the hook for surprise engine, transmission, or driveline repairs — those are warranty events, not assessments."
+            />
+            <Coverage
+              line="LLC-level reserve for post-warranty issues"
+              detail="The LLC's annual budget includes a maintenance reserve scaled to the vehicle's service profile. Out-of-warranty mechanical issues are paid from the reserve, not from members' pockets. If a major repair exhausts the reserve, the group decides next steps by vote — never a surprise bill in your inbox."
+            />
+          </ul>
+          <p className="mt-8 rounded-2xl border border-rule bg-surface p-6 text-sm leading-relaxed text-ink-soft">
+            <span className="font-medium text-ink">Bottom line:</span>{" "}
+            co-ownership shouldn't mean inheriting someone else's deferred
+            maintenance. RYDA's job is to deliver a documented, warrantied,
+            reserve-backed vehicle to your LLC on day one — and to keep it
+            that way.
+          </p>
+        </div>
+      </section>
+
+      {/* Claims section */}
+      <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
             Claims

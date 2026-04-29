@@ -152,9 +152,9 @@ export default function RentPage() {
             Renting is the test drive. Ownership is the point.
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
-            Every RYDA vehicle is also available as a co-ownership seat.
+            Every RYDA vehicle is also available as a co-ownership share.
             Effective ~$236/day on a co-owned Ferrari versus ~$2,500/day to
-            rent it. Transfer your seat to another verified member after the
+            rent it. Transfer your share to another verified member after the
             12-month minimum hold. That's where we want you to land.
           </p>
           <Link

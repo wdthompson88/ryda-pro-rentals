@@ -40,11 +40,11 @@ export const HELP: HelpCategory[] = [
         body: [
           {
             type: "p",
-            text: "RYDA is a US member-managed supercar co-ownership platform. Each vehicle in the fleet is held in a single-purpose Delaware LLC. Five to ten verified members co-own and manage that LLC together, and each seat entitles its holder to usage of the underlying vehicle — typically 50 days and 4,000 miles per seat per year.",
+            text: "RYDA is a US member-managed supercar co-ownership platform. Each vehicle in the fleet is held in a single-purpose Delaware LLC. Up to ten verified members co-own and manage that LLC together, and each share entitles its holder to usage of the underlying vehicle — typically ~30 days and ~4,000 miles per share per year.",
           },
           {
             type: "p",
-            text: "RYDA, as the LLC's hired service provider, handles every operational layer: acquisition support, storage, insurance, scheduling, maintenance, and member services. RYDA also facilitates the LLC paperwork when a member transfers their seat to another verified member after the 12-month minimum hold.",
+            text: "RYDA, as the LLC's hired service provider, handles every operational layer: acquisition support, storage, insurance, scheduling, maintenance, and member services. RYDA also facilitates the LLC paperwork when a member transfers their share to another verified member after the 12-month minimum hold.",
           },
           {
             type: "p",
@@ -70,7 +70,7 @@ export const HELP: HelpCategory[] = [
             type: "ul",
             items: [
               "If the LLC sells the vehicle, the LLC's proceeds are distributed pro-rata to members per the Operating Agreement.",
-              "You can transfer your seat to another verified RYDA member after the 12-month minimum hold. RYDA facilitates the LLC paperwork.",
+              "You can transfer your share to another verified RYDA member after the 12-month minimum hold. RYDA facilitates the LLC paperwork.",
               "You have voting rights on material decisions (sale, modifications, replacement) defined in the Operating Agreement.",
             ],
           },
@@ -89,12 +89,12 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Core — Free" },
           {
             type: "p",
-            text: "Free, no commitment. You can browse the fleet, see vehicle data, and read all marketing materials. You cannot claim a co-ownership seat, book vehicles, or transfer between members on Core.",
+            text: "Free, no commitment. You can browse the fleet, see vehicle data, and read all marketing materials. You cannot claim a co-ownership share, book vehicles, or transfer between members on Core.",
           },
           { type: "h3", text: "Blue — $500/year ($350 founding)" },
           {
             type: "p",
-            text: "The standard tier for active co-owners. Includes co-ownership seats, member-to-member transfers, member event invitations, and standard concierge services. Founding-100 members lock in $350/year for life.",
+            text: "The standard tier for active co-owners. Includes co-ownership shares, member-to-member transfers, member event invitations, and standard concierge services. Founding-100 members lock in $350/year for life.",
           },
           { type: "h3", text: "Black — $1,500/year ($1,000 founding)" },
           {
@@ -161,9 +161,9 @@ export const HELP: HelpCategory[] = [
       },
       {
         slug: "rental-vs-ownership",
-        q: "Should I rent or claim a co-ownership seat?",
+        q: "Should I rent or claim a co-ownership share?",
         summary:
-          "Rent first to test the experience and the specific vehicle. Claim a seat when usage exceeds ~10 days a year and you want priority and a relationship with the car.",
+          "Rent first to test the experience and the specific vehicle. Claim a share when usage exceeds ~10 days a year and you want priority and a relationship with the car.",
         body: [
           { type: "h3", text: "Rent if any of these apply" },
           {
@@ -175,7 +175,7 @@ export const HELP: HelpCategory[] = [
               "You want to swap between different makes (Ferrari one weekend, McLaren another) instead of holding one.",
             ],
           },
-          { type: "h3", text: "Claim a co-ownership seat if any of these apply" },
+          { type: "h3", text: "Claim a co-ownership share if any of these apply" },
           {
             type: "ul",
             items: [
@@ -188,12 +188,12 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Per-day comparison" },
           {
             type: "p",
-            text: "On a co-owned Ferrari 296 GTB at $56K per seat with up to 65 days entitlement, the effective daily cost works out to about $182/day. The rental rate on the same vehicle is $2,500/day. If you'll drive 15+ days a year, co-ownership pays for itself.",
+            text: "On a co-owned Ferrari 296 GTB at $34K per share (1 of 10) with ~30 days entitlement, the effective daily cost works out to about $236/day. The rental rate on the same vehicle is $2,500/day. If you'll drive 15+ days a year, co-ownership pays for itself.",
           },
           {
             type: "callout",
             tone: "info",
-            text: "Many members rent first, then convert that experience into a co-ownership seat on the same vehicle. We credit a portion of recent rental payments toward the buy-in, capped at 30 days.",
+            text: "Many members rent first, then convert that experience into a co-ownership share on the same vehicle. We credit a portion of recent rental payments toward the buy-in, capped at 30 days.",
           },
         ],
       },
@@ -201,7 +201,7 @@ export const HELP: HelpCategory[] = [
         slug: "founding-member-benefits",
         q: "What do founding-100 members get?",
         summary:
-          "Locked-for-life membership pricing ($350 Blue / $1,000 Black), founding-100 badge, priority on first vehicle launches, member-event access, and faster onboarding for additional seats.",
+          "Locked-for-life membership pricing ($350 Blue / $1,000 Black), founding-100 badge, priority on first vehicle launches, member-event access, and faster onboarding for additional shares.",
         body: [
           { type: "h3", text: "Pricing locked for life" },
           {
@@ -218,7 +218,7 @@ export const HELP: HelpCategory[] = [
             type: "ul",
             items: [
               "Founding-100 badge on member directory and event invitations.",
-              "Reduced KYC friction (single identity verification carries across multiple co-ownership seats).",
+              "Reduced KYC friction (single identity verification carries across multiple co-ownership shares).",
               "Invitation to RYDA's annual founding-member dinner.",
               "Direct line to RYDA founders for product feedback during the launch year.",
             ],
@@ -242,12 +242,12 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Personal unsecured loan" },
           {
             type: "p",
-            text: "Many members use unsecured personal loans (Marcus, LightStream, SoFi) to fund a buy-in. Rates are typically 7–14% APR for high-credit borrowers. The LLC seat isn't pledged — the loan is just personal credit on your name.",
+            text: "Many members use unsecured personal loans (Marcus, LightStream, SoFi) to fund a buy-in. Rates are typically 7–14% APR for high-credit borrowers. The LLC share isn't pledged — the loan is just personal credit on your name.",
           },
           { type: "h3", text: "Securities-backed line of credit" },
           {
             type: "p",
-            text: "If you have a brokerage account at Schwab, Fidelity, or Morgan Stanley, you may already have access to a securities-backed line of credit (against your stocks/bonds, not against the LLC seat) at lower rates (5–8% APR). This is often the cheapest path. Talk to your wealth manager.",
+            text: "If you have a brokerage account at Schwab, Fidelity, or Morgan Stanley, you may already have access to a securities-backed line of credit (against your stocks/bonds, not against the LLC share) at lower rates (5–8% APR). This is often the cheapest path. Talk to your wealth manager.",
           },
           { type: "h3", text: "Specialty leisure-asset finance" },
           {
@@ -270,18 +270,18 @@ export const HELP: HelpCategory[] = [
     icon: "$",
     title: "Co-ownership",
     blurb:
-      "Claiming a co-ownership seat, the Operating Agreement, the 12-month minimum hold, member-to-member transfers.",
+      "Claiming a co-ownership share, the Operating Agreement, the 12-month minimum hold, member-to-member transfers.",
     articles: [
       {
         slug: "how-to-buy",
-        q: "How do I claim a co-ownership seat?",
+        q: "How do I claim a co-ownership share?",
         summary:
-          "Pick a vehicle, complete KYC, sign the Operating Agreement and Management Services Agreement, fund your seat, you're a co-owner. No accreditation required.",
+          "Pick a vehicle, complete KYC, sign the Operating Agreement and Management Services Agreement, fund your share, you're a co-owner. No accreditation required.",
         body: [
           { type: "h3", text: "1. Pick the vehicle" },
           {
             type: "p",
-            text: "Browse the fleet at /markets, pick a vehicle and the number of seats you want. Each vehicle is held in a separate Delaware LLC. Most vehicles have 6 total seats; some hypercar-tier vehicles have up to 10.",
+            text: "Browse the fleet at /markets, pick a vehicle and the number of shares you want. Each vehicle is held in a separate Delaware LLC. Most vehicles have 6 total shares; some hypercar-tier vehicles have up to 10.",
           },
           { type: "h3", text: "2. Identity verification (KYC)" },
           {
@@ -296,7 +296,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "4. Funding" },
           {
             type: "p",
-            text: "Wire or ACH your buy-in into the LLC's escrow account. RYDA holds funds in escrow until all signatures are collected, then releases to the LLC and your seat is officially recorded in the LLC's member register.",
+            text: "Wire or ACH your buy-in into the LLC's escrow account. RYDA holds funds in escrow until all signatures are collected, then releases to the LLC and your share is officially recorded in the LLC's member register.",
           },
           { type: "h3", text: "5. Onboarding" },
           {
@@ -340,14 +340,14 @@ export const HELP: HelpCategory[] = [
       },
       {
         slug: "entitlement",
-        q: "What does a co-ownership seat actually entitle me to?",
+        q: "What does a co-ownership share actually entitle me to?",
         summary:
-          "Up to ~65 days and ~4,000 miles per year of vehicle use (depending on the vehicle), voting rights on material LLC decisions, and pro-rata participation in the LLC's assets at dissolution.",
+          "~30 days and up to ~4,000 miles per year of vehicle use (depending on the vehicle), voting rights on material LLC decisions, and pro-rata participation in the LLC's assets at dissolution.",
         body: [
           { type: "h3", text: "Usage" },
           {
             type: "p",
-            text: "Each seat entitles you to up to ~65 days and ~4,000 miles of vehicle usage per year, with the exact entitlement set per vehicle when the LLC is formed. Days are booked on a shared calendar with the other co-owners. Fair-use rules cap consecutive days during peak season.",
+            text: "Each share entitles you to ~30 days and up to ~4,000 miles of vehicle usage per year, with the exact entitlement set per vehicle when the LLC is formed. Days are booked on a shared calendar with the other co-owners. Fair-use rules cap consecutive days during peak season.",
           },
           { type: "h3", text: "Membership" },
           {
@@ -372,7 +372,7 @@ export const HELP: HelpCategory[] = [
       },
       {
         slug: "selling",
-        q: "Can I transfer my seat whenever I want?",
+        q: "Can I transfer my share whenever I want?",
         summary:
           "After a 12-month minimum hold, yes — directly to another verified RYDA member. RYDA facilitates the LLC paperwork. 3% transfer fee.",
         body: [
@@ -384,7 +384,7 @@ export const HELP: HelpCategory[] = [
             type: "ul",
             items: [
               "12-month minimum hold from your closing date. This is in the Operating Agreement to keep co-owner groups stable through at least one full year of use.",
-              "The new co-owner must be a verified RYDA member who has cleared KYC. Seats can only transfer between RYDA members under the Operating Agreement.",
+              "The new co-owner must be a verified RYDA member who has cleared KYC. Shares can only transfer between RYDA members under the Operating Agreement.",
             ],
           },
           {
@@ -403,7 +403,7 @@ export const HELP: HelpCategory[] = [
           {
             type: "callout",
             tone: "info",
-            text: "Co-ownership seats are illiquid by design. Cars depreciate, transfer requires another verified member to want your seat, and timing isn't guaranteed. Don't claim a seat expecting on-demand exit — claim it because you want to drive the car.",
+            text: "Co-ownership shares are illiquid by design. Cars depreciate, transfer requires another verified member to want your share, and timing isn't guaranteed. Don't claim a share expecting on-demand exit — claim it because you want to drive the car.",
           },
         ],
       },
@@ -422,7 +422,7 @@ export const HELP: HelpCategory[] = [
             type: "ul",
             items: [
               "A quarterly vehicle condition report and comparable-cost summary (auction comparables on Bring a Trailer, RM Sotheby's, Mecum; current retail offers).",
-              "A simple reference number for the seat: (current comparable-cost estimate + accrued LLC reserves) ÷ seat count.",
+              "A simple reference number for the share: (current comparable-cost estimate + accrued LLC reserves) ÷ share count.",
               "A summary of any prior transfers on the same vehicle for transparency.",
             ],
           },
@@ -433,7 +433,7 @@ export const HELP: HelpCategory[] = [
           {
             type: "callout",
             tone: "info",
-            text: "Cars depreciate. Reference numbers typically decline over time. Don't claim a seat expecting it to hold or grow in value — claim it for the use you'll get from the car.",
+            text: "Cars depreciate. Reference numbers typically decline over time. Don't claim a share expecting it to hold or grow in value — claim it for the use you'll get from the car.",
           },
         ],
       },
@@ -441,11 +441,11 @@ export const HELP: HelpCategory[] = [
         slug: "transfer-fee",
         q: "What's the 3% transfer fee?",
         summary:
-          "A flat 3% of the agreed price on every member-to-member seat transfer, paid to RYDA. Covers LLC paperwork, KYC re-verification of the new co-owner, and registry updates.",
+          "A flat 3% of the agreed price on every member-to-member share transfer, paid to RYDA. Covers LLC paperwork, KYC re-verification of the new co-owner, and registry updates.",
         body: [
           {
             type: "p",
-            text: "Every member-to-member seat transfer that RYDA facilitates carries a 3% fee on the agreed price. It's deducted from seller proceeds at settlement.",
+            text: "Every member-to-member share transfer that RYDA facilitates carries a 3% fee on the agreed price. It's deducted from seller proceeds at settlement.",
           },
           { type: "h3", text: "What the fee covers" },
           {
@@ -473,17 +473,17 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Lifetime gifts" },
           {
             type: "p",
-            text: "You can transfer a seat to a family member as a gift, but the recipient has to clear RYDA's standard verification (KYC + clean driving record) before the transfer completes. The 3% transfer fee is waived for first-degree family transfers (spouse, children, parents, siblings).",
+            text: "You can transfer a share to a family member as a gift, but the recipient has to clear RYDA's standard verification (KYC + clean driving record) before the transfer completes. The 3% transfer fee is waived for first-degree family transfers (spouse, children, parents, siblings).",
           },
           { type: "h3", text: "Inheritance and estate transfer" },
           {
             type: "p",
-            text: "When a co-owner dies, the seat is part of their estate and passes per their will or trust. The estate can either transfer the seat to another verified member (transfer fee waived for estate transfers) or hand it to a named heir. Heirs must complete RYDA verification before the seat transfers.",
+            text: "When a co-owner dies, the share is part of their estate and passes per their will or trust. The estate can either transfer the share to another verified member (transfer fee waived for estate transfers) or hand it to a named heir. Heirs must complete RYDA verification before the share transfers.",
           },
           { type: "h3", text: "If no heir wants it" },
           {
             type: "p",
-            text: "The estate can list the seat through RYDA for transfer to another verified member. Transfers can take 30–90 days depending on member demand. There's no guaranteed buyer.",
+            text: "The estate can list the share through RYDA for transfer to another verified member. Transfers can take 30–90 days depending on member demand. There's no guaranteed buyer.",
           },
           {
             type: "callout",
@@ -501,14 +501,14 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Capital outlay" },
           {
             type: "p",
-            text: "A solo Ferrari 296 GTB is $340,000 plus tax (~$365K all-in). A 1/6 seat is roughly $57,000. Same vehicle, six times less up-front cost. Either way, the car depreciates — co-ownership just lets you split the depreciation with other members.",
+            text: "A solo Ferrari 296 GTB is $340,000 plus tax (~$365K all-in). A 1/10 share is roughly $34,000. Same vehicle, ten times less up-front cost. Either way, the car depreciates — co-ownership just lets you split the depreciation with the rest of the LLC's members.",
           },
           { type: "h3", text: "Annual carrying cost" },
           {
             type: "ul",
             items: [
               "Solo: $80,000+/year (insurance ~$15K, storage ~$8K, maintenance ~$10K, depreciation ~$45K, taxes/registration ~$2K).",
-              "Co-owned: ~$11,800/year per seat — covers your share of insurance, storage, scheduled maintenance, and the LLC's reserves.",
+              "Co-owned: ~$11,800/year per share — covers your share of insurance, storage, scheduled maintenance, and the LLC's reserves.",
             ],
           },
           { type: "h3", text: "What you trade away" },
@@ -522,12 +522,12 @@ export const HELP: HelpCategory[] = [
             items: [
               "Lower up-front cost and lower annual carry — more access for less commitment.",
               "Operational ease. RYDA handles every layer — insurance renewals, service appointments, storage, registration, claims.",
-              "Variety. Some members hold seats in 2–3 different vehicles to vary their experience across the year.",
+              "Variety. Some members hold shares in 2–3 different vehicles to vary their experience across the year.",
             ],
           },
           {
             type: "p",
-            text: "Bottom line: if you'd drive a solo-owned exotic 50+ days a year and you love the operational responsibility, buy outright. If you'd drive 10–50 days a year and prefer to outsource the rest, share.",
+            text: "Bottom line: if you'd drive a solo-owned exotic 60+ days a year and you love the operational responsibility, buy outright. If you'd drive 10–30 days a year and prefer to outsource the rest, share.",
           },
         ],
       },
@@ -545,7 +545,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "If they don't cure" },
           {
             type: "p",
-            text: "The LLC can force transfer of the delinquent seat to another verified member at the most recent reference value. Proceeds first cover the unpaid amount, then any LLC-level transaction costs, then the rest goes to the former member. The remaining co-owners aren't on the hook for the unpaid amount — the seat itself secures the obligation.",
+            text: "The LLC can force transfer of the delinquent share to another verified member at the most recent reference value. Proceeds first cover the unpaid amount, then any LLC-level transaction costs, then the rest goes to the former member. The remaining co-owners aren't on the hook for the unpaid amount — the share itself secures the obligation.",
           },
           { type: "h3", text: "Why it doesn't disrupt operations" },
           {
@@ -561,20 +561,20 @@ export const HELP: HelpCategory[] = [
       },
       {
         slug: "share-count-changes",
-        q: "Can a vehicle's seat count change after launch?",
+        q: "Can a vehicle's share count change after launch?",
         summary:
-          "No — seat count is fixed at LLC formation. New seats cannot be added later. Existing co-owners can buy each other out, but the total seat count stays the same.",
+          "No — share count is fixed at LLC formation. New shares cannot be added later. Existing co-owners can buy each other out, but the total share count stays the same.",
         body: [
           {
             type: "p",
-            text: "When a vehicle's LLC is formed, the seat count is set permanently in the Operating Agreement (typically 6, sometimes 8 or 10 for higher-value vehicles). This is by design — letting the LLC add seats later would dilute existing co-owners' usage entitlement.",
+            text: "When a vehicle's LLC is formed, the share count is set permanently in the Operating Agreement (typically 6, sometimes 8 or 10 for higher-value vehicles). This is by design — letting the LLC add shares later would dilute existing co-owners' usage entitlement.",
           },
           { type: "h3", text: "Why it's fixed" },
           {
             type: "ul",
             items: [
               "Protects existing members from dilution.",
-              "Provides predictable usage entitlement (e.g. 5 seats × 65 days = 325 days/yr, with ~40 days reserved for service and downtime).",
+              "Provides predictable usage entitlement (10 shares × 30 days = 300 days/yr, with ~65 days reserved for service and downtime).",
               "Keeps the co-owner group small enough to coordinate.",
               "Keeps the LLC's member-managed governance simple and stable.",
             ],
@@ -582,7 +582,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Buyouts within the same LLC" },
           {
             type: "p",
-            text: "Existing co-owners can transfer between each other at any time. If one member transfers two seats to another member, the total is still 6 — just held differently. This is how members consolidate more seats in a vehicle they love.",
+            text: "Existing co-owners can transfer between each other at any time. If one member transfers two shares to another member, the total is still 6 — just held differently. This is how members consolidate more shares in a vehicle they love.",
           },
         ],
       },
@@ -1449,7 +1449,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Vehicle management fee" },
           {
             type: "p",
-            text: "12% of the vehicle's annual value, billed quarterly to the LLC, paid pro-rata by co-owners. So on a $340K Ferrari with 6 seats, your quarterly contribution is roughly $1,700.",
+            text: "12% of the vehicle's annual value, billed quarterly to the LLC, paid pro-rata by co-owners. So on a $340K Ferrari with 6 shares, your quarterly contribution is roughly $1,700.",
           },
           { type: "h3", text: "Per-booking charges" },
           {
@@ -1464,7 +1464,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Statements" },
           {
             type: "p",
-            text: "Monthly account statement summarizes membership status, all charges, all bookings, and all per-seat LLC obligations. Annual statement issued each year by March 15.",
+            text: "Monthly account statement summarizes membership status, all charges, all bookings, and all per-share LLC obligations. Annual statement issued each year by March 15.",
           },
         ],
       },
@@ -1535,7 +1535,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Sharing" },
           {
             type: "p",
-            text: "We don't share KYC data with anyone except (a) insurance carriers when adding you to a policy, (b) state/federal regulators when legally required, and (c) the new co-owner's verification flow on a member-to-member seat transfer (limited fields, with your consent).",
+            text: "We don't share KYC data with anyone except (a) insurance carriers when adding you to a policy, (b) state/federal regulators when legally required, and (c) the new co-owner's verification flow on a member-to-member share transfer (limited fields, with your consent).",
           },
         ],
       },
@@ -1543,7 +1543,7 @@ export const HELP: HelpCategory[] = [
         slug: "close",
         q: "Closing my account",
         summary:
-          "If you hold no co-ownership seats: instant. If you hold seats: transfer them to other verified members first, then close. Settlement of any open obligations happens at closure.",
+          "If you hold no co-ownership shares: instant. If you hold shares: transfer them to other verified members first, then close. Settlement of any open obligations happens at closure.",
         body: [
           { type: "h3", text: "If you hold no shares" },
           {
@@ -1553,7 +1553,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "If you hold one or more shares" },
           {
             type: "p",
-            text: "You'll need to transfer your seats to other verified members before closing. The process:",
+            text: "You'll need to transfer your shares to other verified members before closing. The process:",
           },
           {
             type: "ul",
@@ -1579,7 +1579,7 @@ export const HELP: HelpCategory[] = [
             type: "ul",
             items: [
               "$500 credit when your referral becomes a paid member (Blue or Black).",
-              "$2,500 credit when your referral closes their first co-ownership seat.",
+              "$2,500 credit when your referral closes their first co-ownership share.",
               "Founding-100 members earn 2× credits on every successful referral.",
             ],
           },
@@ -1636,7 +1636,7 @@ export const HELP: HelpCategory[] = [
           },
           {
             type: "p",
-            text: "All 100 founding seats are allocated by application order, with priority weighting for members in launch markets and members making early share commitments.",
+            text: "All 100 founding shares are allocated by application order, with priority weighting for members in launch markets and members making early share commitments.",
           },
         ],
       },
@@ -1742,7 +1742,7 @@ export const HELP: HelpCategory[] = [
               "Cars depreciate. Co-owners aren't buying with appreciation expectation — the asset is a depreciating consumption good, like a jet card or a country-club membership.",
               "The LLC is member-managed. You and your co-owners hold authority over material decisions (sale, modifications, replacement). RYDA is a hired service provider, not the LLC's decision-maker.",
               "No income distribution. Members get usage; they don't earn yield from the LLC's operations.",
-              "Resale is member-to-member transfer of an LLC seat, not a public marketplace trade.",
+              "Resale is member-to-member transfer of an LLC share, not a public marketplace trade.",
             ],
           },
           { type: "h3", text: "What this means in practice" },
@@ -1785,8 +1785,8 @@ export const HELP: HelpCategory[] = [
             items: [
               "Insurance carriers (when adding you to a policy).",
               "Federal/state regulators (when legally required).",
-              "Other co-owners on your specific LLC (limited: your name, contact, seat count — for booking calendar coordination).",
-              "Buyer KYC systems on member-to-member seat transfers (limited fields, with your consent).",
+              "Other co-owners on your specific LLC (limited: your name, contact, share count — for booking calendar coordination).",
+              "Buyer KYC systems on member-to-member share transfers (limited fields, with your consent).",
             ],
           },
           { type: "h3", text: "Who we don't share with" },
@@ -1814,7 +1814,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Sequence of events" },
           {
             type: "p",
-            text: "Per the Operating Agreement and the Management Services Agreement, RYDA performs the wind-down operations: marshalling assets (insurance proceeds or sale proceeds), paying outstanding liabilities (carrier balances, vendor invoices, taxes), and distributing the remainder pro-rata to co-owners according to their seats held. The dissolution decision itself is a member vote; RYDA executes it. Distribution happens within 60 days of the decision.",
+            text: "Per the Operating Agreement and the Management Services Agreement, RYDA performs the wind-down operations: marshalling assets (insurance proceeds or sale proceeds), paying outstanding liabilities (carrier balances, vendor invoices, taxes), and distributing the remainder pro-rata to co-owners according to their shares held. The dissolution decision itself is a member vote; RYDA executes it. Distribution happens within 60 days of the decision.",
           },
           { type: "h3", text: "Tax implications" },
           {
@@ -2002,34 +2002,34 @@ export const HELP: HelpCategory[] = [
         ],
       },
       {
-        slug: "kids-and-baby-seats",
-        q: "Can I install a child seat?",
+        slug: "kids-and-baby-shares",
+        q: "Can I install a child share?",
         summary:
-          "Yes, with care. Most modern exotics have ISOFIX/LATCH anchors. Don't damage the upholstery — use a seat protector. RYDA can install for you on Black tier.",
+          "Yes, with care. Most modern exotics have ISOFIX/LATCH anchors. Don't damage the upholstery — use a share protector. RYDA can install for you on Black tier.",
         body: [
           { type: "h3", text: "Where it works" },
           {
             type: "p",
-            text: "Most modern exotics (Ferrari 296 GTB, McLaren 720S, Lambo Urus, Aston DBX, Rolls-Royce Cullinan, Porsche Taycan) have ISOFIX/LATCH child-seat anchors in the rear seats or extended cabin. Some 2-seat configurations don't accommodate child seats safely — check the vehicle listing.",
+            text: "Most modern exotics (Ferrari 296 GTB, McLaren 720S, Lambo Urus, Aston DBX, Rolls-Royce Cullinan, Porsche Taycan) have ISOFIX/LATCH child-share anchors in the rear shares or extended cabin. Some 2-share configurations don't accommodate child shares safely — check the vehicle listing.",
           },
           { type: "h3", text: "What we ask" },
           {
             type: "ul",
             items: [
-              "Use a seat protector underneath. The buckles and anchor points scratch leather/Alcantara on hundreds of dollars of upholstery.",
+              "Use a share protector underneath. The buckles and anchor points scratch leather/Alcantara on hundreds of dollars of upholstery.",
               "Don't tighten anchors with full force — exotic interior trim can deform.",
-              "Remove the seat at end of booking. Don't leave it in the car for the next member.",
+              "Remove the share at end of booking. Don't leave it in the car for the next member.",
             ],
           },
           { type: "h3", text: "Help installing" },
           {
             type: "p",
-            text: "Black tier members can request RYDA Operations to pre-install the child seat at handover. We use a clean, non-damaging installation method. Available for $50/booking, included in white-glove delivery.",
+            text: "Black tier members can request RYDA Operations to pre-install the child share at handover. We use a clean, non-damaging installation method. Available for $50/booking, included in white-glove delivery.",
           },
           {
             type: "callout",
             tone: "info",
-            text: "Two-seat configurations (most McLarens, Ferrari 488 / 296 / F8, Aston Vantage) are typically NOT safe for child seats — the airbag system isn't designed for it and there's no rear seat to relocate to. The Cullinan, Urus, DBX, Taycan, and Bentley Bentayga work well for families.",
+            text: "Two-share configurations (most McLarens, Ferrari 488 / 296 / F8, Aston Vantage) are typically NOT safe for child shares — the airbag system isn't designed for it and there's no rear share to relocate to. The Cullinan, Urus, DBX, Taycan, and Bentley Bentayga work well for families.",
           },
         ],
       },
@@ -2132,7 +2132,7 @@ const ARTICLE_KEYWORDS: Record<string, string[]> = {
   "vehicle-use/smoking-pets-food": ["smoke", "smoking", "vape", "vaping", "weed", "marijuana", "cigarette", "cigar", "pet", "dog", "cat", "food", "drink", "eat"],
   "vehicle-use/road-trips": ["road trip", "long drive", "drive cross country", "weekend trip", "long distance drive", "vacation drive", "tour"],
   "vehicle-use/car-shows-photoshoots": ["car show", "show car", "exhibition", "photoshoot", "photo shoot", "instagram", "social media", "youtube", "video", "filming", "music video", "brand deal"],
-  "vehicle-use/kids-and-baby-seats": ["kid", "child", "baby", "infant", "toddler", "child seat", "car seat", "isofix", "latch", "family", "stroller"],
+  "vehicle-use/kids-and-baby-shares": ["kid", "child", "baby", "infant", "toddler", "child share", "car share", "isofix", "latch", "family", "stroller"],
 };
 
 // ── Search ─────────────────────────────────────────────────────────

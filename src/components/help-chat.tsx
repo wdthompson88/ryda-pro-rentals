@@ -16,11 +16,11 @@ type ChatMessage =
     };
 
 const SUGGESTIONS = [
-  "How do I claim a co-ownership seat?",
+  "How do I claim a co-ownership share?",
   "Can I take it on a road trip?",
   "What's covered by insurance?",
   "What if I total the car?",
-  "Can I gift my seat to my kids?",
+  "Can I gift my share to my kids?",
 ];
 
 const GREETING: ChatMessage = {

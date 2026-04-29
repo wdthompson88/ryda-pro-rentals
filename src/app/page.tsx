@@ -23,22 +23,16 @@ export default function Home() {
               <span className="italic text-red">most exceptional cars.</span>
             </h1>
             <p className="mt-8 max-w-xl text-lg leading-relaxed text-ink-soft">
-              Co-own a real Ferrari, Lamborghini, or McLaren together with
-              5–10 other verified members in a Delaware LLC. Drive it up to
-              ~65 days a year. Transfer your seat when you're done.
+              Co-own a CPO Ferrari, Lamborghini, or McLaren together with
+              up to 9 other verified members in a Delaware LLC. Drive it
+              ~30 days a year. Transfer your share when you're done.
             </p>
-            <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
+            <div className="mt-10 flex justify-center sm:justify-start">
               <Link
                 href="/markets"
                 className="inline-flex h-12 items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream transition-colors hover:bg-red"
               >
-                See the fleet
-              </Link>
-              <Link
-                href="/how-it-works"
-                className="inline-flex h-12 items-center justify-center rounded-full border border-ink/15 px-7 text-sm font-medium text-ink hover:border-ink"
-              >
-                How it works
+                See the fleet →
               </Link>
             </div>
           </div>
@@ -71,7 +65,7 @@ export default function Home() {
                         <p className="font-medium text-ink tabular-nums">
                           {formatUSD(v.pricePerShare)}
                         </p>
-                        <p className="text-xs text-mute">per seat</p>
+                        <p className="text-xs text-mute">per share</p>
                       </div>
                     </Link>
                   </li>
@@ -79,7 +73,7 @@ export default function Home() {
               </ul>
             </div>
             <p className="mt-3 text-center text-xs text-mute">
-              Co-ownership seats. {featured.length} of {VEHICLES.length} vehicles shown.
+              Co-ownership shares. {featured.length} of {VEHICLES.length} vehicles shown.
             </p>
           </div>
         </div>
@@ -100,10 +94,10 @@ export default function Home() {
           </p>
           <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-3 lg:grid-cols-5">
             <Step n="01" title="Verify" body="Apply, complete identity verification, and confirm RYDA membership requirements." />
-            <Step n="02" title="Choose" body="Browse the curated fleet. Rent any vehicle by the day, or claim a co-ownership seat." />
-            <Step n="03" title="Co-own" body="5–10 members form a Delaware LLC together to hold the vehicle. You sign the operating agreement and fund your seat." />
-            <Step n="04" title="Drive" body="Book your time on the RYDA app. Up to ~65 days and ~4,000 miles per seat, per year — exact entitlement depends on the vehicle." />
-            <Step n="05" title="Transfer" body="After 12 months, transfer your seat to another verified member. RYDA handles the LLC paperwork. 3% transfer fee." />
+            <Step n="02" title="Choose" body="Browse the curated, CPO-only fleet. Every car passes a multi-point Pre-Purchase Inspection before a single share is sold — co-owners are protected from inheriting major powertrain or mechanical issues." />
+            <Step n="03" title="Co-own" body="Up to 10 members form a Delaware LLC together to hold the vehicle. You sign the operating agreement and fund your share." />
+            <Step n="04" title="Drive" body="Book your time on the RYDA app. ~30 days and ~4,000 miles per share, per year — exact entitlement depends on the vehicle." />
+            <Step n="05" title="Transfer" body="After 12 months, transfer your share to another verified member. RYDA handles the LLC paperwork. 3% transfer fee." />
           </div>
           <div className="mt-16 flex justify-center">
             <Link

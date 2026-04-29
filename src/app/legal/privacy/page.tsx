@@ -19,7 +19,7 @@ export default function PrivacyPage() {
         },
         {
           heading: "3. How we use your information",
-          body: "To verify your identity and eligibility for membership.\n\nTo facilitate rentals and co-ownership seat onboarding, including LLC documents, payments, and member records.\n\nTo communicate about your account, bookings, billing, and changes to our service.\n\nTo prevent fraud, enforce our Terms of Service, and comply with the law.",
+          body: "To verify your identity and eligibility for membership.\n\nTo facilitate rentals and co-ownership share onboarding, including LLC documents, payments, and member records.\n\nTo communicate about your account, bookings, billing, and changes to our service.\n\nTo prevent fraud, enforce our Terms of Service, and comply with the law.",
         },
         {
           heading: "4. How we share your information",

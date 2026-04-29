@@ -6,8 +6,8 @@ import { VEHICLES, formatUSD } from "@/lib/market-data";
 export const metadata = { title: "My Cars — RYDA" };
 
 const HOLDINGS = [
-  { symbol: "F296", seats: 1, isLeadOwner: true, status: "active" as const },
-  { symbol: "MC75", seats: 1, isLeadOwner: false, status: "active" as const },
+  { symbol: "F296", shares: 1, isLeadOwner: true, status: "active" as const },
+  { symbol: "MC75", shares: 1, isLeadOwner: false, status: "active" as const },
 ];
 
 export default function MyCarsPage() {
@@ -57,7 +57,7 @@ export default function MyCarsPage() {
                       </span>
                     )}
                     <span className="absolute right-3 top-3 rounded-full bg-ink/80 px-3 py-1 text-xs font-medium text-cream">
-                      {h.seats} of {v.shares} seats
+                      {h.shares} of {v.shares} shares
                     </span>
                   </div>
                   <div className="p-6">

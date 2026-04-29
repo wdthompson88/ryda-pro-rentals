@@ -21,8 +21,8 @@ export async function generateMetadata({
   const v = getVehicleBySymbol(symbol);
   if (!v) return { title: "RYDA Markets" };
   return {
-    title: `${v.name} — ${formatUSD(v.pricePerShare)} per seat | RYDA`,
-    description: `Co-own a ${v.year} ${v.name}. ${v.sharesAvailable} of ${v.shares} member-managed LLC seats available.`,
+    title: `${v.name} — ${formatUSD(v.pricePerShare)} per share | RYDA`,
+    description: `Co-own a ${v.year} ${v.name}. ${v.sharesAvailable} of ${v.shares} member-managed LLC shares available.`,
   };
 }
 
@@ -74,11 +74,11 @@ export default async function VehicleMarketPage({
 
               <dl className="mt-8 grid grid-cols-2 gap-x-8 gap-y-5 sm:grid-cols-3">
                 <Fact label="Vehicle price" value={formatUSD(v.fullPrice)} />
-                <Fact label="Per seat" value={formatUSD(v.pricePerShare)} />
-                <Fact label="Total seats" value={String(v.shares)} />
-                <Fact label="Days / seat" value={`${v.daysPerYear}/yr`} />
-                <Fact label="Miles / seat" value={`${v.milesPerYear.toLocaleString()}/yr`} />
-                <Fact label="Annual contribution" value={`${formatUSD(v.annualOpCost)} per seat`} />
+                <Fact label="Per share" value={formatUSD(v.pricePerShare)} />
+                <Fact label="Total shares" value={String(v.shares)} />
+                <Fact label="Days / share" value={`${v.daysPerYear}/yr`} />
+                <Fact label="Miles / share" value={`${v.milesPerYear.toLocaleString()}/yr`} />
+                <Fact label="Annual contribution" value={`${formatUSD(v.annualOpCost)} per share`} />
               </dl>
             </div>
 
@@ -90,15 +90,15 @@ export default async function VehicleMarketPage({
         </div>
       </section>
 
-      {/* Your seat — sample co-ownership view */}
+      {/* Your share — sample co-ownership view */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
-          <h2 className="font-display text-2xl text-ink">Your seat</h2>
+          <h2 className="font-display text-2xl text-ink">Your share</h2>
           <p className="mt-1 text-sm text-mute">
-            Sample co-ownership view — sign in to see your actual seats.
+            Sample co-ownership view — sign in to see your actual shares.
           </p>
           <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-            <Stat label="Seats held" value="1" sub={`of ${v.shares}`} />
+            <Stat label="Shares held" value="1" sub={`of ${v.shares}`} />
             <Stat
               label="Days available"
               value={`${v.daysPerYear}`}
@@ -112,7 +112,7 @@ export default async function VehicleMarketPage({
             <Stat
               label="Annual cost"
               value={formatUSD(v.annualOpCost)}
-              sub="all-in per seat"
+              sub="all-in per share"
             />
           </div>
         </div>
@@ -139,10 +139,10 @@ export default async function VehicleMarketPage({
         <div className="mx-auto max-w-7xl px-6 py-14 sm:px-10">
           <h2 className="font-display text-3xl text-ink">Recent activity</h2>
           <ul className="mt-6 divide-y divide-rule rounded-xl border border-rule bg-surface">
-            <Activity label="New co-owner joined the LLC" detail="Apr 24" amount="—" sub="1 seat" />
+            <Activity label="New co-owner joined the LLC" detail="Apr 24" amount="—" sub="1 share" />
             <Activity label="Inspection report posted" detail="Apr 20" amount="—" sub="Mileage: 2,140 mi" />
-            <Activity label="Seat transferred to a new verified member" detail="Apr 22" amount="—" sub="1 seat" />
-            <Activity label="New co-owners joined the LLC" detail="Apr 18" amount="—" sub="2 seats" />
+            <Activity label="Share transferred to a new verified member" detail="Apr 22" amount="—" sub="1 share" />
+            <Activity label="New co-owners joined the LLC" detail="Apr 18" amount="—" sub="2 shares" />
           </ul>
           <p className="mt-3 text-xs text-mute">
             Member-to-member transfer prices are private to the parties. RYDA
@@ -167,7 +167,7 @@ export default async function VehicleMarketPage({
                 <p className="mt-3 font-display text-xl text-ink tabular-nums">
                   {formatUSD(x.pricePerShare)}
                 </p>
-                <p className="mt-1 text-xs text-mute">per seat</p>
+                <p className="mt-1 text-xs text-mute">per share</p>
               </Link>
             ))}
           </div>
@@ -180,7 +180,7 @@ export default async function VehicleMarketPage({
           RYDA is a luxury access platform. Co-ownership stakes are LLC
           membership interests in member-managed Delaware LLCs and are
           not registered securities. They are not offered for investment
-          purposes. Cars depreciate; seats are illiquid by design.
+          purposes. Cars depreciate; shares are illiquid by design.
           Membership is limited to verified individuals 28 years or older.
           See the full Co-Ownership Disclaimer at /legal/disclaimer.
         </div>

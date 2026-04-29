@@ -9,13 +9,13 @@ export const metadata = {
 };
 
 const TOP_TOPICS: { label: string; href: string }[] = [
-  { label: "How to claim a co-ownership seat", href: "/help/shares/how-to-buy" },
+  { label: "How to claim a co-ownership share", href: "/help/shares/how-to-buy" },
   { label: "Is this an investment?", href: "/help/legal/securities" },
   { label: "Member-managed LLC explained", href: "/help/legal/member-managed-llc" },
   { label: "Fair-use rules", href: "/help/bookings/fair-use" },
   { label: "File an insurance claim", href: "/help/insurance/file-claim" },
   { label: "Tax treatment", href: "/help/account/taxes" },
-  { label: "Transfer your seat", href: "/help/shares/selling" },
+  { label: "Transfer your share", href: "/help/shares/selling" },
 ];
 
 export default function HelpCenterPage() {
@@ -45,7 +45,7 @@ export default function HelpCenterPage() {
               <input
                 id="help-search"
                 type="search"
-                placeholder="Search bookings, insurance, seat transfer, KYC…"
+                placeholder="Search bookings, insurance, share transfer, KYC…"
                 className="h-full flex-1 bg-transparent text-base text-ink placeholder:text-mute focus:outline-none"
               />
             </div>

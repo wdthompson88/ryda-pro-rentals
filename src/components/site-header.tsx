@@ -22,7 +22,7 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
           href="/#waitlist"
           className={`rounded-full border px-5 py-2 text-sm font-medium transition-colors ${ctaBase}`}
         >
-          Join the list
+          Apply to join
         </Link>
       </div>
     </header>

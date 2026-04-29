@@ -8,9 +8,9 @@ type Props = { vehicle: Vehicle };
 
 export function OrderPanel({ vehicle }: Props) {
   const router = useRouter();
-  const [seats, setSeats] = useState("1");
+  const [shares, setSeats] = useState("1");
 
-  const numericSeats = Math.max(1, Math.min(vehicle.sharesAvailable || 1, parseInt(seats || "1", 10) || 1));
+  const numericSeats = Math.max(1, Math.min(vehicle.sharesAvailable || 1, parseInt(shares || "1", 10) || 1));
   const buyInCost = numericSeats * vehicle.pricePerShare;
   const annualContribution = numericSeats * vehicle.annualOpCost;
   const daysPerYear = numericSeats * vehicle.daysPerYear;
@@ -27,21 +27,21 @@ export function OrderPanel({ vehicle }: Props) {
   return (
     <div className="rounded-2xl border border-rule bg-surface p-6 shadow-sm">
       <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-        Claim a seat
+        Claim a share
       </p>
       <p className="mt-2 font-display text-xl text-ink">{vehicle.name}</p>
       <p className="mt-1 text-xs text-mute">
-        {vehicle.sharesAvailable} of {vehicle.shares} seats available
+        {vehicle.sharesAvailable} of {vehicle.shares} shares available
       </p>
 
       <div className="mt-5 border-t border-rule pt-4">
-        <Field label="Seats">
+        <Field label="Shares">
           <input
             type="number"
             inputMode="numeric"
             min={1}
             max={vehicle.sharesAvailable || 1}
-            value={seats}
+            value={shares}
             onChange={(e) => setSeats(e.target.value)}
             className="w-full bg-transparent text-right font-medium text-ink placeholder:text-mute focus:outline-none"
           />
@@ -83,7 +83,7 @@ export function OrderPanel({ vehicle }: Props) {
         disabled={sold}
         className="mt-5 w-full rounded-full bg-ink px-7 py-3 text-sm font-semibold text-cream transition-colors hover:bg-red disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {sold ? "All seats taken" : `Reserve ${numericSeats} seat${numericSeats > 1 ? "s" : ""} →`}
+        {sold ? "All shares taken" : `Reserve ${numericSeats} share${numericSeats > 1 ? "s" : ""} →`}
       </button>
 
       <p className="mt-4 text-center text-xs text-mute">

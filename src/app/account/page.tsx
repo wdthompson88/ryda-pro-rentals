@@ -31,7 +31,7 @@ export default function AccountPage() {
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             <Stat label="Cars co-owned" value="2" sub="Ferrari 296 + McLaren 750S" />
             <Stat label="Days used this year" value="14" sub="Of 100 entitled" />
-            <Stat label="Days remaining" value="86" sub="Across all seats" />
+            <Stat label="Days remaining" value="86" sub="Across all shares" />
             <Stat label="Upcoming bookings" value="3" sub="Next: Apr 28" />
           </div>
         </div>
@@ -42,7 +42,7 @@ export default function AccountPage() {
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10">
           <h2 className="font-display text-2xl text-ink">Your account</h2>
           <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <Card title="My Cars" desc="2 vehicles · 1 seat each" href="/portfolio" />
+            <Card title="My Cars" desc="2 vehicles · 1 share each" href="/portfolio" />
             <Card title="Bookings" desc="3 upcoming · next Apr 28" href="/bookings" />
             <Card title="Messages" desc="2 unread" href="/messages" />
             <Card title="Membership" desc="RYDA Blue · renews Apr 27, 2027" href="/membership" />
@@ -64,7 +64,7 @@ export default function AccountPage() {
             <Activity label="Inspection report posted" detail="McLaren 750S Spider · 2,140 mi" date="Yesterday" />
             <Activity label="Quarterly mgmt fee paid" detail="$1,700 — Ferrari 296 LLC" date="3 days ago" />
             <Activity label="Welcome to RYDA Blue" detail="Annual membership active" date="2 weeks ago" />
-            <Activity label="Co-ownership seat confirmed" detail="McLaren 750S — 1 of 6 seats" date="3 weeks ago" />
+            <Activity label="Co-ownership share confirmed" detail="McLaren 750S — 1 of 6 shares" date="3 weeks ago" />
           </ul>
         </div>
       </section>

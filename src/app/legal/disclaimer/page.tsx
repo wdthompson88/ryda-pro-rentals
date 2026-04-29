@@ -11,7 +11,7 @@ export default function DisclaimerPage() {
       sections={[
         {
           heading: "1. What you are buying",
-          body: "Each co-ownership seat on the RYDA platform is a membership interest in a Delaware single-purpose LLC formed to hold and operate a specific vehicle. The LLC's only assets are the vehicle, its insurance and operating reserves, and a Management Services Agreement with RYDA for operational services. The LLC is treated as a partnership for US federal income tax purposes.",
+          body: "Each co-ownership share on the RYDA platform is a membership interest in a Delaware single-purpose LLC formed to hold and operate a specific vehicle. The LLC's only assets are the vehicle, its insurance and operating reserves, and a Management Services Agreement with RYDA for operational services. The LLC is treated as a partnership for US federal income tax purposes.",
         },
         {
           heading: "2. The LLC is member-managed",
@@ -23,11 +23,11 @@ export default function DisclaimerPage() {
         },
         {
           heading: "4. Member-to-member transfer",
-          body: "After a 12-month minimum holding period, members may transfer their seat to another verified RYDA member. RYDA facilitates the LLC paperwork. Settlement is typically 1–3 business days. RYDA charges a 3% transfer fee on completed transfers. There is no public marketplace, no order book, and no broker-dealer or alternative trading system.",
+          body: "After a 12-month minimum holding period, members may transfer their share to another verified RYDA member. RYDA facilitates the LLC paperwork. Settlement is typically 1–3 business days. RYDA charges a 3% transfer fee on completed transfers. There is no public marketplace, no order book, and no broker-dealer or alternative trading system.",
         },
         {
           heading: "5. Indicative reference numbers",
-          body: "Any reference numbers displayed on the RYDA platform — including the LLC's annual insurance agreed value and a current condition/comparable-cost summary — are indicative context, not bids, offers, or quoted prices on any exchange. RYDA does not publish a transfer price for any seat. Members negotiating a transfer set their own price.",
+          body: "Any reference numbers displayed on the RYDA platform — including the LLC's annual insurance agreed value and a current condition/comparable-cost summary — are indicative context, not bids, offers, or quoted prices on any exchange. RYDA does not publish a transfer price for any share. Members negotiating a transfer set their own price.",
         },
         {
           heading: "6. Risk factors (non-exhaustive)",
@@ -35,7 +35,7 @@ export default function DisclaimerPage() {
         },
         {
           heading: "7. Tax",
-          body: "RYDA does not provide tax advice. Co-ownership of a luxury vehicle for personal access is generally a non-deductible personal-use expense (IRS Pub. 946 / IRC §280F). Members should consult their own advisors regarding the tax consequences of purchasing, holding, and transferring a co-ownership seat.",
+          body: "RYDA does not provide tax advice. Co-ownership of a luxury vehicle for personal access is generally a non-deductible personal-use expense (IRS Pub. 946 / IRC §280F). Members should consult their own advisors regarding the tax consequences of purchasing, holding, and transferring a co-ownership share.",
         },
         {
           heading: "8. Forward-looking statements",

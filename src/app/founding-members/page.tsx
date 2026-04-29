@@ -24,7 +24,7 @@ export default function FoundingMembersPage() {
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-cream/70">
             We're hand-selecting the first 100 RYDA members to launch Miami.
             Founding members get permanent founding-member pricing on RYDA
-            Black, first access to every new vehicle in the city, and a seat
+            Black, first access to every new vehicle in the city, and a share
             on the inaugural co-owner advisory board.
           </p>
         </div>

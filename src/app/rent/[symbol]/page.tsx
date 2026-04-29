@@ -182,7 +182,7 @@ export default async function RentDetailPage({
               Drive once. Own it forever.
             </p>
             <h2 className="mt-3 font-display text-3xl sm:text-4xl">
-              Or claim a co-ownership seat for ~{formatUSD(v.pricePerShare)}.
+              Or claim a co-ownership share for ~{formatUSD(v.pricePerShare)}.
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
               Effective {formatUSD(v.effectiveDailyCost)}/day vs. {formatUSD(v.rentalDailyRate)}

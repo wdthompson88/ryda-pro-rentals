@@ -17,11 +17,11 @@ const FEATURES: { group: string; items: { label: string; core: CellValue; blue: 
     items: [
       { label: "Browse all vehicles in every market", core: true, blue: true, black: true },
       { label: "Rent any available vehicle", core: true, blue: true, black: true },
-      { label: "Claim co-ownership seats · transfer to other members", core: false, blue: true, black: true },
+      { label: "Claim co-ownership shares · transfer to other members", core: false, blue: true, black: true },
       { label: "In-app messaging with co-owners", core: true, blue: true, black: true },
       { label: "Inspection reports + LLC documents", core: true, blue: true, black: true },
       { label: "Member directory access", core: false, blue: true, black: true },
-      { label: "Member-to-member seat transfers", core: false, blue: true, black: true },
+      { label: "Member-to-member share transfers", core: false, blue: true, black: true },
       { label: "Off-market vehicle pre-list visibility", core: false, blue: false, black: true },
     ],
   },
@@ -62,7 +62,7 @@ const TIERS = [
     name: "Core",
     price: "Free",
     priceSub: "",
-    tagline: "Browse the fleet and rent any available vehicle. Upgrade to Blue or Black to claim a co-ownership seat.",
+    tagline: "Browse the fleet and rent any available vehicle. Upgrade to Blue or Black to claim a co-ownership share.",
     cta: "Get started",
   },
   {
@@ -70,7 +70,7 @@ const TIERS = [
     name: "Blue",
     price: "$500",
     priceSub: "/year",
-    tagline: "For active members. Priority on new vehicles, monthly meetups, member-to-member seat transfers.",
+    tagline: "For active members. Priority on new vehicles, monthly meetups, member-to-member share transfers.",
     cta: "Choose Blue",
     badge: "Most chosen",
   },
@@ -101,7 +101,7 @@ export default function MembershipPage() {
             <span className="italic text-red">Pick the one that fits.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
-            Core to browse and rent. Blue or Black to claim a seat.
+            Core to browse and rent. Blue or Black to claim a share.
           </p>
         </div>
       </section>
@@ -183,7 +183,7 @@ export default function MembershipPage() {
           <div className="mt-8 space-y-4">
             <Math
               tier="Blue · $500/yr"
-              detail="$200 buy-in credit + 1 free delivery ($300 value) + member-to-member transfer access = breaks even on day 1 if you claim a seat or use 1 delivery."
+              detail="$200 buy-in credit + 1 free delivery ($300 value) + member-to-member transfer access = breaks even on day 1 if you claim a share or use 1 delivery."
             />
             <Math
               tier="Black · $1,500/yr"

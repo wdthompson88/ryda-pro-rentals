@@ -39,16 +39,16 @@ export default function HowItWorksPage() {
             Own a piece of the world's best cars.
           </h2>
           <p className="mt-4 max-w-2xl text-lg text-ink-soft">
-            Effective ~$182/day on a co-owned Ferrari. Compare with $2,500+/day
-            to rent or $40–80K/yr to own outright.
+            Effective ~$236/day on a co-owned Ferrari for $34K up front.
+            Compare with $2,500+/day to rent or $40–80K/yr to own outright.
           </p>
 
           <div className="mt-12 grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-5">
             <Step n="01" title="Verify" body="Apply, complete KYC. Valid US license, clean recent driving record, 28 or older. No accreditation required." />
-            <Step n="02" title="Choose" body="Browse the fleet. Each vehicle is a single-purpose Delaware LLC member-managed by 5–10 co-owners." />
-            <Step n="03" title="Co-own" body="Join the LLC alongside other members. Sign the Operating Agreement and Management Services Agreement. Fund your seat via wire or ACH." />
-            <Step n="04" title="Drive" body="Book your time on the RYDA app. Up to ~65 days and ~4,000 miles per seat, per year — exact entitlement depends on the vehicle." />
-            <Step n="05" title="Transfer" body="Transfer your seat to another verified member after the 12-month minimum hold. RYDA handles the LLC paperwork. 3% transfer fee." />
+            <Step n="02" title="Choose" body="Browse the curated, CPO-only fleet. Every car passes a multi-point Pre-Purchase Inspection before a single share is sold — co-owners are protected from inheriting major powertrain or mechanical issues." />
+            <Step n="03" title="Co-own" body="Join the LLC alongside other members. Sign the Operating Agreement and Management Services Agreement. Fund your share via wire or ACH." />
+            <Step n="04" title="Drive" body="Book your time on the RYDA app. ~30 days and ~4,000 miles per share, per year — exact entitlement depends on the vehicle." />
+            <Step n="05" title="Transfer" body="Transfer your share to another verified member after the 12-month minimum hold. RYDA handles the LLC paperwork. 3% transfer fee." />
           </div>
         </div>
       </section>
@@ -60,7 +60,7 @@ export default function HowItWorksPage() {
             The math, one Ferrari at a time.
           </h2>
           <p className="mt-4 max-w-2xl text-base text-ink-soft">
-            Real numbers for the Ferrari 296 GTB at $340,000.
+            Real numbers for the Ferrari 296 GTB at $340,000 — split 10 ways.
           </p>
           <div className="mt-10 overflow-hidden rounded-2xl border border-rule bg-surface">
             <table className="w-full text-sm">
@@ -68,26 +68,26 @@ export default function HowItWorksPage() {
                 <tr>
                   <th className="px-6 py-4 text-left">Cost</th>
                   <th className="px-6 py-4 text-right">Solo ownership</th>
-                  <th className="px-6 py-4 text-right">RYDA (1 seat of 6)</th>
+                  <th className="px-6 py-4 text-right">RYDA (1 share of 10)</th>
                 </tr>
               </thead>
               <tbody className="text-ink">
-                <Tr label="Acquisition" solo="$340,000" ryda="$56,667" />
-                <Tr label="Annual insurance" solo="$11,000" ryda="$1,833" />
-                <Tr label="Annual storage" solo="$5,000" ryda="$833" />
-                <Tr label="Annual maintenance" solo="$8,000" ryda="$1,333" />
-                <Tr label="Annual depreciation reserve" solo="$22,000" ryda="$3,667" />
-                <Tr label="RYDA service fee" solo="—" ryda="$4,134" />
-                <Tr label="Total Year 1" solo="$386,000" ryda="$68,467" emphasis />
-                <Tr label="Days driven" solo="365 (in theory)" ryda="~65 / seat" />
-                <Tr label="Effective $/day" solo="$1,058" ryda="$182" emphasis />
+                <Tr label="Acquisition" solo="$340,000" ryda="$34,000" />
+                <Tr label="Annual insurance" solo="$11,000" ryda="$1,100" />
+                <Tr label="Annual storage" solo="$5,000" ryda="$500" />
+                <Tr label="Annual maintenance" solo="$8,000" ryda="$800" />
+                <Tr label="Annual depreciation reserve" solo="$22,000" ryda="$2,200" />
+                <Tr label="RYDA service fee" solo="—" ryda="$2,480" />
+                <Tr label="Total Year 1" solo="$386,000" ryda="$41,080" emphasis />
+                <Tr label="Days driven" solo="365 (in theory)" ryda="~30 / share" />
+                <Tr label="Effective $/day" solo="$1,058" ryda="$236" emphasis />
               </tbody>
             </table>
           </div>
           <p className="mt-4 text-center text-xs text-mute">
             Numbers shown for illustration. Final pricing varies by vehicle. The
             LLC pays a 12% annual management fee bundled into its operating
-            budget; what you see above is the per-seat allocation.
+            budget; what you see above is the per-share allocation.
           </p>
         </div>
       </section>
@@ -104,12 +104,12 @@ export default function HowItWorksPage() {
               a="No. RYDA is a luxury access platform, not an investment platform. Each car is held in a member-managed Delaware LLC where you and your co-owners hold authority over material decisions; RYDA is hired as a service provider via a separate Management Services Agreement. Co-ownership stakes are not registered securities and are not offered for investment purposes."
             />
             <Faq
-              q="Can I transfer my seat whenever I want?"
+              q="Can I transfer my share whenever I want?"
               a="After a 12-month minimum hold, yes — to another verified RYDA member. RYDA handles the LLC paperwork. Settlement takes 1–3 business days. RYDA charges a 3% transfer fee on the sale price."
             />
             <Faq
               q="What if a co-owner stops paying?"
-              a="The vehicle LLC has remedies in the Operating Agreement, including forced transfer of the delinquent seat. RYDA also keeps a maintenance reserve at the LLC level so vehicle ops continue uninterrupted while it's resolved."
+              a="The vehicle LLC has remedies in the Operating Agreement, including forced transfer of the delinquent share. RYDA also keeps a maintenance reserve at the LLC level so vehicle ops continue uninterrupted while it's resolved."
             />
             <Faq
               q="Where are the cars stored?"
@@ -147,7 +147,7 @@ export default function HowItWorksPage() {
           <p className="mx-auto mt-4 max-w-xl text-base text-ink-soft">
             Members and prospective buyers can rent any RYDA vehicle by the
             day. It's the best way to know if the car fits your life before
-            you claim a co-ownership seat.
+            you claim a co-ownership share.
           </p>
           <Link
             href="/rent"
