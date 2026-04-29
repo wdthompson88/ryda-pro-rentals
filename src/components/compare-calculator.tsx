@@ -1,19 +1,34 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { VEHICLES, formatUSD, type Vehicle } from "@/lib/market-data";
+import {
+  VEHICLES,
+  formatUSD,
+  HOLDING_YEARS,
+  TARGET_DEPRECIATION_PCT,
+  RENTAL_DEFAULTS,
+  computeRentalEconomics,
+  type Vehicle,
+} from "@/lib/market-data";
 
 const RENTAL_FALLBACK = 2_500;
+const DEFAULT_RESIDUAL_PCT = 100 - TARGET_DEPRECIATION_PCT; // 95% of buy-in
+const RENTED_RESIDUAL_PCT = 100 - RENTAL_DEFAULTS.rentedDepreciationPct; // 88%
 
 export function CompareCalculator() {
   // Educational tool — let users model 1..vehicle.shares regardless of
   // current inventory. Real availability lives on each vehicle's listing.
+  // Defaults reflect the doctrinal CPO 2-year planned exit.
   const initial = VEHICLES.find((v) => v.symbol === "F296") ?? VEHICLES[0];
   const [vehicleSymbol, setVehicleSymbol] = useState(initial.symbol);
   const [shares, setShares] = useState(1);
   const [days, setDays] = useState(20);
-  const [holdYears, setHoldYears] = useState(3);
-  const [residualPct, setResidualPct] = useState(80);
+  const [holdYears, setHoldYears] = useState(HOLDING_YEARS);
+  const [residualPct, setResidualPct] = useState(DEFAULT_RESIDUAL_PCT);
+  const [optInRental, setOptInRental] = useState(false);
+  const [rentalOccupancy, setRentalOccupancy] = useState(
+    RENTAL_DEFAULTS.defaultOccupancyPct,
+  );
 
   const vehicle: Vehicle =
     VEHICLES.find((v) => v.symbol === vehicleSymbol) ?? initial;
@@ -33,11 +48,33 @@ export function CompareCalculator() {
     const totalOps = annualOps * holdYears;
     const totalCash = buyIn + totalOps;
 
-    // Residual: what you'd get back transferring shares at hold end
-    const residual = Math.round(buyIn * (residualPct / 100));
-    const economicCost = totalCash - residual;
+    // If opted into the rental pool, depreciation runs higher (heavier
+    // wear). Otherwise the user's chosen residual stands.
+    const effectiveResidualPct = optInRental
+      ? Math.min(residualPct, RENTED_RESIDUAL_PCT)
+      : residualPct;
 
-    // Rental: pay-per-day for the same total days
+    // Residual: what proceeds you'd get back at exit (LLC sale or
+    // member-to-member transfer). Same % applies to share value.
+    const residual = Math.round(buyIn * (effectiveResidualPct / 100));
+
+    // Rental income for shareholders if opted in. Owner-use days come
+    // from what THIS user actually drives (cappedDays per year per their
+    // share count). The pool of rentable days is the rest of the calendar
+    // across ALL shares.
+    const ownerUseDaysPerShare = Math.round(cappedDays / safeShares);
+    const rentalEcon = computeRentalEconomics(vehicle, {
+      holdYears,
+      occupancyPct: rentalOccupancy,
+      ownerUseDaysPerShare,
+    });
+    const rentalIncomePerShare = optInRental
+      ? rentalEcon.perShareTotalIncome * safeShares
+      : 0;
+
+    const economicCost = totalCash - residual - rentalIncomePerShare;
+
+    // Rental: pay-per-day for the same total days (alternative scenario)
     const rentalCost = rentalDaily * totalDays;
 
     // Regular ownership: same hold period, full sticker + carrying.
@@ -61,10 +98,15 @@ export function CompareCalculator() {
       totalDays,
       residual,
       economicCost,
+      effectiveResidualPct,
       perDayCash: totalDays === 0 ? 0 : Math.round(totalCash / totalDays),
       perDayEconomic: totalDays === 0 ? 0 : Math.round(economicCost / totalDays),
       utilizationPct,
       unusedDaysPerYear,
+      rentalIncomePerShare,
+      rentalIncomeAnnual: optInRental
+        ? rentalEcon.perShareAnnualIncome * safeShares
+        : 0,
     };
     const rental = {
       total: rentalCost,
@@ -88,12 +130,22 @@ export function CompareCalculator() {
       ryda,
       rental,
       regular,
+      rentalEcon,
       savings,
       savingsPct,
       savingsVsRegular,
       cappedDays,
     };
-  }, [vehicle, safeShares, days, holdYears, residualPct, maxDays]);
+  }, [
+    vehicle,
+    safeShares,
+    days,
+    holdYears,
+    residualPct,
+    maxDays,
+    optInRental,
+    rentalOccupancy,
+  ]);
 
   return (
     <div
@@ -107,10 +159,12 @@ export function CompareCalculator() {
         Co-own vs. rent — your numbers.
       </h3>
       <p className="mt-3 max-w-xl text-sm text-ink-soft">
-        Move the sliders. The math is honest: it amortizes your buy-in over
-        your hold period and assumes you transfer your share at a residual
-        value at the end. Compare against renting the same car at its
-        published daily rate.
+        Move the sliders. The math is honest: each curated CPO car is held
+        for {HOLDING_YEARS} years (the default), then sold and proceeds are
+        returned pro-rata. The calculator subtracts your estimated share
+        sale from your total cash to show real{" "}
+        <span className="font-medium text-ink">net cost</span> — and
+        compares it against renting the same car or owning it solo.
       </p>
 
       {/* Inputs */}
@@ -171,27 +225,126 @@ export function CompareCalculator() {
 
         <Slider
           id="calc-hold"
-          label="How many years would you hold?"
+          label="Hold period (years)"
           value={holdYears}
           onChange={setHoldYears}
           min={1}
           max={5}
           step={1}
           valueLabel={`${holdYears} ${holdYears === 1 ? "year" : "years"}`}
-          subLabel="12-month minimum hold required"
+          subLabel={`Default: ${HOLDING_YEARS}-yr CPO exit baseline · 12-month minimum hold`}
         />
 
         <Slider
           id="calc-residual"
-          label="Residual value at exit (% of buy-in)"
+          label="Estimated share sale at exit (% of buy-in)"
           value={residualPct}
           onChange={setResidualPct}
           min={50}
           max={100}
           step={5}
           valueLabel={`${residualPct}%`}
-          subLabel="CPO exotics typically transfer at 70–85% over 24–36 months"
+          subLabel={`Default ${DEFAULT_RESIDUAL_PCT}% — assumes ~${TARGET_DEPRECIATION_PCT}% depreciation over ${HOLDING_YEARS} yrs on low-mileage CPO exotics`}
         />
+      </div>
+
+      {/* Rental opt-in */}
+      <div className="mt-10 rounded-2xl border border-rule bg-cream-2/40 p-6">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="max-w-xl">
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+              Optional · Rent your unused days
+            </p>
+            <h4 className="mt-2 font-display text-xl text-ink">
+              Pool unused days into the RYDA rental program.
+            </h4>
+            <p className="mt-2 text-sm text-ink-soft">
+              Miami exotic-rental fleets average 200–240 booked days/yr.
+              Shareholders can opt their unused entitlement into the
+              rental pool — RYDA handles the bookings, insurance, and
+              cleaning. Revenue splits {100 - RENTAL_DEFAULTS.defaultManagementFeePct}/{RENTAL_DEFAULTS.defaultManagementFeePct}{" "}
+              (you / RYDA), distributed pro-rata across shares.
+            </p>
+            <p className="mt-2 text-xs text-mute">
+              Heads up: heavier rental utilization runs faster
+              depreciation. We bump the resale assumption to{" "}
+              {RENTED_RESIDUAL_PCT}% (~{RENTAL_DEFAULTS.rentedDepreciationPct}%
+              hit) when this is on.
+            </p>
+          </div>
+          <label className="inline-flex cursor-pointer items-center gap-3 self-start">
+            <span className="text-xs font-medium uppercase tracking-wider text-mute">
+              {optInRental ? "Opted in" : "Opt in"}
+            </span>
+            <span
+              role="switch"
+              aria-checked={optInRental}
+              tabIndex={0}
+              onClick={() => setOptInRental((v) => !v)}
+              onKeyDown={(e) => {
+                if (e.key === " " || e.key === "Enter") {
+                  e.preventDefault();
+                  setOptInRental((v) => !v);
+                }
+              }}
+              className={`relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors ${
+                optInRental ? "bg-red" : "bg-rule"
+              }`}
+            >
+              <span
+                className={`inline-block h-5 w-5 transform rounded-full bg-cream transition-transform ${
+                  optInRental ? "translate-x-6" : "translate-x-1"
+                }`}
+              />
+            </span>
+          </label>
+        </div>
+
+        {optInRental && (
+          <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <Slider
+              id="calc-rental-occ"
+              label="Rental occupancy (% of pooled days booked)"
+              value={rentalOccupancy}
+              onChange={setRentalOccupancy}
+              min={30}
+              max={90}
+              step={5}
+              valueLabel={`${rentalOccupancy}%`}
+              subLabel={`At ${rentalOccupancy}% on ${numbers.rentalEcon.rentablePoolDays} pooled days = ~${numbers.rentalEcon.bookedDays} booked days/yr`}
+            />
+            <div className="rounded-2xl border border-rule bg-surface p-5">
+              <p className="text-xs uppercase tracking-wider text-mute">
+                Rental income — your share{safeShares > 1 ? "s" : ""}
+              </p>
+              <p className="mt-2 font-display text-2xl text-ink tabular-nums">
+                {formatUSD(numbers.ryda.rentalIncomeAnnual)}
+                <span className="ml-1 text-sm text-mute">/yr</span>
+              </p>
+              <p className="mt-2 text-xs text-ink-soft">
+                Offsets{" "}
+                <span className="font-medium text-ink tabular-nums">
+                  {numbers.ryda.annualOps === 0
+                    ? 0
+                    : Math.round(
+                        (numbers.ryda.rentalIncomeAnnual /
+                          numbers.ryda.annualOps) *
+                          100,
+                      )}
+                  %
+                </span>{" "}
+                of your {formatUSD(numbers.ryda.annualOps)}/yr carrying
+                cost.
+              </p>
+              <p className="mt-2 text-[11px] text-mute">
+                Total over {holdYears} yrs:{" "}
+                <span className="tabular-nums">
+                  {formatUSD(numbers.ryda.rentalIncomePerShare)}
+                </span>
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Results — RYDA */}
@@ -201,16 +354,24 @@ export function CompareCalculator() {
         </p>
         <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <ResultCard
-            label="Total RYDA cost"
+            label="Total cash out"
             value={formatUSD(numbers.ryda.totalCash)}
             sub={`${formatUSD(numbers.ryda.buyIn)} buy-in + ${formatUSD(
               numbers.ryda.annualOps,
             )}/yr × ${holdYears}`}
           />
           <ResultCard
-            label="RYDA economic cost"
+            label={
+              optInRental
+                ? "Net cost (after sale + rental income)"
+                : "Net cost (after share sale)"
+            }
             value={formatUSD(numbers.ryda.economicCost)}
-            sub={`After ${formatUSD(numbers.ryda.residual)} residual at exit`}
+            sub={
+              optInRental
+                ? `Less ${formatUSD(numbers.ryda.residual)} share sale (${numbers.ryda.effectiveResidualPct}%) and ${formatUSD(numbers.ryda.rentalIncomePerShare)} rental income`
+                : `Less ${formatUSD(numbers.ryda.residual)} estimated share sale (${residualPct}% of buy-in)`
+            }
             accent
           />
         </div>
@@ -280,8 +441,10 @@ export function CompareCalculator() {
       </div>
 
       <p className="mt-4 text-xs text-mute">
-        Numbers assume you transfer your shares at the residual you set
-        above; actual exits depend on member-to-member negotiation.
+        Default exit: RYDA sells the car at year {HOLDING_YEARS} and
+        distributes proceeds pro-rata. Earlier exits are possible by
+        transferring shares to another verified member after the 12-month
+        minimum hold; transfer prices are member-to-member.
       </p>
 
       {numbers.ryda.unusedDaysPerYear > 0 && numbers.ryda.utilizationPct < 80 && (

@@ -3,7 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { VEHICLES, formatUSD, type Vehicle } from "@/lib/market-data";
+import {
+  VEHICLES,
+  formatUSD,
+  computeShareEconomics,
+  computeRentalEconomics,
+  HOLDING_YEARS,
+  type Vehicle,
+} from "@/lib/market-data";
 
 type SortOption =
   | "featured"
@@ -331,6 +338,8 @@ function FilterSelect({
 function VehicleCard({ vehicle: v }: { vehicle: Vehicle }) {
   const isSold = v.sharesAvailable === 0;
   const stickerSavings = v.fullPrice - v.pricePerShare;
+  const econ = computeShareEconomics(v);
+  const rental = computeRentalEconomics(v);
 
   return (
     <Link
@@ -435,6 +444,13 @@ function VehicleCard({ vehicle: v }: { vehicle: Vehicle }) {
               <p className="font-display text-2xl text-ink tabular-nums">
                 {formatUSD(v.pricePerShare)}
               </p>
+              <p className="mt-1 text-[11px] text-ink-soft tabular-nums">
+                Net{" "}
+                <span className="font-medium text-red">
+                  ~{formatUSD(econ.netCost)}
+                </span>{" "}
+                after {HOLDING_YEARS}-yr sale
+              </p>
             </div>
             <div className="text-right">
               <p className="text-[11px] uppercase tracking-[0.14em] text-mute">
@@ -443,12 +459,28 @@ function VehicleCard({ vehicle: v }: { vehicle: Vehicle }) {
               <p className="text-sm text-mute line-through tabular-nums">
                 {formatUSD(v.fullPrice)}
               </p>
+              <p className="mt-1 text-[11px] text-mute tabular-nums">
+                ~{formatUSD(econ.netPerDay)}/day
+              </p>
             </div>
           </div>
           <p className="mt-2 text-[11px] text-mute">
             You save {formatUSD(stickerSavings)} vs full ownership · ~34
             days/yr per share
           </p>
+          {v.rentalAvailable && rental.perShareAnnualIncome > 0 ? (
+            <p className="mt-2 text-[11px] text-ink-soft">
+              <span className="font-medium text-ink">Opt in to rent:</span>{" "}
+              ~{formatUSD(rental.perShareAnnualIncome)}/yr per share — covers{" "}
+              {Math.min(
+                100,
+                Math.round(
+                  (rental.perShareAnnualIncome / v.annualOpCost) * 100,
+                ),
+              )}
+              % of carrying.
+            </p>
+          ) : null}
         </div>
 
         {/* CTA */}

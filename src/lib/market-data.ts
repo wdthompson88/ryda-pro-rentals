@@ -291,3 +291,174 @@ export function formatUSD(n: number, opts: { decimals?: number } = {}) {
   }).format(n);
 }
 
+// ─────────────────────────────────────────────────────────────────────────
+// CPO doctrine — 2-year planned exit
+// ─────────────────────────────────────────────────────────────────────────
+// We curate Certified Pre-Owned vehicles and hold each one for ~2 years.
+// At exit, the LLC sells the car and proceeds are distributed pro-rata.
+// Modeled assumption: the curated fleet depreciates ~5% over the 2-year
+// hold (low mileage, kept-condition CPO exotics often clear this bar).
+// Members can still transfer their share to another verified member at
+// any time after the 12-month minimum hold; the 2-year sale is the
+// default exit baseline shown in pricing and calculators.
+
+export const HOLDING_YEARS = 2;
+export const TARGET_DEPRECIATION_PCT = 5; // % over the full 2-year hold
+
+export type ShareEconomics = {
+  shares: number;
+  holdYears: number;
+  depreciationPct: number;
+  buyIn: number;          // pricePerShare × shares
+  annualCarrying: number; // annualOpCost × shares (per year)
+  totalCarrying: number;  // annualCarrying × holdYears
+  totalSpend: number;     // buyIn + totalCarrying
+  estimatedResale: number;// buyIn × (1 − depreciationPct/100)
+  netCost: number;        // totalSpend − estimatedResale
+  totalDays: number;      // daysPerYear × shares × holdYears
+  netPerDay: number;      // netCost / totalDays (rounded)
+  carryingPerDay: number; // annualOpCost / daysPerYear (rounded)
+};
+
+/**
+ * Two-year share economics with the resale baked in. Defaults to one
+ * share, the doctrinal 2-year hold, and the 5% depreciation model.
+ */
+// ─────────────────────────────────────────────────────────────────────────
+// Rental opt-in (shareholders can pool unused days into the rental program)
+// ─────────────────────────────────────────────────────────────────────────
+// Miami exotic-rental fleets average ~200–240 booked days/yr. RYDA lets
+// shareholders opt their unused entitlement into the rental pool. Revenue
+// is split: RYDA keeps a management fee (operations + booking + insurance
+// admin + a damage reserve), shareholders keep the rest, distributed
+// pro-rata to the days each share contributes.
+//
+// Heavy rental utilization correlates with faster depreciation, so the
+// model also lets the caller bump the depreciation assumption when
+// estimating net cost on a rented-out scenario.
+
+export const RENTAL_DEFAULTS = {
+  // Total non-service days available in a year
+  daysAvailablePerYear: 340,
+  // What % of available days a typical Miami exotic rental fleet actually
+  // books. Conservative middle of the 200–240 day published range.
+  defaultOccupancyPct: 65,
+  // Owners realistically keep some days for themselves before pooling.
+  defaultOwnerUseDaysPerShare: 12,
+  // RYDA's cut covers operations, booking, insurance admin, damage
+  // reserve. Members net the rest.
+  defaultManagementFeePct: 35,
+  // When a car is rented heavily, depreciation runs higher than the
+  // CPO baseline. Bumped scenario for the calculator's rental path.
+  rentedDepreciationPct: 12,
+};
+
+export type RentalEconomics = {
+  ownerUseDaysPerShare: number;   // days each share-holder keeps for self
+  ownerUseDaysTotal: number;      // × shares-issued (usually 10)
+  rentablePoolDays: number;       // 340 − ownerUseDaysTotal
+  occupancyPct: number;
+  bookedDays: number;             // rentablePoolDays × occupancyPct
+  dailyRate: number;
+  grossRevenue: number;           // bookedDays × dailyRate
+  managementFeePct: number;
+  rydaTake: number;               // grossRevenue × mgmtFeePct
+  shareholderPool: number;        // grossRevenue − rydaTake
+  perShareAnnualIncome: number;   // shareholderPool / shares
+  perShareTotalIncome: number;    // × holdYears (for the 2-yr math)
+  carryingOffsetPct: number;      // perShareAnnualIncome / annualOpCost
+};
+
+export function computeRentalEconomics(
+  v: Vehicle,
+  opts: {
+    holdYears?: number;
+    occupancyPct?: number;
+    ownerUseDaysPerShare?: number;
+    managementFeePct?: number;
+    dailyRate?: number;
+  } = {},
+): RentalEconomics {
+  const holdYears = opts.holdYears ?? HOLDING_YEARS;
+  const occupancyPct = opts.occupancyPct ?? RENTAL_DEFAULTS.defaultOccupancyPct;
+  const ownerUseDaysPerShare =
+    opts.ownerUseDaysPerShare ?? RENTAL_DEFAULTS.defaultOwnerUseDaysPerShare;
+  const managementFeePct =
+    opts.managementFeePct ?? RENTAL_DEFAULTS.defaultManagementFeePct;
+  const dailyRate = opts.dailyRate ?? v.rentalDailyRate ?? 2_500;
+
+  const ownerUseDaysTotal = ownerUseDaysPerShare * v.shares;
+  const rentablePoolDays = Math.max(
+    0,
+    RENTAL_DEFAULTS.daysAvailablePerYear - ownerUseDaysTotal,
+  );
+  const bookedDays = Math.round(rentablePoolDays * (occupancyPct / 100));
+  const grossRevenue = bookedDays * dailyRate;
+  const rydaTake = Math.round(grossRevenue * (managementFeePct / 100));
+  const shareholderPool = grossRevenue - rydaTake;
+  const perShareAnnualIncome = Math.round(shareholderPool / v.shares);
+  const perShareTotalIncome = perShareAnnualIncome * holdYears;
+  const carryingOffsetPct =
+    v.annualOpCost === 0
+      ? 0
+      : Math.round((perShareAnnualIncome / v.annualOpCost) * 100);
+
+  return {
+    ownerUseDaysPerShare,
+    ownerUseDaysTotal,
+    rentablePoolDays,
+    occupancyPct,
+    bookedDays,
+    dailyRate,
+    grossRevenue,
+    managementFeePct,
+    rydaTake,
+    shareholderPool,
+    perShareAnnualIncome,
+    perShareTotalIncome,
+    carryingOffsetPct,
+  };
+}
+
+export function computeShareEconomics(
+  v: Vehicle,
+  opts: {
+    shares?: number;
+    holdYears?: number;
+    depreciationPct?: number;
+  } = {},
+): ShareEconomics {
+  const shares = opts.shares ?? 1;
+  const holdYears = opts.holdYears ?? HOLDING_YEARS;
+  const depreciationPct = opts.depreciationPct ?? TARGET_DEPRECIATION_PCT;
+
+  const buyIn = v.pricePerShare * shares;
+  const annualCarrying = v.annualOpCost * shares;
+  const totalCarrying = annualCarrying * holdYears;
+  const totalSpend = buyIn + totalCarrying;
+
+  const residualPct = (100 - depreciationPct) / 100;
+  const estimatedResale = Math.round(buyIn * residualPct);
+
+  const netCost = totalSpend - estimatedResale;
+  const totalDays = v.daysPerYear * shares * holdYears;
+  const netPerDay = totalDays > 0 ? Math.round(netCost / totalDays) : 0;
+  const carryingPerDay =
+    v.daysPerYear > 0 ? Math.round(v.annualOpCost / v.daysPerYear) : 0;
+
+  return {
+    shares,
+    holdYears,
+    depreciationPct,
+    buyIn,
+    annualCarrying,
+    totalCarrying,
+    totalSpend,
+    estimatedResale,
+    netCost,
+    totalDays,
+    netPerDay,
+    carryingPerDay,
+  };
+}
+

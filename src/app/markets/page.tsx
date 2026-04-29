@@ -25,8 +25,10 @@ export default function MarketsPage() {
           </h1>
           <p className="mt-6 max-w-2xl text-lg text-ink-soft">
             Claim shares in any vehicle's Delaware LLC. Each share unlocks
-            ~34 days/year — hold one or several. Transfer after the
-            12-month minimum hold.
+            ~34 days/year — hold one or several. RYDA holds each curated
+            CPO car for 2 years, then sells it and returns proceeds
+            pro-rata. Need an earlier exit? Transfer to another verified
+            member after the 12-month minimum hold.
           </p>
         </div>
       </section>

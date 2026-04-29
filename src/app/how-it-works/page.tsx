@@ -50,7 +50,7 @@ export default function HowItWorksPage() {
             <Step n="02" title="Choose" body="Browse the curated, CPO-only fleet. Every car passes a multi-point Pre-Purchase Inspection before a single share is sold — co-owners are protected from inheriting major powertrain or mechanical issues." />
             <Step n="03" title="Co-own" body="Join the LLC alongside other members. Sign the Operating Agreement and Management Services Agreement. Fund your share via wire or ACH." />
             <Step n="04" title="Drive" body="Book your time on the RYDA app. Each share unlocks ~34 days and ~4,000 miles per year. Hold multiple shares to scale linearly — 5 ≈ 170 days, all 10 ≈ year-round access." />
-            <Step n="05" title="Transfer" body="Transfer your share to another verified member after the 12-month minimum hold. RYDA handles the LLC paperwork. 3% transfer fee." />
+            <Step n="05" title="Exit" body="Default: RYDA sells the car at year 2 and distributes proceeds pro-rata (we model a ~5% depreciation assumption). Want out sooner? Transfer your share to another verified member after the 12-month minimum hold. RYDA handles the LLC paperwork. 3% transfer fee on member-to-member transfers." />
           </div>
         </div>
       </section>
@@ -101,33 +101,35 @@ export default function HowItWorksPage() {
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            How to read $208/day
+            How to read the price
           </p>
           <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
-            That's the steady-state ops number. Year 1 is different.
+            $208/day is operating cost. Net cost is the real number.
           </h2>
           <div className="mt-8 space-y-5 text-base leading-relaxed text-ink-soft">
             <p>
-              The $208/day figure on the table above is the steady-state
-              cost: $7,080 in annual ops divided across 34 driving days. That
-              is what every driving day costs you in years 2 and beyond,
-              after the buy-in is amortized.
+              The $208/day figure is steady-state operating cost: $7,080 of
+              annual ops divided by 34 driving days. It's what every day
+              behind the wheel costs you{" "}
+              <span className="italic">while you hold the share</span>, ignoring
+              the buy-in.
             </p>
             <p>
-              Year 1 includes the buy-in as real cash. $34K share + $7,080
-              ops + $1,500 closing = ~$42,580 spent. If you drive your full
-              34-day entitlement, that's ~$1,250 per day in Year 1 — still
-              roughly half the cost of renting the same Ferrari for the
-              same 34 days ($2,400/day × 34 = $81,600), and you exit with a
-              transferable share, not a stack of receipts.
+              The bigger number is net cost over the full hold. RYDA's
+              doctrine is a 2-year planned exit: each curated CPO car is held
+              for ~2 years, then the LLC sells it and proceeds are
+              distributed pro-rata. We model a 5% depreciation hit over the
+              full hold — a bar that low-mileage, kept-condition CPO exotics
+              consistently clear, but the calculator lets you stress-test it.
             </p>
             <p>
-              At year 3, assuming you transfer your share at ~80% of buy-in
-              (CPO-warranty Ferraris typically transfer in this range over a
-              24–36 month hold), the math: $34K + $7,080 × 3 = $55,240 spent;
-              recover $27,200 at exit; net economic cost ~$28,040 over 102
-              driving days = <strong>~$275 per driving day</strong>. That's
-              the apples-to-apples number to use against rental.
+              For the F296 at one share over 2 years: $34K buy-in + $7,080 ×
+              2 carrying = $48,160 spent. Resale at 95% of buy-in returns
+              ~$32,300. <strong>Net cost ~$15,860</strong> for 68 driving
+              days = <strong>~$233 per actual driving day</strong>. That's
+              the apples-to-apples number to use against rental ($2,400/day
+              × 68 = $163,200). You also exit with cash from the sale, not
+              a stack of receipts.
             </p>
           </div>
           <Link
@@ -135,6 +137,74 @@ export default function HowItWorksPage() {
             className="mt-10 inline-flex h-12 items-center justify-center rounded-full border border-rule px-7 text-sm font-medium text-ink hover:border-ink"
           >
             Run the numbers on your own usage →
+          </Link>
+        </div>
+      </section>
+
+      {/* Rental opt-in for shareholders */}
+      <section className="border-b border-rule">
+        <div className="mx-auto max-w-5xl px-6 py-20 sm:px-10">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+            Optional · Rental opt-in
+          </p>
+          <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
+            Don&apos;t want to drive every day you&apos;re entitled to? Rent
+            it out.
+          </h2>
+          <p className="mt-4 max-w-3xl text-base leading-relaxed text-ink-soft">
+            Miami&apos;s exotic-rental fleets average 200–240 booked days a
+            year. Shareholders can opt their unused entitlement into the
+            RYDA rental pool — we handle the bookings, insurance, condition
+            checks, and damage reserve. Revenue splits 65/35 (you / RYDA),
+            distributed pro-rata across the days each share contributes.
+          </p>
+
+          <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <div className="rounded-2xl border border-rule bg-surface p-6">
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+                Worked example · Ferrari 296
+              </p>
+              <p className="mt-3 font-display text-xl text-ink">
+                Drive 12 days/yr. Rent the rest.
+              </p>
+              <p className="mt-3 text-sm leading-relaxed text-ink-soft">
+                Owners reserve 12 days each (120 total). 220 days enter the
+                pool. At 65% occupancy = ~143 booked days @ $2,400/day =
+                $343,200/yr gross. After RYDA&apos;s 35% management fee,
+                shareholders split ~$223,080. <span className="font-medium text-ink">~$22,300/share/yr</span> —
+                roughly 3× your $7,080/yr carrying cost.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-rule bg-surface p-6">
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+                What we cover
+              </p>
+              <ul className="mt-3 space-y-2 text-sm leading-relaxed text-ink-soft">
+                <li>· Listing on /rent + booking management</li>
+                <li>· Renter screening (28+, clean record, RYDA verified)</li>
+                <li>· Pre/post inspection, photos, fueling, detailing</li>
+                <li>· Insurance riders + agreed-value damage policy</li>
+                <li>· Damage reserve held at LLC level</li>
+              </ul>
+            </div>
+            <div className="rounded-2xl border border-rule bg-surface p-6">
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+                Honest tradeoffs
+              </p>
+              <ul className="mt-3 space-y-2 text-sm leading-relaxed text-ink-soft">
+                <li>· Heavier use → faster depreciation. We model 12% over the 2-yr hold (vs 5% drive-only) for the rented scenario.</li>
+                <li>· Rental days are pooled across all shares — no individual day-of priority guaranteed.</li>
+                <li>· Members keep first-call on owner-priority weeks. Renters fill the gaps.</li>
+                <li>· Track-day cars come out of the pool when you take them on track.</li>
+              </ul>
+            </div>
+          </div>
+
+          <Link
+            href="/compare#calculator"
+            className="mt-10 inline-flex h-12 items-center justify-center rounded-full bg-red px-7 text-sm font-medium text-cream hover:bg-red-deep"
+          >
+            Toggle rental income in the calculator →
           </Link>
         </div>
       </section>
@@ -153,6 +223,10 @@ export default function HowItWorksPage() {
             <Faq
               q="Can I transfer my share whenever I want?"
               a="After a 12-month minimum hold, yes — to another verified RYDA member. RYDA handles the LLC paperwork. Settlement takes 1–3 business days. RYDA charges a 3% transfer fee on the sale price."
+            />
+            <Faq
+              q="Can I rent out my share days for income?"
+              a="Yes — opting into RYDA's rental pool is voluntary, share-by-share. We list the car on /rent, handle bookings, insurance, screening, and condition checks. Revenue splits 65/35 (you / RYDA) and is distributed pro-rata across the days each share contributes. On a Miami exotic running 200–240 days/yr at fleet average, a single share can earn $15–25K/yr — typically 2–3× your annual carrying cost. Heavier use does run faster depreciation; we model 12% over the 2-yr hold for the rental scenario (vs 5% drive-only)."
             />
             <Faq
               q="What if a co-owner stops paying?"

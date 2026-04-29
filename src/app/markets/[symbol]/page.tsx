@@ -3,10 +3,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { OrderPanel } from "@/components/order-panel";
+import { CostBreakdown } from "@/components/cost-breakdown";
 import {
   VEHICLES,
   getVehicleBySymbol,
   formatUSD,
+  computeShareEconomics,
+  HOLDING_YEARS,
 } from "@/lib/market-data";
 
 export async function generateStaticParams() {
@@ -35,6 +38,8 @@ export default async function VehicleMarketPage({
   const { symbol } = await params;
   const v = getVehicleBySymbol(symbol);
   if (!v) notFound();
+
+  const econ = computeShareEconomics(v);
 
   return (
     <>
@@ -77,7 +82,11 @@ export default async function VehicleMarketPage({
 
               <dl className="mt-8 grid grid-cols-2 gap-x-8 gap-y-5 sm:grid-cols-3">
                 <Fact label="Vehicle price" value={formatUSD(v.fullPrice)} />
-                <Fact label="Per share" value={formatUSD(v.pricePerShare)} />
+                <Fact
+                  label="Per share"
+                  value={formatUSD(v.pricePerShare)}
+                  sub={`Net ~${formatUSD(econ.netCost)} after ${HOLDING_YEARS}-yr sale`}
+                />
                 <Fact label="Total shares" value={String(v.shares)} />
                 <Fact label="Days / share" value={`${v.daysPerYear}/yr`} />
                 <Fact label="Miles / share" value={`${v.milesPerYear.toLocaleString()}/yr`} />
@@ -121,6 +130,49 @@ export default async function VehicleMarketPage({
         </div>
       </section>
 
+      {/* Two-year cost breakdown */}
+      <section className="border-b border-rule">
+        <div className="mx-auto max-w-7xl px-6 py-14 sm:px-10">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+            <div className="lg:col-span-5">
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+                What you actually pay
+              </p>
+              <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
+                The {HOLDING_YEARS}-year math, in one box.
+              </h2>
+              <p className="mt-4 text-sm leading-relaxed text-ink-soft">
+                Each RYDA car is a curated CPO held for {HOLDING_YEARS} years.
+                At exit, the LLC sells the vehicle and proceeds are
+                distributed pro-rata to shareholders. We model a{" "}
+                {econ.depreciationPct}% depreciation hit over the full hold
+                — a bar that low-mileage, kept-condition CPO exotics often
+                clear, but always verify with your own resale assumption.
+              </p>
+              <p className="mt-4 text-sm leading-relaxed text-ink-soft">
+                Net result for one share of the {v.name}: roughly{" "}
+                <span className="font-medium text-ink">
+                  {formatUSD(econ.netCost)}
+                </span>{" "}
+                of true cost spread over {econ.totalDays} driving days — about{" "}
+                <span className="font-medium text-ink">
+                  {formatUSD(econ.netPerDay)}
+                </span>{" "}
+                per day actually behind the wheel.
+              </p>
+              <Link
+                href="/compare#calculator"
+                className="mt-6 inline-flex h-11 items-center justify-center rounded-full border border-rule bg-surface px-5 text-sm font-medium text-ink hover:border-ink"
+              >
+                Run your own numbers →
+              </Link>
+            </div>
+            <div className="lg:col-span-7">
+              <CostBreakdown vehicle={v} shares={1} />
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Specs */}
       <section className="border-b border-rule bg-cream-2">
@@ -159,20 +211,26 @@ export default async function VehicleMarketPage({
         <div className="mx-auto max-w-7xl px-6 py-14 sm:px-10">
           <h2 className="font-display text-3xl text-ink">Other cars in the fleet</h2>
           <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-            {VEHICLES.filter((x) => x.symbol !== v.symbol).slice(0, 4).map((x) => (
-              <Link
-                key={x.symbol}
-                href={`/markets/${x.symbol}`}
-                className="block rounded-xl border border-rule bg-surface p-5 transition-shadow hover:shadow-md"
-              >
-                <p className="text-xs text-mute">{x.brand}</p>
-                <p className="mt-1 font-display text-base text-ink">{x.name}</p>
-                <p className="mt-3 font-display text-xl text-ink tabular-nums">
-                  {formatUSD(x.pricePerShare)}
-                </p>
-                <p className="mt-1 text-xs text-mute">per share</p>
-              </Link>
-            ))}
+            {VEHICLES.filter((x) => x.symbol !== v.symbol).slice(0, 4).map((x) => {
+              const xEcon = computeShareEconomics(x);
+              return (
+                <Link
+                  key={x.symbol}
+                  href={`/markets/${x.symbol}`}
+                  className="block rounded-xl border border-rule bg-surface p-5 transition-shadow hover:shadow-md"
+                >
+                  <p className="text-xs text-mute">{x.brand}</p>
+                  <p className="mt-1 font-display text-base text-ink">{x.name}</p>
+                  <p className="mt-3 font-display text-xl text-ink tabular-nums">
+                    {formatUSD(x.pricePerShare)}
+                  </p>
+                  <p className="mt-1 text-xs text-mute">per share</p>
+                  <p className="mt-2 text-[11px] text-red tabular-nums">
+                    Net ~{formatUSD(xEcon.netCost)} after {HOLDING_YEARS} yrs
+                  </p>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -261,11 +319,20 @@ function Stat({
   );
 }
 
-function Fact({ label, value }: { label: string; value: string }) {
+function Fact({
+  label,
+  value,
+  sub,
+}: {
+  label: string;
+  value: string;
+  sub?: string;
+}) {
   return (
     <div>
       <dt className="text-xs uppercase tracking-wider text-mute">{label}</dt>
       <dd className="mt-1 text-sm text-ink">{value}</dd>
+      {sub ? <dd className="mt-0.5 text-[11px] text-red">{sub}</dd> : null}
     </div>
   );
 }
