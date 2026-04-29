@@ -1,14 +1,89 @@
 "use client";
 
+// Unified rental listings — RYDA co-ownership fleet + extended Miami
+// inventory in ONE filterable card grid. Each card links to a detail
+// page at /rent/[slug] regardless of which fleet it came from. The
+// route handler resolves slug → Vehicle (RYDA) or PartnerVehicle.
+
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import {
+  VEHICLES,
+  formatUSD,
+  type Vehicle,
+} from "@/lib/market-data";
 import {
   PARTNER_VEHICLES,
   brandTint,
   type PartnerVehicle,
 } from "@/lib/partner-fleet";
-import { formatUSD } from "@/lib/market-data";
+
+// ─────────────────────────────────────────────────────────────────────────
+// Normalized listing shape
+// ─────────────────────────────────────────────────────────────────────────
+
+type RentalListing = {
+  slug: string;             // route param: vehicle.symbol.toLowerCase() OR partner.slug
+  kind: "ryda" | "partner";
+  make: string;
+  model: string;
+  year?: number;
+  category: string;
+  dailyRate: number;
+  regularRate?: number;     // discounted-vs-sticker price (partner cars only)
+  market: string;
+  hero?: string;
+  flipImage?: boolean;
+  imagePosition?: string;
+  trackEligible?: boolean;
+  isCoOwnable: boolean;     // RYDA fleet → can also claim a share
+  sharesAvailable?: number; // RYDA fleet only
+};
+
+function vehicleToListing(v: Vehicle): RentalListing {
+  return {
+    slug: v.symbol.toLowerCase(),
+    kind: "ryda",
+    make: v.brand,
+    model: v.name.replace(`${v.brand} `, "").trim() || v.name,
+    year: v.year,
+    category: v.category,
+    dailyRate: v.rentalDailyRate,
+    market: v.market,
+    hero: v.hero,
+    flipImage: v.flipImage,
+    imagePosition: v.imagePosition,
+    trackEligible: v.trackEligible,
+    isCoOwnable: true,
+    sharesAvailable: v.sharesAvailable,
+  };
+}
+
+function partnerToListing(p: PartnerVehicle): RentalListing {
+  return {
+    slug: p.slug,
+    kind: "partner",
+    make: p.make,
+    model: p.model,
+    year: p.year,
+    category: p.category,
+    dailyRate: p.dailyRate,
+    regularRate: p.regularRate,
+    market: p.market,
+    hero: p.hero,
+    isCoOwnable: false,
+  };
+}
+
+const ALL_LISTINGS: RentalListing[] = [
+  ...VEHICLES.filter((v) => v.rentalAvailable).map(vehicleToListing),
+  ...PARTNER_VEHICLES.map(partnerToListing),
+];
+
+// ─────────────────────────────────────────────────────────────────────────
+// Filters & sort
+// ─────────────────────────────────────────────────────────────────────────
 
 type SortOption =
   | "featured"
@@ -20,8 +95,11 @@ const ANY = "__any__";
 
 const CATEGORY_OPTIONS: { value: string; label: string }[] = [
   { value: ANY, label: "All types" },
-  { value: "Exotic", label: "Exotic" },
+  { value: "Coupe", label: "Coupe" },
   { value: "Convertible", label: "Convertible" },
+  { value: "GT", label: "GT" },
+  { value: "Hypercar", label: "Hypercar" },
+  { value: "Exotic", label: "Exotic" },
   { value: "SUV", label: "SUV" },
   { value: "Sedan", label: "Sedan" },
   { value: "7-Seater", label: "7-Seater" },
@@ -47,7 +125,11 @@ const PRICE_BUCKETS: {
   { value: "1000+", label: "$1,000+/day", test: (r) => r >= 1_000 },
 ];
 
-export function PartnerListings() {
+// ─────────────────────────────────────────────────────────────────────────
+// Component
+// ─────────────────────────────────────────────────────────────────────────
+
+export function RentalListings() {
   const [make, setMake] = useState<string>(ANY);
   const [category, setCategory] = useState<string>(ANY);
   const [priceBucket, setPriceBucket] = useState<string>(ANY);
@@ -55,12 +137,12 @@ export function PartnerListings() {
 
   const makes = useMemo(
     () =>
-      Array.from(new Set(PARTNER_VEHICLES.map((v) => v.make))).sort(),
+      Array.from(new Set(ALL_LISTINGS.map((v) => v.make))).sort(),
     [],
   );
 
-  const filtered: PartnerVehicle[] = useMemo(() => {
-    return PARTNER_VEHICLES.filter((v) => {
+  const filtered: RentalListing[] = useMemo(() => {
+    return ALL_LISTINGS.filter((v) => {
       if (make !== ANY && v.make !== make) return false;
       if (category !== ANY && v.category !== category) return false;
       if (priceBucket !== ANY) {
@@ -82,17 +164,17 @@ export function PartnerListings() {
         break;
       case "savings":
         out.sort((a, b) => {
-          const aPct = (a.regularRate - a.dailyRate) / a.regularRate;
-          const bPct = (b.regularRate - b.dailyRate) / b.regularRate;
+          const aPct = a.regularRate ? (a.regularRate - a.dailyRate) / a.regularRate : 0;
+          const bPct = b.regularRate ? (b.regularRate - b.dailyRate) / b.regularRate : 0;
           return bPct - aPct;
         });
         break;
       case "featured":
       default:
-        // Exotics first, then by price descending (showcase top-tier first)
+        // RYDA fleet first (co-own option), then by price descending
         out.sort((a, b) => {
-          const aTier = a.category === "Exotic" ? 0 : 1;
-          const bTier = b.category === "Exotic" ? 0 : 1;
+          const aTier = a.isCoOwnable ? 0 : 1;
+          const bTier = b.isCoOwnable ? 0 : 1;
           if (aTier !== bTier) return aTier - bTier;
           return b.dailyRate - a.dailyRate;
         });
@@ -177,7 +259,7 @@ export function PartnerListings() {
               {totalListed}
             </span>
             <span className="ml-2">
-              {totalListed === 1 ? "vehicle" : "vehicles"} available · Miami
+              {totalListed === 1 ? "vehicle" : "vehicles"} available · Miami · LA · NYC
             </span>
           </p>
           {totalListed > 0 ? (
@@ -218,7 +300,7 @@ export function PartnerListings() {
         ) : (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {visible.map((v) => (
-              <PartnerCard key={v.slug} vehicle={v} />
+              <RentalCard key={`${v.kind}-${v.slug}`} listing={v} />
             ))}
           </div>
         )}
@@ -258,27 +340,23 @@ function FilterSelect({
   );
 }
 
-function PartnerCard({ vehicle: v }: { vehicle: PartnerVehicle }) {
-  const savings = v.regularRate - v.dailyRate;
-  const savingsPct = Math.round((savings / v.regularRate) * 100);
+function RentalCard({ listing: v }: { listing: RentalListing }) {
+  const savings = v.regularRate ? v.regularRate - v.dailyRate : 0;
+  const savingsPct = v.regularRate
+    ? Math.round((savings / v.regularRate) * 100)
+    : 0;
   const tint = brandTint(v.make);
-
-  // Internal inquiry URL — keeps the customer relationship with RYDA.
-  // White-label arrangement: RYDA brand, RYDA inquiry, RYDA handles the
-  // booking with operations partner behind the scenes.
-  const inquiryHref = `/contact?type=Rental&note=${encodeURIComponent(
-    `Rental inquiry: ${v.make} ${v.model}${v.year ? ` (${v.year})` : ""} · ${v.market}`,
-  )}#form`;
+  const hasShare = v.isCoOwnable && (v.sharesAvailable ?? 0) > 0;
 
   return (
     <Link
-      href={inquiryHref}
+      href={`/rent/${v.slug}`}
       className="group flex flex-col overflow-hidden rounded-2xl border border-rule bg-surface transition-all hover:-translate-y-0.5 hover:border-ink/40 hover:shadow-lg"
     >
       {/* Image with badges */}
       <div
         className="relative aspect-[16/10] w-full overflow-hidden"
-        style={{ backgroundColor: tint }}
+        style={{ backgroundColor: v.kind === "partner" ? tint : undefined }}
       >
         {v.hero ? (
           <Image
@@ -286,11 +364,13 @@ function PartnerCard({ vehicle: v }: { vehicle: PartnerVehicle }) {
             alt={`${v.make} ${v.model}`}
             fill
             sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
-            unoptimized
+            className={`object-cover transition-transform duration-500 group-hover:scale-105 ${
+              v.flipImage ? "-scale-x-100" : ""
+            }`}
+            style={{ objectPosition: v.imagePosition ?? "center" }}
+            unoptimized={v.kind === "partner"}
           />
         ) : (
-          // Placeholder for cars without confirmed photos yet
           <div className="absolute inset-0 flex items-center justify-center">
             <div
               aria-hidden
@@ -314,8 +394,12 @@ function PartnerCard({ vehicle: v }: { vehicle: PartnerVehicle }) {
           {v.make}
         </span>
 
-        {/* Discount badge top-right (if meaningful) */}
-        {savingsPct >= 10 ? (
+        {/* Track-ready or savings badge top-right */}
+        {v.trackEligible ? (
+          <span className="absolute right-3 top-3 rounded-full bg-red/95 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] text-cream backdrop-blur">
+            Track-ready
+          </span>
+        ) : savingsPct >= 10 ? (
           <span className="absolute right-3 top-3 rounded-full bg-red/95 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] text-cream backdrop-blur">
             Save {savingsPct}%
           </span>
@@ -361,9 +445,7 @@ function PartnerCard({ vehicle: v }: { vehicle: PartnerVehicle }) {
             </svg>
             {v.market}
           </span>
-          {v.milesIncluded ? (
-            <span className="text-mute">· {v.milesIncluded} included</span>
-          ) : null}
+          <span className="text-mute">· 100 mi/day included</span>
         </div>
 
         {/* Price block */}
@@ -378,7 +460,7 @@ function PartnerCard({ vehicle: v }: { vehicle: PartnerVehicle }) {
                 <span className="ml-1 text-sm text-mute">/day</span>
               </p>
             </div>
-            {savings > 0 ? (
+            {v.regularRate && savings > 0 ? (
               <div className="text-right">
                 <p className="text-[11px] uppercase tracking-[0.14em] text-mute">
                   Regular
@@ -387,20 +469,31 @@ function PartnerCard({ vehicle: v }: { vehicle: PartnerVehicle }) {
                   {formatUSD(v.regularRate)}
                 </p>
               </div>
+            ) : hasShare ? (
+              <div className="text-right">
+                <p className="text-[11px] uppercase tracking-[0.14em] text-mute">
+                  Or own a share
+                </p>
+                <p className="text-sm text-red tabular-nums">
+                  {v.sharesAvailable} of 10 left
+                </p>
+              </div>
             ) : null}
           </div>
         </div>
 
         {/* CTA */}
         <div className="mt-5 flex items-center justify-between">
-          <p className="text-xs text-ink-soft">100 mi/day included</p>
+          <p className="text-xs text-ink-soft">
+            {hasShare ? "Co-ownership available" : "100 mi/day included"}
+          </p>
           <span className="inline-flex items-center gap-1.5 text-sm font-medium text-red transition-colors group-hover:text-red-deep">
-            Inquire to book
+            View details
             <span
               aria-hidden
               className="transition-transform group-hover:translate-x-0.5"
             >
-              ↗
+              →
             </span>
           </span>
         </div>
