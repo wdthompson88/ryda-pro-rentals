@@ -15,7 +15,7 @@ export default function AccountPage() {
             Account
           </p>
           <h1 className="mt-4 font-display text-4xl font-light text-ink sm:text-5xl">
-            Welcome back, Ryan.
+            Welcome back.
           </h1>
           <p className="mt-2 text-sm text-mute">
             Member since April 2026 · RYDA Blue · Miami

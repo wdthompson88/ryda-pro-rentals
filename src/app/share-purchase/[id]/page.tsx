@@ -107,24 +107,23 @@ export default async function PurchasePage({
         <div className="mx-auto max-w-3xl px-6 py-12 sm:px-10">
           <h2 className="font-display text-2xl text-ink">Wire instructions</h2>
           <p className="mt-2 text-sm text-ink-soft">
-            We sent these instructions to your email at{" "}
-            <span className="text-ink">ryan@example.com</span>. Use this
-            unique reference code on the wire so we can match it.
+            For your security, RYDA never displays escrow bank details in
+            the browser. We've emailed the verified wire instructions —
+            including your unique reference code — to the address on file.
+            Always confirm wire details against the email before sending.
           </p>
-          <div className="mt-6 rounded-2xl border border-rule bg-surface p-6">
-            <dl className="space-y-3 text-sm">
-              <Field k="Bank" v="First Republic Bank" />
-              <Field k="Account name" v="RYDA Ferrari 296 GTB LLC" />
-              <Field k="Routing (ABA)" v="••• ••• 871" copy />
-              <Field k="Account number" v="•••• •••• 4729" copy />
-              <Field k="Reference code" v="RYDA-PUR-00428-RG" copy />
-              <Field k="Total" v={formatUSD(59_501)} emphasis />
-            </dl>
+          <div className="mt-6 rounded-2xl border border-rule bg-cream-2/40 p-6 text-sm text-ink-soft">
+            <p>
+              Total to wire:{" "}
+              <span className="font-display text-lg text-ink tabular-nums">
+                {formatUSD(59_501)}
+              </span>
+            </p>
+            <p className="mt-2 text-xs text-mute">
+              Reference code is unique to this purchase. Wires received
+              without a matching reference are returned.
+            </p>
           </div>
-          <p className="mt-4 text-xs text-mute">
-            Reference code is unique to this purchase. Without it, we can't
-            match your wire to your share.
-          </p>
         </div>
       </section>
 

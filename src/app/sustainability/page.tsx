@@ -46,9 +46,9 @@ export default function SustainabilityPage() {
               detail="6 cars become 1"
             />
             <Stat
-              number="~250 tons"
+              number="~200 tons"
               label="CO2 avoided in manufacturing"
-              detail="Per shared vehicle vs. 6 individuals"
+              detail="Per shared 6-seat vehicle vs. 6 individuals (~40 tons each)"
             />
             <Stat
               number="3x"
@@ -83,12 +83,12 @@ export default function SustainabilityPage() {
               body="Our 2027 lineup is 50% hybrid or fully electric — Spectre, Taycan Turbo S, 296 GTB hybrid. Members vote on additions."
             />
             <Card
-              title="Carbon-offset on every booking"
-              body="Each booking auto-purchases verified carbon offsets matching the trip's estimated emissions. RYDA covers the cost."
+              title="Carbon-offset program (planned)"
+              body="At launch, RYDA will offer optional verified carbon offsets keyed to each booking's estimated emissions. Provider partner finalized before Miami goes live."
             />
             <Card
               title="Climate-controlled storage"
-              body="Our facility runs on 100% renewable energy via a Florida solar power purchase agreement. Maintained at minimum-impact climate ranges."
+              body="Our Miami storage partner is targeted for high-renewable-energy supply (solar PPA in evaluation). Vehicles are kept in stable climate ranges to minimize wear."
             />
             <Card
               title="Transport optimization"
@@ -96,7 +96,7 @@ export default function SustainabilityPage() {
             />
             <Card
               title="Vehicle longevity"
-              body="Cars in shared programs are typically retired at 8-12 years vs. 4-6 for solo-owned exotics — fewer rebuilds, fewer write-offs."
+              body="Shared programs typically run cars longer than solo-owned exotics — more consistent care, complete service records, fewer write-offs from inactivity."
             />
           </div>
         </div>

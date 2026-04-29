@@ -528,10 +528,11 @@ function FundStep({
         />
         <FundingOption
           method="ach"
-          label="ACH transfer"
-          detail="Free. 3–5 business day settlement. Recommended for amounts under $50K."
+          label="ACH transfer (post-launch)"
+          detail="Free, 3–5 business day settlement. Ships shortly after the Miami launch — wire is the only funding option for now."
           selected={fundingMethod === "ach"}
           onSelect={() => setFundingMethod("ach")}
+          disabled
         />
       </div>
 
@@ -541,27 +542,17 @@ function FundStep({
           <p className="mt-2 font-display text-xl text-ink">
             {vehicle.name} LLC — Escrow Account
           </p>
-          <dl className="mt-5 space-y-3 border-t border-rule pt-5 text-sm">
-            <KvRow label="Bank" value="JPMorgan Chase, N.A." />
-            <KvRow label="Bank address" value="270 Park Ave, New York, NY 10017" />
-            <KvRow label="ABA / Routing" value="021000021" mono />
-            <KvRow
-              label="Account number"
-              value={`9874-${Math.abs(hashCode(vehicle.symbol)).toString().padStart(6, "0").slice(0, 6)}`}
-              mono
-            />
-            <KvRow label="Beneficiary" value={`${vehicle.name} LLC, Delaware`} />
-            <KvRow
-              label="Reference / memo"
-              value={`Co-ownership buy-in · ${vehicle.symbol} · [your name]`}
-              mono
-            />
-            <KvRow label="Amount" value={formatUSD(grandTotal)} mono />
-          </dl>
+          <p className="mt-3 text-sm text-ink-soft">
+            For your security, RYDA never displays escrow bank details in the
+            browser. Once you submit this step, we'll email the verified
+            wire instructions for {vehicle.name} LLC's escrow account to
+            your verified inbox, along with your unique reference code and
+            the exact amount of {formatUSD(grandTotal)}.
+          </p>
           <p className="mt-5 rounded-xl border border-rule bg-cream-2/40 p-4 text-xs leading-relaxed text-ink-soft">
-            <strong className="text-ink">Important:</strong> include your full legal name in the
-            wire memo so we can match the transfer to your buy-in. Wires received without a
-            matching memo are returned.
+            <strong className="text-ink">Important:</strong> always confirm
+            wire details against the email. RYDA will never ask you to wire
+            funds to a different bank or account by phone or text.
           </p>
         </div>
       )}
@@ -569,20 +560,11 @@ function FundStep({
       {fundingMethod === "ach" && (
         <div className="rounded-2xl border border-rule bg-surface p-6">
           <p className="text-xs font-medium uppercase tracking-wider text-red">ACH transfer</p>
-          <p className="mt-2 font-display text-xl text-ink">Connect your bank</p>
+          <p className="mt-2 font-display text-xl text-ink">Bank connection ships post-launch</p>
           <p className="mt-2 text-sm text-ink-soft">
-            Securely link your bank account through Plaid. Once linked, we initiate the transfer
-            and notify you when it settles.
-          </p>
-          <button
-            type="button"
-            className="mt-5 inline-flex h-11 items-center justify-center rounded-full bg-ink px-6 text-sm font-medium text-cream hover:bg-red"
-          >
-            Connect with Plaid →
-          </button>
-          <p className="mt-3 text-xs text-mute">
-            Plaid integration is wired client-side; the actual handoff completes once a bank is
-            linked.
+            ACH (via Plaid) ships shortly after the Miami launch. For now,
+            please complete your buy-in by wire transfer — switch the option
+            above. Wires settle in 1–2 business days.
           </p>
         </div>
       )}
@@ -840,13 +822,12 @@ function DocCard({
           <li key={i}>{s}</li>
         ))}
       </ul>
-      <div className="mt-5 flex flex-wrap items-center gap-3">
-        <button
-          type="button"
-          className="inline-flex h-10 items-center justify-center rounded-full border border-rule px-5 text-sm font-medium text-ink hover:border-ink"
-        >
-          Read the full document
-        </button>
+      <p className="mt-5 text-xs text-mute">
+        The full counsel-prepared document is sent to your verified email
+        before signing — your e-signature here confirms you've reviewed both
+        the summary above and the long-form version.
+      </p>
+      <div className="mt-3 flex flex-wrap items-center gap-3">
         {!signed && (
           <button
             type="button"
@@ -867,19 +848,26 @@ function FundingOption({
   detail,
   selected,
   onSelect,
+  disabled = false,
 }: {
   method: "wire" | "ach";
   label: string;
   detail: string;
   selected: boolean;
   onSelect: () => void;
+  disabled?: boolean;
 }) {
   return (
     <button
       type="button"
       onClick={onSelect}
+      disabled={disabled}
       className={`flex flex-col items-start gap-2 rounded-2xl border p-5 text-left transition-colors ${
-        selected ? "border-red bg-red/5" : "border-rule bg-surface hover:border-ink-soft"
+        selected
+          ? "border-red bg-red/5"
+          : disabled
+            ? "border-rule bg-surface opacity-60 cursor-not-allowed"
+            : "border-rule bg-surface hover:border-ink-soft"
       }`}
     >
       <span className="text-xs font-medium uppercase tracking-wider text-red">

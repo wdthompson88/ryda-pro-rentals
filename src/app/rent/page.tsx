@@ -37,9 +37,12 @@ export default function RentPage() {
             <Field label="Where" value="Miami" />
             <Field label="From" value="Apr 28, 2026" />
             <Field label="Until" value="May 1, 2026" />
-            <button className="h-12 rounded-full bg-red px-7 text-sm font-medium text-cream transition-colors hover:bg-red-deep">
-              Search
-            </button>
+            <Link
+              href="#available"
+              className="inline-flex h-12 items-center justify-center rounded-full bg-red px-7 text-sm font-medium text-cream transition-colors hover:bg-red-deep"
+            >
+              See available
+            </Link>
           </div>
         </div>
       </section>
@@ -76,7 +79,7 @@ export default function RentPage() {
       </section>
 
       {/* Vehicle grid */}
-      <section className="border-b border-rule">
+      <section id="available" className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
           <div className="mb-6 flex items-end justify-between">
             <h2 className="font-display text-3xl text-ink">Available now</h2>

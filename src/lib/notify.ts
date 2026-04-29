@@ -3,13 +3,12 @@ import { Resend } from "resend";
 const apiKey = process.env.RESEND_API_KEY;
 const resend = apiKey ? new Resend(apiKey) : null;
 
-// onboarding@resend.dev is Resend's default test sender — works without
-// domain verification on the free tier. Limitation: it can only deliver
-// to the email used at Resend signup (ryangalli3@gmail.com here), which
-// is exactly our team-notification recipient, so this works for now.
-// Swap to a verified ryda.com sender once a custom domain is set up.
-const FROM = "RYDA Notifications <onboarding@resend.dev>";
-const TEAM_EMAIL = "ryangalli3@gmail.com";
+// Sender + recipient are configured via env vars so production uses a verified
+// ryda.com domain sender and a team alias (e.g. team@ryda.com). In dev or
+// when env vars are unset, calls fall back to a no-op so we never accidentally
+// route real form submissions to a personal inbox.
+const FROM = process.env.RYDA_NOTIFY_FROM ?? "";
+const TEAM_EMAIL = process.env.RYDA_NOTIFY_TO ?? "";
 
 export type NotifyArgs = {
   subject: string;
@@ -21,8 +20,8 @@ export type NotifyArgs = {
 // Never throws — calling routes treat email as a side effect of the primary
 // DB write, not a failure mode.
 export async function notifyTeam({ subject, html, replyTo }: NotifyArgs): Promise<boolean> {
-  if (!resend) {
-    console.log("[notify · no-key]", { subject });
+  if (!resend || !FROM || !TEAM_EMAIL) {
+    console.log("[notify · skipped — missing resend config]", { subject });
     return false;
   }
 

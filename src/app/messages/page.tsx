@@ -40,11 +40,11 @@ const CONVERSATIONS = [
 ];
 
 const MESSAGES = [
-  { from: "Mike", time: "9:42 AM", text: "Booked Pebble Beach hotels for the August trip. 3 nights, valet parking, spot for the 296.", own: false },
-  { from: "Mike", time: "9:43 AM", text: "Pebble Beach is locked for the August trip. Anyone want to caravan?", own: false },
+  { from: "Co-owner A", time: "9:42 AM", text: "Booked Pebble Beach hotels for the August trip. 3 nights, valet parking, spot for the 296.", own: false },
+  { from: "Co-owner A", time: "9:43 AM", text: "Pebble Beach is locked for the August trip. Anyone want to caravan?", own: false },
   { from: "You", time: "10:14 AM", text: "I'm in. Driving up Friday morning, leaving Sunday evening.", own: true },
-  { from: "Sarah", time: "11:02 AM", text: "Going to fly down Saturday and meet you. Mike, can you handle the Ferrari Saturday afternoon?", own: false },
-  { from: "Mike", time: "11:08 AM", text: "Of course. I'll do a soft top-down test before I hand off.", own: false },
+  { from: "Co-owner B", time: "11:02 AM", text: "Going to fly down Saturday and meet you. Co-owner A, can you handle the Ferrari Saturday afternoon?", own: false },
+  { from: "Co-owner A", time: "11:08 AM", text: "Of course. I'll do a soft top-down test before I hand off.", own: false },
   { from: "RYDA Concierge", time: "11:30 AM", text: "I can coordinate hotel parking arrangements + Sunday morning detail. Should I book?", own: false, system: true },
 ];
 
@@ -126,9 +126,9 @@ export default function MessagesPage() {
                     placeholder="Message the group…"
                     className="flex-1 bg-transparent text-sm text-ink placeholder:text-mute focus:outline-none"
                   />
-                  <button className="rounded-full bg-red px-4 py-1.5 text-xs font-medium text-cream hover:bg-red-deep">
+                  <span className="rounded-full bg-red/40 px-4 py-1.5 text-xs font-medium text-cream cursor-not-allowed">
                     Send
-                  </button>
+                  </span>
                 </div>
                 <p className="mt-2 text-center text-xs text-mute">
                   Messages here are auditable. Don't share trade secrets or NDA-covered info.

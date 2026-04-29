@@ -5,7 +5,7 @@ import { InvestorInquiryForm } from "@/components/investor-inquiry-form";
 export const metadata = {
   title: "Invest in RYDA — Seed Round",
   description:
-    "RYDA's $2.5M seed round is open. We're building the first US member-managed supercar co-ownership platform. Miami launch Q3 2026.",
+    "RYDA is the first US member-managed supercar co-ownership platform, raising a seed round to launch Miami.",
 };
 
 export default function InvestorsPage() {
@@ -33,7 +33,7 @@ export default function InvestorsPage() {
       <section className="border-b border-rule bg-ink text-cream">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-28">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            Seed round · Q2 2026
+            Seed round · open
           </p>
           <h1 className="mt-4 max-w-4xl font-display text-5xl font-light leading-[1.05] sm:text-6xl">
             The luxury access category{" "}
@@ -114,7 +114,7 @@ export default function InvestorsPage() {
             How RYDA works.
           </h2>
           <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-5">
-            <Step n="01" title="Source" body="RYDA acquires curated supercars in target markets — Ferrari, Lamborghini, McLaren, Aston Martin, Rolls-Royce." />
+            <Step n="01" title="Source" body="RYDA sources curated supercars on behalf of each vehicle LLC in target markets — Ferrari, Lamborghini, McLaren, Aston Martin, Rolls-Royce." />
             <Step n="02" title="Structure" body="Each vehicle is held in a single-purpose Delaware LLC. 5–10 verified members co-own and manage the LLC together." />
             <Step n="03" title="Operate" body="RYDA contracts with each LLC as a service provider — storage, insurance, maintenance, scheduling, concierge." />
             <Step n="04" title="Use" body="Members book usage on the RYDA app — typically 50 days + 4,000 miles per seat per year." />

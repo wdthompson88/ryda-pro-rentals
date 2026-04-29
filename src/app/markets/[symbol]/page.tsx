@@ -21,7 +21,7 @@ export async function generateMetadata({
   const v = getVehicleBySymbol(symbol);
   if (!v) return { title: "RYDA Markets" };
   return {
-    title: `${v.name} — ${formatUSD(v.pricePerShare)} | RYDA Markets`,
+    title: `${v.name} — ${formatUSD(v.pricePerShare)} per seat | RYDA`,
     description: `Co-own a ${v.year} ${v.name}. ${v.sharesAvailable} of ${v.shares} member-managed LLC seats available.`,
   };
 }
@@ -46,7 +46,7 @@ export default async function VehicleMarketPage({
             href="/markets"
             className="text-xs font-medium uppercase tracking-[0.2em] text-red hover:text-red-deep"
           >
-            ← Markets
+            ← Fleet
           </Link>
 
           <div className="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-12">
@@ -139,11 +139,15 @@ export default async function VehicleMarketPage({
         <div className="mx-auto max-w-7xl px-6 py-14 sm:px-10">
           <h2 className="font-display text-3xl text-ink">Recent activity</h2>
           <ul className="mt-6 divide-y divide-rule rounded-xl border border-rule bg-surface">
-            <Activity label="New co-owner joined" detail="Apr 24" amount={formatUSD(v.pricePerShare * 1)} sub="1 seat" />
-            <Activity label="Seat transferred to new member" detail="Apr 22" amount={formatUSD(v.prevClose * 1)} sub="1 seat" />
+            <Activity label="New co-owner joined the LLC" detail="Apr 24" amount="—" sub="1 seat" />
             <Activity label="Inspection report posted" detail="Apr 20" amount="—" sub="Mileage: 2,140 mi" />
-            <Activity label="New co-owners joined" detail="Apr 18" amount={formatUSD(v.pricePerShare * 2)} sub="2 seats" />
+            <Activity label="Seat transferred to a new verified member" detail="Apr 22" amount="—" sub="1 seat" />
+            <Activity label="New co-owners joined the LLC" detail="Apr 18" amount="—" sub="2 seats" />
           </ul>
+          <p className="mt-3 text-xs text-mute">
+            Member-to-member transfer prices are private to the parties. RYDA
+            does not publish a transfer-price ticker.
+          </p>
         </div>
       </section>
 

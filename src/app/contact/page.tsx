@@ -99,13 +99,14 @@ export default function ContactPage() {
           </p>
           <div className="mx-auto mt-10 max-w-md rounded-2xl border border-cream/10 bg-cream/5 p-8">
             <p className="text-sm text-cream/70">
-              Calendly embed will appear here once a booking link is set up.
+              Send a quick note and a RYDA membership advisor will reply
+              within one business day with a calendar link.
             </p>
             <a
               href="/contact?type=Membership#form"
               className="mt-6 inline-flex h-11 items-center justify-center rounded-full bg-cream px-6 text-sm font-medium text-ink hover:bg-red hover:text-cream"
             >
-              Send a message instead
+              Request a call
             </a>
           </div>
         </div>

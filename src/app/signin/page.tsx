@@ -17,13 +17,16 @@ export default function SignInPage() {
           <form className="mt-8 space-y-4">
             <Field label="Email" type="email" placeholder="you@email.com" />
             <Field label="Password" type="password" placeholder="••••••••" />
-            <button
-              type="button"
-              className="mt-2 h-12 w-full rounded-full bg-red px-7 text-sm font-medium text-cream transition-colors hover:bg-red-deep"
-            >
-              Sign in
-            </button>
           </form>
+
+          <p className="mt-6 rounded-xl border border-rule bg-cream-2/40 px-4 py-3 text-xs leading-relaxed text-ink-soft">
+            Member sign-in goes live with the Miami launch. If you're a
+            founding member who needs early access,{" "}
+            <Link href="/contact" className="font-medium text-red hover:text-red-deep">
+              reach out
+            </Link>
+            .
+          </p>
 
           <div className="mt-6 flex items-center justify-between text-xs">
             <Link href="/contact" className="text-ink-soft hover:text-ink">

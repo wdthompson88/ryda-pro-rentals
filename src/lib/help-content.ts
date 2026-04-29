@@ -131,7 +131,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Why the structure works without accreditation" },
           {
             type: "p",
-            text: "Each car is held in a Delaware LLC that you and 5–10 other verified members manage together. RYDA operates the car under a separate management services agreement — but the LLC itself is yours. You're not buying a passive investment product; you're buying the right to use a car you and your co-owners actually own. Because the structure is consumption-first (real ownership, real usage rights, no profit expectation), it falls outside SEC investment-contract classification.",
+            text: "Each car is held in a Delaware LLC that you and the other verified members manage together — 5 to 10 co-owners total. RYDA operates the car under a separate management services agreement — but the LLC itself is yours. You're not buying a passive investment product; you're buying the right to use a car you and your co-owners actually own. Because the structure is consumption-first (real ownership, real usage rights, no profit expectation), it falls outside SEC investment-contract classification.",
           },
         ],
       },

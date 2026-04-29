@@ -230,7 +230,7 @@ export function HandoverFlow({
             <div className="mt-8 rounded-xl border border-dashed border-rule bg-cream/40 p-8 text-center">
               <p className="font-display text-xl text-mute">Tap and draw to sign</p>
               <p className="mt-2 text-xs text-mute">
-                Touch sign — Mock display
+                Signature capture loads on a touch device
               </p>
             </div>
             <label className="mt-6 flex items-start gap-3 text-xs text-ink-soft">

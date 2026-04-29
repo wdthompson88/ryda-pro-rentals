@@ -146,12 +146,6 @@ function Identity({ onNext, onBack }: { onNext: () => void; onBack: () => void }
         .
       </p>
       <BackNext onBack={onBack} onNext={onNext} hideNext />
-      <button
-        onClick={onNext}
-        className="mt-3 w-full text-xs text-mute underline hover:text-ink"
-      >
-        Skip (demo) →
-      </button>
     </div>
   );
 }

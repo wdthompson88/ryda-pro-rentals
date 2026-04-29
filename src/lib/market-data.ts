@@ -13,9 +13,8 @@ export type Vehicle = {
   fullPrice: number;       // total vehicle price
   shares: number;          // total shares (e.g. 6)
   sharesAvailable: number; // shares available right now
-  pricePerShare: number;   // current ask price per share
-  prevClose: number;       // yesterday's last trade
-  annualOpCost: number;    // per share
+  pricePerShare: number;   // current per-seat buy-in
+  annualOpCost: number;    // per seat all-in annual contribution
   daysPerYear: number;     // entitlement
   milesPerYear: number;    // entitlement
   effectiveDailyCost: number;
@@ -51,7 +50,6 @@ export const VEHICLES: Vehicle[] = [
     shares: 6,
     sharesAvailable: 2,
     pricePerShare: 56_667,
-    prevClose: 56_240,
     annualOpCost: 11_800,
     daysPerYear: 50,
     milesPerYear: 4_000,
@@ -84,7 +82,6 @@ export const VEHICLES: Vehicle[] = [
     shares: 10,
     sharesAvailable: 3,
     pricePerShare: 99_000,
-    prevClose: 100_350,
     annualOpCost: 14_200,
     daysPerYear: 30,
     milesPerYear: 2_500,
@@ -117,7 +114,6 @@ export const VEHICLES: Vehicle[] = [
     shares: 6,
     sharesAvailable: 4,
     pricePerShare: 62_667,
-    prevClose: 61_980,
     annualOpCost: 11_500,
     daysPerYear: 50,
     milesPerYear: 4_000,
@@ -151,7 +147,6 @@ export const VEHICLES: Vehicle[] = [
     shares: 8,
     sharesAvailable: 2,
     pricePerShare: 60_000,
-    prevClose: 60_400,
     annualOpCost: 14_800,
     daysPerYear: 40,
     milesPerYear: 3_000,
@@ -185,7 +180,6 @@ export const VEHICLES: Vehicle[] = [
     shares: 8,
     sharesAvailable: 0,
     pricePerShare: 63_750,
-    prevClose: 62_900,
     annualOpCost: 13_200,
     daysPerYear: 40,
     milesPerYear: 3_000,
@@ -219,7 +213,6 @@ export const VEHICLES: Vehicle[] = [
     shares: 10,
     sharesAvailable: 5,
     pricePerShare: 130_900,
-    prevClose: 128_750,
     annualOpCost: 26_580,
     daysPerYear: 30,
     milesPerYear: 2_000,
@@ -243,280 +236,6 @@ export const VEHICLES: Vehicle[] = [
   },
 ];
 
-// ─────────────────────────────────────────────────────────────────────────
-// Mock seat reference history. Real version pulls from a `seat_transfers` table.
-// ─────────────────────────────────────────────────────────────────────────
-
-export type Timeframe = "1D" | "1W" | "1M" | "3M" | "YTD" | "1Y" | "5Y" | "MAX";
-export type PricePoint = { t: string; price: number; miles?: number; service?: ServiceEvent | null };
-
-export type ServiceEvent = {
-  date: string;     // ISO date when service happened
-  miles: number;    // Odometer at the time
-  type: "oil-change" | "tires" | "brakes" | "annual" | "inspection" | "detailing" | "track-prep";
-  title: string;
-  detail: string;
-  cost: number;
-};
-
-const DAY_MS = 24 * 3600 * 1000;
-const BACKBONE_DAYS = 365 * 7; // 7 years
-const BACKBONE_VOL = 0.012;    // ~1.2% daily walk
-const BACKBONE_TREND = -0.0001; // slight backwards drift so target is "up" over 7 yrs
-
-const backboneCache = new Map<string, PricePoint[]>();
-
-/**
- * The single source of truth for a vehicle's price history. Every timeframe
- * is derived from this one walk so that overlapping windows agree exactly:
- * the last point of `1W` equals the value at "7 days ago" inside `1M`, etc.
- *
- * Walks BACKWARDS from the current price for stability — the latest point is
- * always exactly `vehicle.pricePerShare`.
- */
-function getBackbone(vehicle: Vehicle): PricePoint[] {
-  const cached = backboneCache.get(vehicle.symbol);
-  if (cached) return cached;
-
-  const seed = symbolToSeed(vehicle.symbol);
-  const rng = mulberry32(seed);
-  const target = vehicle.pricePerShare;
-  const now = Date.now();
-
-  const points: PricePoint[] = new Array(BACKBONE_DAYS);
-  let p = target;
-  for (let i = BACKBONE_DAYS - 1; i >= 0; i--) {
-    points[i] = { t: new Date(now - (BACKBONE_DAYS - 1 - i) * DAY_MS).toISOString(), price: round2(p) };
-    // Walk backwards in time: subtract typical daily move + slight trend.
-    const move = (rng() - 0.5) * 2 * BACKBONE_VOL * p;
-    p = p - move - BACKBONE_TREND * p;
-    // Prevent unrealistic drifts.
-    if (p < target * 0.3) p = target * 0.4;
-    if (p > target * 2.5) p = target * 1.8;
-  }
-  // Force last point to match current price exactly.
-  points[BACKBONE_DAYS - 1] = { t: new Date(now).toISOString(), price: target };
-
-  backboneCache.set(vehicle.symbol, points);
-  return points;
-}
-
-/**
- * Generates an intraday (today) walk going from yesterday's close to the
- * current price across ~78 5-minute bars (6.5 trading hours).
- * Independent of the daily backbone — markets-style intraday flavor.
- */
-function intradayWalk(vehicle: Vehicle): PricePoint[] {
-  const seed = symbolToSeed(vehicle.symbol) + 7919; // offset so it doesn't collide
-  const rng = mulberry32(seed);
-  const target = vehicle.pricePerShare;
-  const open = vehicle.prevClose;
-  const points = 78;
-  const now = Date.now();
-  const spanMs = 6.5 * 3600 * 1000;
-
-  const series: PricePoint[] = [];
-  let p = open;
-  // Linear path from open to target plus noise.
-  for (let i = 0; i < points; i++) {
-    const progress = i / (points - 1);
-    const trend = open + (target - open) * progress;
-    const noise = (rng() - 0.5) * 2 * 0.003 * p;
-    p = trend + noise;
-    series.push({
-      t: new Date(now - spanMs + (i / (points - 1)) * spanMs).toISOString(),
-      price: round2(p),
-    });
-  }
-  // Pin the endpoints exactly so the header math is clean.
-  series[0] = { t: series[0].t, price: open };
-  series[series.length - 1] = { t: new Date(now).toISOString(), price: target };
-  return series;
-}
-
-/** Number of points to display per timeframe (resampled from backbone). */
-const TF_POINTS: Record<Timeframe, number> = {
-  "1D": 78,
-  "1W": 56,
-  "1M": 60,
-  "3M": 90,
-  "YTD": 90,
-  "1Y": 120,
-  "5Y": 180,
-  "MAX": 200,
-};
-
-/** Number of *days* of history each timeframe should include. */
-function daysForTimeframe(tf: Timeframe): number {
-  if (tf === "1D") return 1;
-  if (tf === "1W") return 7;
-  if (tf === "1M") return 30;
-  if (tf === "3M") return 90;
-  if (tf === "YTD") {
-    const now = new Date();
-    const jan1 = new Date(now.getFullYear(), 0, 1);
-    return Math.max(1, Math.floor((now.getTime() - jan1.getTime()) / DAY_MS));
-  }
-  if (tf === "1Y") return 365;
-  if (tf === "5Y") return 365 * 5;
-  return BACKBONE_DAYS; // MAX
-}
-
-/** Resample a price series down to N evenly-spaced points (last point preserved). */
-function resample(points: PricePoint[], n: number): PricePoint[] {
-  if (points.length <= n) return points;
-  const out: PricePoint[] = [];
-  const step = (points.length - 1) / (n - 1);
-  for (let i = 0; i < n; i++) {
-    const idx = Math.round(i * step);
-    out.push(points[idx]);
-  }
-  // Always pin the last point exactly so the header price matches the backbone end.
-  out[out.length - 1] = points[points.length - 1];
-  return out;
-}
-
-export function generateHistory(vehicle: Vehicle, timeframe: Timeframe): PricePoint[] {
-  const events = getServiceEvents(vehicle);
-
-  if (timeframe === "1D") {
-    // 1D doesn't show meaningful mileage variation — keep it flat at current.
-    return intradayWalk(vehicle).map((p) => ({
-      ...p,
-      miles: vehicle.currentMiles,
-      service: matchService(events, p.t),
-    }));
-  }
-
-  const backbone = getBackbone(vehicle);
-  const days = daysForTimeframe(timeframe);
-  const slice = backbone.slice(Math.max(0, backbone.length - days));
-  const resampled = resample(slice, TF_POINTS[timeframe]);
-  // Attach mileage + any service event that landed on each point.
-  const totalSpan = resampled.length;
-  return resampled.map((p, i) => {
-    const progress = (i + 1) / totalSpan;
-    const miles = mileageAt(vehicle, progress);
-    return { ...p, miles, service: matchService(events, p.t) };
-  });
-}
-
-// Mileage grows along an S-curve from 0 → currentMiles across the visible
-// window. Light noise so it doesn't look perfectly synthetic. Always
-// monotonically non-decreasing (cars don't lose miles).
-function mileageAt(vehicle: Vehicle, progress: number): number {
-  // Slight ease so the line bends naturally rather than going pure-linear.
-  const eased = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
-  return Math.round(vehicle.currentMiles * (0.05 + 0.95 * eased));
-}
-
-// ─────────────────────────────────────────────────────────────────────────
-// Service events. Generated deterministically per vehicle from its current
-// mileage and symbol seed. Events span the past 12 months and are placed
-// at typical exotic-car service intervals.
-// ─────────────────────────────────────────────────────────────────────────
-
-const serviceCache = new Map<string, ServiceEvent[]>();
-
-export function getServiceEvents(vehicle: Vehicle): ServiceEvent[] {
-  const cached = serviceCache.get(vehicle.symbol);
-  if (cached) return cached;
-
-  const seed = symbolToSeed(vehicle.symbol);
-  const rng = mulberry32(seed + 12345);
-  const now = Date.now();
-  const events: ServiceEvent[] = [];
-
-  // Pre-purchase inspection: ~12 months back, ~5% of current miles
-  events.push({
-    date: new Date(now - 365 * DAY_MS).toISOString(),
-    miles: Math.round(vehicle.currentMiles * 0.05),
-    type: "inspection",
-    title: "Pre-purchase inspection",
-    detail: `Multi-point pre-purchase inspection at ${vehicle.brand} authorized dealer. Compression, leak-down, fluids, brake and suspension verified. Title and lien search clean.`,
-    cost: 1_650 + Math.floor(rng() * 800),
-  });
-
-  // First oil change: ~9 months back, ~25% miles
-  events.push({
-    date: new Date(now - 270 * DAY_MS).toISOString(),
-    miles: Math.round(vehicle.currentMiles * 0.25),
-    type: "oil-change",
-    title: "Scheduled oil + filter service",
-    detail: `Manufacturer-specified synthetic oil change, filter replacement, fluids top-up, multipoint inspection. Performed at ${vehicle.brand} of ${vehicle.market}.`,
-    cost: 1_200 + Math.floor(rng() * 600),
-  });
-
-  // Tires: ~6 months back, ~50% miles
-  events.push({
-    date: new Date(now - 180 * DAY_MS).toISOString(),
-    miles: Math.round(vehicle.currentMiles * 0.5),
-    type: "tires",
-    title: "Tire replacement (4) + alignment",
-    detail: `Manufacturer-spec Pirelli P Zero tires installed. Four-wheel alignment performed. Original tires retained for track-day rotation.`,
-    cost: 4_200 + Math.floor(rng() * 1_400),
-  });
-
-  // Annual service: ~3 months back, ~75% miles
-  events.push({
-    date: new Date(now - 90 * DAY_MS).toISOString(),
-    miles: Math.round(vehicle.currentMiles * 0.75),
-    type: "annual",
-    title: "Annual major service",
-    detail: `Full annual service: spark plugs, brake fluid flush, transmission fluid check, A/C system service, suspension inspection, software updates. Manufacturer warranty preserved.`,
-    cost: 3_800 + Math.floor(rng() * 2_400),
-  });
-
-  // Detailing: ~6 weeks back, ~88% miles (only some vehicles)
-  if (rng() > 0.4) {
-    events.push({
-      date: new Date(now - 42 * DAY_MS).toISOString(),
-      miles: Math.round(vehicle.currentMiles * 0.88),
-      type: "detailing",
-      title: "Concours-level detailing + ceramic top-up",
-      detail: `Full paint correction, ceramic coating top-up, deep interior detailing, leather conditioning. Performed before member event use.`,
-      cost: 2_200 + Math.floor(rng() * 800),
-    });
-  }
-
-  serviceCache.set(vehicle.symbol, events);
-  return events;
-}
-
-// Match a chart point's timestamp to a service event within ~3 days.
-// We only attach one event per chart point so two close-together events
-// don't overlap visually.
-function matchService(events: ServiceEvent[], pointIso: string): ServiceEvent | null {
-  const t = new Date(pointIso).getTime();
-  for (const e of events) {
-    const dt = Math.abs(new Date(e.date).getTime() - t);
-    if (dt < 3 * DAY_MS) return e;
-  }
-  return null;
-}
-
-function symbolToSeed(symbol: string): number {
-  let h = 0;
-  for (let i = 0; i < symbol.length; i++) {
-    h = (h * 31 + symbol.charCodeAt(i)) >>> 0;
-  }
-  return h;
-}
-
-function mulberry32(a: number) {
-  return function () {
-    a |= 0;
-    a = (a + 0x6d2b79f5) | 0;
-    let t = a;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-function round2(n: number) {
-  return Math.round(n * 100) / 100;
-}
 
 // ─────────────────────────────────────────────────────────────────────────
 // Helpers
@@ -537,8 +256,3 @@ export function formatUSD(n: number, opts: { decimals?: number } = {}) {
   }).format(n);
 }
 
-export function changeFromPrev(price: number, prev: number) {
-  const diff = price - prev;
-  const pct = (diff / prev) * 100;
-  return { diff, pct, isUp: diff >= 0 };
-}

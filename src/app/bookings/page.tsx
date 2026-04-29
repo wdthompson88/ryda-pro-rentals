@@ -60,9 +60,12 @@ export default function BookingsPage() {
               <Tag>Ferrari 296</Tag>
               <Tag>McLaren 750S</Tag>
             </div>
-            <button className="h-11 rounded-full bg-red px-6 text-sm font-medium text-cream transition-colors hover:bg-red-deep">
+            <Link
+              href="/bookings/new"
+              className="inline-flex h-11 items-center justify-center rounded-full bg-red px-6 text-sm font-medium text-cream transition-colors hover:bg-red-deep"
+            >
               + Book time
-            </button>
+            </Link>
           </div>
         </div>
       </section>

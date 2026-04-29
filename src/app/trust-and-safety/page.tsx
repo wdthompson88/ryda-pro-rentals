@@ -164,9 +164,10 @@ export default function TrustAndSafetyPage() {
             </li>
             <li>
               <span className="font-medium text-ink">No undocumented modifications.</span>{" "}
-              Performance and appearance modifications require RYDA approval.
-              The vehicles are co-owned assets — one member doesn't get to
-              wrap a Ferrari without the others' agreement.
+              Performance and appearance modifications go through the LLC's
+              decision process — co-owners vote, and RYDA verifies that the
+              change is operationally and insurance-feasible. One member
+              doesn't get to wrap a Ferrari unilaterally.
             </li>
             <li>
               <span className="font-medium text-ink">No leaving the operating market.</span>{" "}

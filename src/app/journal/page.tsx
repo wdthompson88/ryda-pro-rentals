@@ -85,7 +85,7 @@ export default function JournalPage() {
       {/* Featured */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10">
-          <Link href="#" className="block group">
+          <div className="block">
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
               <div className="aspect-[4/3] w-full overflow-hidden rounded-2xl bg-cream/30">
                 <div className="flex h-full items-center justify-center text-sm text-mute">
@@ -94,7 +94,7 @@ export default function JournalPage() {
               </div>
               <div>
                 <p className="text-xs uppercase tracking-wider text-red">{POSTS[0].tag}</p>
-                <h2 className="mt-3 font-display text-3xl font-light text-ink transition-colors group-hover:text-red sm:text-4xl">
+                <h2 className="mt-3 font-display text-3xl font-light text-ink sm:text-4xl">
                   {POSTS[0].title}
                 </h2>
                 <p className="mt-4 text-base leading-relaxed text-ink-soft">
@@ -106,10 +106,12 @@ export default function JournalPage() {
                   <span>{POSTS[0].date}</span>
                   <span>·</span>
                   <span>{POSTS[0].readTime}</span>
+                  <span>·</span>
+                  <span className="italic">Coming at launch</span>
                 </div>
               </div>
             </div>
-          </Link>
+          </div>
         </div>
       </section>
 
@@ -119,13 +121,12 @@ export default function JournalPage() {
           <h2 className="font-display text-2xl text-ink">Recent</h2>
           <div className="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {POSTS.slice(1).map((p) => (
-              <Link
+              <div
                 key={p.slug}
-                href="#"
-                className="group block rounded-2xl border border-rule bg-surface p-6 transition-shadow hover:shadow-md"
+                className="group block rounded-2xl border border-rule bg-surface p-6"
               >
                 <p className="text-xs uppercase tracking-wider text-red">{p.tag}</p>
-                <h3 className="mt-2 font-display text-xl text-ink transition-colors group-hover:text-red">
+                <h3 className="mt-2 font-display text-xl text-ink">
                   {p.title}
                 </h3>
                 <p className="mt-3 text-sm leading-relaxed text-ink-soft">{p.excerpt}</p>
@@ -133,8 +134,10 @@ export default function JournalPage() {
                   <span className="font-medium text-ink-soft">{p.author}</span>
                   <span>·</span>
                   <span>{p.date}</span>
+                  <span>·</span>
+                  <span className="italic">Coming at launch</span>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         </div>

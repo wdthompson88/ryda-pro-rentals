@@ -275,36 +275,43 @@ export default async function MyVehiclePage({
         </div>
       </Section>
 
-      {/* Settings (Lead Owner only) */}
+      {/* Member proposals (Lead Owner posts on behalf of co-owners) */}
       {isLead && (
-        <Section id="settings" title="Settings · Lead Owner">
+        <Section id="settings" title="Member proposals · Lead Owner">
           <p className="mb-6 inline-block rounded-full bg-red/10 px-3 py-1 text-xs font-medium text-red">
-            ★ Lead Owner controls — visible only to you
+            ★ Lead Owner — your role is to facilitate co-owner votes
+          </p>
+          <p className="mb-6 max-w-2xl text-sm text-ink-soft">
+            As Lead Owner you post proposals on behalf of the LLC's
+            members. Material decisions — booking rules, vehicle
+            modifications, transfers, document additions — go to a
+            co-owner vote per the Operating Agreement. RYDA executes
+            once the vote clears.
           </p>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <SettingCard
-              title="Booking rules"
-              desc="Approval required, max consecutive days, blackout dates, buffer time."
+              title="Propose booking rules"
+              desc="Submit a proposed change (max consecutive days, blackouts, buffer time) for co-owner vote."
             />
             <SettingCard
-              title="Vehicle preferences"
-              desc="Track-day eligibility, fuel policy, delivery options."
+              title="Propose vehicle preferences"
+              desc="Submit changes to track-day eligibility, fuel policy, or delivery defaults for co-owner vote."
             />
             <SettingCard
-              title="Co-owner management"
-              desc="View the LLC member register. Signal intent to transfer your seat."
+              title="LLC member register"
+              desc="View current co-owners. Members signal intent to transfer their own seat individually."
             />
             <SettingCard
               title="Post an update"
-              desc="Send a vehicle update to all co-owners' activity feed."
+              desc="Send a vehicle update to all co-owners' activity feed (informational, no vote required)."
             />
             <SettingCard
-              title="Upload document"
-              desc="Add a doc to the vehicle's Documents tab. Optionally mark as required reading."
+              title="Upload document for review"
+              desc="Add a doc to the vehicle's Documents tab. Required-reading flag goes to a co-owner vote."
             />
             <SettingCard
-              title="Report issue"
-              desc="Escalate a co-owner conflict or vehicle issue to RYDA admin."
+              title="Open a service request"
+              desc="Flag a vehicle issue to RYDA, or escalate a co-owner conflict for mediation."
             />
           </div>
         </Section>

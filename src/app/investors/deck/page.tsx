@@ -291,7 +291,7 @@ function SolutionSlide() {
       <H2>One car. 5–10 co-owners. Member-managed LLC. Real keys.</H2>
       <ol className="mt-12 space-y-4">
         {[
-          ["Source", "RYDA acquires curated supercars in target markets."],
+          ["Source", "RYDA sources curated supercars on behalf of each vehicle LLC in target markets."],
           ["Structure", "Each vehicle = single-purpose Delaware LLC. 5–10 verified members co-own and manage the LLC together."],
           ["Operate", "RYDA contracts with each LLC as a service provider — storage, insurance, maintenance, scheduling, concierge."],
           ["Use", "Members book usage on the RYDA app — ~50 days, ~4,000 mi per seat per year."],
@@ -325,7 +325,7 @@ function WhyNowSlide() {
         />
         <Why
           title="Member-managed LLC"
-          body="Delaware's member-managed LLC framework supports a structurally different product than fractional investment platforms. Members co-own and manage the LLC; RYDA is hired as a service provider. No accreditation gate, no order book, mass-market access. Final structure subject to securities counsel review."
+          body="Delaware's member-managed LLC framework gives members real co-ownership and real authority over their vehicle. Members co-own and manage the LLC; RYDA is hired as a service provider. The product is luxury access — drive the car, share the cost — not investment return."
         />
         <Why
           title="Insurance carriers"
