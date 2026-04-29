@@ -22,10 +22,8 @@ export default function TrustAndSafetyPage() {
             Co-ownership only works if everyone trusts the system.
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
-            Every RYDA vehicle is held by a single-purpose Delaware LLC,
-            insured to agreed value, and operated by vetted members against
-            documented standards. Here's how that holds together — what we
-            verify, what we cover, and what happens when something goes wrong.
+            Vehicles in vetted LLCs. Insurance to agreed value. Members
+            verified before they touch the keys.
           </p>
         </div>
       </section>

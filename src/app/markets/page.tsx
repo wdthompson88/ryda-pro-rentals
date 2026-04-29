@@ -22,10 +22,8 @@ export default function MarketsPage() {
             Co-own the world's most exceptional cars.
           </h1>
           <p className="mt-6 max-w-2xl text-lg text-ink-soft">
-            Each car is held in a Delaware LLC managed by 5–10 verified
-            members. Claim a seat in the LLC, drive up to ~50 days a year
-            depending on the vehicle, transfer to another member after the
-            12-month minimum hold.
+            Claim a seat in any vehicle's Delaware LLC. Drive up to ~50 days
+            a year. Transfer after the 12-month minimum hold.
           </p>
         </div>
       </section>
@@ -172,19 +170,16 @@ export default function MarketsPage() {
 
       {/* Disclaimer */}
       <section className="bg-cream-2">
-        <div className="bg-cream-2 mx-auto max-w-3xl px-6 py-12 text-center text-sm text-ink-soft sm:px-10">
-          <p className="font-medium text-ink">A note on co-ownership.</p>
-          <p className="mt-3">
-            RYDA is a luxury access platform, not an investment product. When
-            you claim a seat in a vehicle, you become a member of that
-            vehicle's Delaware LLC alongside 5–10 other co-owners. The LLC
-            holds title to the car. RYDA operates the car under a separate
-            services agreement. Co-ownership stakes are not registered
-            securities and are not offered for investment purposes.
-          </p>
-          <p className="mt-2 text-xs text-mute">
-            Membership is gated by KYC verification. Co-owners participate
-            in material LLC decisions through the operating agreement.
+        <div className="bg-cream-2 mx-auto max-w-3xl px-6 py-12 text-center text-xs text-mute sm:px-10">
+          <p>
+            RYDA is a luxury access platform. Co-ownership stakes are
+            membership interests in member-managed Delaware LLCs — not
+            registered securities, not offered for investment purposes.
+            See the{" "}
+            <Link href="/legal/disclaimer" className="text-red hover:text-red-deep">
+              Co-Ownership Disclaimer
+            </Link>
+            .
           </p>
         </div>
       </section>

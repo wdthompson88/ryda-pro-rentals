@@ -23,11 +23,8 @@ export default function HowItWorksPage() {
             <span className="italic text-red">a key.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
-            RYDA is a luxury access platform built on real ownership. Each
-            car is held in a Delaware LLC that you and 5–10 other verified
-            members manage together. RYDA is hired as the operations partner
-            via a separate management services agreement. Member-managed
-            governance, real co-ownership, no investment thesis.
+            Each car is held in a Delaware LLC that 5–10 verified members
+            manage together. RYDA is hired as the operations partner.
           </p>
         </div>
       </section>
@@ -52,30 +49,6 @@ export default function HowItWorksPage() {
             <Step n="03" title="Co-own" body="Join the LLC alongside other members. Sign the Operating Agreement and Management Services Agreement. Fund your seat via wire or ACH." />
             <Step n="04" title="Drive" body="Book your time on the RYDA app. Up to ~50 days and ~4,000 miles per seat, per year — exact entitlement depends on the vehicle." />
             <Step n="05" title="Transfer" body="Transfer your seat to another verified member after the 12-month minimum hold. RYDA handles the LLC paperwork. 3% transfer fee." />
-          </div>
-        </div>
-      </section>
-
-      {/* Why this is new */}
-      <section className="border-b border-rule">
-        <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            Why this is new
-          </p>
-          <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
-            What makes RYDA different.
-          </h2>
-          <p className="mt-4 max-w-2xl text-base text-ink-soft">
-            We're not selling timeshares. We're not running a rental
-            marketplace. We're a US member-managed co-ownership
-            platform for exotic vehicles — real ownership, real governance,
-            no investment thesis.
-          </p>
-          <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            <Diff title="Real LLCs" body="Each vehicle is held in a Delaware single-purpose LLC that you and your co-owners manage together. Your membership is recorded in the LLC's signed Operating Agreement and member register." />
-            <Diff title="Member governance" body="You and 5–10 co-owners hold authority over material decisions. RYDA is hired as your service provider, not your decision-maker." />
-            <Diff title="Curated only" body="We hand-select every car. No marketplace listings. No surprises. Quality is consistent across the entire fleet." />
-            <Diff title="Concierge ops" body="Storage, insurance, maintenance, scheduling, white-glove handover — all RYDA via a separate Management Services Agreement. You drive." />
           </div>
         </div>
       </section>
@@ -209,15 +182,6 @@ export default function HowItWorksPage() {
         </div>
       </section>
     </>
-  );
-}
-
-function Diff({ title, body }: { title: string; body: string }) {
-  return (
-    <div className="rounded-2xl border border-rule bg-surface p-6">
-      <p className="font-display text-lg text-ink">{title}</p>
-      <p className="mt-3 text-sm leading-relaxed text-ink-soft">{body}</p>
-    </div>
   );
 }
 

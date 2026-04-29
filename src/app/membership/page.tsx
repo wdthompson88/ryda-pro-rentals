@@ -101,10 +101,7 @@ export default function MembershipPage() {
             <span className="italic text-red">Pick the one that fits.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
-            Core is free and gets you the full platform. Blue is for the
-            active member who wants priority and member-only access at a
-            sane price. Black is for the driver who wants every concierge
-            convenience built in.
+            Core to browse and rent. Blue or Black to claim a seat.
           </p>
         </div>
       </section>
@@ -201,18 +198,9 @@ export default function MembershipPage() {
         <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10">
           <h2 className="font-display text-3xl text-ink sm:text-4xl">Who can join?</h2>
           <ul className="mt-8 space-y-4 text-base text-ink-soft">
-            <Bullet>28 years or older</Bullet>
-            <Bullet>Valid US driver's license, clean recent driving record</Bullet>
+            <Bullet>28 or older with a valid US driver's license and clean recent record</Bullet>
             <Bullet>Pass identity verification (KYC)</Bullet>
-            <Bullet>
-              No accredited-investor status or financial qualification
-              required — RYDA is a luxury access platform, not an investment
-              platform
-            </Bullet>
-            <Bullet>
-              No requirement to claim a co-ownership seat — Core members
-              are welcome to browse and rent only
-            </Bullet>
+            <Bullet>No accredited-investor status required</Bullet>
           </ul>
         </div>
       </section>
@@ -245,25 +233,23 @@ function TierCard({ tier }: { tier: typeof TIERS[number] }) {
   const isBlue = tier.key === "blue";
   const isBlack = tier.key === "black";
 
-  // Pull the items that this tier wins on (true / non-empty value)
-  const highlights = FEATURES.flatMap((g) =>
-    g.items.filter((i) => i[tier.key] !== false).slice(0, 0),
-  );
-
-  // Show top 6 things this tier gets that the lower tier doesn't.
+  // For each tier, show the upgrades over the previous tier.
+  // - Blue: anything Blue has that Core doesn't (or improves on)
+  // - Black: anything Black has that Blue doesn't (or improves on)
+  // - Core: the universal baseline features
   const above = isBlack ? "blue" : isBlue ? "core" : null;
-  const exclusiveTop6 = above
-    ? FEATURES.flatMap((g) =>
-        g.items.filter(
-          (i) => i[tier.key] !== false && i[above] === false,
-        ),
-      ).slice(0, 6)
-    : null;
 
-  // For Core, just list the universal features (everyone gets these)
-  const coreFeatures = !above
-    ? FEATURES[0].items.filter((i) => i.core === true).slice(0, 5)
-    : null;
+  function isUpgrade(item: { core: CellValue; blue: CellValue; black: CellValue }) {
+    if (!above) return item.core === true; // Core: just list what everyone gets
+    const my = item[tier.key];
+    const prev = item[above];
+    if (my === false) return false;
+    // Either prev was a hard `false`, or my value is a *better* string than prev's.
+    return prev === false || (my !== prev);
+  }
+
+  const items = FEATURES.flatMap((g) => g.items.filter(isUpgrade)).slice(0, 7);
+  const previousLabel = isBlack ? "Everything in Blue, plus" : isBlue ? "Everything in Core, plus" : null;
 
   const bg = isBlack
     ? "bg-ink text-cream"
@@ -298,8 +284,14 @@ function TierCard({ tier }: { tier: typeof TIERS[number] }) {
       </p>
       <p className={`mt-3 text-sm ${sub}`}>{tier.tagline}</p>
 
-      <ul className="mt-8 flex-1 space-y-3 text-sm">
-        {(coreFeatures || exclusiveTop6 || []).map((f) => (
+      {previousLabel && (
+        <p className={`mt-8 text-xs font-medium uppercase tracking-wider ${sub}`}>
+          {previousLabel}
+        </p>
+      )}
+
+      <ul className={`${previousLabel ? "mt-3" : "mt-8"} flex-1 space-y-3 text-sm`}>
+        {items.map((f) => (
           <li key={f.label} className="flex items-start gap-3">
             <span className="mt-1 text-red">✓</span>
             <span>

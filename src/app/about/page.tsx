@@ -22,10 +22,7 @@ export default function AboutPage() {
             We're building the supercar market that should already exist.
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
-            For decades, owning an exotic car has been all-or-nothing —
-            a $300,000 cash commitment and $80,000 a year in costs. Or worse,
-            renting one for a weekend at $5,000/day with no equity, no community,
-            and no priority access. RYDA is the third option.
+            Owning is all-or-nothing. Renting is hollow. RYDA is the third option.
           </p>
         </div>
       </section>
@@ -34,39 +31,22 @@ export default function AboutPage() {
       <section className="border-b border-rule">
         <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10 sm:py-24">
           <h2 className="font-display text-3xl text-ink sm:text-4xl">Our story</h2>
-          <div className="mt-8 space-y-6 text-base leading-relaxed text-ink-soft">
+          <div className="mt-8 space-y-5 text-base leading-relaxed text-ink-soft">
             <p>
-              RYDA started in Florida. Ryan and Dave had rented a Lamborghini
-              for the weekend, and by Sunday night they were running the math
-              on what it would cost to actually own one. Solo, the numbers
-              never worked. Renting was expensive and hollow. Something was
-              missing in the middle.
+              RYDA started in Florida. Ryan and Dave rented a Lamborghini for
+              a weekend and ran the numbers on Sunday night: solo ownership
+              was unworkable, renting was hollow.
             </p>
             <p>
-              In Europe, that middle ground exists. Companies like Supercar
-              Sharing AG in Switzerland have spent a decade proving that
-              structured co-ownership of supercars works — legally,
-              operationally, and as a community. Thousands of European
-              enthusiasts co-own Ferraris, Lamborghinis, and McLarens. None of
-              it existed in the US.
+              In Europe, that middle ground exists. Supercar Sharing AG has
+              spent a decade proving structured supercar co-ownership works.
+              Thousands of European enthusiasts co-own Ferraris, Lamborghinis,
+              and McLarens. None of it existed in the US.
             </p>
             <p>
-              We built RYDA to fill that gap. A member-managed, concierge-
-              operated co-ownership platform for the US market. We took the
-              best of what works in Europe and rebuilt it for American legal
-              structures (Delaware member-managed LLCs), American lifestyles,
-              and the markets where the demand is concentrated.
-            </p>
-            <p>
-              We launched in Miami first because it is the most natural
-              starting point: the highest per-capita luxury auto ownership in
-              the country, no state income tax, F1 Grand Prix and Art Basel,
-              and a year-round driving culture.
-            </p>
-            <p>
-              Our goal is simple: make ownership of extraordinary vehicles
-              possible for more enthusiasts — responsibly, transparently, and
-              with a community-first experience.
+              We built RYDA to fill that gap — member-managed Delaware LLCs,
+              concierge ops, US markets. Miami first: highest per-capita
+              luxury auto density, no state income tax, year-round driving.
             </p>
           </div>
         </div>

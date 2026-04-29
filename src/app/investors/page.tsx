@@ -81,26 +81,15 @@ export default function InvestorsPage() {
           <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
             All-or-nothing supercar ownership.
           </h2>
-          <div className="mt-8 space-y-6 text-base leading-relaxed text-ink-soft">
+          <div className="mt-8 space-y-5 text-base leading-relaxed text-ink-soft">
             <p>
-              A 2024 Ferrari 296 GTB costs $320,000 to buy and $80,000+ a
-              year in carrying costs. For the overwhelming majority of
-              people who want to drive one, this math has never worked.
+              Buying a Ferrari outright: $320K + $80K/yr in carrying. Renting
+              at $2,500–5,000/day: no priority, no community, no ownership.
             </p>
             <p>
-              The alternative — renting at $2,500 to $5,000 per day —
-              offers no priority, no community, inconsistent vehicle
-              quality, and no real ownership. It is transactional and
-              forgettable.
-            </p>
-            <p>
-              Member-managed access has matured into a billion-dollar
-              category in private aviation (NetJets jet card), luxury
-              hospitality (Soho House, Equinox Black), and country clubs.
-              No US platform has built the equivalent for exotic vehicles.
-              RYDA fills that gap with a real-ownership structure: each
-              car is held in a Delaware LLC that 5–10 verified members
-              manage together.
+              Member-managed access has scaled to billions in jets (NetJets),
+              hospitality (Soho House), and clubs. No US platform has built
+              the equivalent for supercars. RYDA fills that gap.
             </p>
           </div>
         </div>

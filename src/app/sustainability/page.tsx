@@ -23,10 +23,8 @@ export default function SustainabilityPage() {
             <span className="italic text-red">One Ferrari.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
-            We're not pretending RYDA is a climate solution. But the math
-            is honest: when six members share one car instead of six members
-            each buying their own, fewer vehicles are manufactured, fewer
-            sit idle, and the cars that exist actually get driven.
+            Not a climate solution. But the math is honest: six members
+            sharing one car beats six cars sitting idle in six garages.
           </p>
         </div>
       </section>
