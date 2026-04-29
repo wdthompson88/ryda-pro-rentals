@@ -132,7 +132,7 @@ export default function MemberProtectionPage() {
             />
             <Case
               q="Can RYDA change the management fee or terms unilaterally?"
-              a="No. The 12% annual management fee is set in the Management Services Agreement at LLC formation. RYDA cannot raise it without member approval. The agreement can be renewed or terminated by member vote per the Operating Agreement. If members vote to terminate, RYDA exits and the members can hire a new service provider (or self-manage)."
+              a="No. The annual all-in management fee (~7–9% of vehicle value, depending on the model) is set in the Management Services Agreement at LLC formation. RYDA cannot raise it without member approval. The agreement can be renewed or terminated by member vote per the Operating Agreement. If members vote to terminate, RYDA exits and the members can hire a new service provider (or self-manage)."
             />
           </div>
         </div>

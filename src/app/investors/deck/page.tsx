@@ -354,8 +354,8 @@ function ModelSlide() {
       <ul className="mt-12 space-y-3 text-sm">
         <Rev
           line="Vehicle Management Fee"
-          rate="12%"
-          detail="Of vehicle value/yr, charged to LLC. Primary recurring revenue."
+          rate="~7–9%"
+          detail="Of vehicle value/yr, all-in (RYDA service + pass-through). Charged to LLC. Primary recurring revenue."
         />
         <Rev
           line="Membership"

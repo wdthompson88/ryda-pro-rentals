@@ -6,15 +6,17 @@ import { formatUSD } from "@/lib/market-data";
 export const metadata = {
   title: "Compare — RYDA",
   description:
-    "Honest math: RYDA co-ownership vs solo ownership vs daily rental vs supercar club. Side-by-side, no fine print.",
+    "Honest math: RYDA co-ownership vs regular ownership vs daily rental vs supercar club. Side-by-side, no fine print.",
 };
 
 // Anchor numbers for the comparison. Tied to the Ferrari 296 GTB illustration
 // used elsewhere on the site so the doctrine stays consistent.
 const STICKER = 340_000;
-const CARRYING_SOLO = 46_000; // insurance + storage + maintenance + depreciation reserve
-const RENTAL_DAILY = 2_500;
-const CLUB_ANNUAL = 95_000; // representative annual fee for a UK / EU supercar club
+const CARRYING_REGULAR = 46_000; // insurance + storage + maintenance + depreciation reserve
+const RENTAL_DAILY = 2_400; // matches F296 published rental rate
+// Mid-tier US/UK supercar club (e.g. Freedom Supercars Diamond, Premier
+// Auto Club). Range across the category is ~$30K–$80K depending on tier.
+const CLUB_ANNUAL = 48_000;
 const CLUB_DAYS_INCLUDED = 30;
 
 const RYDA_SHARE_BUYIN = 34_000;
@@ -25,7 +27,7 @@ const ASSUMED_DRIVE_DAYS = 34;
 
 type Row = {
   label: string;
-  solo: string;
+  regular: string;
   rental: string;
   club: string;
   ryda: string;
@@ -35,36 +37,36 @@ type Row = {
 const ROWS: Row[] = [
   {
     label: "Up-front cost",
-    solo: formatUSD(STICKER),
+    regular: formatUSD(STICKER),
     rental: "$0",
     club: formatUSD(CLUB_ANNUAL) + " (annual)",
     ryda: formatUSD(RYDA_SHARE_BUYIN),
   },
   {
     label: "Annual carrying / fees",
-    solo: formatUSD(CARRYING_SOLO),
+    regular: formatUSD(CARRYING_REGULAR),
     rental: "—",
     club: "Included",
     ryda: formatUSD(RYDA_ANNUAL_OPS),
   },
   {
     label: "Days of access per year",
-    solo: "365 (in theory)",
+    regular: "365 (in theory)",
     rental: "Pay-per-day",
     club: `~${CLUB_DAYS_INCLUDED}`,
     ryda: `~${RYDA_DAYS} per share (hold 1–10)`,
   },
   {
-    label: "Year 1 cash, 34 days driven",
-    solo: formatUSD(STICKER + CARRYING_SOLO),
+    label: "Year 1 spend, 34 days driven",
+    regular: formatUSD(STICKER + CARRYING_REGULAR),
     rental: formatUSD(RENTAL_DAILY * ASSUMED_DRIVE_DAYS),
     club: formatUSD(CLUB_ANNUAL),
     ryda: formatUSD(RYDA_SHARE_BUYIN + RYDA_ANNUAL_OPS),
     emphasis: true,
   },
   {
-    label: "Effective $/day, year 1 cash",
-    solo: formatUSD(Math.round((STICKER + CARRYING_SOLO) / ASSUMED_DRIVE_DAYS)),
+    label: "Effective $/day, year 1",
+    regular: formatUSD(Math.round((STICKER + CARRYING_REGULAR) / ASSUMED_DRIVE_DAYS)),
     rental: formatUSD(RENTAL_DAILY),
     club: formatUSD(Math.round(CLUB_ANNUAL / CLUB_DAYS_INCLUDED)),
     ryda: formatUSD(
@@ -73,7 +75,7 @@ const ROWS: Row[] = [
   },
   {
     label: "Effective $/day, ops only (after Y1)",
-    solo: formatUSD(Math.round(CARRYING_SOLO / ASSUMED_DRIVE_DAYS)),
+    regular: formatUSD(Math.round(CARRYING_REGULAR / ASSUMED_DRIVE_DAYS)),
     rental: formatUSD(RENTAL_DAILY),
     club: formatUSD(Math.round(CLUB_ANNUAL / CLUB_DAYS_INCLUDED)),
     ryda: formatUSD(Math.round(RYDA_ANNUAL_OPS / RYDA_DAYS)),
@@ -81,56 +83,56 @@ const ROWS: Row[] = [
   },
   {
     label: "Real ownership stake",
-    solo: "Yes — 100%",
+    regular: "Yes — 100%",
     rental: "No",
     club: "No",
     ryda: "Yes — LLC member",
   },
   {
     label: "Operational burden",
-    solo: "All of it",
+    regular: "All of it",
     rental: "None (reservation only)",
     club: "None",
     ryda: "None (concierge ops)",
   },
   {
     label: "Liquidity / exit",
-    solo: "Sell privately or to dealer",
+    regular: "Sell privately or to dealer",
     rental: "Walk away",
     club: "Cancel renewal",
     ryda: "Transfer share after 12-month hold (3% fee)",
   },
   {
     label: "Insurance + maintenance bundled",
-    solo: "No",
+    regular: "No",
     rental: "Yes",
     club: "Yes",
     ryda: "Yes",
   },
   {
     label: "Pick a different car each trip",
-    solo: "No",
+    regular: "No",
     rental: "Yes",
     club: "Yes (rotating)",
     ryda: "Not within one share — hold shares across multiple LLCs",
   },
   {
     label: "Booking priority on the vehicle",
-    solo: "100% — it's yours",
+    regular: "100% — it's yours",
     rental: "First-come-first-served",
     club: "Calendar-based (limited)",
     ryda: "Pro-rata to your share count",
   },
   {
     label: "Damage / deductible exposure",
-    solo: "All of it",
+    regular: "All of it",
     rental: "Per-rental deductible (varies)",
     club: "Capped per booking",
     ryda: "Low deductible; LLC absorbs at-fault below threshold",
   },
   {
     label: "Tax / title / admin friction",
-    solo: "On you",
+    regular: "On you",
     rental: "None",
     club: "None",
     ryda: "On the LLC; RYDA handles paperwork",
@@ -172,7 +174,7 @@ export default function ComparePage() {
                 <thead className="border-b border-rule bg-cream-2 text-xs font-medium uppercase tracking-wider text-ink-soft">
                   <tr>
                     <th className="px-6 py-5 text-left">&nbsp;</th>
-                    <th className="px-6 py-5 text-right">Solo ownership</th>
+                    <th className="px-6 py-5 text-right">Regular ownership</th>
                     <th className="px-6 py-5 text-right">Daily rental</th>
                     <th className="px-6 py-5 text-right">Supercar club</th>
                     <th className="px-6 py-5 text-right text-red">RYDA</th>
@@ -200,7 +202,7 @@ export default function ComparePage() {
                           r.emphasis ? "font-display text-base text-ink" : ""
                         }`}
                       >
-                        {r.solo}
+                        {r.regular}
                       </td>
                       <td
                         className={`px-6 py-4 text-right tabular-nums ${
@@ -235,11 +237,11 @@ export default function ComparePage() {
             Numbers shown for illustration on the Ferrari 296 GTB at $340K
             sticker, modeled around a single co-ownership share. Multi-share
             holders scale linearly: a 5-share holder pays ~$170K up front +
-            ~$35K/yr in ops for ~170 days/yr; a 10-share holder is
-            essentially a solo owner at ~$340K + $71K/yr. Solo carrying
+            ~$35K/yr in ops for ~170 days/yr. Regular-ownership carrying
             assumes industry averages for insurance, storage, maintenance,
-            and depreciation reserve. Club figure represents a typical UK /
-            EU supercar club annual membership; US clubs vary. Daily rental
+            and depreciation reserve (range: $40–80K/yr depending on the
+            car). Club figure represents a mid-tier US/UK supercar club
+            annual membership; tiers run ~$30K–$80K/yr. Daily rental
             assumes Miami market rate for a base 296 GTB.
           </p>
         </div>
@@ -258,8 +260,8 @@ export default function ComparePage() {
 
           <div className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-4">
             <Take
-              title="Solo ownership"
-              good="You'd drive 60+ days a year, you love the operational responsibility (storage, insurance, maintenance, registration), and you have the capital and tolerance for $80K+/yr in carrying."
+              title="Regular ownership"
+              good="You'd drive 60+ days a year, you love the operational responsibility (storage, insurance, maintenance, registration), and you have the capital and tolerance for $40–80K/yr in carrying."
               tradeoff="The asset sits idle 90% of the time. Carrying costs accrue whether you drive or not. Selling takes weeks to months."
             />
             <Take
@@ -296,17 +298,19 @@ export default function ComparePage() {
               That's roughly $7,080 ÷ 34 days.
             </p>
             <p>
-              Year 1 looks different because the buy-in is real cash. With
-              acquisition + ops, year-one cash on a 1-of-10 share is around
-              $42,000, or ~$1,235 per driving day if you actually drive 34.
-              That's still ~50% under daily rental ($2,500/day for the same
-              34 days = $85,000) — and you exit with a transferable share, not
-              a stack of receipts.
+              Year 1 looks different because the buy-in is real cash. $34K
+              share + $7,080 ops + $1,500 closing fee = ~$42,580 spent. At
+              34 days driven that's ~$1,250 per driving day in Year 1 —
+              still roughly half the cost of renting the same Ferrari for
+              34 days ($2,400/day × 34 = $81,600). And you exit with a
+              transferable share, not receipts.
             </p>
             <p>
               At year 3, assuming you transfer your share at ~80% of buy-in
-              (typical for CPO-warranty exotics over a 24-36 month hold), the
-              economic cost works out to roughly $560 per driving day all-in.
+              (typical for CPO-warranty exotics over a 24–36 month hold),
+              the math: $34K buy-in + $7,080 × 3 yr ops = $55,240 spent;
+              recover $27,200 at exit; net economic cost ~$28,040 over
+              102 driving days = ~<strong>$275 per driving day</strong>.
               That's the apples-to-apples number to use against rental.
             </p>
           </div>

@@ -40,6 +40,15 @@ export function CompareCalculator() {
     // Rental: pay-per-day for the same total days
     const rentalCost = rentalDaily * totalDays;
 
+    // Regular ownership: same hold period, full sticker + carrying.
+    // Apply the same residual % the user picked — depreciation hits the
+    // whole car, not just one share.
+    const regularBuyIn = vehicle.fullPrice;
+    const regularAnnualCarrying = vehicle.annualSoloCarrying;
+    const regularTotalCash = regularBuyIn + regularAnnualCarrying * holdYears;
+    const regularResidual = Math.round(regularBuyIn * (residualPct / 100));
+    const regularEconomicCost = regularTotalCash - regularResidual;
+
     // Utilization — how much of the entitled days you'd actually use
     const utilizationPct =
       maxDays === 0 ? 0 : Math.round((cappedDays / maxDays) * 100);
@@ -61,11 +70,29 @@ export function CompareCalculator() {
       total: rentalCost,
       perDay: rentalDaily,
     };
+    const regular = {
+      buyIn: regularBuyIn,
+      annualCarrying: regularAnnualCarrying,
+      totalCash: regularTotalCash,
+      residual: regularResidual,
+      economicCost: regularEconomicCost,
+      perDayEconomic:
+        totalDays === 0 ? 0 : Math.round(regularEconomicCost / totalDays),
+    };
 
     const savings = rental.total - ryda.economicCost;
     const savingsPct = rental.total === 0 ? 0 : Math.round((savings / rental.total) * 100);
+    const savingsVsRegular = regular.economicCost - ryda.economicCost;
 
-    return { ryda, rental, savings, savingsPct, cappedDays };
+    return {
+      ryda,
+      rental,
+      regular,
+      savings,
+      savingsPct,
+      savingsVsRegular,
+      cappedDays,
+    };
   }, [vehicle, safeShares, days, holdYears, residualPct, maxDays]);
 
   return (
@@ -167,36 +194,57 @@ export function CompareCalculator() {
         />
       </div>
 
-      {/* Results */}
-      <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <ResultCard
-          label="RYDA cash outlay"
-          value={formatUSD(numbers.ryda.totalCash)}
-          sub={`${formatUSD(numbers.ryda.buyIn)} buy-in + ${formatUSD(
-            numbers.ryda.annualOps,
-          )}/yr × ${holdYears}`}
-        />
-        <ResultCard
-          label="RYDA economic cost"
-          value={formatUSD(numbers.ryda.economicCost)}
-          sub={`After ${formatUSD(numbers.ryda.residual)} residual at exit`}
-          accent
-        />
-        <ResultCard
-          label="Renting same days"
-          value={formatUSD(numbers.rental.total)}
-          sub={`${formatUSD(numbers.rental.perDay)}/day × ${
-            numbers.ryda.totalDays
-          } days`}
-        />
+      {/* Results — RYDA */}
+      <div className="mt-12">
+        <p className="text-xs font-medium uppercase tracking-wider text-mute">
+          RYDA — your share{safeShares > 1 ? "s" : ""}
+        </p>
+        <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <ResultCard
+            label="Total RYDA cost"
+            value={formatUSD(numbers.ryda.totalCash)}
+            sub={`${formatUSD(numbers.ryda.buyIn)} buy-in + ${formatUSD(
+              numbers.ryda.annualOps,
+            )}/yr × ${holdYears}`}
+          />
+          <ResultCard
+            label="RYDA economic cost"
+            value={formatUSD(numbers.ryda.economicCost)}
+            sub={`After ${formatUSD(numbers.ryda.residual)} residual at exit`}
+            accent
+          />
+        </div>
       </div>
 
-      <div className="mt-6 rounded-2xl border border-rule bg-cream-2/40 p-6">
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
+      {/* Results — alternatives */}
+      <div className="mt-8">
+        <p className="text-xs font-medium uppercase tracking-wider text-mute">
+          The alternatives, same {numbers.ryda.totalDays} driving days
+        </p>
+        <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <ResultCard
+            label="Regular ownership"
+            value={formatUSD(numbers.regular.economicCost)}
+            sub={`${formatUSD(numbers.regular.buyIn)} sticker + ${formatUSD(
+              numbers.regular.annualCarrying,
+            )}/yr carrying × ${holdYears}, less ${formatUSD(numbers.regular.residual)} residual`}
+          />
+          <ResultCard
+            label="Renting the same days"
+            value={formatUSD(numbers.rental.total)}
+            sub={`${formatUSD(numbers.rental.perDay)}/day × ${
+              numbers.ryda.totalDays
+            } days`}
+          />
+        </div>
+      </div>
+
+      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="rounded-2xl border border-rule bg-cream-2/40 p-6">
           <p className="text-xs font-medium uppercase tracking-wider text-mute">
-            Versus renting
+            Saved vs. renting
           </p>
-          <p className="font-display text-3xl text-ink sm:text-4xl">
+          <p className="mt-2 font-display text-3xl text-ink sm:text-4xl tabular-nums">
             {numbers.savings >= 0 ? "" : "−"}
             {formatUSD(Math.abs(numbers.savings))}
             <span className="ml-2 text-base text-ink-soft">
@@ -204,32 +252,50 @@ export function CompareCalculator() {
               {numbers.savingsPct}%)
             </span>
           </p>
-        </div>
-        <p className="mt-3 text-sm text-ink-soft">
-          Effective cost per driving day:{" "}
-          <span className="font-medium text-ink tabular-nums">
-            {formatUSD(numbers.ryda.perDayEconomic)}
-          </span>{" "}
-          on RYDA vs.{" "}
-          <span className="font-medium text-ink tabular-nums">
-            {formatUSD(numbers.rental.perDay)}
-          </span>{" "}
-          renting. Numbers assume you transfer your shares at the residual you
-          set above; actual exits depend on member-to-member negotiation.
-        </p>
-        {numbers.ryda.unusedDaysPerYear > 0 && numbers.ryda.utilizationPct < 80 && (
-          <p className="mt-3 rounded-xl border border-rule bg-cream-2/60 p-3 text-xs text-ink-soft">
-            <span className="font-medium text-ink">Heads up:</span> at{" "}
-            {numbers.ryda.utilizationPct}% utilization, you'd leave{" "}
-            <span className="tabular-nums">
-              {numbers.ryda.unusedDaysPerYear}
-            </span>{" "}
-            entitled days/yr unused. RYDA still wins on cost per actually-driven
-            day, but if your real usage is much lower than your share count
-            unlocks, fewer shares is the more honest economic answer.
+          <p className="mt-3 text-xs text-ink-soft">
+            <span className="font-medium text-ink tabular-nums">
+              {formatUSD(numbers.ryda.perDayEconomic)}
+            </span>
+            /day on RYDA vs.{" "}
+            <span className="font-medium text-ink tabular-nums">
+              {formatUSD(numbers.rental.perDay)}
+            </span>
+            /day renting.
           </p>
-        )}
+        </div>
+        <div className="rounded-2xl border border-rule bg-cream-2/40 p-6">
+          <p className="text-xs font-medium uppercase tracking-wider text-mute">
+            Saved vs. regular ownership
+          </p>
+          <p className="mt-2 font-display text-3xl text-ink sm:text-4xl tabular-nums">
+            {numbers.savingsVsRegular >= 0 ? "" : "−"}
+            {formatUSD(Math.abs(numbers.savingsVsRegular))}
+          </p>
+          <p className="mt-3 text-xs text-ink-soft">
+            You give up {(100 - safeShares * 10).toFixed(0)}% of access in
+            exchange for {(100 - safeShares * 10).toFixed(0)}% less capital
+            tied up in the asset.
+          </p>
+        </div>
       </div>
+
+      <p className="mt-4 text-xs text-mute">
+        Numbers assume you transfer your shares at the residual you set
+        above; actual exits depend on member-to-member negotiation.
+      </p>
+
+      {numbers.ryda.unusedDaysPerYear > 0 && numbers.ryda.utilizationPct < 80 && (
+        <p className="mt-4 rounded-xl border border-rule bg-cream-2/60 p-4 text-xs text-ink-soft">
+          <span className="font-medium text-ink">Heads up:</span> at{" "}
+          {numbers.ryda.utilizationPct}% utilization, you'd leave{" "}
+          <span className="tabular-nums">
+            {numbers.ryda.unusedDaysPerYear}
+          </span>{" "}
+          entitled days/yr unused. RYDA still wins on cost per actually-driven
+          day, but if your real usage is much lower than your share count
+          unlocks, fewer shares is the more honest economic answer.
+        </p>
+      )}
     </div>
   );
 }

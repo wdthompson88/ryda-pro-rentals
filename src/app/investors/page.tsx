@@ -127,7 +127,7 @@ export default function InvestorsPage() {
           <ul className="mt-10 space-y-4 text-sm">
             <Revenue
               line="Vehicle Management Fee"
-              detail="12% of vehicle value/year, charged to the LLC. On a $340K vehicle: $40,800/year."
+              detail="All-in annual fee charged to the LLC, covering RYDA's service component plus pass-through costs (insurance, storage, scheduled maintenance, reserves). Range: ~7–9% of vehicle value depending on the model. On a $340K Ferrari with 10 shares: ~$7,080 per share per year ($70,800 LLC total)."
               tag="Primary · Recurring"
             />
             <Revenue

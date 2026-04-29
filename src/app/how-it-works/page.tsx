@@ -87,11 +87,12 @@ export default function HowItWorksPage() {
             </table>
           </div>
           <p className="mt-4 text-center text-xs text-mute">
-            Numbers shown for illustration. Final pricing varies by vehicle. The
-            LLC pays a 12% annual management fee bundled into its operating
-            budget; what you see above is the per-share allocation. The fleet
-            calendar reserves 25 days/yr per vehicle for service and downtime
-            (10 shares × 34 days = 340 days used; 365 − 340 = 25).
+            Numbers shown for illustration. Final pricing varies by vehicle.
+            The all-in annual contribution covers RYDA's service component
+            plus pass-through insurance, storage, maintenance, and reserves
+            (combined: ~7–9% of vehicle value). The fleet calendar reserves
+            25 days/yr per vehicle for service and downtime (10 shares × 34
+            days = 340 days used; 365 − 340 = 25).
           </p>
         </div>
       </section>
@@ -113,18 +114,20 @@ export default function HowItWorksPage() {
               after the buy-in is amortized.
             </p>
             <p>
-              Year 1 includes the buy-in as real cash. With acquisition + ops,
-              Year-1 cash on a 1-of-10 share is roughly $42,000, or $1,235 per
-              driving day if you actually drive 34. Still ~50% under daily
-              rental ($2,500/day for 34 days = $85,000) — and you exit with a
+              Year 1 includes the buy-in as real cash. $34K share + $7,080
+              ops + $1,500 closing = ~$42,580 spent. If you drive your full
+              34-day entitlement, that's ~$1,250 per day in Year 1 — still
+              roughly half the cost of renting the same Ferrari for the
+              same 34 days ($2,400/day × 34 = $81,600), and you exit with a
               transferable share, not a stack of receipts.
             </p>
             <p>
               At year 3, assuming you transfer your share at ~80% of buy-in
-              (typical for CPO-warranty exotics over a 24–36 month hold), the
-              economic cost of co-ownership works out to roughly $560 per
-              driving day all-in. That is the apples-to-apples number to
-              use against rental.
+              (CPO-warranty Ferraris typically transfer in this range over a
+              24–36 month hold), the math: $34K + $7,080 × 3 = $55,240 spent;
+              recover $27,200 at exit; net economic cost ~$28,040 over 102
+              driving days = <strong>~$275 per driving day</strong>. That's
+              the apples-to-apples number to use against rental.
             </p>
           </div>
           <Link

@@ -15,6 +15,7 @@ export type Vehicle = {
   sharesAvailable: number; // shares available right now
   pricePerShare: number;   // current per-share buy-in
   annualOpCost: number;    // per share all-in annual contribution
+  annualSoloCarrying: number; // industry-typical carrying cost for solo ownership of this vehicle (insurance + storage + maintenance + depreciation reserve)
   daysPerYear: number;     // entitlement
   milesPerYear: number;    // entitlement
   effectiveDailyCost: number;
@@ -51,6 +52,7 @@ export const VEHICLES: Vehicle[] = [
     sharesAvailable: 4,
     pricePerShare: 34_000,
     annualOpCost: 7_080,
+    annualSoloCarrying: 46_000,
     daysPerYear: 34,
     milesPerYear: 4_000,
     effectiveDailyCost: 208,
@@ -81,8 +83,9 @@ export const VEHICLES: Vehicle[] = [
     fullPrice: 900_000,
     shares: 10,
     sharesAvailable: 3,
-    pricePerShare: 99_000,
+    pricePerShare: 90_000,
     annualOpCost: 14_200,
+    annualSoloCarrying: 48_000,
     daysPerYear: 34,
     milesPerYear: 2_500,
     effectiveDailyCost: 418,
@@ -115,6 +118,7 @@ export const VEHICLES: Vehicle[] = [
     sharesAvailable: 7,
     pricePerShare: 37_600,
     annualOpCost: 6_900,
+    annualSoloCarrying: 50_000,
     daysPerYear: 34,
     milesPerYear: 4_000,
     effectiveDailyCost: 203,
@@ -148,6 +152,7 @@ export const VEHICLES: Vehicle[] = [
     sharesAvailable: 4,
     pricePerShare: 48_000,
     annualOpCost: 11_840,
+    annualSoloCarrying: 58_000,
     daysPerYear: 34,
     milesPerYear: 3_000,
     effectiveDailyCost: 348,
@@ -181,6 +186,7 @@ export const VEHICLES: Vehicle[] = [
     sharesAvailable: 0,
     pricePerShare: 51_000,
     annualOpCost: 10_560,
+    annualSoloCarrying: 36_000,
     daysPerYear: 34,
     milesPerYear: 3_000,
     effectiveDailyCost: 311,
@@ -212,8 +218,9 @@ export const VEHICLES: Vehicle[] = [
     fullPrice: 1_190_000,
     shares: 10,
     sharesAvailable: 5,
-    pricePerShare: 130_900,
+    pricePerShare: 119_000,
     annualOpCost: 26_580,
+    annualSoloCarrying: 62_000,
     daysPerYear: 34,
     milesPerYear: 2_000,
     effectiveDailyCost: 782,

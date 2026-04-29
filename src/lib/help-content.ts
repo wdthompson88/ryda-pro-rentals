@@ -324,7 +324,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Management Services Agreement (MSA)" },
           {
             type: "p",
-            text: "The MSA is between the LLC and RYDA. It defines the services RYDA provides — storage, insurance procurement, scheduling, maintenance, concierge, member services — and the 12% annual management fee charged to the LLC. RYDA is a service provider engaged by the LLC's members, not a manager of the LLC itself. The MSA can be renewed or terminated by member vote per the Operating Agreement.",
+            text: "The MSA is between the LLC and RYDA. It defines the services RYDA provides — storage, insurance procurement, scheduling, maintenance, concierge, member services — and the all-in annual management fee charged to the LLC (~7–9% of vehicle value, covering RYDA's service component plus pass-through costs). RYDA is a service provider engaged by the LLC's members, not a manager of the LLC itself. The MSA can be renewed or terminated by member vote per the Operating Agreement.",
           },
           { type: "h3", text: "Annual documents" },
           {
@@ -496,9 +496,9 @@ export const HELP: HelpCategory[] = [
         slug: "whole-vs-fractional",
         q: "How does this compare to buying a car outright?",
         summary:
-          "You give up exclusive use, but cut your one-time outlay 6×, eliminate operational overhead entirely, and avoid the carrying-cost math of solo ownership. Works for people who'd drive an exotic less than 50–80 days a year.",
+          "You give up exclusive use, but cut your one-time spend ~10×, eliminate operational overhead entirely, and avoid the carrying-cost math of regular ownership. Works for people who'd drive an exotic less than 50–80 days a year.",
         body: [
-          { type: "h3", text: "Capital outlay" },
+          { type: "h3", text: "Up-front cost" },
           {
             type: "p",
             text: "A solo Ferrari 296 GTB is $340,000 plus tax (~$365K all-in). A 1/10 share is roughly $34,000. Same vehicle, ten times less up-front cost. Either way, the car depreciates — co-ownership just lets you split the depreciation with the rest of the LLC's members.",
@@ -550,7 +550,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Why it doesn't disrupt operations" },
           {
             type: "p",
-            text: "RYDA maintains a vehicle-level operating reserve at the LLC (built into the 12% management fee) that covers ongoing operating costs during a delinquency-and-cure cycle. So while the legal process plays out, the vehicle stays insured, stored, and bookable for the other co-owners.",
+            text: "RYDA maintains a vehicle-level operating reserve at the LLC (built into the annual management fee) that covers ongoing operating costs during a delinquency-and-cure cycle. So while the legal process plays out, the vehicle stays insured, stored, and bookable for the other co-owners.",
           },
           {
             type: "callout",
@@ -1194,11 +1194,11 @@ export const HELP: HelpCategory[] = [
         slug: "who-pays",
         q: "Who pays for routine service?",
         summary:
-          "Routine maintenance is paid from the LLC's annual reserve, funded by the 12% vehicle management fee. No surprise bills.",
+          "Routine maintenance is paid from the LLC's annual reserve, funded by the all-in annual management fee. No surprise bills.",
         body: [
           {
             type: "p",
-            text: "Routine maintenance is fully covered by the 12% annual management fee (charged to the LLC, not directly to members). The fee is set high enough to cover:",
+            text: "Routine maintenance is fully covered by the annual all-in management fee (charged to the LLC, not directly to members). The fee is set high enough to cover:",
           },
           {
             type: "ul",
@@ -1223,7 +1223,7 @@ export const HELP: HelpCategory[] = [
           },
           {
             type: "p",
-            text: "The 12% rate is reviewed annually and may adjust if maintenance costs trend differently than projected. Any adjustment is a documented LLC decision with member notice.",
+            text: "The fee rate is reviewed annually and may adjust if maintenance costs trend differently than projected. Any adjustment is a documented LLC decision with member notice.",
           },
         ],
       },
@@ -1449,7 +1449,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Vehicle management fee" },
           {
             type: "p",
-            text: "12% of the vehicle's annual value, billed quarterly to the LLC, paid pro-rata by co-owners. On a $340K Ferrari with 10 shares, the LLC's $40,800/yr fee divides into roughly $1,020 per share each quarter (one share holder pays ~$1,020/Q; a two-share holder pays ~$2,040/Q).",
+            text: "All-in fee charged to the LLC, billed quarterly, paid pro-rata by co-owners. On a $340K Ferrari with 10 shares, the LLC's annual fee runs ~$70,800 ($7,080 per share, ~$1,770/quarter for a one-share holder). The fee covers RYDA's service component plus pass-through costs (insurance, storage, scheduled maintenance, depreciation reserves). Range across the fleet: ~7–9% of vehicle value depending on the model.",
           },
           { type: "h3", text: "Per-booking charges" },
           {
