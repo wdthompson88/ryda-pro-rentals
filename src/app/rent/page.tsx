@@ -1,16 +1,19 @@
 import Link from "next/link";
 import Image from "next/image";
 import { SiteHeader } from "@/components/site-header";
+import { PartnerListings } from "@/components/partner-listings";
 import { VEHICLES, formatUSD } from "@/lib/market-data";
+import { PARTNER_VEHICLES } from "@/lib/partner-fleet";
 
 export const metadata = {
   title: "Rent — RYDA",
   description:
-    "Rent a curated supercar by the day. Hand-prepared, fully insured, white-glove delivery available.",
+    "Rent a curated supercar by the day. The RYDA fleet plus our Miami partner GM LUXE — hand-prepared, fully insured, white-glove delivery.",
 };
 
 export default function RentPage() {
   const rentable = VEHICLES.filter((v) => v.rentalAvailable);
+  const partnerCount = PARTNER_VEHICLES.length;
 
   return (
     <>
@@ -28,24 +31,40 @@ export default function RentPage() {
           <p className="mt-6 max-w-2xl text-lg text-ink-soft">
             Rentals are how members and prospective buyers experience a RYDA
             vehicle before committing to a share. Hand-prepared, fully insured,
-            white-glove delivered. Same fleet, same operations team — just
-            paid by the day instead of by the share.
+            white-glove delivered.
           </p>
-          <Link
-            href="#available"
-            className="mt-10 inline-flex h-12 items-center justify-center rounded-full bg-red px-7 text-sm font-medium text-cream transition-colors hover:bg-red-deep"
-          >
-            See what's available →
-          </Link>
+          <div className="mt-10 flex flex-wrap gap-3">
+            <Link
+              href="#ryda-fleet"
+              className="inline-flex h-12 items-center justify-center rounded-full bg-red px-7 text-sm font-medium text-cream transition-colors hover:bg-red-deep"
+            >
+              See the RYDA fleet →
+            </Link>
+            <Link
+              href="#partner-fleet"
+              className="inline-flex h-12 items-center justify-center rounded-full border border-rule px-7 text-sm font-medium text-ink hover:border-ink"
+            >
+              Browse {partnerCount} partner vehicles →
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* Vehicle grid */}
-      <section id="available" className="border-b border-rule">
+      {/* RYDA Vehicle grid */}
+      <section id="ryda-fleet" className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
           <div className="mb-6 flex items-end justify-between">
-            <h2 className="font-display text-3xl text-ink">Available now</h2>
-            <p className="text-sm text-mute">{rentable.length} vehicles · Miami · LA · NYC</p>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+                RYDA fleet
+              </p>
+              <h2 className="mt-2 font-display text-3xl text-ink">
+                Available now
+              </h2>
+            </div>
+            <p className="text-sm text-mute">
+              {rentable.length} vehicles · Miami · LA · NYC
+            </p>
           </div>
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -92,15 +111,74 @@ export default function RentPage() {
         </div>
       </section>
 
+      {/* Partner fleet — GM LUXE */}
+      <section id="partner-fleet" className="border-b border-rule">
+        <div className="mx-auto max-w-7xl px-6 pt-16 pb-2 sm:px-10">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div className="max-w-2xl">
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+                Partner fleet · Miami
+              </p>
+              <h2 className="mt-2 font-display text-3xl text-ink sm:text-4xl">
+                Plus {partnerCount} more cars from GM LUXE.
+              </h2>
+              <p className="mt-3 text-base text-ink-soft">
+                We've partnered with{" "}
+                <a
+                  href="https://www.gmluxe.net/?utm_source=ryda&utm_medium=partner_listing&utm_campaign=fleet_2026"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-ink underline-offset-4 hover:underline"
+                >
+                  GM LUXE
+                </a>
+                , a Miami exotic and luxury rental house, to broaden what you
+                can drive while you decide on a share. Click any card to book
+                directly with GM LUXE — RYDA earns a referral, you keep their
+                rates.
+              </p>
+            </div>
+            <a
+              href="https://www.gmluxe.net/?utm_source=ryda&utm_medium=partner_listing&utm_campaign=fleet_2026"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-11 items-center justify-center rounded-full border border-rule px-5 text-sm font-medium text-ink hover:border-ink"
+            >
+              GM LUXE site ↗
+            </a>
+          </div>
+        </div>
+        <PartnerListings />
+      </section>
+
       {/* What's included */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10">
-          <h2 className="font-display text-3xl text-ink">What every RYDA rental includes</h2>
+          <h2 className="font-display text-3xl text-ink">
+            What every RYDA-fleet rental includes
+          </h2>
+          <p className="mt-2 max-w-2xl text-sm text-ink-soft">
+            These standards apply to RYDA-owned vehicles. Partner rentals
+            (GM LUXE) are operated by the partner under their terms — see
+            their site for specifics.
+          </p>
           <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-            <Pillar title="Full insurance" body="$1M third-party liability. Agreed-value physical damage with a low deductible." />
-            <Pillar title="White-glove handover" body="Vehicle delivered washed, fueled, and prepped. Photo-documented condition both ways." />
-            <Pillar title="24/7 roadside" body="Single number, single call. Replacement vehicle if anything goes wrong on the road." />
-            <Pillar title="200 miles / day" body="Generous baseline included. Extra miles available; track day mode unlocks unlimited." />
+            <Pillar
+              title="Full insurance"
+              body="$1M third-party liability. Agreed-value physical damage with a low deductible."
+            />
+            <Pillar
+              title="White-glove handover"
+              body="Vehicle delivered washed, fueled, and prepped. Photo-documented condition both ways."
+            />
+            <Pillar
+              title="24/7 roadside"
+              body="Single number, single call. Replacement vehicle if anything goes wrong on the road."
+            />
+            <Pillar
+              title="200 miles / day"
+              body="Generous baseline included. Extra miles available; track day mode unlocks unlimited."
+            />
           </div>
         </div>
       </section>

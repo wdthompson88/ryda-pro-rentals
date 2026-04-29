@@ -15,6 +15,12 @@ const nextConfig: NextConfig = {
         hostname: "images.unsplash.com",
         pathname: "/**",
       },
+      // GM LUXE partner fleet images (hosted on Wix CDN).
+      {
+        protocol: "https",
+        hostname: "static.wixstatic.com",
+        pathname: "/**",
+      },
     ],
   },
 };
