@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 const NAV = [
-  { href: "/markets", label: "Fleet" },
+  { href: "/markets", label: "Co-Own" },
   { href: "/rent", label: "Rent" },
   { href: "/how-it-works", label: "How it works" },
   { href: "/concierge-ownership", label: "Concierge" },

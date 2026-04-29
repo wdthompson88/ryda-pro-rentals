@@ -54,7 +54,7 @@ export default async function VehicleMarketPage({
             href="/markets"
             className="text-xs font-medium uppercase tracking-[0.2em] text-red hover:text-red-deep"
           >
-            ← Fleet
+            ← Co-Own
           </Link>
 
           <div className="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-12">
