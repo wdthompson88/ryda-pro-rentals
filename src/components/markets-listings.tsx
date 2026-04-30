@@ -11,6 +11,7 @@ import {
   HOLDING_YEARS,
   type Vehicle,
 } from "@/lib/market-data";
+import { Reveal } from "@/components/reveal";
 
 type SortOption =
   | "featured"
@@ -353,8 +354,10 @@ export function MarketsListings() {
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {visible.map((v) => (
-              <VehicleCard key={v.symbol} vehicle={v} />
+            {visible.map((v, i) => (
+              <Reveal key={v.symbol} delayMs={Math.min(i * 60, 400)}>
+                <VehicleCard vehicle={v} />
+              </Reveal>
             ))}
           </div>
         )}

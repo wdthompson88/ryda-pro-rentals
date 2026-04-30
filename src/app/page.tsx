@@ -3,6 +3,7 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { WaitlistForm } from "@/components/waitlist-form";
 import { InlineEmailCapture } from "@/components/inline-email-capture";
+import { Reveal } from "@/components/reveal";
 import { VEHICLES, formatUSD } from "@/lib/market-data";
 
 export default function Home() {
@@ -119,40 +120,41 @@ export default function Home() {
             </Link>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {featured.map((v) => (
-              <Link
-                key={v.symbol}
-                href={`/markets/${v.symbol}`}
-                className="group block overflow-hidden rounded-xl border border-rule bg-surface transition-shadow hover:shadow-md"
-              >
-                <div className="relative aspect-[16/10] w-full overflow-hidden bg-cream-2">
-                  <Image
-                    src={v.hero}
-                    alt={`${v.year} ${v.name}`}
-                    fill
-                    sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                    className={`object-cover transition-transform duration-500 group-hover:scale-105 ${v.flipImage ? "-scale-x-100" : ""}`}
-                    style={{ objectPosition: v.imagePosition ?? "center" }}
-                  />
-                </div>
-                <div className="p-4">
-                  <p className="text-xs text-mute">{v.brand}</p>
-                  <p className="mt-1 font-display text-base text-ink">
-                    {v.name}
-                  </p>
-                  <div className="mt-2 flex items-baseline justify-between">
-                    <p>
-                      <span className="font-display text-xl text-ink tabular-nums">
-                        {formatUSD(v.pricePerShare)}
-                      </span>
-                      <span className="text-xs text-mute">/share</span>
-                    </p>
-                    <span className="text-xs font-medium text-red group-hover:text-red-deep">
-                      View →
-                    </span>
+            {featured.map((v, i) => (
+              <Reveal key={v.symbol} delayMs={i * 80}>
+                <Link
+                  href={`/markets/${v.symbol}`}
+                  className="group block overflow-hidden rounded-xl border border-rule bg-surface transition-shadow hover:shadow-md"
+                >
+                  <div className="relative aspect-[16/10] w-full overflow-hidden bg-cream-2">
+                    <Image
+                      src={v.hero}
+                      alt={`${v.year} ${v.name}`}
+                      fill
+                      sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                      className={`object-cover transition-transform duration-500 group-hover:scale-105 ${v.flipImage ? "-scale-x-100" : ""}`}
+                      style={{ objectPosition: v.imagePosition ?? "center" }}
+                    />
                   </div>
-                </div>
-              </Link>
+                  <div className="p-4">
+                    <p className="text-xs text-mute">{v.brand}</p>
+                    <p className="mt-1 font-display text-base text-ink">
+                      {v.name}
+                    </p>
+                    <div className="mt-2 flex items-baseline justify-between">
+                      <p>
+                        <span className="font-display text-xl text-ink tabular-nums">
+                          {formatUSD(v.pricePerShare)}
+                        </span>
+                        <span className="text-xs text-mute">/share</span>
+                      </p>
+                      <span className="text-xs font-medium text-red group-hover:text-red-deep">
+                        View →
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -182,40 +184,41 @@ export default function Home() {
             </Link>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {featuredRentable.map((v) => (
-              <Link
-                key={v.symbol}
-                href={`/rent/${v.symbol.toLowerCase()}`}
-                className="group block overflow-hidden rounded-xl border border-cream/15 bg-cream/[0.04] transition-colors hover:bg-cream/[0.08]"
-              >
-                <div className="relative aspect-[16/10] w-full overflow-hidden bg-cream-2">
-                  <Image
-                    src={v.hero}
-                    alt={`${v.year} ${v.name}`}
-                    fill
-                    sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                    className={`object-cover transition-transform duration-500 group-hover:scale-105 ${v.flipImage ? "-scale-x-100" : ""}`}
-                    style={{ objectPosition: v.imagePosition ?? "center" }}
-                  />
-                </div>
-                <div className="p-4">
-                  <p className="text-xs text-cream/60">{v.brand}</p>
-                  <p className="mt-1 font-display text-base text-cream">
-                    {v.name}
-                  </p>
-                  <div className="mt-2 flex items-baseline justify-between">
-                    <p>
-                      <span className="font-display text-xl text-cream tabular-nums">
-                        {formatUSD(v.rentalDailyRate)}
-                      </span>
-                      <span className="text-xs text-cream/60">/day</span>
-                    </p>
-                    <span className="text-xs font-medium text-red">
-                      Rent →
-                    </span>
+            {featuredRentable.map((v, i) => (
+              <Reveal key={v.symbol} delayMs={i * 80}>
+                <Link
+                  href={`/rent/${v.symbol.toLowerCase()}`}
+                  className="group block overflow-hidden rounded-xl border border-cream/15 bg-cream/[0.04] transition-colors hover:bg-cream/[0.08]"
+                >
+                  <div className="relative aspect-[16/10] w-full overflow-hidden bg-cream-2">
+                    <Image
+                      src={v.hero}
+                      alt={`${v.year} ${v.name}`}
+                      fill
+                      sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                      className={`object-cover transition-transform duration-500 group-hover:scale-105 ${v.flipImage ? "-scale-x-100" : ""}`}
+                      style={{ objectPosition: v.imagePosition ?? "center" }}
+                    />
                   </div>
-                </div>
-              </Link>
+                  <div className="p-4">
+                    <p className="text-xs text-cream/60">{v.brand}</p>
+                    <p className="mt-1 font-display text-base text-cream">
+                      {v.name}
+                    </p>
+                    <div className="mt-2 flex items-baseline justify-between">
+                      <p>
+                        <span className="font-display text-xl text-cream tabular-nums">
+                          {formatUSD(v.rentalDailyRate)}
+                        </span>
+                        <span className="text-xs text-cream/60">/day</span>
+                      </p>
+                      <span className="text-xs font-medium text-red">
+                        Rent →
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              </Reveal>
             ))}
           </div>
         </div>
