@@ -18,7 +18,7 @@ export default function MarketsPage() {
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            The fleet
+            Co-Own · The curated fleet
           </p>
           <h1 className="mt-4 font-display text-5xl font-light leading-tight text-ink sm:text-6xl">
             Asset-backed shares of the world's most exceptional cars.

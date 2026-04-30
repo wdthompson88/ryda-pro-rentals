@@ -28,7 +28,10 @@ export function CompareCalculator({
     lockedVehicle ?? VEHICLES.find((v) => v.symbol === "F296") ?? VEHICLES[0];
   const [vehicleSymbol, setVehicleSymbol] = useState(initial.symbol);
   const [shares, setShares] = useState(1);
-  const [days, setDays] = useState(20);
+  // Default to 12 owner-use days/yr per share — matches the static
+  // worked example on /how-it-works and the rental scenario shown in
+  // CostBreakdown / cost-sheet (both pull from RENTAL_DEFAULTS).
+  const [days, setDays] = useState(12);
   const [holdYears, setHoldYears] = useState(HOLDING_YEARS);
   const [residualPct, setResidualPct] = useState(DEFAULT_RESIDUAL_PCT);
   const [optInRental, setOptInRental] = useState(false);

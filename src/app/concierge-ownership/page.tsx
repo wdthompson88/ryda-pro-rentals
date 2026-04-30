@@ -112,12 +112,12 @@ export default function ConciergeOwnershipPage() {
             <Pillar
               n="03"
               title="Legal protection of the asset"
-              body="Single-purpose LLC isolates the vehicle from your other liabilities and vice versa. Operating agreement spells out that the asset cannot be transferred, encumbered, or disposed of without your explicit authorization. Ownership is verifiable and enforceable across cross-border situations."
+              body="Single-purpose LLC isolates the vehicle from your other liabilities and vice versa. Operating agreement spells out that the asset cannot be transferred, encumbered, or disposed of without your explicit authorization. The legal documentation gives your counsel a clean chain of title to work from in domestic disputes; cross-border enforcement varies by jurisdiction and is reviewed case by case with your counsel."
             />
             <Pillar
               n="04"
               title="Institutional administration"
-              body="Registration procedures, insurance coordination, regulatory compliance, communication with authorities, documentation management, renewal coordination, inspection and certification scheduling — all handled by the RYDA operations team. The asset stays compliant and ready for use whether you're in Miami or in Monaco."
+              body="Registration procedures, insurance coordination, regulatory compliance, communication with authorities, documentation management, renewal coordination, inspection and certification scheduling — all handled by the RYDA operations team in the LLC's home state. We coordinate routine compliance so the car is ready when you are; jurisdiction-specific issues that come up during international travel are coordinated with your counsel and insurer ahead of time."
             />
             <Pillar
               n="05"
@@ -137,7 +137,7 @@ export default function ConciergeOwnershipPage() {
             <Pillar
               n="08"
               title="Acquisition, import & logistics"
-              body="If RYDA is sourcing the car (+0.5% to the setup fee), we handle dealer or auction representation, pre-purchase inspection, transport, and — for international acquisitions — customs entry, duty, EPA/DOT compliance, and federal certification. The car arrives roadable, registered, insured, and stored from day one."
+              body="If RYDA is sourcing the car (+0.5% to the setup fee), we handle dealer or auction representation, pre-purchase inspection, and transport. For international acquisitions, customs entry, duty, EPA/DOT compliance, and federal certification are coordinated with specialized partners — timelines and feasibility depend on the specific vehicle and country of origin. Once cleared, registration, insurance, and storage are arranged before delivery."
             />
             <Pillar
               n="09"
