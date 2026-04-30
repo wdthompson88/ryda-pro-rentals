@@ -142,8 +142,7 @@ export function CostBreakdown({
             >
               <div>
                 <p className="text-sm font-medium text-ink">
-                  Projected outcome ({rentedIsPositive ? "+" : ""}
-                  {rentedReturnPct.toFixed(2)}%)
+                  Net ({e.holdYears} yrs)
                 </p>
                 <p className="mt-0.5 text-[11px] text-mute">
                   {rentedIsPositive
@@ -156,8 +155,12 @@ export function CostBreakdown({
                   rentedIsPositive ? "text-emerald-600" : "text-red"
                 }`}
               >
-                {rentedIsPositive ? "+ " : "− "}
+                = {rentedIsPositive ? "+ " : "− "}
                 {formatUSD(Math.abs(rentedProfit))}
+                <span className="ml-2 align-baseline text-xs font-normal opacity-75">
+                  {rentedIsPositive ? "+" : ""}
+                  {rentedReturnPct.toFixed(2)}%
+                </span>
               </p>
             </div>
           </div>

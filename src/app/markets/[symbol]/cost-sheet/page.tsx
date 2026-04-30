@@ -339,16 +339,19 @@ export default async function CostSheetPage({
                 }`}
               >
                 <p className="text-[10px] uppercase tracking-wider text-mute">
-                  Projected outcome ({rentedIsPositive ? "+" : ""}
-                  {rentedReturnPct.toFixed(2)}%)
+                  Net ({HOLDING_YEARS} yrs)
                 </p>
                 <p
                   className={`mt-1 font-display text-lg tabular-nums ${
                     rentedIsPositive ? "text-emerald-700" : "text-ink"
                   }`}
                 >
-                  {rentedIsPositive ? "+ " : "− "}
+                  = {rentedIsPositive ? "+ " : "− "}
                   {formatUSD(Math.abs(rentedProfit))}
+                  <span className="ml-1.5 align-baseline text-[10px] font-normal opacity-75">
+                    {rentedIsPositive ? "+" : ""}
+                    {rentedReturnPct.toFixed(2)}%
+                  </span>
                 </p>
               </div>
             </div>

@@ -521,16 +521,19 @@ function VehicleCard({ vehicle: v }: { vehicle: Vehicle }) {
                 }`}
               >
                 <span className="font-medium text-ink">
-                  Projected outcome ({rentedIsPositive ? "+" : ""}
-                  {rentedReturnPct.toFixed(2)}%)
+                  Net ({HOLDING_YEARS} yrs)
                 </span>
                 <span
                   className={`font-display text-base tabular-nums ${
                     rentedIsPositive ? "text-emerald-600" : "text-red"
                   }`}
                 >
-                  {rentedIsPositive ? "+ " : "− "}
+                  = {rentedIsPositive ? "+ " : "− "}
                   {formatUSD(Math.abs(rentedProfit))}
+                  <span className="ml-1.5 align-baseline text-[10px] font-normal opacity-75">
+                    {rentedIsPositive ? "+" : ""}
+                    {rentedReturnPct.toFixed(2)}%
+                  </span>
                 </span>
               </div>
             </div>

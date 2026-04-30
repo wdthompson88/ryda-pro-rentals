@@ -381,29 +381,32 @@ export function CompareCalculator({
               numbers.ryda.annualOps,
             )}/yr × ${holdYears}`}
           />
-          <ResultCard
-            label={(() => {
-              const profit = -numbers.ryda.economicCost;
-              const isPos = profit > 0;
-              const returnPct =
-                numbers.ryda.totalCash === 0
-                  ? 0
-                  : (profit / numbers.ryda.totalCash) * 100;
-              return `Projected outcome (${isPos ? "+" : ""}${returnPct.toFixed(2)}%)`;
-            })()}
-            value={
-              numbers.ryda.economicCost < 0
-                ? `+ ${formatUSD(Math.abs(numbers.ryda.economicCost))}`
-                : `− ${formatUSD(numbers.ryda.economicCost)}`
-            }
-            sub={
-              optInRental
-                ? `${formatUSD(numbers.ryda.rentalIncomePerShare)} rental income + ${formatUSD(numbers.ryda.residual)} sale − ${formatUSD(numbers.ryda.buyIn)} buy-in − ${formatUSD(numbers.ryda.totalCash - numbers.ryda.buyIn)} carrying`
-                : `${formatUSD(numbers.ryda.residual)} sale − ${formatUSD(numbers.ryda.buyIn)} buy-in − ${formatUSD(numbers.ryda.totalCash - numbers.ryda.buyIn)} carrying`
-            }
-            accent
-            positive={numbers.ryda.economicCost < 0}
-          />
+          {(() => {
+            const profit = -numbers.ryda.economicCost;
+            const isPos = profit > 0;
+            const returnPct =
+              numbers.ryda.totalCash === 0
+                ? 0
+                : (profit / numbers.ryda.totalCash) * 100;
+            return (
+              <ResultCard
+                label={`Net (${holdYears} yrs)`}
+                value={
+                  numbers.ryda.economicCost < 0
+                    ? `= + ${formatUSD(Math.abs(numbers.ryda.economicCost))}`
+                    : `= − ${formatUSD(numbers.ryda.economicCost)}`
+                }
+                valueDetail={`${isPos ? "+" : ""}${returnPct.toFixed(2)}%`}
+                sub={
+                  optInRental
+                    ? `${formatUSD(numbers.ryda.rentalIncomePerShare)} rental income + ${formatUSD(numbers.ryda.residual)} sale − ${formatUSD(numbers.ryda.buyIn)} buy-in − ${formatUSD(numbers.ryda.totalCash - numbers.ryda.buyIn)} carrying`
+                    : `${formatUSD(numbers.ryda.residual)} sale − ${formatUSD(numbers.ryda.buyIn)} buy-in − ${formatUSD(numbers.ryda.totalCash - numbers.ryda.buyIn)} carrying`
+                }
+                accent
+                positive={numbers.ryda.economicCost < 0}
+              />
+            );
+          })()}
         </div>
 
         {/* The math — explicit breakdown */}
@@ -463,16 +466,19 @@ export function CompareCalculator({
                 }`}
               >
                 <span className="text-sm font-medium text-ink">
-                  Projected outcome ({isPositive ? "+" : ""}
-                  {returnPct.toFixed(2)}%)
+                  Net ({holdYears} yrs)
                 </span>
                 <span
                   className={`font-display text-2xl tabular-nums ${
                     isPositive ? "text-emerald-600" : "text-ink"
                   }`}
                 >
-                  {isPositive ? "+ " : "− "}
+                  = {isPositive ? "+ " : "− "}
                   {formatUSD(Math.abs(profit))}
+                  <span className="ml-2 align-baseline text-xs font-normal opacity-75">
+                    {isPositive ? "+" : ""}
+                    {returnPct.toFixed(2)}%
+                  </span>
                 </span>
               </div>
               <p className="mt-3 text-[11px] text-mute">
@@ -653,12 +659,16 @@ function CalcMathRow({
 function ResultCard({
   label,
   value,
+  valueDetail,
   sub,
   accent,
   positive,
 }: {
   label: string;
   value: string;
+  /** Small annotation displayed inline next to the main value (e.g.
+   *  the percentage subscript on a "Net (2 yrs)" line). */
+  valueDetail?: string;
   sub: string;
   accent?: boolean;
   positive?: boolean;
@@ -675,6 +685,11 @@ function ResultCard({
       <p className="text-xs uppercase tracking-wider text-mute">{label}</p>
       <p className={`mt-2 font-display text-3xl tabular-nums ${textColor}`}>
         {value}
+        {valueDetail ? (
+          <span className="ml-2 align-baseline text-sm font-normal opacity-75">
+            {valueDetail}
+          </span>
+        ) : null}
       </p>
       <p className="mt-2 text-xs text-ink-soft">{sub}</p>
     </div>
