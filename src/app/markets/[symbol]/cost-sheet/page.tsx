@@ -204,7 +204,7 @@ export default async function CostSheetPage({
                   share={Math.round(econ1.annualCarrying * 0.07)}
                 />
                 <CostLine
-                  label="Depreciation reserve"
+                  label="Reserve allocation (notional)"
                   solo={Math.round(soloAnnualCarrying * 0.48)}
                   share={Math.round(econ1.annualCarrying * 0.31)}
                 />
@@ -238,7 +238,12 @@ export default async function CostSheetPage({
           </div>
           <p className="mt-2 text-[11px] text-mute">
             Per-line splits illustrative; actual expense categories vary
-            quarter to quarter and are reported on the LLC's books.
+            quarter to quarter and are reported on the LLC&apos;s books.
+            &quot;Reserve allocation&quot; is the periodic set-aside a
+            prudent owner holds against eventual depreciation — it is
+            not paid out, and the realized depreciation hit is captured
+            separately at exit in the resale figure below (no
+            double-counting).
           </p>
         </section>
 
@@ -334,7 +339,7 @@ export default async function CostSheetPage({
                 }`}
               >
                 <p className="text-[10px] uppercase tracking-wider text-mute">
-                  Projected return ({rentedIsPositive ? "+" : ""}
+                  Projected outcome ({rentedIsPositive ? "+" : ""}
                   {rentedReturnPct.toFixed(2)}%)
                 </p>
                 <p

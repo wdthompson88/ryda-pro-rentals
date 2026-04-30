@@ -334,7 +334,7 @@ export default function HowItWorksPage() {
             <Reason
               n="02"
               title="Financial security through tangible ownership"
-              body="Unlike speculative investments, an exotic in storage can't go bankrupt. The car is always there. Even if RYDA the company disappeared, the LLC still owns the asset and you still own your share."
+              body="A car in storage doesn't disappear with a company. Even if RYDA dissolved tomorrow, the LLC still holds title to the physical vehicle and you still own your share of the LLC. The asset is real, in a garage, with a VIN you can verify."
             />
             <Reason
               n="03"
@@ -561,7 +561,7 @@ export default function HowItWorksPage() {
             />
             <Faq
               q="Can I rent out my share days for income?"
-              a={`Yes — opting into RYDA's rental pool is voluntary, share-by-share. We list the car on /rent, handle bookings, insurance, screening, and condition checks. Revenue splits 65/35 (you / RYDA) and is distributed pro-rata across the days each share contributes. The pool is whatever days members don't reserve, so realistic pool occupancy is ~50% (full-control fleets clock 60–70%). On that basis, a single Ferrari 296 share can earn ~$15–18K/yr — typically 2–2.5× your annual carrying cost, and often enough to flip your two-year hold from a net cost into a net positive return. Same flat ${TARGET_DEPRECIATION_PCT}% depreciation assumption applies in both scenarios — that one number already absorbs the heavier rental-pool wear.`}
+              a={`Yes — opting into RYDA's rental pool is voluntary, share-by-share. We list the car on /rent, handle bookings, insurance, screening, and condition checks. Rental revenue splits 65/35 (you / RYDA) and is distributed pro-rata across the days each share contributes. The pool is whatever days members don't reserve, so realistic pool occupancy is ~50% (full-control fleets clock 60–70%). On that basis, a single Ferrari 296 share can offset ~$15–18K/yr of carrying — typically 2–2.5× your annual ops cost, sometimes enough to bring your two-year net cost down close to zero or below. Same flat ${TARGET_DEPRECIATION_PCT}% depreciation assumption applies in both scenarios. Co-ownership shares are member-managed LLC interests, not securities; rental is a usage offset, not an investment yield.`}
             />
             <Faq
               q="What if a co-owner stops paying?"

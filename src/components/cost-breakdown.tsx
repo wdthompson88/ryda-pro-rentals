@@ -142,7 +142,7 @@ export function CostBreakdown({
             >
               <div>
                 <p className="text-sm font-medium text-ink">
-                  Projected return ({rentedIsPositive ? "+" : ""}
+                  Projected outcome ({rentedIsPositive ? "+" : ""}
                   {rentedReturnPct.toFixed(2)}%)
                 </p>
                 <p className="mt-0.5 text-[11px] text-mute">

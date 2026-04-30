@@ -21,11 +21,11 @@ export function SiteFooter() {
           <FooterCol
             title="Platform"
             links={[
-              ["Fleet", "/markets"],
+              ["Co-Own", "/markets"],
               ["Rent", "/rent"],
+              ["Concierge", "/concierge-ownership"],
               ["Membership", "/membership"],
               ["How it works", "/how-it-works"],
-              ["Compare", "/compare"],
               ["FAQ", "/faq"],
             ]}
           />

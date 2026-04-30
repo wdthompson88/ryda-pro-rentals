@@ -4,7 +4,7 @@
 // rest go into the gallery.
 
 export const PARTNER_PHOTOS: Record<string, string[]> = {
-  "audi-a5-2018": [
+  "audi-a5": [
     "https://static.wixstatic.com/media/9f27fe_37ae6c088beb4fd9bdf01bc030a36334~mv2.jpg",
     "https://static.wixstatic.com/media/9f27fe_3f823e5a488440e3bae1ee9f1243778a~mv2.jpg",
     "https://static.wixstatic.com/media/9f27fe_41f935551f6c4d46b2bb785e78c783ff~mv2.jpg",
@@ -21,7 +21,7 @@ export const PARTNER_PHOTOS: Record<string, string[]> = {
     "https://static.wixstatic.com/media/9f27fe_f17e3001069a4403adc2bcf743e1aa30~mv2.jpg",
     "https://static.wixstatic.com/media/9f27fe_ff28b5fbd086486b89b0e754ebb22b96~mv2.jpg",
   ],
-  "bentley-continental-gtc": [
+  "bentley-continental-gt": [
     "https://static.wixstatic.com/media/9ab993_318a0caeb37746e1b705559014655b50~mv2.jpg",
     "https://static.wixstatic.com/media/9ab993_652f718e048e4f959e1d64bbe61eea53~mv2.jpg",
     "https://static.wixstatic.com/media/9ab993_6674b252c6b9481bb38be3c30794cbad~mv2.jpg",
@@ -41,7 +41,7 @@ export const PARTNER_PHOTOS: Record<string, string[]> = {
     "https://static.wixstatic.com/media/9ab993_c995bcddee574204a8455b9f4fdb293a~mv2.jpg",
     "https://static.wixstatic.com/media/9ab993_ebe2bb67390a4ec09eb2b9bed3235c5a~mv2.jpg",
   ],
-  "cadillac-escalade-2021-black": [
+  "cadillac-escalade": [
     "https://static.wixstatic.com/media/9ab993_3a318fe99fb24d0f88d9dd8b7801a6f7~mv2.jpg",
     "https://static.wixstatic.com/media/9ab993_4d390ae6a0e648da9466b20e768c567f~mv2.jpg",
     "https://static.wixstatic.com/media/9ab993_7f77990ba4dd44ec8a1462fd2a2a6835~mv2.jpg",
@@ -63,14 +63,14 @@ export const PARTNER_PHOTOS: Record<string, string[]> = {
     "https://static.wixstatic.com/media/3e6987_ada7e58782c14ec6bdece9d18f562a2b~mv2.jpg",
     "https://static.wixstatic.com/media/3e6987_f0374fdce8d045dc8efbeb029de7dcaf~mv2.jpg",
   ],
-  "chevrolet-camaro-lt1-2024": [
+  "chevrolet-camaro-lt1": [
     "https://static.wixstatic.com/media/4c8f97_1d2b3eedc4d14a0d8d1bff2dd696bce6~mv2.jpg",
     "https://static.wixstatic.com/media/4c8f97_22c60db0b007465cbd170069dbc9a57b~mv2.jpg",
     "https://static.wixstatic.com/media/4c8f97_3614eb15a4434701ab5cacc629b1596f~mv2.jpg",
     "https://static.wixstatic.com/media/4c8f97_66559191c3d446558c4b1a9b91736f41~mv2.jpg",
     "https://static.wixstatic.com/media/4c8f97_81562ef73b50451190ce8b1e0bd75006~mv2.jpg",
   ],
-  "chevrolet-corvette-stingray-2024": [
+  "chevrolet-corvette-stingray": [
     "https://static.wixstatic.com/media/4c8f97_2539246c46314e15a9f28189a876fdef~mv2.jpg",
     "https://static.wixstatic.com/media/4c8f97_5747d87bc17f474798738b85139e1bd7~mv2.jpg",
     "https://static.wixstatic.com/media/4c8f97_72e59c7fc5694c86a6308c0c0185a220~mv2.jpg",
@@ -103,7 +103,7 @@ export const PARTNER_PHOTOS: Record<string, string[]> = {
     "https://static.wixstatic.com/media/3e6987_b4a231c00f424c07b2d2171d5d7594f7~mv2.jpg",
     "https://static.wixstatic.com/media/3e6987_bf520390a495417daccf44063153b7de~mv2.jpg",
   ],
-  "ferrari-488-gtb-2018": [
+  "ferrari-488-gtb": [
     "https://static.wixstatic.com/media/9f27fe_0e460a4f82e7419897c693db4c7c43d2~mv2.jpg",
     "https://static.wixstatic.com/media/9f27fe_145c4b5dd4854b4189173be563e745cc~mv2.jpg",
     "https://static.wixstatic.com/media/9f27fe_1b8e7d46cceb44a691b57b5d0799b7e6~mv2.jpg",
@@ -168,7 +168,7 @@ export const PARTNER_PHOTOS: Record<string, string[]> = {
     "https://static.wixstatic.com/media/3e6987_d1ccdf1bf3ab4f248702ba45a05bef1b~mv2.jpg",
     "https://static.wixstatic.com/media/3e6987_f517d93289b24b72a5cc1b79139df019~mv2.jpg",
   ],
-  "infiniti-qx80-2024": [
+  "infiniti-qx80": [
     "https://static.wixstatic.com/media/4c8f97_111da8f13047491b8b76dd7c05e0a804~mv2.jpg",
     "https://static.wixstatic.com/media/4c8f97_289ba427715a4be3b1ae03156b2d46f1~mv2.jpg",
     "https://static.wixstatic.com/media/4c8f97_3223b98db6f64d35897d83a5526df059~mv2.jpg",
@@ -192,7 +192,7 @@ export const PARTNER_PHOTOS: Record<string, string[]> = {
     "https://static.wixstatic.com/media/3e6987_e01ed10804a24372a9b6fbfb4f09f15a~mv2.jpg",
     "https://static.wixstatic.com/media/3e6987_ecc40aed2c9a498bb35fc37e4e1dd58c~mv2.jpg",
   ],
-  "lamborghini-huracan-1": [
+  "lamborghini-huracan": [
     "https://static.wixstatic.com/media/3e6987_376751eeb158450c8896e7590861f5fd~mv2.jpg",
     "https://static.wixstatic.com/media/3e6987_383d060259734d15b9c1325408046ba2~mv2.jpg",
     "https://static.wixstatic.com/media/3e6987_46bc640670ac45b3b7f58bf0305de2eb~mv2.jpg",
@@ -221,7 +221,7 @@ export const PARTNER_PHOTOS: Record<string, string[]> = {
     "https://static.wixstatic.com/media/3e6987_9ec91f4a3be343408c02d168387022c1~mv2.jpg",
     "https://static.wixstatic.com/media/3e6987_f49fb4e2890745258283db7897be3a07~mv2.jpg",
   ],
-  "lamborghini-urus-1": [
+  "lamborghini-urus": [
     "https://static.wixstatic.com/media/3e6987_02490411560a4f61b8ad4bc413b68e39~mv2.jpg",
     "https://static.wixstatic.com/media/3e6987_1e84d80c92a44eb084b4929339cc0564~mv2.jpg",
     "https://static.wixstatic.com/media/3e6987_29830a2a43cc42128cc49c236381efdd~mv2.jpg",
@@ -249,7 +249,7 @@ export const PARTNER_PHOTOS: Record<string, string[]> = {
     "https://static.wixstatic.com/media/9ab993_f3736a21b15648e3ac25ae82a3dee711~mv2.avif",
     "https://static.wixstatic.com/media/9ab993_f48cf3a757ce4eafa7424c1c35496aa2~mv2.avif",
   ],
-  "mercedes-benz-c-class-2020": [
+  "mercedes-c63s": [
     "https://static.wixstatic.com/media/4c8f97_0996ac1fe4274a81a731f2e49ebb99aa~mv2.jpg",
     "https://static.wixstatic.com/media/4c8f97_10b9d19334904ce69d7ee0d7c99a0335~mv2.jpg",
     "https://static.wixstatic.com/media/4c8f97_1b26572670da468d995979ab2d74d1dc~mv2.jpg",
@@ -259,7 +259,7 @@ export const PARTNER_PHOTOS: Record<string, string[]> = {
     "https://static.wixstatic.com/media/4c8f97_adf57aae5e1744c08b752a5c6b2d19bb~mv2.jpg",
     "https://static.wixstatic.com/media/4c8f97_ddf0658905da434a8cba8e40780af107~mv2.jpg",
   ],
-  "mercedes-benz-c300-1": [
+  "mercedes-c300": [
     "https://static.wixstatic.com/media/3e6987_04cd3ae68992477693ba859c38fdc6f0~mv2.jpg",
     "https://static.wixstatic.com/media/3e6987_61f9ec8f7078464c89917354ca3f82d6~mv2.jpg",
     "https://static.wixstatic.com/media/3e6987_67ff4bd48ba64b44816c5973e7bca851~mv2.jpg",
@@ -271,7 +271,7 @@ export const PARTNER_PHOTOS: Record<string, string[]> = {
     "https://static.wixstatic.com/media/3e6987_e0a35cc504de4b8698283f0ce38b2754~mv2.jpg",
     "https://static.wixstatic.com/media/3e6987_f761ceae70744a3bb487899680711aae~mv2.jpg",
   ],
-  "mercedes-benz-g550": [
+  "mercedes-g550": [
     "https://static.wixstatic.com/media/3e6987_1e038492d0294c25bd697c2d37f48174~mv2.jpg",
     "https://static.wixstatic.com/media/3e6987_243c116b4a814c7b96159b3c9c0bc7f5~mv2.jpg",
     "https://static.wixstatic.com/media/3e6987_26862c878cd744e98e695a83f6ed27c8~mv2.jpg",
@@ -282,7 +282,7 @@ export const PARTNER_PHOTOS: Record<string, string[]> = {
     "https://static.wixstatic.com/media/3e6987_6a56afe9ea1643499ceb85396f9a4600~mv2.jpg",
     "https://static.wixstatic.com/media/3e6987_9addcb4751e045ac8d1b0b4b04fe234c~mv2.jpg",
   ],
-  "mercedes-benz-glc-class-2019": [
+  "mercedes-glc63s": [
     "https://static.wixstatic.com/media/9f27fe_0ae13936b4a24871bb544c9dd3c675fc~mv2.jpg",
     "https://static.wixstatic.com/media/9f27fe_1b612b48708f493c95557897aa4f6e46~mv2.jpg",
     "https://static.wixstatic.com/media/9f27fe_2477eab9008a43b48b0ab949e44e80b3~mv2.jpg",
@@ -298,7 +298,7 @@ export const PARTNER_PHOTOS: Record<string, string[]> = {
     "https://static.wixstatic.com/media/9f27fe_b394626ac3e541529bde96ed66633977~mv2.jpg",
     "https://static.wixstatic.com/media/9f27fe_f262de8bfe374bc2b53a041852ae16e5~mv2.jpg",
   ],
-  "mercedes-benz-gle-class-2021": [
+  "mercedes-gle": [
     "https://static.wixstatic.com/media/4c8f97_024914829d7b49d1a867affb147ee67c~mv2.jpg",
     "https://static.wixstatic.com/media/4c8f97_373b4dd4d419428c95852e5d3d53ab53~mv2.jpg",
     "https://static.wixstatic.com/media/4c8f97_8c49093f8ca54aa293250c3774db327e~mv2.jpg",
@@ -316,7 +316,7 @@ export const PARTNER_PHOTOS: Record<string, string[]> = {
     "https://static.wixstatic.com/media/9ab993_b240bcba2f6a424487d15af3d178850f~mv2.jpg",
     "https://static.wixstatic.com/media/9ab993_d31d0f7e3e384ebfa828ddc498c7f66d~mv2.jpg",
   ],
-  "porsche-cayenne-2020": [
+  "porsche-cayenne-hybrid": [
     "https://static.wixstatic.com/media/9f27fe_124ef42db312471691492b76165a4d4b~mv2.jpg",
     "https://static.wixstatic.com/media/9f27fe_1b4496d9d3e84a78bfbbd87ada54b673~mv2.jpg",
     "https://static.wixstatic.com/media/9f27fe_20ed49c7bc26441a9e0cae29ea6e2e06~mv2.jpg",
@@ -333,7 +333,7 @@ export const PARTNER_PHOTOS: Record<string, string[]> = {
     "https://static.wixstatic.com/media/9f27fe_df86fde63e48431785dcd4c21c6f67de~mv2.jpg",
     "https://static.wixstatic.com/media/9f27fe_fefec3c4274f4d52b2f3cf7664684da3~mv2.jpg",
   ],
-  "porsche-macan-gts-2017": [
+  "porsche-macan-gts": [
     "https://static.wixstatic.com/media/9f27fe_07f84398cfd144728043df12789500b4~mv2.jpg",
     "https://static.wixstatic.com/media/9f27fe_178b7ba6fc3b4229a3e8d1c6ee69e935~mv2.jpg",
     "https://static.wixstatic.com/media/9f27fe_1a8d0579979e4456885aa3c5dec9c33e~mv2.jpg",
@@ -362,7 +362,7 @@ export const PARTNER_PHOTOS: Record<string, string[]> = {
     "https://static.wixstatic.com/media/9ab993_d366f86539ee4973b655263e2897dfa3~mv2.jpg",
     "https://static.wixstatic.com/media/9ab993_e225e2605394483d89e61966203d5709~mv2.jpg",
   ],
-  "porsche-panamera-2020": [
+  "porsche-panamera": [
     "https://static.wixstatic.com/media/136995_463afa4ebfdc46799fecef37da423c5f~mv2.jpg",
     "https://static.wixstatic.com/media/136995_766875771e6c4201952e0b01292b6762~mv2.jpg",
     "https://static.wixstatic.com/media/136995_926e05ce7240440bb50a8cad0f8b9c3b~mv2.jpg",
@@ -386,7 +386,7 @@ export const PARTNER_PHOTOS: Record<string, string[]> = {
     "https://static.wixstatic.com/media/3e6987_d1d479de2e9345e7b7b6eb2eac9d00ac~mv2.jpg",
     "https://static.wixstatic.com/media/3e6987_e4575217b33d4cbd878798414b4d1155~mv2.jpg",
   ],
-  "range-rover-velar": [
+  "land-rover-range-rover-velar": [
     "https://static.wixstatic.com/media/9ab993_85a3359b8ea4428f8bce9825e61ebc58~mv2.jpg",
     "https://static.wixstatic.com/media/9ab993_88a9f93b30f04d21bab3b22207fe887a~mv2.jpg",
     "https://static.wixstatic.com/media/9ab993_8f558b8bb86f4528a48baee4231eba25~mv2.jpg",
@@ -409,7 +409,7 @@ export const PARTNER_PHOTOS: Record<string, string[]> = {
     "https://static.wixstatic.com/media/3e6987_e4c5c5e941ba4550ba8b18fb297074d8~mv2.jpg",
     "https://static.wixstatic.com/media/3e6987_e93359569ab64586817b59155914b94a~mv2.jpg",
   ],
-  "rolls-royce-dawn-1": [
+  "rolls-royce-dawn": [
     "https://static.wixstatic.com/media/3e6987_033b80e444e74456a8c9692dd5c27513~mv2.jpg",
     "https://static.wixstatic.com/media/3e6987_26017a7cea854f73a339ea7bce9fd394~mv2.jpg",
     "https://static.wixstatic.com/media/3e6987_4a58c937e23a4a948cdd6761669b73ce~mv2.jpg",
@@ -434,7 +434,7 @@ export const PARTNER_PHOTOS: Record<string, string[]> = {
     "https://static.wixstatic.com/media/9ab993_e7f7fddeae8843d6ae8ae6b56c98635e~mv2.jpg",
     "https://static.wixstatic.com/media/9ab993_e9d32f44f8ff492b9fe08d2c264e9083~mv2.jpg",
   ],
-  "toyota-sienna-2021": [
+  "toyota-sienna": [
     "https://static.wixstatic.com/media/9f27fe_3c1752de8918401db67522671d28ccb9~mv2.jpg",
     "https://static.wixstatic.com/media/9f27fe_3e8093fcff2b48199031f957f782cb36~mv2.jpg",
     "https://static.wixstatic.com/media/9f27fe_3f538b99933e40648402fbe6d9a45686~mv2.jpg",
@@ -448,7 +448,7 @@ export const PARTNER_PHOTOS: Record<string, string[]> = {
     "https://static.wixstatic.com/media/9f27fe_dc9236496b944953a0f47252db0903eb~mv2.jpg",
     "https://static.wixstatic.com/media/9f27fe_f0ab50acb6c24b36ba2657afb2708175~mv2.jpg",
   ],
-  "volkswagen-atlas-cross-sport-2021-black": [
+  "volkswagen-atlas-cross-sport": [
     "https://static.wixstatic.com/media/df54ce_262d3efa9b894fbc8ebbb01c843e3b6f~mv2.jpg",
     "https://static.wixstatic.com/media/df54ce_7a24dde368eb45cda35de7a0755f5e76~mv2.jpg",
     "https://static.wixstatic.com/media/df54ce_bebac19ae9fa4468be1ac9d7a74499c2~mv2.jpg",

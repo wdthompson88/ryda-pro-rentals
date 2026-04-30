@@ -386,7 +386,7 @@ export function CompareCalculator({
                 numbers.ryda.totalCash === 0
                   ? 0
                   : (profit / numbers.ryda.totalCash) * 100;
-              return `Projected return (${isPos ? "+" : ""}${returnPct.toFixed(2)}%)`;
+              return `Projected outcome (${isPos ? "+" : ""}${returnPct.toFixed(2)}%)`;
             })()}
             value={
               numbers.ryda.economicCost < 0
@@ -460,7 +460,7 @@ export function CompareCalculator({
                 }`}
               >
                 <span className="text-sm font-medium text-ink">
-                  Projected return ({isPositive ? "+" : ""}
+                  Projected outcome ({isPositive ? "+" : ""}
                   {returnPct.toFixed(2)}%)
                 </span>
                 <span

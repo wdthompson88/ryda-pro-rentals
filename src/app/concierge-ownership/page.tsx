@@ -65,11 +65,12 @@ export default function ConciergeOwnershipPage() {
           </h2>
           <div className="mt-8 space-y-5 text-base leading-relaxed text-ink-soft">
             <p>
-              Delaware has long been the preferred US jurisdiction for the
-              structured ownership of valuable assets. Its legal stability,
-              registry framework, and asset-protection conventions make it
-              the natural home for high-value vehicles held inside a
-              broader portfolio.
+              Delaware is one of the more common US jurisdictions for
+              single-purpose LLC structures, alongside Nevada, Wyoming, and
+              the client&apos;s home state. The right choice depends on
+              your residency, the vehicle&apos;s primary garaging address,
+              and your tax counsel&apos;s view — we structure to those
+              specifics rather than defaulting to a single jurisdiction.
             </p>
             <p>
               RYDA Concierge enables collectors, entrepreneurs, and family
@@ -125,8 +126,8 @@ export default function ConciergeOwnershipPage() {
             />
             <Pillar
               n="06"
-              title="Multi-state & international use"
-              body="The LLC's home state is selected based on your usage and storage profile (residency, garaging, tax nexus); we navigate inter-state titling and registration so the structure stays compliant wherever you actually drive. Multilingual Power of Attorney documentation lets authorized drivers operate the vehicle inside the insurance envelope. Cross-border travel (Mexico/Canada) is coordinated case by case."
+              title="Multi-state coordination"
+              body="The LLC's home state is selected with your tax counsel based on your residency, the vehicle's primary garaging address, and your insurance carrier's preferences. We coordinate inter-state titling and registration alongside your counsel; specifics on tax nexus, sales/use tax, and PPT vary by state and require their sign-off. Cross-border travel (Mexico/Canada) is reviewed case by case with the insurer."
             />
             <Pillar
               n="07"
@@ -251,7 +252,7 @@ export default function ConciergeOwnershipPage() {
             <Profile label="Family offices" />
             <Profile label="Internationally mobile entrepreneurs" />
             <Profile label="Collectors of limited-production vehicles" />
-            <Profile label="Investors in passion assets" />
+            <Profile label="Owners of passion assets &amp; specialty vehicles" />
             <Profile label="Owners seeking discretion in title-holding" />
             <Profile label="Clients consolidating assets across jurisdictions" />
           </div>

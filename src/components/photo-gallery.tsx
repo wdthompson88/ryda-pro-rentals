@@ -6,7 +6,7 @@
 // to close, and arrow-key navigation.
 
 import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export function PhotoGallery({
   photos,
@@ -157,6 +157,44 @@ function Lightbox({
   onSelect: (i: number) => void;
 }) {
   const current = photos[index];
+  const closeRef = useRef<HTMLButtonElement | null>(null);
+  const lastFocusedRef = useRef<HTMLElement | null>(null);
+
+  // a11y: when the lightbox opens, remember what had focus, move focus
+  // to the close button, and restore on unmount. Tab + Shift-Tab are
+  // trapped inside the dialog so keyboard users don't tab behind it.
+  useEffect(() => {
+    lastFocusedRef.current = document.activeElement as HTMLElement | null;
+    closeRef.current?.focus();
+    return () => {
+      lastFocusedRef.current?.focus();
+    };
+  }, []);
+
+  // Focus trap: cycle Tab through the dialog's focusable elements only.
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key !== "Tab") return;
+      const dialog = closeRef.current?.closest('[role="dialog"]');
+      if (!dialog) return;
+      const focusable = dialog.querySelectorAll<HTMLElement>(
+        'button, [href], [tabindex]:not([tabindex="-1"])',
+      );
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      const active = document.activeElement;
+      if (e.shiftKey && active === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   return (
     <div
@@ -168,13 +206,14 @@ function Lightbox({
     >
       {/* Close button (top-right) */}
       <button
+        ref={closeRef}
         type="button"
         onClick={(e) => {
           e.stopPropagation();
           onClose();
         }}
         aria-label="Close photo viewer"
-        className="absolute right-5 top-5 z-10 inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20"
+        className="absolute right-5 top-5 z-10 inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/60"
       >
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden>
           <path

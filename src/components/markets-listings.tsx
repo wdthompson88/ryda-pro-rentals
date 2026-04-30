@@ -521,7 +521,7 @@ function VehicleCard({ vehicle: v }: { vehicle: Vehicle }) {
                 }`}
               >
                 <span className="font-medium text-ink">
-                  Projected return ({rentedIsPositive ? "+" : ""}
+                  Projected outcome ({rentedIsPositive ? "+" : ""}
                   {rentedReturnPct.toFixed(2)}%)
                 </span>
                 <span
