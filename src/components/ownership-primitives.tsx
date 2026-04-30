@@ -75,7 +75,7 @@ export function OwnershipPrimitives({
     return (
       <div className={`rounded-2xl border ${wrapperBorder} ${wrapperBg} p-5`}>
         <p className={`text-[10px] font-medium uppercase tracking-[0.18em] ${eyebrowTone}`}>
-          {title ?? "The ownership primitives"}
+          {title ?? "Every share, in six numbers"}
         </p>
         <div className="mt-4 grid grid-cols-2 gap-x-5 gap-y-4 sm:grid-cols-3 lg:grid-cols-6">
           {items.map((it) => (
