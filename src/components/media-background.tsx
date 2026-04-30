@@ -1,19 +1,29 @@
 "use client";
 
-// Background-media component for hero sections. Renders an autoplay /
-// muted / looped video on top of a poster image. When given an array
-// of video URLs, picks one at random on first mount — fresh content
-// on every visit. Falls back to the poster on video error or when no
-// URL is provided.
+// Background-media component. Renders an autoplay/muted/playsInline
+// video over a poster image and CYCLES through the array on each
+// video-end event — so a column with N clips plays clip[0], then
+// clip[1], …, then loops back to clip[0].
 //
-// Honors prefers-reduced-motion: if the user has reduced motion on,
-// we skip the video entirely and show a calm Ken-Burns-zoomed poster.
+// Why cycling vs. random-pick-and-loop: a splitter that loops one
+// clip forever turns into wallpaper. Cycling keeps the column alive
+// for visitors who hover for any length of time.
+//
+// Falls back to the still poster (with Ken-Burns) if:
+//   • no videos provided (empty array)
+//   • the chosen clip 404s or codec fails
+//   • prefers-reduced-motion is set
+//
+// Media Fragment URI: clip URLs may include a `#t=START,END` fragment
+// (e.g. "/videos/cars-svj.mp4#t=1.5,11.5") — browsers natively respect
+// it for `<video src>`. Used to trim YouTube-short intro/outro frames
+// without re-encoding the file.
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 type Props = {
-  /** One URL, multiple URLs (rotates randomly), or empty for poster-only. */
+  /** One URL, multiple URLs (cycles through), or empty for poster-only. */
   videos?: string | string[];
   poster: string;
   alt: string;
@@ -28,6 +38,12 @@ type Props = {
   className?: string;
 };
 
+function toList(v: Props["videos"]): string[] {
+  if (Array.isArray(v)) return v;
+  if (typeof v === "string" && v.length > 0) return [v];
+  return [];
+}
+
 export function MediaBackground({
   videos,
   poster,
@@ -39,24 +55,18 @@ export function MediaBackground({
   className = "",
 }: Props) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const [chosenVideo, setChosenVideo] = useState<string | null>(null);
+  // The full ordered list of clips for this column.
+  const [list] = useState<string[]>(() => toList(videos));
+  // Index of the currently-playing clip. Start at a random index so
+  // each visit feels different but every clip eventually plays.
+  const [index, setIndex] = useState<number>(() => {
+    const items = toList(videos);
+    return items.length === 0 ? 0 : Math.floor(Math.random() * items.length);
+  });
   const [videoOK, setVideoOK] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
 
-  // Pick a random clip from the rotation on mount. Set on mount only
-  // (empty deps) so the choice locks for the visit — no flicker if a
-  // parent re-renders.
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const list = Array.isArray(videos) ? videos : videos ? [videos] : [];
-    if (list.length === 0) return;
-    const pick = list[Math.floor(Math.random() * list.length)];
-    setChosenVideo(pick);
-    // We intentionally exclude `videos` from the deps — we only want
-    // to pick once on mount, even if the parent hands us a new array
-    // reference on re-render.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const chosenVideo = list[index];
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -67,20 +77,41 @@ export function MediaBackground({
     return () => mq.removeEventListener?.("change", onChange);
   }, []);
 
-  // If the chosen video fails to play (404, codec issue), drop it
-  // silently and let the poster carry the page.
+  // Whenever the chosen URL changes (initial mount or cycle advance),
+  // reset the visible-state and bind error/canplay/ended handlers.
   useEffect(() => {
     const v = videoRef.current;
     if (!v || !chosenVideo) return;
+    setVideoOK(false);
     const onCanPlay = () => setVideoOK(true);
-    const onError = () => setVideoOK(false);
+    // If a clip 404s or the codec fails, advance to the next one
+    // rather than freezing on a poster mid-rotation.
+    const onError = () => {
+      if (list.length > 1) {
+        setIndex((i) => (i + 1) % list.length);
+      }
+    };
+    // Cycle through the list — no `loop` attribute on the video
+    // element, so `ended` fires and we step to the next clip.
+    const onEnded = () => {
+      if (list.length > 1) {
+        setIndex((i) => (i + 1) % list.length);
+      } else {
+        // Single-clip rotation: replay it from the start manually so
+        // we don't stall (Media Fragment URI clips don't auto-loop).
+        v.currentTime = 0;
+        v.play().catch(() => {});
+      }
+    };
     v.addEventListener("canplay", onCanPlay);
     v.addEventListener("error", onError);
+    v.addEventListener("ended", onEnded);
     return () => {
       v.removeEventListener("canplay", onCanPlay);
       v.removeEventListener("error", onError);
+      v.removeEventListener("ended", onEnded);
     };
-  }, [chosenVideo]);
+  }, [chosenVideo, list]);
 
   const showVideo = !!chosenVideo && !reducedMotion;
 
@@ -98,15 +129,17 @@ export function MediaBackground({
         style={{ objectPosition: position }}
       />
 
-      {/* Video layer — only rendered if we have a URL and motion is OK.
-          Sits above the poster with a fade-in once playback starts. */}
+      {/* Video layer — fades in once the next clip in the cycle is
+          playable. We re-key on the URL so React unmounts/remounts
+          the <video> element on each cycle advance, which forces a
+          fresh load + the canplay handshake. */}
       {showVideo && (
         <video
+          key={chosenVideo}
           ref={videoRef}
           src={chosenVideo}
           autoPlay
           muted
-          loop
           playsInline
           preload="auto"
           aria-hidden

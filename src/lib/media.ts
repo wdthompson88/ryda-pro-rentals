@@ -34,18 +34,25 @@ const PX = (id: string, spec: string) =>
 
 export const SPLITTER_MEDIA: Record<"cars" | "boats" | "planes", MediaSlot> = {
   cars: {
-    // 7 supercar clips where the camera stays LOCKED on the car —
-    // either interior/cockpit POV (guaranteed lock) or external
-    // tracking shots that follow the vehicle. No clips that trail
-    // off to landscape, road, or environment.
+    // Mix: 6 Pexels supercar clips (camera locked on vehicle) + 3
+    // CEO-provided owned-asset clips (Koenigsegg Jesko, Ferrari,
+    // Aventador SVJ). The SVJ uses Media Fragment URI #t=1.5,11.5
+    // to trim the YouTube-short intro/outro (road-only frames the
+    // CEO flagged). Browser plays only the trimmed window natively.
+    // Dropped Aventador-Lisbon (17051328) — the "trails off to
+    // skyline" clip the CEO called out in the screenshot.
     videos: [
+      // Owned-asset, brand-approved
+      "/videos/cars-koenigsegg-jesko.mp4",
+      "/videos/cars-ferrari.mp4",
+      "/videos/cars-aventador-svj.mp4#t=1.5,11.5",
+      // Pexels — camera-locked supercar shots
       PX("8443860", "hd_1920_1080_30fps"),  // Driver-side interior of red Ferrari, in motion
       PX("8443861", "hd_1920_1080_30fps"),  // Luxury sports car interior, driving
       PX("8443781", "hd_1920_1080_30fps"),  // Red Ferrari driver POV
       PX("5309345", "hd_1920_1080_25fps"),  // Man driving McLaren (interior)
-      PX("7727416", "hd_1920_1080_25fps"),  // Lamborghini speeding (tracking shot, car centered)
+      PX("7727416", "hd_1920_1080_25fps"),  // Lamborghini speeding (tracking, car centered)
       PX("16976173", "hd_1920_1080_24fps"), // Ferrari 458 in Zurich (tracking)
-      PX("17051328", "hd_1920_1080_24fps"), // Lamborghini Aventador in Lisbon (tracking)
     ],
     poster:
       "https://images.unsplash.com/photo-1592198084033-aade902d1aae?auto=format&fit=crop&w=2400&q=85",
@@ -53,14 +60,21 @@ export const SPLITTER_MEDIA: Record<"cars" | "boats" | "planes", MediaSlot> = {
     position: "center 30%",
   },
   boats: {
-    // 5 SUPERYACHT clips — large luxury vessels only. Dropped the
-    // generic motorboat tracking shots (4337674/4337675) that didn't
-    // read as luxury. Every clip features a 100ft+ yacht.
+    // Mix: 4 Pexels superyacht clips + 5 CEO-provided owned-asset
+    // yacht clips (LOON, Eclipse, Superyacht-in-London, Untitled,
+    // vtMyG3i7TvI). Dropped the Haulover Bay clip (19867146) — the
+    // "yacht too small at horizon" one the CEO called out.
     videos: [
+      // Owned-asset, brand-approved (named superyachts: LOON, ECLIPSE)
+      "/videos/boats-my-loon.mp4",
+      "/videos/boats-eclipse.mp4",
+      "/videos/boats-london.mp4",
+      "/videos/boats-vtmyg3.mp4",
+      "/videos/boats-untitled.mp4",
+      // Pexels — superyacht only
       PX("14037403", "hd_1920_1080_30fps"), // White yacht sailing (aerial)
       PX("14037398", "hd_1920_1080_30fps"), // Drone aerial of white motor yacht along coastal city
       PX("13878618", "hd_1920_1080_30fps"), // Yacht sailing out of marina
-      PX("19867146", "hd_1920_1080_30fps"), // White yacht in Haulover Bay, Miami
       PX("15288018", "hd_1920_1080_30fps"), // Drone video of luxury yacht docked at port
     ],
     poster:
@@ -69,14 +83,9 @@ export const SPLITTER_MEDIA: Record<"cars" | "boats" | "planes", MediaSlot> = {
     position: "center 50%",
   },
   planes: {
-    // PRIVATE JETS only — Gulfstream/Bombardier/Citation-class
-    // business jets. Dropped the commercial-airliner clips
-    // (12086908 "Airplane landing over trees", 3678380 "Montreal
-    // landing") that read as Boeing/Airbus.
-    videos: [
-      PX("13278455", "hd_1920_1080_30fps"), // Private jet landing at airport
-      PX("13278451", "hd_1920_1080_30fps"), // Private jet landing at Prague airport
-    ],
+    // Single owned-asset private-jet edit. CEO replaced the
+    // turboprop / commercial-airliner Pexels clips entirely.
+    videos: ["/videos/planes-jet-edit.mp4"],
     poster:
       "https://images.unsplash.com/photo-1474302770737-173ee21bab63?auto=format&fit=crop&w=2400&q=85",
     alt: "Private jet on tarmac at dusk",
