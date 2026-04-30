@@ -5,7 +5,7 @@ export function SiteFooter() {
     <footer className="border-t border-rule">
       <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10">
         <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-12">
-          <div className="lg:col-span-4">
+          <div className="lg:col-span-3">
             <p className="font-display text-2xl text-ink">RYDA</p>
             <p className="mt-3 max-w-sm text-sm text-ink-soft">
               Supercar co-ownership and rentals. Miami, FL.
@@ -16,6 +16,15 @@ export function SiteFooter() {
             >
               Apply to join
             </Link>
+            <div className="mt-5 flex items-center gap-3 text-xs text-mute">
+              <Link href="/signin" className="hover:text-ink">
+                Sign in
+              </Link>
+              <span className="text-rule">·</span>
+              <Link href="/signup" className="hover:text-ink">
+                Sign up
+              </Link>
+            </div>
           </div>
 
           <FooterCol
@@ -41,14 +50,25 @@ export function SiteFooter() {
             ]}
           />
           <FooterCol
+            title="Resources"
+            links={[
+              ["Inside RYDA", "/inside"],
+              ["Sample documents", "/sample-documents"],
+              ["RYDA vs Turo", "/vs/turo"],
+              ["RYDA vs Marengo", "/vs/marengo"],
+              ["RYDA vs Supercar Club", "/vs/supercar-club"],
+              ["Journal", "/journal"],
+            ]}
+          />
+          <FooterCol
             title="Company"
             links={[
               ["About", "/about"],
-              ["Journal", "/journal"],
               ["Careers", "/careers"],
               ["Press", "/press"],
               ["Investors", "/investors"],
               ["Contact", "/contact"],
+              ["Help center", "/help"],
             ]}
           />
           <FooterCol

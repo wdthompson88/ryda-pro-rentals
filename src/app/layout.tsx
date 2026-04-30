@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Fraunces } from "next/font/google";
 import "./globals.css";
 import { SiteFooter } from "@/components/site-footer";
+import { CookieBanner } from "@/components/cookie-banner";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -80,6 +81,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-cream text-ink">
         <div className="flex-1">{children}</div>
         <SiteFooter />
+        <CookieBanner />
       </body>
     </html>
   );

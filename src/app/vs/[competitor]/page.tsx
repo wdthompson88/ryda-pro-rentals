@@ -37,12 +37,12 @@ const COMPARISONS: Comparison[] = [
       },
       {
         label: "Insurance",
-        competitor: "Host-paid plan; premium vehicles often excluded from Turo's standard protection",
+        competitor: "Coverage varies by host's chosen Turo plan; review their protection plan docs for premium-vehicle specifics",
         ryda: "Agreed-value LLC fleet policy from an A-rated US carrier; co-owners named insureds",
       },
       {
         label: "Cost on a Ferrari 296",
-        competitor: "$2,000–3,000/day on Turo + commercial insurance burden if you list one",
+        competitor: "$2,000–3,000/day on Turo (host-set rates); commercial insurance often required if you list a high-value car",
         ryda: "$34K share + $7,080/yr ops = ~$236/day in steady-state ops + $30,600 estimated resale at year 2",
       },
       {
@@ -137,7 +137,7 @@ const COMPARISONS: Comparison[] = [
     whenChoose: {
       theirs:
         "You want variety, predictable annual budgeting, and zero commitment to a specific vehicle. Club membership reads as a usage-fee, not an investment.",
-      ours: "You want the ownership stake and the cost discipline — your buy-in is recovered (most of it) at exit, so the all-in over 2 years is materially lower than club fees.",
+      ours: "You want an ownership stake and cost discipline — at exit, the LLC's resale returns most of your buy-in (subject to actual market depreciation, modeled here at 10%), so the all-in over 2 years is materially lower than club fees consumed for nothing.",
     },
   },
 ];

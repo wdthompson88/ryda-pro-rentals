@@ -1,11 +1,11 @@
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { OrderPanel } from "@/components/order-panel";
 import { CostBreakdown } from "@/components/cost-breakdown";
 import { ShareValueChart } from "@/components/share-value-chart";
 import { CompareCalculator } from "@/components/compare-calculator";
+import { PhotoGallery } from "@/components/photo-gallery";
 import {
   VEHICLES,
   getVehicleBySymbol,
@@ -44,26 +44,23 @@ export default async function VehicleMarketPage({
   const econ = computeShareEconomics(v);
 
   // Structured data for richer Google search results.
-  // Modeled as a Vehicle (not Product) since these are real cars with VINs.
+  // We model the listing as a Product (the share itself) with the
+  // physical Vehicle as the itemOffered. This way Google reads the
+  // page price as the per-share price, not the full vehicle price.
+  const pageUrl = `/markets/${v.symbol.toLowerCase()}`;
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Vehicle",
-    name: `${v.year} ${v.name}`,
-    brand: { "@type": "Brand", name: v.brand },
-    model: v.name.replace(`${v.brand} `, "").trim(),
-    vehicleModelDate: String(v.year),
-    bodyType: v.category,
-    numberOfDoors: v.category === "SUV" ? 4 : 2,
-    fuelType: v.cylinders === 0 ? "Electric" : "Gasoline",
-    driveWheelConfiguration:
-      v.drive === "AWD"
-        ? "https://schema.org/AllWheelDriveConfiguration"
-        : "https://schema.org/RearWheelDriveConfiguration",
-    color: v.specs.color,
+    "@type": "Product",
+    "@id": pageUrl,
+    url: pageUrl,
+    name: `1 share · ${v.year} ${v.name}`,
+    description: `Asset-backed co-ownership share in a ${v.year} ${v.name}. Each share unlocks ~${v.daysPerYear} days/yr and ~${v.milesPerYear.toLocaleString()} mi/yr. ${v.description}`,
     image: v.hero,
-    description: v.description,
+    brand: { "@type": "Brand", name: "RYDA" },
+    category: "Co-ownership share",
     offers: {
       "@type": "Offer",
+      url: pageUrl,
       name: `1 share (${v.daysPerYear} days/yr · ${v.milesPerYear.toLocaleString()} mi/yr)`,
       price: v.pricePerShare,
       priceCurrency: "USD",
@@ -77,6 +74,22 @@ export default async function VehicleMarketPage({
         value: v.sharesAvailable,
         maxValue: v.shares,
         unitText: "shares",
+      },
+      itemOffered: {
+        "@type": "Vehicle",
+        name: `${v.year} ${v.name}`,
+        brand: { "@type": "Brand", name: v.brand },
+        model: v.name.replace(`${v.brand} `, "").trim(),
+        vehicleModelDate: String(v.year),
+        bodyType: v.category,
+        numberOfDoors: v.category === "SUV" ? 4 : 2,
+        fuelType: v.cylinders === 0 ? "Electric" : "Gasoline",
+        driveWheelConfiguration:
+          v.drive === "AWD"
+            ? "https://schema.org/AllWheelDriveConfiguration"
+            : "https://schema.org/RearWheelDriveConfiguration",
+        color: v.specs.color,
+        image: v.hero,
       },
     },
   };
@@ -102,17 +115,13 @@ export default async function VehicleMarketPage({
           <div className="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-12">
             {/* Left column — title + chart (price + change live inside the chart) */}
             <div className="lg:col-span-8">
-              <div className="relative aspect-[16/9] w-full overflow-hidden rounded-2xl bg-cream-2">
-                <Image
-                  src={v.hero}
-                  alt={`${v.year} ${v.name}`}
-                  fill
-                  priority
-                  sizes="(min-width: 1024px) 66vw, 100vw"
-                  className={`object-cover ${v.flipImage ? "-scale-x-100" : ""}`}
-                  style={{ objectPosition: v.imagePosition ?? "center" }}
-                />
-              </div>
+              <PhotoGallery
+                photos={[v.hero]}
+                alt={`${v.year} ${v.name}`}
+                flipFirst={v.flipImage}
+                imagePosition={v.imagePosition}
+                optimize
+              />
 
               <h1 className="mt-6 font-display text-4xl font-light text-ink sm:text-5xl">
                 {v.name}

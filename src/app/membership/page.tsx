@@ -253,32 +253,34 @@ function TierCard({ tier }: { tier: typeof TIERS[number] }) {
   const items = FEATURES.flatMap((g) => g.items.filter(isUpgrade)).slice(0, 7);
   const previousLabel = isBlack ? "Everything in Blue, plus" : isBlue ? "Everything in Core, plus" : null;
 
-  // Tier colorways — distinct color per tier so they read as a ladder:
+  // Tier colorways — distinct color per tier, theme-independent so
+  // they look identical in both light + dark modes:
   //   Core  → RYDA red (the entry tier, brand-loud and inviting)
   //   Blue  → deep sapphire blue (the active-member tier)
   //   Black → pure black (the concierge tier, premium)
+  // Text + accents always use #F4F1EC (warm cream) — does NOT theme,
+  // because the card backgrounds don't theme either.
   const bg = isBlack
-    ? "bg-black text-cream border-black"
+    ? "bg-black border-black"
     : isBlue
-      ? "bg-[#1e40af] text-cream border-[#1e40af]"
-      : "bg-red text-cream border-red";
+      ? "bg-[#1e40af] border-[#1e40af]"
+      : "bg-[#DC4747] border-[#DC4747]";
 
-  // All three cards now have light text on dark bg, so sub + accents
-  // are uniform.
-  const sub = "text-cream/75";
-  const accent = "text-cream";
-  const checkColor = "text-cream";
+  const textOnCard = "text-[#F4F1EC]";
+  const sub = "text-[#F4F1EC]/75";
+  const accent = "text-[#F4F1EC]";
+  const checkColor = "text-[#F4F1EC]";
 
-  // CTA buttons: cream on every card, hover lifts to white.
+  // CTA buttons: warm cream bg + tier-color text, theme-independent.
   const ctaCls = isBlack
-    ? "bg-cream text-black hover:bg-white"
+    ? "bg-[#F4F1EC] text-black hover:bg-white"
     : isBlue
-      ? "bg-cream text-[#1e40af] hover:bg-white"
-      : "bg-cream text-red hover:bg-white";
+      ? "bg-[#F4F1EC] text-[#1e40af] hover:bg-white"
+      : "bg-[#F4F1EC] text-[#DC4747] hover:bg-white";
 
   return (
     <div
-      className={`relative flex flex-col rounded-2xl border border-rule p-8 ${bg}`}
+      className={`relative flex flex-col rounded-2xl border border-rule p-8 ${bg} ${textOnCard}`}
     >
       {tier.badge && (
         <span className="absolute -top-3 left-8 rounded-full bg-red px-3 py-1 text-xs font-medium text-cream">

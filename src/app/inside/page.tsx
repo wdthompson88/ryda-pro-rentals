@@ -35,11 +35,11 @@ export default function InsidePage() {
             <span className="italic text-red">the inside.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
-            Every section below is a real screen from the member app —
-            populated with sample holdings so you can see what the
-            experience looks like before you commit. Sign in after
-            purchase to see your actual portfolio, calendar, and
-            documents.
+            A preview of the upcoming member app, modeled with sample
+            holdings so you can see what the experience will look like
+            before you commit. Final views may differ in polish detail.
+            After purchase, sign in to see your actual portfolio,
+            calendar, and documents.
           </p>
         </div>
       </section>
@@ -179,10 +179,11 @@ export default function InsidePage() {
                 <div className="p-6">
                   <div className="mb-4 flex items-center justify-between">
                     <p className="font-display text-xl text-ink">May 2026</p>
-                    <div className="flex gap-2 text-xs text-mute">
+                    <div className="flex flex-wrap gap-2 text-xs text-mute">
                       <Legend color="bg-red" label="Yours" />
                       <Legend color="bg-mute/60" label="Other co-owner" />
-                      <Legend color="bg-cream-2" label="Open" />
+                      <Legend color="border border-rule bg-cream-2" label="Open" />
+                      <Legend color="bg-ink/30" label="Service" />
                     </div>
                   </div>
                   <div className="grid grid-cols-7 gap-1.5">
@@ -194,7 +195,7 @@ export default function InsidePage() {
                         bg = "bg-cream-2/40";
                         textColor = "text-mute";
                       } else if (day >= 8 && day <= 11) {
-                        bg = "bg-red text-cream";
+                        bg = "bg-red";
                         textColor = "text-cream";
                       } else if (
                         day === 4 ||
@@ -203,8 +204,11 @@ export default function InsidePage() {
                         day === 18 ||
                         day === 22
                       ) {
-                        bg = "bg-mute/60 text-cream";
+                        bg = "bg-mute/60";
                         textColor = "text-cream";
+                      } else if (day === 28) {
+                        bg = "bg-ink/30";
+                        textColor = "text-ink-soft";
                       }
                       return (
                         <div
@@ -331,22 +335,27 @@ export default function InsidePage() {
                     ["Title Evidence", "F296 LLC", "Apr 02", "PDF"],
                     ["Q1 Condition Report", "F296", "Mar 31", "PDF"],
                   ].map(([title, owner, date, type]) => (
-                    <li
-                      key={title}
-                      className="flex items-center gap-4 px-5 py-3.5"
-                    >
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-cream-2 text-[10px] font-bold uppercase tracking-wider text-mute">
-                        {type}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-ink">{title}</p>
-                        <p className="text-[11px] text-mute">
-                          {owner} · {date}
-                        </p>
-                      </div>
-                      <span className="text-xs font-medium text-red">
-                        Download
-                      </span>
+                    <li key={title}>
+                      <Link
+                        href={`/sample-documents#${(title as string)
+                          .toLowerCase()
+                          .replace(/[^a-z0-9]+/g, "-")
+                          .replace(/(^-|-$)/g, "")}`}
+                        className="flex items-center gap-4 px-5 py-3.5 transition-colors hover:bg-cream-2/40"
+                      >
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-cream-2 text-[10px] font-bold uppercase tracking-wider text-mute">
+                          {type}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium text-ink">{title}</p>
+                          <p className="text-[11px] text-mute">
+                            {owner} · {date}
+                          </p>
+                        </div>
+                        <span className="text-xs font-medium text-red">
+                          View sample →
+                        </span>
+                      </Link>
                     </li>
                   ))}
                 </ul>

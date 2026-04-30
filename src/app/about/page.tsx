@@ -53,6 +53,89 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* Founder's letter */}
+      <section className="border-b border-rule bg-cream-2">
+        <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10 sm:py-24">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+            A note from our founder
+          </p>
+          <h2 className="mt-4 font-display text-3xl text-ink sm:text-4xl">
+            What we're trying to build, in plain English.
+          </h2>
+          <div className="mt-10 space-y-5 text-base leading-relaxed text-ink-soft">
+            <p>
+              I&apos;m going to keep this short. There are roughly three honest
+              ways to put a supercar in your driveway in the United States
+              today. You can buy one outright, which costs $250,000 to
+              $1,000,000 of capital plus $40,000 to $80,000 a year to keep —
+              and the car sits idle 90% of the year. You can rent one for
+              $2,000–$3,000 a day from a marketplace where coverage and quality
+              vary by host. Or you can join a club that hands you rotating
+              access for an annual fee that&apos;s consumed regardless of how
+              much you drive.
+            </p>
+            <p>
+              None of those was the right answer for us, or for any of our
+              friends who actually wanted to drive an exotic. RYDA is the
+              fourth answer. It&apos;s a real ownership stake — title held by
+              a single-purpose Delaware LLC where you and up to nine other
+              verified members are the registered owners. We run the
+              operations under a separate Management Services Agreement, the
+              same way an aviation club runs the jets it doesn&apos;t own.
+            </p>
+            <p>
+              The math is simple: a $34K share in a Ferrari 296, plus $7,080 a
+              year for insurance, storage, maintenance, and reserves, gets you
+              up to 30 days behind the wheel and a real exit at year two. We
+              model the residual at 90% of buy-in. We don&apos;t pretend the
+              car appreciates — it depreciates, and the model accounts for it.
+              What you walk away with isn&apos;t a return. It&apos;s the
+              experience of having actually driven a Ferrari, on real roads,
+              for the kind of money that doesn&apos;t require selling an
+              equity position to pull off.
+            </p>
+            <p>
+              We&apos;re vetting the first 100 members for our Miami launch.
+              If this fits how you actually want to use a supercar — own a
+              piece, drive it 30 days a year, never deal with the
+              operational side — we&apos;d like to talk.
+            </p>
+          </div>
+
+          <div className="mt-10 flex items-center gap-4">
+            <Image
+              src="/team/ryan.jpg"
+              alt="Ryan Galli"
+              width={56}
+              height={56}
+              className="rounded-full object-cover"
+              style={{ filter: "grayscale(100%) contrast(1.05)" }}
+            />
+            <div>
+              <p className="font-display text-base text-ink">Ryan Galli</p>
+              <p className="text-xs uppercase tracking-wider text-mute">
+                Co-founder & CEO, RYDA
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-10 flex flex-wrap gap-3">
+            <Link
+              href="/founding-members"
+              className="inline-flex h-12 items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream hover:bg-red"
+            >
+              Apply for founding membership →
+            </Link>
+            <Link
+              href="/contact?type=Membership#form"
+              className="inline-flex h-12 items-center justify-center rounded-full border border-rule px-7 text-sm font-medium text-ink hover:border-ink"
+            >
+              Schedule a 30-minute call
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Mission + Values */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-24">

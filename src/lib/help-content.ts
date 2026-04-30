@@ -36,7 +36,7 @@ export const HELP: HelpCategory[] = [
         slug: "what-is-ryda",
         q: "What is RYDA, in one paragraph?",
         summary:
-          "Member-managed supercar co-ownership. Each vehicle is held in a single-purpose Delaware LLC; up to 10 verified members co-own and manage it together.",
+          "Supercar co-ownership and rentals. Each vehicle is held in a single-purpose, member-managed Delaware LLC; up to 10 verified members co-own and manage it together. Members can also rent any car in the fleet by the day.",
         body: [
           {
             type: "p",

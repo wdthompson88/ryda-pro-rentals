@@ -3,40 +3,60 @@ import { SiteHeader } from "@/components/site-header";
 
 export const metadata = { title: "Not found — RYDA" };
 
+const POPULAR = [
+  { label: "See the fleet", href: "/markets", note: "Co-ownership shares" },
+  { label: "Browse rentals", href: "/rent", note: "Daily rates from $1,200" },
+  { label: "How it works", href: "/how-it-works", note: "The 5-step explainer" },
+  { label: "Sample documents", href: "/sample-documents", note: "Operating Agreement, MSA, more" },
+  { label: "Membership tiers", href: "/membership", note: "Core · Blue · Black" },
+  { label: "Contact us", href: "/contact", note: "Real humans, fast replies" },
+];
+
 export default function NotFound() {
   return (
     <>
       <SiteHeader />
-      <section className="flex min-h-[70vh] items-center justify-center px-6 py-20">
-        <div className="text-center">
+      <section className="px-6 py-20 sm:py-28">
+        <div className="mx-auto max-w-4xl text-center">
           <p className="font-display text-8xl text-red sm:text-9xl">404</p>
           <h1 className="mt-6 font-display text-3xl text-ink sm:text-4xl">
             That page took the long way home.
           </h1>
           <p className="mx-auto mt-4 max-w-md text-base text-ink-soft">
             We can't find what you were looking for. Could be moved, could be
-            renamed, could be a typo. Here's what we'd suggest instead:
+            renamed, could be a typo. Here are some popular destinations:
           </p>
-          <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+        </div>
+
+        <div className="mx-auto mt-12 grid max-w-4xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {POPULAR.map((p) => (
             <Link
-              href="/"
-              className="inline-flex h-12 items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream hover:bg-red"
+              key={p.href}
+              href={p.href}
+              className="group block rounded-2xl border border-rule bg-surface p-5 text-left transition-shadow hover:shadow-md"
             >
-              Back to home →
+              <p className="font-display text-base text-ink">{p.label}</p>
+              <p className="mt-1 text-xs text-mute">{p.note}</p>
+              <p className="mt-3 text-xs font-medium text-red group-hover:text-red-deep">
+                Go →
+              </p>
             </Link>
-            <Link
-              href="/markets"
-              className="inline-flex h-12 items-center justify-center rounded-full border border-rule px-7 text-sm font-medium text-ink hover:border-ink"
-            >
-              See the fleet
-            </Link>
-            <Link
-              href="/contact"
-              className="inline-flex h-12 items-center justify-center rounded-full border border-rule px-7 text-sm font-medium text-ink hover:border-ink"
-            >
-              Contact us
-            </Link>
-          </div>
+          ))}
+        </div>
+
+        <div className="mx-auto mt-12 flex max-w-md flex-col items-center gap-3 sm:flex-row sm:justify-center">
+          <Link
+            href="/"
+            className="inline-flex h-12 items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream hover:bg-red"
+          >
+            Back to home →
+          </Link>
+          <Link
+            href="/help"
+            className="inline-flex h-12 items-center justify-center rounded-full border border-rule px-7 text-sm font-medium text-ink-soft hover:border-ink hover:text-ink"
+          >
+            Search help center
+          </Link>
         </div>
       </section>
     </>

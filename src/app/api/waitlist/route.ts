@@ -10,6 +10,12 @@ export async function POST(req: Request) {
     const email = String(body.email || "").trim().toLowerCase();
     const name = String(body.name || "").trim();
     const market = VALID_MARKETS.has(body.market) ? body.market : "Miami";
+    // Source attribution — which surface produced this lead. Free-form
+    // string, capped at 64 chars to keep the column tidy. Persisted if
+    // the `source` column exists; the email notification always shows it.
+    const source = String(body.source || "")
+      .trim()
+      .slice(0, 64);
 
     if (!email || !email.includes("@")) {
       return NextResponse.json({ error: "Valid email required." }, { status: 400 });
@@ -27,9 +33,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true, persisted: false });
     }
 
-    const { error } = await supabase
+    // Try inserting with `source`; fall back to a source-less insert
+    // if the column doesn't exist yet (older deployments).
+    let { error } = await supabase
       .from("waitlist")
-      .insert({ email, name: name || null, market });
+      .insert({ email, name: name || null, market, source: source || null });
+
+    if (error && /column.*source/i.test(error.message ?? "")) {
+      ({ error } = await supabase
+        .from("waitlist")
+        .insert({ email, name: name || null, market }));
+    }
 
     if (error) {
       // 23505 = unique violation (duplicate email). Don't email on duplicates;
@@ -50,6 +64,7 @@ export async function POST(req: Request) {
         ${name ? `<div style="margin-top:14px;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#9A9590;">Name</div><div style="margin-top:2px;">${escapeHtml(name)}</div>` : ""}
         <div style="margin-top:14px;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#9A9590;">Market</div>
         <div style="margin-top:2px;">${escapeHtml(market)}</div>
+        ${source ? `<div style="margin-top:14px;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#9A9590;">Source</div><div style="margin-top:2px;">${escapeHtml(source)}</div>` : ""}
         <div style="margin-top:24px;padding-top:18px;border-top:1px solid #e5e1d8;font-size:13px;color:#3c3c3c;">
           <strong>Hit reply</strong> to respond — this email's reply-to is set to ${escapeHtml(email)}.
         </div>

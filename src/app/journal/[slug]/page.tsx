@@ -87,24 +87,41 @@ export default async function JournalPostPage({
           <ul className="mt-6 space-y-3">
             {POSTS.filter((p) => p.slug !== post.slug)
               .slice(0, 3)
-              .map((p) => (
-                <li
-                  key={p.slug}
-                  className="rounded-xl border border-rule bg-surface p-5"
-                >
-                  <p className="text-xs uppercase tracking-wider text-red">
-                    {p.tag}
-                  </p>
-                  <p className="mt-2 font-display text-base text-ink">
-                    {p.title}
-                  </p>
-                  <p className="mt-2 text-xs text-mute italic">
-                    {p.status === "published"
-                      ? "Read →"
-                      : "Coming at launch"}
-                  </p>
-                </li>
-              ))}
+              .map((p) =>
+                p.status === "published" ? (
+                  <li key={p.slug}>
+                    <Link
+                      href={`/journal/${p.slug}`}
+                      className="block rounded-xl border border-rule bg-surface p-5 transition-shadow hover:shadow-md"
+                    >
+                      <p className="text-xs uppercase tracking-wider text-red">
+                        {p.tag}
+                      </p>
+                      <p className="mt-2 font-display text-base text-ink">
+                        {p.title}
+                      </p>
+                      <p className="mt-2 text-xs font-medium text-red">
+                        Read →
+                      </p>
+                    </Link>
+                  </li>
+                ) : (
+                  <li
+                    key={p.slug}
+                    className="rounded-xl border border-rule bg-surface p-5"
+                  >
+                    <p className="text-xs uppercase tracking-wider text-red">
+                      {p.tag}
+                    </p>
+                    <p className="mt-2 font-display text-base text-ink">
+                      {p.title}
+                    </p>
+                    <p className="mt-2 text-xs text-mute italic">
+                      Coming at launch
+                    </p>
+                  </li>
+                ),
+              )}
           </ul>
         </div>
       </article>

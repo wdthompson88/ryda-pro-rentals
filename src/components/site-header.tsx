@@ -40,6 +40,12 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
         <div className="flex items-center gap-3">
           <ThemeToggle className="hidden sm:inline-flex" />
           <Link
+            href="/signin"
+            className={`hidden text-sm font-medium transition-colors sm:inline-flex ${tone}`}
+          >
+            Sign in
+          </Link>
+          <Link
             href="/founding-members"
             className={`hidden rounded-full border px-5 py-2 text-sm font-medium transition-colors sm:inline-flex ${ctaBase}`}
           >
@@ -101,6 +107,13 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
                 {n.label}
               </Link>
             ))}
+            <Link
+              href="/signin"
+              onClick={() => setOpen(false)}
+              className="rounded-lg px-3 py-3"
+            >
+              Sign in
+            </Link>
             <Link
               href="/founding-members"
               onClick={() => setOpen(false)}
