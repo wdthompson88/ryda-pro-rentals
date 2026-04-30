@@ -8,7 +8,7 @@ export function SiteFooter() {
           <div className="lg:col-span-4">
             <p className="font-display text-2xl text-ink">RYDA</p>
             <p className="mt-3 max-w-sm text-sm text-ink-soft">
-              Member-managed supercar co-ownership. Miami, FL.
+              Supercar co-ownership and rentals. Miami, FL.
             </p>
             <Link
               href="/founding-members"
