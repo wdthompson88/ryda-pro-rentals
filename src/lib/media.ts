@@ -71,16 +71,15 @@ export const SPLITTER_MEDIA: Record<"cars" | "boats" | "planes", MediaSlot> = {
     position: "center 50%",
   },
   planes: {
-    // 2 confirmed plane-landing clips. Add more as Pexels releases new
-    // motion-focused aviation footage.
-    videos: [
-      PX("12086908", "hd_1920_1080_30fps"), // Airplane landing over trees
-      PX("3678380", "hd_1920_1080_30fps"),  // Airplane landing on Montreal runway
-    ],
+    // Owned-asset cloud-sunset loop (above-the-clouds, golden hour).
+    // Single clip — CEO requested this exact aesthetic, no rotation.
+    // File lives at /public/videos/planes-clouds.mp4 so it's served
+    // from our own CDN, no external dependency or hotlink fragility.
+    videos: ["/videos/planes-clouds.mp4"],
     poster:
       "https://images.unsplash.com/photo-1474302770737-173ee21bab63?auto=format&fit=crop&w=2400&q=85",
-    alt: "Private jet on tarmac at dusk",
-    position: "center 70%",
+    alt: "Above the clouds at sunset",
+    position: "center",
   },
 };
 
@@ -123,9 +122,9 @@ export const HERO_MEDIA: Record<
     alt: "Yacht on the water at sunset",
   },
   planes: {
-    videos: [PX("12086908", "hd_1920_1080_30fps")],
+    videos: ["/videos/planes-clouds.mp4"],
     poster:
       "https://images.unsplash.com/photo-1474302770737-173ee21bab63?auto=format&fit=crop&w=2400&q=85",
-    alt: "Private jet on tarmac at dusk",
+    alt: "Above the clouds at sunset",
   },
 };
