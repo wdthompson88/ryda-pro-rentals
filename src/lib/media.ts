@@ -51,12 +51,19 @@ export const SPLITTER_MEDIA: Record<"cars" | "boats" | "planes", MediaSlot> = {
     position: "center 30%",
   },
   boats: {
-    // 4 yacht clips — drone aerials, sailing on open water.
+    // 6 yacht-PROMINENT clips. Earlier rotation included 3 wide-ocean
+    // panoramas where the yacht was a small dot on the horizon — a
+    // splitter column that plays "open water with no boat" reads as
+    // broken to a buyer. Replaced with tracking shots, close marina
+    // shots, and a Miami Haulover Bay yacht — boat fills the frame in
+    // every clip.
     videos: [
-      PX("14037398", "hd_1920_1080_30fps"), // Drone aerial of white motor yacht
-      PX("7555069", "hd_1920_1080_25fps"),  // Yachts on the sea
-      PX("4646338", "hd_1920_1080_30fps"),  // Sailing boats on the sea
-      PX("854702", "hd_1920_1080_25fps"),   // Sailing boat at sea
+      PX("14037398", "hd_1920_1080_30fps"), // Drone aerial of white motor yacht along coastal city
+      PX("4337674", "hd_1920_1080_30fps"),  // Tracking shot of motor boat on water
+      PX("4337675", "hd_1920_1080_30fps"),  // Tracking shot, alternate angle
+      PX("13878618", "hd_1920_1080_30fps"), // Yacht sailing out of marina
+      PX("19867146", "hd_1920_1080_30fps"), // White yacht in Haulover Bay, Miami
+      PX("4115781", "hd_1920_1080_25fps"),  // Motor boat traversing open sea
     ],
     poster:
       "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?auto=format&fit=crop&w=2400&q=85",
