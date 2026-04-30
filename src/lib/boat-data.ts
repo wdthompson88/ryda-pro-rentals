@@ -165,7 +165,9 @@ export const BOATS: Boat[] = [
     listingStart: "2026-03-30",
     listingEnd: "2026-09-30",
     hero:
-      "https://images.unsplash.com/photo-1551731409-43eb3e517a1a?auto=format&fit=crop&w=1920&q=80",
+      "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?auto=format&fit=crop&w=1920&q=80",
+    flipImage: true,
+    imagePosition: "center 40%",
     currentEngineHours: 410,
     description:
       "The Pershing 6X is the marquee sport yacht in our Miami fleet — surface drives for blistering bay-to-Bimini runs, three-cabin layout, and a beach-club aft platform that converts the swim step into a full lounge.",
@@ -213,7 +215,8 @@ export const BOATS: Boat[] = [
     listingStart: "2026-04-22",
     listingEnd: "2026-10-22",
     hero:
-      "https://images.unsplash.com/photo-1547036967-23d11aacaee0?auto=format&fit=crop&w=1920&q=80",
+      "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?auto=format&fit=crop&w=1920&q=80",
+    imagePosition: "center 70%",
     currentEngineHours: 165,
     description:
       "The Aquariva is the most photographable boat in Italian history. Mahogany hull, polished stainless detailing, twin Yanmars to fly across the bay. A day boat for a member who wants something timeless.",
@@ -261,7 +264,9 @@ export const BOATS: Boat[] = [
     listingStart: "2026-04-10",
     listingEnd: "2026-10-10",
     hero:
-      "https://images.unsplash.com/photo-1572731884502-bd0fd95c6306?auto=format&fit=crop&w=1920&q=80",
+      "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?auto=format&fit=crop&w=1920&q=80",
+    flipImage: true,
+    imagePosition: "center 25%",
     currentEngineHours: 220,
     description:
       "The Lagoon 50 is built for distance. Four-cabin layout with crew quarters, full bluewater rig, generator and watermaker — capable of multi-day Bahamas runs without thinking about fuel or supplies.",
@@ -356,13 +361,16 @@ export const BOAT_MARKETS: Record<
     hero: string;
   }
 > = {
+  // Market hero photos all share the confirmed-working yacht photo at
+  // different position crops. We swap to vertical-specific imagery once
+  // brand-approved assets are licensed.
   Miami: {
     label: "Miami",
     status: "live",
     blurb:
       "Biscayne Bay flagship. Stiltsville lunch runs, Bimini in two hours, full hurricane prep through our Coconut Grove partner yard. Fleet operates Apr–Nov in market, hauls Dec–Mar.",
     hero:
-      "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&w=2000&q=80",
+      "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?auto=format&fit=crop&w=2400&q=85",
   },
   "Los Angeles": {
     label: "Los Angeles",
@@ -371,7 +379,7 @@ export const BOAT_MARKETS: Record<
     blurb:
       "Marina del Rey flagship with Catalina runs, Newport Harbor day trips, and Channel Islands overnighters. Year-round-able with the right hull.",
     hero:
-      "https://images.unsplash.com/photo-1582967788606-a171c1080cb0?auto=format&fit=crop&w=2000&q=80",
+      "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?auto=format&fit=crop&w=2400&q=85",
   },
   "New York": {
     label: "New York",
@@ -380,7 +388,7 @@ export const BOAT_MARKETS: Record<
     blurb:
       "Sag Harbor + Hudson + Long Island Sound. Northeast summer season runs Apr–Oct; winter haul-out at our Connecticut yard partner.",
     hero:
-      "https://images.unsplash.com/photo-1518806118471-f28b20a1d79d?auto=format&fit=crop&w=2000&q=80",
+      "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?auto=format&fit=crop&w=2400&q=85",
   },
 };
 

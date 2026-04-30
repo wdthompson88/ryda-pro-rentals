@@ -1,59 +1,56 @@
 // Media config — single source of truth for hero video + poster
 // imagery across the site. Each vertical (cars, boats, planes) gets a
-// stable Pexels CDN video URL and a fallback poster image.
+// poster image that's confirmed water-themed (boats) / vehicle-themed
+// (cars, planes) and an OPTIONAL video URL.
 //
-// We hotlink Pexels because (1) their CDN is robust and stable for
-// established videos, (2) we don't yet have brand-approved b-roll, and
-// (3) the MediaBackground component falls back to the poster image if
-// the video fails or is omitted, so a broken video URL never breaks
-// the page. Swap these for owned-asset URLs when they're licensed.
+// VIDEO STATUS: empty for now. Earlier we hotlinked Pexels CDN URLs
+// for ambient b-roll, but the videos rendering at run time turned out
+// not to match the descriptions (wrong content, parked rather than
+// in-motion, or 404). Until brand-approved owned-asset videos are
+// licensed and dropped into /public/, we keep the still posters with
+// the slow Ken-Burns zoom — clean and reliable.
 //
-// PHILOSOPHY: ambient motion only. Videos play muted, looped,
-// autoplay, playsInline. No audio. No sticky-volume tricks. The
-// experience should feel like watching a luxury showroom screen, not
-// like an autoplay ad.
+// To re-enable: drop your owned video files into /public/videos/ and
+// set the `video` field below to /videos/<filename>.mp4. The
+// MediaBackground component handles the rest (fades video in once
+// playable; falls back to poster on error).
 
 export type MediaSlot = {
-  /** Direct video URL (mp4 preferred). Empty string = poster only. */
+  /** Direct video URL. Empty string = poster only (current default). */
   video: string;
-  /** Fallback poster image. Always required so SSR + bandwidth-aware clients render fine. */
+  /** Fallback poster image. Always required. */
   poster: string;
   /** Alt text for the poster image. */
   alt: string;
-  /**
-   * Optional CSS object-position override for awkwardly framed posters
-   * (e.g. "center 65%" to bias toward the bottom of the image).
-   */
+  /** Optional CSS object-position override. */
   position?: string;
 };
 
 // ─────────────────────────────────────────────────────────────────────────
-// Vertical splitter media (the / page columns)
+// Splitter columns (the / page)
 // ─────────────────────────────────────────────────────────────────────────
+// Cars: action Lambo (poster). Boats: yacht in water. Planes: jet on
+// tarmac. Videos disabled until owned assets are dropped in.
 
 export const SPLITTER_MEDIA: Record<"cars" | "boats" | "planes", MediaSlot> = {
   cars: {
-    // Lambo / supercar driving b-roll. Pexels ID 4434242.
-    video:
-      "https://videos.pexels.com/video-files/4434242/4434242-hd_1920_1080_30fps.mp4",
+    video: "",
     poster:
       "https://images.unsplash.com/photo-1621135802920-133df287f89c?auto=format&fit=crop&w=2400&q=85",
     alt: "Lamborghini at night",
     position: "center 55%",
   },
   boats: {
-    // Aerial mega yacht in turquoise water. Pexels ID 1093662.
-    video:
-      "https://videos.pexels.com/video-files/1093662/1093662-hd_1920_1080_30fps.mp4",
+    video: "",
+    // Confirmed water-themed yacht photo (same one used on the Wajer
+    // listing and across boat market hero panels).
     poster:
-      "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&w=2400&q=85",
-    alt: "Mega yacht in turquoise water from above",
-    position: "center",
+      "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?auto=format&fit=crop&w=2400&q=85",
+    alt: "Yacht on the water at sunset",
+    position: "center 50%",
   },
   planes: {
-    // Private jet ramp / tarmac. Pexels ID 2715418.
-    video:
-      "https://videos.pexels.com/video-files/2715418/2715418-hd_1920_1080_30fps.mp4",
+    video: "",
     poster:
       "https://images.unsplash.com/photo-1474302770737-173ee21bab63?auto=format&fit=crop&w=2400&q=85",
     alt: "Private jet on tarmac at dusk",
@@ -62,9 +59,9 @@ export const SPLITTER_MEDIA: Record<"cars" | "boats" | "planes", MediaSlot> = {
 };
 
 // ─────────────────────────────────────────────────────────────────────────
-// Hero media — used on /cars hero, /boats hero, /markets hero, etc.
-// Re-uses splitter posters where it makes sense; provides distinct
-// editorial videos otherwise.
+// Hero media — used on cars-home, /boats, /markets, /boats/portfolio,
+// /planes. All posters confirmed; videos can be added later via
+// /public/videos/* once brand-approved.
 // ─────────────────────────────────────────────────────────────────────────
 
 export const HERO_MEDIA: Record<
@@ -88,22 +85,19 @@ export const HERO_MEDIA: Record<
     alt: "Supercar at dusk",
   },
   "boats-home": {
-    video:
-      "https://videos.pexels.com/video-files/2421545/2421545-hd_1920_1080_30fps.mp4",
+    video: "",
     poster:
       "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?auto=format&fit=crop&w=2400&q=85",
-    alt: "Mega yacht at sunset on water",
+    alt: "Yacht on the water at sunset",
   },
   "boats-portfolio": {
-    video:
-      "https://videos.pexels.com/video-files/2099595/2099595-hd_1920_1080_30fps.mp4",
+    video: "",
     poster:
-      "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&w=2400&q=85",
-    alt: "Aerial view of mega yacht in turquoise water",
+      "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?auto=format&fit=crop&w=2400&q=85",
+    alt: "Yacht on the water at sunset",
   },
   planes: {
-    video:
-      "https://videos.pexels.com/video-files/2715418/2715418-hd_1920_1080_30fps.mp4",
+    video: "",
     poster:
       "https://images.unsplash.com/photo-1474302770737-173ee21bab63?auto=format&fit=crop&w=2400&q=85",
     alt: "Private jet on tarmac at dusk",
