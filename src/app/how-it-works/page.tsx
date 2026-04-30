@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { StickyToc } from "@/components/sticky-toc";
+import { BookingTiersExplainer } from "@/components/booking-tiers-explainer";
 import {
   formatUSD,
   HOLDING_YEARS,
@@ -13,6 +14,7 @@ const TOC_ITEMS = [
   { id: "compare", label: "Compare" },
   { id: "right-for-you", label: "Right for you?" },
   { id: "nine-reasons", label: "9 reasons" },
+  { id: "booking", label: "Booking model" },
   { id: "trust", label: "Buyer protection" },
   { id: "deeper-math", label: "Deeper math" },
   { id: "rental-opt-in", label: "Rent your days" },
@@ -385,6 +387,28 @@ export default function HowItWorksPage() {
               title="Community over solitary ownership"
               body="Verified members, shared track days, member events, off-market sourcing. The car is a passion asset; the network around it is what makes the asset useful when you're not driving."
             />
+          </div>
+        </div>
+      </section>
+
+      {/* Booking model — Pacaso SmartStay translated to RYDA. Surfaced
+          here so prospective buyers see calendar fairness before they
+          ever click into the buy flow. */}
+      <section id="booking" className="border-b border-rule">
+        <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+            Booking model
+          </p>
+          <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
+            Two ways to book — short-notice and planned.
+          </h2>
+          <p className="mt-3 max-w-2xl text-base text-ink-soft">
+            Same annual entitlement, two clear modes so you always know what
+            you can grab and what you have to plan ahead. Calendar
+            fairness is enforced by code, not by polite asks.
+          </p>
+          <div className="mt-10">
+            <BookingTiersExplainer variant="full" />
           </div>
         </div>
       </section>

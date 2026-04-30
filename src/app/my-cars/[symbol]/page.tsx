@@ -3,7 +3,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { DemoBanner } from "@/components/demo-banner";
-import { VEHICLES, getVehicleBySymbol, formatUSD } from "@/lib/market-data";
+import { BookingTiersExplainer } from "@/components/booking-tiers-explainer";
+import {
+  VEHICLES,
+  getVehicleBySymbol,
+  formatUSD,
+  BOOKING_POLICY,
+} from "@/lib/market-data";
 
 const OWNED = ["F296", "MC75"];
 
@@ -77,6 +83,11 @@ export default async function MyVehiclePage({
                 <Stat label="Status" value="In storage" />
                 <Stat label="Days used (yr)" value={`8 / ${v.daysPerYear}`} />
                 <Stat label="Miles used (yr)" value={`658 / ${v.milesPerYear.toLocaleString()}`} />
+                <Stat
+                  label="Planned reservations"
+                  value={`1 of ${BOOKING_POLICY.planned.activeLimitPerShare} active`}
+                />
+                <Stat label="Short-notice" value="Open · book up to 7 days out" />
               </div>
               <div className="mt-6 flex flex-col gap-2">
                 <Link
@@ -221,10 +232,9 @@ export default async function MyVehiclePage({
             })}
           </div>
         </div>
-        <p className="mt-4 text-xs text-mute">
-          Fair-use rules: max 7 consecutive days per share in high season,
-          14 in low season.
-        </p>
+        <div className="mt-6">
+          <BookingTiersExplainer variant="compact" />
+        </div>
       </Section>
 
       {/* Documents */}

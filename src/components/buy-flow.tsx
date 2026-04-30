@@ -7,6 +7,12 @@ import { Vehicle, formatUSD } from "@/lib/market-data";
 
 type StepKey = "review" | "verify" | "documents" | "fund" | "confirm";
 
+// Funding methods — wire/ACH stay as the default direct paths; the rest
+// route the buyer to a partner conversation (we don't underwrite or
+// custody outside funds). Pattern borrowed from Pacaso's
+// "Co-ownership financing partners" treatment.
+type FundingMethod = "wire" | "ach" | "liquidity" | "partner" | "crypto";
+
 const STEPS: { key: StepKey; label: string }[] = [
   { key: "review", label: "Review" },
   { key: "verify", label: "Verify" },
@@ -27,7 +33,7 @@ export function BuyFlow({ vehicle, initialShares }: Props) {
   const [oaSigned, setOaSigned] = useState(false);
   const [msaSigned, setMsaSigned] = useState(false);
   const [signature, setSignature] = useState("");
-  const [fundingMethod, setFundingMethod] = useState<"wire" | "ach" | null>(null);
+  const [fundingMethod, setFundingMethod] = useState<FundingMethod | null>(null);
 
   const shares = initialShares;
   const totalPrice = vehicle.pricePerShare * shares;
@@ -511,14 +517,28 @@ function FundStep({
   onContinue,
 }: {
   grandTotal: number;
-  fundingMethod: "wire" | "ach" | null;
-  setFundingMethod: (v: "wire" | "ach" | null) => void;
+  fundingMethod: FundingMethod | null;
+  setFundingMethod: (v: FundingMethod | null) => void;
   vehicle: Vehicle;
   onBack: () => void;
   onContinue: () => void;
 }) {
   const [confirmedTransfer, setConfirmedTransfer] = useState(false);
+  // Partner / liquidity-line / crypto paths are referral-only at this
+  // stage; the user just needs to acknowledge they're starting the
+  // partner intro, not actually fund anything live in the buy flow.
   const ready = fundingMethod !== null && confirmedTransfer;
+
+  const confirmCopy: Record<FundingMethod, string> = {
+    wire: "I've initiated the wire transfer from my bank with the matching memo.",
+    ach: "I've connected my bank and authorized the ACH transfer.",
+    liquidity:
+      "I've started the draw against my liquidity line and will fund within 5 business days.",
+    partner:
+      "I'd like RYDA to introduce me to a financing partner before I fund.",
+    crypto:
+      "I've initiated the crypto transfer through the regulated exchange partner.",
+  };
 
   return (
     <div className="space-y-8">
@@ -528,8 +548,10 @@ function FundStep({
           Fund your share
         </h1>
         <p className="mt-3 text-base text-ink-soft">
-          Send {formatUSD(grandTotal)} to the LLC's escrow account. Funds are held until your
-          documents and verifications clear, then released to the LLC and your share is recorded in the LLC's member register.
+          Send {formatUSD(grandTotal)} to the LLC&apos;s escrow account. Funds
+          are held until your documents and verifications clear, then released
+          to the LLC and your share is recorded in the LLC&apos;s member
+          register. Five payment paths — pick what fits.
         </p>
       </div>
 
@@ -549,6 +571,27 @@ function FundStep({
           onSelect={() => setFundingMethod("ach")}
           disabled
         />
+        <FundingOption
+          method="liquidity"
+          label="Liquidity line"
+          detail="HELOC, SBLOC, or pledged-asset line through your existing bank. You wire the funds; we hold the share."
+          selected={fundingMethod === "liquidity"}
+          onSelect={() => setFundingMethod("liquidity")}
+        />
+        <FundingOption
+          method="partner"
+          label="Financing partner (referral)"
+          detail="We introduce you to a specialty lender. They underwrite; you fund through them. RYDA does not extend credit."
+          selected={fundingMethod === "partner"}
+          onSelect={() => setFundingMethod("partner")}
+        />
+        <FundingOption
+          method="crypto"
+          label="Crypto (BTC, ETH, USDC)"
+          detail="Routed through a regulated US exchange partner. Conversion to USD on receipt; LLC escrow always holds USD."
+          selected={fundingMethod === "crypto"}
+          onSelect={() => setFundingMethod("crypto")}
+        />
       </div>
 
       {fundingMethod === "wire" && (
@@ -559,8 +602,8 @@ function FundStep({
           </p>
           <p className="mt-3 text-sm text-ink-soft">
             For your security, RYDA never displays escrow bank details in the
-            browser. Once you submit this step, we'll email the verified
-            wire instructions for {vehicle.name} LLC's escrow account to
+            browser. Once you submit this step, we&apos;ll email the verified
+            wire instructions for {vehicle.name} LLC&apos;s escrow account to
             your verified inbox, along with your unique reference code and
             the exact amount of {formatUSD(grandTotal)}.
           </p>
@@ -584,6 +627,86 @@ function FundStep({
         </div>
       )}
 
+      {fundingMethod === "liquidity" && (
+        <div className="rounded-2xl border border-rule bg-surface p-6">
+          <p className="text-xs font-medium uppercase tracking-wider text-red">
+            Liquidity line
+          </p>
+          <p className="mt-2 font-display text-xl text-ink">
+            Draw from your existing line, wire to the LLC.
+          </p>
+          <p className="mt-3 text-sm text-ink-soft">
+            Common paths: a HELOC against your primary residence, a
+            securities-backed line of credit (SBLOC) against your brokerage
+            account, or a pledged-asset line at a private bank. Most members
+            who go this route have the line open before they reach this step.
+            RYDA does not arrange the line; your bank or wealth advisor does.
+          </p>
+          <p className="mt-5 rounded-xl border border-rule bg-cream-2/40 p-4 text-xs leading-relaxed text-ink-soft">
+            <strong className="text-ink">Note:</strong> SBLOC and pledged-asset
+            lines are typically the fastest path here. We&apos;ll email
+            wire instructions on submit so you can fund directly from the line.
+          </p>
+        </div>
+      )}
+
+      {fundingMethod === "partner" && (
+        <div className="rounded-2xl border border-rule bg-surface p-6">
+          <p className="text-xs font-medium uppercase tracking-wider text-red">
+            Financing partner (referral)
+          </p>
+          <p className="mt-2 font-display text-xl text-ink">
+            We&apos;ll introduce you to a specialty lender.
+          </p>
+          <p className="mt-3 text-sm text-ink-soft">
+            For members who&apos;d rather not use cash or a liquidity line, we
+            maintain a short list of independent lenders who underwrite
+            co-ownership share purchases. They&apos;ll talk to you directly
+            about rate, term, down payment, and approval. RYDA receives no
+            fee from the lender; the introduction is at-cost.
+          </p>
+          <ul className="mt-4 space-y-1 text-xs text-ink-soft">
+            <li>• Submit means: we&apos;ll email a warm intro within 1 business day.</li>
+            <li>• Typical close: 5–10 business days from intro.</li>
+            <li>• Approval is between you and the lender.</li>
+          </ul>
+          <p className="mt-5 rounded-xl border border-rule bg-cream-2/40 p-4 text-xs leading-relaxed text-ink-soft">
+            <strong className="text-ink">No financial advice.</strong> RYDA
+            doesn&apos;t recommend whether to finance vs. fund in cash. Talk
+            to your accountant or wealth advisor.
+          </p>
+        </div>
+      )}
+
+      {fundingMethod === "crypto" && (
+        <div className="rounded-2xl border border-rule bg-surface p-6">
+          <p className="text-xs font-medium uppercase tracking-wider text-red">
+            Crypto
+          </p>
+          <p className="mt-2 font-display text-xl text-ink">
+            BTC, ETH, or USDC — settled in USD to escrow.
+          </p>
+          <p className="mt-3 text-sm text-ink-soft">
+            Crypto buy-ins route through a regulated US exchange partner with
+            full KYC/AML. You send crypto from your wallet; the partner
+            converts to USD on receipt and wires the LLC&apos;s escrow account.
+            The LLC always holds USD — no crypto sits on RYDA&apos;s balance
+            sheet or the LLC&apos;s.
+          </p>
+          <ul className="mt-4 space-y-1 text-xs text-ink-soft">
+            <li>• Conversion at spot at the time of confirmation.</li>
+            <li>• Network + exchange fees are paid by the buyer.</li>
+            <li>• Confirmation typically &lt; 30 minutes for BTC/ETH; minutes for USDC.</li>
+          </ul>
+          <p className="mt-5 rounded-xl border border-rule bg-cream-2/40 p-4 text-xs leading-relaxed text-ink-soft">
+            <strong className="text-ink">Heads up:</strong> spot pricing
+            volatility means the USD amount delivered to escrow may differ
+            slightly from the quoted price; we true up by wire if there&apos;s
+            a shortfall.
+          </p>
+        </div>
+      )}
+
       {fundingMethod && (
         <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-rule bg-surface p-4 text-sm">
           <input
@@ -592,11 +715,7 @@ function FundStep({
             onChange={(e) => setConfirmedTransfer(e.target.checked)}
             className="mt-1 h-4 w-4 accent-red"
           />
-          <span className="text-ink">
-            {fundingMethod === "wire"
-              ? "I've initiated the wire transfer from my bank with the matching memo."
-              : "I've connected my bank and authorized the ACH transfer."}
-          </span>
+          <span className="text-ink">{confirmCopy[fundingMethod]}</span>
         </label>
       )}
 
@@ -865,13 +984,20 @@ function FundingOption({
   onSelect,
   disabled = false,
 }: {
-  method: "wire" | "ach";
+  method: FundingMethod;
   label: string;
   detail: string;
   selected: boolean;
   onSelect: () => void;
   disabled?: boolean;
 }) {
+  const tagLabel: Record<FundingMethod, string> = {
+    wire: "Wire",
+    ach: "ACH",
+    liquidity: "Liquidity",
+    partner: "Partner",
+    crypto: "Crypto",
+  };
   return (
     <button
       type="button"
@@ -886,7 +1012,7 @@ function FundingOption({
       }`}
     >
       <span className="text-xs font-medium uppercase tracking-wider text-red">
-        {method === "wire" ? "Wire" : "ACH"}
+        {tagLabel[method]}
       </span>
       <span className="font-display text-lg text-ink">{label}</span>
       <span className="text-sm text-ink-soft">{detail}</span>

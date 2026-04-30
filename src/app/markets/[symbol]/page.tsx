@@ -6,6 +6,8 @@ import { CostBreakdown } from "@/components/cost-breakdown";
 import { ShareValueChart } from "@/components/share-value-chart";
 import { CompareCalculator } from "@/components/compare-calculator";
 import { PhotoGallery } from "@/components/photo-gallery";
+import { OwnershipPrimitives } from "@/components/ownership-primitives";
+import { BookingTiersExplainer } from "@/components/booking-tiers-explainer";
 import {
   VEHICLES,
   getVehicleBySymbol,
@@ -159,6 +161,14 @@ export default async function VehicleMarketPage({
         </div>
       </section>
 
+      {/* Ownership primitives — six-number trust block right under the
+          hero so the buyer sees the structure before scrolling further. */}
+      <section className="border-b border-rule">
+        <div className="mx-auto max-w-7xl px-6 py-10 sm:px-10">
+          <OwnershipPrimitives variant="compact" title="What this share is, in six numbers" />
+        </div>
+      </section>
+
       {/* Your share — sample co-ownership view */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
@@ -291,6 +301,14 @@ export default async function VehicleMarketPage({
             </Link>
           </div>
           <CompareCalculator lockedVehicle={v} />
+        </div>
+      </section>
+
+      {/* Booking model — compact two-tier explainer so buyers see how
+          the calendar works before they wire anything. */}
+      <section className="border-b border-rule">
+        <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
+          <BookingTiersExplainer variant="compact" />
         </div>
       </section>
 

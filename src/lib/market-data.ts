@@ -318,6 +318,122 @@ export const TARGET_DEPRECIATION_PCT = 10; // % over the full 2-year hold
 export const MILES_PER_DAY_PER_SHARE = 100;
 export const DAYS_PER_SHARE = 30;
 
+// ─────────────────────────────────────────────────────────────────────────
+// BOOKING POLICY — two-tier scheduling (inspired by Pacaso SmartStay)
+// ─────────────────────────────────────────────────────────────────────────
+// We split bookings into two clear modes so members can reason about the
+// calendar without hunting through a wall of rules:
+//
+//   1. SHORT-NOTICE DRIVES — "it's sunny this weekend"
+//      The closer-in window. Quick, opportunistic, unlimited in count
+//      so long as the calendar is open. A hard cap on consecutive days
+//      keeps short-notice from monopolising peak weekends.
+//
+//   2. PLANNED DRIVES — "I'm planning my Hamptons run in August"
+//      The longer-horizon window. Each share gets a fixed number of
+//      active reservations at any given time, so the queue stays fair.
+//      Consecutive-day caps are higher than short-notice (peak: 7 / off
+//      peak: 14) so members can take genuine trips.
+//
+// Both modes consume the share's annual entitlement (DAYS_PER_SHARE,
+// MILES_PER_DAY_PER_SHARE). The split is a UX/fairness layer — not a
+// separate quota.
+//
+// PEAK PROTECTION: each share gets one "protected peak window" before
+// any single co-owner can book a second peak slot, so dominant
+// schedulers can't lock down the calendar.
+
+export const BOOKING_POLICY = {
+  shortNotice: {
+    minDaysAdvance: 1,
+    maxDaysAdvance: 7,
+    maxConsecutiveDays: 3,
+    activeLimitPerShare: null, // unlimited so long as calendar is open
+  },
+  planned: {
+    minDaysAdvance: 8,
+    maxDaysAdvance: 365,
+    maxConsecutiveDaysPeak: 7,
+    maxConsecutiveDaysOffPeak: 14,
+    activeLimitPerShare: 4,
+  },
+  peakProtection: {
+    protectedWindowsPerShare: 1, // 1 protected peak window per share
+    description:
+      "One protected peak weekend or event window per share before any co-owner can book a second.",
+  },
+  // Annotated peak periods — Miami today; LA / NY when we list those
+  // markets. Pulled into the calendar for visual treatment + warning
+  // copy when a member tries to book a peak slot they're not entitled
+  // to under peak protection.
+  peakWindows: {
+    Miami: [
+      { label: "Miami Grand Prix", monthsApprox: "May" },
+      { label: "Art Basel", monthsApprox: "Dec" },
+      { label: "Spring Break", monthsApprox: "Mar" },
+      { label: "Holiday week", monthsApprox: "Dec 24 – Jan 2" },
+    ],
+    "Los Angeles": [
+      { label: "Goodwood week / Pebble", monthsApprox: "Aug" },
+      { label: "Holiday week", monthsApprox: "Dec 24 – Jan 2" },
+    ],
+    "New York": [
+      { label: "Hamptons summer", monthsApprox: "Jul – Aug" },
+      { label: "Holiday week", monthsApprox: "Dec 24 – Jan 2" },
+    ],
+  },
+};
+
+// ─────────────────────────────────────────────────────────────────────────
+// MARKETS — for portfolio grouping
+// ─────────────────────────────────────────────────────────────────────────
+// Pacaso groups inventory by destination first; we group by US market.
+// Used by the portfolio page to lay out "Miami flagship" / "LA coming"
+// / "NY coming" sections. `status` drives whether the section shows a
+// "launching in [date]" tag.
+
+export type MarketKey = "Miami" | "Los Angeles" | "New York";
+export type MarketStatus = "live" | "coming-2027";
+
+export const MARKETS: Record<
+  MarketKey,
+  {
+    label: string;
+    status: MarketStatus;
+    launchLabel?: string; // shown when status === "coming-2027"
+    blurb: string;
+    hero: string; // image URL for the market header
+  }
+> = {
+  Miami: {
+    label: "Miami",
+    status: "live",
+    blurb:
+      "Highest US per-capita exotic density. Year-round driving, no state income tax. Our Miami flagship fleet runs out of a climate-controlled Wynwood facility.",
+    hero: "https://images.unsplash.com/photo-1535498730771-e735b998cd64?auto=format&fit=crop&w=2000&q=80",
+  },
+  "Los Angeles": {
+    label: "Los Angeles",
+    status: "coming-2027",
+    launchLabel: "Q2 2027",
+    blurb:
+      "Mulholland, Pebble, the canyons. The LA fleet leans coupe-heavy with a track-eligible bias and our Pasadena storage partner.",
+    hero: "https://images.unsplash.com/photo-1444723121867-7a241cacace9?auto=format&fit=crop&w=2000&q=80",
+  },
+  "New York": {
+    label: "New York",
+    status: "coming-2027",
+    launchLabel: "Q4 2027",
+    blurb:
+      "Hamptons summer, Hudson Valley fall, Manhattan winter garage. NY skews GT and SUV — cars built for the road from East 79th to Sag Harbor.",
+    hero: "https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=2000&q=80",
+  },
+};
+
+export function getVehiclesByMarket(market: MarketKey): Vehicle[] {
+  return VEHICLES.filter((v) => v.market === market);
+}
+
 export type ShareEconomics = {
   shares: number;
   holdYears: number;

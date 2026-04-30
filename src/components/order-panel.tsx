@@ -99,10 +99,45 @@ export function OrderPanel({ vehicle }: Props) {
         12-month minimum hold. Transferable to other verified members.
       </p>
 
+      {/* Payment options — Pacaso surfaces these up-front rather than
+          burying them in the buy flow. Each option is referral-style:
+          we don't underwrite credit; we hand off to the right partner.
+          Crypto is supported via a regulated exchange partner with the
+          actual transfer settled in USD to the LLC's escrow account. */}
+      <div className="mt-5 border-t border-rule pt-4">
+        <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-mute">
+          Ways to pay
+        </p>
+        <ul className="mt-3 space-y-2 text-xs">
+          <PayMethod label="Wire / ACH" sub="Default — same-day or next-day to LLC escrow" />
+          <PayMethod
+            label="Liquidity line"
+            sub="HELOC, SBLOC, or pledged-asset line via your bank"
+          />
+          <PayMethod
+            label="Financing partner"
+            sub="Referral to specialty lender; subject to underwriting"
+          />
+          <PayMethod
+            label="Crypto"
+            sub="BTC / ETH / USDC via regulated exchange; settles USD"
+          />
+        </ul>
+      </div>
+
       <div className="mt-5 border-t border-rule pt-4 text-center text-xs text-mute">
         Vehicle stored in {vehicle.market}
       </div>
     </div>
+  );
+}
+
+function PayMethod({ label, sub }: { label: string; sub: string }) {
+  return (
+    <li className="flex items-baseline justify-between gap-3">
+      <span className="font-medium text-ink">{label}</span>
+      <span className="text-right text-mute">{sub}</span>
+    </li>
   );
 }
 

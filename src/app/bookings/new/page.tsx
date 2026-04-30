@@ -4,17 +4,37 @@ import { useState } from "react";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { StepProgress } from "@/components/step-progress";
+import { BOOKING_POLICY } from "@/lib/market-data";
 
-const STEPS = ["Vehicle", "Dates", "Details", "Review", "Confirmed"];
+// Booking mode is the first decision after vehicle selection — it sets
+// the calendar validation rules (advance window, consecutive cap,
+// active-reservation cap). Inspired by Pacaso SmartStay's two-tier
+// short-notice / general split.
+type BookingMode = "short-notice" | "planned";
+
+const STEPS = ["Vehicle", "Mode", "Dates", "Details", "Review", "Confirmed"];
 
 const VEHICLES = [
-  { symbol: "F296", name: "Ferrari 296 GTB", daysLeft: 42, milesLeft: 3_342 },
-  { symbol: "MC75", name: "McLaren 750S Spider", daysLeft: 44, milesLeft: 3_568 },
+  {
+    symbol: "F296",
+    name: "Ferrari 296 GTB",
+    daysLeft: 42,
+    milesLeft: 3_342,
+    activePlanned: 1, // already booked planned drives this share has live
+  },
+  {
+    symbol: "MC75",
+    name: "McLaren 750S Spider",
+    daysLeft: 44,
+    milesLeft: 3_568,
+    activePlanned: 0,
+  },
 ];
 
 export default function NewBookingPage() {
   const [step, setStep] = useState(0);
   const [vehicle, setVehicle] = useState(VEHICLES[0]);
+  const [mode, setMode] = useState<BookingMode>("planned");
   const [dates, setDates] = useState(() => {
     // Default to "two weeks from today, 3 days" so the demo doesn't go stale
     // as the calendar moves forward.
@@ -60,21 +80,38 @@ export default function NewBookingPage() {
             />
           )}
           {step === 1 && (
-            <PickDates dates={dates} onChange={setDates} onBack={back} onNext={next} vehicle={vehicle} />
+            <PickMode
+              mode={mode}
+              onChange={setMode}
+              vehicle={vehicle}
+              onBack={back}
+              onNext={next}
+            />
           )}
           {step === 2 && (
-            <PickDetails details={details} onChange={setDetails} onBack={back} onNext={next} vehicle={vehicle} />
+            <PickDates
+              dates={dates}
+              onChange={setDates}
+              onBack={back}
+              onNext={next}
+              vehicle={vehicle}
+              mode={mode}
+            />
           )}
           {step === 3 && (
+            <PickDetails details={details} onChange={setDetails} onBack={back} onNext={next} vehicle={vehicle} />
+          )}
+          {step === 4 && (
             <Review
               vehicle={vehicle}
               dates={dates}
               details={details}
+              mode={mode}
               onBack={back}
               onConfirm={next}
             />
           )}
-          {step === 4 && <Confirmed vehicle={vehicle} dates={dates} />}
+          {step === 5 && <Confirmed vehicle={vehicle} dates={dates} />}
         </div>
       </section>
     </>
@@ -126,26 +163,134 @@ function PickVehicle({
   );
 }
 
+function PickMode({
+  mode,
+  onChange,
+  vehicle,
+  onBack,
+  onNext,
+}: {
+  mode: BookingMode;
+  onChange: (m: BookingMode) => void;
+  vehicle: { name: string; activePlanned: number };
+  onBack: () => void;
+  onNext: () => void;
+}) {
+  const plannedRemaining =
+    (BOOKING_POLICY.planned.activeLimitPerShare ?? 0) - vehicle.activePlanned;
+  return (
+    <div>
+      <h2 className="font-display text-2xl text-ink">What kind of drive?</h2>
+      <p className="mt-2 text-sm text-ink-soft">
+        Pick the booking mode — it sets your date window and how many
+        active reservations you can hold for {vehicle.name}.
+      </p>
+
+      <div className="mt-8 space-y-3">
+        <ModeOption
+          active={mode === "short-notice"}
+          onClick={() => onChange("short-notice")}
+          tag="Short-notice drive"
+          headline="1–7 days out · unlimited count · max 3 consecutive days"
+          example="It's sunny this weekend, you're in the car Saturday."
+          subline={`No active-reservation cap. Consumes annual days/miles like any other booking.`}
+        />
+        <ModeOption
+          active={mode === "planned"}
+          onClick={() => onChange("planned")}
+          tag="Planned drive"
+          headline="8–365 days out · max 4 active per share · 7 days peak / 14 off-peak"
+          example="The August Hamptons trip you're booking in March."
+          subline={`You currently have ${vehicle.activePlanned} of ${BOOKING_POLICY.planned.activeLimitPerShare} active planned reservations on this share. ${plannedRemaining} more available.`}
+        />
+      </div>
+
+      <div className="mt-6 rounded-xl border border-red/30 bg-red/5 p-4 text-xs">
+        <p className="font-medium text-red">Peak protection</p>
+        <p className="mt-1 text-ink-soft">
+          Each share gets one protected peak window before any co-owner
+          can book a second. Peak weekends in Miami: F1 GP, Art Basel,
+          Spring Break, Holiday week.
+        </p>
+      </div>
+
+      <BackNext onBack={onBack} onNext={onNext} />
+    </div>
+  );
+}
+
+function ModeOption({
+  active,
+  onClick,
+  tag,
+  headline,
+  example,
+  subline,
+}: {
+  active: boolean;
+  onClick: () => void;
+  tag: string;
+  headline: string;
+  example: string;
+  subline: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`w-full rounded-xl border p-5 text-left transition-colors ${
+        active
+          ? "border-red bg-red/5"
+          : "border-rule bg-cream hover:border-ink-soft"
+      }`}
+    >
+      <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-red">
+        {tag}
+      </p>
+      <p className="mt-2 font-display text-lg text-ink">{headline}</p>
+      <p className="mt-2 text-sm italic text-ink-soft">{example}</p>
+      <p className="mt-2 text-xs text-mute">{subline}</p>
+    </button>
+  );
+}
+
 function PickDates({
   dates,
   onChange,
   onBack,
   onNext,
   vehicle,
+  mode,
 }: {
   dates: { start: string; end: string; days: number };
   onChange: (d: { start: string; end: string; days: number }) => void;
   onBack: () => void;
   onNext: () => void;
   vehicle: { name: string; daysLeft: number };
+  mode: BookingMode;
 }) {
+  const policy =
+    mode === "short-notice"
+      ? BOOKING_POLICY.shortNotice
+      : BOOKING_POLICY.planned;
+  const maxConsecutive =
+    mode === "short-notice"
+      ? BOOKING_POLICY.shortNotice.maxConsecutiveDays
+      : BOOKING_POLICY.planned.maxConsecutiveDaysOffPeak;
   return (
     <div>
       <h2 className="font-display text-2xl text-ink">When?</h2>
       <p className="mt-2 text-sm text-ink-soft">
         {vehicle.name} · {vehicle.daysLeft} days left in your annual entitlement.
       </p>
-      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="mt-4 rounded-xl border border-rule bg-cream-2/40 p-3 text-xs text-ink-soft">
+        <span className="font-medium text-ink">
+          {mode === "short-notice" ? "Short-notice" : "Planned"} drive
+        </span>{" "}
+        · {policy.minDaysAdvance}–{policy.maxDaysAdvance} days advance · max{" "}
+        {maxConsecutive} consecutive days
+      </div>
+      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <label className="block text-xs font-medium uppercase tracking-wider text-mute">
             Start
@@ -171,10 +316,12 @@ function PickDates({
       </div>
       <div className="mt-6 rounded-xl border border-rule bg-cream-2/40 p-4 text-sm">
         <p className="text-ink">
-          <span className="font-medium">{dates.days} days</span> · ~360 estimated miles
+          <span className="font-medium">{dates.days} days</span> · ~
+          {(dates.days * 100).toLocaleString()} estimated miles included
         </p>
         <p className="mt-1 text-xs text-mute">
-          Uses 3 of {vehicle.daysLeft} days. Within your annual entitlement.
+          Uses {dates.days} of {vehicle.daysLeft} days. Within your annual
+          entitlement.
         </p>
       </div>
       <BackNext onBack={onBack} onNext={onNext} />
@@ -273,12 +420,14 @@ function Review({
   vehicle,
   dates,
   details,
+  mode,
   onBack,
   onConfirm,
 }: {
   vehicle: { name: string };
   dates: { start: string; end: string; days: number };
   details: { type: string; handover: string; notes: string };
+  mode: BookingMode;
   onBack: () => void;
   onConfirm: () => void;
 }) {
@@ -287,6 +436,10 @@ function Review({
       <h2 className="font-display text-2xl text-ink">Review your booking.</h2>
       <ul className="mt-8 divide-y divide-rule rounded-xl border border-rule bg-cream-2/40">
         <Row k="Vehicle" v={vehicle.name} />
+        <Row
+          k="Mode"
+          v={mode === "short-notice" ? "Short-notice drive" : "Planned drive"}
+        />
         <Row k="Dates" v={`${dates.start} – ${dates.end}`} />
         <Row k="Duration" v={`${dates.days} days`} />
         <Row k="Type" v={details.type === "standard" ? "Standard drive" : details.type === "track" ? "Track day" : "Special event"} />

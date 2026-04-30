@@ -4,6 +4,7 @@ import { SiteHeader } from "@/components/site-header";
 import { WaitlistForm } from "@/components/waitlist-form";
 import { InlineEmailCapture } from "@/components/inline-email-capture";
 import { Reveal } from "@/components/reveal";
+import { OwnershipPrimitives } from "@/components/ownership-primitives";
 import { VEHICLES, formatUSD } from "@/lib/market-data";
 
 export default function Home() {
@@ -95,16 +96,72 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Ownership primitives — six numbers in a compact strip below the hero,
+          high-trust signal before the user dives into vehicles. Cinematic
+          full-width version lives on /markets; here we use the compact
+          variant so it doesn't dominate the home page rhythm. */}
+      <section className="border-b border-rule bg-cream-2">
+        <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
+          <OwnershipPrimitives variant="compact" />
+        </div>
+      </section>
+
+      {/* Browse the portfolio — Pacaso-style teaser entry to /markets */}
+      <section className="relative isolate overflow-hidden border-b border-rule">
+        <div className="absolute inset-0 -z-10">
+          <Image
+            src="https://images.unsplash.com/photo-1535498730771-e735b998cd64?auto=format&fit=crop&w=2000&q=80"
+            alt="Miami at sunset"
+            fill
+            sizes="100vw"
+            className="object-cover"
+          />
+          <div
+            aria-hidden
+            className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/30"
+          />
+        </div>
+        <div className="mx-auto max-w-7xl px-6 py-16 text-cream sm:px-10 sm:py-20">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-cream/80">
+            Browse the portfolio
+          </p>
+          <h2 className="mt-4 max-w-2xl font-display text-4xl font-light italic leading-tight sm:text-5xl">
+            Miami today. <span className="not-italic text-red">LA</span> and{" "}
+            <span className="not-italic text-red">NY</span> next.
+          </h2>
+          <p className="mt-5 max-w-xl text-base text-cream/85">
+            The full RYDA portfolio organised by city — featured vehicles,
+            booking model, and the path to claiming a share. Inspired by
+            the cleanest fractional-ownership browse experience we&apos;ve
+            seen.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link
+              href="/markets"
+              className="inline-flex h-12 items-center justify-center rounded-full bg-red px-7 text-sm font-medium text-cream hover:bg-red-deep"
+            >
+              Open the portfolio →
+            </Link>
+            <Link
+              href="/markets#all"
+              className="inline-flex h-12 items-center justify-center rounded-full border border-cream/40 px-7 text-sm font-medium text-cream hover:border-cream"
+            >
+              Filter all {VEHICLES.length} vehicles
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Co-Own — featured share cars */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
           <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
             <div className="max-w-2xl">
               <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-                Co-Own · The curated fleet
+                Co-Own · From the portfolio
               </p>
               <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
-                Own a piece of the world's most exceptional cars.
+                Own a piece of the world&apos;s most exceptional cars.
               </h2>
               <p className="mt-3 max-w-xl text-base text-ink-soft">
                 Each car held in a Delaware LLC, 10 shares per vehicle.

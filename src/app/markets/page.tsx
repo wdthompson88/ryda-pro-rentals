@@ -2,42 +2,172 @@ import Image from "next/image";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { MarketsListings } from "@/components/markets-listings";
-import { VEHICLES, formatUSD } from "@/lib/market-data";
+import { PortfolioCarousel } from "@/components/portfolio-carousel";
+import { OwnershipPrimitives } from "@/components/ownership-primitives";
+import { BookingTiersExplainer } from "@/components/booking-tiers-explainer";
+import {
+  VEHICLES,
+  MARKETS,
+  formatUSD,
+  type MarketKey,
+} from "@/lib/market-data";
 
 export const metadata = {
-  title: "Markets — RYDA",
+  title: "RYDA Portfolio — Supercars co-owned in the US",
   description:
-    "Browse the RYDA fleet. Each car is held in a member-managed Delaware LLC; claim a co-ownership share alongside other verified members.",
+    "The RYDA portfolio. Member-managed Delaware LLCs hold each curated CPO supercar; up to 10 verified members co-own every car. Browse Miami, Los Angeles, and New York.",
 };
 
+const FEATURED_SYMBOLS = ["F296", "L780", "MC75", "AM-V", "812", "RRC"];
+
 export default function MarketsPage() {
+  // Featured carousel: prefer the canonical featured ordering, but only
+  // ship vehicles that exist in inventory (defensive against rename).
+  const featured = FEATURED_SYMBOLS.map((s) =>
+    VEHICLES.find((v) => v.symbol === s),
+  ).filter((v): v is NonNullable<typeof v> => v !== undefined);
+
+  const marketKeys = Object.keys(MARKETS) as MarketKey[];
+
   return (
     <>
       <SiteHeader />
 
-      <section className="border-b border-rule">
-        <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            Co-Own · The curated fleet
+      {/* Cinematic portfolio hero — full-bleed photo with overlaid copy */}
+      <section className="relative isolate overflow-hidden border-b border-rule">
+        <div className="absolute inset-0 -z-10">
+          <Image
+            src={MARKETS.Miami.hero}
+            alt="Miami at sunset"
+            fill
+            sizes="100vw"
+            priority
+            className="object-cover"
+          />
+          <div
+            aria-hidden
+            className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/35 to-black/85"
+          />
+        </div>
+        <div className="mx-auto max-w-7xl px-6 py-24 text-cream sm:px-10 sm:py-36">
+          <p className="text-xs font-medium uppercase tracking-[0.24em] text-cream/80">
+            RYDA Portfolio
           </p>
-          <h1 className="mt-4 font-display text-5xl font-light leading-tight text-ink sm:text-6xl">
-            Asset-backed shares of the world's most exceptional cars.
+          <h1 className="mt-5 max-w-4xl font-display text-5xl font-light leading-[1.05] sm:text-6xl lg:text-7xl">
+            The world&apos;s most coveted supercars,{" "}
+            <span className="italic text-red">co-owned in the US.</span>
           </h1>
-          <p className="mt-6 max-w-2xl text-lg text-ink-soft">
-            Claim shares in any vehicle's Delaware LLC. Each share unlocks
-            ~30 days/year — hold one or several. RYDA holds each curated
-            CPO car for 2 years, then sells it and returns proceeds
-            pro-rata. Need an earlier exit? Transfer to another verified
-            member after the 12-month minimum hold.
+          <p className="mt-7 max-w-2xl text-lg leading-relaxed text-cream/85">
+            Each car is held in a member-managed Delaware LLC. Up to 10
+            verified members co-own every vehicle. RYDA runs operations
+            end-to-end. Two-year planned exit; transferable to other members
+            after twelve months.
           </p>
+          <div className="mt-10 flex flex-wrap gap-3">
+            <Link
+              href="#featured"
+              className="inline-flex h-12 items-center justify-center rounded-full bg-red px-7 text-sm font-medium text-cream hover:bg-red-deep"
+            >
+              See featured vehicles →
+            </Link>
+            <Link
+              href="#all"
+              className="inline-flex h-12 items-center justify-center rounded-full border border-cream/40 px-7 text-sm font-medium text-cream hover:border-cream"
+            >
+              Browse the full portfolio
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* Filterable card grid */}
-      <MarketsListings />
+      {/* Ownership primitives — six numbers above the fold for trust */}
+      <OwnershipPrimitives variant="default" />
 
-      {/* Try before you buy — small rentals teaser */}
-      <section className="border-t border-rule">
+      {/* Featured carousel */}
+      <section id="featured" className="border-y border-rule bg-cream-2">
+        <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+                Featured
+              </p>
+              <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
+                Currently in the spotlight.
+              </h2>
+              <p className="mt-3 max-w-xl text-sm text-ink-soft">
+                The marquee positions across our active markets — the cars
+                drawing the most member traffic this season.
+              </p>
+            </div>
+            <Link
+              href="#all"
+              className="text-sm font-medium text-red hover:text-red-deep"
+            >
+              See all {VEHICLES.length} vehicles →
+            </Link>
+          </div>
+          <div className="mt-10">
+            <PortfolioCarousel vehicles={featured} />
+          </div>
+        </div>
+      </section>
+
+      {/* Markets — group cards by city Miami / LA / NY (Pacaso pattern) */}
+      <section id="markets" className="border-b border-rule">
+        <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+            By market
+          </p>
+          <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
+            Miami today. LA and NY soon.
+          </h2>
+          <p className="mt-3 max-w-2xl text-sm text-ink-soft">
+            We launch one market at a time — concentration of fleet,
+            partners, and ops talent matters more than spread. Miami is
+            live. LA opens Q2 2027. NY opens Q4 2027.
+          </p>
+
+          <div className="mt-12 space-y-12">
+            {marketKeys.map((key) => {
+              const market = MARKETS[key];
+              const inMarket = VEHICLES.filter((v) => v.market === key);
+              if (inMarket.length === 0 && market.status === "live") return null;
+              return (
+                <MarketSection key={key} market={market} vehicles={inMarket} />
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Booking model explainer — Pacaso SmartStay translation */}
+      <section className="border-b border-rule bg-cream-2">
+        <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
+          <BookingTiersExplainer variant="full" />
+        </div>
+      </section>
+
+      {/* All vehicles — keep the existing power-filter UI for buyers
+          who came to slice by spec rather than browse by city. */}
+      <section id="all" className="border-b border-rule">
+        <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10 sm:py-16">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+            Filter the full portfolio
+          </p>
+          <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
+            All {VEHICLES.length} vehicles.
+          </h2>
+          <p className="mt-3 max-w-2xl text-sm text-ink-soft">
+            Search and filter by brand, market, status, cylinders, body
+            style, or drivetrain. Useful when you know what you&apos;re
+            after.
+          </p>
+        </div>
+        <MarketsListings />
+      </section>
+
+      {/* Try before you buy — rentals teaser */}
+      <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
@@ -103,8 +233,8 @@ export default function MarketsPage() {
       </section>
 
       {/* Disclaimer */}
-      <section className="bg-cream-2">
-        <div className="bg-cream-2 mx-auto max-w-3xl px-6 py-12 text-center text-xs text-mute sm:px-10">
+      <section>
+        <div className="mx-auto max-w-3xl px-6 py-12 text-center text-xs text-mute sm:px-10">
           <p>
             RYDA is a luxury access platform. Co-ownership stakes are
             membership interests in member-managed Delaware LLCs — not
@@ -118,5 +248,126 @@ export default function MarketsPage() {
         </div>
       </section>
     </>
+  );
+}
+
+function MarketSection({
+  market,
+  vehicles,
+}: {
+  market: (typeof MARKETS)[MarketKey];
+  vehicles: (typeof VEHICLES)[number][];
+}) {
+  const isLive = market.status === "live";
+  return (
+    <div>
+      {/* Market header card */}
+      <div className="relative overflow-hidden rounded-2xl border border-rule">
+        <div className="absolute inset-0 -z-10">
+          <Image
+            src={market.hero}
+            alt={market.label}
+            fill
+            sizes="(min-width: 1280px) 1100px, 100vw"
+            className="object-cover"
+          />
+          <div
+            aria-hidden
+            className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/40 to-black/10"
+          />
+        </div>
+        <div className="relative p-6 text-cream sm:p-8 lg:p-10">
+          <div className="flex flex-wrap items-baseline gap-3">
+            <h3 className="font-display text-3xl italic sm:text-4xl">
+              {market.label}
+            </h3>
+            <span
+              className={`rounded-full px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.18em] ${
+                isLive
+                  ? "bg-red/95 text-cream"
+                  : "border border-cream/40 text-cream/85"
+              }`}
+            >
+              {isLive ? "Live" : `Coming ${market.launchLabel}`}
+            </span>
+          </div>
+          <p className="mt-3 max-w-xl text-sm leading-relaxed text-cream/80">
+            {market.blurb}
+          </p>
+        </div>
+      </div>
+
+      {/* Cards */}
+      {vehicles.length > 0 ? (
+        <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {vehicles.map((v) => (
+            <Link
+              key={v.symbol}
+              href={`/markets/${v.symbol.toLowerCase()}`}
+              className="group flex flex-col overflow-hidden rounded-2xl border border-rule bg-surface transition-all hover:-translate-y-0.5 hover:border-ink/40 hover:shadow-md"
+            >
+              <div className="relative aspect-[16/10] w-full overflow-hidden bg-cream-2">
+                <Image
+                  src={v.hero}
+                  alt={`${v.year} ${v.name}`}
+                  fill
+                  sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                  className={`object-cover transition-transform duration-500 group-hover:scale-105 ${
+                    v.flipImage ? "-scale-x-100" : ""
+                  }`}
+                  style={{ objectPosition: v.imagePosition ?? "center" }}
+                />
+                <span
+                  className={`absolute right-3 top-3 rounded-full px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] backdrop-blur ${
+                    v.sharesAvailable === 0
+                      ? "bg-mute/90 text-cream"
+                      : "bg-red/95 text-cream"
+                  }`}
+                >
+                  {v.sharesAvailable === 0
+                    ? "Sold out"
+                    : `${v.sharesAvailable} shares left`}
+                </span>
+              </div>
+              <div className="flex flex-1 flex-col p-5">
+                <p className="text-[11px] uppercase tracking-[0.16em] text-mute">
+                  {v.brand} · {v.year}
+                </p>
+                <p className="mt-1 font-display text-lg italic text-ink">
+                  {v.name.replace(`${v.brand} `, "")}
+                </p>
+                <div className="mt-3 flex items-baseline justify-between border-t border-rule pt-3">
+                  <p>
+                    <span className="text-[10px] uppercase tracking-[0.14em] text-mute">
+                      Per share
+                    </span>
+                    <br />
+                    <span className="font-display text-xl text-ink tabular-nums">
+                      {formatUSD(v.pricePerShare)}
+                    </span>
+                  </p>
+                  <span className="text-xs font-medium text-red group-hover:text-red-deep">
+                    View →
+                  </span>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <div className="mt-5 rounded-2xl border border-rule bg-surface p-10 text-center">
+          <p className="font-display text-xl text-ink">
+            Inventory in {market.label} ships with the local launch.
+          </p>
+          <p className="mt-2 text-sm text-ink-soft">
+            Want first-look access?{" "}
+            <Link href="/contact?type=Membership#form" className="text-red underline-offset-4 hover:underline">
+              Email us
+            </Link>{" "}
+            and we&apos;ll add you to the {market.label} waitlist.
+          </p>
+        </div>
+      )}
+    </div>
   );
 }
