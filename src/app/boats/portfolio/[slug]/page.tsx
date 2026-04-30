@@ -51,7 +51,7 @@ export default async function BoatDetailPage({
         <div className="mx-auto max-w-7xl px-6 py-10 sm:px-10 sm:py-14">
           <Link
             href="/boats/portfolio"
-            className="text-xs font-medium uppercase tracking-[0.2em] text-red hover:text-red-deep"
+            className="text-xs font-medium uppercase tracking-[0.2em] text-marine hover:text-marine-deep"
           >
             ← Boats portfolio
           </Link>
@@ -102,7 +102,7 @@ export default async function BoatDetailPage({
             {/* Order panel */}
             <div className="lg:col-span-4">
               <div className="sticky top-6 rounded-2xl border border-rule bg-surface p-6 shadow-sm">
-                <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+                <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
                   Claim a share
                 </p>
                 <p className="mt-2 font-display text-xl text-ink">{b.name}</p>
@@ -142,7 +142,7 @@ export default async function BoatDetailPage({
 
                 <Link
                   href={`/signup?next=${encodeURIComponent(`/contact?type=Membership&note=${encodeURIComponent(`Reserve a share: ${b.name}`)}#form`)}&reason=buy`}
-                  className={`mt-5 inline-flex h-12 w-full items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream transition-colors hover:bg-red ${
+                  className={`mt-5 inline-flex h-12 w-full items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream transition-colors hover:bg-marine ${
                     b.sharesAvailable === 0 ? "pointer-events-none opacity-50" : ""
                   }`}
                 >
@@ -166,7 +166,7 @@ export default async function BoatDetailPage({
       {/* Booking policy callout */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
             How booking works
           </p>
           <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
@@ -224,7 +224,7 @@ export default async function BoatDetailPage({
       {/* Or charter teaser */}
       <section className="border-b border-rule bg-ink py-14 text-cream">
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
             Try it before you commit
           </p>
           <h2 className="mt-3 font-display text-3xl sm:text-4xl">
@@ -236,7 +236,7 @@ export default async function BoatDetailPage({
           </p>
           <Link
             href={`/boats/rent/${b.slug}`}
-            className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-red hover:text-cream"
+            className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-marine hover:text-cream"
           >
             See charter details →
           </Link>
@@ -290,7 +290,7 @@ function BookingCard({
   return (
     <div className="rounded-2xl border border-rule bg-surface p-5">
       <div className="flex items-baseline justify-between gap-3">
-        <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-red">
+        <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-marine">
           {tag}
         </p>
         <span className="text-[10px] uppercase tracking-wider text-mute">

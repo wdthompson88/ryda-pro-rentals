@@ -61,7 +61,7 @@ export default async function BoatCharterDetail({
         <div className="mx-auto max-w-7xl px-6 py-10 sm:px-10 sm:py-14">
           <Link
             href="/boats/rent"
-            className="text-xs font-medium uppercase tracking-[0.2em] text-red hover:text-red-deep"
+            className="text-xs font-medium uppercase tracking-[0.2em] text-marine hover:text-marine-deep"
           >
             ← Charters
           </Link>
@@ -156,7 +156,7 @@ export default async function BoatCharterDetail({
 
                 <Link
                   href={`/signup?next=${encodeURIComponent(`/contact?type=Rental&note=${encodeURIComponent(`Charter request: ${b.name} · ${b.market}`)}#form`)}&reason=rent`}
-                  className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-red px-7 py-3 text-sm font-semibold text-cream transition-colors hover:bg-red-deep"
+                  className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-marine px-7 py-3 text-sm font-semibold text-cream transition-colors hover:bg-marine-deep"
                 >
                   Request charter
                 </Link>
@@ -181,7 +181,7 @@ export default async function BoatCharterDetail({
                   {formatUSD(rate.total)}
                 </p>
                 {rate.save > 0 && (
-                  <p className="mt-1 text-xs font-medium text-red">
+                  <p className="mt-1 text-xs font-medium text-marine">
                     Save {rate.save}%
                   </p>
                 )}
@@ -194,7 +194,7 @@ export default async function BoatCharterDetail({
       {/* Co-own teaser */}
       <section className="border-b border-rule bg-ink py-14 text-cream">
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
             Charter once. Own a piece forever.
           </p>
           <h2 className="mt-3 font-display text-3xl sm:text-4xl">
@@ -207,7 +207,7 @@ export default async function BoatCharterDetail({
           </p>
           <Link
             href={`/boats/portfolio/${b.slug}`}
-            className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-red hover:text-cream"
+            className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-marine hover:text-cream"
           >
             See in the fleet →
           </Link>

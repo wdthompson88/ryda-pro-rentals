@@ -18,7 +18,7 @@ export default function BoatsRentPage() {
       {/* Hero */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
             Charter · Try before you commit
           </p>
           <h1 className="mt-4 font-display text-5xl font-light leading-tight text-ink sm:text-6xl">
@@ -32,7 +32,7 @@ export default function BoatsRentPage() {
           <div className="mt-10 flex flex-wrap gap-3">
             <Link
               href="#available"
-              className="inline-flex h-12 items-center justify-center rounded-full bg-red px-7 text-sm font-medium text-cream transition-colors hover:bg-red-deep"
+              className="inline-flex h-12 items-center justify-center rounded-full bg-marine px-7 text-sm font-medium text-cream transition-colors hover:bg-marine-deep"
             >
               See {BOATS.length} available boats →
             </Link>
@@ -65,7 +65,7 @@ export default function BoatsRentPage() {
                     {b.brand}
                   </span>
                   {b.captainIncluded && (
-                    <span className="absolute right-3 top-3 rounded-full bg-red/95 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] text-cream backdrop-blur">
+                    <span className="absolute right-3 top-3 rounded-full bg-marine/95 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] text-cream backdrop-blur">
                       Crewed
                     </span>
                   )}
@@ -98,7 +98,7 @@ export default function BoatsRentPage() {
                           <p className="text-[11px] uppercase tracking-[0.14em] text-mute">
                             Or own a share
                           </p>
-                          <p className="text-sm text-red tabular-nums">
+                          <p className="text-sm text-marine tabular-nums">
                             {b.sharesAvailable} of {b.shares} left
                           </p>
                         </div>
@@ -107,7 +107,7 @@ export default function BoatsRentPage() {
                   </div>
                   <div className="mt-5 flex items-center justify-between">
                     <p className="text-xs text-ink-soft">Captain + mate included</p>
-                    <span className="inline-flex items-center gap-1.5 text-sm font-medium text-red transition-colors group-hover:text-red-deep">
+                    <span className="inline-flex items-center gap-1.5 text-sm font-medium text-marine transition-colors group-hover:text-marine-deep">
                       View details →
                     </span>
                   </div>
@@ -148,7 +148,7 @@ export default function BoatsRentPage() {
       {/* Co-own teaser */}
       <section className="bg-ink py-20 text-cream">
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
             Beyond the charter
           </p>
           <h2 className="mt-4 font-display text-3xl sm:text-4xl">
@@ -161,7 +161,7 @@ export default function BoatsRentPage() {
           </p>
           <Link
             href="/boats/portfolio"
-            className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-red hover:text-cream"
+            className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-marine hover:text-cream"
           >
             See the co-ownership portfolio →
           </Link>

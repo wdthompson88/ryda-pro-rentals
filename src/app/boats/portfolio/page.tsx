@@ -51,7 +51,7 @@ export default function BoatsPortfolioPage() {
           </p>
           <h1 className="mt-5 max-w-4xl font-display text-5xl font-light leading-[1.05] sm:text-6xl lg:text-7xl">
             {PORTFOLIO_HERO.headline.prefix}{" "}
-            <span className="italic text-red">{PORTFOLIO_HERO.headline.highlight}</span>
+            <span className="italic text-marine">{PORTFOLIO_HERO.headline.highlight}</span>
           </h1>
           <p className="mt-7 max-w-2xl text-lg leading-relaxed text-cream/85">
             {PORTFOLIO_HERO.subhead}
@@ -59,7 +59,7 @@ export default function BoatsPortfolioPage() {
           <div className="mt-10 flex flex-wrap gap-3">
             <Link
               href="#featured"
-              className="inline-flex h-12 items-center justify-center rounded-full bg-red px-7 text-sm font-medium text-cream hover:bg-red-deep"
+              className="inline-flex h-12 items-center justify-center rounded-full bg-marine px-7 text-sm font-medium text-cream hover:bg-marine-deep"
             >
               See the fleet →
             </Link>
@@ -78,7 +78,7 @@ export default function BoatsPortfolioPage() {
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
                 Featured
               </p>
               <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
@@ -91,7 +91,7 @@ export default function BoatsPortfolioPage() {
             </div>
             <Link
               href="/boats/rent"
-              className="text-sm font-medium text-red hover:text-red-deep"
+              className="text-sm font-medium text-marine hover:text-marine-deep"
             >
               Charter the same hulls →
             </Link>
@@ -107,7 +107,7 @@ export default function BoatsPortfolioPage() {
       {/* By market */}
       <section id="markets" className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
             By market
           </p>
           <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
@@ -143,7 +143,7 @@ export default function BoatsPortfolioPage() {
             are membership interests in member-managed Delaware LLCs —
             not registered securities, not offered for investment
             purposes. See the{" "}
-            <Link href="/legal/disclaimer" className="text-red hover:text-red-deep">
+            <Link href="/legal/disclaimer" className="text-marine hover:text-marine-deep">
               Co-Ownership Disclaimer
             </Link>
             .
@@ -186,7 +186,7 @@ function BoatMarketSection({
             <span
               className={`rounded-full px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.18em] ${
                 isLive
-                  ? "bg-red/95 text-cream"
+                  ? "bg-marine/95 text-cream"
                   : "border border-cream/40 text-cream/85"
               }`}
             >
@@ -222,7 +222,7 @@ function BoatMarketSection({
                   className={`absolute right-3 top-3 rounded-full px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] backdrop-blur ${
                     b.sharesAvailable === 0
                       ? "bg-mute/90 text-cream"
-                      : "bg-red/95 text-cream"
+                      : "bg-marine/95 text-cream"
                   }`}
                 >
                   {b.sharesAvailable === 0
@@ -247,7 +247,7 @@ function BoatMarketSection({
                       {formatUSD(b.pricePerShare)}
                     </span>
                   </p>
-                  <span className="text-xs font-medium text-red group-hover:text-red-deep">
+                  <span className="text-xs font-medium text-marine group-hover:text-marine-deep">
                     View →
                   </span>
                 </div>
@@ -264,7 +264,7 @@ function BoatMarketSection({
             Want first-look access?{" "}
             <Link
               href={`/contact?type=Membership&note=${encodeURIComponent(`Want ${market.label} boats access`)}#form`}
-              className="text-red underline-offset-4 hover:underline"
+              className="text-marine underline-offset-4 hover:underline"
             >
               Email us
             </Link>{" "}
@@ -298,7 +298,7 @@ function FeaturedBoatCard({ boat: b }: { boat: Boat }) {
       />
       <span
         className={`absolute right-4 top-4 rounded-full px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] backdrop-blur ${
-          b.sharesAvailable === 0 ? "bg-mute/90 text-cream" : "bg-red/95 text-cream"
+          b.sharesAvailable === 0 ? "bg-mute/90 text-cream" : "bg-marine/95 text-cream"
         }`}
       >
         {b.sharesAvailable === 0 ? "Sold out" : `${b.sharesAvailable} shares left`}

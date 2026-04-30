@@ -21,6 +21,9 @@
   --ryda-red:       #DC4747;   /* brand red — bumped from #C03030 to clear AA on dark */
   --ryda-red-deep:  #ED5C5C;   /* hover red */
   --ryda-gold:      #C9A66B;   /* premium accent for Black tier */
+  /* Boats accent — marine blue. Contrast on cream (#0E0E10) ≈ 5.7:1. */
+  --ryda-marine:      #4A90D9;
+  --ryda-marine-deep: #6FA8E5;
 }
 
 /* Light theme — explicit opt-in via data-theme="light" on <html>.
@@ -38,6 +41,9 @@
   --ryda-red:       #C03030;   /* brand red — slightly deeper for AA on light */
   --ryda-red-deep:  #9C2424;   /* hover red */
   --ryda-gold:      #A88340;   /* premium accent */
+  /* Boats accent — marine blue, deeper for AA on light. */
+  --ryda-marine:      #1E5DAB;
+  --ryda-marine-deep: #143C75;
 }
 
 /* Smooth color transitions when toggling themes (but not on load) */
@@ -61,6 +67,8 @@ html.theme-ready * {
   --color-red:       var(--ryda-red);
   --color-red-deep:  var(--ryda-red-deep);
   --color-gold:      var(--ryda-gold);
+  --color-marine:      var(--ryda-marine);
+  --color-marine-deep: var(--ryda-marine-deep);
 
   --font-display: var(--font-fraunces);
   --font-sans:    var(--font-inter);

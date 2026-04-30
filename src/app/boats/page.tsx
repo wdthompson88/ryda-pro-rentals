@@ -35,12 +35,12 @@ export default function BoatsHome() {
       <section className="border-b border-rule">
         <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-6 py-20 sm:px-10 sm:py-24 lg:grid-cols-12 lg:gap-12">
           <div className="lg:col-span-6">
-            <p className="mb-6 text-xs font-medium uppercase tracking-[0.2em] text-red">
+            <p className="mb-6 text-xs font-medium uppercase tracking-[0.2em] text-marine">
               {HERO_EYEBROW}
             </p>
             <h1 className="font-display text-5xl font-light leading-[1.05] tracking-tight text-ink sm:text-6xl lg:text-7xl">
               {HERO_HEADLINE.prefix}{" "}
-              <span className="italic text-red">{HERO_HEADLINE.highlight}</span>
+              <span className="italic text-marine">{HERO_HEADLINE.highlight}</span>
             </h1>
             <p className="mt-8 max-w-xl text-lg leading-relaxed text-ink-soft">
               {HERO_SUBHEAD}
@@ -48,7 +48,7 @@ export default function BoatsHome() {
             <div className="mt-10 flex flex-wrap gap-3">
               <Link
                 href="/boats/portfolio"
-                className="inline-flex h-12 items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream transition-colors hover:bg-red"
+                className="inline-flex h-12 items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream transition-colors hover:bg-marine"
               >
                 Co-Own a share →
               </Link>
@@ -79,7 +79,7 @@ export default function BoatsHome() {
               />
               <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 bg-gradient-to-t from-cream/90 via-cream/30 to-transparent p-5 sm:p-6">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-red">
+                  <p className="text-xs uppercase tracking-[0.2em] text-marine">
                     In the fleet
                   </p>
                   <p className="mt-1 font-display text-xl text-ink sm:text-2xl">
@@ -91,7 +91,7 @@ export default function BoatsHome() {
                     available
                   </p>
                 </div>
-                <span className="hidden text-sm font-medium text-red sm:inline">
+                <span className="hidden text-sm font-medium text-marine sm:inline">
                   View →
                 </span>
               </div>
@@ -105,7 +105,7 @@ export default function BoatsHome() {
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
           <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
             <div className="max-w-2xl">
-              <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
                 Co-Own · Featured
               </p>
               <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
@@ -153,7 +153,7 @@ export default function BoatsHome() {
                         </span>
                         <span className="text-xs text-mute">/share</span>
                       </p>
-                      <span className="text-xs font-medium text-red group-hover:text-red-deep">
+                      <span className="text-xs font-medium text-marine group-hover:text-marine-deep">
                         View →
                       </span>
                     </div>
@@ -170,7 +170,7 @@ export default function BoatsHome() {
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
           <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
             <div className="max-w-2xl">
-              <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
                 Charter · Featured
               </p>
               <h2 className="mt-3 font-display text-3xl sm:text-4xl">
@@ -218,7 +218,7 @@ export default function BoatsHome() {
                         </span>
                         <span className="text-xs text-cream/60">/day</span>
                       </p>
-                      <span className="text-xs font-medium text-red">
+                      <span className="text-xs font-medium text-marine">
                         Charter →
                       </span>
                     </div>
@@ -233,7 +233,7 @@ export default function BoatsHome() {
       {/* 5-step block (parallel to cars home) */}
       <section id="how-it-works" className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-28">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
             Why RYDA Boats
           </p>
           <h2 className="mt-4 max-w-3xl font-display text-4xl font-light leading-tight text-ink sm:text-5xl">
@@ -247,7 +247,7 @@ export default function BoatsHome() {
           <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-3 lg:grid-cols-5">
             {HOW_IT_WORKS_STEPS.map((s) => (
               <div key={s.n}>
-                <p className="font-display text-sm text-red">{s.n}</p>
+                <p className="font-display text-sm text-marine">{s.n}</p>
                 <p className="mt-3 font-display text-xl text-ink">{s.title}</p>
                 <p className="mt-3 text-sm leading-relaxed text-ink-soft">
                   {s.body}
@@ -277,7 +277,7 @@ export default function BoatsHome() {
       {/* Waitlist */}
       <section id="waitlist" className="border-b border-rule bg-ink text-cream">
         <div className="mx-auto max-w-3xl px-6 py-20 text-center sm:px-10 sm:py-28">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
             Founding members · Boats
           </p>
           <h2 className="mt-4 font-display text-4xl font-light leading-tight sm:text-5xl">

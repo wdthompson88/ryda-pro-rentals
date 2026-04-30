@@ -18,12 +18,12 @@ export default function BoatsHowItWorks() {
       {/* Hero */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-28">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
             How it works · Boat co-ownership
           </p>
           <h1 className="mt-4 max-w-4xl font-display text-5xl font-light leading-tight text-ink sm:text-6xl">
             Member-managed Delaware LLC.{" "}
-            <span className="italic text-red">Same doctrine as cars.</span>
+            <span className="italic text-marine">Same doctrine as cars.</span>
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-ink-soft">
             Each boat is held in a single-purpose Delaware LLC. Up to 10
@@ -38,7 +38,7 @@ export default function BoatsHowItWorks() {
       {/* 5 steps */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
             Lifecycle
           </p>
           <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
@@ -47,7 +47,7 @@ export default function BoatsHowItWorks() {
           <div className="mt-12 grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-5">
             {HOW_IT_WORKS_STEPS.map((s) => (
               <div key={s.n}>
-                <p className="font-display text-sm text-red">{s.n}</p>
+                <p className="font-display text-sm text-marine">{s.n}</p>
                 <p className="mt-3 font-display text-xl text-ink">{s.title}</p>
                 <p className="mt-3 text-sm leading-relaxed text-ink-soft">{s.body}</p>
               </div>
@@ -59,7 +59,7 @@ export default function BoatsHowItWorks() {
       {/* The numbers */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
             The numbers, exactly
           </p>
           <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
@@ -79,7 +79,7 @@ export default function BoatsHowItWorks() {
       {/* FAQ */}
       <section id="faq" className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
             FAQ
           </p>
           <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
@@ -114,7 +114,7 @@ export default function BoatsHowItWorks() {
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
               href="/boats/portfolio"
-              className="inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-red hover:text-cream"
+              className="inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-marine hover:text-cream"
             >
               See the fleet →
             </Link>
