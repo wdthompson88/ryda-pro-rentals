@@ -35,20 +35,22 @@ export default function MarketsPage() {
     <>
       <SiteHeader />
 
-      {/* Cinematic portfolio hero — full-bleed photo with overlaid copy.
-          Uses a different image from the home page's "Browse the portfolio"
-          backdrop (which is the Miami beach shot reused as MARKETS.Miami.hero).
-          Here we use a dramatic supercar shot to anchor the Portfolio brand
-          rather than a city skyline. */}
+      {/* Cinematic portfolio hero — full-bleed photo. The previous
+          Unsplash ID rendered a Porsche Panamera at run time (not the
+          McLaren that ID was supposed to be). Switched to the
+          confirmed red Ferrari 296 photo, with a tighter
+          `object-position` crop so it doesn't read as a duplicate of
+          the same image used on the cars home hero. */}
       <section className="relative isolate overflow-hidden border-b border-rule">
         <div className="absolute inset-0 -z-10">
           <Image
-            src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=2000&q=80"
-            alt="Supercar at dusk"
+            src="https://images.unsplash.com/photo-1592198084033-aade902d1aae?auto=format&fit=crop&w=2400&q=85"
+            alt="Red Ferrari 296 GTB"
             fill
             sizes="100vw"
             priority
             className="object-cover"
+            style={{ objectPosition: "center 30%" }}
           />
           <div
             aria-hidden

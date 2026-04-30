@@ -80,9 +80,14 @@ export const HERO_MEDIA: Record<
   },
   "cars-portfolio": {
     video: "",
+    // Confirmed red Ferrari 296 photo (matches what the F296 listing
+    // uses). The previous ID rendered a Porsche Panamera, which the
+    // CEO flagged as not luxury enough — Ferrari/Lambo/Bugatti read
+    // as the brand the portfolio is built around.
     poster:
-      "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=2400&q=85",
-    alt: "Supercar at dusk",
+      "https://images.unsplash.com/photo-1592198084033-aade902d1aae?auto=format&fit=crop&w=2400&q=85",
+    alt: "Red Ferrari 296 GTB",
+    position: "center 30%",
   },
   "boats-home": {
     video: "",
