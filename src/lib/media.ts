@@ -34,33 +34,53 @@ const PX = (id: string, spec: string) =>
 
 export const SPLITTER_MEDIA: Record<"cars" | "boats" | "planes", MediaSlot> = {
   cars: {
-    // Owned asset — file named "For Cars.mp4" by the CEO, renamed to
-    // /public/videos/cars.mp4. Single clip, no rotation.
-    videos: ["/videos/cars.mp4"],
+    // 7 supercar clips where the camera stays LOCKED on the car —
+    // either interior/cockpit POV (guaranteed lock) or external
+    // tracking shots that follow the vehicle. No clips that trail
+    // off to landscape, road, or environment.
+    videos: [
+      PX("8443860", "hd_1920_1080_30fps"),  // Driver-side interior of red Ferrari, in motion
+      PX("8443861", "hd_1920_1080_30fps"),  // Luxury sports car interior, driving
+      PX("8443781", "hd_1920_1080_30fps"),  // Red Ferrari driver POV
+      PX("5309345", "hd_1920_1080_25fps"),  // Man driving McLaren (interior)
+      PX("7727416", "hd_1920_1080_25fps"),  // Lamborghini speeding (tracking shot, car centered)
+      PX("16976173", "hd_1920_1080_24fps"), // Ferrari 458 in Zurich (tracking)
+      PX("17051328", "hd_1920_1080_24fps"), // Lamborghini Aventador in Lisbon (tracking)
+    ],
     poster:
       "https://images.unsplash.com/photo-1592198084033-aade902d1aae?auto=format&fit=crop&w=2400&q=85",
-    alt: "Cars splitter b-roll",
+    alt: "Red Ferrari supercar",
     position: "center 30%",
   },
   boats: {
-    // Owned asset — file named "For boats.mp4" by the CEO, renamed to
-    // /public/videos/boats.mp4. Single clip, no rotation.
-    videos: ["/videos/boats.mp4"],
+    // 5 SUPERYACHT clips — large luxury vessels only. Dropped the
+    // generic motorboat tracking shots (4337674/4337675) that didn't
+    // read as luxury. Every clip features a 100ft+ yacht.
+    videos: [
+      PX("14037403", "hd_1920_1080_30fps"), // White yacht sailing (aerial)
+      PX("14037398", "hd_1920_1080_30fps"), // Drone aerial of white motor yacht along coastal city
+      PX("13878618", "hd_1920_1080_30fps"), // Yacht sailing out of marina
+      PX("19867146", "hd_1920_1080_30fps"), // White yacht in Haulover Bay, Miami
+      PX("15288018", "hd_1920_1080_30fps"), // Drone video of luxury yacht docked at port
+    ],
     poster:
       "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?auto=format&fit=crop&w=2400&q=85",
-    alt: "Boats splitter b-roll",
+    alt: "Superyacht on the water at sunset",
     position: "center 50%",
   },
   planes: {
-    // Owned-asset cloud-sunset loop (above-the-clouds, golden hour).
-    // Single clip — CEO requested this exact aesthetic, no rotation.
-    // File lives at /public/videos/planes-clouds.mp4 so it's served
-    // from our own CDN, no external dependency or hotlink fragility.
-    videos: ["/videos/planes-clouds.mp4"],
+    // PRIVATE JETS only — Gulfstream/Bombardier/Citation-class
+    // business jets. Dropped the commercial-airliner clips
+    // (12086908 "Airplane landing over trees", 3678380 "Montreal
+    // landing") that read as Boeing/Airbus.
+    videos: [
+      PX("13278455", "hd_1920_1080_30fps"), // Private jet landing at airport
+      PX("13278451", "hd_1920_1080_30fps"), // Private jet landing at Prague airport
+    ],
     poster:
       "https://images.unsplash.com/photo-1474302770737-173ee21bab63?auto=format&fit=crop&w=2400&q=85",
-    alt: "Above the clouds at sunset",
-    position: "center",
+    alt: "Private jet on tarmac at dusk",
+    position: "center 70%",
   },
 };
 
