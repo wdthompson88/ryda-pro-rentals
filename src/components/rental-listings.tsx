@@ -90,7 +90,8 @@ type SortOption =
   | "featured"
   | "price-low"
   | "price-high"
-  | "savings";
+  | "savings"
+  | "year-new";
 
 const ANY = "__any__";
 
@@ -111,6 +112,7 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: "featured", label: "Featured" },
   { value: "price-low", label: "Price: low → high" },
   { value: "price-high", label: "Price: high → low" },
+  { value: "year-new", label: "Year: newest" },
   { value: "savings", label: "Biggest discount" },
 ];
 
@@ -123,7 +125,21 @@ const PRICE_BUCKETS: {
   { value: "u200", label: "Under $200/day", test: (r) => r < 200 },
   { value: "200-500", label: "$200 – $500/day", test: (r) => r >= 200 && r < 500 },
   { value: "500-1000", label: "$500 – $1,000/day", test: (r) => r >= 500 && r < 1_000 },
-  { value: "1000+", label: "$1,000+/day", test: (r) => r >= 1_000 },
+  { value: "1000-3000", label: "$1,000 – $3,000/day", test: (r) => r >= 1_000 && r < 3_000 },
+  { value: "3000+", label: "$3,000+/day", test: (r) => r >= 3_000 },
+];
+
+// Year buckets — partner inventory is recent but not always current model;
+// "Newer than 2022" matches member expectation around modern luxury.
+const YEAR_BUCKETS: {
+  value: string;
+  label: string;
+  test?: (year: number | undefined) => boolean;
+}[] = [
+  { value: ANY, label: "Any year" },
+  { value: "2024+", label: "2024 or newer", test: (y) => !!y && y >= 2024 },
+  { value: "2022+", label: "2022 or newer", test: (y) => !!y && y >= 2022 },
+  { value: "2020+", label: "2020 or newer", test: (y) => !!y && y >= 2020 },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -131,9 +147,14 @@ const PRICE_BUCKETS: {
 // ─────────────────────────────────────────────────────────────────────────
 
 export function RentalListings() {
+  const [query, setQuery] = useState("");
+  const [location, setLocation] = useState<string>(ANY);
   const [make, setMake] = useState<string>(ANY);
   const [category, setCategory] = useState<string>(ANY);
   const [priceBucket, setPriceBucket] = useState<string>(ANY);
+  const [yearBucket, setYearBucket] = useState<string>(ANY);
+  const [coOwnableOnly, setCoOwnableOnly] = useState(false);
+  const [trackOnly, setTrackOnly] = useState(false);
   const [sort, setSort] = useState<SortOption>("featured");
 
   const makes = useMemo(
@@ -142,17 +163,42 @@ export function RentalListings() {
     [],
   );
 
+  // Markets surfaced in the filter — include all RYDA markets (Miami,
+  // Los Angeles, New York) even if the inventory in some markets is
+  // Coming Soon. Partner inventory is Miami-only today but the
+  // architecture is ready for partner fleets in other cities.
+  const locations = useMemo(() => {
+    const set = new Set<string>(ALL_LISTINGS.map((v) => v.market));
+    // Force the canonical RYDA markets to appear even when a market has
+    // no inventory yet — clearer "Coming soon" UX than silently hiding.
+    ["Miami", "Los Angeles", "New York"].forEach((m) => set.add(m));
+    return Array.from(set).sort();
+  }, []);
+
   const filtered: RentalListing[] = useMemo(() => {
+    const q = query.trim().toLowerCase();
     return ALL_LISTINGS.filter((v) => {
+      if (q) {
+        const haystack =
+          `${v.make} ${v.model} ${v.market} ${v.category} ${v.year ?? ""}`.toLowerCase();
+        if (!haystack.includes(q)) return false;
+      }
+      if (location !== ANY && v.market !== location) return false;
       if (make !== ANY && v.make !== make) return false;
       if (category !== ANY && v.category !== category) return false;
       if (priceBucket !== ANY) {
         const bucket = PRICE_BUCKETS.find((b) => b.value === priceBucket);
         if (bucket?.test && !bucket.test(v.dailyRate)) return false;
       }
+      if (yearBucket !== ANY) {
+        const bucket = YEAR_BUCKETS.find((b) => b.value === yearBucket);
+        if (bucket?.test && !bucket.test(v.year)) return false;
+      }
+      if (coOwnableOnly && !v.isCoOwnable) return false;
+      if (trackOnly && !v.trackEligible) return false;
       return true;
     });
-  }, [make, category, priceBucket]);
+  }, [query, location, make, category, priceBucket, yearBucket, coOwnableOnly, trackOnly]);
 
   const visible = useMemo(() => {
     const out = [...filtered];
@@ -162,6 +208,9 @@ export function RentalListings() {
         break;
       case "price-high":
         out.sort((a, b) => b.dailyRate - a.dailyRate);
+        break;
+      case "year-new":
+        out.sort((a, b) => (b.year ?? 0) - (a.year ?? 0));
         break;
       case "savings":
         out.sort((a, b) => {
@@ -191,21 +240,107 @@ export function RentalListings() {
   const maxRate = visible.reduce((acc, v) => Math.max(acc, v.dailyRate), 0);
 
   const anyFilterActive =
-    make !== ANY || category !== ANY || priceBucket !== ANY;
+    query.trim().length > 0 ||
+    location !== ANY ||
+    make !== ANY ||
+    category !== ANY ||
+    priceBucket !== ANY ||
+    yearBucket !== ANY ||
+    coOwnableOnly ||
+    trackOnly;
 
   function clearAll() {
+    setQuery("");
+    setLocation(ANY);
     setMake(ANY);
     setCategory(ANY);
     setPriceBucket(ANY);
+    setYearBucket(ANY);
+    setCoOwnableOnly(false);
+    setTrackOnly(false);
     setSort("featured");
   }
 
+  // Active-filter chip strip — quick at-a-glance read of what's currently
+  // filtered, with single-click removal. Pacaso uses the same pattern.
+  type Chip = { label: string; onClear: () => void };
+  const chips: Chip[] = [];
+  if (query.trim()) chips.push({ label: `“${query.trim()}”`, onClear: () => setQuery("") });
+  if (location !== ANY) chips.push({ label: location, onClear: () => setLocation(ANY) });
+  if (make !== ANY) chips.push({ label: make, onClear: () => setMake(ANY) });
+  if (category !== ANY) chips.push({ label: category, onClear: () => setCategory(ANY) });
+  if (priceBucket !== ANY) {
+    const lbl = PRICE_BUCKETS.find((b) => b.value === priceBucket)?.label;
+    if (lbl) chips.push({ label: lbl, onClear: () => setPriceBucket(ANY) });
+  }
+  if (yearBucket !== ANY) {
+    const lbl = YEAR_BUCKETS.find((b) => b.value === yearBucket)?.label;
+    if (lbl) chips.push({ label: lbl, onClear: () => setYearBucket(ANY) });
+  }
+  if (coOwnableOnly)
+    chips.push({ label: "Co-ownership", onClear: () => setCoOwnableOnly(false) });
+  if (trackOnly)
+    chips.push({ label: "Track-ready", onClear: () => setTrackOnly(false) });
+
   return (
     <section>
-      {/* Filter bar */}
-      <div className="border-b border-rule bg-cream-2/50">
-        <div className="mx-auto max-w-7xl px-6 py-6 sm:px-10">
-          <div className="flex flex-wrap items-end gap-3">
+      {/* Filter bar — sticky so filters stay accessible while browsing */}
+      <div className="sticky top-0 z-30 border-b border-rule bg-cream-2/95 backdrop-blur">
+        <div className="mx-auto max-w-7xl px-6 py-5 sm:px-10">
+          {/* Search */}
+          <label className="block">
+            <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-mute">
+              Search
+            </span>
+            <div className="mt-1.5 flex h-11 items-center rounded-full border border-rule bg-surface px-4 transition-colors focus-within:border-ink">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 14 14"
+                fill="none"
+                aria-hidden
+                className="mr-2 shrink-0 text-mute"
+              >
+                <circle cx="6" cy="6" r="4.5" stroke="currentColor" strokeWidth="1.4" />
+                <path
+                  d="M9.5 9.5L13 13"
+                  stroke="currentColor"
+                  strokeWidth="1.4"
+                  strokeLinecap="round"
+                />
+              </svg>
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Try Ferrari, Miami, Convertible, 2024…"
+                className="h-full min-w-0 flex-1 bg-transparent text-sm text-ink placeholder:text-mute focus:outline-none"
+              />
+              {query ? (
+                <button
+                  type="button"
+                  onClick={() => setQuery("")}
+                  className="ml-2 shrink-0 rounded-full px-2 text-xs text-mute hover:text-ink"
+                  aria-label="Clear search"
+                >
+                  ×
+                </button>
+              ) : null}
+            </div>
+          </label>
+
+          {/* Filter row — Location is first because it's the most
+              consequential decision (Miami today, LA + NY soon). */}
+          <div className="mt-4 flex flex-wrap items-end gap-3">
+            <FilterSelect
+              label="Location"
+              value={location}
+              onChange={setLocation}
+              options={[
+                { value: ANY, label: "All locations" },
+                ...locations.map((m) => ({ value: m, label: m })),
+              ]}
+            />
             <FilterSelect
               label="Make"
               value={make}
@@ -230,6 +365,28 @@ export function RentalListings() {
                 label: b.label,
               }))}
             />
+            <FilterSelect
+              label="Year"
+              value={yearBucket}
+              onChange={setYearBucket}
+              options={YEAR_BUCKETS.map((b) => ({
+                value: b.value,
+                label: b.label,
+              }))}
+            />
+
+            {/* Toggles for boolean attributes — distinct visual treatment
+                from selects so members can tell them apart. */}
+            <FilterToggle
+              label="Co-ownership"
+              active={coOwnableOnly}
+              onClick={() => setCoOwnableOnly((v) => !v)}
+            />
+            <FilterToggle
+              label="Track-ready"
+              active={trackOnly}
+              onClick={() => setTrackOnly((v) => !v)}
+            />
 
             <div className="ml-auto flex items-end gap-3">
               {anyFilterActive ? (
@@ -249,6 +406,30 @@ export function RentalListings() {
               />
             </div>
           </div>
+
+          {/* Active filter chips — appear only when filters are applied.
+              Each chip clears its filter on click. */}
+          {chips.length > 0 ? (
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-mute">
+                Filtering by
+              </span>
+              {chips.map((c, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={c.onClear}
+                  aria-label={`Remove filter: ${c.label}`}
+                  className="group inline-flex items-center gap-1.5 rounded-full border border-rule bg-surface px-3 py-1 text-xs text-ink-soft transition-colors hover:border-ink hover:text-ink"
+                >
+                  <span>{c.label}</span>
+                  <span className="text-mute group-hover:text-ink" aria-hidden>
+                    ×
+                  </span>
+                </button>
+              ))}
+            </div>
+          ) : null}
         </div>
       </div>
 
@@ -260,8 +441,13 @@ export function RentalListings() {
               {totalListed}
             </span>
             <span className="ml-2">
-              {totalListed === 1 ? "vehicle" : "vehicles"} available · Miami · LA · NYC
+              {totalListed === 1 ? "vehicle" : "vehicles"} available
             </span>
+            {location !== ANY ? (
+              <span className="ml-2 text-mute">in {location}</span>
+            ) : (
+              <span className="ml-2 text-mute">· Miami · LA · NYC</span>
+            )}
           </p>
           {totalListed > 0 ? (
             <p className="text-sm text-ink-soft tabular-nums">
@@ -282,22 +468,10 @@ export function RentalListings() {
       {/* Card grid */}
       <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
         {visible.length === 0 ? (
-          <div className="rounded-2xl border border-rule bg-surface p-12 text-center">
-            <p className="font-display text-xl text-ink">
-              No vehicles match those filters.
-            </p>
-            <p className="mt-2 text-sm text-ink-soft">
-              Try widening your search or{" "}
-              <button
-                type="button"
-                onClick={clearAll}
-                className="text-red underline-offset-4 hover:underline"
-              >
-                reset all filters
-              </button>
-              .
-            </p>
-          </div>
+          <EmptyState
+            location={location !== ANY ? location : null}
+            onReset={clearAll}
+          />
         ) : (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {visible.map((v) => (
@@ -307,6 +481,69 @@ export function RentalListings() {
         )}
       </div>
     </section>
+  );
+}
+
+function EmptyState({
+  location,
+  onReset,
+}: {
+  location: string | null;
+  onReset: () => void;
+}) {
+  // Special case: filtered to LA or NY where partner fleet hasn't shipped
+  // yet. Show a "Coming soon" treatment instead of the generic empty state.
+  const isComingSoonMarket =
+    location === "Los Angeles" || location === "New York";
+  if (isComingSoonMarket) {
+    return (
+      <div className="rounded-2xl border border-rule bg-surface p-12 text-center">
+        <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+          {location} · Coming soon
+        </p>
+        <p className="mt-3 font-display text-2xl text-ink">
+          The {location} fleet ships with the local launch.
+        </p>
+        <p className="mx-auto mt-3 max-w-md text-sm text-ink-soft">
+          We&apos;re assembling fleet partners and storage in {location} now.
+          Want first-look access when listings open? Tell us and we&apos;ll
+          get in touch.
+        </p>
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
+          <Link
+            href={`/contact?type=Membership&note=${encodeURIComponent(`Want ${location} rental access`)}#form`}
+            className="inline-flex h-11 items-center justify-center rounded-full bg-red px-5 text-sm font-medium text-cream hover:bg-red-deep"
+          >
+            Notify me at launch →
+          </Link>
+          <button
+            type="button"
+            onClick={onReset}
+            className="inline-flex h-11 items-center justify-center rounded-full border border-rule px-5 text-sm font-medium text-ink-soft hover:border-ink hover:text-ink"
+          >
+            See Miami inventory instead
+          </button>
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div className="rounded-2xl border border-rule bg-surface p-12 text-center">
+      <p className="font-display text-xl text-ink">
+        No vehicles match those filters.
+      </p>
+      <p className="mt-2 text-sm text-ink-soft">
+        Try widening your search or{" "}
+        <button
+          type="button"
+          onClick={onReset}
+          className="text-red underline-offset-4 hover:underline"
+        >
+          reset all filters
+        </button>
+        .
+      </p>
+    </div>
   );
 }
 
@@ -337,6 +574,56 @@ function FilterSelect({
           </option>
         ))}
       </select>
+    </label>
+  );
+}
+
+function FilterToggle({
+  label,
+  active,
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <label className="flex flex-col gap-1.5">
+      <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-mute">
+        Toggle
+      </span>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={active}
+        aria-label={label}
+        onClick={onClick}
+        className={`flex h-10 items-center gap-2 rounded-full border px-4 text-xs font-medium transition-colors ${
+          active
+            ? "border-red bg-red text-cream hover:bg-red-deep"
+            : "border-rule bg-surface text-ink-soft hover:border-ink hover:text-ink"
+        }`}
+      >
+        <span
+          aria-hidden
+          className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
+            active ? "border-cream bg-cream" : "border-rule bg-surface"
+          }`}
+        >
+          {active && (
+            <svg width="9" height="9" viewBox="0 0 9 9" fill="none" aria-hidden>
+              <path
+                d="M2 4.5L4 6.5L7.5 2.5"
+                stroke="#DC4747"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          )}
+        </span>
+        {label}
+      </button>
     </label>
   );
 }
