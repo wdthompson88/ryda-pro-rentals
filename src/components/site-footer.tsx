@@ -5,7 +5,7 @@ export function SiteFooter() {
     <footer className="border-t border-rule">
       <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10">
         <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-12">
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-2">
             <p className="font-display text-2xl text-ink">RYDA</p>
             <p className="mt-3 max-w-sm text-sm text-ink-soft">
               Supercar co-ownership and rentals. Miami, FL.
