@@ -71,9 +71,11 @@ export const SPLITTER_MEDIA: Record<"cars" | "boats" | "planes", MediaSlot> = {
       "/videos/boats-london.mp4",
       "/videos/boats-vtmyg3.mp4",
       "/videos/boats-untitled.mp4",
-      // Pexels — superyacht only
-      PX("14037403", "hd_1920_1080_30fps"), // White yacht sailing (aerial)
-      PX("14037398", "hd_1920_1080_30fps"), // Drone aerial of white motor yacht along coastal city
+      // Pexels — superyacht only. Dropped 14037398 (yacht-too-far-from-
+      // -camera against an LA-coast-style coastline — CEO flagged the
+      // screenshot a second time) and 14037403 (similar wide-establishing
+      // shot). Kept the marina + docked-at-port shots where the yacht
+      // fills more of the frame.
       PX("13878618", "hd_1920_1080_30fps"), // Yacht sailing out of marina
       PX("15288018", "hd_1920_1080_30fps"), // Drone video of luxury yacht docked at port
     ],
