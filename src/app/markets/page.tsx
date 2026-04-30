@@ -35,12 +35,16 @@ export default function MarketsPage() {
     <>
       <SiteHeader />
 
-      {/* Cinematic portfolio hero — full-bleed photo with overlaid copy */}
+      {/* Cinematic portfolio hero — full-bleed photo with overlaid copy.
+          Uses a different image from the home page's "Browse the portfolio"
+          backdrop (which is the Miami beach shot reused as MARKETS.Miami.hero).
+          Here we use a dramatic supercar shot to anchor the Portfolio brand
+          rather than a city skyline. */}
       <section className="relative isolate overflow-hidden border-b border-rule">
         <div className="absolute inset-0 -z-10">
           <Image
-            src={MARKETS.Miami.hero}
-            alt="Miami at sunset"
+            src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=2000&q=80"
+            alt="Supercar at dusk"
             fill
             sizes="100vw"
             priority
@@ -48,7 +52,7 @@ export default function MarketsPage() {
           />
           <div
             aria-hidden
-            className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/35 to-black/85"
+            className="absolute inset-0 bg-gradient-to-b from-black/65 via-black/40 to-black/85"
           />
         </div>
         <div className="mx-auto max-w-7xl px-6 py-24 text-cream sm:px-10 sm:py-36">

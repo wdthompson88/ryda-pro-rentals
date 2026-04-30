@@ -131,31 +131,25 @@ export default function Home() {
             >
               Open the portfolio →
             </Link>
-            <Link
-              href="/markets#all"
-              className="inline-flex h-12 items-center justify-center rounded-full border border-cream/40 px-7 text-sm font-medium text-cream hover:border-cream"
-            >
-              Filter all {VEHICLES.length} vehicles
-            </Link>
           </div>
         </div>
       </section>
 
-      {/* Co-Own — featured share cars */}
+      {/* Co-Own — featured share cars (curated, not the full inventory) */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
           <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
             <div className="max-w-2xl">
               <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-                Co-Own · From the portfolio
+                Co-Own · Featured
               </p>
               <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
-                Own a piece of the world&apos;s most exceptional cars.
+                Featured cars from the co-ownership portfolio.
               </h2>
               <p className="mt-3 max-w-xl text-base text-ink-soft">
-                Each car held in a Delaware LLC, 10 shares per vehicle.
-                ~30 days a year per share. Effective ~$236/day in
-                steady-state ops vs $2,400+/day to rent.
+                A curated four. Each car held in a Delaware LLC, 10 shares
+                per vehicle. ~30 days a year per share. Effective ~$236/day
+                in steady-state ops vs $2,400+/day to rent.
               </p>
             </div>
             <Link
@@ -206,20 +200,21 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Rent — try before you buy */}
+      {/* Rent — featured rentals (try before you buy) */}
       <section className="border-b border-rule bg-ink text-cream">
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
           <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
             <div className="max-w-2xl">
               <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-                Try before you buy
+                Rent · Featured
               </p>
               <h2 className="mt-3 font-display text-3xl sm:text-4xl">
-                Rent any vehicle by the day.
+                Featured rentals — try before you buy.
               </h2>
               <p className="mt-3 max-w-xl text-base text-cream/70">
-                Drive it first. Then decide if you want to own a piece.
-                Members + prospective buyers welcome.
+                A curated four. Drive one first, decide if you want to own
+                a piece. The full Miami fleet (RYDA + partner cars) lives
+                on the rentals page.
               </p>
             </div>
             <Link
