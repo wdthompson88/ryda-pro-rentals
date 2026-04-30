@@ -8,7 +8,7 @@ export function SiteFooter() {
           <div className="lg:col-span-2">
             <p className="font-display text-2xl text-ink">RYDA</p>
             <p className="mt-3 max-w-sm text-sm text-ink-soft">
-              Supercar co-ownership and rentals. Miami, FL.
+              Luxury vehicle access — Cars, Boats, and (soon) Planes. Miami, FL.
             </p>
             <Link
               href="/founding-members"
@@ -28,14 +28,24 @@ export function SiteFooter() {
           </div>
 
           <FooterCol
-            title="Platform"
+            title="Cars"
             links={[
-              ["Co-Own", "/markets"],
+              ["Portfolio", "/markets"],
               ["Rent", "/rent"],
               ["Concierge", "/concierge-ownership"],
               ["Membership", "/membership"],
               ["How it works", "/how-it-works"],
               ["FAQ", "/faq"],
+            ]}
+          />
+          <FooterCol
+            title="Boats"
+            links={[
+              ["Boats home", "/boats"],
+              ["Portfolio", "/boats/portfolio"],
+              ["Charter", "/boats/rent"],
+              ["How it works", "/boats/how-it-works"],
+              ["Apply", "/contact?type=Membership&note=RYDA+Boats"],
             ]}
           />
           <FooterCol

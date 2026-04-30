@@ -1,13 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useState } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
 
-// Pacaso pattern: Portfolio is the front door. We keep "Co-Own" + "Rent"
-// as the next-tier nav so the dual product story stays prominent.
-const NAV = [
+// RYDA spans three verticals: Cars, Boats, Planes. The header detects
+// which vertical the visitor is in via the pathname and swaps the nav
+// accordingly. A small "Cars · Boats · Planes" switcher pill lets
+// members move between verticals without going back to the splitter.
+
+type Vertical = "cars" | "boats" | "planes" | "neutral";
+
+const CARS_NAV = [
   { href: "/markets", label: "Portfolio" },
   { href: "/rent", label: "Rent" },
   { href: "/how-it-works", label: "How it works" },
@@ -15,11 +20,43 @@ const NAV = [
   { href: "/membership", label: "Membership" },
 ];
 
+const BOATS_NAV = [
+  { href: "/boats/portfolio", label: "Portfolio" },
+  { href: "/boats/rent", label: "Charter" },
+  { href: "/boats/how-it-works", label: "How it works" },
+  { href: "/contact?type=Membership&note=RYDA+Boats", label: "Apply" },
+];
+
+const PLANES_NAV: { href: string; label: string }[] = [
+  // Planes is just a coming-soon surface today — no sub-nav.
+];
+
+function detectVertical(pathname: string | null): Vertical {
+  if (!pathname) return "neutral";
+  if (pathname.startsWith("/boats")) return "boats";
+  if (pathname.startsWith("/planes")) return "planes";
+  if (pathname === "/") return "neutral";
+  // Everything else (the existing car-era routes) is the cars vertical:
+  // /markets, /rent, /membership, /how-it-works, /faq, /inside, /journal,
+  // /vs, /sample-documents, etc. plus /cars itself.
+  return "cars";
+}
+
+function navForVertical(v: Vertical): { href: string; label: string }[] {
+  if (v === "boats") return BOATS_NAV;
+  if (v === "planes") return PLANES_NAV;
+  if (v === "neutral") return [];
+  return CARS_NAV;
+}
+
 export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const router = useRouter();
+  const pathname = usePathname();
+  const vertical = detectVertical(pathname);
+  const nav = navForVertical(vertical);
 
   const tone = inverted ? "text-cream/70 hover:text-cream" : "text-ink-soft hover:text-ink";
   const brand = inverted ? "text-cream" : "text-ink";
@@ -32,9 +69,6 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
     e.preventDefault();
     const q = query.trim();
     if (!q) return;
-    // Route the search to the help center search (closest to a real
-    // search experience pre-launch). Help search already supports
-    // query strings, vehicles, and content.
     router.push(`/help?q=${encodeURIComponent(q)}`);
     setSearchOpen(false);
     setQuery("");
@@ -42,13 +76,57 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
 
   return (
     <header className={`w-full border-b ${inverted ? "border-cream/20" : "border-rule"}`}>
+      {/* Vertical switcher strip — small, always visible above the main nav.
+          Lets a member jump between Cars / Boats / Planes without going
+          back to the splitter at /. */}
+      <div
+        className={`border-b ${
+          inverted ? "border-cream/15 bg-ink" : "border-rule bg-cream-2/40"
+        }`}
+      >
+        <div className="mx-auto flex max-w-7xl items-center justify-center gap-1 px-6 py-1.5 text-[10px] font-medium uppercase tracking-[0.18em] sm:justify-start sm:px-10">
+          <VerticalLink
+            href="/cars"
+            label="Cars"
+            active={vertical === "cars"}
+            inverted={inverted}
+          />
+          <span aria-hidden className={inverted ? "text-cream/30" : "text-mute/50"}>
+            ·
+          </span>
+          <VerticalLink
+            href="/boats"
+            label="Boats"
+            active={vertical === "boats"}
+            inverted={inverted}
+          />
+          <span aria-hidden className={inverted ? "text-cream/30" : "text-mute/50"}>
+            ·
+          </span>
+          <VerticalLink
+            href="/planes"
+            label="Planes"
+            active={vertical === "planes"}
+            comingSoon
+            inverted={inverted}
+          />
+        </div>
+      </div>
+
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 sm:px-10">
         <Link href="/" className={`font-display text-2xl tracking-tight ${brand}`}>
           RYDA
+          {vertical !== "neutral" && (
+            <span className={`ml-2 align-baseline text-[10px] font-medium uppercase tracking-[0.24em] ${
+              inverted ? "text-cream/60" : "text-mute"
+            }`}>
+              {vertical}
+            </span>
+          )}
         </Link>
 
         <nav className={`hidden gap-7 text-sm font-medium sm:flex ${tone}`}>
-          {NAV.map((n) => (
+          {nav.map((n) => (
             <Link key={n.href} href={n.href}>
               {n.label}
             </Link>
@@ -56,9 +134,6 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
         </nav>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* Quiet search trigger — Pacaso has it as a persistent piece
-              of the header. We expand inline rather than route to a
-              search page, so the existing nav stays visible. */}
           <button
             type="button"
             onClick={() => setSearchOpen((s) => !s)}
@@ -91,7 +166,6 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
             Apply to join
           </Link>
 
-          {/* Mobile burger */}
           <button
             type="button"
             onClick={() => setOpen((s) => !s)}
@@ -127,7 +201,6 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
         </div>
       </div>
 
-      {/* Inline search bar — slides open from the header */}
       {searchOpen && (
         <div
           className={`hidden border-t sm:block ${
@@ -167,7 +240,6 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
         </div>
       )}
 
-      {/* Mobile menu */}
       {open && (
         <div
           id="mobile-menu"
@@ -176,7 +248,7 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
           }`}
         >
           <nav className={`mx-auto flex max-w-7xl flex-col gap-1 px-6 py-4 text-base ${tone}`}>
-            {NAV.map((n) => (
+            {nav.map((n) => (
               <Link
                 key={n.href}
                 href={n.href}
@@ -210,5 +282,41 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
         </div>
       )}
     </header>
+  );
+}
+
+function VerticalLink({
+  href,
+  label,
+  active,
+  comingSoon,
+  inverted,
+}: {
+  href: string;
+  label: string;
+  active: boolean;
+  comingSoon?: boolean;
+  inverted?: boolean;
+}) {
+  const baseTone = inverted
+    ? "text-cream/55 hover:text-cream"
+    : "text-mute hover:text-ink";
+  const activeTone = inverted ? "text-cream" : "text-ink";
+  return (
+    <Link
+      href={href}
+      className={`px-2 py-0.5 transition-colors ${active ? activeTone : baseTone}`}
+    >
+      {label}
+      {comingSoon && (
+        <span
+          className={`ml-1 align-baseline text-[8px] font-normal normal-case tracking-normal ${
+            inverted ? "text-cream/45" : "text-mute"
+          }`}
+        >
+          (soon)
+        </span>
+      )}
+    </Link>
   );
 }
