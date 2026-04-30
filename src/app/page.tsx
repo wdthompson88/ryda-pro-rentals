@@ -4,7 +4,6 @@ import { SiteHeader } from "@/components/site-header";
 import { WaitlistForm } from "@/components/waitlist-form";
 import { InlineEmailCapture } from "@/components/inline-email-capture";
 import { Reveal } from "@/components/reveal";
-import { OwnershipPrimitives } from "@/components/ownership-primitives";
 import { VEHICLES, formatUSD } from "@/lib/market-data";
 
 export default function Home() {
@@ -93,16 +92,6 @@ export default function Home() {
               </div>
             </Link>
           </div>
-        </div>
-      </section>
-
-      {/* Ownership primitives — six numbers in a compact strip below the hero,
-          high-trust signal before the user dives into vehicles. Cinematic
-          full-width version lives on /markets; here we use the compact
-          variant so it doesn't dominate the home page rhythm. */}
-      <section className="border-b border-rule bg-cream-2">
-        <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
-          <OwnershipPrimitives variant="compact" />
         </div>
       </section>
 

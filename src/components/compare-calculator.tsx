@@ -34,7 +34,10 @@ export function CompareCalculator({
   const [days, setDays] = useState(12);
   const [holdYears, setHoldYears] = useState(HOLDING_YEARS);
   const [residualPct, setResidualPct] = useState(DEFAULT_RESIDUAL_PCT);
-  const [optInRental, setOptInRental] = useState(false);
+  // Rental opt-in defaults to ON — most members will want the rental
+  // income surfaced in their projection. The button text flips to
+  // "Opt out" so the action is explicit when the toggle is ON.
+  const [optInRental, setOptInRental] = useState(true);
   const [rentalOccupancy, setRentalOccupancy] = useState(
     RENTAL_DEFAULTS.defaultOccupancyPct,
   );
@@ -259,7 +262,9 @@ export function CompareCalculator({
         />
       </div>
 
-      {/* Rental opt-in — promoted to a stronger card with prominent toggle */}
+      {/* Rental opt-in — defaults ON; toggle reads "Opt out" when on so
+          the action is explicit. Most members rent their unused days,
+          so the math should reflect that by default. */}
       <div
         className={`mt-10 rounded-2xl border-2 p-6 transition-colors ${
           optInRental
@@ -270,10 +275,12 @@ export function CompareCalculator({
         <div className="flex flex-wrap items-start justify-between gap-6">
           <div className="max-w-xl">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-red">
-              Optional · Rent your unused days
+              Rent your unused days · Included by default
             </p>
             <h4 className="mt-2 font-display text-2xl text-ink">
-              Toggle on to add rental income to your math.
+              {optInRental
+                ? "Rental income is included in this math."
+                : "Toggle back on to add rental income."}
             </h4>
             <p className="mt-3 text-sm leading-relaxed text-ink-soft">
               Miami exotic-rental fleets average 200–240 booked days/yr.
@@ -282,7 +289,8 @@ export function CompareCalculator({
               cleaning. Revenue splits{" "}
               {100 - RENTAL_DEFAULTS.defaultManagementFeePct}/
               {RENTAL_DEFAULTS.defaultManagementFeePct} (you / RYDA),
-              distributed pro-rata across shares.
+              distributed pro-rata across shares. Opt out for the
+              drive-only number.
             </p>
             <p className="mt-2 text-xs text-mute">
               Same {TARGET_DEPRECIATION_PCT}% depreciation assumption
@@ -292,7 +300,7 @@ export function CompareCalculator({
             </p>
           </div>
 
-          {/* Larger, higher-contrast toggle with explicit ON/OFF labels */}
+          {/* Toggle: when ON the action is "Opt out"; when OFF, "Opt in" */}
           <button
             type="button"
             role="switch"
@@ -304,7 +312,7 @@ export function CompareCalculator({
                 : "border-red bg-cream text-red shadow-md hover:bg-red/5"
             }`}
           >
-            <span>{optInRental ? "Opted in" : "Opt in"}</span>
+            <span>{optInRental ? "Opt out" : "Opt in"}</span>
             <span
               className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${
                 optInRental ? "bg-cream" : "bg-red"
