@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { MarketsListings } from "@/components/markets-listings";
-import { PortfolioCarousel } from "@/components/portfolio-carousel";
 import { OwnershipPrimitives } from "@/components/ownership-primitives";
 import { BookingTiersExplainer } from "@/components/booking-tiers-explainer";
 import {
@@ -10,6 +9,7 @@ import {
   MARKETS,
   formatUSD,
   type MarketKey,
+  type Vehicle,
 } from "@/lib/market-data";
 
 export const metadata = {
@@ -18,11 +18,13 @@ export const metadata = {
     "The RYDA portfolio. Member-managed Delaware LLCs hold each curated CPO supercar; up to 10 verified members co-own every car. Browse Miami, Los Angeles, and New York.",
 };
 
-const FEATURED_SYMBOLS = ["F296", "L780", "MC75", "AM-V", "812", "RRC"];
+// Featured tile: 4 marquee positions, statically rendered (no carousel).
+// The CEO didn't like the auto-advancing carousel — easier to scan four
+// large cards in a single row than scroll through six. Fall back to the
+// canonical fleet order if any of these symbols disappear from inventory.
+const FEATURED_SYMBOLS = ["F296", "L780", "MC75", "AM-V"];
 
 export default function MarketsPage() {
-  // Featured carousel: prefer the canonical featured ordering, but only
-  // ship vehicles that exist in inventory (defensive against rename).
   const featured = FEATURED_SYMBOLS.map((s) =>
     VEHICLES.find((v) => v.symbol === s),
   ).filter((v): v is NonNullable<typeof v> => v !== undefined);
@@ -83,7 +85,7 @@ export default function MarketsPage() {
       {/* Ownership primitives — six numbers above the fold for trust */}
       <OwnershipPrimitives variant="default" />
 
-      {/* Featured carousel */}
+      {/* Featured — four static cards, no carousel. */}
       <section id="featured" className="border-y border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
           <div className="flex flex-wrap items-end justify-between gap-4">
@@ -106,8 +108,10 @@ export default function MarketsPage() {
               See all {VEHICLES.length} vehicles →
             </Link>
           </div>
-          <div className="mt-10">
-            <PortfolioCarousel vehicles={featured} />
+          <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {featured.map((v) => (
+              <FeaturedCard key={v.symbol} vehicle={v} />
+            ))}
           </div>
         </div>
       </section>
@@ -369,5 +373,64 @@ function MarketSection({
         </div>
       )}
     </div>
+  );
+}
+
+// Featured card — static, used in the four-up "Currently in the spotlight"
+// row. Same aesthetic as the previous carousel cards (italic display
+// brand naming, dark gradient overlay, status pill, per-share price)
+// but without the snap-scroll / auto-advance.
+function FeaturedCard({ vehicle: v }: { vehicle: Vehicle }) {
+  return (
+    <Link
+      href={`/markets/${v.symbol.toLowerCase()}`}
+      className="group relative block aspect-[4/5] overflow-hidden rounded-2xl bg-cream-2 transition-shadow hover:shadow-xl"
+    >
+      <Image
+        src={v.hero}
+        alt={`${v.year} ${v.name}`}
+        fill
+        sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+        className={`object-cover transition-transform duration-700 group-hover:scale-105 ${
+          v.flipImage ? "-scale-x-100" : ""
+        }`}
+        style={{ objectPosition: v.imagePosition ?? "center" }}
+      />
+      <div
+        aria-hidden
+        className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent"
+      />
+      <span
+        className={`absolute right-4 top-4 rounded-full px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] backdrop-blur ${
+          v.sharesAvailable === 0
+            ? "bg-mute/90 text-cream"
+            : "bg-red/95 text-cream"
+        }`}
+      >
+        {v.sharesAvailable === 0 ? "Sold out" : `${v.sharesAvailable} shares left`}
+      </span>
+      <div className="absolute inset-x-0 bottom-0 p-5 text-cream sm:p-6">
+        <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-cream/70">
+          {v.market} · {v.year}
+        </p>
+        <h3 className="mt-2 font-display text-2xl italic font-light leading-tight sm:text-3xl">
+          {v.brand}
+        </h3>
+        <p className="mt-1 font-display text-base text-cream/95">{v.name}</p>
+        <div className="mt-4 flex items-baseline justify-between border-t border-cream/20 pt-3">
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.14em] text-cream/55">
+              Per share
+            </p>
+            <p className="font-display text-xl tabular-nums">
+              {formatUSD(v.pricePerShare)}
+            </p>
+          </div>
+          <span className="text-xs font-medium text-cream/90 transition-transform group-hover:translate-x-1">
+            View →
+          </span>
+        </div>
+      </div>
+    </Link>
   );
 }
