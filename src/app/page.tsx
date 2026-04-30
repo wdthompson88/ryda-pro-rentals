@@ -125,11 +125,13 @@ function VerticalColumn({ v, index }: { v: Vertical; index: number }) {
       href={v.href}
       className="group relative flex min-h-[60vh] flex-1 items-end overflow-hidden border-cream/10 lg:min-h-screen lg:border-r last:lg:border-r-0"
     >
-      {/* Media layer — video b-roll on top of poster image. Default
-          state is dimmed; hover brightens the whole column. */}
+      {/* Media layer — random Pexels b-roll loop on top of poster.
+          MediaBackground picks one clip from the videos array on
+          mount, so each visit shows different footage. Default state
+          is dimmed; hover brightens the whole column. */}
       <div className="absolute inset-0 transition-all duration-700 ease-out [filter:brightness(0.55)_saturate(0.9)] group-hover:scale-[1.02] group-hover:[filter:brightness(0.95)_saturate(1.1)]">
         <MediaBackground
-          video={v.media.video}
+          videos={v.media.videos}
           poster={v.media.poster}
           alt={v.media.alt}
           position={v.media.position}

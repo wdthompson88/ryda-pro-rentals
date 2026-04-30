@@ -1,24 +1,20 @@
 "use client";
 
 // Background-media component for hero sections. Renders an autoplay /
-// muted / looped video on top of a poster image. The poster image
-// shows during loading and as a permanent fallback if the video fails
-// (no URL provided, network error, codec unsupported).
+// muted / looped video on top of a poster image. When given an array
+// of video URLs, picks one at random on first mount — fresh content
+// on every visit. Falls back to the poster on video error or when no
+// URL is provided.
 //
 // Honors prefers-reduced-motion: if the user has reduced motion on,
-// we skip the video entirely and show a calm Ken-Burns-zoomed poster
-// instead. Ambient motion only — never audio, never autoplay-with-sound.
-//
-// Why a client component: <video autoPlay muted playsInline /> needs
-// to mount in the browser to actually start playing on Safari/Chrome
-// first-paint. We could SSR the <video> element with hydration but a
-// client island is simpler and the cost is one tiny script.
+// we skip the video entirely and show a calm Ken-Burns-zoomed poster.
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 type Props = {
-  video?: string;
+  /** One URL, multiple URLs (rotates randomly), or empty for poster-only. */
+  videos?: string | string[];
   poster: string;
   alt: string;
   position?: string;
@@ -33,7 +29,7 @@ type Props = {
 };
 
 export function MediaBackground({
-  video,
+  videos,
   poster,
   alt,
   position = "center",
@@ -43,8 +39,24 @@ export function MediaBackground({
   className = "",
 }: Props) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [chosenVideo, setChosenVideo] = useState<string | null>(null);
   const [videoOK, setVideoOK] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
+
+  // Pick a random clip from the rotation on mount. Set on mount only
+  // (empty deps) so the choice locks for the visit — no flicker if a
+  // parent re-renders.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const list = Array.isArray(videos) ? videos : videos ? [videos] : [];
+    if (list.length === 0) return;
+    const pick = list[Math.floor(Math.random() * list.length)];
+    setChosenVideo(pick);
+    // We intentionally exclude `videos` from the deps — we only want
+    // to pick once on mount, even if the parent hands us a new array
+    // reference on re-render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -55,11 +67,11 @@ export function MediaBackground({
     return () => mq.removeEventListener?.("change", onChange);
   }, []);
 
-  // If the video hits an error (404, codec issue), drop it silently and
-  // let the poster carry the page.
+  // If the chosen video fails to play (404, codec issue), drop it
+  // silently and let the poster carry the page.
   useEffect(() => {
     const v = videoRef.current;
-    if (!v || !video) return;
+    if (!v || !chosenVideo) return;
     const onCanPlay = () => setVideoOK(true);
     const onError = () => setVideoOK(false);
     v.addEventListener("canplay", onCanPlay);
@@ -68,9 +80,9 @@ export function MediaBackground({
       v.removeEventListener("canplay", onCanPlay);
       v.removeEventListener("error", onError);
     };
-  }, [video]);
+  }, [chosenVideo]);
 
-  const showVideo = !!video && !reducedMotion;
+  const showVideo = !!chosenVideo && !reducedMotion;
 
   return (
     <div className={`absolute inset-0 ${className}`}>
@@ -87,12 +99,11 @@ export function MediaBackground({
       />
 
       {/* Video layer — only rendered if we have a URL and motion is OK.
-          Sits above the poster with a fade-in once playback starts so
-          the transition is graceful. */}
+          Sits above the poster with a fade-in once playback starts. */}
       {showVideo && (
         <video
           ref={videoRef}
-          src={video}
+          src={chosenVideo}
           autoPlay
           muted
           loop
@@ -106,10 +117,6 @@ export function MediaBackground({
         />
       )}
 
-      {/* Inline keyframes for the slow Ken-Burns motion. Subtle scale
-          (1.0 → 1.06) over 24s back-and-forth, easing-in-out. We keep
-          the keyframes inline so the component is self-contained and
-          doesn't depend on globals.css. */}
       <style jsx>{`
         @keyframes media-kenburns-keys {
           0% {

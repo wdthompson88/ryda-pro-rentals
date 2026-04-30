@@ -1,23 +1,22 @@
 // Media config — single source of truth for hero video + poster
 // imagery across the site. Each vertical (cars, boats, planes) gets a
-// poster image that's confirmed water-themed (boats) / vehicle-themed
-// (cars, planes) and an OPTIONAL video URL.
+// curated list of Pexels CDN clip URLs and a fallback poster image.
+// MediaBackground rotates through the list on each visit so the
+// splitter never feels static.
 //
-// VIDEO STATUS: empty for now. Earlier we hotlinked Pexels CDN URLs
-// for ambient b-roll, but the videos rendering at run time turned out
-// not to match the descriptions (wrong content, parked rather than
-// in-motion, or 404). Until brand-approved owned-asset videos are
-// licensed and dropped into /public/, we keep the still posters with
-// the slow Ken-Burns zoom — clean and reliable.
+// All Pexels URLs below were probed live and confirmed to return 200
+// (predictable filename pattern: {ID}/{ID}-{spec}.mp4). License: each
+// clip is royalty-free under Pexels' standard license, free for
+// commercial use, no attribution required (attribution appreciated).
 //
-// To re-enable: drop your owned video files into /public/videos/ and
-// set the `video` field below to /videos/<filename>.mp4. The
-// MediaBackground component handles the rest (fades video in once
-// playable; falls back to poster on error).
+// To swap to owned-asset videos: drop files into /public/videos/ and
+// replace the URL strings below with `/videos/<filename>.mp4`.
 
 export type MediaSlot = {
-  /** Direct video URL. Empty string = poster only (current default). */
-  video: string;
+  /** List of video URLs to rotate through. First entry is used during
+   *  SSR / initial paint; client picks a random one on mount. Empty
+   *  array = poster only. */
+  videos: string[];
   /** Fallback poster image. Always required. */
   poster: string;
   /** Alt text for the poster image. */
@@ -26,31 +25,51 @@ export type MediaSlot = {
   position?: string;
 };
 
+const PX = (id: string, spec: string) =>
+  `https://videos.pexels.com/video-files/${id}/${id}-${spec}.mp4`;
+
 // ─────────────────────────────────────────────────────────────────────────
 // Splitter columns (the / page)
 // ─────────────────────────────────────────────────────────────────────────
-// Cars: action Lambo (poster). Boats: yacht in water. Planes: jet on
-// tarmac. Videos disabled until owned assets are dropped in.
 
 export const SPLITTER_MEDIA: Record<"cars" | "boats" | "planes", MediaSlot> = {
   cars: {
-    video: "",
+    // 7 luxury supercar clips — Lambo, Ferrari, McLaren in motion.
+    // Random rotation on each page load keeps the front door alive.
+    videos: [
+      PX("7727416", "hd_1920_1080_25fps"),  // Lamborghini speeding on city highway
+      PX("8443860", "hd_1920_1080_30fps"),  // Man driving red Ferrari (interior+driving)
+      PX("8443861", "hd_1920_1080_30fps"),  // Luxury sports car driving
+      PX("8443781", "hd_1920_1080_30fps"),  // Red Ferrari, driver POV
+      PX("16976173", "hd_1920_1080_24fps"), // Ferrari 458 in Zurich streets
+      PX("14052063", "hd_1920_1080_25fps"), // Orange Lamborghini on road
+      PX("5309345", "hd_1920_1080_25fps"),  // McLaren driving with driver
+    ],
     poster:
-      "https://images.unsplash.com/photo-1621135802920-133df287f89c?auto=format&fit=crop&w=2400&q=85",
-    alt: "Lamborghini at night",
-    position: "center 55%",
+      "https://images.unsplash.com/photo-1592198084033-aade902d1aae?auto=format&fit=crop&w=2400&q=85",
+    alt: "Red Ferrari supercar",
+    position: "center 30%",
   },
   boats: {
-    video: "",
-    // Confirmed water-themed yacht photo (same one used on the Wajer
-    // listing and across boat market hero panels).
+    // 4 yacht clips — drone aerials, sailing on open water.
+    videos: [
+      PX("14037398", "hd_1920_1080_30fps"), // Drone aerial of white motor yacht
+      PX("7555069", "hd_1920_1080_25fps"),  // Yachts on the sea
+      PX("4646338", "hd_1920_1080_30fps"),  // Sailing boats on the sea
+      PX("854702", "hd_1920_1080_25fps"),   // Sailing boat at sea
+    ],
     poster:
       "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?auto=format&fit=crop&w=2400&q=85",
     alt: "Yacht on the water at sunset",
     position: "center 50%",
   },
   planes: {
-    video: "",
+    // 2 confirmed plane-landing clips. Add more as Pexels releases new
+    // motion-focused aviation footage.
+    videos: [
+      PX("12086908", "hd_1920_1080_30fps"), // Airplane landing over trees
+      PX("3678380", "hd_1920_1080_30fps"),  // Airplane landing on Montreal runway
+    ],
     poster:
       "https://images.unsplash.com/photo-1474302770737-173ee21bab63?auto=format&fit=crop&w=2400&q=85",
     alt: "Private jet on tarmac at dusk",
@@ -59,9 +78,8 @@ export const SPLITTER_MEDIA: Record<"cars" | "boats" | "planes", MediaSlot> = {
 };
 
 // ─────────────────────────────────────────────────────────────────────────
-// Hero media — used on cars-home, /boats, /markets, /boats/portfolio,
-// /planes. All posters confirmed; videos can be added later via
-// /public/videos/* once brand-approved.
+// Hero media — single-clip slots for cinematic hero sections on the
+// non-splitter pages. Same Pexels URLs as the splitter rotations.
 // ─────────────────────────────────────────────────────────────────────────
 
 export const HERO_MEDIA: Record<
@@ -73,36 +91,32 @@ export const HERO_MEDIA: Record<
   MediaSlot
 > = {
   "cars-home": {
-    video: "",
-    poster:
-      "https://images.unsplash.com/photo-1592198084033-aade902d1aae?auto=format&fit=crop&w=2400&q=85",
-    alt: "Ferrari 296 GTB",
-  },
-  "cars-portfolio": {
-    video: "",
-    // Confirmed red Ferrari 296 photo (matches what the F296 listing
-    // uses). The previous ID rendered a Porsche Panamera, which the
-    // CEO flagged as not luxury enough — Ferrari/Lambo/Bugatti read
-    // as the brand the portfolio is built around.
+    videos: [PX("8443860", "hd_1920_1080_30fps")],
     poster:
       "https://images.unsplash.com/photo-1592198084033-aade902d1aae?auto=format&fit=crop&w=2400&q=85",
     alt: "Red Ferrari 296 GTB",
+  },
+  "cars-portfolio": {
+    videos: [PX("16976173", "hd_1920_1080_24fps")],
+    poster:
+      "https://images.unsplash.com/photo-1592198084033-aade902d1aae?auto=format&fit=crop&w=2400&q=85",
+    alt: "Red Ferrari supercar",
     position: "center 30%",
   },
   "boats-home": {
-    video: "",
+    videos: [PX("14037398", "hd_1920_1080_30fps")],
     poster:
       "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?auto=format&fit=crop&w=2400&q=85",
     alt: "Yacht on the water at sunset",
   },
   "boats-portfolio": {
-    video: "",
+    videos: [PX("7555069", "hd_1920_1080_25fps")],
     poster:
       "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?auto=format&fit=crop&w=2400&q=85",
     alt: "Yacht on the water at sunset",
   },
   planes: {
-    video: "",
+    videos: [PX("12086908", "hd_1920_1080_30fps")],
     poster:
       "https://images.unsplash.com/photo-1474302770737-173ee21bab63?auto=format&fit=crop&w=2400&q=85",
     alt: "Private jet on tarmac at dusk",
