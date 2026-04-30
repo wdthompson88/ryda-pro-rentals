@@ -43,9 +43,51 @@ export default async function VehicleMarketPage({
 
   const econ = computeShareEconomics(v);
 
+  // Structured data for richer Google search results.
+  // Modeled as a Vehicle (not Product) since these are real cars with VINs.
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Vehicle",
+    name: `${v.year} ${v.name}`,
+    brand: { "@type": "Brand", name: v.brand },
+    model: v.name.replace(`${v.brand} `, "").trim(),
+    vehicleModelDate: String(v.year),
+    bodyType: v.category,
+    numberOfDoors: v.category === "SUV" ? 4 : 2,
+    fuelType: v.cylinders === 0 ? "Electric" : "Gasoline",
+    driveWheelConfiguration:
+      v.drive === "AWD"
+        ? "https://schema.org/AllWheelDriveConfiguration"
+        : "https://schema.org/RearWheelDriveConfiguration",
+    color: v.specs.color,
+    image: v.hero,
+    description: v.description,
+    offers: {
+      "@type": "Offer",
+      name: `1 share (${v.daysPerYear} days/yr · ${v.milesPerYear.toLocaleString()} mi/yr)`,
+      price: v.pricePerShare,
+      priceCurrency: "USD",
+      availability:
+        v.sharesAvailable > 0
+          ? "https://schema.org/InStock"
+          : "https://schema.org/OutOfStock",
+      seller: { "@type": "Organization", name: "RYDA" },
+      eligibleQuantity: {
+        "@type": "QuantitativeValue",
+        value: v.sharesAvailable,
+        maxValue: v.shares,
+        unitText: "shares",
+      },
+    },
+  };
+
   return (
     <>
       <SiteHeader />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
 
       {/* Top: title + chart on left, order panel on right */}
       <section className="border-b border-rule">
@@ -352,7 +394,7 @@ export default async function VehicleMarketPage({
       </section>
 
       {/* Disclaimer footer */}
-      <section className="bg-ink py-12 text-cream/60">
+      <section className="bg-ink py-12 pb-28 text-cream/60 lg:pb-12">
         <div className="mx-auto max-w-3xl px-6 text-center text-xs sm:px-10">
           RYDA is a luxury access platform. Co-ownership stakes are LLC
           membership interests in member-managed Delaware LLCs and are
@@ -362,6 +404,38 @@ export default async function VehicleMarketPage({
           See the full Co-Ownership Disclaimer at /legal/disclaimer.
         </div>
       </section>
+
+      {/* Sticky bottom CTA bar — mobile-first, hidden on lg+ where the
+          OrderPanel sits in the right column */}
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-rule bg-cream/95 backdrop-blur-md lg:hidden">
+        <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3">
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] uppercase tracking-[0.14em] text-mute">
+              Per share
+            </p>
+            <p className="font-display text-lg text-ink tabular-nums">
+              {formatUSD(v.pricePerShare)}
+              {v.sharesAvailable > 0 ? (
+                <span className="ml-1.5 text-[11px] font-normal text-ink-soft">
+                  · {v.sharesAvailable} of {v.shares} left
+                </span>
+              ) : (
+                <span className="ml-1.5 text-[11px] font-normal text-mute">
+                  · Sold out
+                </span>
+              )}
+            </p>
+          </div>
+          <Link
+            href={`/contact?type=Membership&note=${encodeURIComponent(
+              `Inquiry: ${v.name} (${v.symbol})`,
+            )}#form`}
+            className="inline-flex h-11 shrink-0 items-center justify-center rounded-full bg-red px-5 text-sm font-medium text-cream hover:bg-red-deep"
+          >
+            {v.sharesAvailable > 0 ? "Schedule a call" : "Notify me"}
+          </Link>
+        </div>
+      </div>
     </>
   );
 }

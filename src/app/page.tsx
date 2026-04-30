@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { WaitlistForm } from "@/components/waitlist-form";
+import { InlineEmailCapture } from "@/components/inline-email-capture";
 import { VEHICLES, formatUSD } from "@/lib/market-data";
 
 export default function Home() {
@@ -45,6 +46,12 @@ export default function Home() {
               >
                 Rent by the day →
               </Link>
+            </div>
+            <div className="mt-8 max-w-md">
+              <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.18em] text-mute">
+                Just want to keep tabs?
+              </p>
+              <InlineEmailCapture source="home-hero" />
             </div>
           </div>
 

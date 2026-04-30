@@ -1,11 +1,23 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
+import { StickyToc } from "@/components/sticky-toc";
 import {
   formatUSD,
   HOLDING_YEARS,
   TARGET_DEPRECIATION_PCT,
   HOLDING_MILES_CAP,
 } from "@/lib/market-data";
+
+const TOC_ITEMS = [
+  { id: "lifecycle", label: "5 steps" },
+  { id: "compare", label: "Compare" },
+  { id: "right-for-you", label: "Right for you?" },
+  { id: "nine-reasons", label: "9 reasons" },
+  { id: "trust", label: "Buyer protection" },
+  { id: "deeper-math", label: "Deeper math" },
+  { id: "rental-opt-in", label: "Rent your days" },
+  { id: "faq", label: "FAQ" },
+];
 
 export const metadata = {
   title: "How it works — RYDA",
@@ -146,8 +158,10 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
+      <StickyToc items={TOC_ITEMS} />
+
       {/* 5-step lifecycle */}
-      <section className="border-b border-rule bg-cream-2">
+      <section id="lifecycle" className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
             Co-ownership
@@ -173,7 +187,7 @@ export default function HowItWorksPage() {
       </section>
 
       {/* 4-way comparison — money only */}
-      <section className="border-b border-rule">
+      <section id="compare" className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
             Compare · Three are usage rights. Only RYDA is asset-backed.
@@ -280,7 +294,7 @@ export default function HowItWorksPage() {
       </section>
 
       {/* When each option makes sense */}
-      <section className="border-b border-rule bg-cream-2">
+      <section id="right-for-you" className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
           <h2 className="font-display text-3xl text-ink sm:text-4xl">
             When each option actually makes sense.
@@ -317,7 +331,7 @@ export default function HowItWorksPage() {
       </section>
 
       {/* Why asset-backed co-ownership — 9 reasons */}
-      <section className="border-b border-rule">
+      <section id="nine-reasons" className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
             Why asset-backed co-ownership
@@ -376,7 +390,7 @@ export default function HowItWorksPage() {
       </section>
 
       {/* Trust grid — 6 buyer protections + 6 advantages */}
-      <section className="border-b border-rule bg-cream-2">
+      <section id="trust" className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
             Buyer protection &amp; further advantages
@@ -416,7 +430,7 @@ export default function HowItWorksPage() {
       </section>
 
       {/* The deeper math — consolidated honest-math + 2-yr exit story */}
-      <section className="border-b border-rule">
+      <section id="deeper-math" className="border-b border-rule">
         <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
             How to read the price
@@ -473,7 +487,7 @@ export default function HowItWorksPage() {
       </section>
 
       {/* Rental opt-in for shareholders */}
-      <section className="border-b border-rule bg-cream-2">
+      <section id="rental-opt-in" className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-5xl px-6 py-20 sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
             Optional · Rental opt-in
@@ -545,7 +559,7 @@ export default function HowItWorksPage() {
       </section>
 
       {/* FAQ */}
-      <section className="border-b border-rule">
+      <section id="faq" className="border-b border-rule">
         <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10">
           <h2 className="font-display text-3xl text-ink sm:text-4xl">
             Frequently asked questions.

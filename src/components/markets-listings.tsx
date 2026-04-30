@@ -59,6 +59,7 @@ function powerToNumber(spec: string) {
 }
 
 export function MarketsListings() {
+  const [query, setQuery] = useState("");
   const [brand, setBrand] = useState<string>(ANY);
   const [market, setMarket] = useState<string>(ANY);
   const [status, setStatus] = useState<StatusFilter>("all");
@@ -90,7 +91,15 @@ export function MarketsListings() {
 
   // Filter
   const filtered: Vehicle[] = useMemo(() => {
+    const q = query.trim().toLowerCase();
     return VEHICLES.filter((v) => {
+      // Free-text search across name, brand, market, symbol — covers
+      // most of how a buyer would mention the car.
+      if (q) {
+        const haystack =
+          `${v.name} ${v.brand} ${v.market} ${v.symbol} ${v.year}`.toLowerCase();
+        if (!haystack.includes(q)) return false;
+      }
       if (brand !== ANY && v.brand !== brand) return false;
       if (market !== ANY && v.market !== market) return false;
       if (status === "available" && v.sharesAvailable === 0) return false;
@@ -100,7 +109,7 @@ export function MarketsListings() {
       if (drive !== ANY && v.drive !== drive) return false;
       return true;
     });
-  }, [brand, market, status, cylinders, category, drive]);
+  }, [query, brand, market, status, cylinders, category, drive]);
 
   // Sort
   const visible = useMemo(() => {
@@ -148,6 +157,7 @@ export function MarketsListings() {
   );
 
   const anyFilterActive =
+    query.trim().length > 0 ||
     brand !== ANY ||
     market !== ANY ||
     status !== "all" ||
@@ -156,6 +166,7 @@ export function MarketsListings() {
     drive !== ANY;
 
   function clearAll() {
+    setQuery("");
     setBrand(ANY);
     setMarket(ANY);
     setStatus("all");
@@ -170,7 +181,55 @@ export function MarketsListings() {
       {/* Filter bar */}
       <div className="border-b border-rule bg-cream-2/50">
         <div className="mx-auto max-w-7xl px-6 py-6 sm:px-10">
-          <div className="flex flex-wrap items-end gap-3">
+          {/* Search */}
+          <label className="block">
+            <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-mute">
+              Search
+            </span>
+            <div className="mt-1.5 flex h-11 items-center rounded-full border border-rule bg-surface px-4 transition-colors focus-within:border-ink">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 14 14"
+                fill="none"
+                aria-hidden
+                className="mr-2 shrink-0 text-mute"
+              >
+                <circle
+                  cx="6"
+                  cy="6"
+                  r="4.5"
+                  stroke="currentColor"
+                  strokeWidth="1.4"
+                />
+                <path
+                  d="M9.5 9.5L13 13"
+                  stroke="currentColor"
+                  strokeWidth="1.4"
+                  strokeLinecap="round"
+                />
+              </svg>
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Try Ferrari, Miami, Coupe…"
+                className="h-full min-w-0 flex-1 bg-transparent text-sm text-ink placeholder:text-mute focus:outline-none"
+              />
+              {query ? (
+                <button
+                  type="button"
+                  onClick={() => setQuery("")}
+                  className="ml-2 shrink-0 rounded-full px-2 text-xs text-mute hover:text-ink"
+                  aria-label="Clear search"
+                >
+                  ×
+                </button>
+              ) : null}
+            </div>
+          </label>
+
+          <div className="mt-4 flex flex-wrap items-end gap-3">
             <FilterSelect
               label="Brand"
               value={brand}
