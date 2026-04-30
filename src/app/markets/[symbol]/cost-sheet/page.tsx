@@ -379,7 +379,7 @@ export default async function CostSheetPage({
             in the calculator on /markets/{v.symbol.toLowerCase()}.
           </p>
           <p className="mt-3">
-            RYDA · Member-managed co-ownership · Miami · LA · NYC
+            RYDA · Supercar co-ownership and rentals · Miami · LA · NYC
           </p>
         </footer>
       </div>

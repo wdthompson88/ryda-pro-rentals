@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "RYDA — Supercar Co-Ownership";
+export const alt = "RYDA — Supercar co-ownership and rentals";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -23,14 +23,14 @@ export default async function OpenGraphImage() {
         {/* Eyebrow */}
         <div
           style={{
-            fontSize: 36,
-            letterSpacing: 8,
+            fontSize: 32,
+            letterSpacing: 7,
             color: "#DC4747",
             textTransform: "uppercase",
             fontWeight: 600,
           }}
         >
-          Supercar Co-Ownership
+          Supercar Co-Ownership &amp; Rentals
         </div>
 
         {/* Wordmark */}
@@ -59,7 +59,7 @@ export default async function OpenGraphImage() {
           }}
         >
           <span style={{ color: "#D4CFC4" }}>
-            Own a Ferrari, Lamborghini, or McLaren —&nbsp;
+            Co-own or rent a Ferrari, Lamborghini, or McLaren —&nbsp;
           </span>
           <span style={{ color: "#DC4747" }}>for a fraction of the cost.</span>
         </div>
@@ -80,7 +80,7 @@ export default async function OpenGraphImage() {
             fontWeight: 500,
           }}
         >
-          <div>Member-managed · Delaware LLC</div>
+          <div>Asset-backed · Delaware LLC</div>
           <div>Miami launch · Q3 2026</div>
         </div>
       </div>

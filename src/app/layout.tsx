@@ -28,22 +28,22 @@ const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://ryda-web-teal.vercel.app";
 
 export const metadata: Metadata = {
-  title: "RYDA — Supercar Co-Ownership",
+  title: "RYDA — Supercar co-ownership and rentals",
   description:
-    "Member-managed supercar co-ownership in the US. Co-own a Ferrari, Lamborghini, or McLaren together with verified members.",
+    "Co-own or rent a curated CPO Ferrari, Lamborghini, or McLaren in the US. Asset-backed Delaware LLC, concierge-operated. Launching in Miami.",
   metadataBase: new URL(siteUrl),
   openGraph: {
-    title: "RYDA — Supercar Co-Ownership",
+    title: "RYDA — Supercar co-ownership and rentals",
     description:
-      "Co-own a curated supercar with verified members. Member-managed Delaware LLC, concierge-operated. Launching in Miami.",
+      "Co-own or rent a curated supercar with verified members. Asset-backed Delaware LLC, concierge-operated. Launching in Miami.",
     siteName: "RYDA",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "RYDA — Supercar Co-Ownership",
+    title: "RYDA — Supercar co-ownership and rentals",
     description:
-      "Co-own a curated supercar with verified members. Member-managed Delaware LLC, concierge-operated. Launching in Miami.",
+      "Co-own or rent a curated supercar with verified members. Asset-backed Delaware LLC, concierge-operated. Launching in Miami.",
   },
 };
 
