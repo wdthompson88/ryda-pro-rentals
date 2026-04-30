@@ -224,53 +224,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Founders preview — surface /about into the main scroll */}
-      <section className="border-b border-rule">
-        <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
-          <div className="grid grid-cols-1 gap-10 lg:grid-cols-12">
-            <div className="lg:col-span-4">
-              <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-                Built by
-              </p>
-              <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
-                Three founders. Real money on the line.
-              </h2>
-              <p className="mt-4 text-sm leading-relaxed text-ink-soft">
-                Combined: 30+ years in institutional equity markets,
-                investment banking, and executive search. Every co-owner
-                deals directly with one of us until launch.
-              </p>
-              <Link
-                href="/about"
-                className="mt-6 inline-flex h-11 items-center justify-center rounded-full border border-rule px-5 text-sm font-medium text-ink hover:border-ink"
-              >
-                Meet the team →
-              </Link>
-            </div>
-            <div className="grid grid-cols-3 gap-4 lg:col-span-8">
-              <FounderCard
-                name="Ryan Galli"
-                role="CEO / CTO"
-                tag="Odin Partners NY"
-                image="/team/ryan.jpg"
-              />
-              <FounderCard
-                name="Dave Thompson"
-                role="CFO / COO"
-                tag="SolomonEdwards · Series 79"
-                image="/team/dave.jpg"
-              />
-              <FounderCard
-                name="Stefano Galli"
-                role="CRO / CSO"
-                tag="Evercore ISI · Wharton MBA"
-                image="/team/stefano.jpg"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Why RYDA — consolidated into 5-step block */}
       <section id="how-it-works" className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-28">
@@ -325,43 +278,6 @@ export default function Home() {
       </section>
 
     </>
-  );
-}
-
-function FounderCard({
-  name,
-  role,
-  tag,
-  image,
-}: {
-  name: string;
-  role: string;
-  tag: string;
-  image: string;
-}) {
-  return (
-    <Link
-      href="/about"
-      className="group block overflow-hidden rounded-2xl border border-rule bg-surface transition-shadow hover:shadow-md"
-    >
-      <div className="relative aspect-square w-full overflow-hidden bg-cream-2">
-        <Image
-          src={image}
-          alt={name}
-          fill
-          sizes="(min-width: 1024px) 22vw, 33vw"
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-          style={{ filter: "grayscale(100%) contrast(1.05)" }}
-        />
-      </div>
-      <div className="p-4">
-        <p className="font-display text-base text-ink">{name}</p>
-        <p className="mt-1 text-[10px] uppercase tracking-[0.16em] text-red">
-          {role}
-        </p>
-        <p className="mt-2 text-[11px] text-ink-soft">{tag}</p>
-      </div>
-    </Link>
   );
 }
 
