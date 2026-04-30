@@ -23,7 +23,7 @@ export default function Home() {
         <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-6 py-20 sm:px-10 sm:py-24 lg:grid-cols-12 lg:gap-12">
           <div className="lg:col-span-6">
             <p className="mb-6 text-xs font-medium uppercase tracking-[0.2em] text-red">
-              Member-managed supercar co-ownership · Miami · Q3 2026
+              Supercar co-ownership and rentals · Miami · Q3 2026
             </p>
             <h1 className="font-display text-5xl font-light leading-[1.05] tracking-tight text-ink sm:text-6xl lg:text-7xl">
               Co-own or rent the world's{" "}
