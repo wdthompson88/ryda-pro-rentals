@@ -47,6 +47,25 @@ export const metadata: Metadata = {
   },
 };
 
+// No-flash theme bootstrap. Reads localStorage before React hydrates
+// so the page renders in the saved theme on first paint. Default is
+// dark (matches the original site palette).
+const themeBootstrap = `
+(function(){
+  try {
+    var t = localStorage.getItem('ryda-theme');
+    if (t === 'light' || t === 'dark') {
+      document.documentElement.setAttribute('data-theme', t);
+    }
+    // Add a class after the first frame so the smooth transition
+    // doesn't fire on initial load (only on user toggles).
+    requestAnimationFrame(function(){
+      document.documentElement.classList.add('theme-ready');
+    });
+  } catch (e) {}
+})();
+`;
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -55,6 +74,9 @@ export default function RootLayout({
       lang="en"
       className={`${inter.variable} ${fraunces.variable} h-full antialiased`}
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
+      </head>
       <body className="min-h-full flex flex-col bg-cream text-ink">
         <div className="flex-1">{children}</div>
         <SiteFooter />

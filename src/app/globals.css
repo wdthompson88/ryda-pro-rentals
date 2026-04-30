@@ -1,11 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  /* RYDA dark palette — luxury black with warm cream text.
+  /* RYDA dark palette (default) — luxury black with warm cream text.
    * Contrast targets (WCAG AA, normal text 4.5:1):
    *  - red    on cream  (#0E0E10): ~4.6:1
    *  - mute   on cream  (#0E0E10): ~5.4:1
    *  - ink-soft on cream:          ~12:1
+   * Note: token names are theme-relative — `cream` always means "page
+   * background"; `ink` always means "primary text". The HEX values
+   * swap between light/dark themes; component classes don't change.
    */
   --ryda-cream:     #0E0E10;   /* page background */
   --ryda-cream-2:   #161618;   /* section variant — slightly lighter than page */
@@ -18,6 +21,32 @@
   --ryda-red:       #DC4747;   /* brand red — bumped from #C03030 to clear AA on dark */
   --ryda-red-deep:  #ED5C5C;   /* hover red */
   --ryda-gold:      #C9A66B;   /* premium accent for Black tier */
+}
+
+/* Light theme — explicit opt-in via data-theme="light" on <html>.
+ * Toggled by ThemeToggle, persisted to localStorage. Same token
+ * NAMES, different HEX values. */
+:root[data-theme="light"] {
+  --ryda-cream:     #F4F1EC;   /* page background — warm off-white */
+  --ryda-cream-2:   #E9E4D8;   /* section variant */
+  --ryda-surface:   #FFFFFF;   /* cards */
+  --ryda-surface-2: #F0EBDF;   /* card hover */
+  --ryda-ink:       #0E0E10;   /* primary text — near black */
+  --ryda-ink-soft:  #3A3A3D;   /* secondary text */
+  --ryda-mute:      #6A655F;   /* tertiary text / borders */
+  --ryda-rule:      #D8D3C8;   /* hairline borders */
+  --ryda-red:       #C03030;   /* brand red — slightly deeper for AA on light */
+  --ryda-red-deep:  #9C2424;   /* hover red */
+  --ryda-gold:      #A88340;   /* premium accent */
+}
+
+/* Smooth color transitions when toggling themes (but not on load) */
+html.theme-ready,
+html.theme-ready * {
+  transition:
+    background-color 220ms ease,
+    border-color 220ms ease,
+    color 220ms ease;
 }
 
 @theme inline {

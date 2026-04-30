@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const NAV = [
   { href: "/markets", label: "Co-Own" },
@@ -37,6 +38,7 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
         </nav>
 
         <div className="flex items-center gap-3">
+          <ThemeToggle className="hidden sm:inline-flex" />
           <Link
             href="/founding-members"
             className={`hidden rounded-full border px-5 py-2 text-sm font-medium transition-colors sm:inline-flex ${ctaBase}`}
@@ -106,6 +108,12 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
             >
               Apply to join
             </Link>
+            <div className="mt-2 flex items-center justify-between rounded-lg px-3 py-2">
+              <span className="text-xs uppercase tracking-wider text-mute">
+                Theme
+              </span>
+              <ThemeToggle />
+            </div>
           </nav>
         </div>
       )}
