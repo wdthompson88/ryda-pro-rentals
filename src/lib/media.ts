@@ -34,17 +34,11 @@ const PX = (id: string, spec: string) =>
 
 export const SPLITTER_MEDIA: Record<"cars" | "boats" | "planes", MediaSlot> = {
   cars: {
-    // 7 luxury supercar clips — Lambo, Ferrari, McLaren in motion.
-    // Random rotation on each page load keeps the front door alive.
-    videos: [
-      PX("7727416", "hd_1920_1080_25fps"),  // Lamborghini speeding on city highway
-      PX("8443860", "hd_1920_1080_30fps"),  // Man driving red Ferrari (interior+driving)
-      PX("8443861", "hd_1920_1080_30fps"),  // Luxury sports car driving
-      PX("8443781", "hd_1920_1080_30fps"),  // Red Ferrari, driver POV
-      PX("16976173", "hd_1920_1080_24fps"), // Ferrari 458 in Zurich streets
-      PX("14052063", "hd_1920_1080_25fps"), // Orange Lamborghini on road
-      PX("5309345", "hd_1920_1080_25fps"),  // McLaren driving with driver
-    ],
+    // Owned-asset road-travel sunset loop (CEO-provided). Single clip,
+    // no rotation — matches the planes treatment so each vertical has
+    // its own signature backdrop.
+    // File served from /public/videos/cars-sunset-road.mp4.
+    videos: ["/videos/cars-sunset-road.mp4"],
     poster:
       "https://images.unsplash.com/photo-1592198084033-aade902d1aae?auto=format&fit=crop&w=2400&q=85",
     alt: "Red Ferrari supercar",
