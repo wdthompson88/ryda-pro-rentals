@@ -5,6 +5,7 @@ import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { supabase } from "@/lib/supabase";
+import { safeNext } from "@/lib/safe-next";
 
 // /signup — front-end member account creation. Drives the user to the
 // guided onboarding (KYC, preferences, age verification) once an account
@@ -22,7 +23,9 @@ export default function SignUpPage() {
 
 function SignUpPageInner() {
   const searchParams = useSearchParams();
-  const next = searchParams.get("next") || "/onboarding";
+  // Sanitize `?next=` against open-redirect / javascript: scheme tricks.
+  // Anything not a same-origin path falls back to /onboarding.
+  const next = safeNext(searchParams.get("next"), "/onboarding");
   const reason = searchParams.get("reason"); // "rent" | "buy" | "checkout"
 
   const [name, setName] = useState("");
@@ -92,7 +95,16 @@ function SignUpPageInner() {
           password,
           options: {
             emailRedirectTo: redirectTo,
-            data: { name, marketing_opt_in: marketingOptIn },
+            // Persist age confirmation + marketing opt-in to user_metadata
+            // so server-side rental flows can verify the 28+ claim later.
+            // Real ID/age verification happens in /onboarding KYC; this
+            // is the lightweight self-attestation captured at signup.
+            data: {
+              name,
+              marketing_opt_in: marketingOptIn,
+              aged_confirmed: true,
+              aged_confirmed_at: new Date().toISOString(),
+            },
           },
         });
         if (err) throw err;

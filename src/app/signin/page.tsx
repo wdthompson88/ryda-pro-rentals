@@ -5,6 +5,7 @@ import { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { supabase } from "@/lib/supabase";
+import { safeNext } from "@/lib/safe-next";
 
 // /signin — passwordless-or-password member sign-in. Wires to
 // Supabase Auth when NEXT_PUBLIC_SUPABASE_URL + ANON_KEY are set.
@@ -24,7 +25,9 @@ export default function SignInPage() {
 function SignInPageInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const next = searchParams.get("next") || "/portfolio";
+  // Sanitize `?next=` against open-redirect / javascript: scheme tricks.
+  // Anything not a same-origin path falls back to /portfolio.
+  const next = safeNext(searchParams.get("next"), "/portfolio");
   const reason = searchParams.get("reason"); // "rent" | "buy" | "checkout" — gives copy a hook
 
   const [mode, setMode] = useState<"password" | "magic">("magic");

@@ -14,6 +14,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { supabase } from "@/lib/supabase";
+import { safeNext } from "@/lib/safe-next";
 
 export default function AuthCallbackPage() {
   return (
@@ -26,7 +27,9 @@ export default function AuthCallbackPage() {
 function Inner() {
   const router = useRouter();
   const params = useSearchParams();
-  const next = params.get("next") || "/portfolio";
+  // Sanitize `?next=` against open-redirect / javascript: scheme tricks.
+  // Anything not a same-origin path falls back to /portfolio.
+  const next = safeNext(params.get("next"), "/portfolio");
   const [status, setStatus] = useState<"verifying" | "ok" | "error">(
     "verifying",
   );
