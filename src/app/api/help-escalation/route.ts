@@ -44,7 +44,7 @@ export async function POST(req: Request) {
 
     // Best-effort email notification — fire and don't block the response.
     // The DB write is the source of truth; email is the alert layer.
-    void notifyTeam({
+    await notifyTeam({
       subject: `New help-chat escalation from ${email}`,
       replyTo: email,
       html: emailLayout(

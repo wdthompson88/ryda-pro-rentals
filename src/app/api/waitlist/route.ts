@@ -65,7 +65,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Could not save." }, { status: 500 });
     }
 
-    void notifyTeam({
+    await notifyTeam({
       subject: `New waitlist signup: ${name || email}`,
       replyTo: email,
       html: emailLayout("New waitlist signup", `

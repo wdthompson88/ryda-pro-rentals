@@ -51,7 +51,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Could not save." }, { status: 500 });
     }
 
-    void notifyTeam({
+    await notifyTeam({
       subject: `New ${inquiry_type.toLowerCase()} inquiry from ${name}`,
       replyTo: email,
       html: emailLayout(`New contact form: ${inquiry_type}`, `
