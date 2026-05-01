@@ -20,7 +20,6 @@ type Accent = "red" | "marine" | "neutral";
 
 type Vertical = {
   href: string;
-  eyebrow: string;
   label: string;
   tagline: string;
   bullet: string;
@@ -34,7 +33,6 @@ type Vertical = {
 const VERTICALS: Vertical[] = [
   {
     href: "/cars",
-    eyebrow: "01",
     label: "Cars",
     tagline: "Co-own or rent the world's most exceptional cars.",
     bullet: "Live · Miami today",
@@ -44,7 +42,6 @@ const VERTICALS: Vertical[] = [
   },
   {
     href: "/boats",
-    eyebrow: "02",
     label: "Boats",
     tagline: "Floating real estate, held in a Delaware LLC.",
     bullet: "Miami launch · Q3 2026",
@@ -54,7 +51,6 @@ const VERTICALS: Vertical[] = [
   },
   {
     href: "/planes",
-    eyebrow: "03",
     label: "Planes",
     tagline: "Fractional access to private aviation. In design.",
     bullet: "Coming soon",
@@ -160,17 +156,9 @@ function VerticalColumn({ v, index }: { v: Vertical; index: number }) {
         {isComingSoon ? "Coming soon" : "Live"}
       </span>
 
-      {/* Eyebrow */}
-      <span className="absolute left-5 top-5 font-display text-sm text-[#F4F1EC]/55">
-        {v.eyebrow}
-      </span>
-
       {/* Caption */}
       <div className="relative z-10 w-full p-7 text-[#F4F1EC] sm:p-10 lg:p-12">
-        <p className={`font-display text-sm text-[#F4F1EC]/55 transition-colors duration-300 ${accentClasses.eyebrowHover}`}>
-          {v.eyebrow}
-        </p>
-        <p className="mt-3 font-display text-5xl font-light italic leading-[0.95] text-[#F4F1EC] transition-transform duration-700 group-hover:-translate-y-1 sm:text-6xl lg:text-7xl">
+        <p className={`font-display text-5xl font-light italic leading-[0.95] text-[#F4F1EC] transition-transform duration-700 group-hover:-translate-y-1 sm:text-6xl lg:text-7xl ${accentClasses.eyebrowHover}`}>
           {v.label}
         </p>
         <p className="mt-5 max-w-sm text-sm leading-relaxed text-[#F4F1EC]/85 sm:text-base">
