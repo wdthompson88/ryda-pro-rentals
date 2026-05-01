@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
+import { supabase } from "@/lib/supabase";
 
 // /signup — front-end member account creation. Drives the user to the
 // guided onboarding (KYC, preferences, age verification) once an account
@@ -54,13 +55,17 @@ function SignUpPageInner() {
     agedConfirmed &&
     tosAccepted;
 
-  function onSubmit(e: React.FormEvent) {
+  const [error, setError] = useState<string | null>(null);
+
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!ready) return;
     setSubmitting(true);
-    // Front-end stub — real account creation ships with the Miami
-    // launch (Supabase Auth). For now we simulate, persist the email
-    // to the waitlist as a soft-create, then route to onboarding/next.
+    setError(null);
+
+    // Always persist to the waitlist regardless of auth path — it's
+    // the lead-attribution surface (market, source) and works even if
+    // auth isn't configured yet.
     void fetch("/api/waitlist", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -71,13 +76,38 @@ function SignUpPageInner() {
         source: reason ? `signup:${reason}` : "signup",
       }),
     }).catch(() => {
-      // Soft-fail — don't block the user; the account flow is mocked
-      // pending real auth.
+      /* Soft-fail — don't block the user. */
     });
-    setTimeout(() => {
+
+    try {
+      // Real account creation when Supabase is configured. Magic-link
+      // flow: signUp creates the user; user gets a confirmation email;
+      // clicking the link returns them to /auth/callback?next=...
+      if (supabase) {
+        const origin =
+          typeof window !== "undefined" ? window.location.origin : "";
+        const redirectTo = `${origin}/auth/callback?next=${encodeURIComponent(next)}`;
+        const { error: err } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: redirectTo,
+            data: { name, marketing_opt_in: marketingOptIn },
+          },
+        });
+        if (err) throw err;
+        setSubmitted(true);
+      } else {
+        // Supabase not configured — simulate. Replace with real auth on
+        // launch by setting NEXT_PUBLIC_SUPABASE_URL + ANON_KEY.
+        await new Promise((r) => setTimeout(r, 600));
+        setSubmitted(true);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong.");
+    } finally {
       setSubmitting(false);
-      setSubmitted(true);
-    }, 800);
+    }
   }
 
   if (submitted) {
@@ -223,6 +253,15 @@ function SignUpPageInner() {
                 time.
               </span>
             </label>
+
+            {error ? (
+              <p
+                role="alert"
+                className="rounded-xl border border-red/40 bg-red/5 px-4 py-3 text-xs text-red"
+              >
+                {error}
+              </p>
+            ) : null}
 
             <button
               type="submit"

@@ -1,9 +1,9 @@
 import { ImageResponse } from "next/og";
 
-// Root-level OG image — the brand has evolved beyond just supercars,
-// so this matches the splitter framing: Cars · Boats · Planes.
+// /cars vertical OG image — same root template but anchored on the
+// supercar brand (red accent).
 
-export const alt = "RYDA — Luxury vehicle access";
+export const alt = "RYDA Cars — Co-own or rent the world's most exceptional cars";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -23,7 +23,6 @@ export default async function OpenGraphImage() {
             "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
         }}
       >
-        {/* Eyebrow */}
         <div
           style={{
             fontSize: 28,
@@ -33,27 +32,26 @@ export default async function OpenGraphImage() {
             fontWeight: 600,
           }}
         >
-          Luxury Vehicle Access
+          RYDA Cars
         </div>
-
-        {/* Wordmark */}
         <div
           style={{
-            fontSize: 240,
+            fontSize: 220,
             fontWeight: 300,
             marginTop: 36,
             lineHeight: 1,
             letterSpacing: -6,
+            display: "flex",
+            alignItems: "baseline",
           }}
         >
-          RYDA
+          <span>Cars</span>
+          <span style={{ color: "#DC4747", fontStyle: "italic" }}>.</span>
         </div>
-
-        {/* Tagline */}
         <div
           style={{
             fontSize: 38,
-            marginTop: 44,
+            marginTop: 48,
             maxWidth: 920,
             lineHeight: 1.3,
             fontWeight: 300,
@@ -62,12 +60,10 @@ export default async function OpenGraphImage() {
           }}
         >
           <span style={{ color: "#D4CFC4" }}>
-            Co-own or rent the world&apos;s most coveted vehicles —&nbsp;
+            Co-own a curated CPO Ferrari, Lamborghini, or McLaren —&nbsp;
           </span>
-          <span style={{ color: "#DC4747" }}>cars, boats, planes.</span>
+          <span style={{ color: "#DC4747" }}>~30 days a year per share.</span>
         </div>
-
-        {/* Footer */}
         <div
           style={{
             marginTop: "auto",
@@ -83,8 +79,8 @@ export default async function OpenGraphImage() {
             fontWeight: 500,
           }}
         >
-          <div>Asset-backed · Delaware LLC</div>
-          <div>Miami launch · Q3 2026</div>
+          <div>2-yr planned exit · Member-managed Delaware LLC</div>
+          <div>Miami today</div>
         </div>
       </div>
     ),

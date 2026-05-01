@@ -4,11 +4,14 @@ import Link from "next/link";
 import { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
+import { supabase } from "@/lib/supabase";
 
-// /signin — passwordless-or-password member sign-in. Front-end only for now;
-// real auth (Supabase Auth + magic-link) wires in at Miami launch. The
-// `?next=` query param is preserved so a member who signs in from a gated
-// CTA (e.g. "Reserve a share") returns to that exact page after auth.
+// /signin — passwordless-or-password member sign-in. Wires to
+// Supabase Auth when NEXT_PUBLIC_SUPABASE_URL + ANON_KEY are set.
+// Falls back to a simulated success when not configured (so the
+// demo never breaks). The `?next=` query param is preserved so a
+// member who signs in from a gated CTA (e.g. "Reserve a share")
+// returns to that exact page after auth.
 
 export default function SignInPage() {
   return (
@@ -39,21 +42,52 @@ function SignInPageInner() {
           ? "Sign in to complete your reservation."
           : "Welcome back.";
 
-  function onSubmit(e: React.FormEvent) {
+  const [error, setError] = useState<string | null>(null);
+
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!email.includes("@")) return;
     setSubmitting(true);
-    // Front-end only for now — simulates the auth call. Real auth ships
-    // with the Miami launch (Supabase Auth + magic-link).
-    setTimeout(() => {
-      setSubmitting(false);
-      if (mode === "magic") {
-        setSubmitted(true);
+    setError(null);
+
+    try {
+      // Supabase wired? Use real auth.
+      if (supabase) {
+        if (mode === "magic") {
+          // Build the absolute redirect URL for the email link.
+          const origin =
+            typeof window !== "undefined" ? window.location.origin : "";
+          const redirectTo = `${origin}/auth/callback?next=${encodeURIComponent(next)}`;
+          const { error: err } = await supabase.auth.signInWithOtp({
+            email,
+            options: { emailRedirectTo: redirectTo },
+          });
+          if (err) throw err;
+          setSubmitted(true);
+        } else {
+          const { error: err } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+          if (err) throw err;
+          router.push(next);
+        }
       } else {
-        // Password path: assume success → return to next
-        router.push(next);
+        // Supabase not configured — simulate the success path so the
+        // demo doesn't break. Replace with actual auth on launch by
+        // setting NEXT_PUBLIC_SUPABASE_URL and ANON_KEY.
+        await new Promise((r) => setTimeout(r, 500));
+        if (mode === "magic") {
+          setSubmitted(true);
+        } else {
+          router.push(next);
+        }
       }
-    }, 700);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -137,6 +171,15 @@ function SignInPageInner() {
                     required
                   />
                 )}
+
+                {error ? (
+                  <p
+                    role="alert"
+                    className="rounded-xl border border-red/40 bg-red/5 px-4 py-3 text-xs text-red"
+                  >
+                    {error}
+                  </p>
+                ) : null}
 
                 <button
                   type="submit"
