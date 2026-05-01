@@ -324,10 +324,17 @@ export function MediaBackground({
     [bindSlotHandlers],
   );
 
-  // Watchdog — if a clip's `ended` doesn't fire within
-  // (clip duration + small buffer) of starting playback, we manually
-  // advance. Catches edge cases where the browser doesn't dispatch
-  // the event (rare but well-documented). Re-armed on every advance.
+  // Watchdog — backstop the natural `ended` event in case the browser
+  // doesn't dispatch it (well-documented edge case for some codecs and
+  // for Media Fragment URI clips). Catches the freeze the CEO has been
+  // hitting after several cycles.
+  //
+  // Re-arms on every activeSlot change (this useEffect runs), and on
+  // durationchange/play events from the active video. Uses the Media
+  // Fragment URI `endTime` when present (more accurate than v.duration)
+  // and falls back to a conservative 30s ceiling if duration is never
+  // reported (rare but happens with chunked streams or codecs that
+  // don't expose metadata cleanly).
   useEffect(() => {
     if (list.length <= 1 || reducedMotion) return;
     const v = activeSlot === 0 ? video0Ref.current : video1Ref.current;
@@ -336,18 +343,37 @@ export function MediaBackground({
 
     const arm = () => {
       if (watchdog) clearTimeout(watchdog);
-      // Don't arm if duration isn't known yet (will arm on durationchange).
-      if (!v.duration || !Number.isFinite(v.duration)) return;
-      const ms = (v.duration - (v.currentTime ?? 0)) * 1000 + 800;
-      if (ms <= 0) return;
+      // Determine end time: prefer fragment endTime, fall back to file
+      // duration, fall back to a 30s safety ceiling.
+      const url =
+        activeSlot === 0 ? slot0SrcRef.current : slot1SrcRef.current;
+      const { endTime } = url
+        ? parseFragment(url)
+        : { endTime: null };
+
+      let endSec: number;
+      if (endTime !== null) {
+        endSec = endTime;
+      } else if (v.duration && Number.isFinite(v.duration)) {
+        endSec = v.duration;
+      } else {
+        // Duration unknown — use a 30s ceiling so we don't freeze
+        // forever on metadata-less streams. arm() will re-fire on
+        // durationchange if the browser eventually reports duration.
+        endSec = (v.currentTime ?? 0) + 30;
+      }
+
+      const remainingMs =
+        Math.max(0, endSec - (v.currentTime ?? 0)) * 1000 + 800;
+
       watchdog = setTimeout(() => {
-        // Only fire if the active slot is still us and the video
-        // hasn't already advanced organically.
-        if (activeSlotRef.current === activeSlot && !v.paused) {
-          // It's been longer than expected — kick the cycle forward.
+        // Only fire if we're still the active slot. We DO NOT bail on
+        // v.paused — a video paused at end is exactly the case this
+        // watchdog exists to catch (browser didn't fire `ended`).
+        if (activeSlotRef.current === activeSlot) {
           advance();
         }
-      }, ms);
+      }, remainingMs);
     };
 
     arm();
