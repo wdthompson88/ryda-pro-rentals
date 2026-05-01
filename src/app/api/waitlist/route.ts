@@ -34,15 +34,25 @@ export async function POST(req: Request) {
     }
 
     // Try inserting with `source`; fall back to a source-less insert
-    // if the column doesn't exist yet (older deployments).
+    // if the column doesn't exist yet (older deployments). PostgREST
+    // emits messages like "Could not find the 'source' column of
+    // 'waitlist' in the schema cache" — match either word order
+    // ("source ... column" or "column ... source") to catch both
+    // PostgREST and raw Postgres surfaces.
     let { error } = await supabase
       .from("waitlist")
       .insert({ email, name: name || null, market, source: source || null });
 
-    if (error && /column.*source/i.test(error.message ?? "")) {
-      ({ error } = await supabase
-        .from("waitlist")
-        .insert({ email, name: name || null, market }));
+    if (error) {
+      const msg = (error.message ?? "").toLowerCase();
+      const sourceColumnMissing =
+        msg.includes("source") &&
+        (msg.includes("column") || msg.includes("schema cache"));
+      if (sourceColumnMissing) {
+        ({ error } = await supabase
+          .from("waitlist")
+          .insert({ email, name: name || null, market }));
+      }
     }
 
     if (error) {
