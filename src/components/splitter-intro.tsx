@@ -100,14 +100,14 @@ export function SplitterIntro() {
         }
       `}</style>
       <div
-        className="ryda-veil pointer-events-none fixed inset-0 z-50 flex items-center justify-center bg-ink"
+        className="ryda-veil pointer-events-none fixed inset-0 z-50 flex items-center justify-center bg-[#0E0E10]"
         aria-hidden
       >
         <div className="text-center">
-          <p className="ryda-mark font-display text-6xl font-light text-cream sm:text-7xl">
+          <p className="ryda-mark font-display text-6xl font-light text-[#F4F1EC] sm:text-7xl">
             RYDA
           </p>
-          <p className="ryda-tagline mt-3 text-[11px] font-medium uppercase tracking-[0.32em] text-cream/70">
+          <p className="ryda-tagline mt-3 text-[11px] font-medium uppercase tracking-[0.32em] text-[#F4F1EC]/70">
             Luxury vehicle access
           </p>
         </div>

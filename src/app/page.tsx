@@ -66,23 +66,23 @@ const VERTICALS: Vertical[] = [
 
 export default function SplitterPage() {
   return (
-    <main className="relative min-h-screen overflow-hidden bg-ink text-cream">
+    <main className="relative min-h-screen overflow-hidden bg-[#0E0E10] text-[#F4F1EC]">
       <SplitterIntro />
 
       {/* Floating top bar — minimal, hovers over the columns */}
       <div className="absolute inset-x-0 top-0 z-30 flex items-center justify-between px-6 py-6 sm:px-10 sm:py-8">
         <Link
           href="/"
-          className="font-display text-2xl tracking-tight text-cream"
+          className="font-display text-2xl tracking-tight text-[#F4F1EC]"
         >
           RYDA
         </Link>
-        <p className="hidden text-[11px] font-medium uppercase tracking-[0.24em] text-cream/55 sm:block">
+        <p className="hidden text-[11px] font-medium uppercase tracking-[0.24em] text-[#F4F1EC]/55 sm:block">
           Luxury vehicle access
         </p>
         <Link
           href="/signin"
-          className="text-[11px] font-medium uppercase tracking-[0.18em] text-cream/55 hover:text-cream"
+          className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#F4F1EC]/55 hover:text-[#F4F1EC]"
         >
           Sign in
         </Link>
@@ -106,24 +106,24 @@ function VerticalColumn({ v, index }: { v: Vertical; index: number }) {
     red: {
       glow: "from-red/35",
       eyebrowHover: "group-hover:text-red",
-      pill: "bg-red/95 text-cream",
+      pill: "bg-red/95 text-[#F4F1EC]",
     },
     marine: {
       glow: "from-marine/40",
       eyebrowHover: "group-hover:text-marine",
-      pill: "bg-marine/95 text-cream",
+      pill: "bg-marine/95 text-[#F4F1EC]",
     },
     neutral: {
-      glow: "from-cream/15",
-      eyebrowHover: "group-hover:text-cream",
-      pill: "border border-cream/40 text-cream/85 group-hover:border-cream group-hover:text-cream",
+      glow: "from-[#F4F1EC]/15",
+      eyebrowHover: "group-hover:text-[#F4F1EC]",
+      pill: "border border-[#F4F1EC]/40 text-[#F4F1EC]/85 group-hover:border-[#F4F1EC] group-hover:text-[#F4F1EC]",
     },
   }[v.accent];
 
   return (
     <Link
       href={v.href}
-      className="group relative flex min-h-[60vh] flex-1 items-end overflow-hidden border-cream/10 lg:min-h-screen lg:border-r last:lg:border-r-0"
+      className="group relative flex min-h-[60vh] flex-1 items-end overflow-hidden border-[#F4F1EC]/10 lg:min-h-screen lg:border-r last:lg:border-r-0"
     >
       {/* Media layer — random Pexels b-roll loop on top of poster.
           MediaBackground picks one clip from the videos array on
@@ -161,26 +161,26 @@ function VerticalColumn({ v, index }: { v: Vertical; index: number }) {
       </span>
 
       {/* Eyebrow */}
-      <span className="absolute left-5 top-5 font-display text-sm text-cream/55">
+      <span className="absolute left-5 top-5 font-display text-sm text-[#F4F1EC]/55">
         {v.eyebrow}
       </span>
 
       {/* Caption */}
-      <div className="relative z-10 w-full p-7 text-cream sm:p-10 lg:p-12">
-        <p className={`font-display text-sm text-cream/55 transition-colors duration-300 ${accentClasses.eyebrowHover}`}>
+      <div className="relative z-10 w-full p-7 text-[#F4F1EC] sm:p-10 lg:p-12">
+        <p className={`font-display text-sm text-[#F4F1EC]/55 transition-colors duration-300 ${accentClasses.eyebrowHover}`}>
           {v.eyebrow}
         </p>
-        <p className="mt-3 font-display text-5xl font-light italic leading-[0.95] text-cream transition-transform duration-700 group-hover:-translate-y-1 sm:text-6xl lg:text-7xl">
+        <p className="mt-3 font-display text-5xl font-light italic leading-[0.95] text-[#F4F1EC] transition-transform duration-700 group-hover:-translate-y-1 sm:text-6xl lg:text-7xl">
           {v.label}
         </p>
-        <p className="mt-5 max-w-sm text-sm leading-relaxed text-cream/85 sm:text-base">
+        <p className="mt-5 max-w-sm text-sm leading-relaxed text-[#F4F1EC]/85 sm:text-base">
           {v.tagline}
         </p>
-        <div className="mt-7 flex items-center justify-between border-t border-cream/20 pt-5">
-          <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-cream/55">
+        <div className="mt-7 flex items-center justify-between border-t border-[#F4F1EC]/20 pt-5">
+          <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-[#F4F1EC]/55">
             {v.bullet}
           </span>
-          <span className="inline-flex items-center gap-1.5 text-sm font-medium text-cream transition-transform duration-300 group-hover:translate-x-1.5">
+          <span className="inline-flex items-center gap-1.5 text-sm font-medium text-[#F4F1EC] transition-transform duration-300 group-hover:translate-x-1.5">
             Enter →
           </span>
         </div>
