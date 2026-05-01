@@ -1,22 +1,30 @@
 import Link from "next/link";
 
+// Slim footer — collapsed from 6 columns to a 3-column layout that
+// reads as a luxury house mark + 2 link groups, plus a quiet bottom
+// strip with legal + disclaimer. Aman / Loro Piana keep marketing
+// footers tight: the prospect doesn't need a sitemap, they need a
+// mark that signs the page off.
+
 export function SiteFooter() {
   return (
     <footer className="border-t border-rule">
-      <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10">
-        <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-12">
-          <div className="lg:col-span-2">
-            <p className="font-display text-2xl text-ink">RYDA</p>
-            <p className="mt-3 max-w-sm text-sm text-ink-soft">
-              Luxury vehicle access — Cars, Boats, and (soon) Planes. Miami, FL.
+      <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-24">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-10">
+          {/* Brand block */}
+          <div className="lg:col-span-5">
+            <p className="font-display text-3xl text-ink">RYDA</p>
+            <p className="mt-4 max-w-sm text-[15px] leading-relaxed text-ink-soft">
+              Luxury vehicle access — Cars, Boats, and (soon) Planes.
+              Miami, FL · Launching Q3 2026.
             </p>
             <Link
               href="/founding-members"
-              className="mt-6 inline-flex h-11 items-center justify-center rounded-full border border-ink bg-ink px-5 text-sm font-medium text-cream hover:bg-red hover:border-red"
+              className="mt-7 inline-flex h-12 items-center justify-center border border-ink bg-ink px-7 text-sm font-medium text-cream transition-colors hover:bg-red hover:border-red"
             >
-              Apply to join
+              Request membership
             </Link>
-            <div className="mt-5 flex items-center gap-3 text-xs text-mute">
+            <div className="mt-6 flex items-center gap-4 text-xs text-mute">
               <Link href="/signin" className="hover:text-ink">
                 Sign in
               </Link>
@@ -24,86 +32,65 @@ export function SiteFooter() {
               <Link href="/signup" className="hover:text-ink">
                 Sign up
               </Link>
+              <span className="text-rule">·</span>
+              <Link href="/search" className="hover:text-ink">
+                Search
+              </Link>
+              <span className="text-rule">·</span>
+              <Link href="/help" className="hover:text-ink">
+                Help center
+              </Link>
             </div>
           </div>
 
+          {/* Two link groups, dense */}
           <FooterCol
-            title="Cars"
+            title="The portfolio"
             links={[
-              ["Portfolio", "/markets"],
-              ["Rent", "/rent"],
-              ["Concierge", "/concierge-ownership"],
+              ["Cars", "/cars"],
+              ["Boats", "/boats"],
+              ["Planes", "/planes"],
               ["Membership", "/membership"],
               ["How it works", "/how-it-works"],
-              ["FAQ", "/faq"],
-            ]}
-          />
-          <FooterCol
-            title="Boats"
-            links={[
-              ["Boats home", "/boats"],
-              ["Portfolio", "/boats/portfolio"],
-              ["Charter", "/boats/rent"],
-              ["How it works", "/boats/how-it-works"],
-              ["Apply", "/contact?type=Membership&note=RYDA+Boats"],
-            ]}
-          />
-          <FooterCol
-            title="Services"
-            links={[
-              ["Insurance", "/insurance"],
-              ["Concierge", "/concierge"],
-              ["Storage", "/storage"],
-              ["Track day", "/track-day"],
-              ["Trust & safety", "/trust-and-safety"],
-              ["Member protection", "/member-protection"],
-            ]}
-          />
-          <FooterCol
-            title="Resources"
-            links={[
-              ["Inside RYDA", "/inside"],
               ["Sample documents", "/sample-documents"],
-              ["RYDA vs Turo", "/vs/turo"],
-              ["RYDA vs Marengo", "/vs/marengo"],
-              ["RYDA vs Supercar Club", "/vs/supercar-club"],
-              ["Journal", "/journal"],
+              ["Inside RYDA", "/inside"],
             ]}
           />
           <FooterCol
             title="Company"
             links={[
               ["About", "/about"],
-              ["Careers", "/careers"],
-              ["Press", "/press"],
+              ["Journal", "/journal"],
               ["Investors", "/investors"],
+              ["Press", "/press"],
+              ["Careers", "/careers"],
               ["Contact", "/contact"],
-              ["Help center", "/help"],
-            ]}
-          />
-          <FooterCol
-            title="Legal"
-            links={[
-              ["Privacy", "/legal/privacy"],
-              ["Terms", "/legal/terms"],
-              ["Co-Ownership Disclaimer", "/legal/disclaimer"],
-              ["Cookies", "/legal/cookies"],
-              ["Accessibility", "/legal/accessibility"],
+              ["Trust &amp; safety", "/trust-and-safety"],
             ]}
           />
         </div>
       </div>
 
       <div className="border-t border-rule">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-6 py-6 text-xs text-mute sm:flex-row sm:px-10">
+        <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-3 px-6 py-6 text-xs text-mute sm:flex-row sm:items-center sm:px-10">
           <p>© {new Date().getFullYear()} RYDA LLC · Formed under Delaware law</p>
-          <p>
-            Co-ownership stakes are not registered securities and not offered
-            for investment purposes.{" "}
-            <Link href="/legal/disclaimer" className="text-ink-soft hover:text-ink">
-              Read the disclaimer →
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <Link href="/legal/privacy" className="hover:text-ink">
+              Privacy
             </Link>
-          </p>
+            <Link href="/legal/terms" className="hover:text-ink">
+              Terms
+            </Link>
+            <Link href="/legal/disclaimer" className="hover:text-ink">
+              Co-ownership disclaimer
+            </Link>
+            <Link href="/legal/cookies" className="hover:text-ink">
+              Cookies
+            </Link>
+            <Link href="/legal/accessibility" className="hover:text-ink">
+              Accessibility
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
@@ -118,12 +105,14 @@ function FooterCol({
   links: [string, string][];
 }) {
   return (
-    <div className="text-sm lg:col-span-2">
-      <p className="font-medium text-ink">{title}</p>
-      <ul className="mt-3 space-y-2 text-ink-soft">
+    <div className="text-[15px] lg:col-span-3">
+      <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-mute">
+        {title}
+      </p>
+      <ul className="mt-5 space-y-3 text-ink-soft">
         {links.map(([label, href]) => (
           <li key={href}>
-            <Link href={href} className="hover:text-ink">
+            <Link href={href} className="transition-colors hover:text-ink">
               {label}
             </Link>
           </li>
