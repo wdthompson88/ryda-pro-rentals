@@ -1,13 +1,13 @@
-// Reusable "ownership primitives" block — the five numbers a member
+// Reusable "ownership primitives" block — the six numbers a member
 // needs to internalise before they wire money. Pacaso uses crisp
 // fractional primitives (1/8 share, 8 owners, etc) as a hero-adjacent
-// trust block; we do the same with car-side numbers.
+// trust block; we do the same with vertical-specific numbers.
 //
 // Drops into:
 //   - / (home, hero-adjacent)
-//   - /markets (under the cinematic hero)
-//   - /markets/[symbol] (under the OrderPanel section)
-//   - /how-it-works (foundational reference)
+//   - /markets, /markets/[symbol] (cars)
+//   - /boats/portfolio, /boats/portfolio/[slug] (boats — pass vertical='boats')
+//   - /how-it-works, /boats/how-it-works (foundational reference)
 
 import {
   DAYS_PER_SHARE,
@@ -15,15 +15,24 @@ import {
   HOLDING_YEARS,
   TARGET_DEPRECIATION_PCT,
 } from "@/lib/market-data";
+import {
+  BOATS_DAYS_PER_SHARE,
+  NM_PER_DAY_PER_SHARE,
+  BOATS_HOLDING_YEARS,
+  BOATS_TARGET_DEPRECIATION_PCT,
+} from "@/lib/boat-data";
 
 type Variant = "default" | "dark" | "compact";
+type Vertical = "cars" | "boats";
 
 export function OwnershipPrimitives({
   variant = "default",
   title,
+  vertical = "cars",
 }: {
   variant?: Variant;
   title?: string;
+  vertical?: Vertical;
 }) {
   const isDark = variant === "dark";
   const wrapperBg = isDark
@@ -32,44 +41,81 @@ export function OwnershipPrimitives({
       ? "bg-cream-2/40"
       : "bg-surface";
   const wrapperBorder = isDark ? "border-cream/10" : "border-rule";
-  const eyebrowTone = isDark ? "text-red" : "text-red";
+  // Cars use red, boats use marine — same accent system as the rest
+  // of the vertical's pages.
+  const accentClass = vertical === "boats" ? "text-marine" : "text-red";
+  const eyebrowTone = isDark ? accentClass : accentClass;
   const headlineTone = isDark ? "text-cream" : "text-ink";
   const labelTone = isDark ? "text-cream/60" : "text-mute";
   const valueTone = isDark ? "text-cream" : "text-ink";
   const subTone = isDark ? "text-cream/70" : "text-ink-soft";
 
-  const items = [
-    {
-      label: "Co-owners",
-      value: "10",
-      sub: "per car (max). Each share = 1/10.",
-    },
-    {
-      label: "Days / share / yr",
-      value: String(DAYS_PER_SHARE),
-      sub: `Multi-share = ${DAYS_PER_SHARE * 2}, ${DAYS_PER_SHARE * 3}…`,
-    },
-    {
-      label: "Miles / share / yr",
-      value: (DAYS_PER_SHARE * MILES_PER_DAY_PER_SHARE).toLocaleString(),
-      sub: `${MILES_PER_DAY_PER_SHARE} mi/day allowance`,
-    },
-    {
-      label: "Planned exit",
-      value: `${HOLDING_YEARS} yrs`,
-      sub: `LLC sells the car at year ${HOLDING_YEARS}.`,
-    },
-    {
-      label: "Modeled depreciation",
-      value: `${TARGET_DEPRECIATION_PCT}%`,
-      sub: `Across the ${HOLDING_YEARS}-yr hold (curated CPO).`,
-    },
-    {
-      label: "Transfer min hold",
-      value: "12 mo",
-      sub: "Then transfer to any verified RYDA member.",
-    },
-  ];
+  const items =
+    vertical === "boats"
+      ? [
+          {
+            label: "Co-owners",
+            value: "10",
+            sub: "per hull (max). Each share = 1/10.",
+          },
+          {
+            label: "Days / share / yr",
+            value: String(BOATS_DAYS_PER_SHARE),
+            sub: `Multi-share = ${BOATS_DAYS_PER_SHARE * 2}, ${BOATS_DAYS_PER_SHARE * 3}…`,
+          },
+          {
+            label: "Nm / share / yr",
+            value: (BOATS_DAYS_PER_SHARE * NM_PER_DAY_PER_SHARE).toLocaleString(),
+            sub: `${NM_PER_DAY_PER_SHARE} nm/day allowance`,
+          },
+          {
+            label: "Planned exit",
+            value: `${BOATS_HOLDING_YEARS} yrs`,
+            sub: `LLC sells the hull at year ${BOATS_HOLDING_YEARS}.`,
+          },
+          {
+            label: "Modeled depreciation",
+            value: `${BOATS_TARGET_DEPRECIATION_PCT}%`,
+            sub: `Across the ${BOATS_HOLDING_YEARS}-yr hold (surveyed hulls).`,
+          },
+          {
+            label: "Transfer min hold",
+            value: "12 mo",
+            sub: "Then transfer to any verified RYDA member.",
+          },
+        ]
+      : [
+          {
+            label: "Co-owners",
+            value: "10",
+            sub: "per car (max). Each share = 1/10.",
+          },
+          {
+            label: "Days / share / yr",
+            value: String(DAYS_PER_SHARE),
+            sub: `Multi-share = ${DAYS_PER_SHARE * 2}, ${DAYS_PER_SHARE * 3}…`,
+          },
+          {
+            label: "Miles / share / yr",
+            value: (DAYS_PER_SHARE * MILES_PER_DAY_PER_SHARE).toLocaleString(),
+            sub: `${MILES_PER_DAY_PER_SHARE} mi/day allowance`,
+          },
+          {
+            label: "Planned exit",
+            value: `${HOLDING_YEARS} yrs`,
+            sub: `LLC sells the car at year ${HOLDING_YEARS}.`,
+          },
+          {
+            label: "Modeled depreciation",
+            value: `${TARGET_DEPRECIATION_PCT}%`,
+            sub: `Across the ${HOLDING_YEARS}-yr hold (curated CPO).`,
+          },
+          {
+            label: "Transfer min hold",
+            value: "12 mo",
+            sub: "Then transfer to any verified RYDA member.",
+          },
+        ];
 
   if (variant === "compact") {
     return (

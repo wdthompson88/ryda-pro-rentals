@@ -2,6 +2,9 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
+import { BoatCostBreakdown } from "@/components/boat-cost-breakdown";
+import { BoatShareValueChart } from "@/components/boat-share-value-chart";
+import { OwnershipPrimitives } from "@/components/ownership-primitives";
 import {
   BOATS,
   getBoatBySlug,
@@ -158,6 +161,73 @@ export default async function BoatDetailPage({
                   12-month minimum hold. Transferable to other verified members.
                 </p>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Ownership primitives — six-number trust block, parallel to
+          the cars detail page. Marine accent. */}
+      <section className="border-b border-rule">
+        <div className="mx-auto max-w-7xl px-6 py-10 sm:px-10">
+          <OwnershipPrimitives
+            variant="compact"
+            vertical="boats"
+            title="What this share is, in six numbers"
+          />
+        </div>
+      </section>
+
+      {/* Cost breakdown + share value chart — the cars-side parity the
+          CEO flagged was missing. Boat economics use 3-yr hold and
+          15% depreciation; charter scenario shown when applicable. */}
+      <section className="border-b border-rule bg-cream-2">
+        <div className="mx-auto max-w-7xl px-6 py-14 sm:px-10">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+            <div className="lg:col-span-5">
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
+                The {BOATS_HOLDING_YEARS}-year math
+              </p>
+              <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
+                What you actually pay over the hold.
+              </h2>
+              <p className="mt-3 text-base text-ink-soft">
+                Buy-in plus {BOATS_HOLDING_YEARS} years of all-in
+                operating cost (slip, captain, fuel, insurance, hurricane
+                prep) minus the modeled sale at exit. Every dollar shown
+                up front; toggle the charter scenario to see how the math
+                shifts when you opt your unused days into the pool.
+              </p>
+            </div>
+            <div className="lg:col-span-7">
+              <BoatCostBreakdown boat={b} shares={1} />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Share-value chart */}
+      <section className="border-b border-rule">
+        <div className="mx-auto max-w-7xl px-6 py-14 sm:px-10">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+            <div className="lg:col-span-5">
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
+                Year-by-year value
+              </p>
+              <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
+                What your share is worth over time.
+              </h2>
+              <p className="mt-3 text-base text-ink-soft">
+                Linear depreciation modeled at{" "}
+                {(BOATS_TARGET_DEPRECIATION_PCT / BOATS_HOLDING_YEARS).toFixed(1)}%
+                per year over the {BOATS_HOLDING_YEARS}-year hold. Real
+                depreciation curves vary — classic Rivas appreciate, big
+                sport yachts compress faster — but the chart anchors the
+                conversation in numbers, not vibes.
+              </p>
+            </div>
+            <div className="lg:col-span-7">
+              <BoatShareValueChart boat={b} />
             </div>
           </div>
         </div>
