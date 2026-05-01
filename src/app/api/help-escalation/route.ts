@@ -1,11 +1,21 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { notifyTeam, emailLayout, escapeHtml } from "@/lib/notify";
+import { isAllowed, clientIp } from "@/lib/rate-limit";
 
 type ConversationTurn = { role: "user" | "bot"; text: string };
 
+const RATE_LIMIT = 5;
+const RATE_WINDOW_MS = 60_000;
+
 export async function POST(req: Request) {
   try {
+    if (!isAllowed(`help-escalation:${clientIp(req)}`, RATE_LIMIT, RATE_WINDOW_MS)) {
+      return NextResponse.json(
+        { error: "Too many requests. Try again in a minute." },
+        { status: 429 },
+      );
+    }
     const body = await req.json();
     const email = String(body.email || "").trim().toLowerCase();
     const note = String(body.note || "").trim().slice(0, 5000);

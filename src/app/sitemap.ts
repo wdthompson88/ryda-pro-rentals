@@ -1,8 +1,24 @@
 import type { MetadataRoute } from "next";
 import { VEHICLES } from "@/lib/market-data";
+import { BOATS } from "@/lib/boat-data";
+import { POSTS as JOURNAL_POSTS } from "@/lib/journal-content";
+
+// Sitemap of every crawlable, public RYDA route. Generated at build
+// time. Three categories:
+//   1. Static landing pages (hand-maintained list below).
+//   2. Per-vehicle dynamic routes derived from /lib/market-data.
+//   3. Per-boat + per-journal-post + per-vs dynamic routes.
+//
+// Routes that are gated, member-only, or stub previews (e.g. /portfolio,
+// /onboarding, /bookings/*, /admin/*) are intentionally NOT listed.
 
 const PUBLIC_ROUTES = [
   "",
+  // Verticals — splash for each line of business.
+  "/cars",
+  "/boats",
+  "/planes",
+  // Cars marketing surfaces.
   "/markets",
   "/rent",
   "/membership",
@@ -25,17 +41,31 @@ const PUBLIC_ROUTES = [
   "/careers",
   "/contact",
   "/events",
+  "/sample-documents",
+  // Locations.
   "/locations/miami",
   "/locations/los-angeles",
   "/locations/new-york",
+  // Boats marketing surfaces (parity with cars).
+  "/boats/about",
+  "/boats/faq",
+  "/boats/journal",
+  "/boats/sample-documents",
+  // Search + auth.
+  "/search",
+  "/signin",
+  "/signup",
+  // Legal.
   "/legal/privacy",
   "/legal/terms",
   "/legal/disclaimer",
   "/legal/cookies",
   "/legal/accessibility",
-  "/signin",
-  "/signup",
 ];
+
+// VS comparison slugs — kept here rather than read from a config file so
+// the sitemap stays explicit. Add new comparisons here as they ship.
+const VS_SLUGS = ["turo", "marengo", "supercar-club"];
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const siteUrl =
@@ -46,7 +76,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${siteUrl}${path}`,
     lastModified,
     changeFrequency: "weekly" as const,
-    priority: path === "" ? 1.0 : 0.7,
+    priority: path === "" ? 1.0 : path === "/cars" || path === "/boats" || path === "/planes" ? 0.9 : 0.7,
   }));
 
   const vehicleEntries: MetadataRoute.Sitemap = VEHICLES.flatMap((v) => [
@@ -55,6 +85,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified,
       changeFrequency: "weekly" as const,
       priority: 0.8,
+    },
+    {
+      url: `${siteUrl}/markets/${v.symbol.toLowerCase()}/cost-sheet`,
+      lastModified,
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
     },
     ...(v.rentalAvailable
       ? [
@@ -68,5 +104,42 @@ export default function sitemap(): MetadataRoute.Sitemap {
       : []),
   ]);
 
-  return [...staticEntries, ...vehicleEntries];
+  const boatEntries: MetadataRoute.Sitemap = BOATS.flatMap((b) => [
+    {
+      url: `${siteUrl}/boats/portfolio/${b.slug}`,
+      lastModified,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    },
+    {
+      url: `${siteUrl}/boats/portfolio/${b.slug}/cost-sheet`,
+      lastModified,
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    },
+  ]);
+
+  const journalEntries: MetadataRoute.Sitemap = JOURNAL_POSTS
+    .filter((p) => p.status === "published")
+    .map((p) => ({
+      url: `${siteUrl}/journal/${p.slug}`,
+      lastModified,
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    }));
+
+  const vsEntries: MetadataRoute.Sitemap = VS_SLUGS.map((slug) => ({
+    url: `${siteUrl}/vs/${slug}`,
+    lastModified,
+    changeFrequency: "monthly" as const,
+    priority: 0.6,
+  }));
+
+  return [
+    ...staticEntries,
+    ...vehicleEntries,
+    ...boatEntries,
+    ...journalEntries,
+    ...vsEntries,
+  ];
 }

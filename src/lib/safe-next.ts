@@ -16,8 +16,13 @@ const FALLBACK = "/portfolio";
 /**
  * Sanitize a `next=` value. Returns `fallback` if input is unsafe.
  *
- * Allow-list: must start with a single `/`, followed by an alphanumeric
- * or one of `_-`. This rejects:
+ * Allow-list: must start with a single `/`, followed by EITHER:
+ *   - an alphanumeric or `_-` (a path char), OR
+ *   - `?` (query-only URL like `/?ref=miami`), OR
+ *   - `#` (fragment-only URL like `/#section`), OR
+ *   - end-of-string (just `/`).
+ *
+ * This rejects:
  *   - protocol-relative URLs (`//evil.com`)
  *   - absolute URLs (`https://evil.com`, `http://...`)
  *   - dangerous schemes (`javascript:`, `data:`, `vbscript:`, etc.)
@@ -32,9 +37,11 @@ export function safeNext(
   if (typeof input !== "string") return fallback;
   const trimmed = input.trim();
   if (trimmed.length === 0) return fallback;
-  // Must start with `/` — and the second char must NOT be `/` or `\`
-  // (which would make the browser interpret it as a host).
-  if (!/^\/[A-Za-z0-9_-]/.test(trimmed)) return fallback;
+  // Bare `/` is fine.
+  if (trimmed === "/") return trimmed;
+  // Must start with `/`. Second char can be a path char OR query/fragment
+  // start — but never `/` or `\` (host-confusion) or anything else odd.
+  if (!/^\/[A-Za-z0-9_\-?#]/.test(trimmed)) return fallback;
   // Reject control characters anywhere in the path.
   // eslint-disable-next-line no-control-regex
   if (/[\x00-\x1F\x7F]/.test(trimmed)) return fallback;

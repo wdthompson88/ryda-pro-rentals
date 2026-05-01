@@ -95,10 +95,12 @@ function SignUpPageInner() {
           password,
           options: {
             emailRedirectTo: redirectTo,
-            // Persist age confirmation + marketing opt-in to user_metadata
-            // so server-side rental flows can verify the 28+ claim later.
-            // Real ID/age verification happens in /onboarding KYC; this
-            // is the lightweight self-attestation captured at signup.
+            // Persist self-attested age confirmation + marketing opt-in
+            // to user_metadata. NOTE: user_metadata is user-editable, so
+            // this is an audit-trail signature — NOT a security primitive.
+            // Real age/identity verification happens in /onboarding KYC,
+            // which writes to a server-owned `members` table that the
+            // rental API checks before any booking can be created.
             data: {
               name,
               marketing_opt_in: marketingOptIn,

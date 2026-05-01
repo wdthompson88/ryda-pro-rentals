@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { notifyTeam, emailLayout, escapeHtml } from "@/lib/notify";
+import { isAllowed, clientIp } from "@/lib/rate-limit";
 
 const VALID_CHECK_SIZES = new Set([
   "$25K–$50K",
@@ -9,8 +10,17 @@ const VALID_CHECK_SIZES = new Set([
   "$1M+",
 ]);
 
+const RATE_LIMIT = 5;
+const RATE_WINDOW_MS = 60_000;
+
 export async function POST(req: Request) {
   try {
+    if (!isAllowed(`investor-inquiry:${clientIp(req)}`, RATE_LIMIT, RATE_WINDOW_MS)) {
+      return NextResponse.json(
+        { error: "Too many requests. Try again in a minute." },
+        { status: 429 },
+      );
+    }
     const body = await req.json();
     const email = String(body.email || "").trim().toLowerCase();
     const name = String(body.name || "").trim();

@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { StepProgress } from "@/components/step-progress";
 import { BOOKING_POLICY } from "@/lib/market-data";
+import { supabase } from "@/lib/supabase";
 
 // Booking mode is the first decision after vehicle selection — it sets
 // the calendar validation rules (advance window, consecutive cap,
@@ -32,6 +34,39 @@ const VEHICLES = [
 ];
 
 export default function NewBookingPage() {
+  const router = useRouter();
+  // Auth gate. Booking is a member-only action — the rental policy (28+
+  // driver, member-managed LLC ownership check, KYC complete) lives on
+  // top of an authenticated session. Unauthenticated visitors get
+  // bounced to /signin with `?next=/bookings/new&reason=checkout` so
+  // they return to this exact step after sign-in. While the check is
+  // pending we render a minimal "checking session" state to avoid
+  // flashing the booking UI to non-members.
+  const [authState, setAuthState] = useState<"checking" | "ok">("checking");
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      // If Supabase isn't configured (dev / preview without env vars),
+      // skip the gate so the demo still works.
+      if (!supabase) {
+        if (!cancelled) setAuthState("ok");
+        return;
+      }
+      const { data } = await supabase.auth.getSession();
+      if (cancelled) return;
+      if (!data.session) {
+        router.replace(
+          "/signin?next=" + encodeURIComponent("/bookings/new") + "&reason=checkout",
+        );
+        return;
+      }
+      setAuthState("ok");
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [router]);
+
   const [step, setStep] = useState(0);
   const [vehicle, setVehicle] = useState(VEHICLES[0]);
   const [mode, setMode] = useState<BookingMode>("planned");
@@ -53,6 +88,20 @@ export default function NewBookingPage() {
 
   const next = () => setStep((s) => Math.min(s + 1, STEPS.length - 1));
   const back = () => setStep((s) => Math.max(s - 1, 0));
+
+  if (authState === "checking") {
+    return (
+      <>
+        <SiteHeader />
+        <section className="mx-auto max-w-2xl px-6 py-20 text-center sm:py-32">
+          <div className="mx-auto h-3 w-3 animate-pulse rounded-full bg-red" />
+          <p className="mt-6 font-display text-xl text-ink">
+            Checking your session…
+          </p>
+        </section>
+      </>
+    );
+  }
 
   return (
     <>

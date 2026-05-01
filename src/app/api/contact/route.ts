@@ -1,18 +1,27 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { notifyTeam, emailLayout, escapeHtml } from "@/lib/notify";
+import { isAllowed, clientIp } from "@/lib/rate-limit";
 
 const VALID_TYPES = new Set(["Membership", "Rental", "Press", "Partnership", "Investor", "Other"]);
 const VALID_MARKETS = new Set(["Miami", "Los Angeles", "New York", "Not sure"]);
+const RATE_LIMIT = 5;            // 5 submissions per minute
+const RATE_WINDOW_MS = 60_000;
 
 export async function POST(req: Request) {
   try {
+    if (!isAllowed(`contact:${clientIp(req)}`, RATE_LIMIT, RATE_WINDOW_MS)) {
+      return NextResponse.json(
+        { error: "Too many requests. Try again in a minute." },
+        { status: 429 },
+      );
+    }
     const body = await req.json();
     const name = String(body.name || "").trim();
     const email = String(body.email || "").trim().toLowerCase();
     const phone = String(body.phone || "").trim();
-    const inquiry_type = VALID_TYPES.has(body.type) ? body.type : "Other";
-    const market = VALID_MARKETS.has(body.market) ? body.market : "Not sure";
+    const inquiry_type = VALID_TYPES.has(String(body.type || "")) ? String(body.type) : "Other";
+    const market = VALID_MARKETS.has(String(body.market || "")) ? String(body.market) : "Not sure";
     const message = String(body.message || "").trim().slice(0, 5000);
 
     if (!name) return NextResponse.json({ error: "Name required." }, { status: 400 });
