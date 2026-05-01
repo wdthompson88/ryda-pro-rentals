@@ -164,7 +164,14 @@ export function HelpChat() {
           conversation,
         }),
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) {
+        // Surface 429 specifically; other errors fall through to the
+        // generic catch.
+        if (res.status === 429) {
+          throw new Error("Too many requests. Try again in a minute.");
+        }
+        throw new Error();
+      }
       // Replace the prompt bubble with a confirmation
       setMessages((all) =>
         all.map((m) =>
@@ -178,13 +185,19 @@ export function HelpChat() {
             : m,
         ),
       );
-    } catch {
+    } catch (err) {
+      // Surface 429 message specifically so the user knows to slow down
+      // rather than thinking the form is broken.
+      const text =
+        err instanceof Error && err.message
+          ? err.message
+          : "Something went wrong sending that. Email hello@ryda.com directly and we'll pick it up from there.";
       setMessages((all) => [
         ...all,
         {
           id: `b-err-${Date.now()}`,
           role: "bot",
-          text: "Something went wrong sending that. Email hello@ryda.com directly and we'll pick it up from there.",
+          text,
         },
       ]);
     }

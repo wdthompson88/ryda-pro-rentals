@@ -10,6 +10,7 @@ type InquiryType = (typeof VALID_TYPES)[number];
 
 export function ContactForm() {
   const [status, setStatus] = useState<Status>("idle");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [type, setType] = useState<InquiryType>("Membership");
 
   // Read ?type= from the URL after mount so deep-linked CTAs from elsewhere
@@ -45,8 +46,16 @@ export function ContactForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error();
+      if (!res.ok) {
+        // Surface API error message (e.g. 429 rate limit) when present.
+        const j = await res.json().catch(() => ({}));
+        setErrorMessage(j.error || (res.status === 429
+          ? "Too many requests. Try again in a minute."
+          : null));
+        throw new Error(j.error || "Submission failed.");
+      }
       setStatus("success");
+      setErrorMessage(null);
       form.reset();
     } catch {
       setStatus("error");
@@ -112,7 +121,8 @@ export function ContactForm() {
       </div>
       {status === "error" && (
         <p className="sm:col-span-2 text-sm text-red">
-          Something went wrong. Try emailing hello@ryda.com instead.
+          {errorMessage ||
+            "Something went wrong. Try emailing hello@ryda.com instead."}
         </p>
       )}
     </form>

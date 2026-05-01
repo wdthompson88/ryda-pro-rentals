@@ -45,12 +45,24 @@ export function InlineEmailCapture({
           source,
         }),
       });
-      if (!res.ok) throw new Error("network");
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        if (res.status === 429) {
+          setStatus("error");
+          setError(j.error || "Too many requests. Try again in a minute.");
+          return;
+        }
+        throw new Error(j.error || "network");
+      }
       setStatus("success");
       form.reset();
-    } catch {
+    } catch (err) {
       setStatus("error");
-      setError("Something went wrong. Try again in a sec.");
+      setError(
+        err instanceof Error && err.message !== "network"
+          ? err.message
+          : "Something went wrong. Try again in a sec.",
+      );
     }
   }
 
