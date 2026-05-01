@@ -60,16 +60,18 @@ export const SPLITTER_MEDIA: Record<"cars" | "boats" | "planes", MediaSlot> = {
     position: "center 30%",
   },
   boats: {
-    // Owned-asset yacht clips (Eclipse, Superyacht-in-London,
-    // Untitled) + 2 Pexels superyacht clips. Dropped LOON — too
-    // identifiable to a specific real-world named vessel (visible
-    // hull lettering + duck-logo branding). Dropped vtMyG3i7TvI
-    // earlier — turned out to be a private jet (moved to planes).
+    // Owned-asset yacht clips (Eclipse, Superyacht-in-London) + 2
+    // Pexels superyacht clips. Removed LOON (too brand-identifiable
+    // — visible logo). Removed vtMyG3i7TvI and Untitled — both
+    // turned out to be aviation, not yachts (moved to planes).
+    // Process of elimination: of the 5 unlabeled CEO-uploaded files,
+    // only the explicitly named ones (Eclipse, London) are confirmed
+    // yachts. Conservative approach until each file is visually
+    // verified.
     videos: [
-      // Owned-asset, brand-approved
+      // Owned-asset, brand-approved (named superyachts)
       "/videos/boats-eclipse.mp4",
       "/videos/boats-london.mp4",
-      "/videos/boats-untitled.mp4",
       // Pexels — superyacht only.
       PX("13878618", "hd_1920_1080_30fps"), // Yacht sailing out of marina
       PX("15288018", "hd_1920_1080_30fps"), // Drone video of luxury yacht docked at port
@@ -80,11 +82,14 @@ export const SPLITTER_MEDIA: Record<"cars" | "boats" | "planes", MediaSlot> = {
     position: "center 50%",
   },
   planes: {
-    // Two owned-asset private-jet clips: the original "edit" montage
-    // plus the front-on Bombardier shot that was misfiled in boats.
+    // Three owned-asset clips: jet-edit montage, the Bombardier
+    // front-on shot (was misfiled in boats), and the Untitled clip
+    // (also moved from boats — likely also aviation given the
+    // recurring CEO callout that "a plane is still appearing in boats").
     videos: [
       "/videos/planes-jet-edit.mp4",
       "/videos/planes-vtmyg3.mp4",
+      "/videos/planes-untitled.mp4",
     ],
     poster:
       "https://images.unsplash.com/photo-1474302770737-173ee21bab63?auto=format&fit=crop&w=2400&q=85",
