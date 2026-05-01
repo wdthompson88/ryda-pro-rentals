@@ -76,7 +76,7 @@ export default function CarsHome() {
                 fill
                 priority
                 sizes="(min-width: 1024px) 50vw, 100vw"
-                className={`object-cover transition-transform duration-700 group-hover:scale-105 ${heroVehicle.flipImage ? "-scale-x-100" : ""}`}
+                className={`object-cover transition-transform duration-700 group-hover:scale-[1.02] ${heroVehicle.flipImage ? "-scale-x-100" : ""}`}
                 style={{ objectPosition: heroVehicle.imagePosition ?? "center" }}
               />
               <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 bg-gradient-to-t from-cream/90 via-cream/30 to-transparent p-5 sm:p-6">
@@ -179,7 +179,7 @@ export default function CarsHome() {
                       alt={`${v.year} ${v.name}`}
                       fill
                       sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                      className={`object-cover transition-transform duration-500 group-hover:scale-105 ${v.flipImage ? "-scale-x-100" : ""}`}
+                      className={`object-cover transition-transform duration-500 group-hover:scale-[1.02] ${v.flipImage ? "-scale-x-100" : ""}`}
                       style={{ objectPosition: v.imagePosition ?? "center" }}
                     />
                   </div>
@@ -244,7 +244,7 @@ export default function CarsHome() {
                       alt={`${v.year} ${v.name}`}
                       fill
                       sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                      className={`object-cover transition-transform duration-500 group-hover:scale-105 ${v.flipImage ? "-scale-x-100" : ""}`}
+                      className={`object-cover transition-transform duration-500 group-hover:scale-[1.02] ${v.flipImage ? "-scale-x-100" : ""}`}
                       style={{ objectPosition: v.imagePosition ?? "center" }}
                     />
                   </div>

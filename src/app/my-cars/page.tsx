@@ -50,7 +50,7 @@ export default function MyCarsPage() {
                       alt={`${v.year} ${v.name}`}
                       fill
                       sizes="(min-width: 1024px) 50vw, 100vw"
-                      className={`object-cover transition-transform duration-500 group-hover:scale-105 ${v.flipImage ? "-scale-x-100" : ""}`}
+                      className={`object-cover transition-transform duration-500 group-hover:scale-[1.02] ${v.flipImage ? "-scale-x-100" : ""}`}
                       style={{ objectPosition: v.imagePosition ?? "center" }}
                     />
                     {h.isLeadOwner && (

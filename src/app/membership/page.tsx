@@ -72,7 +72,6 @@ const TIERS = [
     priceSub: "/year",
     tagline: "For active members. Priority on new vehicles, monthly meetups, member-to-member share transfers.",
     cta: "Choose Blue",
-    badge: "Most chosen",
   },
   {
     key: "black" as const,
@@ -235,83 +234,65 @@ function TierCard({ tier }: { tier: typeof TIERS[number] }) {
   const isBlue = tier.key === "blue";
   const isBlack = tier.key === "black";
 
-  // For each tier, show the upgrades over the previous tier.
-  // - Blue: anything Blue has that Core doesn't (or improves on)
-  // - Black: anything Black has that Blue doesn't (or improves on)
-  // - Core: the universal baseline features
   const above = isBlack ? "blue" : isBlue ? "core" : null;
 
   function isUpgrade(item: { core: CellValue; blue: CellValue; black: CellValue }) {
-    if (!above) return item.core === true; // Core: just list what everyone gets
+    if (!above) return item.core === true;
     const my = item[tier.key];
     const prev = item[above];
     if (my === false) return false;
-    // Either prev was a hard `false`, or my value is a *better* string than prev's.
     return prev === false || (my !== prev);
   }
 
   const items = FEATURES.flatMap((g) => g.items.filter(isUpgrade)).slice(0, 7);
   const previousLabel = isBlack ? "Everything in Blue, plus" : isBlue ? "Everything in Core, plus" : null;
 
-  // Tier colorways — distinct color per tier, theme-independent so
-  // they look identical in both light + dark modes:
-  //   Core  → RYDA red (the entry tier, brand-loud and inviting)
-  //   Blue  → deep sapphire blue (the active-member tier)
-  //   Black → pure black (the concierge tier, premium)
-  // Text + accents always use #F4F1EC (warm cream) — does NOT theme,
-  // because the card backgrounds don't theme either.
-  const bg = isBlack
-    ? "bg-black border-black"
+  // Monochrome tier cards. Saturated red/blue/black saturated cards
+  // read as Stripe pricing. Restrained palette: cream/surface body
+  // with a 2px top accent line in the tier color (red / marine / gold).
+  // Black tier earns the gold detail — gold was previously underused
+  // in tokens; this is its one recurring brand surface.
+  const accentLine = isBlack
+    ? "before:bg-[#C9A66B]" // gold (--ryda-gold)
     : isBlue
-      ? "bg-[#1e40af] border-[#1e40af]"
-      : "bg-[#DC4747] border-[#DC4747]";
-
-  const textOnCard = "text-[#F4F1EC]";
-  const sub = "text-[#F4F1EC]/75";
-  const accent = "text-[#F4F1EC]";
-  const checkColor = "text-[#F4F1EC]";
-
-  // CTA buttons: warm cream bg + tier-color text, theme-independent.
-  const ctaCls = isBlack
-    ? "bg-[#F4F1EC] text-black hover:bg-white"
-    : isBlue
-      ? "bg-[#F4F1EC] text-[#1e40af] hover:bg-white"
-      : "bg-[#F4F1EC] text-[#DC4747] hover:bg-white";
+      ? "before:bg-marine"
+      : "before:bg-red";
 
   return (
     <div
-      className={`relative flex flex-col rounded-2xl border border-rule p-8 ${bg} ${textOnCard}`}
+      className={`relative flex flex-col rounded-none border border-rule bg-surface p-8 before:absolute before:inset-x-0 before:top-0 before:h-[3px] ${accentLine}`}
     >
-      {tier.badge && (
-        <span className="absolute -top-3 left-8 rounded-full bg-red px-3 py-1 text-xs font-medium text-cream">
-          {tier.badge}
-        </span>
-      )}
-      <p className={`text-xs font-medium uppercase tracking-[0.2em] ${accent}`}>
+      <p
+        className={`text-[10px] font-medium uppercase tracking-[0.22em] ${
+          isBlack ? "text-[#C9A66B]" : isBlue ? "text-marine" : "text-red"
+        }`}
+      >
         RYDA {tier.name}
       </p>
-      <p className="mt-4 font-display text-5xl font-light">
+      <p className="mt-5 font-display text-5xl font-light text-ink">
         {tier.price}
         {tier.priceSub && (
-          <span className={`text-base ${sub}`}>{tier.priceSub}</span>
+          <span className="text-base text-mute">{tier.priceSub}</span>
         )}
       </p>
-      <p className={`mt-3 text-sm ${sub}`}>{tier.tagline}</p>
+      <p className="mt-3 text-[15px] leading-relaxed text-ink-soft">
+        {tier.tagline}
+      </p>
 
       {previousLabel && (
-        <p className={`mt-8 text-xs font-medium uppercase tracking-wider ${sub}`}>
+        <p className="mt-8 text-[10px] font-medium uppercase tracking-[0.2em] text-mute">
           {previousLabel}
         </p>
       )}
 
-      <ul className={`${previousLabel ? "mt-3" : "mt-8"} flex-1 space-y-3 text-sm`}>
+      <ul className={`${previousLabel ? "mt-3" : "mt-8"} flex-1 space-y-3 text-[14px]`}>
         {items.map((f) => (
-          <li key={f.label} className="flex items-start gap-3">
-            <span className={`mt-1 ${checkColor}`}>✓</span>
+          <li key={f.label} className="flex items-start gap-3 text-ink-soft">
+            <span className="mt-1 text-mute">·</span>
             <span>
-              {f.label}
+              <span className="text-ink">{f.label}</span>
               {typeof f[tier.key] === "string" && (
-                <span className="ml-1.5 text-xs italic opacity-80">
+                <span className="ml-1.5 text-xs italic text-mute">
                   ({f[tier.key]})
                 </span>
               )}
@@ -322,9 +303,9 @@ function TierCard({ tier }: { tier: typeof TIERS[number] }) {
 
       <Link
         href={tier.key === "core" ? "/signup" : "/founding-members"}
-        className={`mt-10 inline-flex h-12 items-center justify-center rounded-full px-7 text-sm font-medium transition-colors ${ctaCls}`}
+        className="mt-10 inline-flex h-12 items-center justify-center border border-ink bg-ink px-7 text-sm font-medium text-cream transition-colors hover:bg-red hover:border-red"
       >
-        {tier.cta} →
+        {tier.cta}
       </Link>
     </div>
   );
@@ -337,7 +318,7 @@ function Group({ group }: { group: typeof FEATURES[number] }) {
     <>
       <tr className="border-b border-rule bg-cream-2/40">
         <td colSpan={4} className="px-6 py-3">
-          <span className="text-xs font-medium uppercase tracking-wider text-red">
+          <span className="text-[10px] font-medium uppercase tracking-[0.22em] text-mute">
             {group.group}
           </span>
         </td>
@@ -355,12 +336,17 @@ function Group({ group }: { group: typeof FEATURES[number] }) {
 }
 
 function Cell({ value, accent }: { value: CellValue; accent?: boolean }) {
-  const bg = accent ? "bg-red/5" : "";
+  // Quiet ink dot for "included," em-dash for "not included."
+  // Replaces the red ✓ / cell shading combo — checkmarks + accent
+  // backgrounds read as feature-comparison SaaS. The ink dot keeps
+  // the affordance without shouting; accent is gone entirely from
+  // the cell, the comparison table inherits no color.
+  const bg = accent ? "bg-cream-2/40" : "";
   let content: React.ReactNode;
   if (value === true) {
-    content = <span className="text-red">✓</span>;
+    content = <span className="inline-block h-1.5 w-1.5 rounded-full bg-ink" aria-label="Included" />;
   } else if (value === false) {
-    content = <span className="text-mute">—</span>;
+    content = <span className="text-mute" aria-label="Not included">—</span>;
   } else {
     content = <span className="text-ink">{value}</span>;
   }
@@ -383,7 +369,7 @@ function Math({ tier, detail }: { tier: string; detail: string }) {
 function Bullet({ children }: { children: React.ReactNode }) {
   return (
     <li className="flex items-start gap-3 leading-relaxed">
-      <span className="mt-1 text-red">·</span>
+      <span className="mt-1 text-mute">·</span>
       <span>{children}</span>
     </li>
   );
