@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
-import { InlineEmailCapture } from "@/components/inline-email-capture";
+import { PlanesMissionProfileForm } from "@/components/planes-mission-profile-form";
 
 export const metadata: Metadata = {
   title: "RYDA Planes — Coming soon",
@@ -49,17 +49,17 @@ export default function PlanesComingSoon() {
             (Part 91 vs Part 135 matters), different timelines, same
             doctrine.
           </p>
-          <div className="mt-10 max-w-md rounded-2xl border border-cream/20 bg-cream/5 p-5 backdrop-blur">
+          <div className="mt-10 max-w-2xl rounded-2xl border border-cream/20 bg-cream/5 p-6 backdrop-blur sm:p-7">
             <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-cream/70">
-              Be first when it lists
+              Tell us your mission profile
             </p>
             <p className="mt-2 text-sm text-cream/85">
-              Drop your email and we&apos;ll send a single update when
-              RYDA Planes opens its founding cohort. No interim
-              marketing.
+              Help us shape the founding cohort: jet class, annual hours,
+              primary base. We contact you when a profile-matching airframe
+              and operator pair are ready — not before.
             </p>
-            <div className="mt-4">
-              <InlineEmailCapture source="planes-waitlist" />
+            <div className="mt-5">
+              <PlanesMissionProfileForm />
             </div>
           </div>
         </div>

@@ -4,21 +4,55 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
+const UNLOCK_KEY = "ryda-deck-unlocked";
+
 export default function DeckPage() {
+  // Gate the deck behind a lightweight investor-inquiry capture so the
+  // public deck doesn't leak unqualified to every visitor — and so the
+  // team gets attribution for who actually opened it. Unlock state
+  // persists per-session via sessionStorage; closing the tab requires
+  // re-submitting (intentional — keeps the deck audience scoped).
+  const [unlocked, setUnlocked] = useState<boolean | null>(null); // null = checking
+  useEffect(() => {
+    try {
+      setUnlocked(sessionStorage.getItem(UNLOCK_KEY) === "1");
+    } catch {
+      setUnlocked(false);
+    }
+  }, []);
+
   const [slide, setSlide] = useState(0);
   const total = SLIDES.length;
   const next = () => setSlide((s) => Math.min(s + 1, total - 1));
   const prev = () => setSlide((s) => Math.max(s - 1, 0));
 
-  // Keyboard navigation
+  // Keyboard navigation — disable until unlocked so spacebar in the
+  // gate form doesn't advance an invisible slide.
   useEffect(() => {
+    if (!unlocked) return;
     function onKey(e: KeyboardEvent) {
       if (e.key === "ArrowRight" || e.key === " ") next();
       if (e.key === "ArrowLeft") prev();
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  });
+  }, [unlocked]);
+
+  if (unlocked === null) return null; // SSR / first-paint stub
+  if (!unlocked) {
+    return (
+      <DeckGate
+        onUnlock={() => {
+          try {
+            sessionStorage.setItem(UNLOCK_KEY, "1");
+          } catch {
+            // sessionStorage blocked — still unlock for this view.
+          }
+          setUnlocked(true);
+        }}
+      />
+    );
+  }
 
   const Slide = SLIDES[slide].render;
 
@@ -89,6 +123,137 @@ export default function DeckPage() {
           Use ← → arrow keys or space to navigate
         </p>
       </footer>
+    </div>
+  );
+}
+
+// ── Gate ───────────────────────────────────────────────────────
+
+function DeckGate({ onUnlock }: { onUnlock: () => void }) {
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setSubmitting(true);
+    setError(null);
+    const data = new FormData(e.currentTarget);
+    const payload = {
+      name: String(data.get("name") || "").trim(),
+      email: String(data.get("email") || "").trim(),
+      firm: String(data.get("firm") || "").trim(),
+      check_size: String(data.get("check_size") || "").trim(),
+      notes: "Requested via deck gate",
+    };
+    if (!payload.name || !payload.email.includes("@")) {
+      setError("Name and a valid email are required.");
+      setSubmitting(false);
+      return;
+    }
+    try {
+      const res = await fetch("/api/investor-inquiry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        if (res.status === 429) {
+          setError(j.error || "Too many requests. Try again in a minute.");
+          return;
+        }
+        throw new Error(j.error || "Submission failed.");
+      }
+      onUnlock();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Submission failed.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <div className="flex min-h-screen flex-col bg-cream">
+      <header className="flex items-center justify-between border-b border-rule bg-cream/95 px-6 py-3 sm:px-10">
+        <Link href="/investors" className="font-display text-xl text-ink hover:text-red">
+          RYDA
+        </Link>
+        <p className="text-xs uppercase tracking-[0.2em] text-mute">
+          Investor Deck · Confidential
+        </p>
+        <span className="text-xs text-mute">Locked</span>
+      </header>
+      <main className="flex flex-1 items-center justify-center px-6 py-12 sm:px-10 sm:py-20">
+        <div className="w-full max-w-xl rounded-3xl border border-rule bg-surface p-8 shadow-xl sm:p-12">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+            Deck access
+          </p>
+          <h1 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
+            Tell us who you are.
+          </h1>
+          <p className="mt-3 text-sm text-ink-soft">
+            The deck is shared with qualified investors. Quick context so we
+            can follow up after you read it — name, email, optional firm,
+            and check-size band. We&apos;ll mark you as having opened it.
+          </p>
+          <form onSubmit={onSubmit} className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <input
+              name="name"
+              autoComplete="name"
+              required
+              placeholder="Full name"
+              className="h-12 rounded-xl border border-rule bg-cream px-4 text-sm text-ink placeholder:text-mute focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
+            />
+            <input
+              name="email"
+              type="email"
+              autoComplete="email"
+              required
+              placeholder="you@firm.com"
+              className="h-12 rounded-xl border border-rule bg-cream px-4 text-sm text-ink placeholder:text-mute focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
+            />
+            <input
+              name="firm"
+              placeholder="Firm (optional)"
+              className="h-12 rounded-xl border border-rule bg-cream px-4 text-sm text-ink placeholder:text-mute focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20 sm:col-span-2"
+            />
+            <select
+              name="check_size"
+              defaultValue=""
+              className="h-12 rounded-xl border border-rule bg-cream px-4 text-sm text-ink focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20 sm:col-span-2"
+            >
+              <option value="" disabled>
+                Anticipated check size (optional)
+              </option>
+              <option value="$25K–$50K">$25K – $50K</option>
+              <option value="$50K–$250K">$50K – $250K</option>
+              <option value="$250K–$1M">$250K – $1M</option>
+              <option value="$1M+">$1M+</option>
+            </select>
+            {error ? (
+              <p className="rounded-xl border border-red/40 bg-red/5 px-4 py-3 text-xs text-red sm:col-span-2">
+                {error}
+              </p>
+            ) : null}
+            <button
+              type="submit"
+              disabled={submitting}
+              className="inline-flex h-12 items-center justify-center rounded-full bg-red px-6 text-sm font-medium text-cream transition-colors hover:bg-red-deep disabled:opacity-50 sm:col-span-2"
+            >
+              {submitting ? "Unlocking…" : "Unlock the deck →"}
+            </button>
+          </form>
+          <p className="mt-5 text-xs text-mute">
+            By accessing the deck you agree the contents are confidential
+            and not for distribution. Looking for the public investor
+            page?{" "}
+            <Link href="/investors" className="text-red underline-offset-4 hover:underline">
+              Go back
+            </Link>
+            .
+          </p>
+        </div>
+      </main>
     </div>
   );
 }

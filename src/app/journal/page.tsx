@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { POSTS } from "@/lib/journal-content";
+import { InlineEmailCapture } from "@/components/inline-email-capture";
 
 export const metadata = {
   title: "Journal — RYDA",
@@ -73,23 +74,20 @@ export default function JournalPage() {
         </div>
       </section>
 
-      {/* Subscribe */}
+      {/* Subscribe — inline email capture posts to the waitlist with
+          source="journal-newsletter" so the team can send a one-off
+          email per post (or batch monthly) to subscribers separately
+          from membership leads. */}
       <section className="bg-ink py-20 text-cream">
-        <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
+        <div className="mx-auto max-w-2xl px-6 text-center sm:px-10">
           <h2 className="font-display text-3xl sm:text-4xl">Get new posts when they drop.</h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
             One email per post. No marketing, no upsells, no daily digest.
             Unsubscribe whenever.
           </p>
-          <Link
-            href="/contact?type=Other#form"
-            className="mx-auto mt-8 inline-flex h-12 items-center justify-center rounded-full bg-red px-7 text-sm font-medium text-cream hover:bg-red-deep"
-          >
-            Email us to subscribe
-          </Link>
-          <p className="mx-auto mt-3 max-w-xs text-xs text-cream/40">
-            Newsletter signup ships with the Miami launch.
-          </p>
+          <div className="mx-auto mt-8 max-w-md">
+            <InlineEmailCapture source="journal-newsletter" />
+          </div>
         </div>
       </section>
     </>

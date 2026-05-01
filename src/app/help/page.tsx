@@ -35,24 +35,35 @@ export default function HelpCenterPage() {
             How can we help?
           </h1>
 
-          {/* Search bar (visual only — wires up later) */}
-          <div className="mt-10 max-w-2xl">
+          {/* Search — submits to the site-wide /search route which
+              indexes vehicles, boats, journal, vs pages, and help.
+              Help-tagged hits are surfaced first when the query
+              matches a help-category keyword. */}
+          <form action="/search" method="get" className="mt-10 max-w-2xl">
             <label className="sr-only" htmlFor="help-search">
               Search help articles
             </label>
-            <div className="flex h-14 items-center gap-3 rounded-full border border-rule bg-surface px-6 shadow-sm">
+            <div className="flex h-14 items-center gap-3 rounded-full border border-rule bg-surface px-6 shadow-sm focus-within:border-red focus-within:ring-2 focus-within:ring-red/20">
               <span className="text-base text-mute">⌕</span>
               <input
                 id="help-search"
+                name="q"
                 type="search"
                 placeholder="Search bookings, insurance, share transfer, KYC…"
                 className="h-full flex-1 bg-transparent text-base text-ink placeholder:text-mute focus:outline-none"
               />
+              <button
+                type="submit"
+                className="text-xs font-medium uppercase tracking-[0.18em] text-red hover:text-red-deep"
+              >
+                Search
+              </button>
             </div>
             <p className="mt-3 text-xs text-mute">
-              {totalArticles} articles across {HELP.length} categories
+              {totalArticles} help articles across {HELP.length} categories.
+              Search also covers the rest of the site.
             </p>
-          </div>
+          </form>
         </div>
       </section>
 
