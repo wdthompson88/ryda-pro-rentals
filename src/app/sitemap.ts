@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { VEHICLES } from "@/lib/market-data";
 import { BOATS } from "@/lib/boat-data";
 import { POSTS as JOURNAL_POSTS } from "@/lib/journal-content";
+import { CARS_VS_SLUGS, BOATS_VS_SLUGS } from "@/lib/vs-comparisons";
 
 // Sitemap of every crawlable, public RYDA route. Generated at build
 // time. Three categories:
@@ -49,7 +50,11 @@ const PUBLIC_ROUTES = [
   // Boats marketing surfaces (parity with cars).
   "/boats/about",
   "/boats/faq",
+  "/boats/how-it-works",
   "/boats/journal",
+  "/boats/membership",
+  "/boats/portfolio",
+  "/boats/rent",
   "/boats/sample-documents",
   // Search + auth.
   "/search",
@@ -63,9 +68,6 @@ const PUBLIC_ROUTES = [
   "/legal/accessibility",
 ];
 
-// VS comparison slugs — kept here rather than read from a config file so
-// the sitemap stays explicit. Add new comparisons here as they ship.
-const VS_SLUGS = ["turo", "marengo", "supercar-club"];
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const siteUrl =
@@ -117,6 +119,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly" as const,
       priority: 0.6,
     },
+    {
+      url: `${siteUrl}/boats/rent/${b.slug}`,
+      lastModified,
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    },
   ]);
 
   const journalEntries: MetadataRoute.Sitemap = JOURNAL_POSTS
@@ -128,8 +136,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.6,
     }));
 
-  const vsEntries: MetadataRoute.Sitemap = VS_SLUGS.map((slug) => ({
+  const carsVsEntries: MetadataRoute.Sitemap = CARS_VS_SLUGS.map((slug) => ({
     url: `${siteUrl}/vs/${slug}`,
+    lastModified,
+    changeFrequency: "monthly" as const,
+    priority: 0.6,
+  }));
+
+  const boatsVsEntries: MetadataRoute.Sitemap = BOATS_VS_SLUGS.map((slug) => ({
+    url: `${siteUrl}/boats/vs/${slug}`,
     lastModified,
     changeFrequency: "monthly" as const,
     priority: 0.6,
@@ -140,6 +155,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...vehicleEntries,
     ...boatEntries,
     ...journalEntries,
-    ...vsEntries,
+    ...carsVsEntries,
+    ...boatsVsEntries,
   ];
 }

@@ -46,21 +46,36 @@ export default function NewBookingPage() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      // If Supabase isn't configured (dev / preview without env vars),
-      // skip the gate so the demo still works.
-      if (!supabase) {
-        if (!cancelled) setAuthState("ok");
-        return;
-      }
-      const { data } = await supabase.auth.getSession();
-      if (cancelled) return;
-      if (!data.session) {
+      try {
+        if (!supabase) {
+          // Fail-closed in production (env misconfig should not let
+          // anyone reach a member-only page). In dev / preview, fall
+          // through so the demo still works without Supabase wired.
+          if (process.env.NODE_ENV === "production") {
+            router.replace("/signin?reason=unavailable");
+            return;
+          }
+          if (!cancelled) setAuthState("ok");
+          return;
+        }
+        const { data } = await supabase.auth.getSession();
+        if (cancelled) return;
+        if (!data.session) {
+          router.replace(
+            "/signin?next=" + encodeURIComponent("/bookings/new") + "&reason=checkout",
+          );
+          return;
+        }
+        setAuthState("ok");
+      } catch {
+        // getSession() can throw on a corrupt localStorage token. Treat
+        // any auth-probe failure as "not signed in" rather than locking
+        // the user on the spinner.
+        if (cancelled) return;
         router.replace(
           "/signin?next=" + encodeURIComponent("/bookings/new") + "&reason=checkout",
         );
-        return;
       }
-      setAuthState("ok");
     })();
     return () => {
       cancelled = true;

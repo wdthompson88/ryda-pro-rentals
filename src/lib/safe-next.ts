@@ -42,6 +42,10 @@ export function safeNext(
   // Must start with `/`. Second char can be a path char OR query/fragment
   // start — but never `/` or `\` (host-confusion) or anything else odd.
   if (!/^\/[A-Za-z0-9_\-?#]/.test(trimmed)) return fallback;
+  // Backslash anywhere in the path is suspicious — browsers normalize
+  // `\` → `/` in URLs, so `/x\evil.com` could become `/x/evil.com`
+  // (cross-origin) when the router expands it. Reject the whole input.
+  if (/\\/.test(trimmed)) return fallback;
   // Reject control characters anywhere in the path.
   // eslint-disable-next-line no-control-regex
   if (/[\x00-\x1F\x7F]/.test(trimmed)) return fallback;
