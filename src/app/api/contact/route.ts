@@ -30,7 +30,10 @@ export async function POST(req: Request) {
     const body = await req.json();
     const name = String(body.name || "").trim();
     const email = String(body.email || "").trim().toLowerCase();
-    const phone = String(body.phone || "").trim();
+    // Cap phone like every other text field — bodyParser limits prevent
+    // a literal DoS but consistency makes the schema easier to reason
+    // about and protects the email template from absurd values.
+    const phone = String(body.phone || "").trim().slice(0, 32);
     const inquiry_type = VALID_TYPES.has(String(body.type || "")) ? String(body.type) : "Other";
     const market = VALID_MARKETS.has(String(body.market || "")) ? String(body.market) : "Not sure";
     const message = String(body.message || "").trim().slice(0, 5000);

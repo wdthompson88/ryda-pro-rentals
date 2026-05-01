@@ -4,7 +4,11 @@ import { useState } from "react";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
-export function WaitlistForm() {
+// Optional source attribution — pages that mount the form on a
+// specific surface (e.g. /investors, /founding-members) can pass
+// a label so the team email + DB row reflects where the lead came
+// from. Omitted defaults to "waitlist-form".
+export function WaitlistForm({ source = "waitlist-form" }: { source?: string }) {
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
 
@@ -19,6 +23,7 @@ export function WaitlistForm() {
       email: String(data.get("email") || "").trim(),
       name: String(data.get("name") || "").trim(),
       market: String(data.get("market") || "Miami"),
+      source,
     };
 
     if (!payload.email || !payload.email.includes("@")) {
