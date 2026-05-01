@@ -68,8 +68,9 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
   function onSearchSubmit(e: React.FormEvent) {
     e.preventDefault();
     const q = query.trim();
-    if (!q) return;
-    router.push(`/help?q=${encodeURIComponent(q)}`);
+    // Route to the real site-wide search page. Empty queries also
+    // route there (lands on the suggestion list).
+    router.push(q ? `/search?q=${encodeURIComponent(q)}` : "/search");
     setSearchOpen(false);
     setQuery("");
   }
