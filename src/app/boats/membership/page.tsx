@@ -2,27 +2,31 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 
 export const metadata = {
-  title: "Membership — RYDA",
+  title: "RYDA Boats Membership — Core, Blue, Black",
   description:
-    "RYDA Core (free), Blue ($500/yr), and Black ($1,500/yr). Compare what each tier unlocks.",
+    "RYDA Boats membership: Core (free), Blue ($500/yr), Black ($1,500/yr). Co-own or charter. Captain-hours bank, priority slip windows, hurricane prep, marine surveys.",
 };
 
-// Single source of truth for the tier matrix.
-// Used for both the tier-card hero and the comparison table below.
+// Single source of truth for the boats tier matrix.
+// Mirrors the cars tier shape so members on both sides can read
+// the same row labels — but the events / concierge / priority rows
+// are deliberately boat-native (hurricane prep, slip windows,
+// captain-hours bank, charter-pool dibs). Don't reach for car
+// vocabulary here — boats live and die on different ops.
 type CellValue = string | boolean;
 
 const FEATURES: { group: string; items: { label: string; core: CellValue; blue: CellValue; black: CellValue }[] }[] = [
   {
     group: "Access",
     items: [
-      { label: "Browse all vehicles in every market", core: true, blue: true, black: true },
-      { label: "Rent any available boat", core: true, blue: true, black: true },
+      { label: "Browse the full RYDA Boats portfolio", core: true, blue: true, black: true },
+      { label: "Charter any available hull", core: true, blue: true, black: true },
       { label: "Claim co-ownership shares · transfer to other members", core: false, blue: true, black: true },
-      { label: "In-app messaging with co-owners", core: true, blue: true, black: true },
-      { label: "Inspection reports + LLC documents", core: true, blue: true, black: true },
-      { label: "Member directory access", core: false, blue: true, black: true },
+      { label: "In-app messaging with co-owners + captains", core: true, blue: true, black: true },
+      { label: "Marine survey + LLC documents", core: true, blue: true, black: true },
+      { label: "Member directory (boats + cars side)", core: false, blue: true, black: true },
       { label: "Member-to-member share transfers", core: false, blue: true, black: true },
-      { label: "Off-market boat pre-list visibility", core: false, blue: false, black: true },
+      { label: "Off-market hull pre-list visibility", core: false, blue: false, black: true },
     ],
   },
   {
@@ -31,27 +35,30 @@ const FEATURES: { group: string; items: { label: string; core: CellValue; blue: 
       { label: "Priority access to new listings", core: false, blue: "24-hour", black: "48-hour" },
       { label: "Buy-in credit", core: false, blue: "$200", black: "$500" },
       { label: "Acquisition fee discount", core: false, blue: "10% off", black: "Waived (1st share)" },
+      { label: "Priority booking window — peak season (Memorial → Labor)", core: false, blue: "+2 days", black: "+5 days" },
+      { label: "Charter-pool first dibs (when an owner opens days)", core: false, blue: true, black: true },
     ],
   },
   {
-    group: "Concierge",
+    group: "Concierge & operations",
     items: [
-      { label: "Free white-glove deliveries / year", core: false, blue: "1", black: "3" },
-      { label: "Free concierge hours / year", core: false, blue: "1", black: "3" },
-      { label: "Free pre-trip boat prep / year", core: false, blue: false, black: "1" },
-      { label: "24/7 roadside assistance", core: true, blue: true, black: true },
-      { label: "Standard handover (pickup)", core: true, blue: true, black: true },
-      { label: "Dedicated account contact", core: false, blue: false, black: true },
+      { label: "24/7 captain dispatch + dockside help", core: true, blue: true, black: true },
+      { label: "Annual hurricane-prep pass (haul, store, re-launch)", core: false, blue: true, black: true },
+      { label: "Captain-hours bank (over and above included)", core: false, blue: "2 hrs", black: "8 hrs" },
+      { label: "Pre-trip provisioning (food, fuel, ice)", core: false, blue: "1 trip", black: "3 trips" },
+      { label: "Concierge hours / year (itinerary, slips, restaurants)", core: false, blue: "1", black: "3" },
+      { label: "Dedicated marine account contact", core: false, blue: false, black: true },
     ],
   },
   {
     group: "Events",
     items: [
-      { label: "Quarterly Cars & Cuban Coffee", core: false, blue: true, black: true },
-      { label: "Member networking dinners", core: false, blue: true, black: true },
-      { label: "Quarterly flagship events (Pebble, GP weekend, Art Basel)", core: false, blue: false, black: true },
-      { label: "Annual founders' weekend", core: false, blue: false, black: true },
-      { label: "Travel programming (Keys road trip, Monterey, etc.)", core: false, blue: "Open to all (paid)", black: "Priority + included" },
+      { label: "Quarterly Sunset Sail · happy hour from a flagship hull", core: false, blue: true, black: true },
+      { label: "Member captains' breakfast (Miami, Bahamas)", core: false, blue: true, black: true },
+      { label: "Miami International Boat Show — member preview day", core: false, blue: true, black: true },
+      { label: "Annual rendezvous (Bimini, Exuma, or member-voted)", core: false, blue: false, black: true },
+      { label: "Annual founders' weekend on the water", core: false, blue: false, black: true },
+      { label: "Travel programming (Caribbean week, Mediterranean, etc.)", core: false, blue: "Open to all (paid)", black: "Priority + included" },
     ],
   },
 ];
@@ -62,7 +69,7 @@ const TIERS = [
     name: "Core",
     price: "Free",
     priceSub: "",
-    tagline: "Browse the fleet and rent any available boat. Upgrade to Blue or Black to claim a co-ownership share.",
+    tagline: "Browse the boats portfolio and charter any available hull. Upgrade to Blue or Black to claim a co-ownership share.",
     cta: "Get started",
   },
   {
@@ -70,7 +77,7 @@ const TIERS = [
     name: "Blue",
     price: "$500",
     priceSub: "/year",
-    tagline: "For active members. Priority on new vehicles, monthly meetups, member-to-member share transfers.",
+    tagline: "For active members on the water. Priority booking windows, hurricane-prep pass, captain-hours bank, member-to-member share transfers.",
     cta: "Choose Blue",
     badge: "Most chosen",
   },
@@ -79,13 +86,13 @@ const TIERS = [
     name: "Black",
     price: "$1,500",
     priceSub: "/year",
-    tagline: "Concierge-grade everything. Travel programming, flagship events, dedicated contact.",
+    tagline: "Concierge-grade everything. Annual rendezvous, dedicated marine account contact, off-market hull access.",
     cta: "Choose Black",
     dark: true,
   },
 ];
 
-export default function MembershipPage() {
+export default function BoatsMembershipPage() {
   return (
     <>
       <SiteHeader />
@@ -94,14 +101,17 @@ export default function MembershipPage() {
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-28">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
-            Membership
+            RYDA Boats · Membership
           </p>
           <h1 className="mt-4 max-w-4xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
             Three tiers.{" "}
-            <span className="italic text-marine">Pick the one that fits.</span>
+            <span className="italic text-marine">Built for the water.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
-            Core to browse and rent. Blue or Black to claim a share.
+            Core to browse and charter. Blue or Black to claim a share.
+            Boats-specific perks throughout — captain hours, hurricane prep,
+            slip priority — because owning a hull doesn&apos;t look like
+            owning a Ferrari.
           </p>
         </div>
       </section>
@@ -179,17 +189,18 @@ export default function MembershipPage() {
             What each tier includes.
           </h2>
           <p className="mt-4 text-base text-ink-soft">
-            Membership is structured around access and service, not coupons.
+            Boats membership is structured around dock-and-go reality, not
+            coupons. The perks save real time on the water.
           </p>
 
           <div className="mt-8 space-y-4">
-            <Math
+            <Detail
               tier="Blue · $500/yr"
-              detail="Active membership: a $200 buy-in credit, one complimentary white-glove delivery, member-to-member share transfers, member directory, and priority access to new vehicles."
+              detail="Active membership: $200 buy-in credit, hurricane-prep pass, +2 days peak-season booking priority, 2 captain-hours bank, one provisioning trip per year, member-to-member share transfers, member directory, and priority access to new hulls."
             />
-            <Math
+            <Detail
               tier="Black · $1,500/yr"
-              detail="Concierge-grade everything: a $500 buy-in credit, three deliveries, three concierge hours, waived first acquisition fee, flagship event programming (Pebble, Miami GP, Art Basel), and a dedicated account contact."
+              detail="Concierge-grade everything: $500 buy-in credit, +5 days peak-season priority, 8 captain-hours bank, three provisioning trips, three concierge hours, waived first acquisition fee, annual rendezvous + founders' weekend, off-market hull pre-list visibility, and a dedicated marine account contact."
             />
           </div>
         </div>
@@ -200,8 +211,13 @@ export default function MembershipPage() {
         <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10">
           <h2 className="font-display text-3xl text-ink sm:text-4xl">Who can join?</h2>
           <ul className="mt-8 space-y-4 text-base text-ink-soft">
-            <Bullet>28 or older with a valid US driver's license and clean recent record</Bullet>
+            <Bullet>28 or older with a valid US-issued ID</Bullet>
             <Bullet>Pass identity verification (KYC)</Bullet>
+            <Bullet>
+              Operator&apos;s license (US, BVI, or equivalent) only required
+              if you intend to skipper personally — most members don&apos;t.
+              Hulls are crewed by default.
+            </Bullet>
             <Bullet>No accredited-investor status required</Bullet>
           </ul>
         </div>
@@ -211,14 +227,14 @@ export default function MembershipPage() {
       <section className="bg-ink py-20 text-cream">
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
           <h2 className="font-display text-4xl font-light sm:text-5xl">
-            Founding members start in Miami.
+            Founding cohort opens for the first 60 boat members.
           </h2>
           <p className="mx-auto mt-6 max-w-xl text-base text-cream/70">
             Apply by July 2026 to lock founding-member pricing on Blue or
             Black for life.
           </p>
           <Link
-            href="/founding-members"
+            href="/founding-members?vertical=boats"
             className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-marine hover:text-cream"
           >
             Apply now →
@@ -236,17 +252,13 @@ function TierCard({ tier }: { tier: typeof TIERS[number] }) {
   const isBlack = tier.key === "black";
 
   // For each tier, show the upgrades over the previous tier.
-  // - Blue: anything Blue has that Core doesn't (or improves on)
-  // - Black: anything Black has that Blue doesn't (or improves on)
-  // - Core: the universal baseline features
   const above = isBlack ? "blue" : isBlue ? "core" : null;
 
   function isUpgrade(item: { core: CellValue; blue: CellValue; black: CellValue }) {
-    if (!above) return item.core === true; // Core: just list what everyone gets
+    if (!above) return item.core === true;
     const my = item[tier.key];
     const prev = item[above];
     if (my === false) return false;
-    // Either prev was a hard `false`, or my value is a *better* string than prev's.
     return prev === false || (my !== prev);
   }
 
@@ -255,28 +267,25 @@ function TierCard({ tier }: { tier: typeof TIERS[number] }) {
 
   // Tier colorways — distinct color per tier, theme-independent so
   // they look identical in both light + dark modes:
-  //   Core  → RYDA red (the entry tier, brand-loud and inviting)
-  //   Blue  → deep sapphire blue (the active-member tier)
-  //   Black → pure black (the concierge tier, premium)
-  // Text + accents always use #F4F1EC (warm cream) — does NOT theme,
-  // because the boatd backgrounds don't theme either.
+  //   Core  → marine blue (the entry tier on the boats side)
+  //   Blue  → deeper sapphire (active member)
+  //   Black → pure black (concierge tier)
   const bg = isBlack
     ? "bg-black border-black"
     : isBlue
       ? "bg-[#1e40af] border-[#1e40af]"
-      : "bg-[#DC4747] border-[#DC4747]";
+      : "bg-[#4A90D9] border-[#4A90D9]";
 
   const textOnCard = "text-[#F4F1EC]";
   const sub = "text-[#F4F1EC]/75";
   const accent = "text-[#F4F1EC]";
   const checkColor = "text-[#F4F1EC]";
 
-  // CTA buttons: warm cream bg + tier-color text, theme-independent.
   const ctaCls = isBlack
     ? "bg-[#F4F1EC] text-black hover:bg-white"
     : isBlue
       ? "bg-[#F4F1EC] text-[#1e40af] hover:bg-white"
-      : "bg-[#F4F1EC] text-[#DC4747] hover:bg-white";
+      : "bg-[#F4F1EC] text-[#4A90D9] hover:bg-white";
 
   return (
     <div
@@ -288,7 +297,7 @@ function TierCard({ tier }: { tier: typeof TIERS[number] }) {
         </span>
       )}
       <p className={`text-xs font-medium uppercase tracking-[0.2em] ${accent}`}>
-        RYDA {tier.name}
+        RYDA Boats {tier.name}
       </p>
       <p className="mt-4 font-display text-5xl font-light">
         {tier.price}
@@ -321,7 +330,7 @@ function TierCard({ tier }: { tier: typeof TIERS[number] }) {
       </ul>
 
       <Link
-        href={tier.key === "core" ? "/signup" : "/founding-members"}
+        href={tier.key === "core" ? "/signup?next=/boats" : "/founding-members?vertical=boats"}
         className={`mt-10 inline-flex h-12 items-center justify-center rounded-full px-7 text-sm font-medium transition-colors ${ctaCls}`}
       >
         {tier.cta} →
@@ -371,7 +380,7 @@ function Cell({ value, accent }: { value: CellValue; accent?: boolean }) {
 
 // ── Math + bullets ─────────────────────────────────────────────
 
-function Math({ tier, detail }: { tier: string; detail: string }) {
+function Detail({ tier, detail }: { tier: string; detail: string }) {
   return (
     <div className="rounded-xl border border-rule bg-surface p-5">
       <p className="font-display text-base text-ink">{tier}</p>

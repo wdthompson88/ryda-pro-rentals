@@ -164,9 +164,12 @@ export const BOATS: Boat[] = [
     effectiveDailyCost: 2_600,
     listingStart: "2026-03-30",
     listingEnd: "2026-09-30",
+    // Hero photo — Pershing-style sport yacht stand-in.
+    // TODO: replace with real licensed Pershing 6X photography
+    // before Q3 2026 launch (current is Unsplash placeholder).
     hero:
-      "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?auto=format&fit=crop&w=1920&q=80",
-    flipImage: true,
+      "https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=1920&q=80",
+    flipImage: false,
     imagePosition: "center 40%",
     currentEngineHours: 410,
     description:
@@ -214,9 +217,12 @@ export const BOATS: Boat[] = [
     effectiveDailyCost: 600,
     listingStart: "2026-04-22",
     listingEnd: "2026-10-22",
+    // Hero photo — classic mahogany speedboat stand-in.
+    // TODO: replace with real licensed Riva Aquariva Super photography
+    // before Q3 2026 launch (current is Unsplash placeholder).
     hero:
-      "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?auto=format&fit=crop&w=1920&q=80",
-    imagePosition: "center 70%",
+      "https://images.unsplash.com/photo-1559827260-dc66d52bef19?auto=format&fit=crop&w=1920&q=80",
+    imagePosition: "center 50%",
     currentEngineHours: 165,
     description:
       "The Aquariva is the most photographable boat in Italian history. Mahogany hull, polished stainless detailing, twin Yanmars to fly across the bay. A day boat for a member who wants something timeless.",
@@ -263,10 +269,13 @@ export const BOATS: Boat[] = [
     effectiveDailyCost: 933,
     listingStart: "2026-04-10",
     listingEnd: "2026-10-10",
+    // Hero photo — sailing catamaran stand-in.
+    // TODO: replace with real licensed Lagoon 50 photography
+    // before Q3 2026 launch (current is Unsplash placeholder).
     hero:
-      "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?auto=format&fit=crop&w=1920&q=80",
-    flipImage: true,
-    imagePosition: "center 25%",
+      "https://images.unsplash.com/photo-1500627964684-141351970a7f?auto=format&fit=crop&w=1920&q=80",
+    flipImage: false,
+    imagePosition: "center 50%",
     currentEngineHours: 220,
     description:
       "The Lagoon 50 is built for distance. Four-cabin layout with crew quarters, full bluewater rig, generator and watermaker — capable of multi-day Bahamas runs without thinking about fuel or supplies.",
