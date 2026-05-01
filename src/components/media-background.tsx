@@ -105,7 +105,7 @@ export function MediaBackground({
     if (!v || !chosenVideo) return;
     setVideoOK(false);
 
-    const { endTime } = parseFragment(chosenVideo);
+    const { startTime, endTime } = parseFragment(chosenVideo);
 
     const advance = () => {
       if (list.length > 1) {
@@ -114,7 +114,7 @@ export function MediaBackground({
         // Single-clip rotation: replay from start manually so Media
         // Fragment URI clips (which don't honor `loop`) restart cleanly.
         try {
-          v.currentTime = 0;
+          v.currentTime = startTime ?? 0;
           void v.play().catch(() => {});
         } catch {
           // Some browsers reject currentTime sets pre-canplay; ignore.
