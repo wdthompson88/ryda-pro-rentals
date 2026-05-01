@@ -60,22 +60,18 @@ export const SPLITTER_MEDIA: Record<"cars" | "boats" | "planes", MediaSlot> = {
     position: "center 30%",
   },
   boats: {
-    // Mix: 4 Pexels superyacht clips + 5 CEO-provided owned-asset
-    // yacht clips (LOON, Eclipse, Superyacht-in-London, Untitled,
-    // vtMyG3i7TvI). Dropped the Haulover Bay clip (19867146) — the
-    // "yacht too small at horizon" one the CEO called out.
+    // Owned-asset yacht clips (LOON, Eclipse, Superyacht-in-London,
+    // Untitled) + 2 Pexels superyacht clips. Dropped vtMyG3i7TvI —
+    // CEO flagged it was a private jet, not a yacht (its YouTube
+    // short had no descriptive title to disambiguate). Renamed to
+    // planes-vtmyg3.mp4 and added to the planes rotation.
     videos: [
       // Owned-asset, brand-approved (named superyachts: LOON, ECLIPSE)
       "/videos/boats-my-loon.mp4",
       "/videos/boats-eclipse.mp4",
       "/videos/boats-london.mp4",
-      "/videos/boats-vtmyg3.mp4",
       "/videos/boats-untitled.mp4",
-      // Pexels — superyacht only. Dropped 14037398 (yacht-too-far-from-
-      // -camera against an LA-coast-style coastline — CEO flagged the
-      // screenshot a second time) and 14037403 (similar wide-establishing
-      // shot). Kept the marina + docked-at-port shots where the yacht
-      // fills more of the frame.
+      // Pexels — superyacht only.
       PX("13878618", "hd_1920_1080_30fps"), // Yacht sailing out of marina
       PX("15288018", "hd_1920_1080_30fps"), // Drone video of luxury yacht docked at port
     ],
@@ -85,9 +81,12 @@ export const SPLITTER_MEDIA: Record<"cars" | "boats" | "planes", MediaSlot> = {
     position: "center 50%",
   },
   planes: {
-    // Single owned-asset private-jet edit. CEO replaced the
-    // turboprop / commercial-airliner Pexels clips entirely.
-    videos: ["/videos/planes-jet-edit.mp4"],
+    // Two owned-asset private-jet clips: the original "edit" montage
+    // plus the front-on Bombardier shot that was misfiled in boats.
+    videos: [
+      "/videos/planes-jet-edit.mp4",
+      "/videos/planes-vtmyg3.mp4",
+    ],
     poster:
       "https://images.unsplash.com/photo-1474302770737-173ee21bab63?auto=format&fit=crop&w=2400&q=85",
     alt: "Private jet on tarmac at dusk",
