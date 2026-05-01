@@ -28,6 +28,9 @@ export function ContactForm() {
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setStatus("submitting");
+    // Clear any prior error message so a stale 429 copy doesn't display
+    // alongside a fresh fetch-level failure on the same form.
+    setErrorMessage(null);
 
     const form = e.currentTarget;
     const data = new FormData(form);

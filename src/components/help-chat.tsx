@@ -423,6 +423,12 @@ function EscalationForm({
       await onSubmit({ email: email.trim(), note: note.trim() });
     } catch {
       setError("Something went wrong. Try again.");
+    } finally {
+      // Always reset the spinner — handleEscalate (the parent onSubmit)
+      // catches its own errors and pushes a bot message instead of
+      // re-throwing, so without `finally` a 429/500 leaves the submit
+      // button stuck on "Sending…" indefinitely. The form unmounts on
+      // success path, so this is a no-op there.
       setSubmitting(false);
     }
   }

@@ -3,7 +3,18 @@ import { supabase } from "@/lib/supabase";
 import { notifyTeam, emailLayout, escapeHtml } from "@/lib/notify";
 import { isAllowed, clientIp } from "@/lib/rate-limit";
 
-const VALID_TYPES = new Set(["Membership", "Rental", "Press", "Partnership", "Investor", "Other"]);
+// Keep in sync with VALID_TYPES in src/components/contact-form.tsx.
+// Adding a new inquiry type? Add it in BOTH places or the form will
+// silently downgrade the lead to "Other" and lose triage intent.
+const VALID_TYPES = new Set([
+  "Membership",
+  "Concierge Ownership",
+  "Rental",
+  "Press",
+  "Partnership",
+  "Investor",
+  "Other",
+]);
 const VALID_MARKETS = new Set(["Miami", "Los Angeles", "New York", "Not sure"]);
 const RATE_LIMIT = 5;            // 5 submissions per minute
 const RATE_WINDOW_MS = 60_000;
