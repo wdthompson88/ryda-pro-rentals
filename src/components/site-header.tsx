@@ -1,14 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 // RYDA spans three verticals: Cars, Boats, Planes. The header detects
 // which vertical the visitor is in via the pathname and swaps the nav
-// accordingly. A small "Cars · Boats · Planes" switcher pill lets
-// members move between verticals without going back to the splitter.
+// accordingly. Vertical switcher + search + theme toggle were removed
+// from the marketing header per UX polish — those move to the footer
+// (theme + search) and are reachable from the splitter (vertical jump).
 
 type Vertical = "cars" | "boats" | "planes" | "neutral";
 
@@ -51,9 +52,6 @@ function navForVertical(v: Vertical): { href: string; label: string }[] {
 
 export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
   const [open, setOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [query, setQuery] = useState("");
-  const router = useRouter();
   const pathname = usePathname();
   const vertical = detectVertical(pathname);
   const nav = navForVertical(vertical);
@@ -65,61 +63,19 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
     : "border-ink bg-ink text-cream hover:bg-red hover:border-red";
   const burger = inverted ? "text-cream/80 hover:text-cream" : "text-ink-soft hover:text-ink";
 
-  function onSearchSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    const q = query.trim();
-    // Route to the real site-wide search page. Empty queries also
-    // route there (lands on the suggestion list).
-    router.push(q ? `/search?q=${encodeURIComponent(q)}` : "/search");
-    setSearchOpen(false);
-    setQuery("");
-  }
-
   return (
     <header className={`w-full border-b ${inverted ? "border-cream/20" : "border-rule"}`}>
-      {/* Vertical switcher strip — small, always visible above the main nav.
-          Lets a member jump between Cars / Boats / Planes without going
-          back to the splitter at /. */}
-      <div
-        className={`border-b ${
-          inverted ? "border-cream/15 bg-ink" : "border-rule bg-cream-2/40"
-        }`}
-      >
-        <div className="mx-auto flex max-w-7xl items-center justify-center gap-1 px-6 py-1.5 text-[10px] font-medium uppercase tracking-[0.18em] sm:justify-start sm:px-10">
-          <VerticalLink
-            href="/cars"
-            label="Cars"
-            active={vertical === "cars"}
-            inverted={inverted}
-          />
-          <span aria-hidden className={inverted ? "text-cream/30" : "text-mute/50"}>
-            ·
-          </span>
-          <VerticalLink
-            href="/boats"
-            label="Boats"
-            active={vertical === "boats"}
-            inverted={inverted}
-          />
-          <span aria-hidden className={inverted ? "text-cream/30" : "text-mute/50"}>
-            ·
-          </span>
-          <VerticalLink
-            href="/planes"
-            label="Planes"
-            active={vertical === "planes"}
-            comingSoon
-            inverted={inverted}
-          />
-        </div>
-      </div>
+      {/* Single-row marketing header. Vertical switcher / theme toggle /
+          search-icon were demoted to footer per luxury polish — header
+          now reads as concierge brand mark + nav + one CTA, not as
+          a control panel. */}
 
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 sm:px-10">
         <Link href="/" className={`font-display text-2xl tracking-tight ${brand}`}>
           RYDA
           {vertical !== "neutral" && (
-            <span className={`ml-2 align-baseline text-[10px] font-medium uppercase tracking-[0.24em] ${
-              inverted ? "text-cream/60" : "text-mute"
+            <span className={`ml-2 align-baseline text-[10px] font-medium uppercase tracking-[0.16em] ${
+              inverted ? "text-cream/55" : "text-mute"
             }`}>
               {vertical}
             </span>
@@ -134,26 +90,7 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
           ))}
         </nav>
 
-        <div className="flex items-center gap-2 sm:gap-3">
-          <button
-            type="button"
-            onClick={() => setSearchOpen((s) => !s)}
-            aria-label="Search"
-            aria-expanded={searchOpen}
-            className={`hidden h-9 w-9 items-center justify-center rounded-full transition-colors sm:inline-flex ${tone}`}
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="none"
-              aria-hidden
-            >
-              <circle cx="7" cy="7" r="5" stroke="currentColor" strokeWidth="1.4" />
-              <path d="M11 11l3.5 3.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-            </svg>
-          </button>
-          <ThemeToggle className="hidden sm:inline-flex" />
+        <div className="flex items-center gap-4 sm:gap-5">
           <Link
             href="/signin"
             className={`hidden text-sm font-medium transition-colors sm:inline-flex ${tone}`}
@@ -164,7 +101,7 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
             href="/founding-members"
             className={`hidden rounded-full border px-5 py-2 text-sm font-medium transition-colors sm:inline-flex ${ctaBase}`}
           >
-            Apply to join
+            Request membership
           </Link>
 
           <button
@@ -202,45 +139,6 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
         </div>
       </div>
 
-      {searchOpen && (
-        <div
-          className={`hidden border-t sm:block ${
-            inverted ? "border-cream/20 bg-ink" : "border-rule bg-cream-2/50"
-          }`}
-        >
-          <form
-            onSubmit={onSearchSubmit}
-            className="mx-auto flex max-w-7xl items-center gap-3 px-6 py-4 sm:px-10"
-          >
-            <input
-              autoFocus
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search the portfolio, help center, or vehicles…"
-              className={`h-11 flex-1 rounded-full border bg-surface px-5 text-sm placeholder:text-mute focus:outline-none focus:ring-2 focus:ring-red/20 ${
-                inverted
-                  ? "border-cream/30 text-cream placeholder:text-cream/50"
-                  : "border-rule text-ink"
-              }`}
-            />
-            <button
-              type="submit"
-              className="inline-flex h-11 items-center justify-center rounded-full bg-red px-5 text-sm font-medium text-cream hover:bg-red-deep"
-            >
-              Search
-            </button>
-            <button
-              type="button"
-              onClick={() => setSearchOpen(false)}
-              className={`text-sm ${tone}`}
-            >
-              Close
-            </button>
-          </form>
-        </div>
-      )}
-
       {open && (
         <div
           id="mobile-menu"
@@ -271,7 +169,7 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
               onClick={() => setOpen(false)}
               className={`mt-2 inline-flex h-12 items-center justify-center rounded-full border px-5 text-sm font-medium transition-colors ${ctaBase}`}
             >
-              Apply to join
+              Request membership
             </Link>
             <div className="mt-2 flex items-center justify-between rounded-lg px-3 py-2">
               <span className="text-xs uppercase tracking-wider text-mute">
@@ -286,38 +184,3 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
   );
 }
 
-function VerticalLink({
-  href,
-  label,
-  active,
-  comingSoon,
-  inverted,
-}: {
-  href: string;
-  label: string;
-  active: boolean;
-  comingSoon?: boolean;
-  inverted?: boolean;
-}) {
-  const baseTone = inverted
-    ? "text-cream/55 hover:text-cream"
-    : "text-mute hover:text-ink";
-  const activeTone = inverted ? "text-cream" : "text-ink";
-  return (
-    <Link
-      href={href}
-      className={`px-2 py-0.5 transition-colors ${active ? activeTone : baseTone}`}
-    >
-      {label}
-      {comingSoon && (
-        <span
-          className={`ml-1 align-baseline text-[8px] font-normal normal-case tracking-normal ${
-            inverted ? "text-cream/45" : "text-mute"
-          }`}
-        >
-          (soon)
-        </span>
-      )}
-    </Link>
-  );
-}

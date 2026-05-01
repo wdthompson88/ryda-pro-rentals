@@ -20,12 +20,12 @@ export default function JournalPage() {
       {/* Hero */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-28">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+          <p className="text-xs font-medium uppercase tracking-[0.22em] text-mute">
             Journal
           </p>
           <h1 className="mt-4 max-w-3xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
             How we think about cars,{" "}
-            <span className="italic text-red">in long form.</span>
+            <span className="italic">in long form.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg text-ink-soft">
             Founder notes, vehicle deep-dives, market analysis, and the
@@ -102,33 +102,41 @@ function FeaturedCard({
   clickable: boolean;
 }) {
   return (
-    <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-      <div className="aspect-[4/3] w-full overflow-hidden rounded-2xl bg-cream/30">
-        <div className="flex h-full items-center justify-center text-sm text-mute">
-          Featured image
-        </div>
+    <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-16">
+      {/* Editorial pull quote treatment instead of a stock-photo
+          placeholder. The featured post leads with a quiet, oversized
+          tag block — Loro Piana / The Row pattern — and the headline
+          carries the visual weight without an image stub. */}
+      <div className="lg:col-span-4">
+        <p className="font-display text-[10px] uppercase tracking-[0.22em] text-mute">
+          Featured · {post.tag}
+        </p>
+        <p className="mt-6 font-display text-xl italic text-ink-soft sm:text-2xl">
+          &ldquo;{post.excerpt.split(".")[0]}.&rdquo;
+        </p>
+        <p className="mt-6 text-xs uppercase tracking-[0.18em] text-mute">
+          {post.date} · {post.readTime}
+        </p>
       </div>
-      <div>
-        <p className="text-xs uppercase tracking-wider text-red">{post.tag}</p>
+      <div className="lg:col-span-8">
+        <p className="font-display text-[10px] uppercase tracking-[0.22em] text-mute">
+          {post.tag}
+        </p>
         <h2
-          className={`mt-3 font-display text-3xl font-light leading-tight text-ink sm:text-4xl ${
+          className={`mt-3 font-display text-4xl font-light leading-tight text-ink sm:text-5xl ${
             clickable ? "transition-colors group-hover:text-red" : ""
           }`}
         >
           {post.title}
         </h2>
-        <p className="mt-4 text-base leading-relaxed text-ink-soft">
+        <p className="mt-5 text-[15px] leading-relaxed text-ink-soft sm:text-base">
           {post.excerpt}
         </p>
-        <div className="mt-6 flex flex-wrap items-center gap-3 text-xs text-mute">
+        <div className="mt-8 flex flex-wrap items-center gap-3 text-xs text-mute">
           <span className="font-medium text-ink">{post.author}</span>
           <span>·</span>
-          <span>{post.date}</span>
-          <span>·</span>
-          <span>{post.readTime}</span>
-          <span>·</span>
-          <span className="italic">
-            {post.status === "published" ? "Read →" : "Coming at launch"}
+          <span>
+            {post.status === "published" ? "Read the essay →" : "Coming at launch"}
           </span>
         </div>
       </div>

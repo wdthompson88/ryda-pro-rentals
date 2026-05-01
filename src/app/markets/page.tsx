@@ -63,7 +63,7 @@ export default function MarketsPage() {
           </p>
           <h1 className="mt-5 max-w-4xl font-display text-5xl font-light leading-[1.05] sm:text-6xl lg:text-7xl">
             The world&apos;s most coveted supercars,{" "}
-            <span className="italic text-red">co-owned in the US.</span>
+            <span className="italic">co-owned in the US.</span>
           </h1>
           <p className="mt-7 max-w-2xl text-lg leading-relaxed text-cream/85">
             Each car is held in a member-managed Delaware LLC. Up to 10

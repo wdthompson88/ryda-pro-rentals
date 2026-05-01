@@ -93,12 +93,12 @@ export default function MembershipPage() {
       {/* Hero */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-28">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+          <p className="text-xs font-medium uppercase tracking-[0.22em] text-mute">
             Membership
           </p>
           <h1 className="mt-4 max-w-4xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
-            Three tiers.{" "}
-            <span className="italic text-red">Pick the one that fits.</span>
+            Three doors{" "}
+            <span className="italic">into RYDA.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
             Core to browse and rent. Blue or Black to claim a share.

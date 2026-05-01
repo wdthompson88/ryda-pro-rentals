@@ -28,8 +28,9 @@ export function SplitterIntro() {
       return;
     }
     setPhase("playing");
-    // Total animation budget: ~1500ms. Mark done so the overlay stops
-    // intercepting clicks and the underlying chooser becomes interactive.
+    // Total animation budget: ~900ms. Cut from 1500ms — luxury splash
+    // bumpers (Aman, Loro Piana) sit in the 700-900ms range; longer
+    // delays the visitor's decision and reads theatrical, not patient.
     const t = setTimeout(() => {
       setPhase("done");
       try {
@@ -37,7 +38,7 @@ export function SplitterIntro() {
       } catch {
         // Best-effort — if storage is blocked the intro just plays again.
       }
-    }, 1500);
+    }, 900);
     return () => clearTimeout(t);
   }, []);
 
@@ -85,16 +86,16 @@ export function SplitterIntro() {
           }
         }
         .ryda-veil {
-          animation: ryda-veil-out 1500ms cubic-bezier(0.4, 0, 0.2, 1)
+          animation: ryda-veil-out 900ms cubic-bezier(0.4, 0, 0.2, 1)
             forwards;
         }
         .ryda-mark {
-          animation: ryda-mark-in 1400ms cubic-bezier(0.22, 1, 0.36, 1)
+          animation: ryda-mark-in 850ms cubic-bezier(0.22, 1, 0.36, 1)
             forwards;
           will-change: transform, opacity;
         }
         .ryda-tagline {
-          animation: ryda-tagline-in 1500ms cubic-bezier(0.22, 1, 0.36, 1)
+          animation: ryda-tagline-in 900ms cubic-bezier(0.22, 1, 0.36, 1)
             forwards;
           will-change: transform, opacity;
         }

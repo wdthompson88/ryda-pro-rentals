@@ -50,44 +50,33 @@ export function CookieBanner() {
     <div
       role="region"
       aria-label="Cookie consent"
-      className="fixed inset-x-0 bottom-0 z-50 px-4 pb-4 sm:px-6 sm:pb-6"
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-rule bg-cream/95 backdrop-blur"
     >
-      <div className="mx-auto max-w-4xl rounded-2xl border border-rule bg-surface p-4 shadow-lg sm:p-5">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex-1 text-sm text-ink-soft">
-            <p className="font-medium text-ink">
-              We use cookies to make RYDA work better.
-            </p>
-            <p className="mt-1 text-xs leading-relaxed">
-              Strictly necessary cookies keep the site running. Analytics
-              cookies help us understand which vehicles members care about
-              most. You can change your preferences anytime in our{" "}
-              <Link
-                href="/legal/cookies"
-                className="underline hover:text-ink"
-              >
-                Cookie Policy
-              </Link>
-              .
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-2 sm:flex-row sm:gap-2">
-            <button
-              type="button"
-              onClick={() => persist("essential")}
-              className="inline-flex h-10 items-center justify-center rounded-full border border-rule px-5 text-xs font-medium text-ink-soft transition-colors hover:border-ink hover:text-ink"
-            >
-              Essential only
-            </button>
-            <button
-              type="button"
-              onClick={() => persist("all")}
-              className="inline-flex h-10 items-center justify-center rounded-full bg-ink px-5 text-xs font-medium text-cream transition-colors hover:bg-red"
-            >
-              Accept all
-            </button>
-          </div>
+      {/* Quiet bottom strip — no shadow, no card frame, no pill buttons.
+          Legal chrome should disappear, not announce itself. */}
+      <div className="mx-auto flex max-w-7xl flex-col gap-3 px-6 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-10">
+        <p className="text-xs leading-relaxed text-ink-soft">
+          We use cookies to keep RYDA running. Read the{" "}
+          <Link href="/legal/cookies" className="underline-offset-2 hover:text-ink hover:underline">
+            policy
+          </Link>
+          .
+        </p>
+        <div className="flex items-center gap-5 text-xs">
+          <button
+            type="button"
+            onClick={() => persist("essential")}
+            className="text-ink-soft transition-colors hover:text-ink"
+          >
+            Essential only
+          </button>
+          <button
+            type="button"
+            onClick={() => persist("all")}
+            className="font-medium text-ink transition-colors hover:text-red"
+          >
+            Accept all
+          </button>
         </div>
       </div>
     </div>

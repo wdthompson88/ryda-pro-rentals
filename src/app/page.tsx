@@ -139,7 +139,7 @@ function VerticalColumn({ v, index }: { v: Vertical; index: number }) {
           MediaBackground picks one clip from the videos array on
           mount, so each visit shows different footage. Default state
           is dimmed; hover brightens the whole column. */}
-      <div className="absolute inset-0 transition-all duration-700 ease-out [filter:brightness(0.55)_saturate(0.9)] group-hover:scale-[1.02] group-hover:[filter:brightness(0.95)_saturate(1.1)]">
+      <div className="absolute inset-0 transition-all duration-700 ease-out [filter:brightness(0.7)_saturate(0.92)] group-hover:scale-[1.02] group-hover:[filter:brightness(0.92)_saturate(1.08)]">
         <MediaBackground
           videos={v.media.videos}
           poster={v.media.poster}
