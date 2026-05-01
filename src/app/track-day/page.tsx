@@ -59,7 +59,7 @@ export default function TrackDayPage() {
           </p>
           <ul className="mt-8 space-y-4 text-sm">
             <Req>RYDA Core or Black member in good standing</Req>
-            <Req>30+ years old</Req>
+            <Req>30+ years old (track-specific; general RYDA membership is 28+)</Req>
             <Req>Clean driving record (no major moving violations in 5 years)</Req>
             <Req>
               For first-time track drivers: completion of an RYDA-approved

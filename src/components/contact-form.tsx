@@ -12,16 +12,29 @@ export function ContactForm() {
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [type, setType] = useState<InquiryType>("Membership");
+  // CTA-attribution string passed via `?note=` from upstream pages
+  // (e.g. "Charter request: Wajer 55 S"). We display it as a pinned
+  // reference badge above the form AND submit it as `context` so the
+  // team email + DB row reflects which surface produced the lead.
+  const [ctaNote, setCtaNote] = useState<string | null>(null);
 
-  // Read ?type= from the URL after mount so deep-linked CTAs from elsewhere
-  // on the site (e.g. /press, /investors, /contact?type=Press) pre-select
-  // the right inquiry type. Done in useEffect to avoid Next.js static-
-  // prerender bail-outs from useSearchParams.
+  // Read URL params after mount so deep-linked CTAs from elsewhere
+  // on the site (e.g. /press, /investors, /contact?type=Press,
+  // /boats/portfolio/wajer-55s?note=Charter+request) pre-select the
+  // right inquiry type AND surface the asset/intent as context.
+  // Done in useEffect to avoid Next.js static-prerender bail-outs.
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const param = new URLSearchParams(window.location.search).get("type");
+    const params = new URLSearchParams(window.location.search);
+    const param = params.get("type");
     if (param && (VALID_TYPES as readonly string[]).includes(param)) {
       setType(param as InquiryType);
+    }
+    const note = params.get("note");
+    if (note) {
+      // Cap at 256 chars to match the API field length and prevent a
+      // pathological URL from blowing out the badge layout.
+      setCtaNote(note.slice(0, 256));
     }
   }, []);
 
@@ -41,6 +54,9 @@ export function ContactForm() {
       type: String(data.get("type") || "Other"),
       market: String(data.get("market") || "Miami"),
       message: String(data.get("message") || ""),
+      // Surface the upstream CTA reference (vehicle, hull, intent) so
+      // the team email subject + body + DB row carry attribution.
+      context: ctaNote || "",
     };
 
     try {
@@ -78,6 +94,14 @@ export function ContactForm() {
 
   return (
     <form onSubmit={onSubmit} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      {ctaNote ? (
+        <div className="sm:col-span-2 rounded-xl border-l-4 border-red bg-cream-2 px-4 py-3">
+          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-mute">
+            Reference
+          </p>
+          <p className="mt-1 text-sm text-ink">{ctaNote}</p>
+        </div>
+      ) : null}
       <Input name="name" label="Full name" required />
       <Input name="email" label="Email" type="email" required />
       <Input name="phone" label="Phone (optional)" />

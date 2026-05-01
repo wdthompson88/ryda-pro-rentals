@@ -23,7 +23,11 @@ type Vertical = {
   label: string;
   tagline: string;
   bullet: string;
-  status: "live" | "coming-soon";
+  /** Status pill copy. "live" = operational; "founding" = site live but ops
+   *  start at a future date (members can join the founding cohort now);
+   *  "coming-soon" = in design, not capturing serious leads. */
+  status: "live" | "founding" | "coming-soon";
+  pillLabel: string;
   media: MediaSlot;
   /** Per-vertical accent — cars use red, boats use marine, planes
    *  stay neutral until they ship. */
@@ -37,6 +41,7 @@ const VERTICALS: Vertical[] = [
     tagline: "Co-own or rent the world's most exceptional cars.",
     bullet: "Live · Miami today",
     status: "live",
+    pillLabel: "Live",
     media: SPLITTER_MEDIA.cars,
     accent: "red",
   },
@@ -44,8 +49,9 @@ const VERTICALS: Vertical[] = [
     href: "/boats",
     label: "Boats",
     tagline: "Floating real estate, held in a Delaware LLC.",
-    bullet: "Miami launch · Q3 2026",
-    status: "live",
+    bullet: "Founding cohort open · Miami launch Q3 2026",
+    status: "founding",
+    pillLabel: "Founding",
     media: SPLITTER_MEDIA.boats,
     accent: "marine",
   },
@@ -55,6 +61,7 @@ const VERTICALS: Vertical[] = [
     tagline: "Fractional access to private aviation. In design.",
     bullet: "Coming soon",
     status: "coming-soon",
+    pillLabel: "Coming soon",
     media: SPLITTER_MEDIA.planes,
     accent: "neutral",
   },
@@ -76,12 +83,20 @@ export default function SplitterPage() {
         <p className="hidden text-[11px] font-medium uppercase tracking-[0.24em] text-[#F4F1EC]/55 sm:block">
           Luxury vehicle access
         </p>
-        <Link
-          href="/signin"
-          className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#F4F1EC]/55 hover:text-[#F4F1EC]"
-        >
-          Sign in
-        </Link>
+        <div className="flex items-center gap-5 sm:gap-6">
+          <Link
+            href="/investors"
+            className="hidden text-[11px] font-medium uppercase tracking-[0.18em] text-[#F4F1EC]/55 hover:text-[#F4F1EC] sm:inline-block"
+          >
+            Investors
+          </Link>
+          <Link
+            href="/signin"
+            className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#F4F1EC]/55 hover:text-[#F4F1EC]"
+          >
+            Sign in
+          </Link>
+        </div>
       </div>
 
       <div className="flex min-h-screen flex-col lg:flex-row">
@@ -94,7 +109,6 @@ export default function SplitterPage() {
 }
 
 function VerticalColumn({ v, index }: { v: Vertical; index: number }) {
-  const isComingSoon = v.status === "coming-soon";
 
   // Per-vertical accent classes. Tailwind needs these spelled out
   // explicitly (no string interpolation) so the JIT can pick them up.
@@ -153,7 +167,7 @@ function VerticalColumn({ v, index }: { v: Vertical; index: number }) {
       <span
         className={`absolute right-5 top-24 rounded-full px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] backdrop-blur transition-colors duration-300 sm:top-28 ${accentClasses.pill}`}
       >
-        {isComingSoon ? "Coming soon" : "Live"}
+        {v.pillLabel}
       </span>
 
       {/* Caption */}

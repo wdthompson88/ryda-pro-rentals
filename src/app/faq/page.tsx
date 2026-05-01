@@ -94,7 +94,7 @@ const SECTIONS: { title: string; questions: Q[] }[] = [
       },
       {
         q: "What's included in a rental?",
-        a: "Full insurance, 200 miles per day, 24/7 roadside, and white-glove delivery if you choose it. Track-eligible vehicles can be booked with a track-day rider for unlimited miles on track.",
+        a: "Full insurance, 100 miles per day, 24/7 roadside, and white-glove delivery if you choose it. Overage is $4/mile. Track-eligible vehicles can be booked with a track-day rider for unlimited miles on track.",
       },
       {
         q: "Why rentals at all? Aren't you focused on ownership?",

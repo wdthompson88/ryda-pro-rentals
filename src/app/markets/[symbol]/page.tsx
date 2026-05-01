@@ -333,19 +333,28 @@ export default async function VehicleMarketPage({
         </div>
       </section>
 
-      {/* Recent activity */}
+      {/* Recent activity — sample shown until Miami operations launch.
+          Real per-LLC events (member joins, inspection posts, transfers)
+          will populate from the member portal post-launch. */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-14 sm:px-10">
-          <h2 className="font-display text-3xl text-ink">Recent activity</h2>
+          <div className="flex items-baseline justify-between gap-4">
+            <h2 className="font-display text-3xl text-ink">Recent activity</h2>
+            <span className="rounded-full border border-rule bg-cream-2 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-mute">
+              Sample · live feed Q3 2026
+            </span>
+          </div>
           <ul className="mt-6 divide-y divide-rule rounded-xl border border-rule bg-surface">
-            <Activity label="New co-owner joined the LLC" detail="Apr 24" amount="—" sub="1 share" />
-            <Activity label="Inspection report posted" detail="Apr 20" amount="—" sub="Mileage: 2,140 mi" />
-            <Activity label="Share transferred to a new verified member" detail="Apr 22" amount="—" sub="1 share" />
-            <Activity label="New co-owners joined the LLC" detail="Apr 18" amount="—" sub="2 shares" />
+            <Activity label="New co-owner joined the LLC" detail="Sample event" amount="—" sub="1 share" />
+            <Activity label="Inspection report posted" detail="Sample event" amount="—" sub="Mileage: 2,140 mi" />
+            <Activity label="Share transferred to a new verified member" detail="Sample event" amount="—" sub="1 share" />
+            <Activity label="New co-owners joined the LLC" detail="Sample event" amount="—" sub="2 shares" />
           </ul>
           <p className="mt-3 text-xs text-mute">
-            Member-to-member transfer prices are private to the parties. RYDA
-            does not publish a transfer-price ticker.
+            These rows are illustrative. The live feed of LLC events
+            switches on at Miami launch. Member-to-member transfer prices
+            are private to the parties — RYDA does not publish a
+            transfer-price ticker.
           </p>
         </div>
       </section>

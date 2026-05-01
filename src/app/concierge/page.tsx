@@ -24,8 +24,9 @@ export default function ConciergePage() {
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-cream/70">
             RYDA's concierge team is the difference between owning a car and
-            owning the experience of a car. Two free hours per year on Black,
-            or pay-as-you-go for Core. One number, one team, all the details.
+            owning the experience of a car. Three free hours per year on
+            Black, one on Blue, or pay-as-you-go for Core. One number, one
+            team, all the details.
           </p>
         </div>
       </section>

@@ -37,6 +37,12 @@ export async function POST(req: Request) {
     const inquiry_type = VALID_TYPES.has(String(body.type || "")) ? String(body.type) : "Other";
     const market = VALID_MARKETS.has(String(body.market || "")) ? String(body.market) : "Not sure";
     const message = String(body.message || "").trim().slice(0, 5000);
+    // Free-form CTA attribution — what asset / intent / surface produced
+    // this lead (e.g. "Charter request: Wajer 55 S", "Concierge ownership
+    // inquiry", "Want LA boats access"). Persists to context column when
+    // present (migration 0006); otherwise the route falls back to a
+    // context-less insert so the form still works on older deployments.
+    const context = String(body.context || "").trim().slice(0, 256);
 
     if (!name) return NextResponse.json({ error: "Name required." }, { status: 400 });
     if (!email || !email.includes("@")) {
@@ -60,14 +66,35 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: true, persisted: false });
     }
 
-    const { error } = await supabase.from("contact_messages").insert({
+    let { error } = await supabase.from("contact_messages").insert({
       name,
       email,
       phone: phone || null,
       inquiry_type,
       market,
       message,
+      context: context || null,
     });
+
+    // Schema-cache fallback — older deployments without migration 0006
+    // don't have the `context` column. Detect and retry without it so
+    // form submissions don't 500 in transition.
+    if (error) {
+      const msg = (error.message ?? "").toLowerCase();
+      const contextColumnMissing =
+        msg.includes("context") &&
+        (msg.includes("column") || msg.includes("schema cache"));
+      if (contextColumnMissing) {
+        ({ error } = await supabase.from("contact_messages").insert({
+          name,
+          email,
+          phone: phone || null,
+          inquiry_type,
+          market,
+          message,
+        }));
+      }
+    }
 
     if (error) {
       console.error("[contact · supabase]", error);
@@ -75,7 +102,12 @@ export async function POST(req: Request) {
     }
 
     await notifyTeam({
-      subject: `New ${inquiry_type.toLowerCase()} inquiry from ${name}`,
+      // Context appears in the subject line so triage can see at a
+      // glance whether a "Membership" inquiry is for a Wajer 55 S
+      // charter or a Ferrari co-ownership share.
+      subject: context
+        ? `[${inquiry_type}] ${context} — ${name}`
+        : `New ${inquiry_type.toLowerCase()} inquiry from ${name}`,
       replyTo: email,
       html: emailLayout(`New contact form: ${inquiry_type}`, `
         <div style="font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#9A9590;">From</div>
@@ -92,6 +124,12 @@ export async function POST(req: Request) {
             <div style="margin-top:2px;">${escapeHtml(market)}</div>
           </div>
         </div>
+        ${context ? `
+          <div style="margin-top:14px;padding:10px 12px;background:#FFF5F0;border-left:3px solid #DC4747;border-radius:4px;">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.18em;color:#9A9590;">CTA reference</div>
+            <div style="margin-top:3px;font-weight:500;color:#1c1c1c;">${escapeHtml(context)}</div>
+          </div>
+        ` : ""}
         <div style="margin-top:18px;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#9A9590;margin-bottom:6px;">Message</div>
         <div style="white-space:pre-wrap;color:#1c1c1c;">${escapeHtml(message)}</div>
         <div style="margin-top:24px;padding-top:18px;border-top:1px solid #e5e1d8;font-size:13px;color:#3c3c3c;">

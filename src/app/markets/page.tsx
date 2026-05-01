@@ -313,7 +313,13 @@ function MarketSection({
           {vehicles.map((v) => (
             <Link
               key={v.symbol}
-              href={`/markets/${v.symbol.toLowerCase()}`}
+              href={
+                isLive
+                  ? `/markets/${v.symbol.toLowerCase()}`
+                  : `/contact?type=Membership&note=${encodeURIComponent(
+                      `${market.label} waitlist — interest in ${v.name}`,
+                    )}#form`
+              }
               className="group flex flex-col overflow-hidden rounded-2xl border border-rule bg-surface transition-all hover:-translate-y-0.5 hover:border-ink/40 hover:shadow-md"
             >
               <div className="relative aspect-[16/10] w-full overflow-hidden bg-cream-2">
@@ -327,16 +333,23 @@ function MarketSection({
                   }`}
                   style={{ objectPosition: v.imagePosition ?? "center" }}
                 />
+                {/* Status pill — for live markets, surface real share counts;
+                    for preview markets (LA, NY), make it explicit that the
+                    vehicle is a preview and shares aren't open yet. */}
                 <span
                   className={`absolute right-3 top-3 rounded-full px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] backdrop-blur ${
-                    v.sharesAvailable === 0
-                      ? "bg-mute/90 text-cream"
-                      : "bg-red/95 text-cream"
+                    !isLive
+                      ? "border border-cream/40 bg-black/40 text-cream"
+                      : v.sharesAvailable === 0
+                        ? "bg-mute/90 text-cream"
+                        : "bg-red/95 text-cream"
                   }`}
                 >
-                  {v.sharesAvailable === 0
-                    ? "Sold out"
-                    : `${v.sharesAvailable} shares left`}
+                  {!isLive
+                    ? `Preview · ${market.launchLabel ?? "soon"}`
+                    : v.sharesAvailable === 0
+                      ? "Sold out"
+                      : `${v.sharesAvailable} shares left`}
                 </span>
               </div>
               <div className="flex flex-1 flex-col p-5">
@@ -347,17 +360,29 @@ function MarketSection({
                   {v.name.replace(`${v.brand} `, "")}
                 </p>
                 <div className="mt-3 flex items-baseline justify-between border-t border-rule pt-3">
-                  <p>
-                    <span className="text-[10px] uppercase tracking-[0.14em] text-mute">
-                      Per share
-                    </span>
-                    <br />
-                    <span className="font-display text-xl text-ink tabular-nums">
-                      {formatUSD(v.pricePerShare)}
-                    </span>
-                  </p>
+                  {isLive ? (
+                    <p>
+                      <span className="text-[10px] uppercase tracking-[0.14em] text-mute">
+                        Per share
+                      </span>
+                      <br />
+                      <span className="font-display text-xl text-ink tabular-nums">
+                        {formatUSD(v.pricePerShare)}
+                      </span>
+                    </p>
+                  ) : (
+                    <p>
+                      <span className="text-[10px] uppercase tracking-[0.14em] text-mute">
+                        Pricing at launch
+                      </span>
+                      <br />
+                      <span className="font-display text-sm text-ink-soft">
+                        Notify me first
+                      </span>
+                    </p>
+                  )}
                   <span className="text-xs font-medium text-red group-hover:text-red-deep">
-                    View →
+                    {isLive ? "View →" : "Join waitlist →"}
                   </span>
                 </div>
               </div>

@@ -46,9 +46,46 @@ export default async function BoatDetailPage({
 
   const econ = computeBoatShareEconomics(b);
 
+  // Schema.org Product + Vehicle JSON-LD so boat listings rank
+  // alongside cars on search-engine SERPs. Without this, Google
+  // treats the page as plain copy. The `<` → `<` escape
+  // prevents script-context breakout if any field ever contains
+  // a literal "</script>".
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: b.name,
+    image: b.hero,
+    description: `Co-own the ${b.year} ${b.name} in ${b.market}. ${formatUSD(b.pricePerShare)} per share, ${formatUSD(b.annualOpCost)}/yr all-in operating cost.`,
+    brand: { "@type": "Brand", name: b.brand },
+    category: "Yacht co-ownership",
+    offers: {
+      "@type": "Offer",
+      price: b.pricePerShare,
+      priceCurrency: "USD",
+      availability:
+        b.sharesAvailable > 0
+          ? "https://schema.org/InStock"
+          : "https://schema.org/SoldOut",
+      url: `https://ryda-web-teal.vercel.app/boats/portfolio/${b.slug}`,
+    },
+    additionalProperty: [
+      { "@type": "PropertyValue", name: "Length", value: `${b.lengthFt} ft` },
+      { "@type": "PropertyValue", name: "Year", value: String(b.year) },
+      { "@type": "PropertyValue", name: "Hailing port", value: b.hailingPort },
+      { "@type": "PropertyValue", name: "Shares available", value: String(b.sharesAvailable) },
+    ],
+  };
+
   return (
     <>
       <SiteHeader />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
 
       {/* Hero — image left, order panel right */}
       <section className="border-b border-rule">
