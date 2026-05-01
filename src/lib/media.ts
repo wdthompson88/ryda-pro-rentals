@@ -60,14 +60,13 @@ export const SPLITTER_MEDIA: Record<"cars" | "boats" | "planes", MediaSlot> = {
     position: "center 30%",
   },
   boats: {
-    // Owned-asset yacht clips (LOON, Eclipse, Superyacht-in-London,
-    // Untitled) + 2 Pexels superyacht clips. Dropped vtMyG3i7TvI —
-    // CEO flagged it was a private jet, not a yacht (its YouTube
-    // short had no descriptive title to disambiguate). Renamed to
-    // planes-vtmyg3.mp4 and added to the planes rotation.
+    // Owned-asset yacht clips (Eclipse, Superyacht-in-London,
+    // Untitled) + 2 Pexels superyacht clips. Dropped LOON — too
+    // identifiable to a specific real-world named vessel (visible
+    // hull lettering + duck-logo branding). Dropped vtMyG3i7TvI
+    // earlier — turned out to be a private jet (moved to planes).
     videos: [
-      // Owned-asset, brand-approved (named superyachts: LOON, ECLIPSE)
-      "/videos/boats-my-loon.mp4",
+      // Owned-asset, brand-approved
       "/videos/boats-eclipse.mp4",
       "/videos/boats-london.mp4",
       "/videos/boats-untitled.mp4",
