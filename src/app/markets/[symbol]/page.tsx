@@ -101,7 +101,13 @@ export default async function VehicleMarketPage({
       <SiteHeader />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        // JSON.stringify doesn't escape HTML; if any of the embedded
+        // values ever contain "</script>", a script-context breakout
+        // is possible. Replace `<` with its escaped Unicode form so
+        // the script body cannot escape its own tag.
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
       />
 
       {/* Top: title + chart on left, order panel on right */}

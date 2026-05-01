@@ -52,7 +52,7 @@ export default function NewBookingPage() {
           // anyone reach a member-only page). In dev / preview, fall
           // through so the demo still works without Supabase wired.
           if (process.env.NODE_ENV === "production") {
-            router.replace("/signin?reason=unavailable");
+            if (!cancelled) router.replace("/signin?reason=unavailable");
             return;
           }
           if (!cancelled) setAuthState("ok");

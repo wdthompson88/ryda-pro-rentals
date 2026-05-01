@@ -46,9 +46,19 @@ export function safeNext(
   // `\` → `/` in URLs, so `/x\evil.com` could become `/x/evil.com`
   // (cross-origin) when the router expands it. Reject the whole input.
   if (/\\/.test(trimmed)) return fallback;
+  // Reject percent-encoded backslash (%5C) and double-encoded slash
+  // (%2F%2F → //) — defense in depth in case a future code path
+  // decodes the value before rendering it. Case-insensitive.
+  if (/%5[Cc]|%2[Ff]%2[Ff]/.test(trimmed)) return fallback;
   // Reject control characters anywhere in the path.
   // eslint-disable-next-line no-control-regex
   if (/[\x00-\x1F\x7F]/.test(trimmed)) return fallback;
+  // Reject zero-width / bidirectional override Unicode — these don't
+  // create open redirects but enable URL-bar visual spoofing on the
+  // destination page (e.g. U+202E reverses display direction).
+  // Range: ZWSP/ZWNJ/ZWJ/LRM/RLM (200B-200F), LRE/RLE/PDF/LRO/RLO
+  // (202A-202E), word-joiner (2060), BOM (FEFF).
+  if (/[​-‏‪-‮⁠﻿]/.test(trimmed)) return fallback;
   // Cap length so a malicious caller can't fill router state.
   if (trimmed.length > 512) return fallback;
   return trimmed;

@@ -28,6 +28,7 @@ const PUBLIC_ROUTES = [
   "/about",
   "/insurance",
   "/concierge",
+  "/concierge-ownership",
   "/storage",
   "/track-day",
   "/trust-and-safety",
@@ -39,6 +40,9 @@ const PUBLIC_ROUTES = [
   "/press",
   "/investors",
   "/investors/deck",
+  "/inside",
+  "/member-protection",
+  "/compare",
   "/careers",
   "/contact",
   "/events",
@@ -48,10 +52,11 @@ const PUBLIC_ROUTES = [
   "/locations/los-angeles",
   "/locations/new-york",
   // Boats marketing surfaces (parity with cars).
+  // NOTE: /boats/journal does NOT exist as a route — boat-themed posts
+  // live in the main /journal listing tagged accordingly.
   "/boats/about",
   "/boats/faq",
   "/boats/how-it-works",
-  "/boats/journal",
   "/boats/membership",
   "/boats/portfolio",
   "/boats/rent",
