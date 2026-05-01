@@ -24,7 +24,7 @@ const BOATS_NAV = [
   { href: "/boats/portfolio", label: "Portfolio" },
   { href: "/boats/rent", label: "Charter" },
   { href: "/boats/how-it-works", label: "How it works" },
-  { href: "/contact?type=Membership&note=RYDA+Boats", label: "Apply" },
+  { href: "/boats/membership", label: "Membership" },
 ];
 
 const PLANES_NAV: { href: string; label: string }[] = [

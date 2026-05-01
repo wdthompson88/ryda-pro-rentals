@@ -297,6 +297,11 @@ export const BOATS_HOLDING_YEARS = 3;
 export const BOATS_TARGET_DEPRECIATION_PCT = 15;
 export const NM_PER_DAY_PER_SHARE = 50; // 30 days × 50 nm = 1,500 nm/yr
 export const BOATS_DAYS_PER_SHARE = 30;
+// Engine-hours equivalent of cars' 50K-mile cap. ~2,000 engine hours
+// is the conventional threshold where major service (engines, rigging,
+// running gear) starts to dominate the carrying cost — the LLC sells
+// at year 3 OR 2,000 hrs, whichever hits first.
+export const BOATS_HOLDING_HOURS_CAP = 2_000;
 
 // ─────────────────────────────────────────────────────────────────────────
 // BOOKING POLICY — same two-tier shape as cars, adapted for boating

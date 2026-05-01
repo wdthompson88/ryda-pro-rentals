@@ -155,7 +155,7 @@ export function BoatCostBreakdown({
               </div>
               <p
                 className={`shrink-0 font-display text-2xl tabular-nums ${
-                  charteredIsPositive ? "text-emerald-600" : "text-marine"
+                  charteredIsPositive ? "text-emerald-600" : "text-red"
                 }`}
               >
                 = {charteredIsPositive ? "+ " : "− "}
@@ -208,10 +208,13 @@ function BreakdownRow({
   positive?: boolean;
   cost?: boolean;
 }) {
+  // Loss / cost coloring stays universally red across both verticals
+  // — green for gains, red for outflows. Marine blue is the boats
+  // brand accent (used on headers/eyebrows), not a profit indicator.
   const tone = positive
     ? "text-emerald-600"
     : cost
-      ? "text-marine"
+      ? "text-red"
       : "text-ink";
   return (
     <div className="flex items-baseline justify-between gap-3">
@@ -245,7 +248,7 @@ function Row({
   return (
     <div
       className={`flex items-baseline justify-between gap-4 px-6 py-3.5 ${
-        accent ? "bg-marine/[0.06]" : ""
+        accent ? "bg-red/[0.04]" : ""
       }`}
     >
       <div className="min-w-0">
@@ -258,10 +261,12 @@ function Row({
         </p>
         {sub ? <p className="mt-0.5 text-[11px] text-mute">{sub}</p> : null}
       </div>
+      {/* Headline net-cost row stays red — it's a net outflow, not a
+          brand accent slot. Loss = red regardless of vertical. */}
       <p
         className={`shrink-0 font-display tabular-nums ${
           accent
-            ? "text-2xl text-marine"
+            ? "text-2xl text-red"
             : emphasized
               ? "text-lg text-ink"
               : "text-base text-ink"

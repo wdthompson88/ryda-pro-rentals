@@ -5,6 +5,7 @@ import { SiteHeader } from "@/components/site-header";
 import { BoatCostBreakdown } from "@/components/boat-cost-breakdown";
 import { BoatShareValueChart } from "@/components/boat-share-value-chart";
 import { OwnershipPrimitives } from "@/components/ownership-primitives";
+import { BoatCompareCalculator } from "@/components/boat-compare-calculator";
 import {
   BOATS,
   getBoatBySlug,
@@ -144,7 +145,7 @@ export default async function BoatDetailPage({
                 </div>
 
                 <Link
-                  href={`/signup?next=${encodeURIComponent(`/contact?type=Membership&note=${encodeURIComponent(`Reserve a share: ${b.name}`)}#form`)}&reason=buy`}
+                  href={`/signup?next=${encodeURIComponent(`/boats/portfolio/${b.slug}/buy?shares=1`)}&reason=buy`}
                   className={`mt-5 inline-flex h-12 w-full items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream transition-colors hover:bg-marine ${
                     b.sharesAvailable === 0 ? "pointer-events-none opacity-50" : ""
                   }`}
@@ -160,6 +161,14 @@ export default async function BoatDetailPage({
                 <p className="mt-4 text-center text-xs text-mute">
                   12-month minimum hold. Transferable to other verified members.
                 </p>
+                <div className="mt-4 border-t border-rule pt-4 text-center">
+                  <Link
+                    href={`/boats/portfolio/${b.slug}/cost-sheet`}
+                    className="text-xs font-medium text-marine hover:text-marine-deep"
+                  >
+                    Full cost sheet (PDF-ready) →
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
@@ -229,6 +238,28 @@ export default async function BoatDetailPage({
             <div className="lg:col-span-7">
               <BoatShareValueChart boat={b} />
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Interactive cost calculator — parallel to cars detail. Lets
+          buyers move shares + days + occupancy sliders to model their
+          own scenario without leaving the listing. */}
+      <section id="calculator" className="border-b border-rule">
+        <div className="mx-auto max-w-7xl px-6 py-14 sm:px-10">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
+            Interactive calculator
+          </p>
+          <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
+            Model your own scenario.
+          </h2>
+          <p className="mt-3 max-w-2xl text-base text-ink-soft">
+            Move shares, expected cruising days, and charter occupancy.
+            The math updates live so you can see exactly how each lever
+            shifts your {BOATS_HOLDING_YEARS}-year net.
+          </p>
+          <div className="mt-10">
+            <BoatCompareCalculator lockedBoat={b} />
           </div>
         </div>
       </section>
