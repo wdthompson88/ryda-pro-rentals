@@ -1,31 +1,40 @@
 "use client";
 
-// Background-media component with TRUE overlay-fade between clips —
-// no poster flash mid-transition.
+// Background-media component — REBUILT FROM SCRATCH for reliability.
 //
-// PROBLEM with a naive symmetric cross-fade (old: 1→0, new: 0→1
-// simultaneously): at the midpoint, both videos sit at ~50% opacity,
-// the SUM doesn't reach 100%, and the still poster underneath shows
-// through for a moment. CEO flagged this as a "stock image flash."
+// CONTRACT: given a list of video URLs, cycle through them randomly,
+// looping forever. Cross-fade between clips so there's no poster
+// flash mid-transition.
 //
-// SOLUTION: layered overlay-fade.
-//   - The new clip is loaded into the inactive slot, given a higher
-//     z-index than the old, and fades 0 → 1 over FADE_MS.
-//   - The OLD clip stays at opacity-1 throughout that fade-in (held
-//     visible behind the new one).
-//   - After the new clip is fully opaque (FADE_MS later), the old
-//     clip's opacity is dropped to 0 — the user doesn't see the
-//     change because the new clip is sitting on top at full opacity.
+// DESIGN
+// - Two stable <video> slots that ping-pong. Each slot's <video>
+//   element mounts ONCE and stays mounted; only its `src` changes.
+// - All "what's playing" state lives in REFS, not React state. Event
+//   handlers (canplay/ended/timeupdate) read from refs, so there are
+//   no stale closures or timing-sensitive state propagation issues.
+// - React state is only used for the rendering layer (opacity / z).
+//   Every advance() touches refs synchronously, then triggers a
+//   re-render via setState.
+// - Handlers bind exactly ONCE per slot via callback refs, on mount.
+//   Never re-bind — no cleanup/reattach race conditions.
 //
-// At every moment of the transition, at least one slot is at high
-// opacity directly over the poster. No flash.
+// CROSS-FADE
+// - Active slot's video is opacity 1 and z-index 2 (on top).
+// - During a transition: the old slot stays at opacity 1 (z-index 1,
+//   underneath) for FADE_MS + 250ms while the new slot fades 0 → 1
+//   over FADE_MS, then the old slot drops to 0. At every moment of
+//   the transition, at least one slot is at full opacity, so the
+//   poster never bleeds through.
 //
-// Two stable <video> elements (slotA + slotB) ping-pong as we cycle.
-// Single-clip rotations replay from fragment-start. Reduced-motion
-// skips video and shows a Ken-Burns poster.
+// FALLBACKS
+// - If a clip 404s or codec-fails, we skip forward to the next.
+// - If the user has prefers-reduced-motion, we don't render videos —
+//   just the still poster with a slow Ken-Burns zoom.
+// - Single-clip rotations (one URL) replay from the fragment-start
+//   on `ended` so Media Fragment URI clips loop cleanly.
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 type Props = {
   videos?: string | string[];
@@ -39,9 +48,6 @@ type Props = {
 };
 
 const FADE_MS = 900;
-/** Extra grace before we drop the old slot, just to make sure the
- *  fade-in transition has fully completed (CSS transitions can run a
- *  hair longer than declared depending on the browser scheduler). */
 const HOLD_PREV_MS = FADE_MS + 250;
 
 function toList(v: Props["videos"]): string[] {
@@ -73,7 +79,7 @@ function pickRandomExcept(len: number, avoid: number): number {
   return next;
 }
 
-type Slot = "A" | "B";
+type SlotIdx = 0 | 1;
 
 export function MediaBackground({
   videos,
@@ -85,38 +91,46 @@ export function MediaBackground({
   kenBurns = true,
   className = "",
 }: Props) {
+  // Lock the playlist once on mount.
   const [list] = useState<string[]>(() => toList(videos));
+  const listRef = useRef<string[]>(list);
+  listRef.current = list;
+
+  // Render state — drives opacity / z-index in JSX.
+  const [activeSlot, setActiveSlot] = useState<SlotIdx>(0);
+  const [slot0Src, setSlot0Src] = useState<string | null>(null);
+  const [slot1Src, setSlot1Src] = useState<string | null>(null);
+  const [holdPrev, setHoldPrev] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
 
-  const [aSrc, setASrc] = useState<string | null>(null);
-  const [bSrc, setBSrc] = useState<string | null>(null);
-  const [aReady, setAReady] = useState(false);
-  const [bReady, setBReady] = useState(false);
-  const [activeSlot, setActiveSlot] = useState<Slot>("A");
-  // True while the OLD slot should remain visible (opacity 1) over
-  // the poster — set when we kick off a transition, cleared after
-  // the new slot's fade-in completes.
-  const [holdPrev, setHoldPrev] = useState(false);
+  // Refs that mirror the render state — kept in sync on every render
+  // so event handlers (which are bound once and outlive renders) read
+  // the LATEST values, not closures captured at bind time.
+  const activeSlotRef = useRef<SlotIdx>(0);
+  const slot0SrcRef = useRef<string | null>(null);
+  const slot1SrcRef = useRef<string | null>(null);
+  // Synchronous-update pattern: this fires on every render of the
+  // component, BEFORE any event handler can run during the same tick.
+  activeSlotRef.current = activeSlot;
+  slot0SrcRef.current = slot0Src;
+  slot1SrcRef.current = slot1Src;
 
-  const aRef = useRef<HTMLVideoElement | null>(null);
-  const bRef = useRef<HTMLVideoElement | null>(null);
-  const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const activeSlotRef = useRef<Slot>("A");
-  const aSrcRef = useRef<string | null>(null);
-  const bSrcRef = useRef<string | null>(null);
+  const video0Ref = useRef<HTMLVideoElement | null>(null);
+  const video1Ref = useRef<HTMLVideoElement | null>(null);
+  const holdTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const handlersBoundRef = useRef<{ s0: boolean; s1: boolean }>({
+    s0: false,
+    s1: false,
+  });
 
-  useEffect(() => {
-    activeSlotRef.current = activeSlot;
-    aSrcRef.current = aSrc;
-    bSrcRef.current = bSrc;
-  }, [activeSlot, aSrc, bSrc]);
-
-  // Initial mount: load a random clip into slot A.
+  // Initial pick — random clip into slot 0 on first mount.
   useEffect(() => {
     if (list.length === 0) return;
-    setASrc(list[Math.floor(Math.random() * list.length)]);
+    const startUrl = list[Math.floor(Math.random() * list.length)];
+    setSlot0Src(startUrl);
   }, [list]);
 
+  // Reduced-motion preference
   useEffect(() => {
     if (typeof window === "undefined") return;
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -126,156 +140,239 @@ export function MediaBackground({
     return () => mq.removeEventListener?.("change", onChange);
   }, []);
 
-  // Cleanup the hold timer on unmount.
+  // Cleanup hold timer on unmount
   useEffect(() => {
     return () => {
-      if (holdTimer.current) clearTimeout(holdTimer.current);
+      if (holdTimerRef.current) clearTimeout(holdTimerRef.current);
     };
   }, []);
 
-  function pickNext(): string {
-    const currentUrl =
-      activeSlotRef.current === "A" ? aSrcRef.current : bSrcRef.current;
-    const currentIdx = currentUrl ? list.indexOf(currentUrl) : -1;
-    const nextIdx = pickRandomExcept(list.length, currentIdx);
-    return list[nextIdx];
-  }
+  // ─── Core advance + promote logic ──────────────────────────────
+  // Stable across renders — uses refs for all reads, so calling these
+  // from event handlers never sees stale data.
 
-  function replaySingle(slot: Slot) {
-    const ref = slot === "A" ? aRef : bRef;
-    const v = ref.current;
-    const src = slot === "A" ? aSrcRef.current : bSrcRef.current;
-    if (!v || !src) return;
-    const { startTime } = parseFragment(src);
-    try {
-      v.currentTime = startTime ?? 0;
-      void v.play().catch(() => {});
-    } catch {
-      // Some browsers reject pre-canplay seeks; ignore.
-    }
-  }
+  const advance = useCallback(() => {
+    const list = listRef.current;
+    const ai = activeSlotRef.current;
+    const s0 = slot0SrcRef.current;
+    const s1 = slot1SrcRef.current;
 
-  function advance() {
-    if (list.length <= 1) {
-      replaySingle(activeSlotRef.current);
+    if (list.length === 0) return;
+
+    // Single-clip rotations: replay from fragment start.
+    if (list.length === 1) {
+      const v = ai === 0 ? video0Ref.current : video1Ref.current;
+      const url = ai === 0 ? s0 : s1;
+      if (!v || !url) return;
+      const { startTime } = parseFragment(url);
+      try {
+        v.currentTime = startTime ?? 0;
+        void v.play().catch(() => {});
+      } catch {
+        // Some browsers reject pre-canplay seeks.
+      }
       return;
     }
-    const nextUrl = pickNext();
-    if (activeSlotRef.current === "A") {
-      setBReady(false);
-      setBSrc(nextUrl);
-    } else {
-      setAReady(false);
-      setASrc(nextUrl);
+
+    // Multi-clip rotations.
+    const activeUrl = ai === 0 ? s0 : s1;
+    const inactiveUrl = ai === 0 ? s1 : s0;
+    const inactiveSlot: SlotIdx = ai === 0 ? 1 : 0;
+    const inactiveVideo =
+      inactiveSlot === 0 ? video0Ref.current : video1Ref.current;
+    const activeIdx_ = activeUrl ? list.indexOf(activeUrl) : -1;
+    const inactiveIdx_ = inactiveUrl ? list.indexOf(inactiveUrl) : -1;
+
+    // Pick a next URL — try to avoid BOTH the active and inactive
+    // current URLs. Reroll up to a few times. If the list is short
+    // (e.g. 2 clips) we fall back to "anything but active."
+    let nextIdx = Math.floor(Math.random() * list.length);
+    for (let attempts = 0; attempts < 8; attempts++) {
+      if (nextIdx !== activeIdx_ && nextIdx !== inactiveIdx_) break;
+      nextIdx = Math.floor(Math.random() * list.length);
     }
-  }
+    if (nextIdx === activeIdx_) {
+      nextIdx = pickRandomExcept(list.length, activeIdx_);
+    }
+    const nextUrl = list[nextIdx];
 
-  // Promote the slot that just finished loading to active. The other
-  // slot stays held visible (holdPrev=true) while the new fades in;
-  // after FADE_MS we drop it.
-  function promote(slot: Slot) {
-    if (activeSlotRef.current === slot) return; // no-op
-    activeSlotRef.current = slot;
+    // FREEZE-PROOF FAST PATH: if the picked URL matches what the
+    // inactive slot ALREADY has loaded, calling setSlot{0,1}Src with
+    // the same value is a React no-op — no re-render, no `canplay`,
+    // the cycle would stall here. Instead, just rewind and play the
+    // already-loaded video element and promote it directly.
+    if (nextUrl === inactiveUrl && inactiveVideo) {
+      try {
+        const { startTime } = parseFragment(nextUrl);
+        inactiveVideo.currentTime = startTime ?? 0;
+        void inactiveVideo.play().catch(() => {});
+      } catch {
+        // Pre-canplay seek may throw — ignore; the play() will still
+        // resume from current position once the browser is ready.
+      }
+      promote(inactiveSlot);
+      return;
+    }
+
+    // Default path: setSrc on the inactive slot. Once its `canplay`
+    // fires, the canplay handler calls promote() which swaps active.
+    if (ai === 0) {
+      slot1SrcRef.current = nextUrl;
+      setSlot1Src(nextUrl);
+    } else {
+      slot0SrcRef.current = nextUrl;
+      setSlot0Src(nextUrl);
+    }
+  }, []);
+
+  const promote = useCallback((target: SlotIdx) => {
+    if (activeSlotRef.current === target) return;
+    activeSlotRef.current = target;
+    setActiveSlot(target);
     setHoldPrev(true);
-    setActiveSlot(slot);
-    if (holdTimer.current) clearTimeout(holdTimer.current);
-    holdTimer.current = setTimeout(() => {
+    if (holdTimerRef.current) clearTimeout(holdTimerRef.current);
+    holdTimerRef.current = setTimeout(() => {
       setHoldPrev(false);
-      holdTimer.current = null;
+      holdTimerRef.current = null;
     }, HOLD_PREV_MS);
-  }
+  }, []);
 
-  // Slot A handlers
-  useEffect(() => {
-    const v = aRef.current;
-    if (!v || !aSrc) return;
-    setAReady(false);
-    const { endTime } = parseFragment(aSrc);
+  // ─── Bind handlers once per video element ──────────────────────
+  // Using callback refs so we bind the moment React assigns the ref,
+  // and only ONCE per element. No useEffect-re-bind cycle.
 
-    const onCanPlay = () => {
-      setAReady(true);
-      void v.play().catch(() => {});
-      // If A just loaded into the inactive slot, promote it.
-      if (activeSlotRef.current !== "A" && bSrcRef.current) promote("A");
-    };
-    const onEnded = () => advance();
-    const onError = () => {
-      if (list.length > 1) advance();
-    };
-    const onTimeUpdate = endTime
-      ? () => {
-          if (v.currentTime >= endTime - 0.05) advance();
+  const bindSlotHandlers = useCallback(
+    (slot: SlotIdx, v: HTMLVideoElement) => {
+      const flag = slot === 0 ? "s0" : "s1";
+      if (handlersBoundRef.current[flag]) return; // already bound
+      handlersBoundRef.current[flag] = true;
+
+      const getSlotUrl = () =>
+        slot === 0 ? slot0SrcRef.current : slot1SrcRef.current;
+
+      const onCanPlay = () => {
+        void v.play().catch(() => {});
+        // If this slot just received a NEW URL while the OTHER slot
+        // was active, this is a "promote me" handshake.
+        const otherUrl =
+          slot === 0 ? slot1SrcRef.current : slot0SrcRef.current;
+        if (activeSlotRef.current !== slot && otherUrl) {
+          promote(slot);
         }
-      : null;
+      };
 
-    v.addEventListener("canplay", onCanPlay);
-    v.addEventListener("ended", onEnded);
-    v.addEventListener("error", onError);
-    if (onTimeUpdate) v.addEventListener("timeupdate", onTimeUpdate);
-    return () => {
-      v.removeEventListener("canplay", onCanPlay);
-      v.removeEventListener("ended", onEnded);
-      v.removeEventListener("error", onError);
-      if (onTimeUpdate) v.removeEventListener("timeupdate", onTimeUpdate);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [aSrc]);
+      const onEnded = () => {
+        // Only advance if THIS slot is currently active. The inactive
+        // slot may also fire ended (it kept playing in the background
+        // after a previous transition); ignore those.
+        if (activeSlotRef.current === slot) advance();
+      };
 
-  // Slot B handlers
-  useEffect(() => {
-    const v = bRef.current;
-    if (!v || !bSrc) return;
-    setBReady(false);
-    const { endTime } = parseFragment(bSrc);
-
-    const onCanPlay = () => {
-      setBReady(true);
-      void v.play().catch(() => {});
-      if (activeSlotRef.current !== "B" && aSrcRef.current) promote("B");
-    };
-    const onEnded = () => advance();
-    const onError = () => {
-      if (list.length > 1) advance();
-    };
-    const onTimeUpdate = endTime
-      ? () => {
-          if (v.currentTime >= endTime - 0.05) advance();
+      const onError = () => {
+        // Codec or 404 — skip forward.
+        if (activeSlotRef.current === slot && listRef.current.length > 1) {
+          advance();
         }
-      : null;
+      };
 
-    v.addEventListener("canplay", onCanPlay);
-    v.addEventListener("ended", onEnded);
-    v.addEventListener("error", onError);
-    if (onTimeUpdate) v.addEventListener("timeupdate", onTimeUpdate);
-    return () => {
-      v.removeEventListener("canplay", onCanPlay);
-      v.removeEventListener("ended", onEnded);
-      v.removeEventListener("error", onError);
-      if (onTimeUpdate) v.removeEventListener("timeupdate", onTimeUpdate);
+      const onTimeUpdate = () => {
+        const url = getSlotUrl();
+        if (!url) return;
+        const { endTime } = parseFragment(url);
+        if (
+          endTime !== null &&
+          v.currentTime >= endTime - 0.05 &&
+          activeSlotRef.current === slot
+        ) {
+          advance();
+        }
+      };
+
+      v.addEventListener("canplay", onCanPlay);
+      v.addEventListener("ended", onEnded);
+      v.addEventListener("error", onError);
+      v.addEventListener("timeupdate", onTimeUpdate);
+    },
+    [advance, promote],
+  );
+
+  const setVideo0Ref = useCallback(
+    (node: HTMLVideoElement | null) => {
+      video0Ref.current = node;
+      if (node) {
+        bindSlotHandlers(0, node);
+      } else {
+        // Element unmounted (e.g. reduced-motion toggled). Reset the
+        // bound flag so we re-bind handlers when the next mount runs
+        // (otherwise we'd attach to a dead element on first mount and
+        // never re-bind to the live one).
+        handlersBoundRef.current.s0 = false;
+      }
+    },
+    [bindSlotHandlers],
+  );
+
+  const setVideo1Ref = useCallback(
+    (node: HTMLVideoElement | null) => {
+      video1Ref.current = node;
+      if (node) {
+        bindSlotHandlers(1, node);
+      } else {
+        handlersBoundRef.current.s1 = false;
+      }
+    },
+    [bindSlotHandlers],
+  );
+
+  // Watchdog — if a clip's `ended` doesn't fire within
+  // (clip duration + small buffer) of starting playback, we manually
+  // advance. Catches edge cases where the browser doesn't dispatch
+  // the event (rare but well-documented). Re-armed on every advance.
+  useEffect(() => {
+    if (list.length <= 1 || reducedMotion) return;
+    const v = activeSlot === 0 ? video0Ref.current : video1Ref.current;
+    if (!v) return;
+    let watchdog: ReturnType<typeof setTimeout> | null = null;
+
+    const arm = () => {
+      if (watchdog) clearTimeout(watchdog);
+      // Don't arm if duration isn't known yet (will arm on durationchange).
+      if (!v.duration || !Number.isFinite(v.duration)) return;
+      const ms = (v.duration - (v.currentTime ?? 0)) * 1000 + 800;
+      if (ms <= 0) return;
+      watchdog = setTimeout(() => {
+        // Only fire if the active slot is still us and the video
+        // hasn't already advanced organically.
+        if (activeSlotRef.current === activeSlot && !v.paused) {
+          // It's been longer than expected — kick the cycle forward.
+          advance();
+        }
+      }, ms);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bSrc]);
+
+    arm();
+    v.addEventListener("durationchange", arm);
+    v.addEventListener("play", arm);
+    return () => {
+      if (watchdog) clearTimeout(watchdog);
+      v.removeEventListener("durationchange", arm);
+      v.removeEventListener("play", arm);
+    };
+  }, [activeSlot, list.length, reducedMotion, advance]);
+
+  // ─── Opacity model ─────────────────────────────────────────────
+  // Active slot: opacity 1 (transitions in from 0 via the inline CSS
+  //   transition the moment React sets opacity 1).
+  // Inactive slot: opacity 1 while holdPrev is true (held visible
+  //   behind the new active during fade-in), opacity 0 otherwise.
+  // z-index: active slot 2, inactive slot 1.
 
   const showVideos = !reducedMotion && list.length > 0;
-
-  // Opacity model:
-  //   Active slot: fades in 0 → 1 once `ready`. Stays at 1 thereafter.
-  //   Inactive slot: stays at 1 while `holdPrev` is true (visible
-  //     behind the active one as it fades in). Drops to 0 after
-  //     holdPrev clears.
-  // Z-index keeps the active slot on top throughout.
-  const aOpacity =
-    activeSlot === "A" ? (aReady ? 1 : 0) : holdPrev ? 1 : 0;
-  const bOpacity =
-    activeSlot === "B" ? (bReady ? 1 : 0) : holdPrev ? 1 : 0;
-  const aZ = activeSlot === "A" ? 2 : 1;
-  const bZ = activeSlot === "B" ? 2 : 1;
+  const slot0Visible = activeSlot === 0 || holdPrev;
+  const slot1Visible = activeSlot === 1 || holdPrev;
 
   return (
     <div className={`absolute inset-0 ${className}`}>
-      {/* Poster image — always rendered. Visible only when both slots
-          are at 0 opacity (initial load before the first canplay, or
-          when reduced-motion forces video off). */}
       <Image
         src={poster}
         alt={alt}
@@ -286,42 +383,41 @@ export function MediaBackground({
         style={{ objectPosition: position }}
       />
 
-      {showVideos && aSrc && (
-        <video
-          ref={aRef}
-          src={aSrc}
-          autoPlay
-          muted
-          playsInline
-          preload="auto"
-          aria-hidden
-          className="absolute inset-0 h-full w-full object-cover"
-          style={{
-            objectPosition: position,
-            opacity: aOpacity,
-            zIndex: aZ,
-            transition: `opacity ${FADE_MS}ms ease-in-out`,
-          }}
-        />
-      )}
-
-      {showVideos && bSrc && (
-        <video
-          ref={bRef}
-          src={bSrc}
-          autoPlay
-          muted
-          playsInline
-          preload="auto"
-          aria-hidden
-          className="absolute inset-0 h-full w-full object-cover"
-          style={{
-            objectPosition: position,
-            opacity: bOpacity,
-            zIndex: bZ,
-            transition: `opacity ${FADE_MS}ms ease-in-out`,
-          }}
-        />
+      {showVideos && (
+        <>
+          <video
+            ref={setVideo0Ref}
+            src={slot0Src ?? undefined}
+            autoPlay
+            muted
+            playsInline
+            preload="auto"
+            aria-hidden
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{
+              objectPosition: position,
+              opacity: slot0Visible ? 1 : 0,
+              zIndex: activeSlot === 0 ? 2 : 1,
+              transition: `opacity ${FADE_MS}ms ease-in-out`,
+            }}
+          />
+          <video
+            ref={setVideo1Ref}
+            src={slot1Src ?? undefined}
+            autoPlay
+            muted
+            playsInline
+            preload="auto"
+            aria-hidden
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{
+              objectPosition: position,
+              opacity: slot1Visible ? 1 : 0,
+              zIndex: activeSlot === 1 ? 2 : 1,
+              transition: `opacity ${FADE_MS}ms ease-in-out`,
+            }}
+          />
+        </>
       )}
 
       <style jsx>{`

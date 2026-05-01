@@ -60,18 +60,15 @@ export const SPLITTER_MEDIA: Record<"cars" | "boats" | "planes", MediaSlot> = {
     position: "center 30%",
   },
   boats: {
-    // Owned-asset yacht clips (Eclipse, Superyacht-in-London) + 2
-    // Pexels superyacht clips. Removed LOON (too brand-identifiable
-    // — visible logo). Removed vtMyG3i7TvI and Untitled — both
-    // turned out to be aviation, not yachts (moved to planes).
-    // Process of elimination: of the 5 unlabeled CEO-uploaded files,
-    // only the explicitly named ones (Eclipse, London) are confirmed
-    // yachts. Conservative approach until each file is visually
-    // verified.
+    // Owned-asset yacht clips (Eclipse, London, vtmyg3) + 2 Pexels
+    // superyacht clips. CEO confirmed vtmyg3 IS a yacht (mega yacht
+    // by the look — moved back from planes). LOON removed earlier
+    // for brand-identifiability. Untitled stays in planes for now.
     videos: [
-      // Owned-asset, brand-approved (named superyachts)
+      // Owned-asset
       "/videos/boats-eclipse.mp4",
       "/videos/boats-london.mp4",
+      "/videos/boats-vtmyg3.mp4",
       // Pexels — superyacht only.
       PX("13878618", "hd_1920_1080_30fps"), // Yacht sailing out of marina
       PX("15288018", "hd_1920_1080_30fps"), // Drone video of luxury yacht docked at port
@@ -82,13 +79,12 @@ export const SPLITTER_MEDIA: Record<"cars" | "boats" | "planes", MediaSlot> = {
     position: "center 50%",
   },
   planes: {
-    // Three owned-asset clips: jet-edit montage, the Bombardier
-    // front-on shot (was misfiled in boats), and the Untitled clip
-    // (also moved from boats — likely also aviation given the
-    // recurring CEO callout that "a plane is still appearing in boats").
+    // Two owned-asset clips: the explicit jet-edit montage and the
+    // Untitled clip (was originally in boats, moved here when CEO
+    // flagged a plane was still in boats — content unverified). If
+    // CEO flags a yacht in planes, untitled goes back to boats.
     videos: [
       "/videos/planes-jet-edit.mp4",
-      "/videos/planes-vtmyg3.mp4",
       "/videos/planes-untitled.mp4",
     ],
     poster:
