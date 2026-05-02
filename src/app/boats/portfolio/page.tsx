@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
+import { BoatsListings } from "@/components/boats-listings";
 import {
   BOATS,
   BOAT_MARKETS,
@@ -133,6 +134,26 @@ export default function BoatsPortfolioPage() {
             })}
           </div>
         </div>
+      </section>
+
+      {/* All hulls — power-filter UI parallel to /markets's MarketsListings.
+          Search + brand/location/status/type filters + sort. Renders the
+          same depth of card the cars side does (BoatCard mirrors
+          VehicleCard exactly). */}
+      <section id="all" className="border-b border-rule">
+        <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10 sm:py-16">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
+            Filter the full portfolio
+          </p>
+          <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
+            All {BOATS.length} hulls.
+          </h2>
+          <p className="mt-3 max-w-2xl text-sm text-ink-soft">
+            Search and filter by brand, market, status, or boat type.
+            Useful when you know what you&apos;re after.
+          </p>
+        </div>
+        <BoatsListings />
       </section>
 
       {/* Disclaimer */}

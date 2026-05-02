@@ -164,13 +164,12 @@ export const BOATS: Boat[] = [
     effectiveDailyCost: 2_600,
     listingStart: "2026-03-30",
     listingEnd: "2026-09-30",
-    // Hero photo — Pershing-style sport yacht stand-in.
-    // TODO: replace with real licensed Pershing 6X photography
-    // before Q3 2026 launch (current is Unsplash placeholder).
+    // Hero photo — mega-yacht stand-in (placeholder until licensed
+    // Pershing 6X photography is sourced pre-launch).
     hero:
-      "https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=1920&q=80",
+      "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&w=1920&q=80",
     flipImage: false,
-    imagePosition: "center 40%",
+    imagePosition: "center 50%",
     currentEngineHours: 410,
     description:
       "The Pershing 6X is the marquee sport yacht in our Miami fleet — surface drives for blistering bay-to-Bimini runs, three-cabin layout, and a beach-club aft platform that converts the swim step into a full lounge.",
@@ -217,11 +216,10 @@ export const BOATS: Boat[] = [
     effectiveDailyCost: 600,
     listingStart: "2026-04-22",
     listingEnd: "2026-10-22",
-    // Hero photo — classic mahogany speedboat stand-in.
-    // TODO: replace with real licensed Riva Aquariva Super photography
-    // before Q3 2026 launch (current is Unsplash placeholder).
+    // Hero photo — mega-yacht stand-in (placeholder until licensed
+    // Riva Aquariva Super photography is sourced pre-launch).
     hero:
-      "https://images.unsplash.com/photo-1559827260-dc66d52bef19?auto=format&fit=crop&w=1920&q=80",
+      "https://images.unsplash.com/photo-1605713288610-00c2fc5c1df1?auto=format&fit=crop&w=1920&q=80",
     imagePosition: "center 50%",
     currentEngineHours: 165,
     description:
