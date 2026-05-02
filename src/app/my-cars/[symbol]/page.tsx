@@ -260,7 +260,7 @@ export default async function MyVehiclePage({
         <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <Owner initials="RG" prof="Founder · Miami" badge="You" lead={isLead} />
           <Owner initials="ML" prof="Tech founder · Miami" />
-          <Owner initials="SK" prof="Founding member · LA" />
+          <Owner initials="SK" prof="Early member · LA" />
           <Owner initials="DM" prof="Real estate · NYC" />
           <Owner initials="JP" prof="Hospitality · Miami" />
           <Owner initials="TR" prof="Logistics · Miami" />

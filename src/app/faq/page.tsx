@@ -52,7 +52,7 @@ const SECTIONS: { title: string; questions: Q[] }[] = [
       },
       {
         q: "Does membership cost anything?",
-        a: "Three tiers. Core is free. Blue is $500/year ($350 for founding members, locked for life). Black is $1,500/year ($1,000 for founding members, locked for life). Most active members start on Blue.",
+        a: "Three tiers. Core is free. Blue is $500/year ($350 early-member pricing, locked for life). Black is $1,500/year ($1,000 early-member pricing, locked for life). Most active members start on Blue.",
       },
       {
         q: "Why 28+?",
@@ -60,7 +60,7 @@ const SECTIONS: { title: string; questions: Q[] }[] = [
       },
       {
         q: "Can I join from anywhere in the US?",
-        a: "Yes — but the actual vehicles only operate in our launch markets. Miami first (Q3 2026), then LA (2027), then NY (2027). Members anywhere in the US can join early to lock in founding pricing.",
+        a: "Yes — but the actual vehicles only operate in our launch markets. Miami first (Q3 2026), then LA (2027), then NY (2027). Members anywhere in the US can join early to lock in early-member pricing.",
       },
     ],
   },

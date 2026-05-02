@@ -4,7 +4,7 @@ import { SiteHeader } from "@/components/site-header";
 export const metadata = {
   title: "Miami — RYDA",
   description:
-    "RYDA's first market. Q3 2026 launch. The story behind Miami, our partner facility, member events, and the founding cohort.",
+    "RYDA's first market. Q3 2026 launch. The story behind Miami, our partner facility, member events, and the member cohort.",
 };
 
 export default function MiamiPage() {
@@ -98,7 +98,7 @@ export default function MiamiPage() {
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
           <h2 className="font-display text-3xl text-ink sm:text-4xl">Miami events</h2>
           <p className="mt-4 max-w-2xl text-base text-ink-soft">
-            Founding members get invitations to all RYDA Miami programming.
+            Members get invitations to all RYDA Miami programming.
           </p>
           <div className="mt-12 space-y-4">
             <Event
@@ -109,7 +109,7 @@ export default function MiamiPage() {
             <Event
               when="Aug 2026"
               what="Soft launch dinner"
-              detail="Founding 100 dinner with the founders. Vehicle reveal of the inaugural Miami fleet."
+              detail="First 100 dinner with the founders. Vehicle reveal of the inaugural Miami fleet."
             />
             <Event
               when="Q4 2026"
@@ -130,25 +130,25 @@ export default function MiamiPage() {
         </div>
       </section>
 
-      {/* Founding members */}
+      {/* Early members */}
       <section className="border-b border-rule bg-ink py-20 text-cream">
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            Miami founding cohort
+            Miami member cohort
           </p>
           <h2 className="mt-4 font-display text-4xl font-light sm:text-5xl">
-            100 founding members.
+            The first 100 members.
           </h2>
           <p className="mx-auto mt-6 max-w-xl text-base text-cream/70">
             We're hand-selecting the first 100 members for the Miami launch.
-            Founding member pricing locked for life. Apply by July 2026 to
+            Members joining before launch lock in pricing for life. Sign up to
             be considered.
           </p>
           <Link
-            href="/founding-members"
+            href="/signup"
             className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-red hover:text-cream"
           >
-            Apply to be a founder →
+            Sign up →
           </Link>
         </div>
       </section>

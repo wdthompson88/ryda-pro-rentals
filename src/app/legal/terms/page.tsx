@@ -23,7 +23,7 @@ export default function TermsPage() {
         },
         {
           heading: "4. Membership tiers and fees",
-          body: "RYDA offers three membership tiers (Core, free; Blue, $500/yr; Black, $1,500/yr). Founding-100 members lock $350/$1,000 for life. Tier benefits are described on our Membership page and may change with notice.",
+          body: "RYDA offers three membership tiers (Core, free; Blue, $500/yr; Black, $1,500/yr). First-100 members lock $350/$1,000 for life. Tier benefits are described on our Membership page and may change with notice.",
         },
         {
           heading: "5. Rentals",

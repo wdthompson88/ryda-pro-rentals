@@ -91,15 +91,15 @@ export const HELP: HelpCategory[] = [
             type: "p",
             text: "Free, no commitment. You can browse the fleet, see vehicle data, and read all marketing materials. You cannot claim a co-ownership share, book vehicles, or transfer between members on Core.",
           },
-          { type: "h3", text: "Blue — $500/year ($350 founding)" },
+          { type: "h3", text: "Blue — $500/year ($350 early)" },
           {
             type: "p",
-            text: "The standard tier for active co-owners. Includes co-ownership shares, member-to-member transfers, member event invitations, and standard member services. Founding-100 members lock in $350/year for life.",
+            text: "The standard tier for active co-owners. Includes co-ownership shares, member-to-member transfers, member event invitations, and standard member services. Early-100 members lock in $350/year for life.",
           },
-          { type: "h3", text: "Black — $1,500/year ($1,000 founding)" },
+          { type: "h3", text: "Black — $1,500/year ($1,000 early)" },
           {
             type: "p",
-            text: "For high-utilization members. Adds priority booking during peak season, included white-glove delivery, complimentary track-day rider on eligible vehicles, dedicated dedicated contact, and first-look access on new fleet additions. Founding-100 lock in $1,000/year for life.",
+            text: "For high-utilization members. Adds priority booking during peak season, included white-glove delivery, complimentary track-day rider on eligible vehicles, dedicated dedicated contact, and first-look access on new fleet additions. Early-100 lock in $1,000/year for life.",
           },
           {
             type: "callout",
@@ -155,7 +155,7 @@ export const HELP: HelpCategory[] = [
           },
           {
             type: "p",
-            text: "If you live outside an active market, you can still join (the membership is national) and use vehicles when you travel to one of the operating cities. Members can also join early to lock in founding-100 pricing.",
+            text: "If you live outside an active market, you can still join (the membership is national) and use vehicles when you travel to one of the operating cities. Members can also join early to lock in early-100 pricing.",
           },
         ],
       },
@@ -198,34 +198,34 @@ export const HELP: HelpCategory[] = [
         ],
       },
       {
-        slug: "founding-member-benefits",
-        q: "What do founding-100 members get?",
+        slug: "early-member-benefits",
+        q: "What do early-100 members get?",
         summary:
-          "Locked-for-life membership pricing ($350 Blue / $1,000 Black), founding-100 badge, priority on first vehicle launches, member-event access, and faster onboarding for additional shares.",
+          "Locked-for-life membership pricing ($350 Blue / $1,000 Black), early-100 badge, priority on first vehicle launches, member-event access, and faster onboarding for additional shares.",
         body: [
           { type: "h3", text: "Pricing locked for life" },
           {
             type: "p",
-            text: "The first 100 members lock in $350/year for Blue tier or $1,000/year for Black tier — for as long as they hold continuous membership. Standard pricing is $500 and $1,500 respectively, so over a 10-year horizon a Black founding member saves $5,000.",
+            text: "The first 100 members lock in $350/year for Blue tier or $1,000/year for Black tier — for as long as they hold continuous membership. Standard pricing is $500 and $1,500 respectively, so over a 10-year horizon a Black early member saves $5,000.",
           },
           { type: "h3", text: "Priority on launch fleet" },
           {
             type: "p",
-            text: "Founding-100 members get first-look on every new vehicle that joins the fleet. They see the listing 7 days before it goes public, with priority on share allocation. Particularly valuable for limited-production vehicles where shares move quickly.",
+            text: "Early-100 members get first-look on every new vehicle that joins the fleet. They see the listing 7 days before it goes public, with priority on share allocation. Particularly valuable for limited-production vehicles where shares move quickly.",
           },
-          { type: "h3", text: "Other founding benefits" },
+          { type: "h3", text: "Other early benefits" },
           {
             type: "ul",
             items: [
-              "Founding-100 badge on member directory and event invitations.",
+              "Early-100 badge on member directory and event invitations.",
               "Reduced KYC friction (single identity verification carries across multiple co-ownership shares).",
-              "Invitation to RYDA's annual founding-member dinner.",
+              "Invitation to RYDA's annual early-member dinner.",
               "Direct line to RYDA founders for product feedback during the launch year.",
             ],
           },
           {
             type: "p",
-            text: "Founding-100 status is non-transferable. If you cancel and re-enroll, you re-enroll at standard pricing.",
+            text: "Early-100 status is non-transferable. If you cancel and re-enroll, you re-enroll at standard pricing.",
           },
         ],
       },
@@ -1264,7 +1264,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Pre-purchase inspection (PPI)" },
           {
             type: "p",
-            text: "Before any vehicle enters the RYDA fleet, we commission an independent multi-point pre-purchase inspection by a qualified specialist (typically the manufacturer's authorized facility). The report is included in the LLC's permanent record and shared with all founding co-owners.",
+            text: "Before any vehicle enters the RYDA fleet, we commission an independent multi-point pre-purchase inspection by a qualified specialist (typically the manufacturer's authorized facility). The report is included in the LLC's permanent record and shared with all early co-owners.",
           },
           { type: "h3", text: "Per-booking condition photos" },
           {
@@ -1444,7 +1444,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Membership fee" },
           {
             type: "p",
-            text: "Annual, billed on your enrollment anniversary. Auto-renews unless you cancel ≥7 days before. Founding-100 pricing locks for life.",
+            text: "Annual, billed on your enrollment anniversary. Auto-renews unless you cancel ≥7 days before. Early-100 pricing locks for life.",
           },
           { type: "h3", text: "Vehicle management fee" },
           {
@@ -1572,7 +1572,7 @@ export const HELP: HelpCategory[] = [
         slug: "referral-program",
         q: "Is there a referral program?",
         summary:
-          "Yes. Refer a member who completes membership: $500 credit. Refer a member who buys a share: $2,500 credit. Founding-100 members get 2× referral credits.",
+          "Yes. Refer a member who completes membership: $500 credit. Refer a member who buys a share: $2,500 credit. Early-100 members get 2× referral credits.",
         body: [
           { type: "h3", text: "Tiers" },
           {
@@ -1580,7 +1580,7 @@ export const HELP: HelpCategory[] = [
             items: [
               "$500 credit when your referral becomes a paid member (Blue or Black).",
               "$2,500 credit when your referral closes their first co-ownership share.",
-              "Founding-100 members earn 2× credits on every successful referral.",
+              "Early-100 members earn 2× credits on every successful referral.",
             ],
           },
           { type: "h3", text: "How to refer" },
@@ -1606,8 +1606,8 @@ export const HELP: HelpCategory[] = [
         ],
       },
       {
-        slug: "founding-pricing",
-        q: "What's the founding-100 pricing lock?",
+        slug: "early-pricing",
+        q: "What's the early-100 pricing lock?",
         summary:
           "First 100 members lock in $350 Blue / $1,000 Black for life. As long as your membership stays active, the price never increases.",
         body: [
@@ -1619,8 +1619,8 @@ export const HELP: HelpCategory[] = [
           {
             type: "ul",
             items: [
-              "Founding Blue: $350/year, locked. (Standard $500/year.)",
-              "Founding Black: $1,000/year, locked. (Standard $1,500/year.)",
+              "Early Blue: $350/year, locked. (Standard $500/year.)",
+              "Early Black: $1,000/year, locked. (Standard $1,500/year.)",
               "10-year savings vs. standard pricing: $1,500 (Blue) or $5,000 (Black).",
             ],
           },
@@ -1629,14 +1629,14 @@ export const HELP: HelpCategory[] = [
             type: "ul",
             items: [
               "The lock applies as long as your membership remains active and continuous.",
-              "If you cancel and re-enroll later, you re-enroll at standard pricing — founding status is non-recoverable.",
-              "Status is non-transferable. You can't sell or gift founding-100 status to another member.",
-              "Status carries through tier changes (e.g., upgrading from Blue to Black keeps your founding lock).",
+              "If you cancel and re-enroll later, you re-enroll at standard pricing — early status is non-recoverable.",
+              "Status is non-transferable. You can't sell or gift early-100 status to another member.",
+              "Status carries through tier changes (e.g., upgrading from Blue to Black keeps your early lock).",
             ],
           },
           {
             type: "p",
-            text: "All 100 founding shares are allocated by application order, with priority weighting for members in launch markets and members making early share commitments.",
+            text: "All 100 early shares are allocated by application order, with priority weighting for members in launch markets and members making early share commitments.",
           },
         ],
       },
@@ -2063,7 +2063,7 @@ const ARTICLE_KEYWORDS: Record<string, string[]> = {
   "getting-started/accreditation": ["accredited", "qualify", "investor", "income requirement", "net worth", "sec", "wealthy", "rich", "qualified", "income", "$200k", "$1m", "net worth"],
   "getting-started/markets": ["where", "miami", "los angeles", "la", "new york", "ny", "city", "location", "available", "operating cities", "states", "regions"],
   "getting-started/rental-vs-ownership": ["rent or buy", "rental vs ownership", "should i rent", "should i buy", "test drive first", "try it out", "before commit", "compare rental"],
-  "getting-started/founding-member-benefits": ["founding", "first 100", "founding member", "early member", "what do founders get", "lifetime pricing", "locked rate", "perks"],
+  "getting-started/early-member-benefits": ["early", "first 100", "early member", "early member", "what do founders get", "lifetime pricing", "locked rate", "perks"],
   "getting-started/share-financing": ["finance", "loan", "borrow", "financing", "credit", "payment plan", "installments", "monthly payment", "afford"],
 
   // Shares
@@ -2117,7 +2117,7 @@ const ARTICLE_KEYWORDS: Record<string, string[]> = {
   "account/kyc": ["kyc", "id verification", "identity", "verify me", "documents required", "passport", "license", "selfie", "persona", "background check"],
   "account/close": ["cancel account", "leave", "quit", "close account", "deactivate", "delete account", "unsubscribe", "i'm done", "not interested"],
   "account/referral-program": ["referral", "refer a friend", "credit", "rewards", "bonus", "earn", "invite code", "promo code", "incentive", "bring a friend"],
-  "account/founding-pricing": ["founding price", "founding pricing", "locked pricing", "lifetime price", "permanently locked", "founder rate"],
+  "account/early-pricing": ["early price", "early-member pricing", "locked pricing", "lifetime price", "permanently locked", "founder rate"],
 
   // Legal
   "legal/operating-agreement": ["operating agreement", "oa", "llc agreement", "governance", "voting", "decision rules", "bylaws"],

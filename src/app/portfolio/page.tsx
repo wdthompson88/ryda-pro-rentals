@@ -47,7 +47,7 @@ export default function PortfolioPage() {
             <Stat label="Days available this year" value={String(totalDays)} sub={`${totalDaysUsed} used`} />
             <Stat label="Days remaining" value={String(totalDays - totalDaysUsed)} sub="across all cars" />
             <Stat label="Annual mgmt fees" value={formatUSD(totalAnnualMgmt)} sub="per year, total" />
-            <Stat label="Member tier" value="Blue" sub="Founding-100 locked" />
+            <Stat label="Member tier" value="Blue" sub="First-100 locked" />
           </div>
         </div>
       </section>

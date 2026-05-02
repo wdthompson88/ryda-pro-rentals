@@ -45,7 +45,7 @@ export const POSTS: JournalPost[] = [
       "The product is quiet on purpose. RYDA isn't a fund, isn't a marketplace, isn't a club. Each vehicle is a Delaware LLC. You're a registered co-owner of a real car alongside up to nine other verified members. We're hired by the LLC to run operations — sourcing, storage, insurance, scheduling, maintenance, transfers — under a separate Management Services Agreement.",
       "Members drive ~30 days a year on a 10-share split. The math comes out to roughly $236 per day in steady-state ops cost once buy-in is amortized — about an order of magnitude below daily rental at $2,400 a day. The remaining 65 days each year are reserved for service and the optional rental pool so the cars don't burn out.",
       "## What's next",
-      "Miami launches Q3 2026. We're vetting our first 100 founding members now. If you've ever stared at a Ferrari in your driveway and known you'd drive it ten times a year, this was built for you.",
+      "Miami launches Q3 2026. We're vetting our first 100 members now. If you've ever stared at a Ferrari in your driveway and known you'd drive it ten times a year, this was built for you.",
     ],
   },
   {
@@ -138,7 +138,7 @@ export const POSTS: JournalPost[] = [
       "LA opens Q2 2027 — eighteen months after Miami. The fleet at that point will reflect what Miami members actually want (rotating in based on usage data, not pre-filled with our guesses). Same for New York Q4 2027.",
       "We are not going to LA in 2026. We are not going to New York in 2026. We are going to do Miami well and let the second market open from a place of operating confidence, not slide-deck ambition.",
       "## The bet",
-      "Co-ownership platforms succeed when the first hundred members feel like the founding cohort of a club they wanted to join. They fail when the first hundred members feel like beta testers spread across cities, paying full price.",
+      "Co-ownership platforms succeed when the first hundred members feel like the member cohort of a club they wanted to join. They fail when the first hundred members feel like beta testers spread across cities, paying full price.",
       "Miami first. Done right. Then the rest.",
     ],
   },
@@ -180,7 +180,7 @@ export const POSTS: JournalPost[] = [
       "Most buyers don't actually drive 100+ days. They drive 22, then feel guilty, then sell at year three with a depreciation hit that erases more than they'd have spent on a co-ownership share. We've watched the cycle.",
       "## What we built RYDA Boats for",
       "The 30–60 day buyer who wants their actual day on the actual hull, not a club rotation. Same Delaware LLC structure as the cars side. Same Howey-defense thinking. Different operating model — slip + crew + hurricane prep — and a 3-year hold instead of 2 because boats run on a different depreciation curve.",
-      "Miami launches Q3 2026 alongside the cars side. We're vetting our first 60 founding boat members now.",
+      "Miami launches Q3 2026 alongside the cars side. We're vetting our first 60 boat members now.",
     ],
   },
   {

@@ -23,10 +23,10 @@ type Vertical = {
   label: string;
   tagline: string;
   bullet: string;
-  /** Status pill copy. "live" = operational; "founding" = site live but ops
-   *  start at a future date (members can join the founding cohort now);
+  /** Status pill copy. "live" = operational; "early" = site live but ops
+   *  start at a future date (members can join the member cohort now);
    *  "coming-soon" = in design, not capturing serious leads. */
-  status: "live" | "founding" | "coming-soon";
+  status: "live" | "early" | "coming-soon";
   pillLabel: string;
   media: MediaSlot;
   /** Per-vertical accent — cars use red, boats use marine, planes
@@ -49,7 +49,7 @@ const VERTICALS: Vertical[] = [
     href: "/boats",
     label: "Boats",
     tagline: "The sea, where the horizon opens.",
-    bullet: "Miami launch · Q3 2026",
+    bullet: "Coming soon",
     status: "coming-soon",
     pillLabel: "Coming soon",
     media: SPLITTER_MEDIA.boats,

@@ -23,7 +23,6 @@ const PUBLIC_ROUTES = [
   "/markets",
   "/rent",
   "/membership",
-  "/founding-members",
   "/how-it-works",
   "/about",
   "/insurance",

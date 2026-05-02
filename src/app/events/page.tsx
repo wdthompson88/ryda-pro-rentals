@@ -13,7 +13,7 @@ const EVENTS = [
     title: "F1 Miami Grand Prix Weekend",
     where: "Miami International Autodrome",
     detail:
-      "Founders' track day Friday at Homestead, paddock + suite access Saturday, gala Saturday night, race day Sunday with private box. Black members + founding 100 only.",
+      "Founders' track day Friday at Homestead, paddock + suite access Saturday, gala Saturday night, race day Sunday with private box. Black members + first 100 only.",
     tag: "Flagship",
   },
   {
@@ -76,7 +76,7 @@ export default function EventsPage() {
           <p className="mt-8 max-w-2xl text-lg text-ink-soft">
             RYDA programming brings members together around the cars and
             the cities. Most events are open to all members. Some are
-            Black-tier only. Founding members get the first invitations.
+            Black-tier only. Early members get the first invitations.
           </p>
         </div>
       </section>
@@ -158,12 +158,12 @@ export default function EventsPage() {
             Get on the calendar.
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
-            Founding members get every event invitation 2 weeks before public.
+            Early members get every event invitation 2 weeks before public.
             Blue members get monthly meetups; Black members get flagship events
             and priority on travel programming.
           </p>
           <Link
-            href="/founding-members"
+            href="/signup"
             className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-red hover:text-cream"
           >
             Apply for membership →

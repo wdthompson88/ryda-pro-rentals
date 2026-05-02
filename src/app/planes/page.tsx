@@ -54,7 +54,7 @@ export default function PlanesComingSoon() {
               Tell us your mission profile
             </p>
             <p className="mt-2 text-sm text-cream/85">
-              Help us shape the founding cohort: jet class, annual hours,
+              Help us shape the member cohort: jet class, annual hours,
               primary base. We contact you when a profile-matching airframe
               and operator pair are ready — not before.
             </p>
@@ -67,7 +67,7 @@ export default function PlanesComingSoon() {
 
       {/* What we're working on — keep it short and honest. Nothing
           shipped, no fake screenshots. Three considerations the
-          founding cohort cares about. */}
+          member cohort cares about. */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-24">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
@@ -123,7 +123,7 @@ export default function PlanesComingSoon() {
             <Phase
               n="02"
               date="Q4 2026"
-              title="Founding cohort outreach"
+              title="Member cohort outreach"
               body="We talk to the first 20–40 prospective Planes members about mission profile (jet category, hours, base), structure, and operator preference."
             />
             <Phase
@@ -149,7 +149,7 @@ export default function PlanesComingSoon() {
             Meanwhile
           </p>
           <h2 className="mt-4 font-display text-3xl sm:text-4xl">
-            Cars and Boats are open for founding members.
+            Cars and Boats are open for early members.
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
             If the Planes thesis resonates, the cars and boats programs

@@ -3,7 +3,7 @@ import { ComingSoonLocation } from "@/components/coming-soon-location";
 export const metadata = {
   title: "New York — RYDA",
   description:
-    "RYDA New York. Q3 2027 launch. Join the NY priority list to lock in founding-member pricing.",
+    "RYDA New York. Q3 2027 launch. Join the NY priority list to lock in early-member pricing.",
 };
 
 export default function NewYorkPage() {

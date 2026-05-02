@@ -299,13 +299,13 @@ export default function CarsHome() {
       {/* Waitlist */}
       <section id="waitlist" className="border-b border-rule bg-ink text-cream">
         <div className="mx-auto max-w-3xl px-6 py-20 text-center sm:px-10 sm:py-28">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">Founding members</p>
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">Early members</p>
           <h2 className="mt-4 font-display text-4xl font-light leading-tight sm:text-5xl">
             Membership is by invitation.
           </h2>
           <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-cream/70">
-            We're vetting the first 100 founding members for the Miami launch.
-            Tell us about yourself and we'll be in touch with the next steps.
+            We're vetting early members for the Miami launch. Tell us
+            about yourself and we'll be in touch with the next steps.
           </p>
           <div className="mt-10">
             <WaitlistForm />

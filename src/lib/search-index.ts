@@ -69,7 +69,7 @@ const STATIC_PAGES: SearchEntry[] = [
     subtitle: "Cars · Core / Blue / Black",
     vertical: "cars",
     type: "page",
-    haystack: "membership tiers core blue black founding",
+    haystack: "membership tiers core blue black early",
   },
   {
     href: "/sample-documents",
@@ -159,7 +159,7 @@ const STATIC_PAGES: SearchEntry[] = [
     subtitle: "Boats · Tiers + perks",
     vertical: "boats",
     type: "page",
-    haystack: "boats membership tiers founding",
+    haystack: "boats membership tiers early",
   },
   {
     href: "/boats/sample-documents",
@@ -190,7 +190,7 @@ const STATIC_PAGES: SearchEntry[] = [
   {
     href: "/planes",
     title: "RYDA Planes",
-    subtitle: "Planes · Coming soon · Founding cohort outreach in 2027",
+    subtitle: "Planes · Coming soon · Member cohort outreach in 2027",
     vertical: "planes",
     type: "page",
     haystack: "planes private jet aviation fractional coming soon",

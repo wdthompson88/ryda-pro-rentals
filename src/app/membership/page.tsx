@@ -210,14 +210,14 @@ export default function MembershipPage() {
       <section className="bg-ink py-20 text-cream">
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
           <h2 className="font-display text-4xl font-light sm:text-5xl">
-            Founding members start in Miami.
+            Members start in Miami.
           </h2>
           <p className="mx-auto mt-6 max-w-xl text-base text-cream/70">
-            Apply by July 2026 to lock founding-member pricing on Blue or
+            Apply by July 2026 to lock early-member pricing on Blue or
             Black for life.
           </p>
           <Link
-            href="/founding-members"
+            href="/signup"
             className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-red hover:text-cream"
           >
             Apply now →
@@ -302,7 +302,7 @@ function TierCard({ tier }: { tier: typeof TIERS[number] }) {
       </ul>
 
       <Link
-        href={tier.key === "core" ? "/signup" : "/founding-members"}
+        href={tier.key === "core" ? "/signup" : "/signup"}
         className="mt-10 inline-flex h-12 items-center justify-center border border-ink bg-ink px-7 text-sm font-medium text-cream transition-colors hover:bg-red hover:border-red"
       >
         {tier.cta}

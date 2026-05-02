@@ -58,7 +58,7 @@ export function ComingSoonLocation({
           <h2 className="font-display text-3xl text-ink sm:text-4xl">Inaugural fleet preview</h2>
           <p className="mt-4 max-w-2xl text-base text-ink-soft">
             Vehicles we expect to anchor the {city} fleet at launch. Final
-            lineup confirmed with the local founding cohort.
+            lineup confirmed with the local member cohort.
           </p>
           <ul className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {vehiclePreview.map((v) => (
@@ -83,9 +83,9 @@ export function ComingSoonLocation({
                 {city} priority list
               </h2>
               <p className="mt-4 max-w-md text-base text-ink-soft">
-                Tell us you want {city}. When we open the founding cohort
-                here, we contact this list first. Founding-member pricing
-                will be locked for life.
+                Tell us you want {city}. When we open membership here, we
+                contact this list first. Early-member pricing will be
+                locked for life.
               </p>
             </div>
             <div className="lg:col-span-7">
@@ -107,7 +107,7 @@ export function ComingSoonLocation({
           <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
             All RYDA operations launch in Miami in Q3 2026. {city} expansion
             follows on the schedule above. Members from {city} are welcome
-            to join now and lock in founding-member pricing — and to fly
+            to join now and lock in early-member pricing — and to fly
             in for Miami events.
           </p>
           <Link

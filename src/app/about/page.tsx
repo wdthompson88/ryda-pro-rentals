@@ -121,10 +121,10 @@ export default function AboutPage() {
 
           <div className="mt-10 flex flex-wrap gap-3">
             <Link
-              href="/founding-members"
+              href="/signup"
               className="inline-flex h-12 items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream hover:bg-red"
             >
-              Apply for founding membership →
+              Sign up →
             </Link>
             <Link
               href="/contact?type=Membership#form"
@@ -224,13 +224,13 @@ export default function AboutPage() {
       <section className="bg-ink py-20 text-cream">
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
           <h2 className="font-display text-3xl sm:text-4xl">
-            Become a founding member.
+            Become a member.
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
-            We're vetting the first 100 founding members for the Miami launch.
+            We're vetting early members for the Miami launch.
           </p>
           <Link
-            href="/founding-members"
+            href="/signup"
             className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-red hover:text-cream"
           >
             Apply now →

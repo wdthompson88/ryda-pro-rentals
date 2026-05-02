@@ -124,10 +124,10 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
             Sign in
           </Link>
           <Link
-            href="/founding-members"
+            href="/signup"
             className={`hidden rounded-full border px-5 py-2 text-sm font-medium transition-colors sm:inline-flex ${ctaBase}`}
           >
-            Request membership
+            Sign up
           </Link>
 
           <button
@@ -219,11 +219,11 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
               Sign in
             </Link>
             <Link
-              href="/founding-members"
+              href="/signup"
               onClick={() => setOpen(false)}
               className={`mt-2 inline-flex h-12 items-center justify-center rounded-full border px-5 text-sm font-medium transition-colors ${ctaBase}`}
             >
-              Request membership
+              Sign up
             </Link>
             <div className="mt-2 flex items-center justify-between rounded-lg px-3 py-2">
               <span className="text-xs uppercase tracking-wider text-mute">

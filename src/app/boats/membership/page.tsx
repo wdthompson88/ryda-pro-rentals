@@ -225,14 +225,14 @@ export default function BoatsMembershipPage() {
       <section className="bg-ink py-20 text-cream">
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
           <h2 className="font-display text-4xl font-light sm:text-5xl">
-            Founding cohort opens for the first 60 boat members.
+            Boats membership opens with the Miami launch.
           </h2>
           <p className="mx-auto mt-6 max-w-xl text-base text-cream/70">
-            Apply by July 2026 to lock founding-member pricing on Blue or
+            Apply by July 2026 to lock early-member pricing on Blue or
             Black for life.
           </p>
           <Link
-            href="/founding-members?vertical=boats"
+            href="/signup?next=/boats"
             className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-marine hover:text-cream"
           >
             Apply now →
@@ -318,7 +318,7 @@ function TierCard({ tier }: { tier: typeof TIERS[number] }) {
       </ul>
 
       <Link
-        href={tier.key === "core" ? "/signup?next=/boats" : "/founding-members?vertical=boats"}
+        href={tier.key === "core" ? "/signup?next=/boats" : "/signup?next=/boats"}
         className="mt-10 inline-flex h-12 items-center justify-center border border-ink bg-ink px-7 text-sm font-medium text-cream transition-colors hover:bg-marine hover:border-marine"
       >
         {tier.cta}

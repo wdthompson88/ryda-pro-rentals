@@ -110,7 +110,7 @@ export default function BoatsAboutPage() {
             </p>
             <p>
               Miami launches Q3 2026, alongside the cars side. We&apos;re
-              vetting our first 60 founding boat members now.
+              vetting our first 60 early boat members now.
             </p>
           </div>
 
@@ -133,10 +133,10 @@ export default function BoatsAboutPage() {
 
           <div className="mt-10 flex flex-wrap gap-3">
             <Link
-              href="/founding-members"
+              href="/signup"
               className="inline-flex h-12 items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream hover:bg-marine"
             >
-              Apply for founding membership →
+              Sign up →
             </Link>
             <Link
               href="/contact?type=Membership&note=RYDA+Boats#form"
@@ -225,19 +225,19 @@ export default function BoatsAboutPage() {
       <section className="bg-ink py-20 text-cream">
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
           <h2 className="font-display text-3xl sm:text-4xl">
-            Become a founding boats member.
+            Become a member.
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
-            The first 60 boats members lock founding pricing on Blue or
+            The first 60 boats members lock early-member pricing on Blue or
             Black for life. We&apos;re vetting now ahead of the Miami
             water launch, Q3 2026.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
-              href="/founding-members?vertical=boats"
+              href="/signup?next=/boats"
               className="inline-flex h-12 items-center justify-center bg-cream px-7 text-sm font-medium text-ink hover:bg-marine hover:text-cream"
             >
-              Apply for founding membership →
+              Sign up →
             </Link>
             <Link
               href="/about"

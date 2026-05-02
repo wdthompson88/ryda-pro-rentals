@@ -623,7 +623,7 @@ export default function HowItWorksPage() {
             />
             <Faq
               q="Is there a membership fee?"
-              a="Three tiers. RYDA Core is free. RYDA Blue is $500/year. RYDA Black is $1,500/year — priority booking during peak season, included white-glove delivery, complimentary track-day rider on eligible vehicles, dedicated dedicated contact. Founding-100 lock in $350/$1,000 for life."
+              a="Three tiers. RYDA Core is free. RYDA Blue is $500/year. RYDA Black is $1,500/year — priority booking during peak season, included white-glove delivery, complimentary track-day rider on eligible vehicles, dedicated dedicated contact. First-100 lock in $350/$1,000 for life."
             />
           </div>
         </div>

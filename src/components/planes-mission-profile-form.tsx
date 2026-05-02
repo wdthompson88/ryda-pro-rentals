@@ -66,7 +66,7 @@ export function PlanesMissionProfileForm() {
 · Primary base: ${base}
 · Preference: ${modeLabel}
 
-Reply when RYDA Planes opens the founding cohort window for this profile.`;
+Reply when RYDA Planes opens the member cohort window for this profile.`;
 
     try {
       const res = await fetch("/api/contact", {
@@ -105,7 +105,7 @@ Reply when RYDA Planes opens the founding cohort window for this profile.`;
           Thanks — mission profile received.
         </p>
         <p className="mt-2 text-sm text-cream/70">
-          When the founding cohort opens for{" "}
+          When the member cohort opens for{" "}
           <span className="text-cream">
             {JET_CLASSES.find((j) => j.value === jetClass)?.label} · {hours} hrs/yr · {base}
           </span>

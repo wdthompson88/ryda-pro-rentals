@@ -80,7 +80,7 @@ export default async function OpenGraphImage() {
           }}
         >
           <div>Member-managed Delaware LLC</div>
-          <div>Founding cohort · 2027</div>
+          <div>Member cohort · 2027</div>
         </div>
       </div>
     ),

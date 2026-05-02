@@ -1,9 +1,9 @@
 "use client";
 
 // Slim, single-line email capture for the home hero. Wraps the same
-// /api/waitlist endpoint the founding-members form uses, but with no
-// name/market fields — just intent. Designed to fit inside a tight
-// hero column without dominating the visual hierarchy.
+// /api/waitlist endpoint the signup form uses, but with no name/market
+// fields — just intent. Designed to fit inside a tight hero column
+// without dominating the visual hierarchy.
 
 import { useState } from "react";
 

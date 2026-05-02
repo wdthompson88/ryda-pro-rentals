@@ -278,13 +278,13 @@ export default function BoatsHome() {
       <section id="waitlist" className="border-b border-rule bg-ink text-cream">
         <div className="mx-auto max-w-3xl px-6 py-20 text-center sm:px-10 sm:py-28">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
-            Founding members · Boats
+            Members · Boats
           </p>
           <h2 className="mt-4 font-display text-4xl font-light leading-tight sm:text-5xl">
             Membership is by invitation.
           </h2>
           <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-cream/70">
-            We&apos;re vetting the first 60 founding members for RYDA
+            We&apos;re vetting early members for the Miami launch for RYDA
             Boats Miami. Tell us about yourself and we&apos;ll be in
             touch with the next steps.
           </p>

@@ -5,7 +5,7 @@ import { useState } from "react";
 type Status = "idle" | "submitting" | "success" | "error";
 
 // Optional source attribution — pages that mount the form on a
-// specific surface (e.g. /investors, /founding-members) can pass
+// specific surface (e.g. /investors, /signup) can pass
 // a label so the team email + DB row reflects where the lead came
 // from. Omitted defaults to "waitlist-form".
 export function WaitlistForm({ source = "waitlist-form" }: { source?: string }) {
@@ -106,7 +106,7 @@ export function WaitlistForm({ source = "waitlist-form" }: { source?: string }) 
         disabled={status === "submitting"}
         className="h-12 rounded-full bg-red px-7 text-sm font-medium text-cream transition-colors hover:bg-red-deep disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {status === "submitting" ? "Submitting…" : "Request membership"}
+        {status === "submitting" ? "Submitting…" : "Sign up"}
       </button>
       {status === "error" && error && (
         <p className="mt-2 text-sm text-red" role="alert">

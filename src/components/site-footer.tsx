@@ -24,10 +24,10 @@ export function SiteFooter() {
             <div className="lg:col-span-5 lg:flex lg:items-end lg:justify-end">
               <div className="flex flex-col items-start gap-3 lg:items-end">
                 <Link
-                  href="/founding-members"
+                  href="/signup"
                   className="inline-flex h-12 items-center justify-center border border-ink bg-ink px-7 text-sm font-medium text-cream transition-colors hover:bg-red hover:border-red"
                 >
-                  Request membership
+                  Sign up
                 </Link>
                 <div className="flex flex-wrap items-center gap-x-4 text-xs text-mute">
                   <Link href="/signin" className="hover:text-ink">
