@@ -38,7 +38,7 @@ const VERTICALS: Vertical[] = [
   {
     href: "/cars",
     label: "Cars",
-    tagline: "Co-own or rent the world's most exceptional cars.",
+    tagline: "The road, without limits.",
     bullet: "Live · Miami today",
     status: "live",
     pillLabel: "Live",
@@ -48,17 +48,17 @@ const VERTICALS: Vertical[] = [
   {
     href: "/boats",
     label: "Boats",
-    tagline: "Floating real estate, held in a Delaware LLC.",
-    bullet: "Founding cohort open · Miami launch Q3 2026",
-    status: "founding",
-    pillLabel: "Founding",
+    tagline: "The sea, where the horizon opens.",
+    bullet: "Miami launch · Q3 2026",
+    status: "coming-soon",
+    pillLabel: "Coming soon",
     media: SPLITTER_MEDIA.boats,
     accent: "marine",
   },
   {
     href: "/planes",
     label: "Planes",
-    tagline: "Fractional access to private aviation. In design.",
+    tagline: "The sky, within reach.",
     bullet: "Coming soon",
     status: "coming-soon",
     pillLabel: "Coming soon",
@@ -72,27 +72,29 @@ export default function SplitterPage() {
     <main className="relative min-h-screen overflow-hidden bg-[#0E0E10] text-[#F4F1EC]">
       <SplitterIntro />
 
-      {/* Floating top bar — minimal, hovers over the columns */}
-      <div className="absolute inset-x-0 top-0 z-30 flex items-center justify-between px-6 py-6 sm:px-10 sm:py-8">
+      {/* Floating top bar — minimal, hovers over the columns. 3-column
+          grid so "Luxury vehicle access" is truly centered on the page,
+          not just floated between unequal-width left/right groups. */}
+      <div className="absolute inset-x-0 top-0 z-30 grid grid-cols-3 items-center px-6 py-6 sm:px-10 sm:py-8">
         <Link
           href="/"
-          className="font-display text-2xl tracking-tight text-[#F4F1EC]"
+          className="justify-self-start font-display text-2xl tracking-tight text-[#F4F1EC]"
         >
           RYDA
         </Link>
-        <p className="hidden text-[11px] font-medium uppercase tracking-[0.24em] text-[#F4F1EC]/55 sm:block">
+        <p className="hidden justify-self-center text-xs font-medium uppercase tracking-[0.32em] text-[#F4F1EC]/70 sm:block">
           Luxury vehicle access
         </p>
-        <div className="flex items-center gap-5 sm:gap-6">
+        <div className="flex items-center justify-self-end gap-6 sm:gap-7">
           <Link
             href="/investors"
-            className="hidden text-[11px] font-medium uppercase tracking-[0.18em] text-[#F4F1EC]/55 hover:text-[#F4F1EC] sm:inline-block"
+            className="hidden text-sm font-medium uppercase tracking-[0.18em] text-[#F4F1EC]/70 transition-colors hover:text-[#F4F1EC] sm:inline-block"
           >
             Investors
           </Link>
           <Link
             href="/signin"
-            className="text-[11px] font-medium uppercase tracking-[0.18em] text-[#F4F1EC]/55 hover:text-[#F4F1EC]"
+            className="text-sm font-medium uppercase tracking-[0.18em] text-[#F4F1EC]/70 transition-colors hover:text-[#F4F1EC]"
           >
             Sign in
           </Link>
@@ -163,9 +165,16 @@ function VerticalColumn({ v, index }: { v: Vertical; index: number }) {
         className={`pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t ${accentClasses.glow} to-transparent opacity-0 transition-opacity duration-700 group-hover:opacity-100`}
       />
 
-      {/* Status pill */}
+      {/* Status pill — "Live" uses the vertical accent (red for cars).
+          "Coming soon" verticals (boats + planes) use the same neutral
+          outlined style so they read consistently as "not open yet"
+          rather than a solid blue button that suggests an action. */}
       <span
-        className={`absolute right-5 top-24 rounded-full px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] backdrop-blur transition-colors duration-300 sm:top-28 ${accentClasses.pill}`}
+        className={`absolute right-5 top-24 rounded-full px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] backdrop-blur transition-colors duration-300 sm:top-28 ${
+          v.status === "coming-soon"
+            ? "border border-[#F4F1EC]/40 text-[#F4F1EC]/85 group-hover:border-[#F4F1EC] group-hover:text-[#F4F1EC]"
+            : accentClasses.pill
+        }`}
       >
         {v.pillLabel}
       </span>

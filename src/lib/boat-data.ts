@@ -216,14 +216,13 @@ export const BOATS: Boat[] = [
     effectiveDailyCost: 600,
     listingStart: "2026-04-22",
     listingEnd: "2026-10-22",
-    // Hero photo — yacht stand-in (placeholder until licensed Riva
-    // Aquariva Super photography is sourced pre-launch). Reverted to
-    // the proven-working Unsplash yacht ID with a different crop
-    // position than the Wajer card so the cards remain visually
-    // distinct.
+    // Hero photo — distinct yacht stand-in (verified working Unsplash
+    // ID, sourced from /s/photos/yacht). Each of the 4 hulls now has a
+    // unique image. TODO: replace with real licensed Riva Aquariva
+    // Super photography pre-launch.
     hero:
-      "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?auto=format&fit=crop&w=1920&q=80",
-    imagePosition: "center 80%",
+      "https://images.unsplash.com/photo-1528154291023-a6525fabe5b4?auto=format&fit=crop&w=1920&q=80",
+    imagePosition: "center 50%",
     currentEngineHours: 165,
     description:
       "The Aquariva is the most photographable boat in Italian history. Mahogany hull, polished stainless detailing, twin Yanmars to fly across the bay. A day boat for a member who wants something timeless.",
@@ -270,11 +269,11 @@ export const BOATS: Boat[] = [
     effectiveDailyCost: 933,
     listingStart: "2026-04-10",
     listingEnd: "2026-10-10",
-    // Hero photo — sailing catamaran stand-in.
-    // TODO: replace with real licensed Lagoon 50 photography
-    // before Q3 2026 launch (current is Unsplash placeholder).
+    // Hero photo — distinct yacht stand-in (verified Unsplash ID
+    // from /s/photos/yacht). 4 hulls, 4 distinct hero photos. TODO:
+    // replace with real licensed Lagoon 50 photography pre-launch.
     hero:
-      "https://images.unsplash.com/photo-1500627964684-141351970a7f?auto=format&fit=crop&w=1920&q=80",
+      "https://images.unsplash.com/photo-1559385301-0187cb6eff46?auto=format&fit=crop&w=1920&q=80",
     flipImage: false,
     imagePosition: "center 50%",
     currentEngineHours: 220,
