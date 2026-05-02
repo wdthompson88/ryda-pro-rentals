@@ -216,11 +216,14 @@ export const BOATS: Boat[] = [
     effectiveDailyCost: 600,
     listingStart: "2026-04-22",
     listingEnd: "2026-10-22",
-    // Hero photo — mega-yacht stand-in (placeholder until licensed
-    // Riva Aquariva Super photography is sourced pre-launch).
+    // Hero photo — yacht stand-in (placeholder until licensed Riva
+    // Aquariva Super photography is sourced pre-launch). Reverted to
+    // the proven-working Unsplash yacht ID with a different crop
+    // position than the Wajer card so the cards remain visually
+    // distinct.
     hero:
-      "https://images.unsplash.com/photo-1605713288610-00c2fc5c1df1?auto=format&fit=crop&w=1920&q=80",
-    imagePosition: "center 50%",
+      "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?auto=format&fit=crop&w=1920&q=80",
+    imagePosition: "center 80%",
     currentEngineHours: 165,
     description:
       "The Aquariva is the most photographable boat in Italian history. Mahogany hull, polished stainless detailing, twin Yanmars to fly across the bay. A day boat for a member who wants something timeless.",

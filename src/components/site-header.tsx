@@ -70,17 +70,44 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
           now reads as concierge brand mark + nav + one CTA, not as
           a control panel. */}
 
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 sm:px-10">
-        <Link href="/" className={`font-display text-2xl tracking-tight ${brand}`}>
-          RYDA
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-5 sm:px-10">
+        <div className="flex items-baseline gap-4 sm:gap-5">
+          <Link href="/" className={`font-display text-2xl tracking-tight ${brand}`}>
+            RYDA
+          </Link>
+          {/* Inline vertical switcher — Cars · Boats · Planes. The
+              currently-active vertical is bolded ink/cream; the others
+              are mute and clickable so members can jump between
+              verticals without bouncing back to the splitter. */}
           {vertical !== "neutral" && (
-            <span className={`ml-2 align-baseline text-[10px] font-medium uppercase tracking-[0.16em] ${
-              inverted ? "text-cream/55" : "text-mute"
-            }`}>
-              {vertical}
-            </span>
+            <div className="hidden items-baseline gap-2 text-[10px] font-medium uppercase tracking-[0.18em] sm:flex">
+              <VerticalSwitch
+                href="/cars"
+                label="Cars"
+                active={vertical === "cars"}
+                inverted={inverted}
+              />
+              <span aria-hidden className={inverted ? "text-cream/30" : "text-mute/50"}>
+                ·
+              </span>
+              <VerticalSwitch
+                href="/boats"
+                label="Boats"
+                active={vertical === "boats"}
+                inverted={inverted}
+              />
+              <span aria-hidden className={inverted ? "text-cream/30" : "text-mute/50"}>
+                ·
+              </span>
+              <VerticalSwitch
+                href="/planes"
+                label="Planes"
+                active={vertical === "planes"}
+                inverted={inverted}
+              />
+            </div>
           )}
-        </Link>
+        </div>
 
         <nav className={`hidden gap-7 text-sm font-medium sm:flex ${tone}`}>
           {nav.map((n) => (
@@ -147,6 +174,34 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
           }`}
         >
           <nav className={`mx-auto flex max-w-7xl flex-col gap-1 px-6 py-4 text-base ${tone}`}>
+            {/* Mobile vertical switcher — same Cars / Boats / Planes
+                jump as the desktop header. Active vertical bolded. */}
+            <div className="mb-2 flex items-baseline gap-3 px-3 py-2 text-[11px] font-medium uppercase tracking-[0.2em]">
+              <VerticalSwitch
+                href="/cars"
+                label="Cars"
+                active={vertical === "cars"}
+                inverted={inverted}
+              />
+              <span aria-hidden className={inverted ? "text-cream/30" : "text-mute/50"}>
+                ·
+              </span>
+              <VerticalSwitch
+                href="/boats"
+                label="Boats"
+                active={vertical === "boats"}
+                inverted={inverted}
+              />
+              <span aria-hidden className={inverted ? "text-cream/30" : "text-mute/50"}>
+                ·
+              </span>
+              <VerticalSwitch
+                href="/planes"
+                label="Planes"
+                active={vertical === "planes"}
+                inverted={inverted}
+              />
+            </div>
             {nav.map((n) => (
               <Link
                 key={n.href}
@@ -181,6 +236,35 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
         </div>
       )}
     </header>
+  );
+}
+
+// Inline vertical-switch link used next to the RYDA wordmark.
+// Active vertical: bolded ink (or cream on inverted headers).
+// Inactive verticals: mute, clickable, hover transition to ink.
+function VerticalSwitch({
+  href,
+  label,
+  active,
+  inverted,
+}: {
+  href: string;
+  label: string;
+  active: boolean;
+  inverted?: boolean;
+}) {
+  const activeTone = inverted ? "text-cream font-semibold" : "text-ink font-semibold";
+  const inactiveTone = inverted
+    ? "text-cream/55 font-medium hover:text-cream"
+    : "text-mute font-medium hover:text-ink";
+  return (
+    <Link
+      href={href}
+      aria-current={active ? "page" : undefined}
+      className={`transition-colors ${active ? activeTone : inactiveTone}`}
+    >
+      {label}
+    </Link>
   );
 }
 
