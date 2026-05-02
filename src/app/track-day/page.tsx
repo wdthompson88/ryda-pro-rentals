@@ -20,7 +20,7 @@ export default function TrackDayPage() {
           </p>
           <h1 className="mt-4 max-w-4xl font-display text-5xl font-light leading-[1.05] sm:text-6xl">
             The car was built for it.{" "}
-            <span className="italic text-red">So we made it possible.</span>
+            <span className="italic">So we made it possible.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-cream/70">
             Every supercar is built for the limit. Most never see one. RYDA's

@@ -40,7 +40,7 @@ export default function PlanesComingSoon() {
           </p>
           <h1 className="mt-5 max-w-4xl font-display text-5xl font-light leading-[1.05] sm:text-6xl lg:text-7xl">
             Fractional access to private aviation,{" "}
-            <span className="italic text-red">structured the same way.</span>
+            <span className="italic">structured the same way.</span>
           </h1>
           <p className="mt-7 max-w-2xl text-lg leading-relaxed text-cream/85">
             We&apos;re building Planes the way we built Cars and Boats —

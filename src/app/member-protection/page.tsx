@@ -20,7 +20,7 @@ export default function MemberProtectionPage() {
           </p>
           <h1 className="mt-4 max-w-3xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
             How your money is{" "}
-            <span className="italic text-red">actually protected.</span>
+            <span className="italic">actually protected.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
             Wealthy buyers ask three questions before wiring six figures:

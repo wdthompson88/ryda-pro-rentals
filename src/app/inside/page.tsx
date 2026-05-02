@@ -32,7 +32,7 @@ export default function InsidePage() {
           </p>
           <h1 className="mt-4 max-w-4xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
             What you see on{" "}
-            <span className="italic text-red">the inside.</span>
+            <span className="italic">the inside.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
             A preview of the upcoming member app, modeled with sample

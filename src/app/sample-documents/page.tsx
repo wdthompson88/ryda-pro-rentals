@@ -113,7 +113,7 @@ export default function SampleDocumentsPage() {
           </p>
           <h1 className="mt-4 max-w-4xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
             Read the paperwork{" "}
-            <span className="italic text-red">before you wire.</span>
+            <span className="italic">before you wire.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
             Every document the LLC produces, available as a redacted

@@ -20,7 +20,7 @@ export default function StoragePage() {
           </p>
           <h1 className="mt-4 max-w-4xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
             Where the cars{" "}
-            <span className="italic text-red">actually live.</span>
+            <span className="italic">actually live.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
             Storage is the most underrated part of supercar ownership.

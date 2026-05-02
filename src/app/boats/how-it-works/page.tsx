@@ -23,7 +23,7 @@ export default function BoatsHowItWorks() {
           </p>
           <h1 className="mt-4 max-w-4xl font-display text-5xl font-light leading-tight text-ink sm:text-6xl">
             Member-managed Delaware LLC.{" "}
-            <span className="italic text-marine">Same doctrine as cars, different ops.</span>
+            <span className="italic">Same doctrine as cars, different ops.</span>
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-ink-soft">
             Each boat is held in a single-purpose Delaware LLC. Up to 10

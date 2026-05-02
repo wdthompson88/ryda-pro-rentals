@@ -71,7 +71,7 @@ export default function EventsPage() {
           </p>
           <h1 className="mt-4 max-w-3xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
             The community is{" "}
-            <span className="italic text-red">half the point.</span>
+            <span className="italic">half the point.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg text-ink-soft">
             RYDA programming brings members together around the cars and

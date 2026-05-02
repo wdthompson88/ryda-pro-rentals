@@ -47,7 +47,7 @@ export default function BoatsFaqPage() {
           </p>
           <h1 className="mt-4 max-w-3xl font-display text-5xl font-light leading-tight text-ink sm:text-6xl">
             The boat-side questions{" "}
-            <span className="italic text-marine">members ask first.</span>
+            <span className="italic">members ask first.</span>
           </h1>
           <p className="mt-6 max-w-2xl text-lg text-ink-soft">
             Co-ownership structure, slip rotation, captain protocol,

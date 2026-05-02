@@ -51,7 +51,7 @@ export default function BoatsPortfolioPage() {
           </p>
           <h1 className="mt-5 max-w-4xl font-display text-5xl font-light leading-[1.05] sm:text-6xl lg:text-7xl">
             {PORTFOLIO_HERO.headline.prefix}{" "}
-            <span className="italic text-marine">{PORTFOLIO_HERO.headline.highlight}</span>
+            <span className="italic">{PORTFOLIO_HERO.headline.highlight}</span>
           </h1>
           <p className="mt-7 max-w-2xl text-lg leading-relaxed text-cream/85">
             {PORTFOLIO_HERO.subhead}

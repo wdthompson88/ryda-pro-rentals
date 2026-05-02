@@ -20,7 +20,7 @@ export default function ConciergePage() {
           </p>
           <h1 className="mt-4 max-w-4xl font-display text-5xl font-light leading-[1.05] sm:text-6xl">
             Everything that isn't driving,{" "}
-            <span className="italic text-red">handled.</span>
+            <span className="italic">handled.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-cream/70">
             RYDA's concierge team is the difference between owning a car and

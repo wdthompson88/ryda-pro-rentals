@@ -37,7 +37,7 @@ export default function InvestorsPage() {
           </p>
           <h1 className="mt-4 max-w-4xl font-display text-5xl font-light leading-[1.05] sm:text-6xl">
             The luxury access category{" "}
-            <span className="italic text-red">supercars have been waiting for.</span>
+            <span className="italic">supercars have been waiting for.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-cream/70">
             RYDA is a US member-managed supercar co-ownership platform —

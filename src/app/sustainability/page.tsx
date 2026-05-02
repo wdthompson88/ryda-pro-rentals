@@ -20,7 +20,7 @@ export default function SustainabilityPage() {
           </p>
           <h1 className="mt-4 max-w-3xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
             Ten shares.{" "}
-            <span className="italic text-red">One Ferrari.</span>
+            <span className="italic">One Ferrari.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
             Not a climate solution. But the math is honest: a single LLC
