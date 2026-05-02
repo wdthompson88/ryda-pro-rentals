@@ -417,7 +417,7 @@ export default function HowItWorksPage() {
       <section id="trust" className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            Buyer protection &amp; further advantages
+            Buyer protection & further advantages
           </p>
           <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
             Twelve guardrails on the way in and the way out.
@@ -429,8 +429,8 @@ export default function HowItWorksPage() {
             </p>
             <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
               <Pillar label="Tested vehicles" body="CPO + multi-point PPI before any share sells." />
-              <Pillar label="Verified members" body="28+, KYC, license &amp; record check before joining." />
-              <Pillar label="Encrypted data" body="Member docs &amp; payment info secured in transit and at rest." />
+              <Pillar label="Verified members" body="28+, KYC, license & record check before joining." />
+              <Pillar label="Encrypted data" body="Member docs & payment info secured in transit and at rest." />
               <Pillar label="Vehicle warranty" body="Manufacturer or independent CPO warranty in force at handover." />
               <Pillar label="Transparent costs" body="Pass-through ops invoiced at cost; service fee disclosed up front." />
               <Pillar label="Flexible share sale" body="Member-to-member transfers after 12 months; LLC sale at year 2 / 50K mi." />

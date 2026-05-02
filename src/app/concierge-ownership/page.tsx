@@ -252,7 +252,7 @@ export default function ConciergeOwnershipPage() {
             <Profile label="Family offices" />
             <Profile label="Internationally mobile entrepreneurs" />
             <Profile label="Collectors of limited-production vehicles" />
-            <Profile label="Owners of passion assets &amp; specialty vehicles" />
+            <Profile label="Owners of passion assets & specialty vehicles" />
             <Profile label="Owners seeking discretion in title-holding" />
             <Profile label="Clients consolidating assets across jurisdictions" />
           </div>

@@ -97,7 +97,7 @@ export default async function CostSheetPage({
               RYDA
             </p>
             <p className="text-xs uppercase tracking-[0.2em] text-mute">
-              Cost &amp; Savings Overview
+              Cost & Savings Overview
             </p>
           </div>
           <h1 className="mt-6 font-display text-3xl text-ink sm:text-4xl">
