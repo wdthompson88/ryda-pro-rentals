@@ -4,7 +4,7 @@ import { SiteHeader } from "@/components/site-header";
 export const metadata = {
   title: "Trust & Safety — RYDA",
   description:
-    "How RYDA protects co-owners, vehicles, and the platform. Member verification, asset vetting, insurance, claims, and the standards we hold ourselves to.",
+    "How RYDA protects co-owners, vehicles and the platform. Member verification, asset vetting, insurance, claims and the standards we hold ourselves to.",
 };
 
 export default function TrustAndSafetyPage() {
@@ -28,6 +28,41 @@ export default function TrustAndSafetyPage() {
         </div>
       </section>
 
+      {/* Why this matters in Miami — Vice-inspired framing without
+          naming names. The Miami exotic-rental scene has well-documented
+          operators who don't verify insurance, sub-lease cars off
+          someone else's title, and run on Instagram clout instead of
+          paperwork. RYDA exists because that market needed a real
+          alternative — not the same model with nicer branding. */}
+      <section className="border-b border-rule">
+        <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+            Why this matters here
+          </p>
+          <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
+            Miami&apos;s exotic-rental scene has a paperwork problem.
+          </h2>
+          <div className="mt-8 space-y-5 text-base leading-relaxed text-ink-soft">
+            <p>
+              Plenty of cars on Miami roads are operated without verified
+              insurance, without trackers, sub-leased off someone
+              else&apos;s title, and rented on a handshake. That&apos;s
+              not a critique of the people involved. It&apos;s a
+              structural feature of a market built on Instagram clout
+              and short-term cash flow.
+            </p>
+            <p>
+              RYDA is the deliberate opposite. Every vehicle is titled
+              in a single-purpose LLC. Every co-owner is a registered
+              member of that LLC. Every booking runs on documented
+              insurance with named insureds. Every car has a Pre-Purchase
+              Inspection on file before a single share is sold. It is
+              boring, in the way that real ownership is supposed to be.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Pillars grid */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
@@ -35,12 +70,12 @@ export default function TrustAndSafetyPage() {
             <Pillar
               eyebrow="Members"
               title="Verified before they touch the keys"
-              body="Every co-owner clears KYC identity verification, a clean recent driving record check, and a 28+ minimum age. Members are added as named insureds on the LLC's vehicle policy. Membership is earned, not bought."
+              body="Every co-owner clears KYC identity verification, a clean recent driving record check and a 28+ minimum age. Members are added as named insureds on the LLC's vehicle policy. Membership is earned, not bought."
             />
             <Pillar
               eyebrow="Vehicles"
               title="certified pre owned, PPI-inspected before any share is sold"
-              body="Every RYDA vehicle is certified pre owned with a manufacturer or independent certified pre owned program. Before the LLC closes on a car, a multi-point Pre-Purchase Inspection by a marque specialist documents engine, transmission, suspension, electronics, and body condition — plus full title and lien search. Co-owners aren't buying surprises; they're buying a documented car."
+              body="Every RYDA vehicle is certified pre owned with a manufacturer or independent certified pre owned program. Before the LLC closes on a car, a multi-point Pre-Purchase Inspection by a marque specialist documents engine, transmission, suspension, electronics and body condition — plus full title and lien search. Co-owners aren't buying surprises; they're buying a documented car."
             />
             <Pillar
               eyebrow="Insurance"
@@ -50,17 +85,17 @@ export default function TrustAndSafetyPage() {
             <Pillar
               eyebrow="Storage"
               title="Climate-controlled, monitored, indoor"
-              body="Every vehicle is stored in a RYDA-vetted facility — climate-controlled, 24/7 video monitoring, on-site security, and segregated bays. We don't park exotics in shared garages or driveways."
+              body="Every vehicle is stored in a RYDA-vetted facility — climate-controlled, 24/7 video monitoring, on-site security and segregated bays. We don't park exotics in shared garages or driveways."
             />
             <Pillar
               eyebrow="Operations"
               title="White-glove handover, every booking"
-              body="Vehicles are washed, fueled, and pre-inspected before every member booking. Photo-documented condition both at delivery and return. Any new damage is logged and assigned before the next booking."
+              body="Vehicles are washed, fueled and pre-inspected before every member booking. Photo-documented condition both at delivery and return. Any new damage is logged and assigned before the next booking."
             />
             <Pillar
               eyebrow="Support"
               title="One number, 24/7"
-              body="A dedicated RYDA member line for roadside, claims, inspections, and operational issues. Single point of contact — never an outsourced call center. Replacement vehicle dispatched if anything breaks down on the road."
+              body="A dedicated RYDA member line for roadside, claims, inspections and operational issues. Single point of contact — never an outsourced call center. Replacement vehicle dispatched if anything breaks down on the road."
             />
           </div>
         </div>
@@ -139,7 +174,7 @@ export default function TrustAndSafetyPage() {
             />
             <Coverage
               line="Active certified pre owned warranty"
-              detail="Every vehicle ships with an active manufacturer or independent certified pre owned warranty covering the powertrain and major mechanical systems for the LLC's first ownership period. Co-owners aren't on the hook for surprise engine, transmission, or driveline repairs — those are warranty events, not assessments."
+              detail="Every vehicle ships with an active manufacturer or independent certified pre owned warranty covering the powertrain and major mechanical systems for the LLC's first ownership period. Co-owners aren't on the hook for surprise engine, transmission or driveline repairs — those are warranty events, not assessments."
             />
             <Coverage
               line="LLC-level reserve for post-warranty issues"
@@ -168,7 +203,7 @@ export default function TrustAndSafetyPage() {
           <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             <Step n="01" title="Call us first" body="One phone number, 24/7. Don't admit fault, don't move the vehicle unless safe, photograph everything." />
             <Step n="02" title="Get medical help if needed" body="Always priority one. The car is replaceable, you're not." />
-            <Step n="03" title="We open the claim" body="RYDA files with the carrier within 24 hours, manages the adjuster, and coordinates rental coverage." />
+            <Step n="03" title="We open the claim" body="RYDA files with the carrier within 24 hours, manages the adjuster and coordinates rental coverage." />
             <Step n="04" title="Resolution" body="For at-fault collisions, the deductible (typically $2,500) is your responsibility. Everything else flows through the policy." />
           </div>
           <p className="mt-12 max-w-2xl rounded-2xl border border-rule bg-surface p-6 text-sm leading-relaxed text-ink-soft">
@@ -199,12 +234,12 @@ export default function TrustAndSafetyPage() {
             <li>
               <span className="font-medium text-ink">No unverified drivers.</span>{" "}
               Only the named co-owner can drive. We don't extend insurance
-              to unverified family, friends, or partners. Co-owners can add
+              to unverified family, friends or partners. Co-owners can add
               a verified household secondary driver on request.
             </li>
             <li>
               <span className="font-medium text-ink">No motorsport on RYDA insurance.</span>{" "}
-              Drag strips, autocross without proper insurance, and street
+              Drag strips, autocross without proper insurance and street
               racing are not covered. We mean it.
             </li>
             <li>

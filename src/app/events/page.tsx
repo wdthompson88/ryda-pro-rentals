@@ -4,7 +4,7 @@ import { SiteHeader } from "@/components/site-header";
 export const metadata = {
   title: "Events — RYDA",
   description:
-    "RYDA member events. F1 Miami GP weekend, founders' dinners, Cars & Cuban Coffee, track days, and more.",
+    "RYDA member events. F1 Miami GP weekend, founders' dinners, Cars & Cuban Coffee, track days and more.",
 };
 
 const EVENTS = [

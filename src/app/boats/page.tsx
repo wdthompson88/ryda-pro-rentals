@@ -177,7 +177,7 @@ export default function BoatsHome() {
                 Charter the same hulls before you commit.
               </h2>
               <p className="mt-3 max-w-xl text-base text-cream/70">
-                Crewed by default — RYDA-vetted captain, mate, and (for
+                Crewed by default — RYDA-vetted captain, mate and (for
                 sport yachts) chef. Bareboat available on the Riva and
                 Lagoon for USCG-licensed members.
               </p>

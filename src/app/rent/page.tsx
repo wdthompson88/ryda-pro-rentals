@@ -61,7 +61,7 @@ export default function RentPage() {
             />
             <Pillar
               title="White-glove handover"
-              body="Vehicle delivered washed, fueled, and prepped. Photo-documented condition both ways."
+              body="Vehicle delivered washed, fueled and prepped. Photo-documented condition both ways."
             />
             <Pillar
               title="24/7 roadside"

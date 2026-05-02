@@ -10,6 +10,7 @@ import {
 } from "@/lib/market-data";
 
 const TOC_ITEMS = [
+  { id: "three-step", label: "How it works" },
   { id: "lifecycle", label: "5 steps" },
   { id: "compare", label: "Compare" },
   { id: "right-for-you", label: "Right for you?" },
@@ -24,7 +25,7 @@ const TOC_ITEMS = [
 export const metadata = {
   title: "How it works — RYDA",
   description:
-    "Asset-backed co-ownership of curated certified pre owned supercars. Five steps to a key, side-by-side comparison vs solo / rental / club, the 2-year exit doctrine, and the optional rental opt-in.",
+    "Asset-backed co-ownership of curated certified pre owned supercars. Five steps to a key, side-by-side comparison vs solo / rental / club, the 2-year exit doctrine and the optional rental opt-in.",
 };
 
 // 4-way comparison anchor numbers — same Ferrari 296 GTB illustration
@@ -153,7 +154,7 @@ export default function HowItWorksPage() {
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
             Each car is held in a single-purpose LLC with 10
             shares. Your share is backed by a real, titled vehicle —
-            not by a subscription, lease, or rental contract. Verified
+            not by a subscription, lease or rental contract. Verified
             members hold one share or several; RYDA is hired as the
             operations partner.
           </p>
@@ -161,6 +162,43 @@ export default function HowItWorksPage() {
       </section>
 
       <StickyToc items={TOC_ITEMS} />
+
+      {/* Turo-style 3-step explainer — the simple version of the doctrine
+          for first-time visitors. The technical 5-step lifecycle below
+          is the deep dive; this is the elevator pitch. Big numbers,
+          short copy, one icon idea per step. */}
+      <section id="three-step" className="border-b border-rule">
+        <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+            How it works
+          </p>
+          <h2 className="mt-3 font-display text-4xl text-ink sm:text-5xl">
+            Three steps to a key.
+          </h2>
+          <div className="mt-12 grid grid-cols-1 gap-10 lg:grid-cols-3">
+            <SimpleStep
+              n="1"
+              title="Choose"
+              body="Browse a curated, certified pre owned fleet. Every car has a documented Pre-Purchase Inspection by the dealer before a single share is sold."
+            />
+            <SimpleStep
+              n="2"
+              title="Co-own"
+              body="Buy your share in a member-managed LLC. Up to 5 verified co-owners per car, with a 2-share minimum per person. RYDA runs operations end-to-end."
+            />
+            <SimpleStep
+              n="3"
+              title="Drive"
+              body="Book your time on the RYDA smart calendar. Each share unlocks ~32 days and ~3,200 miles a year. Planned exit at 24 months; transfer earlier after the 12-month minimum hold."
+            />
+          </div>
+          <p className="mt-12 max-w-2xl text-base leading-relaxed text-ink-soft">
+            That&apos;s the short version. The technical detail —
+            paperwork, exit math, booking rules — lives in the five-step
+            lifecycle below.
+          </p>
+        </div>
+      </section>
 
       {/* 5-step lifecycle */}
       <section id="lifecycle" className="border-b border-rule bg-cream-2">
@@ -199,7 +237,7 @@ export default function HowItWorksPage() {
           </h2>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-soft">
             Wealthy enthusiasts have three real options for getting into
-            an exotic: buy outright, rent by the day, or join a club.
+            an exotic: buy outright, rent by the day or join a club.
             RYDA is a fourth — structured co-ownership of a real car.
             The math below anchors on the Ferrari 296 GTB and a single
             share over the {HOLDING_YEARS}-year planned exit.
@@ -235,31 +273,29 @@ export default function HowItWorksPage() {
                         {r.label}
                       </td>
                       <td
-                        className={`px-6 py-4 text-right tabular-nums ${
-                          r.emphasis ? "font-display text-base text-ink" : ""
+                        className={`px-6 py-4 text-right font-display tabular-nums text-base ${
+                          r.emphasis ? "font-medium text-ink" : "text-ink-soft"
                         }`}
                       >
                         {r.regular}
                       </td>
                       <td
-                        className={`px-6 py-4 text-right tabular-nums ${
-                          r.emphasis ? "font-display text-base text-ink" : ""
+                        className={`px-6 py-4 text-right font-display tabular-nums text-base ${
+                          r.emphasis ? "font-medium text-ink" : "text-ink-soft"
                         }`}
                       >
                         {r.rental}
                       </td>
                       <td
-                        className={`px-6 py-4 text-right tabular-nums ${
-                          r.emphasis ? "font-display text-base text-ink" : ""
+                        className={`px-6 py-4 text-right font-display tabular-nums text-base ${
+                          r.emphasis ? "font-medium text-ink" : "text-ink-soft"
                         }`}
                       >
                         {r.club}
                       </td>
                       <td
-                        className={`px-6 py-4 text-right tabular-nums text-ink ${
-                          r.emphasis
-                            ? "font-display text-base font-medium"
-                            : ""
+                        className={`px-6 py-4 text-right font-display tabular-nums text-base text-ink ${
+                          r.emphasis ? "font-medium" : ""
                         }`}
                       >
                         {r.ryda}
@@ -315,17 +351,17 @@ export default function HowItWorksPage() {
             />
             <Take
               title="RYDA vs solo ownership"
-              good="Solo ownership works if you'd drive 60+ days a year, you love the operational responsibility (storage, insurance, maintenance, registration), and you have the capital and tolerance for $40–80K/yr in carrying."
+              good="Solo ownership works if you'd drive 60+ days a year, you love the operational responsibility (storage, insurance, maintenance, registration) and you have the capital and tolerance for $40–80K/yr in carrying."
               tradeoff="The asset sits idle 90% of the time. Carrying costs accrue whether you drive or not. Selling takes weeks to months."
             />
             <Take
               title="RYDA vs daily rental"
-              good="Daily rental works if you drive once or twice a year, you don't want any commitment, and the per-day price is not your primary concern."
+              good="Daily rental works if you drive once or twice a year, you don't want any commitment and the per-day price is not your primary concern."
               tradeoff="$2,400+/day adds up fast. No priority on the vehicle you want, no relationship with it, no ownership upside."
             />
             <Take
               title="RYDA vs supercar club"
-              good="A club works if you want rotating access to many cars, you don't care which specific car, and you don't want to own anything."
+              good="A club works if you want rotating access to many cars, you don't care which specific car and you don't want to own anything."
               tradeoff="Annual fees rival co-ownership without an ownership stake. You're a customer of the club, not a co-owner."
             />
           </div>
@@ -355,17 +391,17 @@ export default function HowItWorksPage() {
             <Reason
               n="03"
               title="Shared costs, not the full burden"
-              body="Insurance, maintenance, tires, detailing, storage, and depreciation reserve split across the LLC's 10 shares. A 1-share holder pays roughly 10% of what the solo owner of the same car would."
+              body="Insurance, maintenance, tires, detailing, storage and depreciation reserve split across the LLC's 10 shares. A 1-share holder pays roughly 10% of what the solo owner of the same car would."
             />
             <Reason
               n="04"
               title="Built for travelers and multi-residence owners"
-              body="Your car is operated by a professional team and ready when you need it. No worrying about cold-start trickle-chargers, lapsed registration, or missed inspection windows while you're abroad."
+              body="Your car is operated by a professional team and ready when you need it. No worrying about cold-start trickle-chargers, lapsed registration or missed inspection windows while you're abroad."
             />
             <Reason
               n="05"
               title="No hidden costs — all-inclusive packages"
-              body="One transparent annual contribution covers insurance, taxes, service, maintenance, tires, detailing, seasonal storage, fleet management, and prep. Predictable. No surprise invoices."
+              body="One transparent annual contribution covers insurance, taxes, service, maintenance, tires, detailing, seasonal storage, fleet management and prep. Predictable. No surprise invoices."
             />
             <Reason
               n="06"
@@ -526,7 +562,7 @@ export default function HowItWorksPage() {
             days after members book first — so realistic occupancy on the
             pool runs lower (~50%). Shareholders can opt their unused
             entitlement into the rental pool — we handle the bookings,
-            insurance, condition checks, and damage reserve. Revenue splits
+            insurance, condition checks and damage reserve. Revenue splits
             65/35 (you / RYDA), distributed pro-rata across the days each
             share contributes.
           </p>
@@ -599,7 +635,7 @@ export default function HowItWorksPage() {
             />
             <Faq
               q="Can I rent out my share days for income?"
-              a={`Yes — opting into RYDA's rental pool is voluntary, share-by-share. We list the car on /rent, handle bookings, insurance, screening, and condition checks. Rental revenue splits 65/35 (you / RYDA) and is distributed pro-rata across the days each share contributes. The pool is whatever days members don't reserve, so realistic pool occupancy is ~50% (full-control fleets clock 60–70%). On that basis, a single Ferrari 296 share can offset ~$15–18K/yr of carrying — typically 2–2.5× your annual ops cost, sometimes enough to bring your two-year net cost down close to zero or below. Same flat ${TARGET_DEPRECIATION_PCT}% depreciation assumption applies in both scenarios. Co-ownership shares are member-managed LLC interests, not securities; rental is a usage offset, not an investment yield.`}
+              a={`Yes — opting into RYDA's rental pool is voluntary, share-by-share. We list the car on /rent, handle bookings, insurance, screening and condition checks. Rental revenue splits 65/35 (you / RYDA) and is distributed pro-rata across the days each share contributes. The pool is whatever days members don't reserve, so realistic pool occupancy is ~50% (full-control fleets clock 60–70%). On that basis, a single Ferrari 296 share can offset ~$15–18K/yr of carrying — typically 2–2.5× your annual ops cost, sometimes enough to bring your two-year net cost down close to zero or below. Same flat ${TARGET_DEPRECIATION_PCT}% depreciation assumption applies in both scenarios. Co-ownership shares are member-managed LLC interests, not securities; rental is a usage offset, not an investment yield.`}
             />
             <Faq
               q="What if a co-owner stops paying?"
@@ -638,6 +674,21 @@ function Step({ n, title, body }: { n: string; title: string; body: string }) {
       <p className="font-display text-2xl text-red">{n}</p>
       <p className="mt-2 font-display text-xl text-ink">{title}</p>
       <p className="mt-3 text-sm leading-relaxed text-ink-soft">{body}</p>
+    </div>
+  );
+}
+
+// Bigger sibling of Step — used in the Turo-style 3-step explainer
+// at the top of the page. Larger numerals, more whitespace, fewer
+// words per step. The technical 5-step lifecycle still uses Step.
+function SimpleStep({ n, title, body }: { n: string; title: string; body: string }) {
+  return (
+    <div>
+      <p className="font-display text-6xl font-light leading-none text-red sm:text-7xl">
+        {n}
+      </p>
+      <p className="mt-5 font-display text-2xl text-ink">{title}</p>
+      <p className="mt-3 text-base leading-relaxed text-ink-soft">{body}</p>
     </div>
   );
 }

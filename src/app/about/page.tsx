@@ -85,7 +85,7 @@ export default function AboutPage() {
             </p>
             <p>
               The math is simple: a $34K share in a Ferrari 296, plus $7,080 a
-              year for insurance, storage, maintenance, and reserves, gets you
+              year for insurance, storage, maintenance and reserves, gets you
               up to 32 days behind the wheel and a real exit at year two. We
               model the residual at 90% of buy-in. We don&apos;t pretend the
               car appreciates — it depreciates, and the model accounts for it.
@@ -144,14 +144,14 @@ export default function AboutPage() {
           </p>
           <p className="mt-4 max-w-3xl font-display text-2xl leading-tight text-ink sm:text-3xl">
             "To make ownership of extraordinary vehicles possible for more
-            enthusiasts — responsibly, transparently, and with a community-first
+            enthusiasts — responsibly, transparently and with a community-first
             experience."
           </p>
 
           <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
             <Value
               title="Transparency"
-              body="Every co-owner sees every cost, every report, and every document. No hidden fees. Ever."
+              body="Every co-owner sees every cost, every report and every document. No hidden fees. Ever."
             />
             <Value
               title="Exclusivity"
@@ -175,7 +175,7 @@ export default function AboutPage() {
           <h2 className="font-display text-3xl text-ink sm:text-4xl">Founders</h2>
           <p className="mt-3 max-w-2xl text-base text-ink-soft">
             Three co-founders combining executive search, investment
-            banking, and three decades of institutional equity markets.
+            banking and three decades of institutional equity markets.
           </p>
           <div className="mt-12 grid grid-cols-1 gap-10 sm:grid-cols-3">
             <Founder
@@ -197,7 +197,7 @@ export default function AboutPage() {
               role="Co-Founder · CRO / CSO"
               image="/team/stefano.jpg"
               tags={["Evercore ISI", "Wharton MBA"]}
-              bio="Co-founder and strategic advisor with 30+ years in institutional equity markets. Managing Director, Global Equity Sales at Evercore ISI (9+ years). Previously Director of Global Equities Research Sales at Bank of America Merrill Lynch in London, Senior Portfolio Manager at Artio Global Management ($75B AUM at peak), and 8 years in research sales at Merrill Lynch. Wharton MBA, Civil Engineering and Economics at Delaware."
+              bio="Co-founder and strategic advisor with 30+ years in institutional equity markets. Managing Director, Global Equity Sales at Evercore ISI (9+ years). Previously Director of Global Equities Research Sales at Bank of America Merrill Lynch in London, Senior Portfolio Manager at Artio Global Management ($75B AUM at peak) and 8 years in research sales at Merrill Lynch. Wharton MBA, Civil Engineering and Economics at Delaware."
             />
           </div>
         </div>

@@ -4,7 +4,7 @@ import { SiteHeader } from "@/components/site-header";
 export const metadata = {
   title: "FAQ — RYDA",
   description:
-    "Answers to the most common questions about RYDA membership, co-ownership, rentals, and operations.",
+    "Answers to the most common questions about RYDA membership, co-ownership, rentals and operations.",
 };
 
 type Q = { q: string; a: string };
@@ -15,7 +15,7 @@ const SECTIONS: { title: string; questions: Q[] }[] = [
     questions: [
       {
         q: "What am I actually buying?",
-        a: "A membership interest in a single-purpose LLC that owns a specific vehicle. The LLC's only assets are the vehicle, its insurance/operating reserves, and a management contract with RYDA. You hold a registered legal interest, not a club point.",
+        a: "A membership interest in a single-purpose LLC that owns a specific vehicle. The LLC's only assets are the vehicle, its insurance/operating reserves and a management contract with RYDA. You hold a registered legal interest, not a club point.",
       },
       {
         q: "How many co-ownership shares per vehicle?",
@@ -35,11 +35,11 @@ const SECTIONS: { title: string; questions: Q[] }[] = [
       },
       {
         q: "What if a major mechanical issue comes up?",
-        a: "RYDA only acquires certified pre owned vehicles, and every car gets a documented multi-point Pre-Purchase Inspection by a marque specialist before the LLC closes on it. Powertrain and major mechanical systems are covered by an active certified pre owned warranty during the LLC's first ownership period. Out-of-warranty repairs come from the LLC's maintenance reserve — not from co-owners' pockets. Co-owners aren't on the hook for surprise engine, transmission, or driveline bills.",
+        a: "RYDA only acquires certified pre owned vehicles, and every car gets a documented multi-point Pre-Purchase Inspection by a marque specialist before the LLC closes on it. Powertrain and major mechanical systems are covered by an active certified pre owned warranty during the LLC's first ownership period. Out-of-warranty repairs come from the LLC's maintenance reserve — not from co-owners' pockets. Co-owners aren't on the hook for surprise engine, transmission or driveline bills.",
       },
       {
         q: "What if the car gets totaled?",
-        a: "The vehicle carries agreed-value physical damage insurance. If totaled, the insurance proceeds go to the LLC, are distributed pro-rata to co-owners, and the LLC is wound down. Most groups elect to roll proceeds into a replacement vehicle.",
+        a: "The vehicle carries agreed-value physical damage insurance. If totaled, the insurance proceeds go to the LLC, are distributed pro-rata to co-owners and the LLC is wound down. Most groups elect to roll proceeds into a replacement vehicle.",
       },
     ],
   },
@@ -48,7 +48,7 @@ const SECTIONS: { title: string; questions: Q[] }[] = [
     questions: [
       {
         q: "Who can join?",
-        a: "Verified individuals 28 years or older with a valid US driver's license, a clean recent driving record, and the ability to pass identity verification (KYC). No accredited-investor status or financial qualification required — RYDA is a luxury access platform, not an investment platform.",
+        a: "Verified individuals 28 years or older with a valid US driver's license, a clean recent driving record and the ability to pass identity verification (KYC). No accredited-investor status or financial qualification required — RYDA is a luxury access platform, not an investment platform.",
       },
       {
         q: "Does membership cost anything?",
@@ -73,7 +73,7 @@ const SECTIONS: { title: string; questions: Q[] }[] = [
       },
       {
         q: "Who maintains them?",
-        a: "RYDA. We handle service, registration, inspections, photography, and condition reports. Co-owners are not on call for any of it.",
+        a: "RYDA. We handle service, registration, inspections, photography and condition reports. Co-owners are not on call for any of it.",
       },
       {
         q: "How do I book my time?",
@@ -90,7 +90,7 @@ const SECTIONS: { title: string; questions: Q[] }[] = [
       },
       {
         q: "What's included in a rental?",
-        a: "Full insurance, 100 miles per day, 24/7 roadside, and white-glove delivery if you choose it. Overage is $4/mile.",
+        a: "Full insurance, 100 miles per day, 24/7 roadside and white-glove delivery if you choose it. Overage is $4/mile.",
       },
       {
         q: "Why rentals at all? Aren't you focused on ownership?",

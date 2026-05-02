@@ -15,7 +15,7 @@ import {
 export const metadata = {
   title: "RYDA Portfolio — Supercars co-owned in the US",
   description:
-    "The RYDA portfolio. Member-managed LLCs hold each curated certified pre owned supercar; up to 5 verified members co-own every car. Browse Miami, Los Angeles, and New York.",
+    "The RYDA portfolio. Member-managed LLCs hold each curated certified pre owned supercar; up to 5 verified members co-own every car. Browse Miami, Los Angeles and New York.",
   // The hero image was washing out the headline copy — bumped the
   // gradient and overlay opacity so the cream text reads cleanly
   // over the red Ferrari hero from any device width.
@@ -136,8 +136,8 @@ export default function MarketsPage() {
             Miami today. LA and NY soon.
           </h2>
           <p className="mt-3 max-w-2xl text-sm text-ink-soft">
-            We launch one market at a time — concentration of fleet,
-            partners, and ops talent matters more than spread. Miami is
+            We launch one market at a time. Concentration of fleet,
+            partners and ops talent matters more than spread. Miami is
             live. LA opens Q2 2027. NY opens Q4 2027.
           </p>
 

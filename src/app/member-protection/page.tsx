@@ -4,7 +4,7 @@ import { SiteHeader } from "@/components/site-header";
 export const metadata = {
   title: "How your money is protected — RYDA",
   description:
-    "Where your buy-in goes, how the LLC's funds are held, what happens if RYDA fails, and what protections members have under the Operating Agreement.",
+    "Where your buy-in goes, how the LLC's funds are held, what happens if RYDA fails and what protections members have under the Operating Agreement.",
 };
 
 export default function MemberProtectionPage() {
@@ -44,12 +44,12 @@ export default function MemberProtectionPage() {
             <Step
               n="01"
               title="Verified-bank escrow"
-              body="Your buy-in wires to a segregated escrow account at a US-licensed escrow agent (not RYDA). The escrow agent holds the funds until all conditions are met: the LLC's vehicle title is clean, the insurance policy is bound, all members' KYC has cleared, and counsel has verified the Operating Agreement is fully executed."
+              body="Your buy-in wires to a segregated escrow account at a US-licensed escrow agent (not RYDA). The escrow agent holds the funds until all conditions are met: the LLC's vehicle title is clean, the insurance policy is bound, all members' KYC has cleared and counsel has verified the Operating Agreement is fully executed."
             />
             <Step
               n="02"
               title="Release to the LLC"
-              body="Once conditions clear, escrow releases funds to the LLC's bank account — not to RYDA. The LLC is a separate legal entity with its own bank account, its own EIN, and its own books. RYDA is a vendor to the LLC."
+              body="Once conditions clear, escrow releases funds to the LLC's bank account — not to RYDA. The LLC is a separate legal entity with its own bank account, its own EIN and its own books. RYDA is a vendor to the LLC."
             />
             <Step
               n="03"
@@ -59,7 +59,7 @@ export default function MemberProtectionPage() {
             <Step
               n="04"
               title="Ongoing reserve"
-              body="The LLC keeps an operating reserve in its own bank account, sized for ~12 months of insurance, storage, maintenance, and contingency. This is the buffer that absorbs surprise costs without member assessments."
+              body="The LLC keeps an operating reserve in its own bank account, sized for ~12 months of insurance, storage, maintenance and contingency. This is the buffer that absorbs surprise costs without member assessments."
             />
           </div>
         </div>
@@ -143,15 +143,15 @@ export default function MemberProtectionPage() {
           <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2">
             <Pillar
               title="Vehicle title"
-              body="Held in the LLC's name. RYDA does not appear on the title and never can. If RYDA were to disappear tomorrow, the LLC and its asset would still exist, and the members would still be the legal owners."
+              body="Held in the LLC's name. RYDA does not appear on the title and never can. If RYDA were to disappear tomorrow, the LLC and its asset would still exist and the members would still be the legal owners."
             />
             <Pillar
               title="Insurance policy"
-              body="Bound by an A-rated US carrier (Hagerty, Travelers, or CHUBB tier), with the LLC named as primary insured and every approved member named as a named insured. RYDA is the broker of record, not the policyholder."
+              body="Bound by an A-rated US carrier (Hagerty, Travelers or CHUBB tier), with the LLC named as primary insured and every approved member named as a named insured. RYDA is the broker of record, not the policyholder."
             />
             <Pillar
               title="Operating Agreement"
-              body="Signed by every member at closing. Spells out voting thresholds (75% supermajority for sales, modifications, replacements), default remedies, distribution waterfall on dissolution, and the process for transferring a share. This is the LLC's constitution."
+              body="Signed by every member at closing. Spells out voting thresholds (75% supermajority for sales, modifications, replacements), default remedies, distribution waterfall on dissolution and the process for transferring a share. This is the LLC's constitution."
             />
             <Pillar
               title="Management Services Agreement"
@@ -174,7 +174,7 @@ export default function MemberProtectionPage() {
           <div className="mt-12 space-y-6">
             <Case
               q="What if RYDA, the company, fails?"
-              a="The LLC and the asset survive. Title is in the LLC's name; the LLC has its own bank account and its own counsel. Members can vote to engage a successor service provider, sell the asset, or wind the LLC down — whatever the Operating Agreement allows. Your share is protected from RYDA's solvency because RYDA never owned the asset to begin with."
+              a="The LLC and the asset survive. Title is in the LLC's name; the LLC has its own bank account and its own counsel. Members can vote to engage a successor service provider, sell the asset or wind the LLC down — whatever the Operating Agreement allows. Your share is protected from RYDA's solvency because RYDA never owned the asset to begin with."
             />
             <Case
               q="What if a co-owner stops paying their quarterly fees?"
@@ -182,7 +182,7 @@ export default function MemberProtectionPage() {
             />
             <Case
               q="What happens on death of a co-owner?"
-              a="The deceased member's share passes to their estate per their will or by intestacy. The estate has 90 days to either hold the share, transfer it to a beneficiary, or list it for transfer through RYDA. The LLC continues operating uninterrupted. We recommend members add their share to estate planning documents at closing."
+              a="The deceased member's share passes to their estate per their will or by intestacy. The estate has 90 days to either hold the share, transfer it to a beneficiary or list it for transfer through RYDA. The LLC continues operating uninterrupted. We recommend members add their share to estate planning documents at closing."
             />
             <Case
               q="What about divorce?"

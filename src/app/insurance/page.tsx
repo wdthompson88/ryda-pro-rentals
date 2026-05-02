@@ -4,7 +4,7 @@ import { SiteHeader } from "@/components/site-header";
 export const metadata = {
   title: "Insurance — RYDA",
   description:
-    "How RYDA insures every vehicle, every booking, and every co-owner. Built for supercars, not Camrys.",
+    "How RYDA insures every vehicle, every booking and every co-owner. Built for supercars, not Camrys.",
 };
 
 export default function InsurancePage() {
@@ -37,7 +37,7 @@ export default function InsurancePage() {
             <Card title="Agreed-value physical damage" body="Pre-set replacement value for each vehicle. No haircuts at total-loss settlement." />
             <Card title="Multi-driver coverage" body="Every approved RYDA member is named insured during their booking window." />
             <Card title="Roadside assistance" body="24/7 dispatch and replacement vehicle for any covered breakdown." />
-            <Card title="Storage coverage" body="Vehicles in RYDA partner storage are insured against theft, fire, and natural disaster." />
+            <Card title="Storage coverage" body="Vehicles in RYDA partner storage are insured against theft, fire and natural disaster." />
           </div>
         </div>
       </section>
@@ -79,7 +79,7 @@ export default function InsurancePage() {
             horror story you've ever heard.
           </p>
           <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
-            <Step n="01" title="Call RYDA" body="One number, 24/7. We dispatch roadside, arrange a tow if needed, and get you mobile." />
+            <Step n="01" title="Call RYDA" body="One number, 24/7. We dispatch roadside, arrange a tow if needed and get you mobile." />
             <Step n="02" title="Document" body="The RYDA app walks you through photo + statement collection. Don't worry about getting it perfect — just capture the scene." />
             <Step n="03" title="We file" body="RYDA opens the claim with our carrier. You don't need to call your own insurance." />
             <Step n="04" title="Resolution" body="Most claims close within 30 days. You're not invoiced for any covered items." />

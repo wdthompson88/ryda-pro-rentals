@@ -9,7 +9,7 @@ import { VEHICLES, formatUSD } from "@/lib/market-data";
 export const metadata: Metadata = {
   title: "RYDA Cars — Co-own or rent the world's most exceptional cars",
   description:
-    "Co-own a certified pre owned Ferrari, Lamborghini, or McLaren in a member-managed LLC. Each share unlocks ~32 days a year. Or rent any car in the fleet by the day.",
+    "Co-own a certified pre owned Ferrari, Lamborghini or McLaren in a member-managed LLC. Each share unlocks ~32 days a year. Or rent any car in the fleet by the day.",
 };
 
 export default function CarsHome() {
@@ -121,7 +121,7 @@ export default function CarsHome() {
           </h2>
           <p className="mt-5 max-w-xl text-base text-cream/85">
             The full RYDA portfolio organised by city — featured vehicles,
-            booking model, and the path to claiming a share. Inspired by
+            booking model and the path to claiming a share. Inspired by
             the cleanest fractional-ownership browse experience we&apos;ve
             seen.
           </p>
