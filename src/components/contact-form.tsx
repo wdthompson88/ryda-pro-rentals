@@ -178,7 +178,7 @@ function Input({
         {required && (
           <>
             {" "}
-            <span aria-hidden="true" className="text-red">*</span>
+            <span aria-hidden="true" className="text-mute">*</span>
             <span className="sr-only">required</span>
           </>
         )}
