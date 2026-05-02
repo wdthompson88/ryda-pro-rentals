@@ -29,7 +29,7 @@ export function ComingSoonLocation({
           </p>
           <h1 className="mt-4 max-w-4xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
             {city} is{" "}
-            <span className="italic text-red">next on the map.</span>
+            <span className="italic">next on the map.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
             {intro}
