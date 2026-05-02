@@ -82,19 +82,19 @@ export default function SplitterPage() {
         >
           RYDA
         </Link>
-        <p className="hidden justify-self-center text-xs font-medium uppercase tracking-[0.32em] text-[#F4F1EC]/70 sm:block">
+        <p className="hidden justify-self-center text-sm font-medium uppercase tracking-[0.32em] text-[#F4F1EC]/75 sm:block">
           Luxury vehicle access
         </p>
         <div className="flex items-center justify-self-end gap-6 sm:gap-7">
           <Link
             href="/investors"
-            className="hidden text-sm font-medium uppercase tracking-[0.18em] text-[#F4F1EC]/70 transition-colors hover:text-[#F4F1EC] sm:inline-block"
+            className="hidden text-base font-medium uppercase tracking-[0.18em] text-[#F4F1EC]/75 transition-colors hover:text-[#F4F1EC] sm:inline-block"
           >
             Investors
           </Link>
           <Link
             href="/signin"
-            className="text-sm font-medium uppercase tracking-[0.18em] text-[#F4F1EC]/70 transition-colors hover:text-[#F4F1EC]"
+            className="text-base font-medium uppercase tracking-[0.18em] text-[#F4F1EC]/75 transition-colors hover:text-[#F4F1EC]"
           >
             Sign in
           </Link>

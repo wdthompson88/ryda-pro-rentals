@@ -555,7 +555,7 @@ export const HELP: HelpCategory[] = [
           {
             type: "callout",
             tone: "info",
-            text: "Forced sales are rare. Across comparable Swiss platforms (Supercar Sharing AG), default rates over 10+ years have been under 1%.",
+            text: "Forced sales are rare. RYDA underwrites every member upfront and the Operating Agreement caps the cumulative exposure of any single non-paying member.",
           },
         ],
       },

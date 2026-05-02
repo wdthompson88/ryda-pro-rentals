@@ -148,7 +148,7 @@ export default function ConciergeOwnershipPage() {
         </div>
       </section>
 
-      {/* Pricing — direct pull from Supercar Sharing AG's structure */}
+      {/* Pricing */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-5xl px-6 py-20 sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">

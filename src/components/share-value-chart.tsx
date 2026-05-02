@@ -1,7 +1,6 @@
-// Year-by-year share value depreciation visualization, modeled on the
-// Supercar Sharing AG chart pattern — vehicle value, share value, and
-// cumulative miles per year — but anchored on RYDA's 2-year planned
-// exit doctrine.
+// Year-by-year share value depreciation visualization — vehicle value,
+// share value, and cumulative miles per year — anchored on RYDA's
+// 2-year planned exit doctrine.
 //
 // Three rows per year (each rendered as a horizontal bar):
 //   1. Cumulative miles (mute / gray)

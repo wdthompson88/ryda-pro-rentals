@@ -1,7 +1,7 @@
-// Print-optimized cost-comparison sheet, modeled on Supercar Sharing AG's
-// "Costs and Savings Overview" PDF format. Browser-native print → PDF.
-// Each /boats/portfolio/[slug]/cost-sheet renders a one-page sheet for that
-// specific boat with the math anchored to its actual numbers.
+// Print-optimized cost-comparison sheet — one-page PDF-style format.
+// Browser-native print → PDF. Each /boats/portfolio/[slug]/cost-sheet
+// renders a single-page sheet for that hull with the math anchored to
+// its actual share economics.
 
 import { notFound } from "next/navigation";
 import Link from "next/link";

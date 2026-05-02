@@ -619,7 +619,7 @@ export default function HowItWorksPage() {
             />
             <Faq
               q="Why is membership only 28+?"
-              a="Underwriting reality. Insurance carriers price exotic-car policies aggressively for younger drivers. The 28+ minimum keeps premiums manageable and matches the European norm we modeled on (Supercar Sharing AG)."
+              a="Underwriting reality. Insurance carriers price exotic-car policies aggressively for younger drivers. The 28+ minimum keeps premiums manageable and matches the underwriting norm for collector and exotic policies."
             />
             <Faq
               q="Is there a membership fee?"

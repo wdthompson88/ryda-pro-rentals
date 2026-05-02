@@ -39,10 +39,10 @@ export default function AboutPage() {
               was unworkable, renting was hollow.
             </p>
             <p>
-              In Europe, that middle ground exists. Supercar Sharing AG has
-              spent a decade proving structured supercar co-ownership works.
-              Thousands of European enthusiasts co-own Ferraris, Lamborghinis,
-              and McLarens. None of it existed in the US.
+              The math worked, the structure worked, the buyer pool was
+              there. The middle ground — real co-ownership of real
+              supercars, with concierge ops and a clean LLC wrapper —
+              just didn&apos;t exist in the US.
             </p>
             <p>
               We built RYDA to fill that gap — member-managed Delaware LLCs,

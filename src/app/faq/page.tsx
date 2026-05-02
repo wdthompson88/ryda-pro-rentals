@@ -56,7 +56,7 @@ const SECTIONS: { title: string; questions: Q[] }[] = [
       },
       {
         q: "Why 28+?",
-        a: "Insurance carriers price exotic-car policies very aggressively for younger drivers. The 28+ minimum keeps fleet premiums manageable and matches the European norm we modeled on (Supercar Sharing AG).",
+        a: "Insurance carriers price exotic-car policies very aggressively for younger drivers. The 28+ minimum keeps fleet premiums manageable and matches the underwriting norm for collector and exotic policies in our market.",
       },
       {
         q: "Can I join from anywhere in the US?",

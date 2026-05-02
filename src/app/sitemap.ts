@@ -39,7 +39,6 @@ const PUBLIC_ROUTES = [
   "/journal",
   "/press",
   "/investors",
-  "/investors/deck",
   "/inside",
   "/member-protection",
   "/compare",

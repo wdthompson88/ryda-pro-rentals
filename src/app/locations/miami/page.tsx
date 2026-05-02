@@ -51,9 +51,9 @@ export default function MiamiPage() {
             <p>
               Miami is the only US city where supercar ownership is a normal
               part of daily life — not a special-occasion thing. You see a
-              Ferrari in line at a coffee shop. Lamborghinis are not rare. A
-              few neighborhoods house more rolling chassis than Switzerland's
-              entire Supercar Sharing fleet combined.
+              Ferrari in line at a coffee shop. Lamborghinis are not rare.
+              The density of $250K+ vehicles per zip code in Miami-Dade
+              exceeds entire metro areas of comparable wealth.
             </p>
             <p>
               That density is the prerequisite for what RYDA is doing. We
