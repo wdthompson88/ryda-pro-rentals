@@ -433,7 +433,7 @@ function FeaturedCard({ vehicle: v }: { vehicle: Vehicle }) {
       />
       <div
         aria-hidden
-        className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent"
+        className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-black/20"
       />
       <span
         className={`absolute right-4 top-4 rounded-full px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] backdrop-blur ${

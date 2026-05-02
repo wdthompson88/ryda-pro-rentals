@@ -87,7 +87,7 @@ export default function BoatsAboutPage() {
             <p>
               None of that was the right answer for us, and none of it
               is the right answer for the buyers we&apos;ve talked to.
-              RYDA Boats is the fourth answer: a real ownership stake
+              RYDA Boats is the alternative: a real ownership stake
               in a single-purpose LLC that holds title to a
               specific yacht, alongside up to four other verified
               members. The Coast Guard documentation is in the

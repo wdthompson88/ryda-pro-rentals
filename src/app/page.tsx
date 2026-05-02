@@ -85,18 +85,27 @@ export default function SplitterPage() {
         <p className="hidden justify-self-center text-sm font-medium uppercase tracking-[0.32em] text-[#F4F1EC]/75 sm:block">
           Luxury vehicle access
         </p>
-        <div className="flex items-center justify-self-end gap-6 sm:gap-7">
+        <div className="flex items-center justify-self-end gap-3 sm:gap-4">
           <Link
             href="/investors"
-            className="hidden text-base font-medium uppercase tracking-[0.18em] text-[#F4F1EC]/75 transition-colors hover:text-[#F4F1EC] sm:inline-block"
+            className="hidden text-sm font-medium uppercase tracking-[0.18em] text-[#F4F1EC]/75 transition-colors hover:text-[#F4F1EC] lg:inline-block"
           >
             Investors
           </Link>
+          {/* Paired auth CTAs in the splitter top bar — Log in (soft
+              cream-on-ink outline) next to Sign up (solid cream),
+              matching the header treatment used on every other page. */}
           <Link
             href="/signin"
-            className="text-base font-medium uppercase tracking-[0.18em] text-[#F4F1EC]/75 transition-colors hover:text-[#F4F1EC]"
+            className="hidden rounded-full border border-[#F4F1EC]/30 bg-[#F4F1EC]/10 px-5 py-2 text-sm font-medium text-[#F4F1EC] transition-colors hover:bg-[#F4F1EC] hover:text-[#0E0E10] sm:inline-flex"
           >
-            Sign in
+            Log in
+          </Link>
+          <Link
+            href="/signup"
+            className="inline-flex rounded-full border border-[#F4F1EC] bg-[#F4F1EC] px-5 py-2 text-sm font-medium text-[#0E0E10] transition-colors hover:bg-red hover:text-[#F4F1EC] hover:border-red"
+          >
+            Sign up
           </Link>
         </div>
       </div>

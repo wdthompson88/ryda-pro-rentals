@@ -77,7 +77,7 @@ export default function AboutPage() {
             <p>
               None of those was the right answer for us, or for any of our
               friends who actually wanted to drive an exotic. RYDA is the
-              fourth answer. It&apos;s a real ownership stake, title held by
+              alternative. It&apos;s a real ownership stake, title held by
               a single-purpose LLC where you and up to four other
               verified members are the registered owners. We run the
               operations under a separate Management Services Agreement, the

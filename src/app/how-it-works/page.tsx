@@ -25,7 +25,7 @@ const TOC_ITEMS = [
 export const metadata = {
   title: "How it works — RYDA",
   description:
-    "Asset-backed co-ownership of curated certified pre owned supercars. Five steps to a key, side-by-side comparison vs solo / rental / club, the 2-year exit doctrine and the optional rental opt-in.",
+    "Asset-backed co-ownership of curated certified pre owned supercars. Five steps to a key, side-by-side comparison of RYDA vs solo / rental / club, the 24-month exit doctrine and the optional rental opt-in.",
 };
 
 // 4-way comparison anchor numbers, same Ferrari 296 GTB illustration
@@ -175,26 +175,29 @@ export default function HowItWorksPage() {
           <h2 className="mt-3 font-display text-4xl text-ink sm:text-5xl">
             Three steps to a key.
           </h2>
-          <div className="mt-12 grid grid-cols-1 gap-10 lg:grid-cols-3">
+          <div className="mt-12 grid grid-cols-1 gap-12 lg:grid-cols-3">
             <SimpleStep
               n="1"
+              icon="search"
               title="Choose"
               body="Browse a curated, certified pre owned fleet. Every car has a documented Pre-Purchase Inspection by the dealer before a single share is sold."
             />
             <SimpleStep
               n="2"
+              icon="signature"
               title="Co-own"
               body="Buy your share in a member-managed LLC. Up to 5 verified co-owners per car, with a 2-share minimum per person. RYDA runs operations end-to-end."
             />
             <SimpleStep
               n="3"
+              icon="key"
               title="Drive"
               body="Book your time on the RYDA smart calendar. Each share unlocks ~32 days and ~3,200 miles a year. Planned exit at 24 months; transfer earlier after the 12-month minimum hold."
             />
           </div>
           <p className="mt-12 max-w-2xl text-base leading-relaxed text-ink-soft">
-            That&apos;s the short version. The technical detail —
-            paperwork, exit math, booking rules, lives in the five-step
+            That&apos;s the short version. The technical detail
+            (paperwork, exit math, booking rules) lives in the five-step
             lifecycle below.
           </p>
         </div>
@@ -236,11 +239,12 @@ export default function HowItWorksPage() {
             Four ways to think about a Ferrari.
           </h2>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-soft">
-            Wealthy enthusiasts have three real options for getting into
-            an exotic: buy outright, rent by the day or join a club.
-            RYDA is a fourth, structured co-ownership of a real car.
-            The math below anchors on the Ferrari 296 GTB and a single
-            share over the {HOLDING_YEARS}-year planned exit.
+            RYDA is structured co-ownership of a real car. Compared
+            against the alternatives, buying outright, renting by the
+            day or joining a club, the math comes out the way most
+            buyers actually use the asset. Numbers below anchor on the
+            Ferrari 296 GTB and a single share over the {HOLDING_YEARS}-year
+            planned exit.
           </p>
 
           <div className="mt-10 overflow-hidden rounded-2xl border border-rule bg-surface">
@@ -249,10 +253,10 @@ export default function HowItWorksPage() {
                 <thead className="border-b border-rule bg-cream-2 text-xs font-medium uppercase tracking-wider text-ink-soft">
                   <tr>
                     <th className="px-6 py-5 text-left">&nbsp;</th>
+                    <th className="px-6 py-5 text-right text-red">RYDA</th>
                     <th className="px-6 py-5 text-right">Solo ownership</th>
                     <th className="px-6 py-5 text-right">Daily rental</th>
                     <th className="px-6 py-5 text-right">Supercar club</th>
-                    <th className="px-6 py-5 text-right text-red">RYDA</th>
                   </tr>
                 </thead>
                 <tbody className="text-ink">
@@ -271,6 +275,13 @@ export default function HowItWorksPage() {
                         }`}
                       >
                         {r.label}
+                      </td>
+                      <td
+                        className={`px-6 py-4 text-right font-display tabular-nums text-base text-ink ${
+                          r.emphasis ? "font-medium" : ""
+                        }`}
+                      >
+                        {r.ryda}
                       </td>
                       <td
                         className={`px-6 py-4 text-right font-display tabular-nums text-base ${
@@ -292,13 +303,6 @@ export default function HowItWorksPage() {
                         }`}
                       >
                         {r.club}
-                      </td>
-                      <td
-                        className={`px-6 py-4 text-right font-display tabular-nums text-base text-ink ${
-                          r.emphasis ? "font-medium" : ""
-                        }`}
-                      >
-                        {r.ryda}
                       </td>
                     </tr>
                   ))}
@@ -679,17 +683,76 @@ function Step({ n, title, body }: { n: string; title: string; body: string }) {
 }
 
 // Bigger sibling of Step, used in the Turo-style 3-step explainer
-// at the top of the page. Larger numerals, more whitespace, fewer
-// words per step. The technical 5-step lifecycle still uses Step.
-function SimpleStep({ n, title, body }: { n: string; title: string; body: string }) {
+// at the top of the page. Larger numerals, a small line-art icon, more
+// whitespace, fewer words per step. The technical 5-step lifecycle
+// still uses Step.
+type StepIcon = "search" | "signature" | "key";
+
+function SimpleStep({
+  n,
+  title,
+  body,
+  icon,
+}: {
+  n: string;
+  title: string;
+  body: string;
+  icon: StepIcon;
+}) {
   return (
     <div>
-      <p className="font-display text-6xl font-light leading-none text-red sm:text-7xl">
-        {n}
-      </p>
+      <div className="flex items-baseline gap-5">
+        <p className="font-display text-6xl font-light leading-none text-red sm:text-7xl">
+          {n}
+        </p>
+        <span className="text-ink/40" aria-hidden>
+          <StepGlyph kind={icon} />
+        </span>
+      </div>
       <p className="mt-5 font-display text-2xl text-ink">{title}</p>
       <p className="mt-3 text-base leading-relaxed text-ink-soft">{body}</p>
     </div>
+  );
+}
+
+// Tiny line-art glyphs for the 3-step explainer. Stroked in
+// currentColor so they tint with whatever wraps them. Designed to feel
+// like a hand-drawn marginalia mark, not a UI button.
+function StepGlyph({ kind }: { kind: StepIcon }) {
+  const common = {
+    width: 28,
+    height: 28,
+    viewBox: "0 0 28 28",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.4,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+  };
+  if (kind === "search") {
+    return (
+      <svg {...common} aria-hidden>
+        <circle cx="11" cy="11" r="7" />
+        <line x1="16.5" y1="16.5" x2="23" y2="23" />
+      </svg>
+    );
+  }
+  if (kind === "signature") {
+    return (
+      <svg {...common} aria-hidden>
+        <path d="M3 21c2-1 4-7 6-7s2 4 4 4 3-9 5-9 2 6 4 6 3-2 3-2" />
+        <line x1="3" y1="25" x2="25" y2="25" />
+      </svg>
+    );
+  }
+  // key
+  return (
+    <svg {...common} aria-hidden>
+      <circle cx="9" cy="14" r="4.5" />
+      <line x1="13.5" y1="14" x2="25" y2="14" />
+      <line x1="20" y1="14" x2="20" y2="18" />
+      <line x1="24" y1="14" x2="24" y2="17" />
+    </svg>
   );
 }
 

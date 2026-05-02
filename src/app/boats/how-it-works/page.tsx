@@ -84,7 +84,7 @@ export default function BoatsHowItWorks() {
             Compare four paths
           </p>
           <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
-            Solo, charter, yacht club, RYDA.
+            RYDA, solo, charter, yacht club.
           </h2>
           <p className="mt-3 max-w-2xl text-base text-ink-soft">
             Same time on the water, four different cost stacks. Boats
@@ -100,6 +100,11 @@ export default function BoatsHowItWorks() {
                     <th className="px-6 py-5 text-left text-xs uppercase tracking-wider text-mute">
                       Concern
                     </th>
+                    <th className="px-6 py-5 text-center bg-marine/5">
+                      <p className="text-xs uppercase tracking-wider text-marine">
+                        RYDA Boats
+                      </p>
+                    </th>
                     <th className="px-6 py-5 text-center text-xs uppercase tracking-wider text-mute">
                       Solo own
                     </th>
@@ -108,11 +113,6 @@ export default function BoatsHowItWorks() {
                     </th>
                     <th className="px-6 py-5 text-center text-xs uppercase tracking-wider text-mute">
                       Yacht club
-                    </th>
-                    <th className="px-6 py-5 text-center bg-marine/5">
-                      <p className="text-xs uppercase tracking-wider text-marine">
-                        RYDA Boats
-                      </p>
                     </th>
                   </tr>
                 </thead>
@@ -447,10 +447,10 @@ function Row({
       <td className={`px-6 py-4 ${emphasis ? "font-medium text-ink" : "text-ink"}`}>
         {label}
       </td>
+      <td className="bg-marine/5 px-6 py-4 text-center text-ink">{d}</td>
       <td className="px-6 py-4 text-center text-ink-soft">{a}</td>
       <td className="px-6 py-4 text-center text-ink-soft">{b}</td>
       <td className="px-6 py-4 text-center text-ink-soft">{c}</td>
-      <td className="bg-marine/5 px-6 py-4 text-center text-ink">{d}</td>
     </tr>
   );
 }

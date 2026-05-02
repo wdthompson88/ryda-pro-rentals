@@ -15,7 +15,7 @@ export default function LosAngelesPage() {
       intro="LA is the second RYDA market because the fleet is already there, every Ferrari dealership in the country has higher LA delivery rates than anywhere except Miami. The PCH, Mulholland, and Angeles Crest practically require a supercar. Storage and registration both work cleanly in California."
       whyHere={[
         "Second-largest US luxury auto market by volume after Miami.",
-        "Driver-friendly geography, PCH, Mulholland, Angeles Crest, plus track day options at Willow Springs and Buttonwillow.",
+        "Driver-friendly geography, PCH, Mulholland, Angeles Crest. The roads themselves are the destination.",
         "Year-round driving weather (the canyon roads stay dry 9 months a year).",
         "Concentration of entertainment, tech, and finance executives, the demographic RYDA already attracts.",
         "Existing community of car culture and clubs that RYDA can plug into rather than recreate.",
