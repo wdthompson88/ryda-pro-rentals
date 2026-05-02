@@ -169,6 +169,43 @@ export default async function BoatCharterDetail({
         </div>
       </section>
 
+      {/* Trust strip — parallel to /rent/[symbol] hosted-by + trust badges */}
+      <section className="border-b border-rule">
+        <div className="mx-auto max-w-7xl px-6 py-10 sm:px-10">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+            {/* Hosted by RYDA */}
+            <div className="lg:col-span-4">
+              <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-mute">
+                Operated by
+              </p>
+              <div className="mt-3 flex items-center gap-3">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-ink text-cream font-display text-lg">
+                  R
+                </div>
+                <div>
+                  <p className="font-display text-base text-ink">RYDA Boats</p>
+                  <p className="text-[11px] text-ink-soft">
+                    Typically responds within 30 min · business hours
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Trust badges grid */}
+            <div className="lg:col-span-8">
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                <TrustBadge label="Captain" value="USCG licensed" />
+                <TrustBadge label="Crew" value="Captain + mate" />
+                <TrustBadge label="Insurance" value="$1M liability" />
+                <TrustBadge label="Hull coverage" value="Agreed value" />
+                <TrustBadge label="Fuel allowance" value="Bay-day budget" />
+                <TrustBadge label="Min charter" value="6 hours" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Duration discounts */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
@@ -187,6 +224,38 @@ export default async function BoatCharterDetail({
                 )}
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* What's included — parallel to /rent/[symbol] What's-included
+          section, boat-native (captain, fuel, insurance, hurricane). */}
+      <section className="border-b border-rule">
+        <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
+          <h2 className="font-display text-3xl text-ink">
+            What every {b.brand} {b.model} charter includes
+          </h2>
+          <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <Pillar
+              title="Captain + mate"
+              body={
+                b.captainIncluded
+                  ? "Captain and mate every charter. Sport yachts also include a chef on overnight runs."
+                  : "Captain available on request. Bareboat allowed for USCG-licensed members on this hull."
+              }
+            />
+            <Pillar
+              title="Full insurance"
+              body="$1M third-party liability and agreed-value hull coverage. Bundled into the daily rate."
+            />
+            <Pillar
+              title="Fuel allowance"
+              body="Generous fuel budget for typical bay-day use. Long-range runs (Bimini, Bahamas) billed at cost."
+            />
+            <Pillar
+              title="Provisioning on request"
+              body="Concierge stocks the galley, ice, drinks, chef on request. Coordinated by RYDA, billed at cost."
+            />
           </div>
         </div>
       </section>
@@ -240,6 +309,26 @@ function Row({ label, value }: { label: string; value: string }) {
     <div className="flex items-baseline justify-between py-1.5">
       <span className="text-ink-soft">{label}</span>
       <span className="font-medium text-ink tabular-nums">{value}</span>
+    </div>
+  );
+}
+
+function TrustBadge({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-xl border border-rule bg-cream-2/40 p-3">
+      <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-mute">
+        {label}
+      </p>
+      <p className="mt-1 text-sm font-medium text-ink">{value}</p>
+    </div>
+  );
+}
+
+function Pillar({ title, body }: { title: string; body: string }) {
+  return (
+    <div>
+      <p className="font-display text-lg text-ink">{title}</p>
+      <p className="mt-2 text-sm leading-relaxed text-ink-soft">{body}</p>
     </div>
   );
 }

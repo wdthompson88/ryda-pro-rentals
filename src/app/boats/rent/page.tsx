@@ -40,8 +40,48 @@ export default function BoatsRentPage() {
         </div>
       </section>
 
-      {/* Grid */}
+      {/* Counter / summary strip — parallel to /rent's RentalListings
+          counter. Boats charter fleet is small (4 hulls) so we don't
+          need a full filter UI; the counter + visible cards is right-
+          sized for the data. */}
       <section id="available" className="border-b border-rule">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-baseline justify-between gap-4 px-6 py-5 sm:px-10">
+          <p className="text-sm text-ink-soft">
+            <span className="font-display text-xl text-ink tabular-nums">
+              {BOATS.filter((b) => b.rentalAvailable).length}
+            </span>
+            <span className="ml-2">
+              {BOATS.filter((b) => b.rentalAvailable).length === 1
+                ? "hull"
+                : "hulls"}{" "}
+              available
+            </span>
+            <span className="ml-2 text-mute">
+              · Up to{" "}
+              {BOATS.filter((b) => b.rentalAvailable).reduce(
+                (n, b) => n + b.capacity,
+                0,
+              )}{" "}
+              total guest capacity
+            </span>
+          </p>
+          <p className="text-sm text-ink-soft">
+            Daily rates from{" "}
+            <span className="ml-1 font-display text-xl text-ink tabular-nums">
+              {formatUSD(
+                Math.min(
+                  ...BOATS.filter((b) => b.rentalAvailable).map(
+                    (b) => b.rentalDailyRate,
+                  ),
+                ),
+              )}
+            </span>
+          </p>
+        </div>
+      </section>
+
+      {/* Grid */}
+      <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10 sm:py-16">
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {BOATS.filter((b) => b.rentalAvailable).map((b) => (
