@@ -8,7 +8,7 @@ import { StepProgress } from "@/components/step-progress";
 import { BOOKING_POLICY } from "@/lib/market-data";
 import { supabase } from "@/lib/supabase";
 
-// Booking mode is the first decision after vehicle selection — it sets
+// Booking mode is the first decision after vehicle selection, it sets
 // the calendar validation rules (advance window, consecutive cap,
 // active-reservation cap). Inspired by Pacaso SmartStay's two-tier
 // short-notice / general split.
@@ -35,7 +35,7 @@ const VEHICLES = [
 
 export default function NewBookingPage() {
   const router = useRouter();
-  // Auth gate. Booking is a member-only action — the rental policy (28+
+  // Auth gate. Booking is a member-only action, the rental policy (28+
   // driver, member-managed LLC ownership check, KYC complete) lives on
   // top of an authenticated session. Unauthenticated visitors get
   // bounced to /signin with `?next=/bookings/new&reason=checkout` so
@@ -246,7 +246,7 @@ function PickMode({
     <div>
       <h2 className="font-display text-2xl text-ink">What kind of drive?</h2>
       <p className="mt-2 text-sm text-ink-soft">
-        Pick the booking mode — it sets your date window and how many
+        Pick the booking mode, it sets your date window and how many
         active reservations you can hold for {vehicle.name}.
       </p>
 
@@ -470,7 +470,7 @@ function PickDetails({
           value={details.notes}
           onChange={(e) => onChange({ ...details, notes: e.target.value })}
           className="mt-2 w-full rounded-xl border border-rule bg-cream px-4 py-3 text-sm text-ink placeholder:text-mute focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
-          placeholder="Going to a wedding — would love a fresh detail before delivery."
+          placeholder="Going to a wedding, would love a fresh detail before delivery."
         />
       </div>
 

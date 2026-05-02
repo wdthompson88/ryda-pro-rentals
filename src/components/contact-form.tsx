@@ -84,7 +84,7 @@ export function ContactForm() {
   if (status === "success") {
     return (
       <div className="rounded-2xl border border-rule bg-cream-2 px-8 py-10">
-        <p className="font-display text-2xl text-ink">Thanks — message received.</p>
+        <p className="font-display text-2xl text-ink">Thanks, message received.</p>
         <p className="mt-3 text-sm text-ink-soft">
           A team member will respond within one business day.
         </p>

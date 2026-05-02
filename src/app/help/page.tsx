@@ -35,7 +35,7 @@ export default function HelpCenterPage() {
             How can we help?
           </h1>
 
-          {/* Search — submits to the site-wide /search route which
+          {/* Search, submits to the site-wide /search route which
               indexes vehicles, boats, journal, vs pages, and help.
               Help-tagged hits are surfaced first when the query
               matches a help-category keyword. */}

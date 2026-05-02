@@ -1,4 +1,4 @@
-// Sample documents page — a simple list of the legal + operational
+// Sample documents page, a simple list of the legal + operational
 // docs RYDA uses, with a single CTA to request the redacted PDF
 // packet. Detailed inline copy was demoted to internal-only reference
 // per the CEO's polish pass; the public surface stays a quiet index
@@ -67,7 +67,7 @@ export default function SampleDocumentsPage() {
         </div>
       </section>
 
-      {/* Doc list — quiet index, no inline detail */}
+      {/* Doc list, quiet index, no inline detail */}
       {DOCS.map((group) => (
         <section
           key={group.category}

@@ -17,11 +17,11 @@ export type NotifyArgs = {
 };
 
 // Best-effort email notification. Returns true on success, false otherwise.
-// Never throws — calling routes treat email as a side effect of the primary
+// Never throws, calling routes treat email as a side effect of the primary
 // DB write, not a failure mode.
 export async function notifyTeam({ subject, html, replyTo }: NotifyArgs): Promise<boolean> {
   if (!resend || !FROM || !TEAM_EMAIL) {
-    console.log("[notify · skipped — missing resend config]", { subject });
+    console.log("[notify · skipped, missing resend config]", { subject });
     return false;
   }
 
@@ -44,7 +44,7 @@ export async function notifyTeam({ subject, html, replyTo }: NotifyArgs): Promis
   }
 }
 
-// Helpers for building HTML email bodies — kept here so route code stays clean.
+// Helpers for building HTML email bodies, kept here so route code stays clean.
 export function escapeHtml(s: string): string {
   return s
     .replace(/&/g, "&amp;")

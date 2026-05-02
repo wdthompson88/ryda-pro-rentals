@@ -4,14 +4,14 @@ import { SplitterIntro } from "@/components/splitter-intro";
 import { MediaBackground } from "@/components/media-background";
 import { SPLITTER_MEDIA, type MediaSlot } from "@/lib/media";
 
-// Splitter — three full-height columns. One ambient b-roll loop per
+// Splitter, three full-height columns. One ambient b-roll loop per
 // vertical (Lambo / overhead yacht / private jet). Hover lights the
 // column up via brightness/saturation lift + scale + red glow. On
 // reduced-motion preference the videos are skipped and the poster
 // images get a subtle Ken-Burns zoom instead.
 
 export const metadata: Metadata = {
-  title: "RYDA — Luxury vehicle access",
+  title: "RYDA, Luxury vehicle access",
   description:
     "Co-own or rent the world's most coveted luxury vehicles in the US. Cars · Boats · Planes. Member-managed LLCs, professionally operated.",
 };
@@ -29,7 +29,7 @@ type Vertical = {
   status: "live" | "early" | "coming-soon";
   pillLabel: string;
   media: MediaSlot;
-  /** Per-vertical accent — cars use red, boats use marine, planes
+  /** Per-vertical accent, cars use red, boats use marine, planes
    *  stay neutral until they ship. */
   accent: Accent;
 };
@@ -72,7 +72,7 @@ export default function SplitterPage() {
     <main className="relative min-h-screen overflow-hidden bg-[#0E0E10] text-[#F4F1EC]">
       <SplitterIntro />
 
-      {/* Floating top bar — minimal, hovers over the columns. 3-column
+      {/* Floating top bar, minimal, hovers over the columns. 3-column
           grid so "Luxury vehicle access" is truly centered on the page,
           not just floated between unequal-width left/right groups. */}
       <div className="absolute inset-x-0 top-0 z-30 grid grid-cols-3 items-center px-6 py-6 sm:px-10 sm:py-8">
@@ -137,7 +137,7 @@ function VerticalColumn({ v, index }: { v: Vertical; index: number }) {
       href={v.href}
       className="group relative flex min-h-[60vh] flex-1 items-end overflow-hidden border-[#F4F1EC]/10 lg:min-h-screen lg:border-r last:lg:border-r-0"
     >
-      {/* Media layer — random Pexels b-roll loop on top of poster.
+      {/* Media layer, random Pexels b-roll loop on top of poster.
           MediaBackground picks one clip from the videos array on
           mount, so each visit shows different footage. Default state
           is dimmed; hover brightens the whole column. */}
@@ -153,7 +153,7 @@ function VerticalColumn({ v, index }: { v: Vertical; index: number }) {
         />
       </div>
 
-      {/* Dark gradient — heavier at bottom for caption legibility */}
+      {/* Dark gradient, heavier at bottom for caption legibility */}
       <div
         aria-hidden
         className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/15 transition-opacity duration-700 group-hover:from-black/55 group-hover:via-black/15 group-hover:to-transparent"
@@ -165,7 +165,7 @@ function VerticalColumn({ v, index }: { v: Vertical; index: number }) {
         className={`pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t ${accentClasses.glow} to-transparent opacity-0 transition-opacity duration-700 group-hover:opacity-100`}
       />
 
-      {/* Status pill — "Live" uses the vertical accent (red for cars).
+      {/* Status pill, "Live" uses the vertical accent (red for cars).
           "Coming soon" verticals (boats + planes) use the same neutral
           outlined style so they read consistently as "not open yet"
           rather than a solid blue button that suggests an action. */}

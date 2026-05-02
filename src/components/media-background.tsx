@@ -1,6 +1,6 @@
 "use client";
 
-// Background-media component — REBUILT FROM SCRATCH for reliability.
+// Background-media component, REBUILT FROM SCRATCH for reliability.
 //
 // CONTRACT: given a list of video URLs, cycle through them randomly,
 // looping forever. Cross-fade between clips so there's no poster
@@ -16,7 +16,7 @@
 //   Every advance() touches refs synchronously, then triggers a
 //   re-render via setState.
 // - Handlers bind exactly ONCE per slot via callback refs, on mount.
-//   Never re-bind — no cleanup/reattach race conditions.
+//   Never re-bind, no cleanup/reattach race conditions.
 //
 // CROSS-FADE
 // - Active slot's video is opacity 1 and z-index 2 (on top).
@@ -96,14 +96,14 @@ export function MediaBackground({
   const listRef = useRef<string[]>(list);
   listRef.current = list;
 
-  // Render state — drives opacity / z-index in JSX.
+  // Render state, drives opacity / z-index in JSX.
   const [activeSlot, setActiveSlot] = useState<SlotIdx>(0);
   const [slot0Src, setSlot0Src] = useState<string | null>(null);
   const [slot1Src, setSlot1Src] = useState<string | null>(null);
   const [holdPrev, setHoldPrev] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
 
-  // Refs that mirror the render state — kept in sync on every render
+  // Refs that mirror the render state, kept in sync on every render
   // so event handlers (which are bound once and outlive renders) read
   // the LATEST values, not closures captured at bind time.
   const activeSlotRef = useRef<SlotIdx>(0);
@@ -123,7 +123,7 @@ export function MediaBackground({
     s1: false,
   });
 
-  // Initial pick — random clip into slot 0 on first mount.
+  // Initial pick, random clip into slot 0 on first mount.
   useEffect(() => {
     if (list.length === 0) return;
     const startUrl = list[Math.floor(Math.random() * list.length)];
@@ -148,7 +148,7 @@ export function MediaBackground({
   }, []);
 
   // ─── Core advance + promote logic ──────────────────────────────
-  // Stable across renders — uses refs for all reads, so calling these
+  // Stable across renders, uses refs for all reads, so calling these
   // from event handlers never sees stale data.
 
   const advance = useCallback(() => {
@@ -183,7 +183,7 @@ export function MediaBackground({
     const activeIdx_ = activeUrl ? list.indexOf(activeUrl) : -1;
     const inactiveIdx_ = inactiveUrl ? list.indexOf(inactiveUrl) : -1;
 
-    // Pick a next URL — try to avoid BOTH the active and inactive
+    // Pick a next URL, try to avoid BOTH the active and inactive
     // current URLs. Reroll up to a few times. If the list is short
     // (e.g. 2 clips) we fall back to "anything but active."
     let nextIdx = Math.floor(Math.random() * list.length);
@@ -198,7 +198,7 @@ export function MediaBackground({
 
     // FREEZE-PROOF FAST PATH: if the picked URL matches what the
     // inactive slot ALREADY has loaded, calling setSlot{0,1}Src with
-    // the same value is a React no-op — no re-render, no `canplay`,
+    // the same value is a React no-op, no re-render, no `canplay`,
     // the cycle would stall here. Instead, just rewind and play the
     // already-loaded video element and promote it directly.
     if (nextUrl === inactiveUrl && inactiveVideo) {
@@ -207,7 +207,7 @@ export function MediaBackground({
         inactiveVideo.currentTime = startTime ?? 0;
         void inactiveVideo.play().catch(() => {});
       } catch {
-        // Pre-canplay seek may throw — ignore; the play() will still
+        // Pre-canplay seek may throw, ignore; the play() will still
         // resume from current position once the browser is ready.
       }
       promote(inactiveSlot);
@@ -269,7 +269,7 @@ export function MediaBackground({
       };
 
       const onError = () => {
-        // Codec or 404 — skip forward.
+        // Codec or 404, skip forward.
         if (activeSlotRef.current === slot && listRef.current.length > 1) {
           advance();
         }
@@ -324,7 +324,7 @@ export function MediaBackground({
     [bindSlotHandlers],
   );
 
-  // Watchdog — backstop the natural `ended` event in case the browser
+  // Watchdog, backstop the natural `ended` event in case the browser
   // doesn't dispatch it (well-documented edge case for some codecs and
   // for Media Fragment URI clips). Catches the freeze the CEO has been
   // hitting after several cycles.
@@ -357,7 +357,7 @@ export function MediaBackground({
       } else if (v.duration && Number.isFinite(v.duration)) {
         endSec = v.duration;
       } else {
-        // Duration unknown — use a 30s ceiling so we don't freeze
+        // Duration unknown, use a 30s ceiling so we don't freeze
         // forever on metadata-less streams. arm() will re-fire on
         // durationchange if the browser eventually reports duration.
         endSec = (v.currentTime ?? 0) + 30;
@@ -368,7 +368,7 @@ export function MediaBackground({
 
       watchdog = setTimeout(() => {
         // Only fire if we're still the active slot. We DO NOT bail on
-        // v.paused — a video paused at end is exactly the case this
+        // v.paused, a video paused at end is exactly the case this
         // watchdog exists to catch (browser didn't fire `ended`).
         if (activeSlotRef.current === activeSlot) {
           advance();

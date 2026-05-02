@@ -82,7 +82,7 @@ export function CostBreakdown({
       {showRentalScenario && rental.perShareAnnualIncome > 0 ? (
         <div className="border-t border-rule bg-ink/[0.03] px-6 py-5">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            Or — opt into the rental pool
+            Or, opt into the rental pool
           </p>
           <p className="mt-1 text-sm leading-relaxed text-ink-soft">
             Pool your unused days into RYDA's rental program (Miami exotic
@@ -182,7 +182,7 @@ export function CostBreakdown({
         <p className="text-[11px] leading-relaxed text-mute">
           Doctrine: RYDA holds each curated certified pre owned car for {HOLDING_YEARS} years,
           then sells it and distributes proceeds pro-rata. Modeled at{" "}
-          {TARGET_DEPRECIATION_PCT}% depreciation — actual sale price varies
+          {TARGET_DEPRECIATION_PCT}% depreciation, actual sale price varies
           by model, mileage, and market conditions.
         </p>
       </div>

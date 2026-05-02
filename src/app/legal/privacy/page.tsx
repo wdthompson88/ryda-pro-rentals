@@ -7,7 +7,7 @@ export default function PrivacyPage() {
     <LegalPage
       title="Privacy Policy"
       lastUpdated="April 27, 2026"
-      intro="This page describes how RYDA LLC (&ldquo;RYDA&rdquo;, &ldquo;we&rdquo;) collects, uses, and protects your personal information. We treat your data the way we'd want our own treated — only what we need, only for as long as we need it, never sold."
+      intro="This page describes how RYDA LLC (&ldquo;RYDA&rdquo;, &ldquo;we&rdquo;) collects, uses, and protects your personal information. We treat your data the way we'd want our own treated, only what we need, only for as long as we need it, never sold."
       sections={[
         {
           heading: "1. Who we are",
@@ -31,7 +31,7 @@ export default function PrivacyPage() {
         },
         {
           heading: "6. Data retention",
-          body: "We keep your information for as long as your account is active and for a reasonable period after — typically 7 years for transactional records, in line with US tax and securities recordkeeping requirements.",
+          body: "We keep your information for as long as your account is active and for a reasonable period after, typically 7 years for transactional records, in line with US tax and securities recordkeeping requirements.",
         },
         {
           heading: "7. Security",

@@ -25,7 +25,7 @@ export default function SustainabilityPage() {
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
             Not a climate solution. But the math is honest: a single LLC
             with 10 shares (up to 5 members) beats up to 10 separately-owned cars sitting idle
-            in 10 separate garages — whether those shares are held by ten
+            in 10 separate garages, whether those shares are held by ten
             members or a smaller group.
           </p>
         </div>
@@ -80,7 +80,7 @@ export default function SustainabilityPage() {
             />
             <Card
               title="Curated EV/hybrid expansion"
-              body="Our 2027 lineup is 50% hybrid or fully electric — Spectre, Taycan Turbo S, 296 GTB hybrid. Members vote on additions."
+              body="Our 2027 lineup is 50% hybrid or fully electric, Spectre, Taycan Turbo S, 296 GTB hybrid. Members vote on additions."
             />
             <Card
               title="Carbon-offset program (planned)"
@@ -96,7 +96,7 @@ export default function SustainabilityPage() {
             />
             <Card
               title="Vehicle longevity"
-              body="Shared programs typically run cars longer than solo-owned exotics — more consistent care, complete service records, fewer write-offs from inactivity."
+              body="Shared programs typically run cars longer than solo-owned exotics, more consistent care, complete service records, fewer write-offs from inactivity."
             />
           </div>
         </div>
@@ -116,7 +116,7 @@ export default function SustainabilityPage() {
             <p>
               What we can honestly say: shared ownership is a meaningfully
               better outcome than individual ownership across every dimension
-              we measure — manufacturing emissions per driver, idle days,
+              we measure, manufacturing emissions per driver, idle days,
               utilization, lifetime, and end-of-life disposition.
             </p>
             <p>
@@ -136,7 +136,7 @@ export default function SustainabilityPage() {
             More questions?
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
-            We publish annual sustainability data starting Year 1 — vehicle
+            We publish annual sustainability data starting Year 1, vehicle
             utilization rates, fleet emissions, offsets purchased,
             renewable-energy use at our facilities.
           </p>

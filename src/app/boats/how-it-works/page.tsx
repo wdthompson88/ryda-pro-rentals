@@ -88,7 +88,7 @@ export default function BoatsHowItWorks() {
           </h2>
           <p className="mt-3 max-w-2xl text-base text-ink-soft">
             Same time on the water, four different cost stacks. Boats
-            depreciate, dock, and dry-out — the path you pick decides
+            depreciate, dock, and dry-out, the path you pick decides
             who carries those line items.
           </p>
 
@@ -119,10 +119,10 @@ export default function BoatsHowItWorks() {
                 <tbody>
                   <Row
                     label="Asset on your balance sheet"
-                    a="Yes — full hull"
+                    a="Yes, full hull"
                     b="No"
                     c="No"
-                    d="Yes — your share of an LLC"
+                    d="Yes, your share of an LLC"
                     emphasis
                   />
                   <Row
@@ -145,7 +145,7 @@ export default function BoatsHowItWorks() {
                     a="You arrange"
                     b="N/A"
                     c="Limited"
-                    d="Included — haul, store, re-launch"
+                    d="Included, haul, store, re-launch"
                   />
                   <Row
                     label="Insurance + survey"
@@ -200,7 +200,7 @@ export default function BoatsHowItWorks() {
           <div className="mt-12 grid grid-cols-1 gap-5 md:grid-cols-2">
             <Stance
               title="You'd buy a Wajer outright if you used it 60+ days/yr"
-              detail="Solo ownership wins on flexibility and depreciation timing. RYDA isn't your fit — we'd actually push you to a broker."
+              detail="Solo ownership wins on flexibility and depreciation timing. RYDA isn't your fit, we'd actually push you to a broker."
               fit="not-us"
             />
             <Stance
@@ -260,7 +260,7 @@ export default function BoatsHowItWorks() {
             <Reason
               n="06"
               title="3-year planned exit"
-              body="Member vote at year 3 to sell, refit, or roll. Modeled 15% depreciation over the period — generous vs the actual flat-to-+5% Wajers and Rivas have shown 2018–2024."
+              body="Member vote at year 3 to sell, refit, or roll. Modeled 15% depreciation over the period, generous vs the actual flat-to-+5% Wajers and Rivas have shown 2018–2024."
             />
             <Reason
               n="07"
@@ -270,12 +270,12 @@ export default function BoatsHowItWorks() {
             <Reason
               n="08"
               title="Cross-vertical access"
-              body="One RYDA membership covers both boats and cars — Boats members can charter cars and car members can charter boats, subject to availability and tier."
+              body="One RYDA membership covers both boats and cars, Boats members can charter cars and car members can charter boats, subject to availability and tier."
             />
             <Reason
               n="09"
               title="Service-grade ops"
-              body="Provisioning, slip reservations, captain dispatch, charter scheduling, hurricane prep — all single-vendor. Black tier gets dedicated marine account contact."
+              body="Provisioning, slip reservations, captain dispatch, charter scheduling, hurricane prep, all single-vendor. Black tier gets dedicated marine account contact."
             />
           </div>
         </div>
@@ -292,7 +292,7 @@ export default function BoatsHowItWorks() {
           </h2>
           <p className="mt-4 max-w-2xl text-base text-ink-soft">
             A worked example on a Pershing 6X share. Numbers are
-            conservative — most members earn more on a Wajer (lower ops,
+            conservative, most members earn more on a Wajer (lower ops,
             higher day rate) and less on a Lagoon (higher ops, family
             charter rate).
           </p>
@@ -330,7 +330,7 @@ export default function BoatsHowItWorks() {
             <p className="mt-6 border-t border-rule pt-5 text-xs text-mute">
               Day rates vary by hull, season, and bookings volume. Charter
               opt-in is a per-trip choice, not a commitment. Not a
-              guaranteed return — Q3 hurricane months pay less, Memorial-
+              guaranteed return, Q3 hurricane months pay less, Memorial-
               to-Labor pays more. Members see the live booking calendar.
             </p>
           </div>
@@ -355,7 +355,7 @@ export default function BoatsHowItWorks() {
             <Pillar label="Marine-grade insurance, agreed-value" body="LLC named insured, members named additional. Hagerty Marine / CHUBB / Travelers per hull." />
             <Pillar label="Hurricane plan codified at acquisition" body="Pre-arranged haul, indoor storage, post-storm re-launch. Costs known, not surprise-invoiced." />
             <Pillar label="Captain employment agreements" body="Captains employed via the LLC, not RYDA. Members see employment terms." />
-            <Pillar label="Charter opt-in agreement" body="Per-day, per-trip — nothing automatic. Members revoke any time." />
+            <Pillar label="Charter opt-in agreement" body="Per-day, per-trip, nothing automatic. Members revoke any time." />
             <Pillar label="Verified members only" body="28+, KYC, ID + credit + (skipper-license check if bareboat)." />
             <Pillar label="3-yr planned exit + 12-mo transfer market" body="Built-in liquidity. No 'forever' lock-in like club initiations." />
             <Pillar label="Open-book reserve account" body="Replacement engines, electronics, sail wardrobe. Audited annually, balance visible to members." />

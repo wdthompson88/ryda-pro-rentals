@@ -1,4 +1,4 @@
-// Partner rental fleet — operations partner inventory (currently GM LUXE
+// Partner rental fleet, operations partner inventory (currently GM LUXE
 // Miami). Source of truth for inventory + rates: https://www.gmluxe.net/
 //
 // Photos: full galleries scraped from each product page and stored in

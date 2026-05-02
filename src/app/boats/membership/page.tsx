@@ -2,17 +2,17 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 
 export const metadata = {
-  title: "RYDA Boats Membership — Core, Blue, Black",
+  title: "RYDA Boats Membership, Core, Blue — Black",
   description:
     "RYDA Boats membership: Core (free), Blue ($500/yr), Black ($1,500/yr). Co-own or charter. Captain-hours bank, priority slip windows, hurricane prep, marine surveys.",
 };
 
 // Single source of truth for the boats tier matrix.
 // Mirrors the cars tier shape so members on both sides can read
-// the same row labels — but the events / service team / priority rows
+// the same row labels, but the events / service team / priority rows
 // are deliberately boat-native (hurricane prep, slip windows,
 // captain-hours bank, charter-pool dibs). Don't reach for car
-// vocabulary here — boats live and die on different ops.
+// vocabulary here, boats live and die on different ops.
 type CellValue = string | boolean;
 
 const FEATURES: { group: string; items: { label: string; core: CellValue; blue: CellValue; black: CellValue }[] }[] = [
@@ -35,7 +35,7 @@ const FEATURES: { group: string; items: { label: string; core: CellValue; blue: 
       { label: "Priority access to new listings", core: false, blue: "24-hour", black: "48-hour" },
       { label: "Buy-in credit", core: false, blue: "$200", black: "$500" },
       { label: "Acquisition fee discount", core: false, blue: "10% off", black: "Waived (1st share)" },
-      { label: "Priority booking window — peak season (Memorial → Labor)", core: false, blue: "+2 days", black: "+5 days" },
+      { label: "Priority booking window, peak season (Memorial → Labor)", core: false, blue: "+2 days", black: "+5 days" },
       { label: "Charter-pool first dibs (when an owner opens days)", core: false, blue: true, black: true },
     ],
   },
@@ -55,7 +55,7 @@ const FEATURES: { group: string; items: { label: string; core: CellValue; blue: 
     items: [
       { label: "Quarterly Sunset Sail · happy hour from a flagship hull", core: false, blue: true, black: true },
       { label: "Member captains' breakfast (Miami, Bahamas)", core: false, blue: true, black: true },
-      { label: "Miami International Boat Show — member preview day", core: false, blue: true, black: true },
+      { label: "Miami International Boat Show, member preview day", core: false, blue: true, black: true },
       { label: "Annual rendezvous (Bimini, Exuma, or member-voted)", core: false, blue: false, black: true },
       { label: "Annual founders' weekend on the water", core: false, blue: false, black: true },
       { label: "Travel programming (Caribbean week, Mediterranean, etc.)", core: false, blue: "Open to all (paid)", black: "Priority + included" },
@@ -107,8 +107,8 @@ export default function BoatsMembershipPage() {
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
             Core to browse and charter. Blue or Black to claim a share.
-            Boats-specific perks throughout — captain hours, hurricane prep,
-            slip priority — because owning a hull doesn&apos;t look like
+            Boats-specific perks throughout, captain hours, hurricane prep,
+            slip priority, because owning a hull doesn&apos;t look like
             owning a Ferrari.
           </p>
         </div>
@@ -213,7 +213,7 @@ export default function BoatsMembershipPage() {
             <Bullet>Pass identity verification (KYC)</Bullet>
             <Bullet>
               Operator&apos;s license (US, BVI, or equivalent) only required
-              if you intend to skipper personally — most members don&apos;t.
+              if you intend to skipper personally, most members don&apos;t.
               Hulls are crewed by default.
             </Bullet>
             <Bullet>No accredited-investor status required</Bullet>
@@ -262,7 +262,7 @@ function TierCard({ tier }: { tier: typeof TIERS[number] }) {
   const items = FEATURES.flatMap((g) => g.items.filter(isUpgrade)).slice(0, 7);
   const previousLabel = isBlack ? "Everything in Blue, plus" : isBlue ? "Everything in Core, plus" : null;
 
-  // Monochrome tier cards — mirrors the cars /membership treatment.
+  // Monochrome tier cards, mirrors the cars /membership treatment.
   // 2px top accent line in the tier color carries the differentiation:
   // marine Core (entry tier on the boats side) / deeper marine Blue
   // / GOLD Black (only place gold lands on the boats marketing side).
@@ -353,7 +353,7 @@ function Group({ group }: { group: typeof FEATURES[number] }) {
 
 function Cell({ value, accent }: { value: CellValue; accent?: boolean }) {
   // Quiet ink dot for "included," em-dash for "not." Mirrors cars
-  // /membership Cell treatment after the iter 1 polish — no red ✓
+  // /membership Cell treatment after the iter 1 polish, no red ✓
   // marks, no accent column shading. The dot is wrapped with
   // role="img" + aria-label so screen readers announce the state.
   const bg = accent ? "bg-cream-2/40" : "";

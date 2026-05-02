@@ -1,6 +1,6 @@
 // Help center content. Single source of truth for /help, /help/[category],
 // and /help/[category]/[slug]. Articles render from `body` blocks. Keep this
-// file pruned and accurate — these pages are public-facing.
+// file pruned and accurate, these pages are public-facing.
 
 export type HelpBlock =
   | { type: "p"; text: string }
@@ -40,7 +40,7 @@ export const HELP: HelpCategory[] = [
         body: [
           {
             type: "p",
-            text: "RYDA is a US member-managed supercar co-ownership platform. Each vehicle in the fleet is held in a single-purpose LLC with 10 shares (up to 5 members). Each share entitles its holder to ~32 days and ~3,200 miles per year (100 mi/day allowance). Members can hold one share or several — usage and cost scale linearly. A 5-share holder gets ~150 days; a 10-share holder is essentially the solo owner with professional ops.",
+            text: "RYDA is a US member-managed supercar co-ownership platform. Each vehicle in the fleet is held in a single-purpose LLC with 10 shares (up to 5 members). Each share entitles its holder to ~32 days and ~3,200 miles per year (100 mi/day allowance). Members can hold one share or several, usage and cost scale linearly. A 5-share holder gets ~150 days; a 10-share holder is essentially the solo owner with professional ops.",
           },
           {
             type: "p",
@@ -86,17 +86,17 @@ export const HELP: HelpCategory[] = [
         summary:
           "Core is free and lets you browse the fleet. Blue ($500/yr) unlocks co-ownership and rentals. Black ($1,500/yr) adds priority and premium perks.",
         body: [
-          { type: "h3", text: "Core — Free" },
+          { type: "h3", text: "Core, Free" },
           {
             type: "p",
             text: "Free, no commitment. You can browse the fleet, see vehicle data, and read all marketing materials. You cannot claim a co-ownership share, book vehicles, or transfer between members on Core.",
           },
-          { type: "h3", text: "Blue — $500/year ($350 early)" },
+          { type: "h3", text: "Blue, $500/year ($350 early)" },
           {
             type: "p",
             text: "The standard tier for active co-owners. Includes co-ownership shares, member-to-member transfers, member event invitations, and standard member services. Early-100 members lock in $350/year for life.",
           },
-          { type: "h3", text: "Black — $1,500/year ($1,000 early)" },
+          { type: "h3", text: "Black, $1,500/year ($1,000 early)" },
           {
             type: "p",
             text: "For high-utilization members. Adds priority booking during peak season, included white-glove delivery, dedicated dedicated contact, and first-look access on new fleet additions. Early-100 lock in $1,000/year for life.",
@@ -116,7 +116,7 @@ export const HELP: HelpCategory[] = [
         body: [
           {
             type: "p",
-            text: "No accredited-investor status required. RYDA does not offer investments — co-ownership stakes are not registered securities and are not offered for investment purposes. They're a way to share the cost and use of a real car with a small group of other verified members.",
+            text: "No accredited-investor status required. RYDA does not offer investments, co-ownership stakes are not registered securities and are not offered for investment purposes. They're a way to share the cost and use of a real car with a small group of other verified members.",
           },
           { type: "h3", text: "What you do need" },
           {
@@ -131,7 +131,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Why the structure works without accreditation" },
           {
             type: "p",
-            text: "Each car is held in an LLC that you and the other verified members manage together — 5 to 10 co-owners total. RYDA operates the car under a separate management services agreement — but the LLC itself is yours. You're not buying a passive investment product; you're buying the right to use a car you and your co-owners actually own. Because the structure is consumption-first (real ownership, real usage rights, no profit expectation), it falls outside SEC investment-contract classification.",
+            text: "Each car is held in an LLC that you and the other verified members manage together, 5 to 10 co-owners total. RYDA operates the car under a separate management services agreement, but the LLC itself is yours. You're not buying a passive investment product; you're buying the right to use a car you and your co-owners actually own. Because the structure is consumption-first (real ownership, real usage rights, no profit expectation), it falls outside SEC investment-contract classification.",
           },
         ],
       },
@@ -148,9 +148,9 @@ export const HELP: HelpCategory[] = [
           {
             type: "ul",
             items: [
-              "Miami — launching Q3 2026. First market because of high HNW density, year-round driving weather, F1 Grand Prix and Art Basel anchors, and no state income tax.",
-              "Los Angeles — 2027. Second market, focused on the Westside and South Bay.",
-              "New York — 2027. Third market, vehicles based in Westchester / Tri-state with weekend transit to NYC.",
+              "Miami, launching Q3 2026. First market because of high HNW density, year-round driving weather, F1 Grand Prix and Art Basel anchors, and no state income tax.",
+              "Los Angeles, 2027. Second market, focused on the Westside and South Bay.",
+              "New York, 2027. Third market, vehicles based in Westchester / Tri-state with weekend transit to NYC.",
             ],
           },
           {
@@ -206,7 +206,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Pricing locked for life" },
           {
             type: "p",
-            text: "The first 100 members lock in $350/year for Blue tier or $1,000/year for Black tier — for as long as they hold continuous membership. Standard pricing is $500 and $1,500 respectively, so over a 10-year horizon a Black early member saves $5,000.",
+            text: "The first 100 members lock in $350/year for Blue tier or $1,000/year for Black tier, for as long as they hold continuous membership. Standard pricing is $500 and $1,500 respectively, so over a 10-year horizon a Black early member saves $5,000.",
           },
           { type: "h3", text: "Priority on launch fleet" },
           {
@@ -233,7 +233,7 @@ export const HELP: HelpCategory[] = [
         slug: "share-financing",
         q: "Can I finance my co-ownership buy-in?",
         summary:
-          "Yes — through your own personal credit (Marcus, LightStream, SoFi) or a securities-backed line of credit if you have a brokerage account. RYDA itself doesn't lend.",
+          "Yes, through your own personal credit (Marcus, LightStream, SoFi) or a securities-backed line of credit if you have a brokerage account. RYDA itself doesn't lend.",
         body: [
           {
             type: "p",
@@ -242,7 +242,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Personal unsecured loan" },
           {
             type: "p",
-            text: "Many members use unsecured personal loans (Marcus, LightStream, SoFi) to fund a buy-in. Rates are typically 7–14% APR for high-credit borrowers. The LLC share isn't pledged — the loan is just personal credit on your name.",
+            text: "Many members use unsecured personal loans (Marcus, LightStream, SoFi) to fund a buy-in. Rates are typically 7–14% APR for high-credit borrowers. The LLC share isn't pledged, the loan is just personal credit on your name.",
           },
           { type: "h3", text: "Securities-backed line of credit" },
           {
@@ -257,7 +257,7 @@ export const HELP: HelpCategory[] = [
           {
             type: "callout",
             tone: "warn",
-            text: "Cars depreciate. Co-ownership is a luxury access expense, not an investment that's expected to appreciate. Don't borrow more than you'd be comfortable spending — your buy-in funds a depreciating consumption product, like a country-club membership or a jet card.",
+            text: "Cars depreciate. Co-ownership is a luxury access expense, not an investment that's expected to appreciate. Don't borrow more than you'd be comfortable spending, your buy-in funds a depreciating consumption product, like a country-club membership or a jet card.",
           },
         ],
       },
@@ -291,7 +291,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "3. Documents" },
           {
             type: "p",
-            text: "Two documents to sign electronically. The LLC Operating Agreement (governs how you and your co-owners run the LLC together — voting, fair-use, transfers, dissolution) and the Management Services Agreement (the contract between the LLC and RYDA covering operations, insurance, storage, scheduling, maintenance). Both are sent via secure e-signature.",
+            text: "Two documents to sign electronically. The LLC Operating Agreement (governs how you and your co-owners run the LLC together, voting, fair-use, transfers, dissolution) and the Management Services Agreement (the contract between the LLC and RYDA covering operations, insurance, storage, scheduling, maintenance). Both are sent via secure e-signature.",
           },
           { type: "h3", text: "4. Funding" },
           {
@@ -319,12 +319,12 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Operating Agreement" },
           {
             type: "p",
-            text: "The Operating Agreement governs the LLC. The LLC is member-managed — meaning you and your co-owners hold authority over material decisions. Covers: voting thresholds (typically 75% supermajority for sale, replacement, modifications), fair-use rules during peak and off-season, what happens if a co-owner stops paying, how the vehicle gets sold or replaced, transfer mechanics, and dispute resolution. Standard length: 30–40 pages. We provide a 2-page plain-English summary alongside the full document.",
+            text: "The Operating Agreement governs the LLC. The LLC is member-managed, meaning you and your co-owners hold authority over material decisions. Covers: voting thresholds (typically 75% supermajority for sale, replacement, modifications), fair-use rules during peak and off-season, what happens if a co-owner stops paying, how the vehicle gets sold or replaced, transfer mechanics, and dispute resolution. Standard length: 30–40 pages. We provide a 2-page plain-English summary alongside the full document.",
           },
           { type: "h3", text: "Management Services Agreement (MSA)" },
           {
             type: "p",
-            text: "The MSA is between the LLC and RYDA. It defines the services RYDA provides — storage, insurance procurement, scheduling, maintenance, member services — and the all-in annual management fee charged to the LLC (~7–9% of vehicle value, covering RYDA's service component plus pass-through costs). RYDA is a service provider engaged by the LLC's members, not a manager of the LLC itself. The MSA can be renewed or terminated by member vote per the Operating Agreement.",
+            text: "The MSA is between the LLC and RYDA. It defines the services RYDA provides, storage, insurance procurement, scheduling, maintenance, member services, and the all-in annual management fee charged to the LLC (~7–9% of vehicle value, covering RYDA's service component plus pass-through costs). RYDA is a service provider engaged by the LLC's members, not a manager of the LLC itself. The MSA can be renewed or terminated by member vote per the Operating Agreement.",
           },
           { type: "h3", text: "Annual documents" },
           {
@@ -347,17 +347,17 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Usage" },
           {
             type: "p",
-            text: "Each share entitles you to ~32 days and up to ~3,200 miles of vehicle usage per year (100 mi/day allowance), with the exact entitlement set per vehicle when the LLC is formed. Members can hold one share or several — usage scales linearly (5 shares ≈ 150 days; 10 shares ≈ 300 days, with the rest reserved for service and rental pool). Days are booked on a shared calendar with the other co-owners. Fair-use rules cap consecutive days during peak season.",
+            text: "Each share entitles you to ~32 days and up to ~3,200 miles of vehicle usage per year (100 mi/day allowance), with the exact entitlement set per vehicle when the LLC is formed. Members can hold one share or several, usage scales linearly (5 shares ≈ 150 days; 10 shares ≈ 300 days, with the rest reserved for service and rental pool). Days are booked on a shared calendar with the other co-owners. Fair-use rules cap consecutive days during peak season.",
           },
           { type: "h3", text: "Membership" },
           {
             type: "p",
-            text: "You hold a registered LLC membership interest. The LLC is member-managed — you and your co-owners run it together. If the LLC eventually winds down (e.g., the group decides to sell the car and dissolve), the LLC's remaining assets are distributed pro-rata to members per the Operating Agreement.",
+            text: "You hold a registered LLC membership interest. The LLC is member-managed, you and your co-owners run it together. If the LLC eventually winds down (e.g., the group decides to sell the car and dissolve), the LLC's remaining assets are distributed pro-rata to members per the Operating Agreement.",
           },
           { type: "h3", text: "Voting" },
           {
             type: "p",
-            text: "Material decisions — selling the vehicle, performing modifications, replacing the vehicle — require a vote per the Operating Agreement (typically a 75% supermajority by member interest). Routine maintenance, scheduling, and operations are delegated to RYDA via the Management Services Agreement.",
+            text: "Material decisions, selling the vehicle, performing modifications, replacing the vehicle, require a vote per the Operating Agreement (typically a 75% supermajority by member interest). Routine maintenance, scheduling, and operations are delegated to RYDA via the Management Services Agreement.",
           },
           { type: "h3", text: "What it does not include" },
           {
@@ -374,7 +374,7 @@ export const HELP: HelpCategory[] = [
         slug: "selling",
         q: "Can I transfer my share whenever I want?",
         summary:
-          "After a 12-month minimum hold, yes — directly to another verified RYDA member. RYDA facilitates the LLC paperwork. 3% transfer fee.",
+          "After a 12-month minimum hold, yes, directly to another verified RYDA member. RYDA facilitates the LLC paperwork. 3% transfer fee.",
         body: [
           {
             type: "p",
@@ -389,12 +389,12 @@ export const HELP: HelpCategory[] = [
           },
           {
             type: "p",
-            text: "Once the hold period clears, signal your intent to transfer through your dashboard. RYDA helps you negotiate directly with another interested verified member — there's no public marketplace, no order book, and no auction. You and the new co-owner agree on a price; RYDA handles the LLC paperwork to update the member register and Operating Agreement.",
+            text: "Once the hold period clears, signal your intent to transfer through your dashboard. RYDA helps you negotiate directly with another interested verified member, there's no public marketplace, no order book, and no auction. You and the new co-owner agree on a price; RYDA handles the LLC paperwork to update the member register and Operating Agreement.",
           },
           { type: "h3", text: "How pricing usually works" },
           {
             type: "p",
-            text: "Members typically reference a quarterly condition report and comparable-cost context for the vehicle (auction comparables, current retail offers) as a starting point and negotiate from there. This is not an exit price, a published bid, or a guaranteed transfer value — it's plain market context to help two co-owners agree on a number.",
+            text: "Members typically reference a quarterly condition report and comparable-cost context for the vehicle (auction comparables, current retail offers) as a starting point and negotiate from there. This is not an exit price, a published bid, or a guaranteed transfer value, it's plain market context to help two co-owners agree on a number.",
           },
           {
             type: "p",
@@ -403,7 +403,7 @@ export const HELP: HelpCategory[] = [
           {
             type: "callout",
             tone: "info",
-            text: "Co-ownership shares are illiquid by design. Cars depreciate, transfer requires another verified member to want your share, and timing isn't guaranteed. Don't claim a share expecting on-demand exit — claim it because you want to drive the car.",
+            text: "Co-ownership shares are illiquid by design. Cars depreciate, transfer requires another verified member to want your share, and timing isn't guaranteed. Don't claim a share expecting on-demand exit, claim it because you want to drive the car.",
           },
         ],
       },
@@ -428,12 +428,12 @@ export const HELP: HelpCategory[] = [
           },
           {
             type: "p",
-            text: "These are reference numbers only — not exit prices, not published bids, not guaranteed transfer values. Co-owners negotiating a transfer can use them as a starting point or ignore them. There is no automatic matching engine — the transfer happens at whatever price the two members agree to.",
+            text: "These are reference numbers only, not exit prices, not published bids, not guaranteed transfer values. Co-owners negotiating a transfer can use them as a starting point or ignore them. There is no automatic matching engine, the transfer happens at whatever price the two members agree to.",
           },
           {
             type: "callout",
             tone: "info",
-            text: "Cars depreciate. Reference numbers typically decline over time. Don't claim a share expecting it to hold or grow in value — claim it for the use you'll get from the car.",
+            text: "Cars depreciate. Reference numbers typically decline over time. Don't claim a share expecting it to hold or grow in value, claim it for the use you'll get from the car.",
           },
         ],
       },
@@ -460,7 +460,7 @@ export const HELP: HelpCategory[] = [
           },
           {
             type: "p",
-            text: "It's competitive with — usually below — comparable structures (jet card transfer fees run 5–10%). The fee is fixed and disclosed in the Operating Agreement and Management Services Agreement.",
+            text: "It's competitive with, usually below, comparable structures (jet card transfer fees run 5–10%). The fee is fixed and disclosed in the Operating Agreement and Management Services Agreement.",
           },
         ],
       },
@@ -468,7 +468,7 @@ export const HELP: HelpCategory[] = [
         slug: "gifting-and-inheritance",
         q: "Can I gift a share or pass it to my heirs?",
         summary:
-          "Gifts to a verified RYDA member: yes, with a transfer of the membership interest. Inheritance: yes — your share passes to your estate per your will or trust, then to your heirs after they verify.",
+          "Gifts to a verified RYDA member: yes, with a transfer of the membership interest. Inheritance: yes, your share passes to your estate per your will or trust, then to your heirs after they verify.",
         body: [
           { type: "h3", text: "Lifetime gifts" },
           {
@@ -488,7 +488,7 @@ export const HELP: HelpCategory[] = [
           {
             type: "callout",
             tone: "info",
-            text: "Talk to your estate attorney about how to title the share. Many members hold shares through a revocable trust to simplify transfer at death — RYDA accepts trust ownership.",
+            text: "Talk to your estate attorney about how to title the share. Many members hold shares through a revocable trust to simplify transfer at death, RYDA accepts trust ownership.",
           },
         ],
       },
@@ -501,14 +501,14 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Up-front cost" },
           {
             type: "p",
-            text: "A solo Ferrari 296 GTB is $340,000 plus tax (~$365K all-in). A 1/10 share is roughly $34,000. Same vehicle, ten times less up-front cost. Either way, the car depreciates — co-ownership just lets you split the depreciation with the rest of the LLC's members.",
+            text: "A solo Ferrari 296 GTB is $340,000 plus tax (~$365K all-in). A 1/10 share is roughly $34,000. Same vehicle, ten times less up-front cost. Either way, the car depreciates, co-ownership just lets you split the depreciation with the rest of the LLC's members.",
           },
           { type: "h3", text: "Annual carrying cost" },
           {
             type: "ul",
             items: [
               "Solo: $40-80K+/year, depending on the car (insurance, storage, maintenance, depreciation reserve, taxes/registration).",
-              "Co-owned (Ferrari 296 example): ~$7,080/year per share, all-in. Covers your share of insurance, storage, scheduled maintenance, LLC reserves, and RYDA's service fee. Other vehicles vary — see the order panel on each listing.",
+              "Co-owned (Ferrari 296 example): ~$7,080/year per share, all-in. Covers your share of insurance, storage, scheduled maintenance, LLC reserves, and RYDA's service fee. Other vehicles vary, see the order panel on each listing.",
             ],
           },
           { type: "h3", text: "What you trade away" },
@@ -520,8 +520,8 @@ export const HELP: HelpCategory[] = [
           {
             type: "ul",
             items: [
-              "Lower up-front cost and lower annual carry — more access for less commitment.",
-              "Operational ease. RYDA handles every layer — insurance renewals, service appointments, storage, registration, claims.",
+              "Lower up-front cost and lower annual carry, more access for less commitment.",
+              "Operational ease. RYDA handles every layer, insurance renewals, service appointments, storage, registration, claims.",
               "Variety. Some members hold shares in 2–3 different vehicles to vary their experience across the year.",
             ],
           },
@@ -535,7 +535,7 @@ export const HELP: HelpCategory[] = [
         slug: "llc-default",
         q: "What if a co-owner stops paying?",
         summary:
-          "The Operating Agreement has remedies — typically a 30-day cure period, then forced sale of the delinquent share. RYDA's reserve covers operations during cure so other owners are unaffected.",
+          "The Operating Agreement has remedies, typically a 30-day cure period, then forced sale of the delinquent share. RYDA's reserve covers operations during cure so other owners are unaffected.",
         body: [
           { type: "h3", text: "Cure period" },
           {
@@ -545,7 +545,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "If they don't cure" },
           {
             type: "p",
-            text: "The LLC can force transfer of the delinquent share to another verified member at the most recent reference value. Proceeds first cover the unpaid amount, then any LLC-level transaction costs, then the rest goes to the former member. The remaining co-owners aren't on the hook for the unpaid amount — the share itself secures the obligation.",
+            text: "The LLC can force transfer of the delinquent share to another verified member at the most recent reference value. Proceeds first cover the unpaid amount, then any LLC-level transaction costs, then the rest goes to the former member. The remaining co-owners aren't on the hook for the unpaid amount, the share itself secures the obligation.",
           },
           { type: "h3", text: "Why it doesn't disrupt operations" },
           {
@@ -563,11 +563,11 @@ export const HELP: HelpCategory[] = [
         slug: "share-count-changes",
         q: "Can a vehicle's share count change after launch?",
         summary:
-          "No — share count is fixed at LLC formation. New shares cannot be added later. Existing co-owners can buy each other out, but the total share count stays the same.",
+          "No, share count is fixed at LLC formation. New shares cannot be added later. Existing co-owners can buy each other out, but the total share count stays the same.",
         body: [
           {
             type: "p",
-            text: "When a vehicle's LLC is formed, the share count is set permanently in the Operating Agreement (typically 6, sometimes 8 or 10 for higher-value vehicles). This is by design — letting the LLC add shares later would dilute existing co-owners' usage entitlement.",
+            text: "When a vehicle's LLC is formed, the share count is set permanently in the Operating Agreement (typically 6, sometimes 8 or 10 for higher-value vehicles). This is by design, letting the LLC add shares later would dilute existing co-owners' usage entitlement.",
           },
           { type: "h3", text: "Why it's fixed" },
           {
@@ -582,7 +582,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Buyouts within the same LLC" },
           {
             type: "p",
-            text: "Existing co-owners can transfer between each other at any time. If one member transfers two shares to another member, the total is still 6 — just held differently. This is how members consolidate more shares in a vehicle they love.",
+            text: "Existing co-owners can transfer between each other at any time. If one member transfers two shares to another member, the total is still 6, just held differently. This is how members consolidate more shares in a vehicle they love.",
           },
         ],
       },
@@ -632,14 +632,14 @@ export const HELP: HelpCategory[] = [
         body: [
           {
             type: "p",
-            text: "Fair-use rules exist to prevent any one co-owner from monopolizing peak windows when 5–7 other members want the same days. They apply per share — if you hold two shares, you get double the budget.",
+            text: "Fair-use rules exist to prevent any one co-owner from monopolizing peak windows when 5–7 other members want the same days. They apply per share, if you hold two shares, you get double the budget.",
           },
           { type: "h3", text: "Peak season (Miami: May–Sep)" },
           {
             type: "ul",
             items: [
               "7 consecutive days max per share, per booking.",
-              "Two peak weekends per share, max — and not adjacent.",
+              "Two peak weekends per share, max, and not adjacent.",
               "F1 Grand Prix weekend: separate lottery among all co-owners.",
             ],
           },
@@ -683,7 +683,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Force majeure" },
           {
             type: "p",
-            text: "Hurricanes, family emergencies, etc. RYDA Service waives fees on case-by-case basis. Just call us — we're not trying to penalize people for legitimate emergencies.",
+            text: "Hurricanes, family emergencies, etc. RYDA Service waives fees on case-by-case basis. Just call us, we're not trying to penalize people for legitimate emergencies.",
           },
         ],
       },
@@ -695,7 +695,7 @@ export const HELP: HelpCategory[] = [
         body: [
           {
             type: "p",
-            text: "Each share gets ~3,200 miles per year (100 mi/day × ~32 days). Tracking is automatic from vehicle telemetry — you'll see real-time mileage status in your dashboard.",
+            text: "Each share gets ~3,200 miles per year (100 mi/day × ~32 days). Tracking is automatic from vehicle telemetry, you'll see real-time mileage status in your dashboard.",
           },
           { type: "h3", text: "Why a cap exists" },
           {
@@ -745,22 +745,22 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Day trips and same-state travel" },
           {
             type: "p",
-            text: "Day trips and overnight travel within the home state of the vehicle are unrestricted — drive to the Keys from Miami, drive Pacific Coast Highway out of LA, take a vehicle from NYC up to the Hamptons. No special permission needed.",
+            text: "Day trips and overnight travel within the home state of the vehicle are unrestricted, drive to the Keys from Miami, drive Pacific Coast Highway out of LA, take a vehicle from NYC up to the Hamptons. No special permission needed.",
           },
           { type: "h3", text: "Inter-market transit" },
           {
             type: "p",
-            text: "Members in good standing can request inter-market transit with 14+ days notice — say, taking a Miami-based Ferrari to LA for a week. RYDA arranges enclosed transport (member-paid) or escorts a road-trip drive. Insurance follows the vehicle automatically.",
+            text: "Members in good standing can request inter-market transit with 14+ days notice, say, taking a Miami-based Ferrari to LA for a week. RYDA arranges enclosed transport (member-paid) or escorts a road-trip drive. Insurance follows the vehicle automatically.",
           },
           { type: "h3", text: "Long-distance road trips" },
           {
             type: "p",
-            text: "Trips of 500+ miles or 5+ days outside the home market require an extended-trip rider on the insurance and a route filing with RYDA Operations. We don't restrict the trip — we just document it for coverage. Approval typically takes 2–3 days.",
+            text: "Trips of 500+ miles or 5+ days outside the home market require an extended-trip rider on the insurance and a route filing with RYDA Operations. We don't restrict the trip, we just document it for coverage. Approval typically takes 2–3 days.",
           },
           {
             type: "callout",
             tone: "warn",
-            text: "Mexican and Canadian border crossings are not permitted on insurance. Period. If you want to cross either border, contact us — we may be able to arrange specific vehicle and rider combinations, but it's a separate process.",
+            text: "Mexican and Canadian border crossings are not permitted on insurance. Period. If you want to cross either border, contact us, we may be able to arrange specific vehicle and rider combinations, but it's a separate process.",
           },
         ],
       },
@@ -773,7 +773,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Hurricane protocol" },
           {
             type: "p",
-            text: "Once NOAA issues a hurricane watch or warning for the operating market, RYDA Operations recalls all currently-booked vehicles to climate-controlled indoor storage. Pickup arrangements happen through Service — typically a transport driver picks up the vehicle from your location.",
+            text: "Once NOAA issues a hurricane watch or warning for the operating market, RYDA Operations recalls all currently-booked vehicles to climate-controlled indoor storage. Pickup arrangements happen through Service, typically a transport driver picks up the vehicle from your location.",
           },
           { type: "h3", text: "Refunds and rebooking" },
           {
@@ -787,7 +787,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Other weather" },
           {
             type: "p",
-            text: "Standard rain, snow, hail are at member discretion — drive carefully or return early if conditions deteriorate. Hail damage during a booking is comprehensive coverage (low deductible). Salt-belt winter driving is allowed but creates extra detail and inspection cost on return.",
+            text: "Standard rain, snow, hail are at member discretion, drive carefully or return early if conditions deteriorate. Hail damage during a booking is comprehensive coverage (low deductible). Salt-belt winter driving is allowed but creates extra detail and inspection cost on return.",
           },
         ],
       },
@@ -800,7 +800,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Airports" },
           {
             type: "p",
-            text: "Indoor (covered, secured) airport parking is allowed. Most major airports offer it — MIA Premium Parking, LAX Premier, JFK Premium Parking. Off-airport surface lots are not permitted because they lack security and weather protection.",
+            text: "Indoor (covered, secured) airport parking is allowed. Most major airports offer it, MIA Premium Parking, LAX Premier, JFK Premium Parking. Off-airport surface lots are not permitted because they lack security and weather protection.",
           },
           { type: "h3", text: "Hotels and restaurants" },
           {
@@ -815,7 +815,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "What if something happens to it in valet" },
           {
             type: "p",
-            text: "Valet damage is covered by the venue's garage-keepers liability first, then by the RYDA insurance policy as backup. Photograph the vehicle's condition both at handover to valet and at retrieval — it makes any claim 10× easier.",
+            text: "Valet damage is covered by the venue's garage-keepers liability first, then by the RYDA insurance policy as backup. Photograph the vehicle's condition both at handover to valet and at retrieval, it makes any claim 10× easier.",
           },
         ],
       },
@@ -848,7 +848,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Who pays" },
           {
             type: "p",
-            text: "The member responsible for the loss covers the replacement cost. We charge it via your default payment method. If you find the key after we've ordered the replacement, you keep the spare set — most members appreciate having one for future bookings.",
+            text: "The member responsible for the loss covers the replacement cost. We charge it via your default payment method. If you find the key after we've ordered the replacement, you keep the spare set, most members appreciate having one for future bookings.",
           },
           {
             type: "callout",
@@ -881,7 +881,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Physical damage" },
           {
             type: "p",
-            text: "Agreed-value comprehensive and collision coverage. The full retail value of the vehicle is agreed at policy inception and paid in the event of a total loss — no depreciation arguments. Includes theft, fire, weather, vandalism, and collision.",
+            text: "Agreed-value comprehensive and collision coverage. The full retail value of the vehicle is agreed at policy inception and paid in the event of a total loss, no depreciation arguments. Includes theft, fire, weather, vandalism, and collision.",
           },
           { type: "h3", text: "Uninsured / underinsured motorist" },
           {
@@ -928,34 +928,34 @@ export const HELP: HelpCategory[] = [
       },
       {
         slug: "file-claim",
-        q: "How to file a claim — step by step",
+        q: "How to file a claim, step by step",
         summary:
           "Call RYDA Service first (one number, 24/7). Photograph everything. Don't admit fault. We file with the carrier within 24 hours and manage the adjuster.",
         body: [
-          { type: "h3", text: "Step 1 — Get safe and call us" },
+          { type: "h3", text: "Step 1, Get safe and call us" },
           {
             type: "p",
             text: "First priority: medical help if anyone's hurt. Second: move the vehicle out of traffic if it's safe. Third: call the RYDA Service line (in your dashboard, on your insurance card, in this help center). One number, 24/7, real human.",
           },
-          { type: "h3", text: "Step 2 — Document" },
+          { type: "h3", text: "Step 2, Document" },
           {
             type: "p",
             text: "Photograph the vehicle, the other vehicle if applicable, the scene, license plates, and any visible damage. Get the other party's name, phone, license, and insurance info. If police respond, get the report number.",
           },
-          { type: "h3", text: "Step 3 — We file" },
+          { type: "h3", text: "Step 3, We file" },
           {
             type: "p",
             text: "RYDA opens the claim with the insurance carrier within 24 hours. We coordinate the adjuster, repair shop, and rental coverage. You don't have to talk to anyone unless we ask you to.",
           },
-          { type: "h3", text: "Step 4 — Resolution" },
+          { type: "h3", text: "Step 4, Resolution" },
           {
             type: "p",
-            text: "For at-fault collisions, your deductible is charged. For not-at-fault, no deductible. Repair takes whatever it takes — exotic parts have lead times.",
+            text: "For at-fault collisions, your deductible is charged. For not-at-fault, no deductible. Repair takes whatever it takes, exotic parts have lead times.",
           },
           {
             type: "callout",
             tone: "warn",
-            text: "Don't admit fault at the scene. Don't sign anything from the other party's insurance. Let the carriers and adjusters work it out — that's what insurance is for.",
+            text: "Don't admit fault at the scene. Don't sign anything from the other party's insurance. Let the carriers and adjusters work it out, that's what insurance is for.",
           },
         ],
       },
@@ -978,7 +978,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Replacement vehicle" },
           {
             type: "p",
-            text: "If the vehicle is out of service for any reason during your booking — accident, mechanical breakdown, recall — RYDA delivers a replacement of similar tier within 4 hours. No paperwork, no stranding, no phone tree.",
+            text: "If the vehicle is out of service for any reason during your booking, accident, mechanical breakdown, recall, RYDA delivers a replacement of similar tier within 4 hours. No paperwork, no stranding, no phone tree.",
           },
           { type: "h3", text: "Out-of-market" },
           {
@@ -1023,7 +1023,7 @@ export const HELP: HelpCategory[] = [
         body: [
           {
             type: "p",
-            text: "The insurance policy specifies who is covered to drive each vehicle: the verified primary co-owner, plus any verified secondary household driver added to the policy. Anyone else is uninsured — including your friend, your business partner, your significant other unless they're added.",
+            text: "The insurance policy specifies who is covered to drive each vehicle: the verified primary co-owner, plus any verified secondary household driver added to the policy. Anyone else is uninsured, including your friend, your business partner, your significant other unless they're added.",
           },
           { type: "h3", text: "If an unauthorized driver gets in an accident" },
           {
@@ -1043,7 +1043,7 @@ export const HELP: HelpCategory[] = [
           {
             type: "callout",
             tone: "warn",
-            text: "We mean it. The 'just for a quick drive around the block' moment is when one accident wipes out years of saved cost. If your buddy wants to drive, get them a RYDA rental booking — that takes 5 minutes, costs a daily rate, and is fully insured.",
+            text: "We mean it. The 'just for a quick drive around the block' moment is when one accident wipes out years of saved cost. If your buddy wants to drive, get them a RYDA rental booking, that takes 5 minutes, costs a daily rate, and is fully insured.",
           },
         ],
       },
@@ -1077,7 +1077,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Practical advice" },
           {
             type: "p",
-            text: "If a passenger is hurt during a booking, call 911 first, then RYDA Service. Don't move them unless safety requires it. Don't admit fault. Document everything as you would any accident scene — the insurance carrier handles the rest.",
+            text: "If a passenger is hurt during a booking, call 911 first, then RYDA Service. Don't move them unless safety requires it. Don't admit fault. Document everything as you would any accident scene, the insurance carrier handles the rest.",
           },
         ],
       },
@@ -1085,7 +1085,7 @@ export const HELP: HelpCategory[] = [
         slug: "voids-coverage",
         q: "What voids my insurance coverage?",
         summary:
-          "DUI, racing on public roads, unauthorized drivers, off-track motorsport, commercial use, intentional damage, fraud — anything outside the policy's stated use voids coverage.",
+          "DUI, racing on public roads, unauthorized drivers, off-track motorsport, commercial use, intentional damage, fraud, anything outside the policy's stated use voids coverage.",
         body: [
           {
             type: "p",
@@ -1203,7 +1203,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "During the booking" },
           {
             type: "p",
-            text: "If you notice or cause damage, report it through the app or call Service. Faster reporting almost always resolves better — undisclosed damage discovered at return is worse than disclosed damage during the booking.",
+            text: "If you notice or cause damage, report it through the app or call Service. Faster reporting almost always resolves better, undisclosed damage discovered at return is worse than disclosed damage during the booking.",
           },
           { type: "h3", text: "At return" },
           {
@@ -1266,7 +1266,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Black tier" },
           {
             type: "p",
-            text: "Black tier members get included white-glove delivery — vehicle is delivered to your Miami address, fueled and prepped, and picked up at the end of the booking.",
+            text: "Black tier members get included white-glove delivery, vehicle is delivered to your Miami address, fueled and prepped, and picked up at the end of the booking.",
           },
         ],
       },
@@ -1285,7 +1285,7 @@ export const HELP: HelpCategory[] = [
           {
             type: "ul",
             items: [
-              "Every service appointment is at the authorized dealer (Ferrari of Miami, McLaren of Beverly Hills, etc.) — never independent shops or quick-lube chains.",
+              "Every service appointment is at the authorized dealer (Ferrari of Miami, McLaren of Beverly Hills, etc.), never independent shops or quick-lube chains.",
               "Service intervals are tracked and scheduled proactively. Vehicles never go past the manufacturer's recommended interval.",
               "Original-equipment parts only on warranty-covered components. No aftermarket substitutions.",
               "All service records are retained in the LLC's permanent file and re-certified annually.",
@@ -1341,14 +1341,14 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Hybrids" },
           {
             type: "p",
-            text: "Plug-in hybrids (Ferrari 296 GTB, McLaren Artura, Aston Valhalla) are delivered with a full battery and full fuel tank. Members can plug in at home overnight at any J1772 outlet — no special station required.",
+            text: "Plug-in hybrids (Ferrari 296 GTB, McLaren Artura, Aston Valhalla) are delivered with a full battery and full fuel tank. Members can plug in at home overnight at any J1772 outlet, no special station required.",
           },
           { type: "h3", text: "Charging during longer bookings" },
           {
             type: "ul",
             items: [
               "RYDA can install a temporary Level 2 charger at your residence for stays of 7+ days. Removed at the end of the booking.",
-              "Public DC fast charging (Electrify America, EVgo) is paid via the vehicle's onboard credentials — no separate account needed.",
+              "Public DC fast charging (Electrify America, EVgo) is paid via the vehicle's onboard credentials, no separate account needed.",
               "Tesla Superchargers are available on most modern EVs via NACS adapter (provided in the trunk).",
             ],
           },
@@ -1385,9 +1385,9 @@ export const HELP: HelpCategory[] = [
           {
             type: "ul",
             items: [
-              "ACH (recommended for membership renewals and management fees — no card processing fee).",
-              "Credit / debit card (Visa, Mastercard, Amex) — used for incidentals, deductibles, mileage overages.",
-              "Wire transfer — used only for buy-ins. Wire instructions are issued per transaction with the Operating Agreement and MSA.",
+              "ACH (recommended for membership renewals and management fees, no card processing fee).",
+              "Credit / debit card (Visa, Mastercard, Amex), used for incidentals, deductibles, mileage overages.",
+              "Wire transfer, used only for buy-ins. Wire instructions are issued per transaction with the Operating Agreement and MSA.",
             ],
           },
           { type: "h3", text: "What we don't accept" },
@@ -1464,15 +1464,15 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "If you use the vehicle for actual business" },
           {
             type: "p",
-            text: "Members who use a co-owned vehicle for genuine business purposes may have different treatment — including potential deductibility of operating costs allocable to business mileage. This requires recordkeeping that goes beyond what RYDA's normal reporting captures. Talk to your CPA before relying on it.",
+            text: "Members who use a co-owned vehicle for genuine business purposes may have different treatment, including potential deductibility of operating costs allocable to business mileage. This requires recordkeeping that goes beyond what RYDA's normal reporting captures. Talk to your CPA before relying on it.",
           },
         ],
       },
       {
         slug: "kyc",
-        q: "KYC verification — what we collect and why",
+        q: "KYC verification, what we collect and why",
         summary:
-          "Government ID, selfie match, address proof, clean recent driving record. Required before any co-ownership buy-in or member booking. Verified through Persona — RYDA never sees raw documents.",
+          "Government ID, selfie match, address proof, clean recent driving record. Required before any co-ownership buy-in or member booking. Verified through Persona, RYDA never sees raw documents.",
         body: [
           { type: "h3", text: "What we collect" },
           {
@@ -1480,19 +1480,19 @@ export const HELP: HelpCategory[] = [
             items: [
               "Government-issued photo ID (US driver's license, passport, or state ID).",
               "Selfie image for biometric match against the ID photo.",
-              "Address verification (mailing address — used for billing, statements, and DMV records).",
+              "Address verification (mailing address, used for billing, statements, and DMV records).",
               "Date of birth and SSN last-4 (for OFAC sanctions screening).",
             ],
           },
           { type: "h3", text: "Why we collect it" },
           {
             type: "p",
-            text: "Two reasons: (1) insurance — we add you as a named insured to the vehicle's policy, and carriers require verified identity and a clean recent driving record; (2) operational — misrepresenting identity voids coverage and breaches the Operating Agreement.",
+            text: "Two reasons: (1) insurance, we add you as a named insured to the vehicle's policy, and carriers require verified identity and a clean recent driving record; (2) operational, misrepresenting identity voids coverage and breaches the Operating Agreement.",
           },
           { type: "h3", text: "Where it's stored" },
           {
             type: "p",
-            text: "Documents are processed by Persona (or equivalent third-party). RYDA never sees raw ID images. We retain only the verification result, ID type, name, address, and DOB — encrypted, in our member system.",
+            text: "Documents are processed by Persona (or equivalent third-party). RYDA never sees raw ID images. We retain only the verification result, ID type, name, address, and DOB, encrypted, in our member system.",
           },
           { type: "h3", text: "Sharing" },
           {
@@ -1521,7 +1521,7 @@ export const HELP: HelpCategory[] = [
             type: "ul",
             items: [
               "Signal your intent to transfer through your dashboard. Typical resolution: 30–90 days depending on vehicle and price.",
-              "If no member is interested at your price, you can lower it, hold and wait, or — in some cases — RYDA may help facilitate a transfer to a member on the waitlist.",
+              "If no member is interested at your price, you can lower it, hold and wait, or, in some cases, RYDA may help facilitate a transfer to a member on the waitlist.",
             ],
           },
           {
@@ -1548,7 +1548,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "How to refer" },
           {
             type: "p",
-            text: "Account → Referral Program in your dashboard. Generate a unique link. Share it however you like — text, email, in person at a track day, social media (within RYDA's brand guidelines). When someone signs up through your link, the credit lands in your account at the qualifying milestone.",
+            text: "Account → Referral Program in your dashboard. Generate a unique link. Share it however you like, text, email, in person at a track day, social media (within RYDA's brand guidelines). When someone signs up through your link, the credit lands in your account at the qualifying milestone.",
           },
           { type: "h3", text: "What credits can be used for" },
           {
@@ -1575,7 +1575,7 @@ export const HELP: HelpCategory[] = [
         body: [
           {
             type: "p",
-            text: "When RYDA launched, the first 100 members were eligible for permanently locked membership pricing at a $150–500 annual discount. The lock applies to the membership fee only — co-ownership buy-in prices, management fees, and other charges are at standard rates.",
+            text: "When RYDA launched, the first 100 members were eligible for permanently locked membership pricing at a $150–500 annual discount. The lock applies to the membership fee only, co-ownership buy-in prices, management fees, and other charges are at standard rates.",
           },
           { type: "h3", text: "Locked rates" },
           {
@@ -1591,7 +1591,7 @@ export const HELP: HelpCategory[] = [
             type: "ul",
             items: [
               "The lock applies as long as your membership remains active and continuous.",
-              "If you cancel and re-enroll later, you re-enroll at standard pricing — early status is non-recoverable.",
+              "If you cancel and re-enroll later, you re-enroll at standard pricing, early status is non-recoverable.",
               "Status is non-transferable. You can't sell or gift early-100 status to another member.",
               "Status carries through tier changes (e.g., upgrading from Blue to Black keeps your early lock).",
             ],
@@ -1646,7 +1646,7 @@ export const HELP: HelpCategory[] = [
         slug: "member-managed-llc",
         q: "What is a member-managed LLC, and why does RYDA use it?",
         summary:
-          "It's an LLC where the members (the co-owners) hold authority over material decisions — not an outside manager. This is what keeps RYDA a luxury access platform, not an investment product.",
+          "It's an LLC where the members (the co-owners) hold authority over material decisions, not an outside manager. This is what keeps RYDA a luxury access platform, not an investment product.",
         body: [
           { type: "h3", text: "Two types of LLC governance" },
           {
@@ -1656,14 +1656,14 @@ export const HELP: HelpCategory[] = [
           {
             type: "ul",
             items: [
-              "Manager-managed: a designated manager runs the LLC. Members are passive — like shareholders. This is what most fractional investment platforms use, which is what makes those products securities.",
+              "Manager-managed: a designated manager runs the LLC. Members are passive, like shareholders. This is what most fractional investment platforms use, which is what makes those products securities.",
               "Member-managed: the members themselves run the LLC, vote on material decisions, and hire service providers as needed. This is what RYDA uses.",
             ],
           },
           { type: "h3", text: "Why this matters for RYDA" },
           {
             type: "p",
-            text: "Member-managed structure is a cornerstone of RYDA's non-investment positioning. The SEC's Howey test for what counts as a security asks whether members expect to profit from the efforts of others. In a member-managed LLC, you and your co-owners ARE the others — you hold authority. RYDA is hired to perform specific services, not to run the LLC. This is structurally similar to how a country club, condo association, or vacation-home co-ownership group operates — none of which are securities.",
+            text: "Member-managed structure is a cornerstone of RYDA's non-investment positioning. The SEC's Howey test for what counts as a security asks whether members expect to profit from the efforts of others. In a member-managed LLC, you and your co-owners ARE the others, you hold authority. RYDA is hired to perform specific services, not to run the LLC. This is structurally similar to how a country club, condo association, or vacation-home co-ownership group operates, none of which are securities.",
           },
           { type: "h3", text: "What you actually decide as a member" },
           {
@@ -1673,7 +1673,7 @@ export const HELP: HelpCategory[] = [
               "Whether to perform modifications (75% supermajority).",
               "Whether to replace the vehicle on a total loss (75% supermajority).",
               "Whether to renew or terminate the management services agreement with RYDA.",
-              "Day-to-day operations are delegated to RYDA — but you can revoke that delegation by member vote.",
+              "Day-to-day operations are delegated to RYDA, but you can revoke that delegation by member vote.",
             ],
           },
           {
@@ -1691,7 +1691,7 @@ export const HELP: HelpCategory[] = [
         body: [
           {
             type: "p",
-            text: "No. RYDA is a luxury access platform, not an investment platform. Each car is held in a member-managed LLC that you and your co-owners run together. RYDA provides operations under a separate management services agreement. The arrangement is consumption-first — real ownership of a real car, with real usage rights — not a passive investment product.",
+            text: "No. RYDA is a luxury access platform, not an investment platform. Each car is held in a member-managed LLC that you and your co-owners run together. RYDA provides operations under a separate management services agreement. The arrangement is consumption-first, real ownership of a real car, with real usage rights, not a passive investment product.",
           },
           { type: "h3", text: "Why this isn't a security" },
           {
@@ -1701,7 +1701,7 @@ export const HELP: HelpCategory[] = [
           {
             type: "ul",
             items: [
-              "Cars depreciate. Co-owners aren't buying with appreciation expectation — the asset is a depreciating consumption good, like a jet card or a country-club membership.",
+              "Cars depreciate. Co-owners aren't buying with appreciation expectation, the asset is a depreciating consumption good, like a jet card or a country-club membership.",
               "The LLC is member-managed. You and your co-owners hold authority over material decisions (sale, modifications, replacement). RYDA is a hired service provider, not the LLC's decision-maker.",
               "No income distribution. Members get usage; they don't earn yield from the LLC's operations.",
               "Resale is member-to-member transfer of an LLC share, not a public marketplace trade.",
@@ -1714,13 +1714,13 @@ export const HELP: HelpCategory[] = [
               "No accredited-investor verification required.",
               "No SEC filings, no Form D, no Reg D 506(c) restrictions.",
               "Open to anyone 28+ who clears KYC and the standard membership requirements.",
-              "12-month minimum hold still applies (Operating Agreement) — but this is a co-ownership stability rule, not a securities lock-up.",
+              "12-month minimum hold still applies (Operating Agreement), but this is a co-ownership stability rule, not a securities lock-up.",
             ],
           },
           {
             type: "callout",
             tone: "info",
-            text: "RYDA is not a broker-dealer, investment adviser, or fund manager. Co-ownership stakes are not offered for investment purposes. If you're considering this primarily for financial return, this is the wrong product — buy a Ferrari outright or look at a registered fund instead.",
+            text: "RYDA is not a broker-dealer, investment adviser, or fund manager. Co-ownership stakes are not offered for investment purposes. If you're considering this primarily for financial return, this is the wrong product, buy a Ferrari outright or look at a registered fund instead.",
           },
         ],
       },
@@ -1738,7 +1738,7 @@ export const HELP: HelpCategory[] = [
               "Driving record (for insurance underwriting).",
               "Accreditation evidence (CPA/attorney letter or equivalent).",
               "Booking and usage history (telemetry from vehicle systems during your bookings).",
-              "Payment information (encrypted, processed by Stripe — RYDA doesn't store card numbers).",
+              "Payment information (encrypted, processed by Stripe, RYDA doesn't store card numbers).",
             ],
           },
           { type: "h3", text: "Who we share with" },
@@ -1747,7 +1747,7 @@ export const HELP: HelpCategory[] = [
             items: [
               "Insurance carriers (when adding you to a policy).",
               "Federal/state regulators (when legally required).",
-              "Other co-owners on your specific LLC (limited: your name, contact, share count — for booking calendar coordination).",
+              "Other co-owners on your specific LLC (limited: your name, contact, share count, for booking calendar coordination).",
               "Buyer KYC systems on member-to-member share transfers (limited fields, with your consent).",
             ],
           },
@@ -1781,7 +1781,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Tax implications" },
           {
             type: "p",
-            text: "The dissolution generates a final K-1 for the year, including any gain or loss on the disposition. Co-owners report it on their personal tax returns. As always — talk to your CPA, RYDA does not provide tax advice.",
+            text: "The dissolution generates a final K-1 for the year, including any gain or loss on the disposition. Co-owners report it on their personal tax returns. As always, talk to your CPA, RYDA does not provide tax advice.",
           },
         ],
       },
@@ -1789,17 +1789,17 @@ export const HELP: HelpCategory[] = [
         slug: "dispute-resolution",
         q: "How do disagreements between co-owners get resolved?",
         summary:
-          "Most disagreements never escalate — RYDA Operations enforces the Operating Agreement consistently. For ones that do: mandatory mediation first, then arbitration under AAA rules.",
+          "Most disagreements never escalate, RYDA Operations enforces the Operating Agreement consistently. For ones that do: mandatory mediation first, then arbitration under AAA rules.",
         body: [
           { type: "h3", text: "Day-to-day governance" },
           {
             type: "p",
-            text: "RYDA, as the LLC's hired service provider, performs most operational decisions (scheduling, service, condition issues) by applying the Operating Agreement consistently. The LLC remains member-managed — co-owners hold authority over material decisions — but day-to-day operations are delegated to RYDA via the Management Services Agreement. RYDA's authority is bounded by what the Operating Agreement and MSA explicitly delegate.",
+            text: "RYDA, as the LLC's hired service provider, performs most operational decisions (scheduling, service, condition issues) by applying the Operating Agreement consistently. The LLC remains member-managed, co-owners hold authority over material decisions, but day-to-day operations are delegated to RYDA via the Management Services Agreement. RYDA's authority is bounded by what the Operating Agreement and MSA explicitly delegate.",
           },
           { type: "h3", text: "When co-owners disagree" },
           {
             type: "p",
-            text: "Material issues — sale, replacement, modification, or expulsion of a delinquent member — require a vote per the OA's threshold (typically 75%). If a vote fails to reach threshold, the status quo continues until a new vote is called.",
+            text: "Material issues, sale, replacement, modification, or expulsion of a delinquent member, require a vote per the OA's threshold (typically 75%). If a vote fails to reach threshold, the status quo continues until a new vote is called.",
           },
           { type: "h3", text: "Formal disputes" },
           {
@@ -1843,16 +1843,16 @@ export const HELP: HelpCategory[] = [
           {
             type: "ul",
             items: [
-              "Track use is excluded under our standard insurance — RYDA fleet vehicles are not approved for track events.",
-              "Spirited driving on public roads — using the powerband, enjoying corners, normal performance driving within posted limits.",
-              "Launch control on a closed track. Multiple manufacturers (Ferrari, Lambo) actually require periodic use of launch control to keep transmission systems calibrated — but only on track or private property.",
+              "Track use is excluded under our standard insurance, RYDA fleet vehicles are not approved for track events.",
+              "Spirited driving on public roads, using the powerband, enjoying corners, normal performance driving within posted limits.",
+              "Launch control on a closed track. Multiple manufacturers (Ferrari, Lambo) actually require periodic use of launch control to keep transmission systems calibrated, but only on track or private property.",
             ],
           },
           { type: "h3", text: "What's not allowed" },
           {
             type: "ul",
             items: [
-              "Drag racing (sanctioned drag strips not eligible — manufacturer warranty issues + insurance coverage gap).",
+              "Drag racing (sanctioned drag strips not eligible, manufacturer warranty issues + insurance coverage gap).",
               "Drift events, gymkhana, autocross without proper rider and approval.",
               "Sustained high-RPM driving on public roads (street racing, pace runs).",
               "Launch control on public roads (insurance won't cover transmission damage from this).",
@@ -1862,20 +1862,20 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Why we care" },
           {
             type: "p",
-            text: "Aggressive use damages the asset (clutch wear, brake wear, transmission stress) and the cost falls on all co-owners through the next round of valuations. Worse, it's a fast track to voiding warranty and insurance coverage. We're not anti-fun — we're pro-keeping-the-asset-valuable for everyone in the group.",
+            text: "Aggressive use damages the asset (clutch wear, brake wear, transmission stress) and the cost falls on all co-owners through the next round of valuations. Worse, it's a fast track to voiding warranty and insurance coverage. We're not anti-fun, we're pro-keeping-the-asset-valuable for everyone in the group.",
           },
         ],
       },
       {
         slug: "smoking-pets-food",
-        q: "Smoking, pets, food — what's allowed?",
+        q: "Smoking, pets, food, what's allowed?",
         summary:
           "No smoking, no vaping, no recreational substances. Small dogs in carriers OK with pre-approval. Food and drinks OK with care; spills are member-charged.",
         body: [
           { type: "h3", text: "Smoking and vaping" },
           {
             type: "p",
-            text: "No smoking, no vaping, no marijuana. Period. Smoke odor in an exotic interior is permanent — it requires full leather replacement to remove, which can run $15,000+. Detected smoking is a $5,000 cabin restoration fee plus potential membership review.",
+            text: "No smoking, no vaping, no marijuana. Period. Smoke odor in an exotic interior is permanent, it requires full leather replacement to remove, which can run $15,000+. Detected smoking is a $5,000 cabin restoration fee plus potential membership review.",
           },
           { type: "h3", text: "Pets" },
           {
@@ -1890,7 +1890,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Food and drinks" },
           {
             type: "p",
-            text: "Food and drinks are allowed but discouraged — exotic interiors are typically Alcantara or hand-stitched leather, neither of which forgives spills. If you're going to eat or drink in the car, use sealed containers. Spills are charged at actual cleaning cost (typically $200–800).",
+            text: "Food and drinks are allowed but discouraged, exotic interiors are typically Alcantara or hand-stitched leather, neither of which forgives spills. If you're going to eat or drink in the car, use sealed containers. Spills are charged at actual cleaning cost (typically $200–800).",
           },
           {
             type: "callout",
@@ -1903,12 +1903,12 @@ export const HELP: HelpCategory[] = [
         slug: "road-trips",
         q: "Can I take the car on a road trip?",
         summary:
-          "Yes — that's part of what these cars are for. Trips of 500+ miles or 5+ days file an extended-trip rider. Long-distance is a great use of a co-owned exotic.",
+          "Yes, that's part of what these cars are for. Trips of 500+ miles or 5+ days file an extended-trip rider. Long-distance is a great use of a co-owned exotic.",
         body: [
           { type: "h3", text: "Why road trips work well" },
           {
             type: "p",
-            text: "Many of RYDA's most-used member experiences are road trips: Miami-to-Keys, LA-to-Sequoia, NYC-to-Newport. Modern exotics are surprisingly comfortable on long-distance — adaptive suspension, climate control, modern infotainment.",
+            text: "Many of RYDA's most-used member experiences are road trips: Miami-to-Keys, LA-to-Sequoia, NYC-to-Newport. Modern exotics are surprisingly comfortable on long-distance, adaptive suspension, climate control, modern infotainment.",
           },
           { type: "h3", text: "What's needed" },
           {
@@ -1923,7 +1923,7 @@ export const HELP: HelpCategory[] = [
           {
             type: "ul",
             items: [
-              "Plan fuel stops on premium-fuel station maps in advance — not every interstate exit has 93 octane.",
+              "Plan fuel stops on premium-fuel station maps in advance, not every interstate exit has 93 octane.",
               "Plan storage: hotels with secured indoor parking are dramatically nicer than hoping for street parking with a Lambo.",
               "Bring a USB-C cable. Modern exotic infotainment is iPhone-default but cables are car-specific.",
               "Tell Service ahead of time if you'll be far from cell coverage. They want to know if something happens.",
@@ -1947,17 +1947,17 @@ export const HELP: HelpCategory[] = [
             type: "p",
             text: "If the vehicle is going to be a featured display at a major event (Cars & Coffee Miami's main showcase, a manufacturer event, a museum exhibition), notify Service in advance. We'll coordinate a clean prep, possibly arrange transport, and confirm event-specific insurance considerations.",
           },
-          { type: "h3", text: "Photoshoots — personal" },
+          { type: "h3", text: "Photoshoots, personal" },
           {
             type: "p",
             text: "Personal photography (you, your friends, social media content) is fine. The car can be in the photo. We just ask you not to obscure RYDA branding if the vehicle has any (most don't).",
           },
-          { type: "h3", text: "Photoshoots — paid or commercial" },
+          { type: "h3", text: "Photoshoots, paid or commercial" },
           {
             type: "ul",
             items: [
               "Paid photoshoots, brand collaborations, music video appearances, paid social posts: require advance approval and a commercial-use rider.",
-              "Commercial use voids the standard policy without the rider — meaning if the car is damaged during a paid shoot, the insurance won't pay.",
+              "Commercial use voids the standard policy without the rider, meaning if the car is damaged during a paid shoot, the insurance won't pay.",
               "RYDA Service can quote the commercial rider in 24 hours; cost is typically $750–2,500 per shoot day depending on use.",
             ],
           },
@@ -1967,19 +1967,19 @@ export const HELP: HelpCategory[] = [
         slug: "kids-and-baby-seats",
         q: "Can I install a child seat?",
         summary:
-          "Yes, with care. Most modern exotics have ISOFIX/LATCH anchors. Don't damage the upholstery — use a share protector. RYDA can install for you on Black tier.",
+          "Yes, with care. Most modern exotics have ISOFIX/LATCH anchors. Don't damage the upholstery, use a share protector. RYDA can install for you on Black tier.",
         body: [
           { type: "h3", text: "Where it works" },
           {
             type: "p",
-            text: "Most modern exotics (Ferrari 296 GTB, McLaren 720S, Lambo Urus, Aston DBX, Rolls-Royce Cullinan, Porsche Taycan) have ISOFIX/LATCH child-seat anchors in the rear seats or extended cabin. Some 2-seat configurations don't accommodate child seats safely — check the vehicle listing.",
+            text: "Most modern exotics (Ferrari 296 GTB, McLaren 720S, Lambo Urus, Aston DBX, Rolls-Royce Cullinan, Porsche Taycan) have ISOFIX/LATCH child-seat anchors in the rear seats or extended cabin. Some 2-seat configurations don't accommodate child seats safely, check the vehicle listing.",
           },
           { type: "h3", text: "What we ask" },
           {
             type: "ul",
             items: [
               "Use a share protector underneath. The buckles and anchor points scratch leather/Alcantara on hundreds of dollars of upholstery.",
-              "Don't tighten anchors with full force — exotic interior trim can deform.",
+              "Don't tighten anchors with full force, exotic interior trim can deform.",
               "Remove the seat at end of booking. Don't leave it in the car for the next member.",
             ],
           },
@@ -1991,7 +1991,7 @@ export const HELP: HelpCategory[] = [
           {
             type: "callout",
             tone: "info",
-            text: "Two-seat configurations (most McLarens, Ferrari 488 / 296 / F8, Aston Vantage) are typically NOT safe for child seats — the airbag system isn't designed for it and there's no rear seat to relocate to. The Cullinan, Urus, DBX, Taycan, and Bentley Bentayga work well for families.",
+            text: "Two-seat configurations (most McLarens, Ferrari 488 / 296 / F8, Aston Vantage) are typically NOT safe for child seats, the airbag system isn't designed for it and there's no rear seat to relocate to. The Cullinan, Urus, DBX, Taycan, and Bentley Bentayga work well for families.",
           },
         ],
       },
@@ -2111,7 +2111,7 @@ const STOPWORDS = new Set([
   "i", "me", "my", "you", "your", "we", "our", "it", "its",
   "this", "that", "these", "those", "what", "how", "why", "when", "where",
   "can", "should", "would", "could", "will", "shall", "may", "might",
-  "ryda", // every article is about RYDA — no signal
+  "ryda", // every article is about RYDA, no signal
 ]);
 
 function tokenize(s: string): string[] {

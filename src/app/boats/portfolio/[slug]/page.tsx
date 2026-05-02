@@ -30,7 +30,7 @@ export async function generateMetadata({
   const b = getBoatBySlug(slug);
   if (!b) return { title: "RYDA Boats" };
   return {
-    title: `${b.name} — ${formatUSD(b.pricePerShare)} per share | RYDA Boats`,
+    title: `${b.name}, ${formatUSD(b.pricePerShare)} per share | RYDA Boats`,
     description: `Co-own the ${b.year} ${b.name} in ${b.market}. ${formatUSD(b.pricePerShare)} per share, ${formatUSD(b.annualOpCost)}/yr all-in operating cost. ${b.sharesAvailable} of ${b.shares} shares available.`,
   };
 }
@@ -87,7 +87,7 @@ export default async function BoatDetailPage({
         }}
       />
 
-      {/* Hero — image left, order panel right */}
+      {/* Hero, image left, order panel right */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-10 sm:px-10 sm:py-14">
           <Link
@@ -212,7 +212,7 @@ export default async function BoatDetailPage({
         </div>
       </section>
 
-      {/* Ownership primitives — six-number trust block, parallel to
+      {/* Ownership primitives, six-number trust block, parallel to
           the cars detail page. Marine accent. */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-10 sm:px-10">
@@ -224,7 +224,7 @@ export default async function BoatDetailPage({
         </div>
       </section>
 
-      {/* Cost breakdown + share value chart — the cars-portfolio parity the
+      {/* Cost breakdown + share value chart, the cars-portfolio parity the
           CEO flagged was missing. Boat economics use 3-yr hold and
           15% depreciation; charter scenario shown when applicable. */}
       <section className="border-b border-rule bg-cream-2">
@@ -267,8 +267,8 @@ export default async function BoatDetailPage({
                 Linear depreciation modeled at{" "}
                 {(BOATS_TARGET_DEPRECIATION_PCT / BOATS_HOLDING_YEARS).toFixed(1)}%
                 per year over the {BOATS_HOLDING_YEARS}-year hold. Real
-                depreciation curves vary — classic Rivas appreciate, big
-                sport yachts compress faster — but the chart anchors the
+                depreciation curves vary, classic Rivas appreciate, big
+                sport yachts compress faster, but the chart anchors the
                 conversation in numbers, not vibes.
               </p>
             </div>
@@ -279,7 +279,7 @@ export default async function BoatDetailPage({
         </div>
       </section>
 
-      {/* Interactive cost calculator — parallel to cars detail. Lets
+      {/* Interactive cost calculator, parallel to cars detail. Lets
           buyers move shares + days + occupancy sliders to model their
           own scenario without leaving the listing. */}
       <section id="calculator" className="border-b border-rule">
@@ -308,7 +308,7 @@ export default async function BoatDetailPage({
             How booking works
           </p>
           <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
-            Two booking modes — short-notice and planned.
+            Two booking modes, short-notice and planned.
           </h2>
           <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
             <BookingCard
@@ -316,7 +316,7 @@ export default async function BoatDetailPage({
               window={`${BOAT_BOOKING_POLICY.shortNotice.minDaysAdvance}–${BOAT_BOOKING_POLICY.shortNotice.maxDaysAdvance} days advance`}
               limit="Unlimited"
               consecutive={`Max ${BOAT_BOOKING_POLICY.shortNotice.maxConsecutiveDays} consecutive days`}
-              example="Sunday looks clear — head to Stiltsville on Saturday."
+              example="Sunday looks clear, head to Stiltsville on Saturday."
             />
             <BookingCard
               tag="Planned"
@@ -353,7 +353,7 @@ export default async function BoatDetailPage({
             />
             <Pillar
               title="Hurricane prep"
-              body="Bundled. Haul-out triggered by named storms in Atlantic basin crossing latitude of Cuba — no per-event charge."
+              body="Bundled. Haul-out triggered by named storms in Atlantic basin crossing latitude of Cuba, no per-event charge."
             />
           </div>
         </div>
@@ -369,7 +369,7 @@ export default async function BoatDetailPage({
             Charter the {b.brand} {b.model} for {formatUSD(b.rentalDailyRate)}/day.
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
-            Crewed by default — captain, mate, and (sport yachts) chef.
+            Crewed by default, captain, mate, and (sport yachts) chef.
             Book a weekend, decide if a share fits.
           </p>
           <Link
@@ -381,7 +381,7 @@ export default async function BoatDetailPage({
         </div>
       </section>
 
-      {/* Sample documents + founder call CTA — parallel to /markets/[symbol]
+      {/* Sample documents + founder call CTA, parallel to /markets/[symbol]
           which has its own founders-call CTA strip below the booking
           policy section. */}
       <section className="border-b border-rule">
@@ -401,7 +401,7 @@ export default async function BoatDetailPage({
                 available pre-application.
               </p>
               <Link
-                href={`/contact?type=Membership&note=${encodeURIComponent(`Sample documents — ${b.name}`)}#form`}
+                href={`/contact?type=Membership&note=${encodeURIComponent(`Sample documents, ${b.name}`)}#form`}
                 className="mt-6 inline-flex h-11 items-center justify-center border border-ink bg-ink px-6 text-sm font-medium text-cream transition-colors hover:bg-marine hover:border-marine"
               >
                 Request the packet
@@ -420,7 +420,7 @@ export default async function BoatDetailPage({
                 commitment.
               </p>
               <Link
-                href={`/contact?type=Membership&note=${encodeURIComponent(`Schedule a call — ${b.name}`)}#form`}
+                href={`/contact?type=Membership&note=${encodeURIComponent(`Schedule a call, ${b.name}`)}#form`}
                 className="mt-6 inline-flex h-11 items-center justify-center border border-ink px-6 text-sm font-medium text-ink transition-colors hover:bg-ink hover:text-cream"
               >
                 Schedule a call
@@ -430,12 +430,12 @@ export default async function BoatDetailPage({
         </div>
       </section>
 
-      {/* Disclaimer — parallel to /markets/[symbol] footer disclaimer */}
+      {/* Disclaimer, parallel to /markets/[symbol] footer disclaimer */}
       <section>
         <div className="mx-auto max-w-3xl px-6 py-12 text-center text-xs text-mute sm:px-10">
           <p>
             RYDA Boats co-ownership stakes are membership interests in
-            single-purpose member-managed LLCs — not registered
+            single-purpose member-managed LLCs, not registered
             securities, not offered for investment purposes. Modeled
             depreciation and charter income are illustrative only; actual
             results depend on use, market, and operator. See the{" "}

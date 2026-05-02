@@ -30,7 +30,7 @@ export async function generateStaticParams() {
 }
 
 // Revalidate hourly so the booking-card default dates ("2 weeks out") stay
-// fresh — never shows past dates after a few days in the wild.
+// fresh, never shows past dates after a few days in the wild.
 export const revalidate = 3600;
 
 type ResolvedListing =
@@ -66,7 +66,7 @@ export async function generateMetadata({
   const title = listingTitle(r);
   const rate = listingDailyRate(r);
   return {
-    title: `Rent the ${title} — ${formatUSD(rate)}/day | RYDA`,
+    title: `Rent the ${title}, ${formatUSD(rate)}/day | RYDA`,
     description: `Hand-prepared, fully insured, white-glove delivered. ${title} in ${r.vehicle.market}.`,
   };
 }
@@ -178,11 +178,11 @@ export default async function RentDetailPage({
                 <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-soft">
                   {r.kind === "ryda"
                     ? r.vehicle.description
-                    : `Hand-prepared, fully insured, and white-glove delivered. The ${title} is part of the RYDA Miami fleet — book a day or a week, we handle the logistics. 100 mi/day included with overage at $4/mi; full insurance bundled.`}
+                    : `Hand-prepared, fully insured, and white-glove delivered. The ${title} is part of the RYDA Miami fleet, book a day or a week, we handle the logistics. 100 mi/day included with overage at $4/mi; full insurance bundled.`}
                 </p>
               </div>
 
-              {/* Specs grid — only RYDA fleet has full specs; partner cards
+              {/* Specs grid, only RYDA fleet has full specs; partner cards
                   use a compact info row instead. */}
               {r.kind === "ryda" ? (
                 <div className="mt-10 grid grid-cols-2 gap-x-10 gap-y-6 border-t border-rule pt-8 sm:grid-cols-3 lg:grid-cols-6">
@@ -313,7 +313,7 @@ export default async function RentDetailPage({
         </div>
       </section>
 
-      {/* Trust strip — hosted by, response time, badges */}
+      {/* Trust strip, hosted by, response time, badges */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-10 sm:px-10">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
@@ -481,7 +481,7 @@ export default async function RentDetailPage({
         </div>
       </section>
 
-      {/* Or claim a co-ownership share — only for RYDA fleet with shares left */}
+      {/* Or claim a co-ownership share, only for RYDA fleet with shares left */}
       {r.kind === "ryda" && r.vehicle.sharesAvailable > 0 && (
         <section className="border-b border-rule bg-ink py-14 text-cream">
           <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">

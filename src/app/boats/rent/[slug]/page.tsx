@@ -19,7 +19,7 @@ export async function generateMetadata({
   const b = getBoatBySlug(slug);
   if (!b) return { title: "RYDA Boats Charter" };
   return {
-    title: `Charter the ${b.name} — ${formatUSD(b.rentalDailyRate)}/day | RYDA Boats`,
+    title: `Charter the ${b.name}, ${formatUSD(b.rentalDailyRate)}/day | RYDA Boats`,
     description: `Crewed charter on the ${b.year} ${b.name}. ${b.lengthFt}-foot ${b.category}, captain + mate included, full insurance, white-glove handover. ${b.market}.`,
   };
 }
@@ -169,7 +169,7 @@ export default async function BoatCharterDetail({
         </div>
       </section>
 
-      {/* Trust strip — parallel to /rent/[symbol] hosted-by + trust badges */}
+      {/* Trust strip, parallel to /rent/[symbol] hosted-by + trust badges */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-10 sm:px-10">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
@@ -228,7 +228,7 @@ export default async function BoatCharterDetail({
         </div>
       </section>
 
-      {/* What's included — parallel to /rent/[symbol] What's-included
+      {/* What's included, parallel to /rent/[symbol] What's-included
           section, boat-native (captain, fuel, insurance, hurricane). */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">

@@ -117,14 +117,14 @@ export default function PortfolioPage() {
           <ul className="mt-6 divide-y divide-rule rounded-xl border border-rule bg-surface">
             <Activity label="Booking confirmed" detail="Ferrari 296 GTB · Apr 28 – May 1" date="2 hours ago" />
             <Activity label="Inspection report posted" detail="McLaren 750S Spider · 2,140 mi" date="Yesterday" />
-            <Activity label="Quarterly mgmt fee paid" detail="$1,700 — Ferrari 296 LLC" date="3 days ago" />
-            <Activity label="New co-owner joined" detail="McLaren 750S LLC — welcome Jordan" date="2 weeks ago" />
+            <Activity label="Quarterly mgmt fee paid" detail="$1,700, Ferrari 296 LLC" date="3 days ago" />
+            <Activity label="New co-owner joined" detail="McLaren 750S LLC, welcome Jordan" date="2 weeks ago" />
             <Activity label="Welcome to RYDA Blue" detail="Annual membership active" date="3 weeks ago" />
           </ul>
         </div>
       </section>
 
-      {/* CTA — explore more */}
+      {/* CTA, explore more */}
       <section className="bg-ink py-16 text-cream">
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
           <h2 className="font-display text-3xl sm:text-4xl">

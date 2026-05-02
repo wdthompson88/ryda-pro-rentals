@@ -18,7 +18,7 @@ import {
 } from "@/lib/boat-content";
 
 export const metadata: Metadata = {
-  title: "RYDA Boats — Co-own or charter the world's most beautiful boats",
+  title: "RYDA Boats, Co-own or charter the world's most beautiful boats",
   description:
     "Boat co-ownership and crewed charter in Miami. Each hull held in a member-managed LLC; up to 5 verified members co-own every boat. Three-year planned exit.",
 };
@@ -31,7 +31,7 @@ export default function BoatsHome() {
     <>
       <SiteHeader />
 
-      {/* Hero — copy left, editorial boat image right (parallel to cars) */}
+      {/* Hero, copy left, editorial boat image right (parallel to cars) */}
       <section className="border-b border-rule">
         <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-6 py-20 sm:px-10 sm:py-24 lg:grid-cols-12 lg:gap-12">
           <div className="lg:col-span-6">
@@ -61,7 +61,7 @@ export default function BoatsHome() {
             </div>
           </div>
 
-          {/* Editorial boat image — links to the listing */}
+          {/* Editorial boat image, links to the listing */}
           <div className="lg:col-span-6">
             <Link
               href={`/boats/portfolio/${heroBoat.slug}`}
@@ -100,7 +100,7 @@ export default function BoatsHome() {
         </div>
       </section>
 
-      {/* Featured boats — same four for both share + charter */}
+      {/* Featured boats, same four for both share + charter */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
           <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
@@ -165,7 +165,7 @@ export default function BoatsHome() {
         </div>
       </section>
 
-      {/* Charter rail — same four boats, framed for charter */}
+      {/* Charter rail, same four boats, framed for charter */}
       <section className="border-b border-rule bg-ink text-cream">
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
           <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
@@ -177,7 +177,7 @@ export default function BoatsHome() {
                 Charter the same hulls before you commit.
               </h2>
               <p className="mt-3 max-w-xl text-base text-cream/70">
-                Crewed by default — RYDA-vetted captain, mate and (for
+                Crewed by default, RYDA-vetted captain, mate and (for
                 sport yachts) chef. Bareboat available on the Riva and
                 Lagoon for USCG-licensed members.
               </p>
@@ -241,7 +241,7 @@ export default function BoatsHome() {
           </h2>
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink-soft">
             Solo yacht ownership runs ~$300–800K a year before you take
-            the lines off. RYDA is the third option — real ownership,
+            the lines off. RYDA is the third option, real ownership,
             zero ops burden, planned 3-year exit.
           </p>
           <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-3 lg:grid-cols-5">
@@ -303,7 +303,7 @@ export default function BoatsHome() {
           </div>
           <p className="mt-6 text-xs text-cream/50">
             Membership is limited to verified individuals 28 years or
-            older. RYDA is a luxury access platform — co-ownership
+            older. RYDA is a luxury access platform, co-ownership
             stakes are not investments and are not offered for
             investment purposes.
           </p>

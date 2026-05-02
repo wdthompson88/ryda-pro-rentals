@@ -1,15 +1,15 @@
 import { SiteHeader } from "@/components/site-header";
 import { InvestorInquiryForm } from "@/components/investor-inquiry-form";
 
-// /investors — public-facing investor contact surface only.
+// /investors, public-facing investor contact surface only.
 // Detailed numbers, projections, and the pitch deck are intentionally
-// confidential — the team emails the deck (PDF) directly to qualified
+// confidential, the team emails the deck (PDF) directly to qualified
 // inquirers. The deck is no longer accessible from the public web.
 
 export const metadata = {
-  title: "RYDA — Investor inquiry",
+  title: "RYDA, Investor inquiry",
   description:
-    "Investor inquiry for RYDA — US member-managed supercar co-ownership. Qualified investors receive a confidential deck via email.",
+    "Investor inquiry for RYDA, US member-managed supercar co-ownership. Qualified investors receive a confidential deck via email.",
 };
 
 export default function InvestorsPage() {

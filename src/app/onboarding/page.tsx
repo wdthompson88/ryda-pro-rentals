@@ -174,13 +174,13 @@ function Financial({ onNext, onBack }: { onNext: () => void; onBack: () => void 
             "I love these cars and want to drive more of them",
             "I want a Ferrari without buying one outright",
             "I rent exotics now and the math no longer works",
-            "I'm exploring — not sure yet",
+            "I'm exploring, not sure yet",
           ]}
         />
         <Select
           label="How often do you drive a supercar today?"
           options={[
-            "Never — but I want to",
+            "Never, but I want to",
             "A few days a year (rentals, friends' cars)",
             "I own one already and want a second flavor",
             "Regularly via track days or a club",
@@ -262,11 +262,11 @@ function Done() {
       </div>
       <h2 className="mt-6 font-display text-3xl text-ink">You're in.</h2>
       <p className="mt-3 text-base text-ink-soft">
-        Welcome to RYDA. Your application is under review — we'll send a
+        Welcome to RYDA. Your application is under review, we'll send a
         decision within 5 business days.
       </p>
       <div className="mt-8 rounded-xl border border-rule bg-cream-2/40 p-5 text-left text-sm">
-        <p className="font-medium text-ink">Member #00104 — Pending review</p>
+        <p className="font-medium text-ink">Member #00104, Pending review</p>
         <ul className="mt-3 space-y-2 text-ink-soft">
           <li>· Identity verification: Submitted</li>
           <li>· Financial qualification: Submitted</li>

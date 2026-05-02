@@ -16,7 +16,7 @@ export async function generateMetadata({
   const v = getVehicleBySymbol(symbol);
   if (!v) return { title: "Claim a co-ownership share — RYDA" };
   return {
-    title: `Claim a share — ${v.name} | RYDA`,
+    title: `Claim a share, ${v.name} | RYDA`,
     description: `Become a co-owner of the ${v.year} ${v.name}. ${formatUSD(v.pricePerShare)} per share.`,
   };
 }

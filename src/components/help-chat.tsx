@@ -26,7 +26,7 @@ const SUGGESTIONS = [
 const GREETING: ChatMessage = {
   id: "greeting",
   role: "bot",
-  text: "Hi — I'm RYDA's help assistant. Ask me anything about membership, shares, bookings, insurance, maintenance, or how the platform works. I'll do my best to answer directly and point you to the full article. Need a real human? Just say so.",
+  text: "Hi, I'm RYDA's help assistant. Ask me anything about membership, shares, bookings, insurance, maintenance, or how the platform works. I'll do my best to answer directly and point you to the full article. Need a real human? Just say so.",
 };
 
 const INTROS = ["Here's the gist:", "Quick answer:", "Short version:", "From the help docs:"];
@@ -180,7 +180,7 @@ export function HelpChat() {
                 ...m,
                 escalation: "submitted",
                 submittedEmail: payload.email,
-                text: `Got it — we'll email ${payload.email} within one business day. Anything else I can help with in the meantime?`,
+                text: `Got it, we'll email ${payload.email} within one business day. Anything else I can help with in the meantime?`,
               }
             : m,
         ),
@@ -223,7 +223,7 @@ export function HelpChat() {
         <span>{open ? "Close" : "Ask RYDA"}</span>
       </button>
 
-      {/* Panel — non-modal: doesn't trap focus or block the page */}
+      {/* Panel, non-modal: doesn't trap focus or block the page */}
       {open && (
         <section
           id="ryda-help-chat-panel"
@@ -424,7 +424,7 @@ function EscalationForm({
     } catch {
       setError("Something went wrong. Try again.");
     } finally {
-      // Always reset the spinner — handleEscalate (the parent onSubmit)
+      // Always reset the spinner, handleEscalate (the parent onSubmit)
       // catches its own errors and pushes a bot message instead of
       // re-throwing, so without `finally` a 429/500 leaves the submit
       // button stuck on "Sending…" indefinitely. The form unmounts on

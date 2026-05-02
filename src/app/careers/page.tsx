@@ -35,7 +35,7 @@ const ROLES = [
     title: "Brand Designer",
     type: "Full-time or contract",
     location: "Remote (US)",
-    body: "Design the visual identity at every touchpoint — site, app, member-facing PDFs, signage, livery on the vehicles themselves. You should be able to point at a thing in the world and tell us why the typography is right.",
+    body: "Design the visual identity at every touchpoint, site, app, member-facing PDFs, signage, livery on the vehicles themselves. You should be able to point at a thing in the world and tell us why the typography is right.",
   },
 ];
 
@@ -54,7 +54,7 @@ export default function CareersPage() {
           <p className="mt-8 max-w-2xl text-lg text-ink-soft">
             We're hiring for the Miami launch. Small team, real equity, real
             cars, no committee. If you've ever wanted to build a brand from
-            zero with the people who actually decide what gets built — read on.
+            zero with the people who actually decide what gets built, read on.
           </p>
         </div>
       </section>

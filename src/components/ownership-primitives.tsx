@@ -1,4 +1,4 @@
-// Reusable "ownership primitives" block — the six numbers a member
+// Reusable "ownership primitives" block, the six numbers a member
 // needs to internalise before they wire money. Pacaso uses crisp
 // fractional primitives (1/8 share, 8 owners, etc) as a hero-adjacent
 // trust block; we do the same with vertical-specific numbers.
@@ -6,7 +6,7 @@
 // Drops into:
 //   - / (home, hero-adjacent)
 //   - /markets, /markets/[symbol] (cars)
-//   - /boats/portfolio, /boats/portfolio/[slug] (boats — pass vertical='boats')
+//   - /boats/portfolio, /boats/portfolio/[slug] (boats, pass vertical='boats')
 //   - /how-it-works, /boats/how-it-works (foundational reference)
 
 import {
@@ -41,7 +41,7 @@ export function OwnershipPrimitives({
       ? "bg-cream-2/40"
       : "bg-surface";
   const wrapperBorder = isDark ? "border-cream/10" : "border-rule";
-  // Cars use red, boats use marine — same accent system as the rest
+  // Cars use red, boats use marine, same accent system as the rest
   // of the vertical's pages.
   const accentClass = vertical === "boats" ? "text-marine" : "text-red";
   const eyebrowTone = isDark ? accentClass : accentClass;

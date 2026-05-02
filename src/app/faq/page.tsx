@@ -19,7 +19,7 @@ const SECTIONS: { title: string; questions: Q[] }[] = [
       },
       {
         q: "How many co-ownership shares per vehicle?",
-        a: "10 shares per vehicle by default. Each share entitles you to ~32 days and up to ~3,200 miles of usage per year (100 mi/day allowance). A single member can hold one share or several — usage scales linearly.",
+        a: "10 shares per vehicle by default. Each share entitles you to ~32 days and up to ~3,200 miles of usage per year (100 mi/day allowance). A single member can hold one share or several, usage scales linearly.",
       },
       {
         q: "Are RYDA co-ownership stakes securities?",
@@ -27,7 +27,7 @@ const SECTIONS: { title: string; questions: Q[] }[] = [
       },
       {
         q: "Can I transfer my share whenever I want?",
-        a: "After a 12-month minimum hold, yes — directly to another verified RYDA member. RYDA facilitates the LLC paperwork. There is no public marketplace and no order book. Settlement takes 1–3 business days. RYDA charges a 3% transfer fee on the agreed price.",
+        a: "After a 12-month minimum hold, yes, directly to another verified RYDA member. RYDA facilitates the LLC paperwork. There is no public marketplace and no order book. Settlement takes 1–3 business days. RYDA charges a 3% transfer fee on the agreed price.",
       },
       {
         q: "What if a co-owner stops paying?",
@@ -35,7 +35,7 @@ const SECTIONS: { title: string; questions: Q[] }[] = [
       },
       {
         q: "What if a major mechanical issue comes up?",
-        a: "RYDA only acquires certified pre owned vehicles, and every car gets a documented multi-point Pre-Purchase Inspection by a marque specialist before the LLC closes on it. Powertrain and major mechanical systems are covered by an active certified pre owned warranty during the LLC's first ownership period. Out-of-warranty repairs come from the LLC's maintenance reserve — not from co-owners' pockets. Co-owners aren't on the hook for surprise engine, transmission or driveline bills.",
+        a: "RYDA only acquires certified pre owned vehicles, and every car gets a documented multi-point Pre-Purchase Inspection by a marque specialist before the LLC closes on it. Powertrain and major mechanical systems are covered by an active certified pre owned warranty during the LLC's first ownership period. Out-of-warranty repairs come from the LLC's maintenance reserve, not from co-owners' pockets. Co-owners aren't on the hook for surprise engine, transmission or driveline bills.",
       },
       {
         q: "What if the car gets totaled?",
@@ -48,7 +48,7 @@ const SECTIONS: { title: string; questions: Q[] }[] = [
     questions: [
       {
         q: "Who can join?",
-        a: "Verified individuals 28 years or older with a valid US driver's license, a clean recent driving record and the ability to pass identity verification (KYC). No accredited-investor status or financial qualification required — RYDA is a luxury access platform, not an investment platform.",
+        a: "Verified individuals 28 years or older with a valid US driver's license, a clean recent driving record and the ability to pass identity verification (KYC). No accredited-investor status or financial qualification required, RYDA is a luxury access platform, not an investment platform.",
       },
       {
         q: "Does membership cost anything?",
@@ -60,7 +60,7 @@ const SECTIONS: { title: string; questions: Q[] }[] = [
       },
       {
         q: "Can I join from anywhere in the US?",
-        a: "Yes — but the actual vehicles only operate in our launch markets. Miami first (Q3 2026), then LA (2027), then NY (2027). Members anywhere in the US can join early to lock in early-member pricing.",
+        a: "Yes, but the actual vehicles only operate in our launch markets. Miami first (Q3 2026), then LA (2027), then NY (2027). Members anywhere in the US can join early to lock in early-member pricing.",
       },
     ],
   },
@@ -69,7 +69,7 @@ const SECTIONS: { title: string; questions: Q[] }[] = [
     questions: [
       {
         q: "Where are the cars stored?",
-        a: "In RYDA-vetted partner facilities — climate-controlled, 24/7 monitored, fully insured. Miami first, with LA and NY following.",
+        a: "In RYDA-vetted partner facilities, climate-controlled, 24/7 monitored, fully insured. Miami first, with LA and NY following.",
       },
       {
         q: "Who maintains them?",
@@ -86,7 +86,7 @@ const SECTIONS: { title: string; questions: Q[] }[] = [
     questions: [
       {
         q: "Can I rent a RYDA car if I'm not a co-owner?",
-        a: "Yes — members and prospective buyers can rent any available vehicle by the day. Rentals are priced for the high end ($1,800–$8,500/day depending on the car) and are intended as a try-before-you-buy for co-ownership.",
+        a: "Yes, members and prospective buyers can rent any available vehicle by the day. Rentals are priced for the high end ($1,800–$8,500/day depending on the car) and are intended as a try-before-you-buy for co-ownership.",
       },
       {
         q: "What's included in a rental?",
@@ -94,7 +94,7 @@ const SECTIONS: { title: string; questions: Q[] }[] = [
       },
       {
         q: "Why rentals at all? Aren't you focused on ownership?",
-        a: "Yes — co-ownership is the core product. Rentals exist for two reasons: (1) prospective members get a real test-drive before committing six figures to a share, and (2) it supports vehicle utilization for co-owners who don't fully use their entitlement. We don't compete on price with generic rental marketplaces.",
+        a: "Yes, co-ownership is the core product. Rentals exist for two reasons: (1) prospective members get a real test-drive before committing six figures to a share, and (2) it supports vehicle utilization for co-owners who don't fully use their entitlement. We don't compete on price with generic rental marketplaces.",
       },
     ],
   },
@@ -117,7 +117,7 @@ export default function FaqPage() {
             <Link href="/contact#form" className="text-red hover:text-red-deep">
               Send us a question
             </Link>{" "}
-            — we add new ones here when they come up.
+           , we add new ones here when they come up.
           </p>
         </div>
       </section>

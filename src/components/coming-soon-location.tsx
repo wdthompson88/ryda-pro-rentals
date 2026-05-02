@@ -107,7 +107,7 @@ export function ComingSoonLocation({
           <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
             All RYDA operations launch in Miami in Q3 2026. {city} expansion
             follows on the schedule above. Members from {city} are welcome
-            to join now and lock in early-member pricing — and to fly
+            to join now and lock in early-member pricing, and to fly
             in for Miami events.
           </p>
           <Link

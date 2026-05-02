@@ -37,12 +37,12 @@ export function CookieBanner() {
     try {
       localStorage.setItem(STORAGE_KEY, choice);
     } catch {
-      // Best-effort persistence — banner will re-appear next visit.
+      // Best-effort persistence, banner will re-appear next visit.
     }
     setConsent(choice);
   }
 
-  // Avoid SSR/hydration mismatch — render nothing until we've checked
+  // Avoid SSR/hydration mismatch, render nothing until we've checked
   // localStorage. Once a decision is made, the banner stays hidden.
   if (!mounted || consent !== null) return null;
 
@@ -52,7 +52,7 @@ export function CookieBanner() {
       aria-label="Cookie consent"
       className="fixed inset-x-0 bottom-0 z-50 border-t border-rule bg-cream/95 backdrop-blur"
     >
-      {/* Quiet bottom strip — no shadow, no card frame, no pill buttons.
+      {/* Quiet bottom strip, no shadow, no card frame, no pill buttons.
           Legal chrome should disappear, not announce itself. */}
       <div className="mx-auto flex max-w-7xl flex-col gap-3 px-6 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-10">
         <p className="text-xs leading-relaxed text-ink-soft">

@@ -18,7 +18,7 @@ export async function generateMetadata({
   const post = getPost(slug);
   if (!post) return { title: "Journal — RYDA" };
   return {
-    title: `${post.title} — RYDA Journal`,
+    title: `${post.title}, RYDA Journal`,
     description: post.excerpt,
   };
 }

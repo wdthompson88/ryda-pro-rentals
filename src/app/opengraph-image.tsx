@@ -1,9 +1,9 @@
 import { ImageResponse } from "next/og";
 
-// Root-level OG image — the brand has evolved beyond just supercars,
+// Root-level OG image, the brand has evolved beyond just supercars,
 // so this matches the splitter framing: Cars · Boats · Planes.
 
-export const alt = "RYDA — Luxury vehicle access";
+export const alt = "RYDA, Luxury vehicle access";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

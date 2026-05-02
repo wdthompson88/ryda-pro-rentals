@@ -5,7 +5,7 @@ import { isAllowed, clientIp } from "@/lib/rate-limit";
 
 const VALID_MARKETS = new Set(["Miami", "LA", "NY", "Other"]);
 
-// 8 submissions per minute per IP — generous for a real signup flow,
+// 8 submissions per minute per IP, generous for a real signup flow,
 // brutal for an attacker spraying emails. Returns 429 above this.
 const RATE_LIMIT = 8;
 const RATE_WINDOW_MS = 60_000;
@@ -22,7 +22,7 @@ export async function POST(req: Request) {
     const email = String(body.email || "").trim().toLowerCase();
     const name = String(body.name || "").trim();
     const market = VALID_MARKETS.has(String(body.market || "")) ? String(body.market) : "Miami";
-    // Source attribution — which surface produced this lead. Free-form
+    // Source attribution, which surface produced this lead. Free-form
     // string, capped at 64 chars to keep the column tidy. Persisted if
     // the `source` column exists; the email notification always shows it.
     const source = String(body.source || "")
@@ -48,7 +48,7 @@ export async function POST(req: Request) {
     // Try inserting with `source`; fall back to a source-less insert
     // if the column doesn't exist yet (older deployments). PostgREST
     // emits messages like "Could not find the 'source' column of
-    // 'waitlist' in the schema cache" — match either word order
+    // 'waitlist' in the schema cache", match either word order
     // ("source ... column" or "column ... source") to catch both
     // PostgREST and raw Postgres surfaces.
     let { error } = await supabase
@@ -88,7 +88,7 @@ export async function POST(req: Request) {
         <div style="margin-top:2px;">${escapeHtml(market)}</div>
         ${source ? `<div style="margin-top:14px;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#9A9590;">Source</div><div style="margin-top:2px;">${escapeHtml(source)}</div>` : ""}
         <div style="margin-top:24px;padding-top:18px;border-top:1px solid #e5e1d8;font-size:13px;color:#3c3c3c;">
-          <strong>Hit reply</strong> to respond — this email's reply-to is set to ${escapeHtml(email)}.
+          <strong>Hit reply</strong> to respond, this email's reply-to is set to ${escapeHtml(email)}.
         </div>
       `),
     });

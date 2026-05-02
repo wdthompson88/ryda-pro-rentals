@@ -1,8 +1,8 @@
-// Boat-side cost breakdown — parallel of CostBreakdown but using
+// Boat-side cost breakdown, parallel of CostBreakdown but using
 // boat economics (3-year hold, 15% depreciation, nautical-mile
 // allowance instead of miles, cruising days). Boats run materially
 // higher annual operating cost than cars (slip + crew + fuel +
-// insurance + hurricane prep) so the math reads differently — but
+// insurance + hurricane prep) so the math reads differently, but
 // the shape is the same so members can compare apples-to-apples
 // across verticals.
 
@@ -83,11 +83,11 @@ export function BoatCostBreakdown({
       {showCharterScenario && charter.perShareAnnualIncome > 0 ? (
         <div className="border-t border-rule bg-ink/[0.03] px-6 py-5">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
-            Or — opt into the charter pool
+            Or, opt into the charter pool
           </p>
           <p className="mt-1 text-sm leading-relaxed text-ink-soft">
             Pool your unused days into the RYDA charter program. Boat
-            charter occupancy runs lower than car rental — Miami high-
+            charter occupancy runs lower than car rental, Miami high-
             season boats average ~120 booked days a year. At a{" "}
             {charter.occupancyPct}% pool occupancy and a{" "}
             {charter.managementFeePct}% management fee, your share
@@ -170,7 +170,7 @@ export function BoatCostBreakdown({
 
           <p className="mt-3 text-[11px] text-mute">
             Same {BOATS_TARGET_DEPRECIATION_PCT}% depreciation assumption
-            applies whether you cruise or charter — surveyed certified pre owned hulls and
+            applies whether you cruise or charter, surveyed certified pre owned hulls and
             shareholder mileage caps keep the resale story consistent.
           </p>
           <p className="mt-1 text-[11px] text-mute">
@@ -185,7 +185,7 @@ export function BoatCostBreakdown({
         <p className="text-[11px] leading-relaxed text-mute">
           Doctrine: RYDA holds each curated hull for {BOATS_HOLDING_YEARS}{" "}
           years, then sells it and distributes proceeds pro-rata. Modeled
-          at {BOATS_TARGET_DEPRECIATION_PCT}% depreciation — actual sale
+          at {BOATS_TARGET_DEPRECIATION_PCT}% depreciation, actual sale
           price varies by model, condition, and market.
         </p>
       </div>
@@ -209,7 +209,7 @@ function BreakdownRow({
   cost?: boolean;
 }) {
   // Loss / cost coloring stays universally red across both verticals
-  // — green for gains, red for outflows. Marine blue is the boats
+  //, green for gains, red for outflows. Marine blue is the boats
   // brand accent (used on headers/eyebrows), not a profit indicator.
   const tone = positive
     ? "text-emerald-600"
@@ -261,7 +261,7 @@ function Row({
         </p>
         {sub ? <p className="mt-0.5 text-[11px] text-mute">{sub}</p> : null}
       </div>
-      {/* Headline net-cost row stays red — it's a net outflow, not a
+      {/* Headline net-cost row stays red, it's a net outflow, not a
           brand accent slot. Loss = red regardless of vertical. */}
       <p
         className={`shrink-0 font-display tabular-nums ${

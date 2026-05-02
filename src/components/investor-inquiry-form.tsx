@@ -57,7 +57,7 @@ export function InvestorInquiryForm() {
   if (status === "success") {
     return (
       <div className="mx-auto mt-10 max-w-xl rounded-2xl border border-cream/20 bg-cream/5 px-6 py-10 text-cream">
-        <p className="font-display text-2xl">Thanks — we'll be in touch.</p>
+        <p className="font-display text-2xl">Thanks, we'll be in touch.</p>
         <p className="mt-3 text-sm text-cream/70">
           We send the deck to qualified investors within 24 hours, followed by a call to walk through diligence materials.
         </p>

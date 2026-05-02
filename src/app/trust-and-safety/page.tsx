@@ -28,12 +28,12 @@ export default function TrustAndSafetyPage() {
         </div>
       </section>
 
-      {/* Why this matters in Miami — Vice-inspired framing without
+      {/* Why this matters in Miami, Vice-inspired framing without
           naming names. The Miami exotic-rental scene has well-documented
           operators who don't verify insurance, sub-lease cars off
           someone else's title, and run on Instagram clout instead of
           paperwork. RYDA exists because that market needed a real
-          alternative — not the same model with nicer branding. */}
+          alternative, not the same model with nicer branding. */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
@@ -75,7 +75,7 @@ export default function TrustAndSafetyPage() {
             <Pillar
               eyebrow="Vehicles"
               title="certified pre owned, PPI-inspected before any share is sold"
-              body="Every RYDA vehicle is certified pre owned with a manufacturer or independent certified pre owned program. Before the LLC closes on a car, a multi-point Pre-Purchase Inspection by a marque specialist documents engine, transmission, suspension, electronics and body condition — plus full title and lien search. Co-owners aren't buying surprises; they're buying a documented car."
+              body="Every RYDA vehicle is certified pre owned with a manufacturer or independent certified pre owned program. Before the LLC closes on a car, a multi-point Pre-Purchase Inspection by a marque specialist documents engine, transmission, suspension, electronics and body condition, plus full title and lien search. Co-owners aren't buying surprises; they're buying a documented car."
             />
             <Pillar
               eyebrow="Insurance"
@@ -85,7 +85,7 @@ export default function TrustAndSafetyPage() {
             <Pillar
               eyebrow="Storage"
               title="Climate-controlled, monitored, indoor"
-              body="Every vehicle is stored in a RYDA-vetted facility — climate-controlled, 24/7 video monitoring, on-site security and segregated bays. We don't park exotics in shared garages or driveways."
+              body="Every vehicle is stored in a RYDA-vetted facility, climate-controlled, 24/7 video monitoring, on-site security and segregated bays. We don't park exotics in shared garages or driveways."
             />
             <Pillar
               eyebrow="Operations"
@@ -95,7 +95,7 @@ export default function TrustAndSafetyPage() {
             <Pillar
               eyebrow="Support"
               title="One number, 24/7"
-              body="A dedicated RYDA member line for roadside, claims, inspections and operational issues. Single point of contact — never an outsourced call center. Replacement vehicle dispatched if anything breaks down on the road."
+              body="A dedicated RYDA member line for roadside, claims, inspections and operational issues. Single point of contact, never an outsourced call center. Replacement vehicle dispatched if anything breaks down on the road."
             />
           </div>
         </div>
@@ -134,7 +134,7 @@ export default function TrustAndSafetyPage() {
             </p>
             <p className="mt-3 text-sm leading-relaxed text-ink-soft">
               Reviewable by your counsel or accountant before any commitment.
-              Email request — typical turnaround under 24 hours.
+              Email request, typical turnaround under 24 hours.
             </p>
             <ul className="mt-4 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
               <li>· Sample LLC Operating Agreement</li>
@@ -165,7 +165,7 @@ export default function TrustAndSafetyPage() {
           </h2>
           <p className="mt-6 text-base leading-relaxed text-ink-soft">
             RYDA only acquires certified pre owned vehicles. Before the LLC
-            closes on any car, three things happen — every time, no exceptions:
+            closes on any car, three things happen, every time, no exceptions:
           </p>
           <ul className="mt-8 space-y-5 text-base">
             <Coverage
@@ -174,18 +174,18 @@ export default function TrustAndSafetyPage() {
             />
             <Coverage
               line="Active certified pre owned warranty"
-              detail="Every vehicle ships with an active manufacturer or independent certified pre owned warranty covering the powertrain and major mechanical systems for the LLC's first ownership period. Co-owners aren't on the hook for surprise engine, transmission or driveline repairs — those are warranty events, not assessments."
+              detail="Every vehicle ships with an active manufacturer or independent certified pre owned warranty covering the powertrain and major mechanical systems for the LLC's first ownership period. Co-owners aren't on the hook for surprise engine, transmission or driveline repairs, those are warranty events, not assessments."
             />
             <Coverage
               line="LLC-level reserve for post-warranty issues"
-              detail="The LLC's annual budget includes a maintenance reserve scaled to the vehicle's service profile. Out-of-warranty mechanical issues are paid from the reserve, not from members' pockets. If a major repair exhausts the reserve, the group decides next steps by vote — never a surprise bill in your inbox."
+              detail="The LLC's annual budget includes a maintenance reserve scaled to the vehicle's service profile. Out-of-warranty mechanical issues are paid from the reserve, not from members' pockets. If a major repair exhausts the reserve, the group decides next steps by vote, never a surprise bill in your inbox."
             />
           </ul>
           <p className="mt-8 rounded-2xl border border-rule bg-surface p-6 text-sm leading-relaxed text-ink-soft">
             <span className="font-medium text-ink">Bottom line:</span>{" "}
             co-ownership shouldn't mean inheriting someone else's deferred
             maintenance. RYDA's job is to deliver a documented, warrantied,
-            reserve-backed vehicle to your LLC on day one — and to keep it
+            reserve-backed vehicle to your LLC on day one, and to keep it
             that way.
           </p>
         </div>
@@ -245,7 +245,7 @@ export default function TrustAndSafetyPage() {
             <li>
               <span className="font-medium text-ink">No undocumented modifications.</span>{" "}
               Performance and appearance modifications go through the LLC's
-              decision process — co-owners vote, and RYDA verifies that the
+              decision process, co-owners vote, and RYDA verifies that the
               change is operationally and insurance-feasible. One member
               doesn't get to wrap a Ferrari unilaterally.
             </li>

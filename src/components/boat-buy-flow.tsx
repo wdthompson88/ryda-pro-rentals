@@ -7,7 +7,7 @@ import { Boat, formatUSD } from "@/lib/boat-data";
 
 type StepKey = "review" | "verify" | "documents" | "fund" | "confirm";
 
-// Funding methods — wire/ACH stay as the default direct paths; the rest
+// Funding methods, wire/ACH stay as the default direct paths; the rest
 // route the buyer to a partner conversation (we don't underwrite or
 // custody outside funds). Pattern borrowed from Pacaso's
 // "Co-ownership financing partners" treatment.
@@ -39,7 +39,7 @@ export function BoatBuyFlow({ boat, initialShares }: Props) {
   const totalPrice = boat.pricePerShare * shares;
   // All-in annual contribution: insurance + storage + maintenance + reserves
   // + RYDA service fee, scaled per share. The 12% management fee is bundled
-  // into annualOpCost — don't show only that piece as the total.
+  // into annualOpCost, don't show only that piece as the total.
   const annualContribution = boat.annualOpCost * shares;
   const closingFee = 1500;
   const grandTotal = totalPrice + closingFee;
@@ -269,7 +269,7 @@ function ReviewStep({
         <p className="font-medium text-ink">A few things to know</p>
         <ul className="mt-3 list-disc space-y-2 pl-5 text-ink-soft">
           <li>12-month minimum hold from your closing date before transferring your share.</li>
-          <li>The LLC is member-managed — you and your co-owners hold authority over material decisions.</li>
+          <li>The LLC is member-managed, you and your co-owners hold authority over material decisions.</li>
           <li>You'll be added to the boat's insurance policy at closing.</li>
           <li>Any boat modifications, sale, or replacement requires a 75% co-owner vote.</li>
           <li>Co-ownership stakes are not investments and the boat will depreciate over time.</li>
@@ -333,7 +333,7 @@ function VerifyStep({
           Verify your identity
         </h1>
         <p className="mt-3 text-base text-ink-soft">
-          Standard KYC. We use Persona for identity verification — government ID
+          Standard KYC. We use Persona for identity verification, government ID
           and a selfie match. Required to be added to the LLC's insurance policy
           and to drive the boat. RYDA never sees raw documents.
         </p>
@@ -381,7 +381,7 @@ function VerifyStep({
           RYDA is a luxury access platform, not an investment product. We do
           not require accredited-investor verification. Co-ownership stakes
           are not registered securities and are not offered for investment
-          purposes — you're buying the right to use a real car you co-own.
+          purposes, you're buying the right to use a real car you co-own.
         </p>
       </div>
 
@@ -439,10 +439,10 @@ function DocumentsStep({
       </div>
 
       <DocCard
-        title={`${boat.name} LLC — Operating Agreement`}
+        title={`${boat.name} LLC, Operating Agreement`}
         meta="34 pages · Reviewed by counsel · Member-managed structure"
         summary={[
-          "The LLC is member-managed — you and your co-owners hold authority over material decisions.",
+          "The LLC is member-managed, you and your co-owners hold authority over material decisions.",
           "Governs decision-making (75% supermajority for sale, replacement, modifications).",
           "Defines fair-use rules during peak and off-season.",
           "Sets remedies if a co-owner stops paying (30-day cure, then forced transfer).",
@@ -454,14 +454,14 @@ function DocumentsStep({
       />
 
       <DocCard
-        title={`${boat.name} LLC — Management Services Agreement`}
+        title={`${boat.name} LLC, Management Services Agreement`}
         meta={`12 pages · LLC ↔ RYDA · Your ${shares} share${shares > 1 ? "s" : ""}`}
         summary={[
           `Engages RYDA as the operating service provider for the LLC.`,
           `Your position: ${shares} of ${boat.shares} shares. Buy-in: ${formatUSD(boat.pricePerShare * shares)}.`,
           "Defines RYDA's services: storage, insurance, scheduling, maintenance, member services.",
           "Defines the 12% annual management fee charged to the LLC and paid pro-rata by members.",
-          "RYDA is a service provider — not a manager of the LLC. Members retain LLC governance.",
+          "RYDA is a service provider, not a manager of the LLC. Members retain LLC governance.",
           "Acknowledgment that co-ownership is for personal use, not investment.",
         ]}
         signed={msaSigned}
@@ -551,7 +551,7 @@ function FundStep({
           Send {formatUSD(grandTotal)} to the LLC&apos;s escrow account. Funds
           are held until your documents and verifications clear, then released
           to the LLC and your share is recorded in the LLC&apos;s member
-          register. Five payment paths — pick what fits.
+          register. Five payment paths, pick what fits.
         </p>
       </div>
 
@@ -566,7 +566,7 @@ function FundStep({
         <FundingOption
           method="ach"
           label="ACH transfer (post-launch)"
-          detail="Free, 3–5 business day settlement. Ships shortly after the Miami launch — wire is the only funding option for now."
+          detail="Free, 3–5 business day settlement. Ships shortly after the Miami launch, wire is the only funding option for now."
           selected={fundingMethod === "ach"}
           onSelect={() => setFundingMethod("ach")}
           disabled
@@ -598,7 +598,7 @@ function FundStep({
         <div className="rounded-2xl border border-rule bg-surface p-6">
           <p className="text-xs font-medium uppercase tracking-wider text-marine">Wire instructions</p>
           <p className="mt-2 font-display text-xl text-ink">
-            {boat.name} LLC — Escrow Account
+            {boat.name} LLC, Escrow Account
           </p>
           <p className="mt-3 text-sm text-ink-soft">
             For your security, RYDA never displays escrow bank details in the
@@ -621,7 +621,7 @@ function FundStep({
           <p className="mt-2 font-display text-xl text-ink">Bank connection ships post-launch</p>
           <p className="mt-2 text-sm text-ink-soft">
             ACH (via Plaid) ships shortly after the Miami launch. For now,
-            please complete your buy-in by wire transfer — switch the option
+            please complete your buy-in by wire transfer, switch the option
             above. Wires settle in 1–2 business days.
           </p>
         </div>
@@ -684,13 +684,13 @@ function FundStep({
             Crypto
           </p>
           <p className="mt-2 font-display text-xl text-ink">
-            BTC, ETH, or USDC — settled in USD to escrow.
+            BTC, ETH, or USDC, settled in USD to escrow.
           </p>
           <p className="mt-3 text-sm text-ink-soft">
             Crypto buy-ins route through a regulated US exchange partner with
             full KYC/AML. You send crypto from your wallet; the partner
             converts to USD on receipt and wires the LLC&apos;s escrow account.
-            The LLC always holds USD — no crypto sits on RYDA&apos;s balance
+            The LLC always holds USD, no crypto sits on RYDA&apos;s balance
             sheet or the LLC&apos;s.
           </p>
           <ul className="mt-4 space-y-1 text-xs text-ink-soft">
@@ -763,7 +763,7 @@ function ConfirmStep({
           <KvRow label="Position" value={`${shares} of ${boat.shares} shares`} />
           <KvRow label="Amount" value={formatUSD(grandTotal)} />
           <KvRow label="LLC" value={`${boat.name} LLC, (member-managed)`} />
-          <KvRow label="Status" value="Pending — funds & verification clearing" />
+          <KvRow label="Status" value="Pending, funds & verification clearing" />
         </dl>
       </div>
 
@@ -783,7 +783,7 @@ function ConfirmStep({
           <Timeline
             n="03"
             title="Documents countersigned"
-            body="The LLC's existing co-owners (acting collectively, per the Operating Agreement) counter-sign your addition. The Management Services Agreement is executed between the LLC's members and RYDA — RYDA does not bind the LLC unilaterally."
+            body="The LLC's existing co-owners (acting collectively, per the Operating Agreement) counter-sign your addition. The Management Services Agreement is executed between the LLC's members and RYDA, RYDA does not bind the LLC unilaterally."
           />
           <Timeline
             n="04"
@@ -958,7 +958,7 @@ function DocCard({
       </ul>
       <p className="mt-5 text-xs text-mute">
         The full counsel-prepared document is sent to your verified email
-        before signing — your e-signature here confirms you've reviewed both
+        before signing, your e-signature here confirms you've reviewed both
         the summary above and the long-form version.
       </p>
       <div className="mt-3 flex flex-wrap items-center gap-3">
@@ -1040,7 +1040,7 @@ function Timeline({
   );
 }
 
-// Deterministic mock account number suffix — same boat always gets the
+// Deterministic mock account number suffix, same boat always gets the
 // same fake account number so it looks consistent across reloads.
 function hashCode(s: string): number {
   let h = 0;

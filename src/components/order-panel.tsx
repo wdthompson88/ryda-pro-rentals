@@ -21,7 +21,7 @@ export function OrderPanel({ vehicle }: Props) {
 
   function handleClaim() {
     if (sold) return;
-    // Browsing is open — but transacting requires an account. Route
+    // Browsing is open, but transacting requires an account. Route
     // through /signup with a `next=` so post-signup we land back at the
     // exact buy flow with the chosen share count preserved. The user's
     // intent ("buy") drives the signup copy.
@@ -51,7 +51,7 @@ export function OrderPanel({ vehicle }: Props) {
             max={vehicle.sharesAvailable || 1}
             value={shares}
             onChange={(e) => setShares(e.target.value)}
-            aria-label={`Shares to claim — between 1 and ${vehicle.sharesAvailable || 1}`}
+            aria-label={`Shares to claim, between 1 and ${vehicle.sharesAvailable || 1}`}
             className="w-full bg-transparent text-right font-medium text-ink placeholder:text-mute focus:outline-none"
           />
         </Field>
@@ -99,7 +99,7 @@ export function OrderPanel({ vehicle }: Props) {
         12-month minimum hold. Transferable to other verified members.
       </p>
 
-      {/* Payment options — Pacaso surfaces these up-front rather than
+      {/* Payment options, Pacaso surfaces these up-front rather than
           burying them in the buy flow. Each option is referral-style:
           we don't underwrite credit; we hand off to the right partner.
           Crypto is supported via a regulated exchange partner with the
@@ -109,7 +109,7 @@ export function OrderPanel({ vehicle }: Props) {
           Ways to pay
         </p>
         <ul className="mt-3 space-y-2 text-xs">
-          <PayMethod label="Wire / ACH" sub="Default — same-day or next-day to LLC escrow" />
+          <PayMethod label="Wire / ACH" sub="Default, same-day or next-day to LLC escrow" />
           <PayMethod
             label="Liquidity line"
             sub="HELOC, SBLOC, or pledged-asset line via your bank"

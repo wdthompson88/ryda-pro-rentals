@@ -1,7 +1,7 @@
 // Lightweight per-IP rate limiter for public POST endpoints.
 //
 // Implementation: in-memory token bucket keyed by client IP. Survives
-// within a single Vercel Lambda warm window — does NOT survive cold
+// within a single Vercel Lambda warm window, does NOT survive cold
 // starts or work across instances. That's intentional: this is a
 // "fast-N abuse" speed bump, not a real DoS defense. For real traffic,
 // upgrade to Upstash / Redis / Vercel KV.
@@ -13,7 +13,7 @@
 // Spoofing assumption: this trusts Vercel's `x-forwarded-for` rewrite
 // behavior (Vercel overwrites client-supplied XFF with the real client
 // IP). On any non-Vercel host (self-hosted, custom proxy chain),
-// attackers can rotate XFF to bypass per-IP buckets — swap to a real
+// attackers can rotate XFF to bypass per-IP buckets, swap to a real
 // limiter before deploying off Vercel.
 
 type Bucket = {
@@ -42,7 +42,7 @@ export function isAllowed(key: string, limit: number, windowMs: number): boolean
         if (v.resetAt <= now) buckets.delete(k);
       }
       // If GC freed nothing (every bucket is still in its window), evict
-      // the OLDEST bucket. This is the "true cap" — Map preserves
+      // the OLDEST bucket. This is the "true cap", Map preserves
       // insertion order, so .keys().next() returns the oldest key.
       // Without this, the map could grow unboundedly under sustained
       // unique-key spray.
@@ -63,7 +63,7 @@ export function isAllowed(key: string, limit: number, windowMs: number): boolean
  * Best-effort client-IP extraction from Next.js Request.
  * Trusts Vercel's `x-forwarded-for` (left-most) and falls back to
  * `x-real-ip`. If neither is set (rare on Vercel), returns "unknown"
- * — all such requests share a bucket, which intentionally fails closed
+ *, all such requests share a bucket, which intentionally fails closed
  * under load.
  *
  * SECURITY: This trusts the platform proxy. On Vercel, XFF is rewritten

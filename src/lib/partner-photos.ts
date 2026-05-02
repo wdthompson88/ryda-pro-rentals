@@ -1,4 +1,4 @@
-// Auto-generated from gmluxe.net product pages — see partner-fleet.ts
+// Auto-generated from gmluxe.net product pages, see partner-fleet.ts
 // Each entry maps a partner slug to the full list of image URLs
 // scraped from that vehicle's product page. First entry = hero;
 // rest go into the gallery.

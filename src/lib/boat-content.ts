@@ -8,7 +8,7 @@ export const HERO_HEADLINE = {
   highlight: "most beautiful boats.",
 };
 export const HERO_SUBHEAD =
-  "Each boat is held in a member-managed LLC. Up to 5 verified members co-own every hull, with a 2-share minimum per person. RYDA runs the operations end-to-end — slip, captain, fuel, insurance, hurricane prep. Three-year planned exit; transferable to other members after twelve months.";
+  "Each boat is held in a member-managed LLC. Up to 5 verified members co-own every hull, with a 2-share minimum per person. RYDA runs the operations end-to-end, slip, captain, fuel, insurance, hurricane prep. Three-year planned exit; transferable to other members after twelve months.";
 
 export const PORTFOLIO_HERO = {
   eyebrow: "RYDA Portfolio · Boats",
@@ -49,25 +49,25 @@ export const HOW_IT_WORKS_STEPS: { n: string; title: string; body: string }[] = 
   },
 ];
 
-// FAQ — boat-specific. Same shape as the cars FAQ.
+// FAQ, boat-specific. Same shape as the cars FAQ.
 export type FaqItem = { q: string; a: string };
 
 export const FAQ_ITEMS: FaqItem[] = [
   {
     q: "What's actually included in the annual operating cost?",
-    a: "Slip rental at the boat's hailing marina, captain hours for member trips (up to your share's 30 day allowance), fuel up to a generous monthly budget, full agreed-value hull and liability insurance, hurricane prep + haul-out, spring commission and fall lay-up service, USCG documentation renewal, and a maintenance reserve. The big visible costs — slip and crew — are bundled. Excess fuel beyond the monthly budget and any optional add-ons (sport-fishing rigging on the Pershing, dive package, etc.) are billed at cost.",
+    a: "Slip rental at the boat's hailing marina, captain hours for member trips (up to your share's 30 day allowance), fuel up to a generous monthly budget, full agreed-value hull and liability insurance, hurricane prep + haul-out, spring commission and fall lay-up service, USCG documentation renewal, and a maintenance reserve. The big visible costs, slip and crew, are bundled. Excess fuel beyond the monthly budget and any optional add-ons (sport-fishing rigging on the Pershing, dive package, etc.) are billed at cost.",
   },
   {
     q: "Can I skipper the boat myself, or is a captain always required?",
-    a: "Crewed by default. Every charter and most member trips ship with a RYDA-vetted captain — it's the cheapest way to keep the insurance carriers happy and the safest way to keep the boat in good shape. Bareboat is available on the Riva Aquariva and the Lagoon 50 for members who hold a USCG-recognized license (OUPV/Six-Pack or higher) and complete a check-out cruise with our captains. Sport yachts (Pershing) are crewed only.",
+    a: "Crewed by default. Every charter and most member trips ship with a RYDA-vetted captain, it's the cheapest way to keep the insurance carriers happy and the safest way to keep the boat in good shape. Bareboat is available on the Riva Aquariva and the Lagoon 50 for members who hold a USCG-recognized license (OUPV/Six-Pack or higher) and complete a check-out cruise with our captains. Sport yachts (Pershing) are crewed only.",
   },
   {
     q: "How does hurricane prep work?",
-    a: "Miami-based hulls are hauled to our partner yard in Coconut Grove between June 1 and October 31 whenever a named storm enters the Atlantic basin and crosses the latitude of Cuba. The cost is bundled into the annual operating cost — members pay nothing additional during a hurricane season, even with multiple storm calls. Off-season haul-out (Dec–Mar in Miami) is also bundled. NY-based hulls winter at our Connecticut partner yard.",
+    a: "Miami-based hulls are hauled to our partner yard in Coconut Grove between June 1 and October 31 whenever a named storm enters the Atlantic basin and crosses the latitude of Cuba. The cost is bundled into the annual operating cost, members pay nothing additional during a hurricane season, even with multiple storm calls. Off-season haul-out (Dec–Mar in Miami) is also bundled. NY-based hulls winter at our Connecticut partner yard.",
   },
   {
     q: "What happens if a member damages the boat?",
-    a: "Standard playbook: agreed-value hull insurance covers the repair after a deductible. The deductible is paid from the LLC's maintenance reserve and rebilled pro-rata to all members — the at-fault member doesn't bear the deductible alone, but they do bear a 50% share of any insurance-rate increase resulting from the incident. Grossly negligent operation (i.e. operating outside RYDA's protocols) shifts the deductible entirely to the at-fault member. Documented in the Operating Agreement.",
+    a: "Standard playbook: agreed-value hull insurance covers the repair after a deductible. The deductible is paid from the LLC's maintenance reserve and rebilled pro-rata to all members, the at-fault member doesn't bear the deductible alone, but they do bear a 50% share of any insurance-rate increase resulting from the incident. Grossly negligent operation (i.e. operating outside RYDA's protocols) shifts the deductible entirely to the at-fault member. Documented in the Operating Agreement.",
   },
   {
     q: "How does the charter (rental) opt-in work?",
@@ -79,7 +79,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   },
   {
     q: "How does Coast Guard documentation work with the LLC?",
-    a: "Each boat is documented federally with the US Coast Guard in the LLC's name (e.g. \"Wajer 55 S RYDA LLC\"). Members are not on the document — the LLC is. State sales-tax mitigation strategies (sales-tax-free purchase, offshore documentation, or charter-fleet exemptions where applicable) are evaluated case-by-case with the LLC's tax counsel. RYDA does not provide tax advice; we coordinate with the LLC's accountant.",
+    a: "Each boat is documented federally with the US Coast Guard in the LLC's name (e.g. \"Wajer 55 S RYDA LLC\"). Members are not on the document, the LLC is. State sales-tax mitigation strategies (sales-tax-free purchase, offshore documentation, or charter-fleet exemptions where applicable) are evaluated case-by-case with the LLC's tax counsel. RYDA does not provide tax advice; we coordinate with the LLC's accountant.",
   },
   {
     q: "Why a 3-year planned exit?",

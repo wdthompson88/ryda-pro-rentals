@@ -24,7 +24,7 @@ export async function generateMetadata({
 }) {
   const { symbol } = await params;
   const v = getVehicleBySymbol(symbol);
-  return { title: v ? `${v.name} — My Cars | RYDA` : "My Cars" };
+  return { title: v ? `${v.name}, My Cars | RYDA` : "My Cars" };
 }
 
 export default async function MyVehiclePage({
@@ -185,7 +185,7 @@ export default async function MyVehiclePage({
       {/* Bookings */}
       <Section id="bookings" title="Bookings">
         <div className="mb-6 flex items-end justify-between">
-          <p className="text-sm text-ink-soft">Vehicle calendar — May 2026</p>
+          <p className="text-sm text-ink-soft">Vehicle calendar, May 2026</p>
           <Link
             href="/bookings/new"
             className="rounded-full bg-red px-5 py-2 text-sm font-medium text-cream hover:bg-red-deep"
@@ -244,8 +244,8 @@ export default async function MyVehiclePage({
           <Doc title="LLC Operating Agreement" date="Mar 12, 2026" size="891 KB" />
           <Doc title="Vehicle Title (RYDA Ferrari 296 GTB LLC)" date="Mar 12, 2026" size="148 KB" />
           <Doc title="Insurance Certificate (2026)" date="Mar 18, 2026" size="220 KB" />
-          <Doc title="Inspection Report — Apr 20, 2026" date="Apr 20, 2026" size="2.1 MB" />
-          <Doc title="Inspection Report — Mar 30, 2026" date="Mar 30, 2026" size="2.4 MB" />
+          <Doc title="Inspection Report, Apr 20, 2026" date="Apr 20, 2026" size="2.1 MB" />
+          <Doc title="Inspection Report, Mar 30, 2026" date="Mar 30, 2026" size="2.4 MB" />
           <Doc title="Service Records (Q1 2026)" date="Mar 25, 2026" size="356 KB" />
           <Doc title="Cost & Fee Schedule" date="Mar 12, 2026" size="98 KB" />
         </ul>
@@ -299,12 +299,12 @@ export default async function MyVehiclePage({
       {isLead && (
         <Section id="settings" title="Member proposals · Proposal Coordinator">
           <p className="mb-6 inline-block rounded-full bg-red/10 px-3 py-1 text-xs font-medium text-red">
-            ★ Proposal Coordinator — your role is to facilitate co-owner votes
+            ★ Proposal Coordinator, your role is to facilitate co-owner votes
           </p>
           <p className="mb-6 max-w-2xl text-sm text-ink-soft">
             As Proposal Coordinator you post proposals on behalf of the LLC's
-            members. Material decisions — booking rules, vehicle
-            modifications, transfers, document additions — go to a
+            members. Material decisions, booking rules, vehicle
+            modifications, transfers, document additions, go to a
             co-owner vote per the Operating Agreement. RYDA executes
             once the vote clears.
           </p>

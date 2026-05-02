@@ -29,7 +29,7 @@ export async function generateMetadata({
   const v = getVehicleBySymbol(symbol);
   if (!v) return { title: "RYDA Markets" };
   return {
-    title: `${v.name} — ${formatUSD(v.pricePerShare)} per share | RYDA`,
+    title: `${v.name}, ${formatUSD(v.pricePerShare)} per share | RYDA`,
     description: `Co-own a ${v.year} ${v.name}. ${v.sharesAvailable} of ${v.shares} member-managed LLC shares available.`,
   };
 }
@@ -121,7 +121,7 @@ export default async function VehicleMarketPage({
           </Link>
 
           <div className="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-12">
-            {/* Left column — title + chart (price + change live inside the chart) */}
+            {/* Left column, title + chart (price + change live inside the chart) */}
             <div className="lg:col-span-8">
               <PhotoGallery
                 photos={[v.hero]}
@@ -159,7 +159,7 @@ export default async function VehicleMarketPage({
               </dl>
             </div>
 
-            {/* Right column — order panel */}
+            {/* Right column, order panel */}
             <div className="lg:col-span-4">
               <OrderPanel vehicle={v} />
             </div>
@@ -167,7 +167,7 @@ export default async function VehicleMarketPage({
         </div>
       </section>
 
-      {/* Ownership primitives — six-number trust block right under the
+      {/* Ownership primitives, six-number trust block right under the
           hero so the buyer sees the structure before scrolling further. */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-10 sm:px-10">
@@ -175,12 +175,12 @@ export default async function VehicleMarketPage({
         </div>
       </section>
 
-      {/* Your share — sample co-ownership view */}
+      {/* Your share, sample co-ownership view */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
           <h2 className="font-display text-2xl text-ink">Your share</h2>
           <p className="mt-1 text-sm text-mute">
-            Sample co-ownership view — sign in to see your actual shares.
+            Sample co-ownership view, sign in to see your actual shares.
           </p>
           <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
             <Stat label="Shares held" value="1" sub={`of ${v.shares}`} />
@@ -219,7 +219,7 @@ export default async function VehicleMarketPage({
                 At exit, the LLC sells the vehicle and proceeds are
                 distributed pro-rata to shareholders. We model a{" "}
                 {econ.depreciationPct}% depreciation hit over the full hold
-                — a bar that low-mileage, kept-condition certified pre owned exotics often
+               , a bar that low-mileage, kept-condition certified pre owned exotics often
                 clear, but always verify with your own resale assumption.
               </p>
               <p className="mt-4 text-sm leading-relaxed text-ink-soft">
@@ -227,7 +227,7 @@ export default async function VehicleMarketPage({
                 <span className="font-medium text-ink">
                   {formatUSD(econ.netCost)}
                 </span>{" "}
-                of true cost spread over {econ.totalDays} driving days — about{" "}
+                of true cost spread over {econ.totalDays} driving days, about{" "}
                 <span className="font-medium text-ink">
                   {formatUSD(econ.netPerDay)}
                 </span>{" "}
@@ -247,7 +247,7 @@ export default async function VehicleMarketPage({
         </div>
       </section>
 
-      {/* Share value chart — year-by-year depreciation visualization */}
+      {/* Share value chart, year-by-year depreciation visualization */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-14 sm:px-10">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
@@ -279,7 +279,7 @@ export default async function VehicleMarketPage({
         </div>
       </section>
 
-      {/* Per-listing calculator — locked to this vehicle. Lets buyers run
+      {/* Per-listing calculator, locked to this vehicle. Lets buyers run
           their own scenario without leaving the listing. */}
       <section id="calculator" className="border-b border-rule">
         <div className="mx-auto max-w-5xl px-6 py-14 sm:px-10">
@@ -293,7 +293,7 @@ export default async function VehicleMarketPage({
               </h2>
               <p className="mt-3 max-w-2xl text-sm text-ink-soft">
                 Move the sliders to model your own usage on the {v.name}{" "}
-                — buy-in, days driven, hold years, and the optional
+               , buy-in, days driven, hold years, and the optional
                 rental opt-in. Live math anchored to this car's actual
                 pricing.
               </p>
@@ -310,7 +310,7 @@ export default async function VehicleMarketPage({
         </div>
       </section>
 
-      {/* Booking model — compact two-tier explainer so buyers see how
+      {/* Booking model, compact two-tier explainer so buyers see how
           the calendar works before they wire anything. */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
@@ -333,7 +333,7 @@ export default async function VehicleMarketPage({
         </div>
       </section>
 
-      {/* Recent activity — sample shown until Miami operations launch.
+      {/* Recent activity, sample shown until Miami operations launch.
           Real per-LLC events (member joins, inspection posts, transfers)
           will populate from the member portal post-launch. */}
       <section className="border-b border-rule">
@@ -353,7 +353,7 @@ export default async function VehicleMarketPage({
           <p className="mt-3 text-xs text-mute">
             These rows are illustrative. The live feed of LLC events
             switches on at Miami launch. Member-to-member transfer prices
-            are private to the parties — RYDA does not publish a
+            are private to the parties, RYDA does not publish a
             transfer-price ticker.
           </p>
         </div>
@@ -402,7 +402,7 @@ export default async function VehicleMarketPage({
               <p className="mt-3 text-sm leading-relaxed text-ink-soft">
                 We&apos;ll send you the LLC Operating Agreement, Management
                 Services Agreement, sample PPI report, sample insurance
-                certificate, and condition report — reviewable by your
+                certificate, and condition report, reviewable by your
                 counsel before any commitment.
               </p>
               <Link
@@ -447,7 +447,7 @@ export default async function VehicleMarketPage({
         </div>
       </section>
 
-      {/* Sticky bottom CTA bar — mobile-first, hidden on lg+ where the
+      {/* Sticky bottom CTA bar, mobile-first, hidden on lg+ where the
           OrderPanel sits in the right column */}
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-rule bg-cream/95 backdrop-blur-md lg:hidden">
         <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3">

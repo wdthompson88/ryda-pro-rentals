@@ -4,7 +4,7 @@ import { SiteHeader } from "@/components/site-header";
 export const metadata = {
   title: "List your car — RYDA",
   description:
-    "Have a supercar sitting in storage? List it on RYDA — earn from rentals, or contribute it to a member-managed LLC and share it with vetted co-owners. We handle insurance, ops, and member services.",
+    "Have a supercar sitting in storage? List it on RYDA, earn from rentals, or contribute it to a member-managed LLC and share it with vetted co-owners. We handle insurance, ops, and member services.",
 };
 
 export default function HostYourCarPage() {
@@ -25,7 +25,7 @@ export default function HostYourCarPage() {
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
             The average exotic is driven less than 2,500 miles per year. The
             other 363 days, it depreciates in a garage costing you money.
-            RYDA gives you two options to put that asset to work — without
+            RYDA gives you two options to put that asset to work, without
             losing control.
           </p>
         </div>
@@ -57,7 +57,7 @@ export default function HostYourCarPage() {
                 "Stay involved as a co-owner, or step away after closing",
                 "RYDA handles the LLC formation, Operating Agreement, and member onboarding",
                 "Insurance + storage move to the LLC at closing",
-                "3% transaction fee — far less than dealer markup",
+                "3% transaction fee, far less than dealer markup",
               ]}
               cta="Talk to an advisor"
               dark
@@ -84,7 +84,7 @@ export default function HostYourCarPage() {
             </Yes>
             <Yes>
               Notable classics with provenance (Ferrari Daytona, 911
-              Carrera RS, etc.) — co-ownership only, not rental
+              Carrera RS, etc.), co-ownership only, not rental
             </Yes>
             <No>
               Vehicles outside our launch markets (Miami first; LA + NY

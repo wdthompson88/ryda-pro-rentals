@@ -40,12 +40,12 @@ export default function AboutPage() {
             </p>
             <p>
               The math worked, the structure worked, the buyer pool was
-              there. The middle ground — real co-ownership of real
+              there. The middle ground, real co-ownership of real
               supercars, with professional ops and a clean LLC wrapper —
               just didn&apos;t exist in the US.
             </p>
             <p>
-              We built RYDA to fill that gap — member-managed LLCs,
+              We built RYDA to fill that gap, member-managed LLCs,
               professional ops, US markets. Miami first: highest per-capita
               luxury auto density, no state income tax, year-round driving.
             </p>
@@ -77,7 +77,7 @@ export default function AboutPage() {
             <p>
               None of those was the right answer for us, or for any of our
               friends who actually wanted to drive an exotic. RYDA is the
-              fourth answer. It&apos;s a real ownership stake — title held by
+              fourth answer. It&apos;s a real ownership stake, title held by
               a single-purpose LLC where you and up to four other
               verified members are the registered owners. We run the
               operations under a separate Management Services Agreement, the
@@ -88,7 +88,7 @@ export default function AboutPage() {
               year for insurance, storage, maintenance and reserves, gets you
               up to 32 days behind the wheel and a real exit at year two. We
               model the residual at 90% of buy-in. We don&apos;t pretend the
-              car appreciates — it depreciates, and the model accounts for it.
+              car appreciates, it depreciates, and the model accounts for it.
               What you walk away with isn&apos;t a return. It&apos;s the
               experience of having actually driven a Ferrari, on real roads,
               for the kind of money that doesn&apos;t require selling an
@@ -96,8 +96,8 @@ export default function AboutPage() {
             </p>
             <p>
               Miami launches Q3 2026. If this fits how you actually want
-              to use a supercar — own a piece, drive it ~32 days a year,
-              never deal with the operational side — sign up and we&apos;ll
+              to use a supercar, own a piece, drive it ~32 days a year,
+              never deal with the operational side, sign up and we&apos;ll
               be in touch.
             </p>
           </div>
@@ -144,7 +144,7 @@ export default function AboutPage() {
           </p>
           <p className="mt-4 max-w-3xl font-display text-2xl leading-tight text-ink sm:text-3xl">
             "To make ownership of extraordinary vehicles possible for more
-            enthusiasts — responsibly, transparently and with a community-first
+            enthusiasts, responsibly, transparently and with a community-first
             experience."
           </p>
 
@@ -190,7 +190,7 @@ export default function AboutPage() {
               role="Co-Founder · CFO / COO"
               image="/team/dave.jpg"
               tags={["SolomonEdwards", "Series 79", "Bucknell '21"]}
-              bio="Co-founder leading capital structuring and operational diligence. Manager, Private Equity Services at SolomonEdwards. Previously spent 3+ years in Investment Banking at Ziegler covering Healthcare M&A — analyst through senior associate. Diamond Capital Advisors before that. SIE + Series 79 certified. Bucknell Economics."
+              bio="Co-founder leading capital structuring and operational diligence. Manager, Private Equity Services at SolomonEdwards. Previously spent 3+ years in Investment Banking at Ziegler covering Healthcare M&A, analyst through senior associate. Diamond Capital Advisors before that. SIE + Series 79 certified. Bucknell Economics."
             />
             <Founder
               name="Stefano Galli"
@@ -210,7 +210,7 @@ export default function AboutPage() {
           <dl className="mt-8 grid max-w-2xl grid-cols-1 gap-5 text-sm sm:grid-cols-2">
             <Fact label="Legal entity" value="RYDA LLC" />
             <Fact label="Structure" value="Member-managed LLC per vehicle" />
-            <Fact label="Headquarters" value="Miami, FL — by appointment" />
+            <Fact label="Headquarters" value="Miami, FL, by appointment" />
             <Fact label="Operating markets" value="Miami (2026) · LA (2027) · NY (2027)" />
             <Fact label="General" value="hello@ryda.com" />
             <Fact label="Press" value="press@ryda.com" />

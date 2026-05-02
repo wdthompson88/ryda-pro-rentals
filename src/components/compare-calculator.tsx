@@ -21,20 +21,20 @@ export function CompareCalculator({
    *  Used on /markets/[symbol] so each listing has its own calculator. */
   lockedVehicle?: Vehicle;
 } = {}) {
-  // Educational tool — let users model 1..vehicle.shares regardless of
+  // Educational tool, let users model 1..vehicle.shares regardless of
   // current inventory. Real availability lives on each vehicle's listing.
   // Defaults reflect the doctrinal certified pre owned 2-year planned exit.
   const initial =
     lockedVehicle ?? VEHICLES.find((v) => v.symbol === "F296") ?? VEHICLES[0];
   const [vehicleSymbol, setVehicleSymbol] = useState(initial.symbol);
   const [shares, setShares] = useState(1);
-  // Default to 12 owner-use days/yr per share — matches the static
+  // Default to 12 owner-use days/yr per share, matches the static
   // worked example on /how-it-works and the rental scenario shown in
   // CostBreakdown / cost-sheet (both pull from RENTAL_DEFAULTS).
   const [days, setDays] = useState(12);
   const [holdYears, setHoldYears] = useState(HOLDING_YEARS);
   const [residualPct, setResidualPct] = useState(DEFAULT_RESIDUAL_PCT);
-  // Rental opt-in defaults to ON — most members will want the rental
+  // Rental opt-in defaults to ON, most members will want the rental
   // income surfaced in their projection. The button text flips to
   // "Opt out" so the action is explicit when the toggle is ON.
   const [optInRental, setOptInRental] = useState(true);
@@ -63,7 +63,7 @@ export function CompareCalculator({
 
     // Residual: what proceeds you'd get back at exit (LLC sale or
     // member-to-member transfer). Held constant across drive-only and
-    // rental scenarios — certified pre owned maintenance + curated mileage caps keep
+    // rental scenarios, certified pre owned maintenance + curated mileage caps keep
     // the resale story consistent regardless of utilization.
     const residual = Math.round(buyIn * (residualPct / 100));
 
@@ -87,7 +87,7 @@ export function CompareCalculator({
     const rentalCost = rentalDaily * totalDays;
 
     // Regular ownership: same hold period, full sticker + carrying.
-    // Apply the same residual % the user picked — depreciation hits the
+    // Apply the same residual % the user picked, depreciation hits the
     // whole car, not just one share.
     const regularBuyIn = vehicle.fullPrice;
     const regularAnnualCarrying = vehicle.annualSoloCarrying;
@@ -95,7 +95,7 @@ export function CompareCalculator({
     const regularResidual = Math.round(regularBuyIn * (residualPct / 100));
     const regularEconomicCost = regularTotalCash - regularResidual;
 
-    // Utilization — how much of the entitled days you'd actually use
+    // Utilization, how much of the entitled days you'd actually use
     const utilizationPct =
       maxDays === 0 ? 0 : Math.round((cappedDays / maxDays) * 100);
     const unusedDaysPerYear = Math.max(0, maxDays - cappedDays);
@@ -164,14 +164,14 @@ export function CompareCalculator({
         Run the math on your usage
       </p>
       <h3 className="mt-3 font-display text-2xl text-ink sm:text-3xl">
-        Co-own vs. rent — your numbers.
+        Co-own vs. rent, your numbers.
       </h3>
       <p className="mt-3 max-w-xl text-sm text-ink-soft">
         Move the sliders. The math is honest: each curated certified pre owned car is held
         for {HOLDING_YEARS} years (the default), then sold and proceeds are
         returned pro-rata. The calculator subtracts your estimated share
         sale from your total cash to show real{" "}
-        <span className="font-medium text-ink">net cost</span> — and
+        <span className="font-medium text-ink">net cost</span>, and
         compares it against renting the same car or owning it solo.
       </p>
 
@@ -258,11 +258,11 @@ export function CompareCalculator({
           max={100}
           step={5}
           valueLabel={`${residualPct}%`}
-          subLabel={`Default ${DEFAULT_RESIDUAL_PCT}% — assumes ~${TARGET_DEPRECIATION_PCT}% depreciation over ${HOLDING_YEARS} yrs on low-mileage certified pre owned exotics`}
+          subLabel={`Default ${DEFAULT_RESIDUAL_PCT}%, assumes ~${TARGET_DEPRECIATION_PCT}% depreciation over ${HOLDING_YEARS} yrs on low-mileage certified pre owned exotics`}
         />
       </div>
 
-      {/* Rental opt-in — defaults ON; toggle reads "Opt out" when on so
+      {/* Rental opt-in, defaults ON; toggle reads "Opt out" when on so
           the action is explicit. Most members rent their unused days,
           so the math should reflect that by default. */}
       <div
@@ -285,7 +285,7 @@ export function CompareCalculator({
             <p className="mt-3 text-sm leading-relaxed text-ink-soft">
               Miami exotic-rental fleets average 200–240 booked days/yr.
               Shareholders can opt their unused entitlement into the
-              rental pool — RYDA handles bookings, insurance, and
+              rental pool, RYDA handles bookings, insurance, and
               cleaning. Revenue splits{" "}
               {100 - RENTAL_DEFAULTS.defaultManagementFeePct}/
               {RENTAL_DEFAULTS.defaultManagementFeePct} (you / RYDA),
@@ -294,7 +294,7 @@ export function CompareCalculator({
             </p>
             <p className="mt-2 text-xs text-mute">
               Same {TARGET_DEPRECIATION_PCT}% depreciation assumption
-              applies — our 100 mi/day allowance + certified pre owned maintenance keep
+              applies, our 100 mi/day allowance + certified pre owned maintenance keep
               the resale story consistent whether you drive or rent it
               out.
             </p>
@@ -344,7 +344,7 @@ export function CompareCalculator({
             />
             <div className="rounded-2xl border border-rule bg-surface p-5">
               <p className="text-xs uppercase tracking-wider text-mute">
-                Rental income — your share{safeShares > 1 ? "s" : ""}
+                Rental income, your share{safeShares > 1 ? "s" : ""}
               </p>
               <p className="mt-2 font-display text-2xl text-ink tabular-nums">
                 {formatUSD(numbers.ryda.rentalIncomeAnnual)}
@@ -376,10 +376,10 @@ export function CompareCalculator({
         )}
       </div>
 
-      {/* Results — RYDA */}
+      {/* Results, RYDA */}
       <div className="mt-12">
         <p className="text-xs font-medium uppercase tracking-wider text-mute">
-          RYDA — your share{safeShares > 1 ? "s" : ""}
+          RYDA, your share{safeShares > 1 ? "s" : ""}
         </p>
         <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <ResultCard
@@ -417,7 +417,7 @@ export function CompareCalculator({
           })()}
         </div>
 
-        {/* The math — explicit breakdown */}
+        {/* The math, explicit breakdown */}
         {(() => {
           const profit = -numbers.ryda.economicCost; // > 0 means net positive
           const isPositive = profit > 0;
@@ -500,7 +500,7 @@ export function CompareCalculator({
         })()}
       </div>
 
-      {/* Results — alternatives */}
+      {/* Results, alternatives */}
       <div className="mt-8">
         <p className="text-xs font-medium uppercase tracking-wider text-mute">
           The alternatives, same {numbers.ryda.totalDays} driving days

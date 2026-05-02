@@ -72,7 +72,7 @@ export async function POST(req: Request) {
         ${check_size ? `<div style="margin-top:14px;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#9A9590;">Anticipated check size</div><div style="margin-top:2px;font-weight:500;">${escapeHtml(check_size)}</div>` : ""}
         ${notes ? `<div style="margin-top:18px;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#9A9590;margin-bottom:6px;">Notes</div><div style="white-space:pre-wrap;color:#1c1c1c;">${escapeHtml(notes)}</div>` : ""}
         <div style="margin-top:24px;padding-top:18px;border-top:1px solid #e5e1d8;font-size:13px;color:#3c3c3c;">
-          <strong>Hit reply</strong> to respond — this email's reply-to is set to ${escapeHtml(email)}.
+          <strong>Hit reply</strong> to respond, this email's reply-to is set to ${escapeHtml(email)}.
         </div>
       `),
     });

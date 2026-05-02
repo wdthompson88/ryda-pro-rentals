@@ -52,7 +52,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Could not save." }, { status: 500 });
     }
 
-    // Best-effort email notification — fire and don't block the response.
+    // Best-effort email notification, fire and don't block the response.
     // The DB write is the source of truth; email is the alert layer.
     await notifyTeam({
       subject: `New help-chat escalation from ${email}`,
@@ -126,7 +126,7 @@ function renderEscalationHtml({
     ${conversationHtml}
 
     <div style="margin-top:24px;padding-top:18px;border-top:1px solid #e5e1d8;font-size:13px;color:#3c3c3c;">
-      <strong>Hit reply</strong> to respond — this email's reply-to is set to ${escapeHtml(email)}.
+      <strong>Hit reply</strong> to respond, this email's reply-to is set to ${escapeHtml(email)}.
     </div>
   `;
 }

@@ -28,7 +28,7 @@ const BOATS_NAV = [
 ];
 
 const PLANES_NAV: { href: string; label: string }[] = [
-  // Planes is just a coming-soon surface today — no sub-nav.
+  // Planes is just a coming-soon surface today, no sub-nav.
 ];
 
 function detectVertical(pathname: string | null): Vertical {
@@ -59,15 +59,15 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
 
   const tone = inverted ? "text-cream/70 hover:text-cream" : "text-ink-soft hover:text-ink";
   const brand = inverted ? "text-cream" : "text-ink";
-  // Sign in (Log In) — soft cream with ink text. Hover lifts to red.
+  // Sign in (Log In), soft cream with ink text. Hover lifts to red.
   const signInBtn = inverted
     ? "border-cream/30 bg-cream/10 text-cream hover:bg-cream hover:text-ink"
     : "border-rule bg-cream-2 text-ink hover:border-red hover:text-red";
-  // Sign up — dark ink (or cream on inverted) with strong CTA presence.
+  // Sign up, dark ink (or cream on inverted) with strong CTA presence.
   const signUpBtn = inverted
     ? "border-cream bg-cream text-ink hover:bg-red hover:text-cream hover:border-red"
     : "border-ink bg-ink text-cream hover:bg-red hover:border-red";
-  // Search input theming — tracks the inverted state.
+  // Search input theming, tracks the inverted state.
   const searchInput = inverted
     ? "border-cream/30 bg-cream/10 text-cream placeholder:text-cream/50 focus:border-cream focus:ring-cream/20"
     : "border-rule bg-cream-2 text-ink placeholder:text-mute focus:border-ink focus:ring-ink/10";
@@ -83,7 +83,7 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
   return (
     <header className={`w-full border-b ${inverted ? "border-cream/20" : "border-rule"}`}>
       {/* Single-row marketing header. Vertical switcher / theme toggle /
-          search-icon were demoted to footer per luxury polish — header
+          search-icon were demoted to footer per luxury polish, header
           now reads as minimal brand mark + nav + one CTA, not as
           a control panel. */}
 
@@ -92,7 +92,7 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
           <Link href="/" className={`font-display text-2xl tracking-tight ${brand}`}>
             RYDA
           </Link>
-          {/* Inline vertical switcher — Cars · Boats · Planes. The
+          {/* Inline vertical switcher, Cars · Boats · Planes. The
               currently-active vertical is bolded ink/cream; the others
               are mute and clickable so members can jump between
               verticals without bouncing back to the splitter. */}
@@ -135,7 +135,7 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
         </nav>
 
         <div className="flex items-center gap-3 sm:gap-3">
-          {/* Site search — visible on >=md so it doesn't crowd small screens.
+          {/* Site search, visible on >=md so it doesn't crowd small screens.
               On mobile, search is reachable from the burger menu. */}
           <form
             onSubmit={onSearchSubmit}
@@ -226,7 +226,7 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
           }`}
         >
           <nav className={`mx-auto flex max-w-7xl flex-col gap-1 px-6 py-4 text-base ${tone}`}>
-            {/* Mobile vertical switcher — same Cars / Boats / Planes
+            {/* Mobile vertical switcher, same Cars / Boats / Planes
                 jump as the desktop header. Active vertical bolded. */}
             <div className="mb-2 flex items-baseline gap-3 px-3 py-2 text-[11px] font-medium uppercase tracking-[0.2em]">
               <VerticalSwitch
@@ -264,7 +264,7 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
                 {n.label}
               </Link>
             ))}
-            {/* Mobile site-search — opens to /search?q=… */}
+            {/* Mobile site-search, opens to /search?q=… */}
             <form
               role="search"
               onSubmit={(e) => {

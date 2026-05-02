@@ -1,4 +1,4 @@
-// Boats sample-documents page — parallel of /sample-documents but
+// Boats sample-documents page, parallel of /sample-documents but
 // boat-specific. Adds Coast Guard documentation, marine survey,
 // captain employment agreement, hurricane plan, etc.
 
@@ -7,7 +7,7 @@ import { SiteHeader } from "@/components/site-header";
 import { Reveal } from "@/components/reveal";
 
 export const metadata = {
-  title: "Sample documents — RYDA Boats",
+  title: "Sample documents, RYDA Boats",
   description:
     "Preview the legal and operational documents RYDA Boats uses: Operating Agreement, Management Services Agreement, marine survey, Coast Guard documentation, captain agreements.",
 };
@@ -60,7 +60,7 @@ const DOCS = [
         title: "USCG Certificate of Documentation (sample)",
         meta: "Federal documentation · LLC-named",
         purpose:
-          "Federal Coast Guard documentation in the LLC's name (e.g. \"Wajer 55 S RYDA LLC\"). Members are not on the document — the LLC is. Renewal handled annually by RYDA.",
+          "Federal Coast Guard documentation in the LLC's name (e.g. \"Wajer 55 S RYDA LLC\"). Members are not on the document, the LLC is. Renewal handled annually by RYDA.",
         signedBy: "USCG-issued",
       },
       {
@@ -142,9 +142,9 @@ export default function BoatsSampleDocumentsPage() {
             <span className="italic">before you wire.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
-            Every document the LLC produces — Operating Agreement,
+            Every document the LLC produces, Operating Agreement,
             Management Services Agreement, marine survey, Coast Guard
-            documentation, captain agreements, hurricane plan — available
+            documentation, captain agreements, hurricane plan, available
             as a redacted sample. Hand these to your counsel and your
             tax advisor before any commitment.
           </p>

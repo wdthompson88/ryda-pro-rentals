@@ -250,7 +250,7 @@ function TierCard({ tier }: { tier: typeof TIERS[number] }) {
   // Monochrome tier cards. Saturated red/blue/black saturated cards
   // read as Stripe pricing. Restrained palette: cream/surface body
   // with a 2px top accent line in the tier color (red / marine / gold).
-  // Black tier earns the gold detail — gold was previously underused
+  // Black tier earns the gold detail, gold was previously underused
   // in tokens; this is its one recurring brand surface.
   const accentLine = isBlack
     ? "before:bg-[#C9A66B]" // gold (--ryda-gold)
@@ -337,7 +337,7 @@ function Group({ group }: { group: typeof FEATURES[number] }) {
 
 function Cell({ value, accent }: { value: CellValue; accent?: boolean }) {
   // Quiet ink dot for "included," em-dash for "not included."
-  // Replaces the red ✓ / cell shading combo — checkmarks + accent
+  // Replaces the red ✓ / cell shading combo, checkmarks + accent
   // backgrounds read as feature-comparison SaaS. The ink dot keeps
   // the affordance without shouting; accent is gone entirely from
   // the cell, the comparison table inherits no color.

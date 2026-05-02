@@ -22,7 +22,7 @@ export default function InsurancePage() {
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
             Insuring a $300,000+ vehicle that's used by multiple drivers with
             varying experience is a non-trivial problem. RYDA carries a
-            commercial fleet policy underwritten for exactly this — agreed
+            commercial fleet policy underwritten for exactly this, agreed
             value, multi-driver, supercar-rated.
           </p>
         </div>
@@ -57,7 +57,7 @@ export default function InsurancePage() {
               racing, off-road use of street cars).
             </NotCovered>
             <NotCovered>
-              Damage during unauthorized use — drivers not approved by RYDA.
+              Damage during unauthorized use, drivers not approved by RYDA.
             </NotCovered>
             <NotCovered>
               Loss of personal property left in the vehicle.
@@ -80,7 +80,7 @@ export default function InsurancePage() {
           </p>
           <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
             <Step n="01" title="Call RYDA" body="One number, 24/7. We dispatch roadside, arrange a tow if needed and get you mobile." />
-            <Step n="02" title="Document" body="The RYDA app walks you through photo + statement collection. Don't worry about getting it perfect — just capture the scene." />
+            <Step n="02" title="Document" body="The RYDA app walks you through photo + statement collection. Don't worry about getting it perfect, just capture the scene." />
             <Step n="03" title="We file" body="RYDA opens the claim with our carrier. You don't need to call your own insurance." />
             <Step n="04" title="Resolution" body="Most claims close within 30 days. You're not invoiced for any covered items." />
           </div>

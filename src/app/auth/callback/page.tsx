@@ -1,11 +1,11 @@
 "use client";
 
-// /auth/callback — landing page for Supabase magic-link / OAuth flows.
+// /auth/callback, landing page for Supabase magic-link / OAuth flows.
 // The Supabase client picks up the auth credentials from the URL hash
 // (PKCE flow) on mount, then we route the user back to the `next=`
 // destination they came from (or /portfolio as a sane default).
 //
-// This page is intentionally minimal — it's a transient redirect, not
+// This page is intentionally minimal, it's a transient redirect, not
 // a destination. If Supabase isn't configured, it just routes home so
 // the demo never breaks.
 
@@ -38,7 +38,7 @@ function Inner() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      // No Supabase configured — nothing to verify; just route to next.
+      // No Supabase configured, nothing to verify; just route to next.
       if (!supabase) {
         router.replace(next);
         return;
@@ -56,7 +56,7 @@ function Inner() {
           // Brief beat so the "Signed in" message paints, then route.
           setTimeout(() => router.replace(next), 250);
         } else {
-          // No session yet — supabase-js sometimes needs a moment to
+          // No session yet, supabase-js sometimes needs a moment to
           // exchange the URL hash. Retry once after a short delay.
           await new Promise((r) => setTimeout(r, 600));
           const second = await supabase.auth.getSession();

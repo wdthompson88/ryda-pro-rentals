@@ -1,4 +1,4 @@
-// Print-optimized cost-comparison sheet — one-page PDF-style format.
+// Print-optimized cost-comparison sheet, one-page PDF-style format.
 // Browser-native print → PDF. Each /markets/[symbol]/cost-sheet renders
 // a single-page sheet for that vehicle with the math anchored to its
 // actual share economics.
@@ -240,7 +240,7 @@ export default async function CostSheetPage({
             Per-line splits illustrative; actual expense categories vary
             quarter to quarter and are reported on the LLC&apos;s books.
             &quot;Reserve allocation&quot; is the periodic set-aside a
-            prudent owner holds against eventual depreciation — it is
+            prudent owner holds against eventual depreciation, it is
             not paid out, and the realized depreciation hit is captured
             separately at exit in the resale figure below (no
             double-counting).
@@ -384,7 +384,7 @@ export default async function CostSheetPage({
         </footer>
       </div>
 
-      {/* Print styling — set page size + margins, hide chrome */}
+      {/* Print styling, set page size + margins, hide chrome */}
       <style>{`
         @media print {
           @page { size: Letter; margin: 0.5in; }

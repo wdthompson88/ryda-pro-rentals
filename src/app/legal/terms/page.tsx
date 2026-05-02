@@ -15,7 +15,7 @@ export default function TermsPage() {
         },
         {
           heading: "2. Eligibility",
-          body: "You must be at least 28 years old, have a valid US driver's license, pass identity verification (KYC), and meet our underwriting standards. No accredited-investor status or financial qualification is required — RYDA is a luxury access platform, not an investment platform.",
+          body: "You must be at least 28 years old, have a valid US driver's license, pass identity verification (KYC), and meet our underwriting standards. No accredited-investor status or financial qualification is required, RYDA is a luxury access platform, not an investment platform.",
         },
         {
           heading: "3. Your account",
@@ -39,7 +39,7 @@ export default function TermsPage() {
         },
         {
           heading: "8. Intellectual property",
-          body: "All content on the RYDA platform — code, design, brand, vehicle photography — belongs to RYDA or our licensors.",
+          body: "All content on the RYDA platform, code, design, brand, vehicle photography, belongs to RYDA or our licensors.",
         },
         {
           heading: "9. Disclaimers and limitation of liability",

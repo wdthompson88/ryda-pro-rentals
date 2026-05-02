@@ -29,14 +29,14 @@ export async function POST(req: Request) {
     const body = await req.json();
     const name = String(body.name || "").trim();
     const email = String(body.email || "").trim().toLowerCase();
-    // Cap phone like every other text field — bodyParser limits prevent
+    // Cap phone like every other text field, bodyParser limits prevent
     // a literal DoS but consistency makes the schema easier to reason
     // about and protects the email template from absurd values.
     const phone = String(body.phone || "").trim().slice(0, 32);
     const inquiry_type = VALID_TYPES.has(String(body.type || "")) ? String(body.type) : "Other";
     const market = VALID_MARKETS.has(String(body.market || "")) ? String(body.market) : "Not sure";
     const message = String(body.message || "").trim().slice(0, 5000);
-    // Free-form CTA attribution — what asset / intent / surface produced
+    // Free-form CTA attribution, what asset / intent / surface produced
     // this lead (e.g. "Charter request: Wajer 55 S", "Boats early
     // inquiry", "Want LA boats access"). Persists to context column when
     // present (migration 0006); otherwise the route falls back to a
@@ -52,7 +52,7 @@ export async function POST(req: Request) {
     }
 
     if (!supabase) {
-      // Fail closed in production — never tell the user "we got it" if we
+      // Fail closed in production, never tell the user "we got it" if we
       // didn't actually persist. Dev mode logs metadata only (no PII).
       if (process.env.NODE_ENV === "production") {
         console.error("[contact · misconfigured]");
@@ -75,7 +75,7 @@ export async function POST(req: Request) {
       context: context || null,
     });
 
-    // Schema-cache fallback — older deployments without migration 0006
+    // Schema-cache fallback, older deployments without migration 0006
     // don't have the `context` column. Detect and retry without it so
     // form submissions don't 500 in transition.
     if (error) {
@@ -105,7 +105,7 @@ export async function POST(req: Request) {
       // glance whether a "Membership" inquiry is for a Wajer 55 S
       // charter or a Ferrari co-ownership share.
       subject: context
-        ? `[${inquiry_type}] ${context} — ${name}`
+        ? `[${inquiry_type}] ${context}, ${name}`
         : `New ${inquiry_type.toLowerCase()} inquiry from ${name}`,
       replyTo: email,
       html: emailLayout(`New contact form: ${inquiry_type}`, `
@@ -132,7 +132,7 @@ export async function POST(req: Request) {
         <div style="margin-top:18px;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#9A9590;margin-bottom:6px;">Message</div>
         <div style="white-space:pre-wrap;color:#1c1c1c;">${escapeHtml(message)}</div>
         <div style="margin-top:24px;padding-top:18px;border-top:1px solid #e5e1d8;font-size:13px;color:#3c3c3c;">
-          <strong>Hit reply</strong> to respond — this email's reply-to is set to ${escapeHtml(email)}.
+          <strong>Hit reply</strong> to respond, this email's reply-to is set to ${escapeHtml(email)}.
         </div>
       `),
     });

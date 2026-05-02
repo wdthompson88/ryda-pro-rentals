@@ -6,7 +6,7 @@ import { SearchResults } from "@/components/search-results";
 export const metadata: Metadata = {
   title: "Search — RYDA",
   description:
-    "Search across the RYDA site — vehicles, boats, journal posts, comparison pages, FAQ.",
+    "Search across the RYDA site, vehicles, boats, journal posts, comparison pages, FAQ.",
 };
 
 export default function SearchPage() {

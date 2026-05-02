@@ -1,4 +1,4 @@
-// Reusable explainer for the two-tier booking model — adapted from
+// Reusable explainer for the two-tier booking model, adapted from
 // Pacaso's SmartStay system for cars instead of homes. Drops into:
 //   - /how-it-works (full version)
 //   - /inside (full version, with peak-protection callout)
@@ -6,7 +6,7 @@
 //   - /faq (compact version)
 //
 // Pattern: Pacaso made scheduling fairness a trust-proof, not a footnote.
-// We do the same — a member should understand the booking math before
+// We do the same, a member should understand the booking math before
 // they wire money.
 
 import { BOOKING_POLICY } from "@/lib/market-data";
@@ -53,7 +53,7 @@ export function BookingTiersExplainer({
         Booking model
       </p>
       <h3 className="mt-3 font-display text-2xl text-ink sm:text-3xl">
-        Two ways to book — short-notice and planned.
+        Two ways to book, short-notice and planned.
       </h3>
       <p className="mt-3 max-w-2xl text-sm text-ink-soft">
         Inspired by the best calendar systems in fractional ownership. Same
@@ -76,7 +76,7 @@ export function BookingTiersExplainer({
             It&apos;s sunny this weekend.
           </h4>
           <p className="mt-2 text-sm text-ink-soft">
-            For opportunistic drives — Miami clears up Friday, you&apos;re in
+            For opportunistic drives, Miami clears up Friday, you&apos;re in
             the car Saturday. No reservation cap; book as many short-notice
             slots as the calendar has open. A 3-day consecutive cap keeps
             short-notice fair across co-owners.
@@ -113,7 +113,7 @@ export function BookingTiersExplainer({
             The August trip you&apos;re thinking about in March.
           </h4>
           <p className="mt-2 text-sm text-ink-soft">
-            For trips you&apos;re actually planning — Hamptons in August,
+            For trips you&apos;re actually planning, Hamptons in August,
             Pebble Beach in October. Each share holds up to 4 active planned
             reservations at a time; once one resolves, you can queue another.
           </p>
@@ -155,7 +155,7 @@ export function BookingTiersExplainer({
       <p className="mt-4 text-xs text-mute">
         Both modes draw from your share&apos;s annual entitlement of 30
         driving days and 3,000 included miles. Multi-share holders scale
-        linearly — two shares = 60 days, 6,000 miles, 8 active planned
+        linearly, two shares = 60 days, 6,000 miles, 8 active planned
         reservations.
       </p>
     </div>

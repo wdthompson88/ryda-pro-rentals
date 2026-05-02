@@ -26,7 +26,7 @@ export default function StoragePage() {
             Storage is the most underrated part of supercar ownership.
             Concrete floor, fluorescent light, and a leaky roof costs you
             $40,000 in deferred maintenance over five years. RYDA's facility
-            is built for these cars — and you can store yours here even if
+            is built for these cars, and you can store yours here even if
             you're not a co-owner yet.
           </p>
         </div>
@@ -122,7 +122,7 @@ export default function StoragePage() {
             />
             <Faq
               q="Can I drop in to see the car?"
-              a="Yes — by appointment. We require 24h notice for non-urgent visits to coordinate facility access. Members can do same-day."
+              a="Yes, by appointment. We require 24h notice for non-urgent visits to coordinate facility access. Members can do same-day."
             />
             <Faq
               q="What if I want to add my car to RYDA's rental fleet?"

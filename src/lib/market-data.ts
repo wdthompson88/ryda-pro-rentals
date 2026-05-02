@@ -21,8 +21,8 @@ export type Vehicle = {
   effectiveDailyCost: number;
   cylinders: number;       // 0 for fully electric
   drive: "RWD" | "AWD";    // drivetrain
-  listingStart: string;    // ISO date — "period listing" start
-  listingEnd: string;      // ISO date — "period listing" end
+  listingStart: string;    // ISO date, "period listing" start
+  listingEnd: string;      // ISO date, "period listing" end
   hero: string;            // hero image URL
   flipImage?: boolean;     // mirror horizontally so the car faces right
   imagePosition?: string;  // CSS object-position to center the car in crops (default "center")
@@ -292,14 +292,14 @@ export function formatUSD(n: number, opts: { decimals?: number } = {}) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// certified pre owned doctrine — 2-year planned exit
+// certified pre owned doctrine, 2-year planned exit
 // ─────────────────────────────────────────────────────────────────────────
 // We curate certified pre owned vehicles and hold each one for ~2 years
 // OR until the odometer crosses ~50,000 miles, whichever comes first.
 // At exit, the LLC sells the car and proceeds are distributed pro-rata.
 // Modeled assumption: the curated fleet depreciates ~10% over the
 // 2-year hold. We use a flat 10% across drive-only AND rental-opt-in
-// scenarios — the number already absorbs the heavier mileage profile
+// scenarios, the number already absorbs the heavier mileage profile
 // of the rental path (50% pool occupancy + 100 mi/day allowance
 // across both shareholder and rental usage). Per-vehicle depreciation
 // curves vary in reality (Aventador Ultimae appreciates, Cullinan
@@ -313,30 +313,30 @@ export const HOLDING_YEARS = 2;
 export const HOLDING_MILES_CAP = 50_000; // alt sale trigger: whichever comes first
 export const TARGET_DEPRECIATION_PCT = 10; // % over the full 2-year hold
 
-// Standard shareholder mileage allowance — matches GM LUXE & industry
+// Standard shareholder mileage allowance, matches GM LUXE & industry
 // norm. 32 days × 100 mi/day = 3,200 mi/yr per share.
 export const MILES_PER_DAY_PER_SHARE = 100;
 export const DAYS_PER_SHARE = 30;
 
 // ─────────────────────────────────────────────────────────────────────────
-// BOOKING POLICY — two-tier scheduling (inspired by Pacaso SmartStay)
+// BOOKING POLICY, two-tier scheduling (inspired by Pacaso SmartStay)
 // ─────────────────────────────────────────────────────────────────────────
 // We split bookings into two clear modes so members can reason about the
 // calendar without hunting through a wall of rules:
 //
-//   1. SHORT-NOTICE DRIVES — "it's sunny this weekend"
+//   1. SHORT-NOTICE DRIVES, "it's sunny this weekend"
 //      The closer-in window. Quick, opportunistic, unlimited in count
 //      so long as the calendar is open. A hard cap on consecutive days
 //      keeps short-notice from monopolising peak weekends.
 //
-//   2. PLANNED DRIVES — "I'm planning my Hamptons run in August"
+//   2. PLANNED DRIVES, "I'm planning my Hamptons run in August"
 //      The longer-horizon window. Each share gets a fixed number of
 //      active reservations at any given time, so the queue stays fair.
 //      Consecutive-day caps are higher than short-notice (peak: 7 / off
 //      peak: 14) so members can take genuine trips.
 //
 // Both modes consume the share's annual entitlement (DAYS_PER_SHARE,
-// MILES_PER_DAY_PER_SHARE). The split is a UX/fairness layer — not a
+// MILES_PER_DAY_PER_SHARE). The split is a UX/fairness layer, not a
 // separate quota.
 //
 // PEAK PROTECTION: each share gets one "protected peak window" before
@@ -362,7 +362,7 @@ export const BOOKING_POLICY = {
     description:
       "One protected peak weekend or event window per share before any co-owner can book a second.",
   },
-  // Annotated peak periods — Miami today; LA / NY when we list those
+  // Annotated peak periods, Miami today; LA / NY when we list those
   // markets. Pulled into the calendar for visual treatment + warning
   // copy when a member tries to book a peak slot they're not entitled
   // to under peak protection.
@@ -385,7 +385,7 @@ export const BOOKING_POLICY = {
 };
 
 // ─────────────────────────────────────────────────────────────────────────
-// MARKETS — for portfolio grouping
+// MARKETS, for portfolio grouping
 // ─────────────────────────────────────────────────────────────────────────
 // Pacaso groups inventory by destination first; we group by US market.
 // Used by the portfolio page to lay out "Miami flagship" / "LA coming"
@@ -425,7 +425,7 @@ export const MARKETS: Record<
     status: "coming-2027",
     launchLabel: "Q4 2027",
     blurb:
-      "Hamptons summer, Hudson Valley fall, Manhattan winter garage. NY skews GT and SUV — cars built for the road from East 79th to Sag Harbor.",
+      "Hamptons summer, Hudson Valley fall, Manhattan winter garage. NY skews GT and SUV, cars built for the road from East 79th to Sag Harbor.",
     hero: "https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=2000&q=80",
   },
 };
@@ -463,7 +463,7 @@ export type ShareEconomics = {
 // pro-rata to the days each share contributes.
 //
 // Depreciation is held constant at TARGET_DEPRECIATION_PCT across both
-// drive-only and rental scenarios — our certified pre owned maintenance + curated mileage
+// drive-only and rental scenarios, our certified pre owned maintenance + curated mileage
 // caps keep the resale story consistent.
 
 export const RENTAL_DEFAULTS = {
@@ -471,7 +471,7 @@ export const RENTAL_DEFAULTS = {
   daysAvailablePerYear: 340,
   // What % of POOLED days actually book. Members get first call on the
   // calendar, so the pool is the leftover (mostly weekday/off-peak)
-  // days — harder to fill than a fully-controlled rental fleet's
+  // days, harder to fill than a fully-controlled rental fleet's
   // calendar. Industry fleet averages run 200–240 booked days/yr on
   // 340 available days (~60–70%); the leftover-pool reality is lower.
   // 50% on a 220-day pool = 110 booked days = ~230 active days/yr

@@ -13,16 +13,16 @@ import {
 } from "@/lib/market-data";
 
 export const metadata = {
-  title: "RYDA Portfolio — Supercars co-owned in the US",
+  title: "RYDA Portfolio, Supercars co-owned in the US",
   description:
     "The RYDA portfolio. Member-managed LLCs hold each curated certified pre owned supercar; up to 5 verified members co-own every car. Browse Miami, Los Angeles and New York.",
-  // The hero image was washing out the headline copy — bumped the
+  // The hero image was washing out the headline copy, bumped the
   // gradient and overlay opacity so the cream text reads cleanly
   // over the red Ferrari hero from any device width.
 };
 
 // Featured tile: 4 marquee positions, statically rendered (no carousel).
-// The CEO didn't like the auto-advancing carousel — easier to scan four
+// The CEO didn't like the auto-advancing carousel, easier to scan four
 // large cards in a single row than scroll through six. Fall back to the
 // canonical fleet order if any of these symbols disappear from inventory.
 const FEATURED_SYMBOLS = ["F296", "L780", "MC75", "AM-V"];
@@ -38,7 +38,7 @@ export default function MarketsPage() {
     <>
       <SiteHeader />
 
-      {/* Cinematic portfolio hero — full-bleed photo. The previous
+      {/* Cinematic portfolio hero, full-bleed photo. The previous
           Unsplash ID rendered a Porsche Panamera at run time (not the
           McLaren that ID was supposed to be). Switched to the
           confirmed red Ferrari 296 photo, with a tighter
@@ -92,10 +92,10 @@ export default function MarketsPage() {
         </div>
       </section>
 
-      {/* Ownership primitives — six numbers above the fold for trust */}
+      {/* Ownership primitives, six numbers above the fold for trust */}
       <OwnershipPrimitives variant="default" />
 
-      {/* Featured — four static cards, no carousel. */}
+      {/* Featured, four static cards, no carousel. */}
       <section id="featured" className="border-y border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
           <div className="flex flex-wrap items-end justify-between gap-4">
@@ -107,7 +107,7 @@ export default function MarketsPage() {
                 Currently in the spotlight.
               </h2>
               <p className="mt-3 max-w-xl text-sm text-ink-soft">
-                The marquee positions across our active markets — the cars
+                The marquee positions across our active markets, the cars
                 drawing the most member traffic this season.
               </p>
             </div>
@@ -126,7 +126,7 @@ export default function MarketsPage() {
         </div>
       </section>
 
-      {/* Markets — group cards by city Miami / LA / NY (Pacaso pattern) */}
+      {/* Markets, group cards by city Miami / LA / NY (Pacaso pattern) */}
       <section id="markets" className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
@@ -154,14 +154,14 @@ export default function MarketsPage() {
         </div>
       </section>
 
-      {/* Booking model explainer — Pacaso SmartStay translation */}
+      {/* Booking model explainer, Pacaso SmartStay translation */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
           <BookingTiersExplainer variant="full" />
         </div>
       </section>
 
-      {/* All vehicles — keep the existing power-filter UI for buyers
+      {/* All vehicles, keep the existing power-filter UI for buyers
           who came to slice by spec rather than browse by city. */}
       <section id="all" className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10 sm:py-16">
@@ -180,7 +180,7 @@ export default function MarketsPage() {
         <MarketsListings />
       </section>
 
-      {/* Try before you buy — rentals teaser */}
+      {/* Try before you buy, rentals teaser */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10">
           <div className="flex flex-wrap items-end justify-between gap-4">
@@ -251,7 +251,7 @@ export default function MarketsPage() {
         <div className="mx-auto max-w-3xl px-6 py-12 text-center text-xs text-mute sm:px-10">
           <p>
             RYDA is a luxury access platform. Co-ownership stakes are
-            membership interests in member-managed LLCs — not
+            membership interests in member-managed LLCs, not
             registered securities, not offered for investment purposes.
             See the{" "}
             <Link href="/legal/disclaimer" className="text-red hover:text-red-deep">
@@ -321,7 +321,7 @@ function MarketSection({
                 isLive
                   ? `/markets/${v.symbol.toLowerCase()}`
                   : `/contact?type=Membership&note=${encodeURIComponent(
-                      `${market.label} waitlist — interest in ${v.name}`,
+                      `${market.label} waitlist, interest in ${v.name}`,
                     )}#form`
               }
               className="group flex flex-col overflow-hidden rounded-2xl border border-rule bg-surface transition-all hover:-translate-y-0.5 hover:border-ink/40 hover:shadow-md"
@@ -337,7 +337,7 @@ function MarketSection({
                   }`}
                   style={{ objectPosition: v.imagePosition ?? "center" }}
                 />
-                {/* Status pill — for live markets, surface real share counts;
+                {/* Status pill, for live markets, surface real share counts;
                     for preview markets (LA, NY), make it explicit that the
                     vehicle is a preview and shares aren't open yet. */}
                 <span
@@ -411,7 +411,7 @@ function MarketSection({
   );
 }
 
-// Featured card — static, used in the four-up "Currently in the spotlight"
+// Featured card, static, used in the four-up "Currently in the spotlight"
 // row. Same aesthetic as the previous carousel cards (italic display
 // brand naming, dark gradient overlay, status pill, per-share price)
 // but without the snap-scroll / auto-advance.

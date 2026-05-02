@@ -5,9 +5,9 @@ import { SiteHeader } from "@/components/site-header";
 import { PlanesMissionProfileForm } from "@/components/planes-mission-profile-form";
 
 export const metadata: Metadata = {
-  title: "RYDA Planes — Coming soon",
+  title: "RYDA Planes, Coming soon",
   description:
-    "RYDA Planes is in design. Fractional access to private aviation, structured the same way as our cars and boats verticals — member-managed LLCs, professionally operated.",
+    "RYDA Planes is in design. Fractional access to private aviation, structured the same way as our cars and boats verticals, member-managed LLCs, professionally operated.",
 };
 
 export default function PlanesComingSoon() {
@@ -15,7 +15,7 @@ export default function PlanesComingSoon() {
     <>
       <SiteHeader />
 
-      {/* Cinematic hero — same pattern as the cars portfolio hero, but
+      {/* Cinematic hero, same pattern as the cars portfolio hero, but
           with a "Coming soon" treatment. The page is intentionally
           spare: there's no inventory yet and we don't want to bluff. */}
       <section className="relative isolate min-h-[70vh] overflow-hidden border-b border-rule">
@@ -56,7 +56,7 @@ export default function PlanesComingSoon() {
             <p className="mt-2 text-sm text-cream/85">
               Help us shape the member cohort: jet class, annual hours,
               primary base. We contact you when a profile-matching airframe
-              and operator pair are ready — not before.
+              and operator pair are ready, not before.
             </p>
             <div className="mt-5">
               <PlanesMissionProfileForm />
@@ -65,7 +65,7 @@ export default function PlanesComingSoon() {
         </div>
       </section>
 
-      {/* What we're working on — keep it short and honest. Nothing
+      {/* What we're working on, keep it short and honest. Nothing
           shipped, no fake screenshots. Three considerations the
           member cohort cares about. */}
       <section className="border-b border-rule">
@@ -80,23 +80,23 @@ export default function PlanesComingSoon() {
             <Pillar
               eyebrow="01"
               title="Real ownership, not card time"
-              body="NetJets and Wheels Up sell hours against a fleet. We're targeting the original fractional model — a registered ownership stake in a specific airframe, held in a member-managed LLC."
+              body="NetJets and Wheels Up sell hours against a fleet. We're targeting the original fractional model, a registered ownership stake in a specific airframe, held in a member-managed LLC."
             />
             <Pillar
               eyebrow="02"
               title="Honest math on operating cost"
-              body="Per-hour costs hide the true picture. RYDA Planes will publish full annual carrying — hangar, crew, insurance, MX reserves, engine reserves — broken out per share, the same way we do on cars and boats."
+              body="Per-hour costs hide the true picture. RYDA Planes will publish full annual carrying, hangar, crew, insurance, MX reserves, engine reserves, broken out per share, the same way we do on cars and boats."
             />
             <Pillar
               eyebrow="03"
               title="Operator separation"
-              body="The LLC owns the airframe. A Part 135 operator runs the flight ops under a separate management agreement. Members retain governance — replacement, sale, modifications — through standard LLC voting."
+              body="The LLC owns the airframe. A Part 135 operator runs the flight ops under a separate management agreement. Members retain governance, replacement, sale, modifications, through standard LLC voting."
             />
           </div>
         </div>
       </section>
 
-      {/* Planned timeline — generous and conservative, no precision
+      {/* Planned timeline, generous and conservative, no precision
           we can't back up. */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-24">
@@ -136,7 +136,7 @@ export default function PlanesComingSoon() {
               n="04"
               date="2028+"
               title="First LLC formed"
-              body="If economics and demand confirm, the first single-airframe LLC takes member funding. Same buy-in / annual operating split / planned exit doctrine as cars and boats — adjusted for the aviation cost stack."
+              body="If economics and demand confirm, the first single-airframe LLC takes member funding. Same buy-in / annual operating split / planned exit doctrine as cars and boats, adjusted for the aviation cost stack."
             />
           </ol>
         </div>

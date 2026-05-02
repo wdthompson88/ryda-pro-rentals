@@ -50,7 +50,7 @@ export default function MiamiPage() {
           <div className="mt-8 space-y-6 text-base leading-relaxed text-ink-soft">
             <p>
               Miami is the only US city where supercar ownership is a normal
-              part of daily life — not a special-occasion thing. You see a
+              part of daily life, not a special-occasion thing. You see a
               Ferrari in line at a coffee shop. Lamborghinis are not rare.
               The density of $250K+ vehicles per zip code in Miami-Dade
               exceeds entire metro areas of comparable wealth.
@@ -78,7 +78,7 @@ export default function MiamiPage() {
           <h2 className="font-display text-3xl text-ink sm:text-4xl">Our Miami facility</h2>
           <p className="mt-4 max-w-2xl text-base text-ink-soft">
             RYDA's flagship storage and handover hub is in partnership with
-            a vetted Miami-based luxury vehicle facility — climate-controlled,
+            a vetted Miami-based luxury vehicle facility, climate-controlled,
             24/7 security, supercar-rated insurance.
           </p>
           <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">

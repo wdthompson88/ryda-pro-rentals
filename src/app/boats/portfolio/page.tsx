@@ -13,7 +13,7 @@ import {
 import { PORTFOLIO_HERO } from "@/lib/boat-content";
 
 export const metadata: Metadata = {
-  title: "RYDA Boats Portfolio — Co-own a yacht in Miami",
+  title: "RYDA Boats Portfolio, Co-own a yacht in Miami",
   description:
     "The RYDA Boats portfolio. Member-managed LLCs hold each curated yacht; up to 5 verified members co-own every hull. Browse Miami today; LA + NY 2027.",
 };
@@ -74,7 +74,7 @@ export default function BoatsPortfolioPage() {
         </div>
       </section>
 
-      {/* Featured — four static cards */}
+      {/* Featured, four static cards */}
       <section id="featured" className="border-y border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
           <div className="flex flex-wrap items-end justify-between gap-4">
@@ -136,7 +136,7 @@ export default function BoatsPortfolioPage() {
         </div>
       </section>
 
-      {/* All hulls — power-filter UI parallel to /markets's MarketsListings.
+      {/* All hulls, power-filter UI parallel to /markets's MarketsListings.
           Search + brand/location/status/type filters + sort. Renders the
           same depth of card the cars portfolio does (BoatCard mirrors
           VehicleCard exactly). */}

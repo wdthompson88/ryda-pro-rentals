@@ -10,7 +10,7 @@ const inter = Inter({
   display: "swap",
 });
 
-// Display serif for headlines — Fraunces stands in well for the spec's "Canela"
+// Display serif for headlines, Fraunces stands in well for the spec's "Canela"
 // (Canela is paid; we can swap later when you license it).
 const fraunces = Fraunces({
   variable: "--font-fraunces",
@@ -20,7 +20,7 @@ const fraunces = Fraunces({
 });
 
 // Resolve absolute URLs in metadata (OG image, etc). Always uses the
-// canonical public domain — NOT the per-deployment URL like
+// canonical public domain, NOT the per-deployment URL like
 // `ryda-xxxxxx-moocow4844s-projects.vercel.app`, which is gated by
 // Vercel deployment protection and unreachable to OG scrapers.
 // Set NEXT_PUBLIC_SITE_URL on Vercel once a custom domain (ryda.com)
@@ -29,12 +29,12 @@ const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://ryda-web-teal.vercel.app";
 
 export const metadata: Metadata = {
-  title: "RYDA — Supercar co-ownership and rentals",
+  title: "RYDA, Supercar co-ownership and rentals",
   description:
     "Co-own or rent a curated certified pre owned Ferrari, Lamborghini, or McLaren in the US. Asset-backed LLC, professionally operated. Launching in Miami.",
   metadataBase: new URL(siteUrl),
   openGraph: {
-    title: "RYDA — Supercar co-ownership and rentals",
+    title: "RYDA, Supercar co-ownership and rentals",
     description:
       "Co-own or rent a curated supercar with verified members. Asset-backed LLC, professionally operated. Launching in Miami.",
     siteName: "RYDA",
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "RYDA — Supercar co-ownership and rentals",
+    title: "RYDA, Supercar co-ownership and rentals",
     description:
       "Co-own or rent a curated supercar with verified members. Asset-backed LLC, professionally operated. Launching in Miami.",
   },

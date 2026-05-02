@@ -26,7 +26,7 @@ export default function MemberProtectionPage() {
             Wealthy buyers ask three questions before wiring six figures:
             where does my money go, who controls the asset, and what happens
             if something goes wrong. This is the operational answer to all
-            three — without legal jargon.
+            three, without legal jargon.
           </p>
         </div>
       </section>
@@ -49,12 +49,12 @@ export default function MemberProtectionPage() {
             <Step
               n="02"
               title="Release to the LLC"
-              body="Once conditions clear, escrow releases funds to the LLC's bank account — not to RYDA. The LLC is a separate legal entity with its own bank account, its own EIN and its own books. RYDA is a vendor to the LLC."
+              body="Once conditions clear, escrow releases funds to the LLC's bank account, not to RYDA. The LLC is a separate legal entity with its own bank account, its own EIN and its own books. RYDA is a vendor to the LLC."
             />
             <Step
               n="03"
               title="LLC pays the seller"
-              body="The LLC uses the pooled member capital to acquire the vehicle from the dealer or private seller, with title issued in the LLC's name. RYDA's role here is operational — sourcing, PPI, paperwork — not custodial. The LLC owns the asset on day one."
+              body="The LLC uses the pooled member capital to acquire the vehicle from the dealer or private seller, with title issued in the LLC's name. RYDA's role here is operational, sourcing, PPI, paperwork, not custodial. The LLC owns the asset on day one."
             />
             <Step
               n="04"
@@ -65,7 +65,7 @@ export default function MemberProtectionPage() {
         </div>
       </section>
 
-      {/* What "asset-backed" actually means — the comparison block */}
+      {/* What "asset-backed" actually means, the comparison block */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
@@ -77,7 +77,7 @@ export default function MemberProtectionPage() {
           <p className="mt-4 max-w-3xl text-base text-ink-soft">
             "Asset-backed" is the difference between a contract with an
             operator and a legal interest in a real, titled vehicle.
-            What happens to your access — and your money — if the
+            What happens to your access, and your money, if the
             platform behind it disappears?
           </p>
           <div className="mt-10 overflow-hidden rounded-2xl border border-rule bg-surface">
@@ -125,7 +125,7 @@ export default function MemberProtectionPage() {
             Co-ownership shares are member-managed LLC interests.
             The vehicle is held on title in the LLC's name; you hold a
             registered legal interest in the LLC. Real asset, real
-            ownership — not a financial instrument and not an
+            ownership, not a financial instrument and not an
             investment offering.
           </p>
         </div>
@@ -174,11 +174,11 @@ export default function MemberProtectionPage() {
           <div className="mt-12 space-y-6">
             <Case
               q="What if RYDA, the company, fails?"
-              a="The LLC and the asset survive. Title is in the LLC's name; the LLC has its own bank account and its own counsel. Members can vote to engage a successor service provider, sell the asset or wind the LLC down — whatever the Operating Agreement allows. Your share is protected from RYDA's solvency because RYDA never owned the asset to begin with."
+              a="The LLC and the asset survive. Title is in the LLC's name; the LLC has its own bank account and its own counsel. Members can vote to engage a successor service provider, sell the asset or wind the LLC down, whatever the Operating Agreement allows. Your share is protected from RYDA's solvency because RYDA never owned the asset to begin with."
             />
             <Case
               q="What if a co-owner stops paying their quarterly fees?"
-              a="The Operating Agreement triggers a 30-day cure period with written notice and a small late fee. If the member doesn't cure, the LLC can force-transfer the delinquent share to another verified member at the most recent reference value. Proceeds first cover the unpaid amount, then any LLC-level transaction costs, then the rest goes to the former member. Other co-owners are not on the hook for the unpaid amount — the share itself secures the obligation."
+              a="The Operating Agreement triggers a 30-day cure period with written notice and a small late fee. If the member doesn't cure, the LLC can force-transfer the delinquent share to another verified member at the most recent reference value. Proceeds first cover the unpaid amount, then any LLC-level transaction costs, then the rest goes to the former member. Other co-owners are not on the hook for the unpaid amount, the share itself secures the obligation."
             />
             <Case
               q="What happens on death of a co-owner?"
@@ -186,7 +186,7 @@ export default function MemberProtectionPage() {
             />
             <Case
               q="What about divorce?"
-              a="Co-ownership shares are personal property and subject to whatever marital-property rules apply in your state. If the share is awarded to a non-member spouse in a divorce settlement, that spouse must clear RYDA's standard verification (KYC, age, driving record) to take the seat — otherwise the share is sold and proceeds awarded. The LLC is not party to the divorce."
+              a="Co-ownership shares are personal property and subject to whatever marital-property rules apply in your state. If the share is awarded to a non-member spouse in a divorce settlement, that spouse must clear RYDA's standard verification (KYC, age, driving record) to take the seat, otherwise the share is sold and proceeds awarded. The LLC is not party to the divorce."
             />
             <Case
               q="What if the car gets totaled?"
@@ -194,7 +194,7 @@ export default function MemberProtectionPage() {
             />
             <Case
               q="What if I want out before my 12-month minimum hold?"
-              a="The 12-month hold is a hard floor. After it clears, you can transfer your share to another verified member at a price you negotiate. RYDA helps facilitate the LLC paperwork and charges a 3% transfer fee on the agreed price. If you genuinely cannot continue paying mid-hold, the LLC can in some cases work with you on a cure plan or accelerated transfer — but those are case-by-case, not contractual rights."
+              a="The 12-month hold is a hard floor. After it clears, you can transfer your share to another verified member at a price you negotiate. RYDA helps facilitate the LLC paperwork and charges a 3% transfer fee on the agreed price. If you genuinely cannot continue paying mid-hold, the LLC can in some cases work with you on a cure plan or accelerated transfer, but those are case-by-case, not contractual rights."
             />
             <Case
               q="Can RYDA change the management fee or terms unilaterally?"
@@ -215,7 +215,7 @@ export default function MemberProtectionPage() {
           </h2>
           <p className="mt-6 text-base leading-relaxed text-ink-soft">
             Every prospective member can request our document packet before
-            applying — sample LLC Operating Agreement, sample Management
+            applying, sample LLC Operating Agreement, sample Management
             Services Agreement, sample Pre-Purchase Inspection report,
             sample insurance certificate, and sample condition report.
             Reviewable by your counsel or accountant before any commitment.

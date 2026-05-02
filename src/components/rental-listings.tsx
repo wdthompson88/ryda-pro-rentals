@@ -1,6 +1,6 @@
 "use client";
 
-// Unified rental listings — RYDA co-ownership fleet + extended Miami
+// Unified rental listings, RYDA co-ownership fleet + extended Miami
 // inventory in ONE filterable card grid. Each card links to a detail
 // page at /rent/[slug] regardless of which fleet it came from. The
 // route handler resolves slug → Vehicle (RYDA) or PartnerVehicle.
@@ -129,7 +129,7 @@ const PRICE_BUCKETS: {
   { value: "3000+", label: "$3,000+/day", test: (r) => r >= 3_000 },
 ];
 
-// Year buckets — partner inventory is recent but not always current model;
+// Year buckets, partner inventory is recent but not always current model;
 // "Newer than 2022" matches member expectation around modern luxury.
 const YEAR_BUCKETS: {
   value: string;
@@ -163,14 +163,14 @@ export function RentalListings() {
     [],
   );
 
-  // Markets surfaced in the filter — include all RYDA markets (Miami,
+  // Markets surfaced in the filter, include all RYDA markets (Miami,
   // Los Angeles, New York) even if the inventory in some markets is
   // Coming Soon. Partner inventory is Miami-only today but the
   // architecture is ready for partner fleets in other cities.
   const locations = useMemo(() => {
     const set = new Set<string>(ALL_LISTINGS.map((v) => v.market));
     // Force the canonical RYDA markets to appear even when a market has
-    // no inventory yet — clearer "Coming soon" UX than silently hiding.
+    // no inventory yet, clearer "Coming soon" UX than silently hiding.
     ["Miami", "Los Angeles", "New York"].forEach((m) => set.add(m));
     return Array.from(set).sort();
   }, []);
@@ -261,7 +261,7 @@ export function RentalListings() {
     setSort("featured");
   }
 
-  // Active-filter chip strip — quick at-a-glance read of what's currently
+  // Active-filter chip strip, quick at-a-glance read of what's currently
   // filtered, with single-click removal. Pacaso uses the same pattern.
   type Chip = { label: string; onClear: () => void };
   const chips: Chip[] = [];
@@ -284,7 +284,7 @@ export function RentalListings() {
 
   return (
     <section>
-      {/* Filter bar — sticky so filters stay accessible while browsing */}
+      {/* Filter bar, sticky so filters stay accessible while browsing */}
       <div className="sticky top-0 z-30 border-b border-rule bg-cream-2/95 backdrop-blur">
         <div className="mx-auto max-w-7xl px-6 py-5 sm:px-10">
           {/* Search */}
@@ -329,7 +329,7 @@ export function RentalListings() {
             </div>
           </label>
 
-          {/* Filter row — Location is first because it's the most
+          {/* Filter row, Location is first because it's the most
               consequential decision (Miami today, LA + NY soon). */}
           <div className="mt-4 flex flex-wrap items-end gap-3">
             <FilterSelect
@@ -375,7 +375,7 @@ export function RentalListings() {
               }))}
             />
 
-            {/* Toggles for boolean attributes — distinct visual treatment
+            {/* Toggles for boolean attributes, distinct visual treatment
                 from selects so members can tell them apart. */}
             <FilterToggle
               label="Co-ownership"
@@ -407,7 +407,7 @@ export function RentalListings() {
             </div>
           </div>
 
-          {/* Active filter chips — appear only when filters are applied.
+          {/* Active filter chips, appear only when filters are applied.
               Each chip clears its filter on click. */}
           {chips.length > 0 ? (
             <div className="mt-4 flex flex-wrap items-center gap-2">

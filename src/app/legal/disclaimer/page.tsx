@@ -19,7 +19,7 @@ export default function DisclaimerPage() {
         },
         {
           heading: "3. Co-ownership is not an investment",
-          body: "Co-ownership stakes are not registered securities and are not offered for investment purposes. RYDA is not a registered broker-dealer, investment adviser, or fund manager. The cars are depreciating consumption goods — like a country-club membership or a jet card. Members buy for use, not for financial return. Members should not expect appreciation, yield, or any guaranteed economic benefit.",
+          body: "Co-ownership stakes are not registered securities and are not offered for investment purposes. RYDA is not a registered broker-dealer, investment adviser, or fund manager. The cars are depreciating consumption goods, like a country-club membership or a jet card. Members buy for use, not for financial return. Members should not expect appreciation, yield, or any guaranteed economic benefit.",
         },
         {
           heading: "4. Member-to-member transfer",
@@ -27,11 +27,11 @@ export default function DisclaimerPage() {
         },
         {
           heading: "5. Indicative reference numbers",
-          body: "Any reference numbers displayed on the RYDA platform — including the LLC's annual insurance agreed value and a current condition/comparable-cost summary — are indicative context, not bids, offers, or quoted prices on any exchange. RYDA does not publish a transfer price for any share. Members negotiating a transfer set their own price.",
+          body: "Any reference numbers displayed on the RYDA platform, including the LLC's annual insurance agreed value and a current condition/comparable-cost summary, are indicative context, not bids, offers, or quoted prices on any exchange. RYDA does not publish a transfer price for any share. Members negotiating a transfer set their own price.",
         },
         {
           heading: "6. Risk factors (non-exhaustive)",
-          body: "Vehicles depreciate. Co-ownership stakes can be worth less when you exit than when you entered. Membership interests are illiquid by design — you may not be able to transfer when you wish or at the price you wish. Operating expenses are real and ongoing. Insurance and storage partners may change. RYDA's management services are subject to fees disclosed in the Operating Agreement and Management Services Agreement.",
+          body: "Vehicles depreciate. Co-ownership stakes can be worth less when you exit than when you entered. Membership interests are illiquid by design, you may not be able to transfer when you wish or at the price you wish. Operating expenses are real and ongoing. Insurance and storage partners may change. RYDA's management services are subject to fees disclosed in the Operating Agreement and Management Services Agreement.",
         },
         {
           heading: "7. Tax",

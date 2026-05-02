@@ -1,7 +1,7 @@
 // Public preview of the member experience. Lets prospective buyers see
 // what they'll get post-purchase before they wire money. Shows mocked
 // portfolio, booking calendar, vehicle telemetry, and document access
-// — clearly labeled as sample data.
+//, clearly labeled as sample data.
 
 import Link from "next/link";
 import Image from "next/image";
@@ -10,9 +10,9 @@ import { Reveal } from "@/components/reveal";
 import { VEHICLES, formatUSD } from "@/lib/market-data";
 
 export const metadata = {
-  title: "Inside RYDA — What members see | RYDA",
+  title: "Inside RYDA, What members see | RYDA",
   description:
-    "A preview of the member experience: portfolio dashboard, booking calendar, telemetry, sample documents. Sample data — see what you get before you commit.",
+    "A preview of the member experience: portfolio dashboard, booking calendar, telemetry, sample documents. Sample data, see what you get before you commit.",
 };
 
 export default function InsidePage() {
@@ -52,7 +52,7 @@ export default function InsidePage() {
               Portfolio dashboard
             </p>
             <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
-              Every share, every car, every reserve — at a glance.
+              Every share, every car, every reserve, at a glance.
             </h2>
             <p className="mt-3 max-w-2xl text-base text-ink-soft">
               Per-LLC view of your holdings. Buy-in paid, current modeled
@@ -287,7 +287,7 @@ export default function InsidePage() {
               <p className="mt-4 text-sm leading-relaxed text-ink-soft">
                 Odometer, fluids, tire wear, last inspection date, next
                 service window. Plus an event log of every booking,
-                detail, and renewal — so you always know what&apos;s
+                detail, and renewal, so you always know what&apos;s
                 happening with the asset.
               </p>
             </Reveal>
@@ -309,7 +309,7 @@ export default function InsidePage() {
               <p className="mt-4 text-sm leading-relaxed text-ink-soft">
                 Operating Agreement, Management Services Agreement,
                 Pre-Purchase Inspection report, insurance certificate,
-                title evidence, condition reports — every document the
+                title evidence, condition reports, every document the
                 LLC holds, available to download in your portal.
               </p>
               <Link

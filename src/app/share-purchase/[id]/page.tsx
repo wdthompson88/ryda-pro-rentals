@@ -111,7 +111,7 @@ export default async function PurchasePage({
           <p className="mt-2 text-sm text-ink-soft">
             For your security, RYDA never displays escrow bank details in
             the browser. We've emailed the verified wire instructions —
-            including your unique reference code — to the address on file.
+            including your unique reference code, to the address on file.
             Always confirm wire details against the email before sending.
           </p>
           <div className="mt-6 rounded-2xl border border-rule bg-cream-2/40 p-6 text-sm text-ink-soft">

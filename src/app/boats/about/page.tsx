@@ -24,7 +24,7 @@ export default function BoatsAboutPage() {
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
             Solo yacht ownership is unworkable for most. Charter is
-            hollow. RYDA Boats is the third option — a member-managed
+            hollow. RYDA Boats is the third option, a member-managed
             LLC per hull, surveyed certified pre owned vessels, and
             professional marine operations across a three-year hold.
           </p>
@@ -56,7 +56,7 @@ export default function BoatsAboutPage() {
             <p>
               Boats run on Coast Guard documentation, marine survey
               workflows, and hurricane-driven seasonality. We built
-              the operations stack — slip, captain, fuel, insurance,
+              the operations stack, slip, captain, fuel, insurance,
               spring commissioning, fall lay-up, hurricane haul-out —
               so members can drive the calendar, not the asset.
             </p>
@@ -76,12 +76,12 @@ export default function BoatsAboutPage() {
           <div className="mt-10 space-y-5 text-base leading-relaxed text-ink-soft">
             <p>
               I&apos;ll keep this short. There are three honest ways to
-              put a yacht in your life right now. You can buy one — and
+              put a yacht in your life right now. You can buy one, and
               spend $300K–$800K a year keeping it serviceable while
               actually using it 30 days. You can charter at $14K–$22K
               per day from a marketplace where coverage and quality
               vary by owner. Or you can join a club that hands you
-              rotating access to smaller boats for $30K–$60K/yr — fees
+              rotating access to smaller boats for $30K–$60K/yr, fees
               that consume themselves with no asset behind them.
             </p>
             <p>
@@ -92,7 +92,7 @@ export default function BoatsAboutPage() {
               specific yacht, alongside up to four other verified
               members. The Coast Guard documentation is in the
               LLC&apos;s name. We run the operations under a separate
-              services agreement — slip, captain, fuel, insurance,
+              services agreement, slip, captain, fuel, insurance,
               spring commissioning, fall lay-up, hurricane haul-out.
               You drive the calendar, we drive the asset.
             </p>
@@ -101,8 +101,8 @@ export default function BoatsAboutPage() {
               $32K/year for everything-included ops, gets you up to 30
               days a year on the water and a real exit at year three.
               We model the residual at 85% of buy-in. Boats and cars
-              depreciate differently — classic Rivas can appreciate,
-              big sport yachts compress faster — and we don&apos;t
+              depreciate differently, classic Rivas can appreciate,
+              big sport yachts compress faster, and we don&apos;t
               pretend the numbers are guaranteed. What you walk away
               with isn&apos;t a return. It&apos;s the experience of
               actually living with a yacht for three years, in real
@@ -148,7 +148,7 @@ export default function BoatsAboutPage() {
         </div>
       </section>
 
-      {/* Mission + Values — parallel of /about */}
+      {/* Mission + Values, parallel of /about */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-24">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-mute">
@@ -156,7 +156,7 @@ export default function BoatsAboutPage() {
           </p>
           <p className="mt-4 max-w-3xl font-display text-2xl leading-tight text-ink sm:text-3xl">
             &ldquo;To make ownership of exceptional yachts possible for
-            more enthusiasts — responsibly, transparently, and with
+            more enthusiasts, responsibly, transparently, and with
             marine-grade ops handled by the team, not the owner.&rdquo;
           </p>
 
@@ -202,7 +202,7 @@ export default function BoatsAboutPage() {
         </div>
       </section>
 
-      {/* HQ — parallel of /about Headquarters */}
+      {/* HQ, parallel of /about Headquarters */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-24">
           <h2 className="font-display text-3xl text-ink sm:text-4xl">
@@ -221,7 +221,7 @@ export default function BoatsAboutPage() {
         </div>
       </section>
 
-      {/* Final CTA — parallel of /about CTA */}
+      {/* Final CTA, parallel of /about CTA */}
       <section className="bg-ink py-20 text-cream">
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
           <h2 className="font-display text-3xl sm:text-4xl">

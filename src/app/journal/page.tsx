@@ -6,7 +6,7 @@ import { InlineEmailCapture } from "@/components/inline-email-capture";
 export const metadata = {
   title: "Journal — RYDA",
   description:
-    "RYDA Journal — long-form on supercar co-ownership, vehicle deep-dives, founder posts, and the business behind the brand.",
+    "RYDA Journal, long-form on supercar co-ownership, vehicle deep-dives, founder posts, and the business behind the brand.",
 };
 
 export default function JournalPage() {
@@ -74,7 +74,7 @@ export default function JournalPage() {
         </div>
       </section>
 
-      {/* Subscribe — inline email capture posts to the waitlist with
+      {/* Subscribe, inline email capture posts to the waitlist with
           source="journal-newsletter" so the team can send a one-off
           email per post (or batch monthly) to subscribers separately
           from membership leads. */}
@@ -105,7 +105,7 @@ function FeaturedCard({
     <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-16">
       {/* Editorial pull quote treatment instead of a stock-photo
           placeholder. The featured post leads with a quiet, oversized
-          tag block — Loro Piana / The Row pattern — and the headline
+          tag block, Loro Piana / The Row pattern, and the headline
           carries the visual weight without an image stub. */}
       <div className="lg:col-span-4">
         <p className="font-display text-[10px] uppercase tracking-[0.22em] text-mute">

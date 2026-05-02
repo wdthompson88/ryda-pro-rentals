@@ -1,6 +1,6 @@
 "use client";
 
-// Splitter intro animation — a brief brand-mark fade-out over the three-card
+// Splitter intro animation, a brief brand-mark fade-out over the three-card
 // chooser when the page first loads. Plays on first visit to / per
 // session (sessionStorage flag). On subsequent visits within the same
 // session it skips the animation so the splitter is instant.
@@ -21,14 +21,14 @@ export function SplitterIntro() {
       played = sessionStorage.getItem(SESSION_KEY);
     } catch {
       // sessionStorage may be blocked; fall through to playing the
-      // intro — better than crashing.
+      // intro, better than crashing.
     }
     if (played === "1") {
       setPhase("done");
       return;
     }
     setPhase("playing");
-    // Total animation budget: ~900ms. Cut from 1500ms — luxury splash
+    // Total animation budget: ~900ms. Cut from 1500ms, luxury splash
     // bumpers (Aman, Loro Piana) sit in the 700-900ms range; longer
     // delays the visitor's decision and reads theatrical, not patient.
     const t = setTimeout(() => {
@@ -36,7 +36,7 @@ export function SplitterIntro() {
       try {
         sessionStorage.setItem(SESSION_KEY, "1");
       } catch {
-        // Best-effort — if storage is blocked the intro just plays again.
+        // Best-effort, if storage is blocked the intro just plays again.
       }
     }, 900);
     return () => clearTimeout(t);

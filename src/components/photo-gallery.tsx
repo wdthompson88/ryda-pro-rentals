@@ -1,6 +1,6 @@
 "use client";
 
-// PhotoGallery — hero image + thumbnail strip + fullscreen lightbox
+// PhotoGallery, hero image + thumbnail strip + fullscreen lightbox
 // cycler. Drop in an array of image URLs and a click on any tile opens
 // a dim-overlay carousel with prev/next arrows, pagination dots, ESC
 // to close, and arrow-key navigation.
@@ -22,7 +22,7 @@ export function PhotoGallery({
   flipFirst?: boolean;
   /** CSS object-position for the hero crop (RYDA fleet only). */
   imagePosition?: string;
-  /** When false, renders <Image unoptimized /> — needed for partner
+  /** When false, renders <Image unoptimized />, needed for partner
    *  Wix CDN images that aren't in the next/image allowlist's
    *  optimization budget. */
   optimize?: boolean;
@@ -70,7 +70,7 @@ export function PhotoGallery({
 
   return (
     <>
-      {/* Hero — clickable to open lightbox at index 0 */}
+      {/* Hero, clickable to open lightbox at index 0 */}
       <button
         type="button"
         onClick={() => setOpenIndex(0)}
@@ -109,7 +109,7 @@ export function PhotoGallery({
             >
               <Image
                 src={src}
-                alt={`${alt} — view ${i + 2}`}
+                alt={`${alt}, view ${i + 2}`}
                 fill
                 sizes="(min-width: 768px) 20vw, 33vw"
                 className="object-cover"
@@ -283,7 +283,7 @@ function Lightbox({
       >
         <Image
           src={current}
-          alt={`${alt} — photo ${index + 1} of ${photos.length}`}
+          alt={`${alt}, photo ${index + 1} of ${photos.length}`}
           fill
           sizes="92vw"
           className="object-contain"

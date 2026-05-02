@@ -3,7 +3,7 @@
 // into a single flat list so the /search page can rank+filter cheaply
 // without a backend.
 //
-// All sources pull from existing typed data — adding a new vehicle to
+// All sources pull from existing typed data, adding a new vehicle to
 // VEHICLES, a new boat to BOATS, or a new published journal post
 // surfaces in search automatically.
 
@@ -18,9 +18,9 @@ export type SearchEntry = {
   title: string;
   /** Short subtitle / detail line. */
   subtitle: string;
-  /** Vertical bucket — drives the badge color. */
+  /** Vertical bucket, drives the badge color. */
   vertical: "cars" | "boats" | "planes" | "general";
-  /** Result type — drives the small label next to the title. */
+  /** Result type, drives the small label next to the title. */
   type:
     | "vehicle"
     | "boat"
@@ -28,7 +28,7 @@ export type SearchEntry = {
     | "page"
     | "doc"
     | "faq";
-  /** Additional searchable text — concatenated and lowercased for matching. */
+  /** Additional searchable text, concatenated and lowercased for matching. */
   haystack: string;
 };
 
@@ -230,7 +230,7 @@ const VEHICLE_ENTRIES: SearchEntry[] = VEHICLES.flatMap((v) => {
   const rental: SearchEntry | null = v.rentalAvailable
     ? {
         href: `/rent/${v.symbol.toLowerCase()}`,
-        title: `${v.name} — rental`,
+        title: `${v.name}, rental`,
         subtitle: `Cars · ${v.year} · From $${v.rentalDailyRate.toLocaleString()}/day`,
         vertical: "cars",
         type: "vehicle",
@@ -275,7 +275,7 @@ const BOAT_ENTRIES: SearchEntry[] = BOATS.flatMap((b) => {
   const charter: SearchEntry | null = b.rentalAvailable
     ? {
         href: `/boats/rent/${b.slug}`,
-        title: `${b.name} — charter`,
+        title: `${b.name}, charter`,
         subtitle: `Boats · ${b.year} · From $${b.rentalDailyRate.toLocaleString()}/day`,
         vertical: "boats",
         type: "boat",
@@ -293,7 +293,7 @@ const BOAT_ENTRIES: SearchEntry[] = BOATS.flatMap((b) => {
 const JOURNAL_ENTRIES: SearchEntry[] = JOURNAL.filter(
   (p) => p.status === "published",
 ).map((p) => {
-  // Determine vertical from tag — journal posts use a "Boats" suffix
+  // Determine vertical from tag, journal posts use a "Boats" suffix
   // when they're boat-themed.
   const isBoats = /boats|yacht|marine|charter|captain/i.test(
     `${p.tag} ${p.title} ${p.excerpt}`,

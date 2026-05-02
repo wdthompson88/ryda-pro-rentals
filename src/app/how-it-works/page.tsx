@@ -28,7 +28,7 @@ export const metadata = {
     "Asset-backed co-ownership of curated certified pre owned supercars. Five steps to a key, side-by-side comparison vs solo / rental / club, the 2-year exit doctrine and the optional rental opt-in.",
 };
 
-// 4-way comparison anchor numbers — same Ferrari 296 GTB illustration
+// 4-way comparison anchor numbers, same Ferrari 296 GTB illustration
 // used across the site so the doctrine stays consistent.
 const STICKER = 340_000;
 const CARRYING_REGULAR = 46_000;
@@ -163,7 +163,7 @@ export default function HowItWorksPage() {
 
       <StickyToc items={TOC_ITEMS} />
 
-      {/* Turo-style 3-step explainer — the simple version of the doctrine
+      {/* Turo-style 3-step explainer, the simple version of the doctrine
           for first-time visitors. The technical 5-step lifecycle below
           is the deep dive; this is the elevator pitch. Big numbers,
           short copy, one icon idea per step. */}
@@ -194,7 +194,7 @@ export default function HowItWorksPage() {
           </div>
           <p className="mt-12 max-w-2xl text-base leading-relaxed text-ink-soft">
             That&apos;s the short version. The technical detail —
-            paperwork, exit math, booking rules — lives in the five-step
+            paperwork, exit math, booking rules, lives in the five-step
             lifecycle below.
           </p>
         </div>
@@ -211,7 +211,7 @@ export default function HowItWorksPage() {
           </h2>
           <p className="mt-4 max-w-2xl text-lg text-ink-soft">
             One Ferrari 296 share: $34K up front, ~$7,080/year all-in,
-            ~32 days/year — roughly $236/day in steady-state ops.
+            ~32 days/year, roughly $236/day in steady-state ops.
             Compare with $2,400+/day to rent or $40–80K/yr to own
             outright.
           </p>
@@ -226,7 +226,7 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
-      {/* 4-way comparison — money only */}
+      {/* 4-way comparison, money only */}
       <section id="compare" className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
@@ -238,7 +238,7 @@ export default function HowItWorksPage() {
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-soft">
             Wealthy enthusiasts have three real options for getting into
             an exotic: buy outright, rent by the day or join a club.
-            RYDA is a fourth — structured co-ownership of a real car.
+            RYDA is a fourth, structured co-ownership of a real car.
             The math below anchors on the Ferrari 296 GTB and a single
             share over the {HOLDING_YEARS}-year planned exit.
           </p>
@@ -318,7 +318,7 @@ export default function HowItWorksPage() {
             annual membership; tiers run ~$30K–$80K/yr. Daily rental
             assumes Miami market rate. Resale assumes
             {" "}{TARGET_DEPRECIATION_PCT}% depreciation over the hold for
-            both solo ownership and RYDA — applied symmetrically.
+            both solo ownership and RYDA, applied symmetrically.
           </p>
           <p className="mt-3 text-sm text-ink-soft">
             Want the math on a specific car?{" "}
@@ -368,7 +368,7 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
-      {/* Why asset-backed co-ownership — 9 reasons */}
+      {/* Why asset-backed co-ownership, 9 reasons */}
       <section id="nine-reasons" className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
@@ -386,7 +386,7 @@ export default function HowItWorksPage() {
             <Reason
               n="02"
               title="Financial security through tangible ownership"
-              body="A car in storage is a real, titled asset. The LLC holds title to the physical vehicle and you own a registered share of the LLC. The asset is real, in a garage, with a VIN you can verify — independent of any platform."
+              body="A car in storage is a real, titled asset. The LLC holds title to the physical vehicle and you own a registered share of the LLC. The asset is real, in a garage, with a VIN you can verify, independent of any platform."
             />
             <Reason
               n="03"
@@ -400,13 +400,13 @@ export default function HowItWorksPage() {
             />
             <Reason
               n="05"
-              title="No hidden costs — all-inclusive packages"
+              title="No hidden costs, all-inclusive packages"
               body="One transparent annual contribution covers insurance, taxes, service, maintenance, tires, detailing, seasonal storage, fleet management and prep. Predictable. No surprise invoices."
             />
             <Reason
               n="06"
               title="Bigger share = more usage time"
-              body="1 share ≈ 32 days + 3,200 mi/yr. 5 shares ≈ 160 days. 10 shares ≈ year-round access — effectively solo ownership with professional ops on top. Linear scaling, no premium for size."
+              body="1 share ≈ 32 days + 3,200 mi/yr. 5 shares ≈ 160 days. 10 shares ≈ year-round access, effectively solo ownership with professional ops on top. Linear scaling, no premium for size."
             />
             <Reason
               n="07"
@@ -416,7 +416,7 @@ export default function HowItWorksPage() {
             <Reason
               n="08"
               title="Depreciation risk shared, not solo"
-              body="A new Ferrari 296 typically loses $50–60K over the first 18 months. Solo, you eat all of that. With 1 share at 10%, your exposure is $5–6K — and the share-resale at exit cushions even that."
+              body="A new Ferrari 296 typically loses $50–60K over the first 18 months. Solo, you eat all of that. With 1 share at 10%, your exposure is $5–6K, and the share-resale at exit cushions even that."
             />
             <Reason
               n="09"
@@ -427,7 +427,7 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
-      {/* Booking model — Pacaso SmartStay translated to RYDA. Surfaced
+      {/* Booking model, Pacaso SmartStay translated to RYDA. Surfaced
           here so prospective buyers see calendar fairness before they
           ever click into the buy flow. */}
       <section id="booking" className="border-b border-rule">
@@ -436,7 +436,7 @@ export default function HowItWorksPage() {
             Booking model
           </p>
           <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
-            Two ways to book — short-notice and planned.
+            Two ways to book, short-notice and planned.
           </h2>
           <p className="mt-3 max-w-2xl text-base text-ink-soft">
             Same annual entitlement, two clear modes so you always know what
@@ -449,7 +449,7 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
-      {/* Trust grid — 6 buyer protections + 6 advantages */}
+      {/* Trust grid, 6 buyer protections + 6 advantages */}
       <section id="trust" className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
@@ -489,7 +489,7 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
-      {/* The deeper math — consolidated honest-math + 2-yr exit story */}
+      {/* The deeper math, consolidated honest-math + 2-yr exit story */}
       <section id="deeper-math" className="border-b border-rule">
         <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
@@ -511,7 +511,7 @@ export default function HowItWorksPage() {
               $7,080 ops = $41,080 spent (the table number above; a
               one-time $1,500 closing fee is added at signing). At 30
               days driven that&apos;s ~$1,369 per driving day in Year 1
-              — still below the cost of renting the same Ferrari for
+             , still below the cost of renting the same Ferrari for
               the same 32 days ($2,400/day × 32 = $76,800). And you
               exit with a transferable share, not a stack of receipts.
             </p>
@@ -522,7 +522,7 @@ export default function HowItWorksPage() {
               whichever comes first): each curated certified pre owned car is held for
               ~2 years, then the LLC sells it and proceeds are
               distributed pro-rata. We model {TARGET_DEPRECIATION_PCT}%
-              depreciation over the hold — a conservative middle that
+              depreciation over the hold, a conservative middle that
               absorbs both the drive-only and rental-opt-in usage
               profiles, given the 100 mi/day shareholder allowance.
             </p>
@@ -559,9 +559,9 @@ export default function HowItWorksPage() {
           <p className="mt-4 max-w-3xl text-base leading-relaxed text-ink-soft">
             Miami&apos;s exotic-rental fleets average 200–240 booked days a
             year on full-control calendars. RYDA&apos;s pool is the leftover
-            days after members book first — so realistic occupancy on the
+            days after members book first, so realistic occupancy on the
             pool runs lower (~50%). Shareholders can opt their unused
-            entitlement into the rental pool — we handle the bookings,
+            entitlement into the rental pool, we handle the bookings,
             insurance, condition checks and damage reserve. Revenue splits
             65/35 (you / RYDA), distributed pro-rata across the days each
             share contributes.
@@ -581,7 +581,7 @@ export default function HowItWorksPage() {
                 $264,000/yr gross. After RYDA&apos;s 35% management fee,
                 shareholders split ~$171,600.{" "}
                 <span className="font-medium text-ink">~$17,160/share/yr</span>{" "}
-                — roughly 2.4× your $7,080/yr carrying cost.
+               , roughly 2.4× your $7,080/yr carrying cost.
               </p>
             </div>
             <div className="rounded-2xl border border-rule bg-surface p-6">
@@ -601,8 +601,8 @@ export default function HowItWorksPage() {
                 Honest tradeoffs
               </p>
               <ul className="mt-3 space-y-2 text-sm leading-relaxed text-ink-soft">
-                <li>· Same {TARGET_DEPRECIATION_PCT}% depreciation assumption applies — our flat-rate model already absorbs the heavier rental-pool wear.</li>
-                <li>· Rental days are pooled across all shares — no individual day-of priority guaranteed.</li>
+                <li>· Same {TARGET_DEPRECIATION_PCT}% depreciation assumption applies, our flat-rate model already absorbs the heavier rental-pool wear.</li>
+                <li>· Rental days are pooled across all shares, no individual day-of priority guaranteed.</li>
                 <li>· Members keep first-call on owner-priority weeks. Renters fill the gaps.</li>
                 <li>· Track-day cars come out of the pool when you take them on track.</li>
               </ul>
@@ -631,11 +631,11 @@ export default function HowItWorksPage() {
             />
             <Faq
               q="Can I transfer my share whenever I want?"
-              a="After a 12-month minimum hold, yes — to another verified RYDA member. RYDA handles the LLC paperwork. Settlement takes 1–3 business days. RYDA charges a 3% transfer fee on the sale price."
+              a="After a 12-month minimum hold, yes, to another verified RYDA member. RYDA handles the LLC paperwork. Settlement takes 1–3 business days. RYDA charges a 3% transfer fee on the sale price."
             />
             <Faq
               q="Can I rent out my share days for income?"
-              a={`Yes — opting into RYDA's rental pool is voluntary, share-by-share. We list the car on /rent, handle bookings, insurance, screening and condition checks. Rental revenue splits 65/35 (you / RYDA) and is distributed pro-rata across the days each share contributes. The pool is whatever days members don't reserve, so realistic pool occupancy is ~50% (full-control fleets clock 60–70%). On that basis, a single Ferrari 296 share can offset ~$15–18K/yr of carrying — typically 2–2.5× your annual ops cost, sometimes enough to bring your two-year net cost down close to zero or below. Same flat ${TARGET_DEPRECIATION_PCT}% depreciation assumption applies in both scenarios. Co-ownership shares are member-managed LLC interests, not securities; rental is a usage offset, not an investment yield.`}
+              a={`Yes, opting into RYDA's rental pool is voluntary, share-by-share. We list the car on /rent, handle bookings, insurance, screening and condition checks. Rental revenue splits 65/35 (you / RYDA) and is distributed pro-rata across the days each share contributes. The pool is whatever days members don't reserve, so realistic pool occupancy is ~50% (full-control fleets clock 60–70%). On that basis, a single Ferrari 296 share can offset ~$15–18K/yr of carrying, typically 2–2.5× your annual ops cost, sometimes enough to bring your two-year net cost down close to zero or below. Same flat ${TARGET_DEPRECIATION_PCT}% depreciation assumption applies in both scenarios. Co-ownership shares are member-managed LLC interests, not securities; rental is a usage offset, not an investment yield.`}
             />
             <Faq
               q="What if a co-owner stops paying?"
@@ -643,7 +643,7 @@ export default function HowItWorksPage() {
             />
             <Faq
               q="Where are the cars stored?"
-              a="In RYDA-vetted partner storage facilities — climate-controlled, 24/7 monitored, insured. Miami first, with LA and NY following in 2027."
+              a="In RYDA-vetted partner storage facilities, climate-controlled, 24/7 monitored, insured. Miami first, with LA and NY following in 2027."
             />
             <Faq
               q="What's covered by insurance?"
@@ -659,7 +659,7 @@ export default function HowItWorksPage() {
             />
             <Faq
               q="Is there a membership fee?"
-              a="Three tiers. RYDA Core is free. RYDA Blue is $500/year. RYDA Black is $1,500/year — priority booking during peak season, included white-glove delivery, dedicated dedicated contact. First-100 lock in $350/$1,000 for life."
+              a="Three tiers. RYDA Core is free. RYDA Blue is $500/year. RYDA Black is $1,500/year, priority booking during peak season, included white-glove delivery, dedicated dedicated contact. First-100 lock in $350/$1,000 for life."
             />
           </div>
         </div>
@@ -678,7 +678,7 @@ function Step({ n, title, body }: { n: string; title: string; body: string }) {
   );
 }
 
-// Bigger sibling of Step — used in the Turo-style 3-step explainer
+// Bigger sibling of Step, used in the Turo-style 3-step explainer
 // at the top of the page. Larger numerals, more whitespace, fewer
 // words per step. The technical 5-step lifecycle still uses Step.
 function SimpleStep({ n, title, body }: { n: string; title: string; body: string }) {

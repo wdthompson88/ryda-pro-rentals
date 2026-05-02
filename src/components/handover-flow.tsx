@@ -146,7 +146,7 @@ export function HandoverFlow({
             <h2 className="font-display text-2xl text-ink">Condition declaration</h2>
             <p className="mt-2 text-sm text-ink-soft">
               Anything visibly different from the last inspection report?
-              We checked it Apr 20 — small stone-chip on lower bumper noted.
+              We checked it Apr 20, small stone-chip on lower bumper noted.
             </p>
             <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
               <button

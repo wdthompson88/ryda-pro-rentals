@@ -1,8 +1,8 @@
-// Boat-side share value chart — parallel of ShareValueChart, anchored
+// Boat-side share value chart, parallel of ShareValueChart, anchored
 // on RYDA Boats' 3-year planned exit doctrine and 15% modeled
 // depreciation. Mileage replaced with nautical miles; usage profile
-// adapted for boat operations (240 days/yr available — boats are
-// hauled out for off-season + hurricane prep — and lower charter
+// adapted for boat operations (240 days/yr available, boats are
+// hauled out for off-season + hurricane prep, and lower charter
 // occupancy than the car fleet).
 
 import {
@@ -138,7 +138,7 @@ export function BoatShareValueChart({ boat: b }: { boat: Boat }) {
       <div className="border-t border-rule bg-cream-2/40 px-6 py-3">
         <p className="text-[11px] leading-relaxed text-mute">
           Illustrative only. Actual sale price varies by model, condition,
-          and market — classic builds (Riva, certain Pershings) can
+          and market, classic builds (Riva, certain Pershings) can
           appreciate. Linear depreciation modeled at{" "}
           {(BOATS_TARGET_DEPRECIATION_PCT / BOATS_HOLDING_YEARS).toFixed(1)}%
           per year for chart simplicity. Co-ownership shares are member-

@@ -1,22 +1,22 @@
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 
-// Footer — brand row on top + 4 link columns below + legal strip.
+// Footer, brand row on top + 4 link columns below + legal strip.
 // Pacaso / Brunello pattern: full sitemap visible, but quiet eyebrows
 // and 15px body so the density doesn't shout. Theme toggle lives in
-// the bottom legal strip — power-user setting, not a top-level nav.
+// the bottom legal strip, power-user setting, not a top-level nav.
 
 export function SiteFooter() {
   return (
     <footer className="border-t border-rule">
-      {/* Brand row — generous, full width */}
+      {/* Brand row, generous, full width */}
       <div className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-10">
             <div className="lg:col-span-7">
               <p className="font-display text-3xl text-ink">RYDA</p>
               <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-ink-soft">
-                Luxury vehicle access — Cars, Boats, and (soon) Planes.
+                Luxury vehicle access, Cars, Boats, and (soon) Planes.
                 Member-managed LLCs, professionally operated.
                 Miami launching Q3 2026.
               </p>

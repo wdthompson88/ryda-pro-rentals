@@ -5,7 +5,7 @@ import { SiteHeader } from "@/components/site-header";
 import { BOATS, formatUSD } from "@/lib/boat-data";
 
 export const metadata: Metadata = {
-  title: "RYDA Boats Charter — Yachts by the day in Miami",
+  title: "RYDA Boats Charter, Yachts by the day in Miami",
   description:
     "Crewed yacht charter in Miami. Same four hulls as the co-ownership portfolio, available by the day. White-glove handover, RYDA-vetted captain, full insurance.",
 };
@@ -40,7 +40,7 @@ export default function BoatsRentPage() {
         </div>
       </section>
 
-      {/* Counter / summary strip — parallel to /rent's RentalListings
+      {/* Counter / summary strip, parallel to /rent's RentalListings
           counter. Boats charter fleet is small (4 hulls) so we don't
           need a full filter UI; the counter + visible cards is right-
           sized for the data. */}
@@ -196,7 +196,7 @@ export default function BoatsRentPage() {
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
             On a Wajer 55 S, charter runs $14,500/day. A share runs
-            $195K + $32K/yr — about $1,067/day in steady-state ops on a
+            $195K + $32K/yr, about $1,067/day in steady-state ops on a
             30-day allowance. That&apos;s where we want you to land.
           </p>
           <Link

@@ -94,7 +94,7 @@ export function MarketsListings() {
   const filtered: Vehicle[] = useMemo(() => {
     const q = query.trim().toLowerCase();
     return VEHICLES.filter((v) => {
-      // Free-text search across name, brand, market, symbol — covers
+      // Free-text search across name, brand, market, symbol, covers
       // most of how a buyer would mention the car.
       if (q) {
         const haystack =

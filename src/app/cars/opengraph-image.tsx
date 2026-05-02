@@ -1,9 +1,9 @@
 import { ImageResponse } from "next/og";
 
-// /cars vertical OG image — same root template but anchored on the
+// /cars vertical OG image, same root template but anchored on the
 // supercar brand (red accent).
 
-export const alt = "RYDA Cars — Co-own or rent the world's most exceptional cars";
+export const alt = "RYDA Cars, Co-own or rent the world's most exceptional cars";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

@@ -1,6 +1,6 @@
 "use client";
 
-// Reveal — wraps children in a subtle fade-up animation triggered the
+// Reveal, wraps children in a subtle fade-up animation triggered the
 // first time the element scrolls into view. Two key timing details:
 //   1. We wait one frame after mount before activating the observer,
 //      so the browser definitely paints the initial (hidden) state
@@ -48,7 +48,7 @@ export function Reveal({
       return;
     }
 
-    // No IntersectionObserver support (very old browsers) — show
+    // No IntersectionObserver support (very old browsers), show
     // immediately so content isn't permanently invisible.
     if (typeof IntersectionObserver === "undefined") {
       setVisible(true);

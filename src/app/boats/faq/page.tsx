@@ -3,7 +3,7 @@ import { SiteHeader } from "@/components/site-header";
 import { FAQ_ITEMS } from "@/lib/boat-content";
 
 export const metadata = {
-  title: "FAQ — RYDA Boats",
+  title: "FAQ, RYDA Boats",
   description:
     "Answers to the most common questions about RYDA Boats: co-ownership, captain protocol, slip rotation, hurricane prep, charter opt-in, exit doctrine.",
 };
@@ -18,7 +18,7 @@ const SHARED_CO_OWNERSHIP: { q: string; a: string }[] = [
   },
   {
     q: "How many co-ownership shares per hull?",
-    a: "10 shares per hull by default. Each share entitles you to ~30 days and up to ~1,600 nautical miles of usage per year (50 nm/day allowance). A single member can hold one share or several — usage scales linearly.",
+    a: "10 shares per hull by default. Each share entitles you to ~30 days and up to ~1,600 nautical miles of usage per year (50 nm/day allowance). A single member can hold one share or several, usage scales linearly.",
   },
   {
     q: "Are RYDA Boats co-ownership stakes securities?",
@@ -26,7 +26,7 @@ const SHARED_CO_OWNERSHIP: { q: string; a: string }[] = [
   },
   {
     q: "Can I transfer my share whenever I want?",
-    a: "After a 12-month minimum hold, yes — directly to another verified RYDA member. RYDA facilitates the LLC paperwork and Coast Guard documentation transfer. There is no public marketplace and no order book. Settlement takes 3–5 business days. RYDA charges a 3% transfer fee on the agreed price.",
+    a: "After a 12-month minimum hold, yes, directly to another verified RYDA member. RYDA facilitates the LLC paperwork and Coast Guard documentation transfer. There is no public marketplace and no order book. Settlement takes 3–5 business days. RYDA charges a 3% transfer fee on the agreed price.",
   },
   {
     q: "What if a co-owner stops paying?",
@@ -57,7 +57,7 @@ export default function BoatsFaqPage() {
         </div>
       </section>
 
-      {/* Co-ownership shared section — expandable details, matches
+      {/* Co-ownership shared section, expandable details, matches
           /faq accordion pattern. */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-3xl px-6 py-16 sm:px-10 sm:py-20">
@@ -87,7 +87,7 @@ export default function BoatsFaqPage() {
         </div>
       </section>
 
-      {/* Boat-specific operations — same expandable pattern */}
+      {/* Boat-specific operations, same expandable pattern */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-3xl px-6 py-16 sm:px-10 sm:py-20">
           <h2 className="font-display text-3xl text-ink sm:text-4xl">

@@ -7,7 +7,7 @@ import { SiteHeader } from "@/components/site-header";
 import { supabase } from "@/lib/supabase";
 import { safeNext } from "@/lib/safe-next";
 
-// /signin — primary path is email+password (shown by default).
+// /signin, primary path is email+password (shown by default).
 // Magic-link is a secondary action below the form for members who
 // don't want to remember a password OR forgot it. The `?next=` query
 // param is preserved so a member who signs in from a gated CTA
@@ -27,7 +27,7 @@ function SignInPageInner() {
   // Sanitize `?next=` against open-redirect / javascript: scheme tricks.
   // Anything not a same-origin path falls back to /portfolio.
   const next = safeNext(searchParams.get("next"), "/portfolio");
-  const reason = searchParams.get("reason"); // "rent" | "buy" | "checkout" — gives copy a hook
+  const reason = searchParams.get("reason"); // "rent" | "buy" | "checkout", gives copy a hook
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -45,7 +45,7 @@ function SignInPageInner() {
           ? "Sign in to complete your reservation."
           : "Welcome back.";
 
-  // Primary submit — email + password.
+  // Primary submit, email + password.
   async function onPasswordSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!email.includes("@") || password.length < 1) return;
@@ -60,7 +60,7 @@ function SignInPageInner() {
         if (err) throw err;
         router.push(next);
       } else {
-        // Supabase not configured — simulate success so the demo still
+        // Supabase not configured, simulate success so the demo still
         // runs without env vars wired.
         await new Promise((r) => setTimeout(r, 500));
         router.push(next);
@@ -72,7 +72,7 @@ function SignInPageInner() {
     }
   }
 
-  // Secondary path — send a magic link to whatever email the user has
+  // Secondary path, send a magic link to whatever email the user has
   // typed in the form. Doesn't require password. Used when the member
   // forgot their password or just doesn't want to type one.
   async function onMagicLink() {
@@ -114,7 +114,7 @@ function SignInPageInner() {
           </p>
           <h1 className="mt-3 font-display text-3xl text-ink">{reasonCopy}</h1>
           <p className="mt-2 text-sm text-ink-soft">
-            Member sign-in for RYDA — co-owners, renters, and applicants.
+            Member sign-in for RYDA, co-owners, renters, and applicants.
           </p>
 
           {magicSent ? (
@@ -135,7 +135,7 @@ function SignInPageInner() {
             </div>
           ) : (
             <>
-              {/* Primary form — email + password together */}
+              {/* Primary form, email + password together */}
               <form className="mt-7 space-y-4" onSubmit={onPasswordSubmit}>
                 <Field
                   label="Email"
@@ -195,7 +195,7 @@ function SignInPageInner() {
                   {submittingMagic ? "Sending…" : "Send me a magic link instead"}
                 </button>
                 <p className="mt-2 text-[11px] text-mute">
-                  We&apos;ll email a one-tap sign-in link — no password
+                  We&apos;ll email a one-tap sign-in link, no password
                   needed.
                 </p>
               </div>

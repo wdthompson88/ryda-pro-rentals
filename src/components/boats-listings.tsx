@@ -13,7 +13,7 @@ import {
 } from "@/lib/boat-data";
 import { Reveal } from "@/components/reveal";
 
-// Boats power-filter listing — parallel of components/markets-listings.tsx.
+// Boats power-filter listing, parallel of components/markets-listings.tsx.
 // Same UI shape (search + filter dropdowns + sort + summary strip + card
 // grid), same VehicleCard depth ported as BoatCard. The two listings
 // pages should now read identically across cars and boats verticals.
@@ -333,7 +333,7 @@ function FilterSelect({
   );
 }
 
-// BoatCard — full-depth listing card, mirrors components/markets-listings.tsx
+// BoatCard, full-depth listing card, mirrors components/markets-listings.tsx
 // VehicleCard structure:
 //   1. Hero image with brand badge top-left + status pill top-right
 //   2. Title (boat name) + subtitle (year · category)
@@ -408,7 +408,7 @@ function BoatCard({ boat: b }: { boat: Boat }) {
           {formatListingPeriod(b.listingStart, b.listingEnd)}
         </p>
 
-        {/* Specs grid 2x2 — boats analog to the cars Power/Cyl/Drive/0-60 */}
+        {/* Specs grid 2x2, boats analog to the cars Power/Cyl/Drive/0-60 */}
         <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 rounded-xl border border-rule bg-cream-2/40 p-3">
           <Spec label="Power" value={`${b.totalHp.toLocaleString()} hp`} />
           <Spec label="Length" value={`${b.lengthFt}′`} />

@@ -1,9 +1,9 @@
 import { ImageResponse } from "next/og";
 
-// /planes vertical OG image — neutral cream accent (the column's
+// /planes vertical OG image, neutral cream accent (the column's
 // styling on the splitter), since the vertical is in design.
 
-export const alt = "RYDA Planes — Fractional access to private aviation. In design.";
+export const alt = "RYDA Planes, Fractional access to private aviation. In design.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

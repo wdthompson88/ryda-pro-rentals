@@ -1,9 +1,9 @@
 import { ImageResponse } from "next/og";
 
-// /boats vertical OG image — marine-blue accent matching the boats
+// /boats vertical OG image, marine-blue accent matching the boats
 // vertical theme.
 
-export const alt = "RYDA Boats — Co-own or charter the world's most beautiful boats";
+export const alt = "RYDA Boats, Co-own or charter the world's most beautiful boats";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

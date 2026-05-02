@@ -14,7 +14,7 @@ import { POSTS as JOURNAL_POSTS } from "@/lib/journal-content";
 
 const PUBLIC_ROUTES = [
   "",
-  // Verticals — splash for each line of business.
+  // Verticals, splash for each line of business.
   "/cars",
   "/boats",
   "/planes",
@@ -45,7 +45,7 @@ const PUBLIC_ROUTES = [
   "/locations/los-angeles",
   "/locations/new-york",
   // Boats marketing surfaces (parity with cars).
-  // NOTE: /boats/journal does NOT exist as a route — boat-themed posts
+  // NOTE: /boats/journal does NOT exist as a route, boat-themed posts
   // live in the main /journal listing tagged accordingly.
   "/boats/about",
   "/boats/faq",

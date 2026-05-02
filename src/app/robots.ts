@@ -10,7 +10,7 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: "*",
         allow: "/",
         // Member-area + per-purchase tracker pages aren't real auth-gated
-        // surfaces yet — keep them out of search until they ship behind auth.
+        // surfaces yet, keep them out of search until they ship behind auth.
         disallow: [
           "/account",
           "/portfolio",

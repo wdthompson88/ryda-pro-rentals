@@ -18,7 +18,7 @@ export async function generateMetadata({
   const found = getArticle(category, slug);
   if (!found) return { title: "Help — RYDA" };
   return {
-    title: `${found.article.q} — RYDA Help`,
+    title: `${found.article.q}, RYDA Help`,
     description: found.article.summary,
   };
 }
@@ -72,7 +72,7 @@ export default async function ArticlePage({
             <div>
               <p className="font-display text-base text-ink">Was this helpful?</p>
               <p className="mt-1 text-xs text-mute">
-                If not, write us — we improve articles based on what members
+                If not, write us, we improve articles based on what members
                 actually ask.
               </p>
             </div>

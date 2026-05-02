@@ -19,7 +19,7 @@ export default function AccessibilityPage() {
         },
         {
           heading: "3. What we're working on",
-          body: "Live-region announcements when the order-panel state changes.\n\nAccessible data-table fallback for the price chart so screen readers can read history values.\n\naria-pressed states on toggle buttons (timeframe selector, buy/sell tabs).\n\nBetter alternative-text discipline on vehicle photography — short, descriptive, never decorative-only.",
+          body: "Live-region announcements when the order-panel state changes.\n\nAccessible data-table fallback for the price chart so screen readers can read history values.\n\naria-pressed states on toggle buttons (timeframe selector, buy/sell tabs).\n\nBetter alternative-text discipline on vehicle photography, short, descriptive, never decorative-only.",
         },
         {
           heading: "4. Compatibility",

@@ -57,7 +57,7 @@ export function PlanesMissionProfileForm() {
         ? "Ownership"
         : mode === "charter"
           ? "Charter / dry-lease"
-          : "Both — open";
+          : "Both, open";
     const context = `Planes intake · ${jetClassLabel} · ${hours} hrs/yr · ${base} · ${modeLabel}`;
     const message = `Mission profile from ${name.trim()}:
 
@@ -102,7 +102,7 @@ Reply when RYDA Planes opens the member cohort window for this profile.`;
     return (
       <div className="rounded-2xl border border-cream/20 bg-cream/5 p-5">
         <p className="font-display text-lg text-cream">
-          Thanks — mission profile received.
+          Thanks, mission profile received.
         </p>
         <p className="mt-2 text-sm text-cream/70">
           When the member cohort opens for{" "}
@@ -188,7 +188,7 @@ Reply when RYDA Planes opens the member cohort window for this profile.`;
             Charter / dry-lease
           </Pill>
           <Pill active={mode === "both"} onClick={() => setMode("both")}>
-            Both — open
+            Both, open
           </Pill>
         </div>
       </Field>

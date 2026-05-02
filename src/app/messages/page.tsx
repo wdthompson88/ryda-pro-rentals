@@ -16,7 +16,7 @@ const CONVERSATIONS = [
   {
     name: "Proposal Coordinator · Ferrari 296",
     type: "Proposal Coordinator channel",
-    last: "Booking request — Jun 5 to Jun 8 — white-glove delivery",
+    last: "Booking request, Jun 5 to Jun 8, white-glove delivery",
     time: "1 hr ago",
     unread: 1,
   },

@@ -1,14 +1,14 @@
-// Year-by-year share value depreciation visualization — vehicle value,
-// share value, and cumulative miles per year — anchored on RYDA's
+// Year-by-year share value depreciation visualization, vehicle value,
+// share value, and cumulative miles per year, anchored on RYDA's
 // 2-year planned exit doctrine.
 //
 // Three rows per year (each rendered as a horizontal bar):
 //   1. Cumulative miles (mute / gray)
-//   2. Vehicle value (red — primary brand)
-//   3. Per-share value (ink — secondary)
+//   2. Vehicle value (red, primary brand)
+//   3. Per-share value (ink, secondary)
 //
 // Year 0 = "new to fleet" baseline. Year 1 = midpoint. Year 2 = planned
-// LLC sale (resale point — highlighted with a red marker line).
+// LLC sale (resale point, highlighted with a red marker line).
 //
 // Math: linear interpolation of the doctrinal depreciation between
 // Year 0 (full price) and Year 2 (full price × residual). Annual mileage
@@ -168,7 +168,7 @@ function YearBlock({
   const milesAdded = point.miles - startingMiles;
   const valuePct = (point.vehicleValue / maxValue) * 100;
   const sharePct = (point.shareValue / (maxValue / 10)) * 100; // share scales same denominator
-  // Miles bar — scaled to the year-2 max so it grows visibly each year.
+  // Miles bar, scaled to the year-2 max so it grows visibly each year.
   const milesPct = maxMiles > 0 ? (point.miles / maxMiles) * 100 : 0;
 
   return (

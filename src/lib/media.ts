@@ -1,4 +1,4 @@
-// Media config — single source of truth for hero video + poster
+// Media config, single source of truth for hero video + poster
 // imagery across the site. Each vertical (cars, boats, planes) gets a
 // curated list of Pexels CDN clip URLs and a fallback poster image.
 // MediaBackground rotates through the list on each visit so the
@@ -39,14 +39,14 @@ export const SPLITTER_MEDIA: Record<"cars" | "boats" | "planes", MediaSlot> = {
     // Aventador SVJ). The SVJ uses Media Fragment URI #t=1.5,11.5
     // to trim the YouTube-short intro/outro (road-only frames the
     // CEO flagged). Browser plays only the trimmed window natively.
-    // Dropped Aventador-Lisbon (17051328) — the "trails off to
+    // Dropped Aventador-Lisbon (17051328), the "trails off to
     // skyline" clip the CEO called out in the screenshot.
     videos: [
       // Owned-asset, brand-approved
       "/videos/cars-koenigsegg-jesko.mp4",
       "/videos/cars-ferrari.mp4",
       "/videos/cars-aventador-svj.mp4#t=1.5,11.5",
-      // Pexels — camera-locked supercar shots
+      // Pexels, camera-locked supercar shots
       PX("8443860", "hd_1920_1080_30fps"),  // Driver-side interior of red Ferrari, in motion
       PX("8443861", "hd_1920_1080_30fps"),  // Luxury sports car interior, driving
       PX("8443781", "hd_1920_1080_30fps"),  // Red Ferrari driver POV
@@ -62,14 +62,14 @@ export const SPLITTER_MEDIA: Record<"cars" | "boats" | "planes", MediaSlot> = {
   boats: {
     // Owned-asset yacht clips (Eclipse, London, vtmyg3) + 2 Pexels
     // superyacht clips. CEO confirmed vtmyg3 IS a yacht (mega yacht
-    // by the look — moved back from planes). LOON removed earlier
+    // by the look, moved back from planes). LOON removed earlier
     // for brand-identifiability. Untitled stays in planes for now.
     videos: [
       // Owned-asset
       "/videos/boats-eclipse.mp4",
       "/videos/boats-london.mp4",
       "/videos/boats-vtmyg3.mp4",
-      // Pexels — superyacht only.
+      // Pexels, superyacht only.
       PX("13878618", "hd_1920_1080_30fps"), // Yacht sailing out of marina
       PX("15288018", "hd_1920_1080_30fps"), // Drone video of luxury yacht docked at port
     ],
@@ -81,7 +81,7 @@ export const SPLITTER_MEDIA: Record<"cars" | "boats" | "planes", MediaSlot> = {
   planes: {
     // Two owned-asset clips: the explicit jet-edit montage and the
     // Untitled clip (was originally in boats, moved here when CEO
-    // flagged a plane was still in boats — content unverified). If
+    // flagged a plane was still in boats, content unverified). If
     // CEO flags a yacht in planes, untitled goes back to boats.
     videos: [
       "/videos/planes-jet-edit.mp4",
@@ -95,7 +95,7 @@ export const SPLITTER_MEDIA: Record<"cars" | "boats" | "planes", MediaSlot> = {
 };
 
 // ─────────────────────────────────────────────────────────────────────────
-// Hero media — single-clip slots for cinematic hero sections on the
+// Hero media, single-clip slots for cinematic hero sections on the
 // non-splitter pages. Same Pexels URLs as the splitter rotations.
 // ─────────────────────────────────────────────────────────────────────────
 

@@ -29,7 +29,7 @@ export default function RentPage() {
           </h1>
           <p className="mt-6 max-w-2xl text-lg text-ink-soft">
             Hand-prepared, fully insured, white-glove delivered. Some of
-            these are also part of the RYDA co-ownership fleet — rent one
+            these are also part of the RYDA co-ownership fleet, rent one
             for a weekend, claim a share if it fits.
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
@@ -43,7 +43,7 @@ export default function RentPage() {
         </div>
       </section>
 
-      {/* Unified rental grid — RYDA fleet + extended Miami inventory */}
+      {/* Unified rental grid, RYDA fleet + extended Miami inventory */}
       <section id="available">
         <RentalListings />
       </section>

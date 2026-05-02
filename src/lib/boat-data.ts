@@ -1,4 +1,4 @@
-// Boat fleet data — RYDA Boats vertical.
+// Boat fleet data, RYDA Boats vertical.
 // Mirrors src/lib/market-data.ts (cars) so the boats surfaces can use
 // equivalent helpers and types. Boats parity intentionally close to
 // cars where it makes sense (10 shares, 32 days/share/yr, two-tier
@@ -120,7 +120,7 @@ export const BOATS: Boat[] = [
       "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?auto=format&fit=crop&w=1920&q=80",
     currentEngineHours: 280,
     description:
-      "The Wajer 55 S is the modern Day Cruiser benchmark — Dutch build quality, three-engine IPS pod drive, and a layout designed for fast-paced bay days and Bimini runs. Ours is finished in Wajer Grey with cream upholstery and a teak deck.",
+      "The Wajer 55 S is the modern Day Cruiser benchmark, Dutch build quality, three-engine IPS pod drive, and a layout designed for fast-paced bay days and Bimini runs. Ours is finished in Wajer Grey with cream upholstery and a teak deck.",
     specs: {
       engine: "Triple Volvo Penta IPS 800",
       power: "1,800 hp combined",
@@ -164,7 +164,7 @@ export const BOATS: Boat[] = [
     effectiveDailyCost: 2_600,
     listingStart: "2026-03-30",
     listingEnd: "2026-09-30",
-    // Hero photo — mega-yacht stand-in (placeholder until licensed
+    // Hero photo, mega-yacht stand-in (placeholder until licensed
     // Pershing 6X photography is sourced pre-launch).
     hero:
       "https://images.unsplash.com/photo-1567899378494-47b22a2ae96a?auto=format&fit=crop&w=1920&q=80",
@@ -172,7 +172,7 @@ export const BOATS: Boat[] = [
     imagePosition: "center 50%",
     currentEngineHours: 410,
     description:
-      "The Pershing 6X is the marquee sport yacht in our Miami fleet — surface drives for blistering bay-to-Bimini runs, three-cabin layout, and a beach-club aft platform that converts the swim step into a full lounge.",
+      "The Pershing 6X is the marquee sport yacht in our Miami fleet, surface drives for blistering bay-to-Bimini runs, three-cabin layout, and a beach-club aft platform that converts the swim step into a full lounge.",
     specs: {
       engine: "Twin MAN V12 1550",
       power: "3,100 hp combined",
@@ -216,7 +216,7 @@ export const BOATS: Boat[] = [
     effectiveDailyCost: 600,
     listingStart: "2026-04-22",
     listingEnd: "2026-10-22",
-    // Hero photo — distinct yacht stand-in (verified working Unsplash
+    // Hero photo, distinct yacht stand-in (verified working Unsplash
     // ID, sourced from /s/photos/yacht). Each of the 4 hulls now has a
     // unique image. TODO: replace with real licensed Riva Aquariva
     // Super photography pre-launch.
@@ -269,7 +269,7 @@ export const BOATS: Boat[] = [
     effectiveDailyCost: 933,
     listingStart: "2026-04-10",
     listingEnd: "2026-10-10",
-    // Hero photo — distinct yacht stand-in (verified Unsplash ID
+    // Hero photo, distinct yacht stand-in (verified Unsplash ID
     // from /s/photos/yacht). 4 hulls, 4 distinct hero photos. TODO:
     // replace with real licensed Lagoon 50 photography pre-launch.
     hero:
@@ -278,7 +278,7 @@ export const BOATS: Boat[] = [
     imagePosition: "center 50%",
     currentEngineHours: 220,
     description:
-      "The Lagoon 50 is built for distance. Four-cabin layout with crew quarters, full bluewater rig, generator and watermaker — capable of multi-day Bahamas runs without thinking about fuel or supplies.",
+      "The Lagoon 50 is built for distance. Four-cabin layout with crew quarters, full bluewater rig, generator and watermaker, capable of multi-day Bahamas runs without thinking about fuel or supplies.",
     specs: {
       engine: "Twin Yanmar 4JH80",
       power: "160 hp combined",
@@ -294,12 +294,12 @@ export const BOATS: Boat[] = [
 ];
 
 // ─────────────────────────────────────────────────────────────────────────
-// CONSTANTS — boat-side doctrine
+// CONSTANTS, boat-side doctrine
 // ─────────────────────────────────────────────────────────────────────────
 // Boats hold longer than cars (3 vs 2 years) because the asset class
 // has a slower depreciation curve and members typically build a
 // stronger relationship with a boat. We model 15% depreciation across
-// the 3-year hold — slightly steeper than the curated certified pre owned car fleet's
+// the 3-year hold, slightly steeper than the curated certified pre owned car fleet's
 // 10% across 2 years, but still conservative for sport-yacht categories.
 
 export const BOATS_HOLDING_YEARS = 3;
@@ -308,15 +308,15 @@ export const NM_PER_DAY_PER_SHARE = 50; // 32 days × 50 nm = 1,600 nm/yr
 export const BOATS_DAYS_PER_SHARE = 30;
 // Engine-hours equivalent of cars' 50K-mile cap. ~2,000 engine hours
 // is the conventional threshold where major service (engines, rigging,
-// running gear) starts to dominate the carrying cost — the LLC sells
+// running gear) starts to dominate the carrying cost, the LLC sells
 // at year 3 OR 2,000 hrs, whichever hits first.
 export const BOATS_HOLDING_HOURS_CAP = 2_000;
 
 // ─────────────────────────────────────────────────────────────────────────
-// BOOKING POLICY — same two-tier shape as cars, adapted for boating
+// BOOKING POLICY, same two-tier shape as cars, adapted for boating
 // ─────────────────────────────────────────────────────────────────────────
 // Boat windows are tighter. Short-notice has a 1-3 day window (weather
-// matters — booking a boat 7 days out is closer to "planned"). Planned
+// matters, booking a boat 7 days out is closer to "planned"). Planned
 // caps at 6 months ahead. Off-peak runs aren't really off in Miami,
 // so the off-peak consecutive cap is generous.
 
@@ -359,7 +359,7 @@ export const BOAT_BOOKING_POLICY = {
 };
 
 // ─────────────────────────────────────────────────────────────────────────
-// MARKETS — for portfolio grouping
+// MARKETS, for portfolio grouping
 // ─────────────────────────────────────────────────────────────────────────
 
 export type BoatMarketKey = "Miami" | "Los Angeles" | "New York";
@@ -411,7 +411,7 @@ export const BOAT_MARKETS: Record<
 // ─────────────────────────────────────────────────────────────────────────
 // Boats are seasonal. ~4 months are spent hauled out for hurricane prep
 // or off-season storage. Charter occupancy is materially lower than car
-// rental occupancy — boats book only on good-weather days and crew
+// rental occupancy, boats book only on good-weather days and crew
 // availability is a hard constraint.
 
 export const RENTAL_DEFAULTS_BOATS = {

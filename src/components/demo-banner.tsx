@@ -1,9 +1,9 @@
 // Visible banner for member-area pages that are not yet behind real
-// authentication — keeps the public, journalist, and SEC views from
+// authentication, keeps the public, journalist, and SEC views from
 // mistaking a demo dashboard for live member data.
 
 export function DemoBanner({
-  message = "Sample view — member-area features ship with the Miami launch. No real co-ownership data is shown here.",
+  message = "Sample view, member-area features ship with the Miami launch. No real co-ownership data is shown here.",
 }: {
   message?: string;
 }) {

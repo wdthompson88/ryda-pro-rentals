@@ -7,13 +7,13 @@ import { Reveal } from "@/components/reveal";
 import { VEHICLES, formatUSD } from "@/lib/market-data";
 
 export const metadata: Metadata = {
-  title: "RYDA Cars — Co-own or rent the world's most exceptional cars",
+  title: "RYDA Cars, Co-own or rent the world's most exceptional cars",
   description:
     "Co-own a certified pre owned Ferrari, Lamborghini or McLaren in a member-managed LLC. Each share unlocks ~32 days a year. Or rent any car in the fleet by the day.",
 };
 
 export default function CarsHome() {
-  // Featured cars for the two parallel sections — same 4 RYDA fleet
+  // Featured cars for the two parallel sections, same 4 RYDA fleet
   // cars, but presented twice with different framings (co-own vs rent).
   const featured = VEHICLES.slice(0, 4);
   const featuredRentable = VEHICLES.filter((v) => v.rentalAvailable).slice(0, 4);
@@ -24,7 +24,7 @@ export default function CarsHome() {
     <>
       <SiteHeader />
 
-      {/* Hero — copy on left, editorial vehicle image on right */}
+      {/* Hero, copy on left, editorial vehicle image on right */}
       <section className="border-b border-rule">
         <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-6 py-20 sm:px-10 sm:py-24 lg:grid-cols-12 lg:gap-12">
           <div className="lg:col-span-6">
@@ -37,7 +37,7 @@ export default function CarsHome() {
             </h1>
             <p className="mt-8 max-w-xl text-lg leading-relaxed text-ink-soft">
               Co-own a certified pre owned Ferrari, Lamborghini, or
-              McLaren in a member-managed LLC — each share is ~32 days
+              McLaren in a member-managed LLC, each share is ~32 days
               a year. Or rent any car in the fleet by the day to drive
               it before you commit.
             </p>
@@ -57,7 +57,7 @@ export default function CarsHome() {
             </div>
           </div>
 
-          {/* Editorial vehicle image — links to the listing */}
+          {/* Editorial vehicle image, links to the listing */}
           <div className="lg:col-span-6">
             <Link
               href={`/markets/${heroVehicle.symbol}`}
@@ -96,7 +96,7 @@ export default function CarsHome() {
         </div>
       </section>
 
-      {/* Browse the portfolio — Pacaso-style teaser entry to /markets */}
+      {/* Browse the portfolio, Pacaso-style teaser entry to /markets */}
       <section className="relative isolate overflow-hidden border-b border-rule">
         <div className="absolute inset-0 -z-10">
           <Image
@@ -120,7 +120,7 @@ export default function CarsHome() {
             <span className="not-italic text-red">NY</span> next.
           </h2>
           <p className="mt-5 max-w-xl text-base text-cream/85">
-            The full RYDA portfolio organised by city — featured vehicles,
+            The full RYDA portfolio organised by city, featured vehicles,
             booking model and the path to claiming a share. Inspired by
             the cleanest fractional-ownership browse experience we&apos;ve
             seen.
@@ -136,7 +136,7 @@ export default function CarsHome() {
         </div>
       </section>
 
-      {/* Co-Own — featured share cars (curated, not the full inventory) */}
+      {/* Co-Own, featured share cars (curated, not the full inventory) */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
           <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
@@ -196,7 +196,7 @@ export default function CarsHome() {
         </div>
       </section>
 
-      {/* Rent — featured rentals (try before you buy) */}
+      {/* Rent, featured rentals (try before you buy) */}
       <section className="border-b border-rule bg-ink text-cream">
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
           <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
@@ -205,7 +205,7 @@ export default function CarsHome() {
                 Rent · Featured
               </p>
               <h2 className="mt-3 font-display text-3xl sm:text-4xl">
-                Featured rentals — try before you buy.
+                Featured rentals, try before you buy.
               </h2>
             </div>
             <Link
@@ -256,7 +256,7 @@ export default function CarsHome() {
         </div>
       </section>
 
-      {/* Why RYDA — consolidated into 5-step block */}
+      {/* Why RYDA, consolidated into 5-step block */}
       <section id="how-it-works" className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-28">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
@@ -314,7 +314,7 @@ export default function CarsHome() {
           </div>
           <p className="mt-6 text-xs text-cream/50">
             Membership is limited to verified individuals 28 years or older.
-            RYDA is a luxury access platform — co-ownership stakes are not
+            RYDA is a luxury access platform, co-ownership stakes are not
             investments and are not offered for investment purposes.
           </p>
         </div>

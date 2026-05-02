@@ -7,7 +7,7 @@ import { SiteHeader } from "@/components/site-header";
 import { supabase } from "@/lib/supabase";
 import { safeNext } from "@/lib/safe-next";
 
-// /signup — front-end member account creation. Drives the user to the
+// /signup, front-end member account creation. Drives the user to the
 // guided onboarding (KYC, preferences, age verification) once an account
 // is created. Preserves `?next=` so post-onboarding the member is
 // returned to the gated action they tried to take (e.g. claim a share,
@@ -48,7 +48,7 @@ function SignUpPageInner() {
 
   const reasonSub =
     reason === "rent" || reason === "buy" || reason === "checkout"
-      ? "Browsing is open to everyone — we just need an account before you can transact. 60 seconds."
+      ? "Browsing is open to everyone, we just need an account before you can transact. 60 seconds."
       : "We review every applicant before Miami launch. The full onboarding takes ~8 minutes (identity check + preferences) and you can save and return.";
 
   const ready =
@@ -66,7 +66,7 @@ function SignUpPageInner() {
     setSubmitting(true);
     setError(null);
 
-    // Always persist to the waitlist regardless of auth path — it's
+    // Always persist to the waitlist regardless of auth path, it's
     // the lead-attribution surface (market, source) and works even if
     // auth isn't configured yet.
     void fetch("/api/waitlist", {
@@ -79,7 +79,7 @@ function SignUpPageInner() {
         source: reason ? `signup:${reason}` : "signup",
       }),
     }).catch(() => {
-      /* Soft-fail — don't block the user. */
+      /* Soft-fail, don't block the user. */
     });
 
     try {
@@ -97,7 +97,7 @@ function SignUpPageInner() {
             emailRedirectTo: redirectTo,
             // Persist self-attested age confirmation + marketing opt-in
             // to user_metadata. NOTE: user_metadata is user-editable, so
-            // this is an audit-trail signature — NOT a security primitive.
+            // this is an audit-trail signature, NOT a security primitive.
             // Real age/identity verification happens in /onboarding KYC,
             // which writes to a server-owned `members` table that the
             // rental API checks before any booking can be created.
@@ -112,7 +112,7 @@ function SignUpPageInner() {
         if (err) throw err;
         setSubmitted(true);
       } else {
-        // Supabase not configured — simulate. Replace with real auth on
+        // Supabase not configured, simulate. Replace with real auth on
         // launch by setting NEXT_PUBLIC_SUPABASE_URL + ANON_KEY.
         await new Promise((r) => setTimeout(r, 600));
         setSubmitted(true);
@@ -140,7 +140,7 @@ function SignUpPageInner() {
               We've emailed{" "}
               <span className="font-medium text-ink">{email}</span> to confirm
               your account. Continue to onboarding to verify your identity and
-              complete your member profile — or pick up where you left off.
+              complete your member profile, or pick up where you left off.
             </p>
 
             <div className="mt-7 flex flex-col gap-3">
@@ -211,7 +211,7 @@ function SignUpPageInner() {
               hint="8+ characters. We recommend a passphrase."
             />
 
-            {/* Age verification — required for both renters (driver age 28+
+            {/* Age verification, required for both renters (driver age 28+
                 everywhere, partner-imposed) and co-owners (LLC member
                 eligibility). Surface here so it's not a surprise later. */}
             <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-rule bg-cream-2/40 p-3 text-xs">
@@ -223,7 +223,7 @@ function SignUpPageInner() {
               />
               <span className="text-ink-soft">
                 I confirm I'm <strong className="text-ink">28 or older</strong>{" "}
-                — required to drive any vehicle in the RYDA fleet.
+               , required to drive any vehicle in the RYDA fleet.
               </span>
             </label>
 
@@ -287,7 +287,7 @@ function SignUpPageInner() {
           </form>
 
           <p className="mt-5 text-center text-xs text-mute">
-            Browsing the fleet doesn't require an account — we ask only when
+            Browsing the fleet doesn't require an account, we ask only when
             you're ready to rent or claim a share.
           </p>
 

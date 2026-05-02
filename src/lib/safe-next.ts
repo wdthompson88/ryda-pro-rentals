@@ -3,7 +3,7 @@
 // gated page they came from.
 //
 // Without this, a link like https://ryda.com/signin?next=https://evil.com
-// would redirect the user off-site after sign-in — classic phishing
+// would redirect the user off-site after sign-in, classic phishing
 // vector. Worse, `router.push("javascript:alert(1)")` is treated by
 // Next.js's router as a navigation and the JS executes in our origin
 // (per Next docs).
@@ -40,20 +40,20 @@ export function safeNext(
   // Bare `/` is fine.
   if (trimmed === "/") return trimmed;
   // Must start with `/`. Second char can be a path char OR query/fragment
-  // start — but never `/` or `\` (host-confusion) or anything else odd.
+  // start, but never `/` or `\` (host-confusion) or anything else odd.
   if (!/^\/[A-Za-z0-9_\-?#]/.test(trimmed)) return fallback;
-  // Backslash anywhere in the path is suspicious — browsers normalize
+  // Backslash anywhere in the path is suspicious, browsers normalize
   // `\` → `/` in URLs, so `/x\evil.com` could become `/x/evil.com`
   // (cross-origin) when the router expands it. Reject the whole input.
   if (/\\/.test(trimmed)) return fallback;
   // Reject percent-encoded backslash (%5C) and double-encoded slash
-  // (%2F%2F → //) — defense in depth in case a future code path
+  // (%2F%2F → //), defense in depth in case a future code path
   // decodes the value before rendering it. Case-insensitive.
   if (/%5[Cc]|%2[Ff]%2[Ff]/.test(trimmed)) return fallback;
   // Reject control characters anywhere in the path.
   // eslint-disable-next-line no-control-regex
   if (/[\x00-\x1F\x7F]/.test(trimmed)) return fallback;
-  // Reject zero-width / bidirectional override Unicode — these don't
+  // Reject zero-width / bidirectional override Unicode, these don't
   // create open redirects but enable URL-bar visual spoofing on the
   // destination page (e.g. U+202E reverses display direction).
   // Range: ZWSP/ZWNJ/ZWJ/LRM/RLM (200B-200F), LRE/RLE/PDF/LRO/RLO
