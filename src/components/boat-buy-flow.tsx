@@ -236,7 +236,7 @@ function ReviewStep({
       <Section title="What you're buying">
         <Bullet label="Boat" value={`${boat.year} ${boat.name}`} />
         <Bullet label="Position" value={`${shares} of ${boat.shares} shares (${sharesPercent}%)`} />
-        <Bullet label="Legal entity" value={`Single-purpose Delaware LLC`} />
+        <Bullet label="Legal entity" value={`Single-purpose LLC`} />
         <Bullet label="Hailing port" value={boat.market} />
       </Section>
 
@@ -284,7 +284,7 @@ function ReviewStep({
           className="mt-1 h-4 w-4 accent-marine"
         />
         <span className="text-ink">
-          I understand I'm joining a member-managed Delaware LLC alongside other co-owners;
+          I understand I'm joining a member-managed LLC alongside other co-owners;
           that this is not an investment and is not offered for investment purposes; that
           co-ownership shares are illiquid for the first 12 months; and that the boat will
           depreciate over time.
@@ -447,7 +447,7 @@ function DocumentsStep({
           "Defines fair-use rules during peak and off-season.",
           "Sets remedies if a co-owner stops paying (30-day cure, then forced transfer).",
           "12-month minimum hold; member-to-member transfer mechanics; 3% transfer fee.",
-          "Mandatory mediation, then arbitration in Wilmington, Delaware.",
+          "Mandatory mediation, then arbitration in under AAA rules.",
         ]}
         signed={oaSigned}
         onSign={() => setOaSigned(true)}
@@ -762,7 +762,7 @@ function ConfirmStep({
           <KvRow label="Boat" value={`${boat.year} ${boat.name}`} />
           <KvRow label="Position" value={`${shares} of ${boat.shares} shares`} />
           <KvRow label="Amount" value={formatUSD(grandTotal)} />
-          <KvRow label="LLC" value={`${boat.name} LLC, Delaware (member-managed)`} />
+          <KvRow label="LLC" value={`${boat.name} LLC, (member-managed)`} />
           <KvRow label="Status" value="Pending — funds & verification clearing" />
         </dl>
       </div>

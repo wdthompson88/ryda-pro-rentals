@@ -20,7 +20,7 @@ import {
 export const metadata: Metadata = {
   title: "RYDA Boats — Co-own or charter the world's most beautiful boats",
   description:
-    "Boat co-ownership and crewed charter in Miami. Each hull held in a member-managed Delaware LLC; up to 10 verified members co-own every boat. Three-year planned exit.",
+    "Boat co-ownership and crewed charter in Miami. Each hull held in a member-managed LLC; up to 5 verified members co-own every boat. Three-year planned exit.",
 };
 
 export default function BoatsHome() {
@@ -112,8 +112,8 @@ export default function BoatsHome() {
                 Featured boats from the co-ownership portfolio.
               </h2>
               <p className="mt-3 max-w-xl text-base text-ink-soft">
-                Four flagship hulls. Each held in a Delaware LLC, 10
-                shares per hull, ~30 days a year per share. Same hulls
+                Four flagship hulls. Each held in an LLC, 10
+                shares per hull, ~32 days a year per share. Same hulls
                 are also available by the day on the charter side.
               </p>
             </div>
@@ -274,22 +274,32 @@ export default function BoatsHome() {
         </div>
       </section>
 
-      {/* Waitlist */}
-      <section id="waitlist" className="border-b border-rule bg-ink text-cream">
+      {/* Sign up */}
+      <section id="signup" className="border-b border-rule bg-ink text-cream">
         <div className="mx-auto max-w-3xl px-6 py-20 text-center sm:px-10 sm:py-28">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
             Members · Boats
           </p>
           <h2 className="mt-4 font-display text-4xl font-light leading-tight sm:text-5xl">
-            Membership is by invitation.
+            Become a member.
           </h2>
           <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-cream/70">
-            We&apos;re vetting early members for the Miami launch for RYDA
-            Boats Miami. Tell us about yourself and we&apos;ll be in
-            touch with the next steps.
+            Create your account to browse the fleet, run the numbers,
+            and claim a share when RYDA Boats Miami opens in Q3 2026.
           </p>
-          <div className="mt-10">
-            <WaitlistForm />
+          <div className="mt-10 flex flex-wrap justify-center gap-3">
+            <Link
+              href="/signup"
+              className="inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink transition-colors hover:bg-red hover:text-cream"
+            >
+              Sign up &rarr;
+            </Link>
+            <Link
+              href="/signin"
+              className="inline-flex h-12 items-center justify-center rounded-full border border-cream/30 px-7 text-sm font-medium text-cream transition-colors hover:border-red hover:text-red"
+            >
+              Sign in
+            </Link>
           </div>
           <p className="mt-6 text-xs text-cream/50">
             Membership is limited to verified individuals 28 years or

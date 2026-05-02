@@ -215,11 +215,11 @@ export default async function VehicleMarketPage({
                 The {HOLDING_YEARS}-year math, in one box.
               </h2>
               <p className="mt-4 text-sm leading-relaxed text-ink-soft">
-                Each RYDA car is a curated CPO held for {HOLDING_YEARS} years.
+                Each RYDA car is a curated certified pre owned held for {HOLDING_YEARS} years.
                 At exit, the LLC sells the vehicle and proceeds are
                 distributed pro-rata to shareholders. We model a{" "}
                 {econ.depreciationPct}% depreciation hit over the full hold
-                — a bar that low-mileage, kept-condition CPO exotics often
+                — a bar that low-mileage, kept-condition certified pre owned exotics often
                 clear, but always verify with your own resale assumption.
               </p>
               <p className="mt-4 text-sm leading-relaxed text-ink-soft">
@@ -439,7 +439,7 @@ export default async function VehicleMarketPage({
       <section className="bg-ink py-12 pb-28 text-cream/60 lg:pb-12">
         <div className="mx-auto max-w-3xl px-6 text-center text-xs sm:px-10">
           RYDA is a luxury access platform. Co-ownership stakes are LLC
-          membership interests in member-managed Delaware LLCs and are
+          membership interests in member-managed LLCs and are
           not registered securities. They are not offered for investment
           purposes. Cars depreciate; shares are illiquid by design.
           Membership is limited to verified individuals 28 years or older.

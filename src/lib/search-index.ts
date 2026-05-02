@@ -25,7 +25,6 @@ export type SearchEntry = {
     | "vehicle"
     | "boat"
     | "journal"
-    | "vs"
     | "page"
     | "doc"
     | "faq";
@@ -318,63 +317,6 @@ const JOURNAL_ENTRIES: SearchEntry[] = JOURNAL.filter(
 });
 
 // ─────────────────────────────────────────────────────────────────────────
-// vs/* comparison pages
-// ─────────────────────────────────────────────────────────────────────────
-
-const VS_ENTRIES: SearchEntry[] = [
-  // Cars vs/*
-  {
-    href: "/vs/turo",
-    title: "RYDA vs Turo",
-    subtitle: "Comparison · Peer-to-peer car rental",
-    vertical: "cars",
-    type: "vs",
-    haystack: "vs turo comparison rental peer to peer",
-  },
-  {
-    href: "/vs/marengo",
-    title: "RYDA vs Marengo",
-    subtitle: "Comparison · Subscription supercar club",
-    vertical: "cars",
-    type: "vs",
-    haystack: "vs marengo subscription supercar club",
-  },
-  {
-    href: "/vs/supercar-club",
-    title: "RYDA vs Supercar Club",
-    subtitle: "Comparison · Annual membership",
-    vertical: "cars",
-    type: "vs",
-    haystack: "vs supercar club annual membership premier auto club freedom",
-  },
-  // Boats vs/*
-  {
-    href: "/boats/vs/boatsetter",
-    title: "RYDA Boats vs Boatsetter",
-    subtitle: "Comparison · Peer-to-peer charter",
-    vertical: "boats",
-    type: "vs",
-    haystack: "vs boatsetter peer to peer charter marketplace",
-  },
-  {
-    href: "/boats/vs/yacht-club",
-    title: "RYDA Boats vs Yacht Club",
-    subtitle: "Comparison · Annual membership clubs",
-    vertical: "boats",
-    type: "vs",
-    haystack: "vs yacht club carefree freedom suntex annual membership",
-  },
-  {
-    href: "/boats/vs/solo-ownership",
-    title: "RYDA Boats vs Solo Ownership",
-    subtitle: "Comparison · Buying a yacht outright",
-    vertical: "boats",
-    type: "vs",
-    haystack: "vs solo ownership buying yacht outright",
-  },
-];
-
-// ─────────────────────────────────────────────────────────────────────────
 // Final flat index
 // ─────────────────────────────────────────────────────────────────────────
 
@@ -383,7 +325,6 @@ export const SEARCH_INDEX: SearchEntry[] = [
   ...VEHICLE_ENTRIES,
   ...BOAT_ENTRIES,
   ...JOURNAL_ENTRIES,
-  ...VS_ENTRIES,
 ];
 
 // ─────────────────────────────────────────────────────────────────────────

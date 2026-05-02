@@ -11,7 +11,7 @@ export default function PrivacyPage() {
       sections={[
         {
           heading: "1. Who we are",
-          body: "RYDA is operated by RYDA LLC, a Delaware limited liability company headquartered in Miami, FL.",
+          body: "RYDA is operated by RYDA LLC, a limited liability company headquartered in Miami, FL.",
         },
         {
           heading: "2. What we collect",

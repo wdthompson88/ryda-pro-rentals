@@ -7,7 +7,7 @@ import { BOATS_HOLDING_YEARS, BOATS_TARGET_DEPRECIATION_PCT } from "@/lib/boat-d
 export const metadata: Metadata = {
   title: "How RYDA Boats works",
   description:
-    "Member-managed Delaware LLC, ten co-owners per hull, three-year planned exit, charter opt-in to offset ops. Compare to solo ownership, peer-to-peer charter, and yacht clubs.",
+    "Member-managed LLC, up to 5 co-owners per hull, three-year planned exit, charter opt-in to offset ops. Compare to solo ownership, peer-to-peer charter, and yacht clubs.",
 };
 
 export default function BoatsHowItWorks() {
@@ -22,11 +22,11 @@ export default function BoatsHowItWorks() {
             How it works · Boat co-ownership
           </p>
           <h1 className="mt-4 max-w-4xl font-display text-5xl font-light leading-tight text-ink sm:text-6xl">
-            Member-managed Delaware LLC.{" "}
+            Member-managed LLC.{" "}
             <span className="italic">Same doctrine as cars, different ops.</span>
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-ink-soft">
-            Each boat is held in a single-purpose Delaware LLC. Up to 10
+            Each boat is held in a single-purpose LLC. Up to 10
             verified members co-own every hull. RYDA runs operations
             (captain, dockage, insurance, hurricane prep, charter
             opt-in) under a separate Management Services Agreement.
@@ -159,7 +159,7 @@ export default function BoatsHowItWorks() {
                     a="Unlimited"
                     b="Per-trip"
                     c="Reservation-gated"
-                    d="30 days/yr per share, with charter opt-in"
+                    d="32 days/yr per share, with charter opt-in"
                   />
                   <Row
                     label="Exit"
@@ -205,7 +205,7 @@ export default function BoatsHowItWorks() {
             />
             <Stance
               title="You charter 4–8 weekends a year and want a real upgrade in inventory"
-              detail="A share fits cleanly. 30 days/yr × your share, plus charter opt-in revenue when you're not on board."
+              detail="A share fits cleanly. 32 days/yr × your share, plus charter opt-in revenue when you're not on board."
               fit="great"
             />
             <Stance
@@ -305,9 +305,9 @@ export default function BoatsHowItWorks() {
                 </p>
                 <ul className="mt-3 space-y-2 text-sm leading-relaxed text-ink-soft">
                   <li>· 1 share of 10 in a Pershing 6X LLC</li>
-                  <li>· 30 days/yr personal use</li>
+                  <li>· 32 days/yr personal use</li>
                   <li>· Annual ops + reserves: ~$32,000 per share</li>
-                  <li>· You opt 8 of your 30 days into the charter pool</li>
+                  <li>· You opt 8 of your 32 days into the charter pool</li>
                 </ul>
               </div>
               <div>
@@ -347,7 +347,7 @@ export default function BoatsHowItWorks() {
             Twelve trust pillars.
           </h2>
           <div className="mt-12 grid grid-cols-1 gap-x-10 gap-y-6 md:grid-cols-2 lg:grid-cols-3">
-            <Pillar label="Member-managed Delaware LLC" body="Members vote on material decisions; not passive. Delaware case law is the gold standard for LLC governance." />
+            <Pillar label="Member-managed LLC" body="Members vote on material decisions; not passive. established LLC case law is the gold standard for LLC governance." />
             <Pillar label="Separate Management Services Agreement" body="RYDA is a hired service provider, not the asset owner. Members can fire RYDA and hire someone else." />
             <Pillar label="Single-purpose LLC per hull" body="No cross-collateralization. Your Pershing 6X share isn't liable for someone else's Lagoon LLC." />
             <Pillar label="USCG documentation + state title" body="Clean chain of custody. Documents in the LLC vault." />

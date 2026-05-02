@@ -15,7 +15,7 @@ import {
 export const metadata = {
   title: "RYDA Portfolio — Supercars co-owned in the US",
   description:
-    "The RYDA portfolio. Member-managed Delaware LLCs hold each curated CPO supercar; up to 10 verified members co-own every car. Browse Miami, Los Angeles, and New York.",
+    "The RYDA portfolio. Member-managed LLCs hold each curated certified pre owned supercar; up to 5 verified members co-own every car. Browse Miami, Los Angeles, and New York.",
 };
 
 // Featured tile: 4 marquee positions, statically rendered (no carousel).
@@ -66,7 +66,7 @@ export default function MarketsPage() {
             <span className="italic">co-owned in the US.</span>
           </h1>
           <p className="mt-7 max-w-2xl text-lg leading-relaxed text-cream/85">
-            Each car is held in a member-managed Delaware LLC. Up to 10
+            Each car is held in a member-managed LLC. Up to 10
             verified members co-own every vehicle. RYDA runs operations
             end-to-end. Two-year planned exit; transferable to other members
             after twelve months.
@@ -247,7 +247,7 @@ export default function MarketsPage() {
         <div className="mx-auto max-w-3xl px-6 py-12 text-center text-xs text-mute sm:px-10">
           <p>
             RYDA is a luxury access platform. Co-ownership stakes are
-            membership interests in member-managed Delaware LLCs — not
+            membership interests in member-managed LLCs — not
             registered securities, not offered for investment purposes.
             See the{" "}
             <Link href="/legal/disclaimer" className="text-red hover:text-red-deep">

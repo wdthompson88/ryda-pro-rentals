@@ -1,15 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 // RYDA spans three verticals: Cars, Boats, Planes. The header detects
 // which vertical the visitor is in via the pathname and swaps the nav
-// accordingly. Vertical switcher + search + theme toggle were removed
-// from the marketing header per UX polish — those move to the footer
-// (theme + search) and are reachable from the splitter (vertical jump).
+// accordingly. Plus a small site-search bar so members can find a car,
+// boat, or doc from any page. Sign-in / Sign-up are paired buttons —
+// soft cream "Log in" next to a dark "Sign up" CTA, in RYDA's palette.
 
 type Vertical = "cars" | "boats" | "planes" | "neutral";
 
@@ -51,16 +51,34 @@ function navForVertical(v: Vertical): { href: string; label: string }[] {
 
 export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
   const [open, setOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const pathname = usePathname();
+  const router = useRouter();
   const vertical = detectVertical(pathname);
   const nav = navForVertical(vertical);
 
   const tone = inverted ? "text-cream/70 hover:text-cream" : "text-ink-soft hover:text-ink";
   const brand = inverted ? "text-cream" : "text-ink";
-  const ctaBase = inverted
+  // Sign in (Log In) — soft cream with ink text. Hover lifts to red.
+  const signInBtn = inverted
+    ? "border-cream/30 bg-cream/10 text-cream hover:bg-cream hover:text-ink"
+    : "border-rule bg-cream-2 text-ink hover:border-red hover:text-red";
+  // Sign up — dark ink (or cream on inverted) with strong CTA presence.
+  const signUpBtn = inverted
     ? "border-cream bg-cream text-ink hover:bg-red hover:text-cream hover:border-red"
     : "border-ink bg-ink text-cream hover:bg-red hover:border-red";
+  // Search input theming — tracks the inverted state.
+  const searchInput = inverted
+    ? "border-cream/30 bg-cream/10 text-cream placeholder:text-cream/50 focus:border-cream focus:ring-cream/20"
+    : "border-rule bg-cream-2 text-ink placeholder:text-mute focus:border-ink focus:ring-ink/10";
   const burger = inverted ? "text-cream/80 hover:text-cream" : "text-ink-soft hover:text-ink";
+
+  function onSearchSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const q = searchQuery.trim();
+    if (!q) return;
+    router.push(`/search?q=${encodeURIComponent(q)}`);
+  }
 
   return (
     <header className={`w-full border-b ${inverted ? "border-cream/20" : "border-rule"}`}>
@@ -108,7 +126,7 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
           )}
         </div>
 
-        <nav className={`hidden gap-7 text-sm font-medium sm:flex ${tone}`}>
+        <nav className={`hidden gap-7 text-sm font-medium md:flex ${tone}`}>
           {nav.map((n) => (
             <Link key={n.href} href={n.href}>
               {n.label}
@@ -116,16 +134,51 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
           ))}
         </nav>
 
-        <div className="flex items-center gap-4 sm:gap-5">
+        <div className="flex items-center gap-3 sm:gap-3">
+          {/* Site search — visible on >=md so it doesn't crowd small screens.
+              On mobile, search is reachable from the burger menu. */}
+          <form
+            onSubmit={onSearchSubmit}
+            role="search"
+            className="hidden lg:block"
+          >
+            <label htmlFor="header-search" className="sr-only">
+              Search RYDA
+            </label>
+            <div className="relative">
+              <svg
+                aria-hidden="true"
+                width="14"
+                height="14"
+                viewBox="0 0 14 14"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                className={`pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 ${inverted ? "text-cream/55" : "text-mute"}`}
+              >
+                <circle cx="6" cy="6" r="4" />
+                <line x1="9.2" y1="9.2" x2="12.5" y2="12.5" />
+              </svg>
+              <input
+                id="header-search"
+                type="search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search RYDA"
+                className={`h-9 w-48 rounded-full border pl-8 pr-3 text-sm transition-colors focus:outline-none focus:ring-2 ${searchInput}`}
+              />
+            </div>
+          </form>
           <Link
             href="/signin"
-            className={`hidden text-sm font-medium transition-colors sm:inline-flex ${tone}`}
+            className={`hidden rounded-full border px-5 py-2 text-sm font-medium transition-colors sm:inline-flex ${signInBtn}`}
           >
-            Sign in
+            Log in
           </Link>
           <Link
             href="/signup"
-            className={`hidden rounded-full border px-5 py-2 text-sm font-medium transition-colors sm:inline-flex ${ctaBase}`}
+            className={`hidden rounded-full border px-5 py-2 text-sm font-medium transition-colors sm:inline-flex ${signUpBtn}`}
           >
             Sign up
           </Link>
@@ -211,17 +264,38 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
                 {n.label}
               </Link>
             ))}
+            {/* Mobile site-search — opens to /search?q=… */}
+            <form
+              role="search"
+              onSubmit={(e) => {
+                onSearchSubmit(e);
+                setOpen(false);
+              }}
+              className="mt-2 px-3"
+            >
+              <label htmlFor="mobile-search" className="sr-only">
+                Search RYDA
+              </label>
+              <input
+                id="mobile-search"
+                type="search"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search RYDA"
+                className={`h-10 w-full rounded-full border px-4 text-sm focus:outline-none focus:ring-2 ${searchInput}`}
+              />
+            </form>
             <Link
               href="/signin"
               onClick={() => setOpen(false)}
-              className="rounded-lg px-3 py-3"
+              className={`mt-3 inline-flex h-12 items-center justify-center rounded-full border px-5 text-sm font-medium transition-colors ${signInBtn}`}
             >
-              Sign in
+              Log in
             </Link>
             <Link
               href="/signup"
               onClick={() => setOpen(false)}
-              className={`mt-2 inline-flex h-12 items-center justify-center rounded-full border px-5 text-sm font-medium transition-colors ${ctaBase}`}
+              className={`mt-2 inline-flex h-12 items-center justify-center rounded-full border px-5 text-sm font-medium transition-colors ${signUpBtn}`}
             >
               Sign up
             </Link>

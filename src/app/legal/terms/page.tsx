@@ -31,7 +31,7 @@ export default function TermsPage() {
         },
         {
           heading: "6. Co-ownership and legal interests",
-          body: "Co-ownership stakes are membership interests in member-managed single-purpose Delaware LLCs, governed by the LLC Operating Agreement and the Management Services Agreement between each LLC and RYDA. RYDA is not a registered broker, dealer, exchange, or investment adviser. Co-ownership stakes are not registered securities and are not offered for investment purposes. See the Co-Ownership Disclaimer for more.",
+          body: "Co-ownership stakes are membership interests in member-managed single-purpose LLCs, governed by the LLC Operating Agreement and the Management Services Agreement between each LLC and RYDA. RYDA is not a registered broker, dealer, exchange, or investment adviser. Co-ownership stakes are not registered securities and are not offered for investment purposes. See the Co-Ownership Disclaimer for more.",
         },
         {
           heading: "7. Prohibited conduct",
@@ -51,7 +51,7 @@ export default function TermsPage() {
         },
         {
           heading: "11. Dispute resolution",
-          body: "These Terms are governed by Delaware law. Disputes will be resolved by binding arbitration administered by JAMS, except for small-claims matters which may be brought in court. Class actions and class arbitrations are waived.",
+          body: "These Terms are governed by applicable LLC law. Disputes will be resolved by binding arbitration administered by JAMS, except for small-claims matters which may be brought in court. Class actions and class arbitrations are waived.",
         },
         {
           heading: "12. Changes to these Terms",

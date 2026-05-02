@@ -79,7 +79,7 @@ export default async function OpenGraphImage() {
             fontWeight: 500,
           }}
         >
-          <div>Member-managed Delaware LLC</div>
+          <div>Member-managed LLC</div>
           <div>Member cohort · 2027</div>
         </div>
       </div>

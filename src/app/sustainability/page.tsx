@@ -24,7 +24,7 @@ export default function SustainabilityPage() {
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
             Not a climate solution. But the math is honest: a single LLC
-            with 10 shares beats up to 10 separately-owned cars sitting idle
+            with 10 shares (up to 5 members) beats up to 10 separately-owned cars sitting idle
             in 10 separate garages — whether those shares are held by ten
             members or a smaller group.
           </p>

@@ -83,7 +83,7 @@ export default async function OpenGraphImage() {
             fontWeight: 500,
           }}
         >
-          <div>Asset-backed · Delaware LLC</div>
+          <div>Asset-backed · LLC</div>
           <div>Miami launch · Q3 2026</div>
         </div>
       </div>

@@ -9,7 +9,7 @@ import { VEHICLES, formatUSD } from "@/lib/market-data";
 export const metadata: Metadata = {
   title: "RYDA Cars — Co-own or rent the world's most exceptional cars",
   description:
-    "Co-own a CPO Ferrari, Lamborghini, or McLaren in a member-managed Delaware LLC. Each share unlocks ~30 days a year. Or rent any car in the fleet by the day.",
+    "Co-own a certified pre owned Ferrari, Lamborghini, or McLaren in a member-managed LLC. Each share unlocks ~32 days a year. Or rent any car in the fleet by the day.",
 };
 
 export default function CarsHome() {
@@ -36,9 +36,10 @@ export default function CarsHome() {
               <span className="italic text-red">most exceptional cars.</span>
             </h1>
             <p className="mt-8 max-w-xl text-lg leading-relaxed text-ink-soft">
-              Co-own a CPO Ferrari, Lamborghini, or McLaren in a Delaware
-              LLC — each share is ~30 days a year. Or rent any car in the
-              fleet by the day to drive it before you commit.
+              Co-own a certified pre owned Ferrari, Lamborghini, or
+              McLaren in a member-managed LLC — each share is ~32 days
+              a year. Or rent any car in the fleet by the day to drive
+              it before you commit.
             </p>
             <div className="mt-10 flex flex-wrap justify-center gap-3 sm:justify-start">
               <Link
@@ -146,11 +147,6 @@ export default function CarsHome() {
               <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
                 Featured cars from the co-ownership portfolio.
               </h2>
-              <p className="mt-3 max-w-xl text-base text-ink-soft">
-                A curated four. Each car held in a Delaware LLC, 10 shares
-                per vehicle. ~30 days a year per share. Effective ~$236/day
-                in steady-state ops vs $2,400+/day to rent.
-              </p>
             </div>
             <Link
               href="/markets"
@@ -211,11 +207,6 @@ export default function CarsHome() {
               <h2 className="mt-3 font-display text-3xl sm:text-4xl">
                 Featured rentals — try before you buy.
               </h2>
-              <p className="mt-3 max-w-xl text-base text-cream/70">
-                A curated four. Drive one first, decide if you want to own
-                a piece. The full Miami fleet (RYDA + partner cars) lives
-                on the rentals page.
-              </p>
             </div>
             <Link
               href="/rent"
@@ -279,11 +270,11 @@ export default function CarsHome() {
             ~$40–80K a year before you turn the key. RYDA is the third option.
           </p>
           <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-3 lg:grid-cols-5">
-            <Step n="01" title="Verify" body="Apply, complete identity verification, and confirm RYDA membership requirements." />
-            <Step n="02" title="Choose" body="Browse the curated, CPO-only fleet. Every car passes a multi-point Pre-Purchase Inspection before a single share is sold — co-owners are protected from inheriting major powertrain or mechanical issues." />
-            <Step n="03" title="Co-own" body="Up to 10 members form a Delaware LLC together to hold the vehicle. You sign the operating agreement and fund your share." />
-            <Step n="04" title="Drive" body="Book your time on the RYDA app. Each share unlocks ~30 days and ~3,000 miles a year (100 mi/day). Most members hold 1–2 shares; high-use members can buy more entitlement on the same car." />
-            <Step n="05" title="Exit" body="Default exit: RYDA sells the car at year 2 OR 50,000 miles — whichever comes first. Proceeds split pro-rata (we model a ~10% depreciation hit). Need out earlier? Transfer your share to another verified member after the 12-month minimum hold." />
+            <Step n="01" title="Verify" body="Apply and complete identity verification." />
+            <Step n="02" title="Choose" body="Browse the curated, certified pre owned fleet. Every car passes a multi-point Pre-Purchase Inspection by the dealer before a single share is sold." />
+            <Step n="03" title="Co-own" body="RYDA forms a LLC for up to 5 members to hold the vehicle. You sign the operating agreement and fund your share (2 shares minimum per person)." />
+            <Step n="04" title="Drive" body="Book your time on the RYDA smart calendar. Each share unlocks ~32 days and ~3,200 miles a year (100 mi/day)." />
+            <Step n="05" title="Exit" body="RYDA sells the car at year 2–3 OR 60,000–75,000 miles depending on certified pre owned program. Proceeds split pro-rata. Need out earlier? Transfer your share to another verified member after the 12-month minimum hold." />
           </div>
           <div className="mt-16 flex justify-center">
             <Link
@@ -296,19 +287,30 @@ export default function CarsHome() {
         </div>
       </section>
 
-      {/* Waitlist */}
-      <section id="waitlist" className="border-b border-rule bg-ink text-cream">
+      {/* Sign up */}
+      <section id="signup" className="border-b border-rule bg-ink text-cream">
         <div className="mx-auto max-w-3xl px-6 py-20 text-center sm:px-10 sm:py-28">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">Early members</p>
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">Members</p>
           <h2 className="mt-4 font-display text-4xl font-light leading-tight sm:text-5xl">
-            Membership is by invitation.
+            Become a member.
           </h2>
           <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-cream/70">
-            We're vetting early members for the Miami launch. Tell us
-            about yourself and we'll be in touch with the next steps.
+            Create your account to browse the fleet, run the numbers,
+            and claim a share when Miami opens in Q3 2026.
           </p>
-          <div className="mt-10">
-            <WaitlistForm />
+          <div className="mt-10 flex flex-wrap justify-center gap-3">
+            <Link
+              href="/signup"
+              className="inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink transition-colors hover:bg-red hover:text-cream"
+            >
+              Sign up →
+            </Link>
+            <Link
+              href="/signin"
+              className="inline-flex h-12 items-center justify-center rounded-full border border-cream/30 px-7 text-sm font-medium text-cream transition-colors hover:border-red hover:text-red"
+            >
+              Sign in
+            </Link>
           </div>
           <p className="mt-6 text-xs text-cream/50">
             Membership is limited to verified individuals 28 years or older.

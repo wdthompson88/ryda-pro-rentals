@@ -5,7 +5,7 @@ import { SiteHeader } from "@/components/site-header";
 export const metadata = {
   title: "About RYDA Boats",
   description:
-    "Why we built RYDA Boats. The same Delaware LLC structure that runs the cars side, adapted for marine — surveyed CPO hulls, member-managed LLCs, three-year planned exit.",
+    "Why we built RYDA Boats. The same LLC structure that runs the cars side, adapted for marine — surveyed certified pre owned hulls, member-managed LLCs, three-year planned exit.",
 };
 
 export default function BoatsAboutPage() {
@@ -25,8 +25,8 @@ export default function BoatsAboutPage() {
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
             Solo yacht ownership is unworkable for most. Charter is
             hollow. RYDA Boats is the third option, built on the same
-            Delaware LLC scaffolding that runs the cars side — adapted
-            for marine ops, surveyed CPO hulls, and a three-year hold.
+            LLC scaffolding that runs the cars side — adapted
+            for marine ops, surveyed certified pre owned hulls, and a three-year hold.
           </p>
         </div>
       </section>
@@ -56,7 +56,7 @@ export default function BoatsAboutPage() {
               Boats run on Coast Guard documentation, marine survey
               workflows, and hurricane-driven seasonality, but the
               co-ownership structure is identical: a single-purpose
-              Delaware LLC holds title, up to 10 members co-own, RYDA
+              LLC holds title, up to 5 members co-own, RYDA
               runs ops under a separate Management Services Agreement.
               Same Howey-defense thinking, same legal scaffolding.
             </p>
@@ -88,8 +88,8 @@ export default function BoatsAboutPage() {
               None of that was the right answer for us, and none of it
               is the right answer for the buyers we&apos;ve talked to.
               RYDA Boats is the fourth answer: a real ownership stake
-              in a single-purpose Delaware LLC that holds title to a
-              specific yacht, alongside up to nine other verified
+              in a single-purpose LLC that holds title to a
+              specific yacht, alongside up to four other verified
               members. The Coast Guard documentation is in the
               LLC&apos;s name. We run the operations under a separate
               services agreement — slip, captain, fuel, insurance,
@@ -109,8 +109,8 @@ export default function BoatsAboutPage() {
               water, without the part-time job.
             </p>
             <p>
-              Miami launches Q3 2026, alongside the cars side. We&apos;re
-              vetting our first 60 early boat members now.
+              Miami launches Q3 2026. Create your account to browse the
+              fleet and claim a share when the first hulls go live.
             </p>
           </div>
 
@@ -175,7 +175,7 @@ export default function BoatsAboutPage() {
             />
             <Value
               title="Integrity"
-              body="Asset-backed ownership, single-purpose Delaware LLC per hull, member voting. We do what we say."
+              body="Asset-backed ownership, single-purpose LLC per hull, member voting. We do what we say."
             />
           </div>
         </div>
@@ -209,7 +209,7 @@ export default function BoatsAboutPage() {
             RYDA Boats operations
           </h2>
           <dl className="mt-8 grid max-w-2xl grid-cols-1 gap-5 text-sm sm:grid-cols-2">
-            <Fact label="Legal entity" value="Single-purpose Delaware LLC per hull" />
+            <Fact label="Legal entity" value="Single-purpose LLC per hull" />
             <Fact label="Operating market" value="Miami flagship · launching Q3 2026" />
             <Fact label="Marina partner" value="Coconut Grove · Island Gardens · Miami Beach Marina" />
             <Fact label="Captains" value="USCG licensed, employed via the LLC" />

@@ -107,7 +107,7 @@ export default async function CostSheetPage({
             {v.year} · {v.brand} · Stored in {v.market} · {HOLDING_YEARS}-year
             planned exit doctrine ({HOLDING_YEARS} yrs OR{" "}
             {HOLDING_MILES_CAP.toLocaleString()} mi, whichever first).
-            Asset-backed Delaware-LLC co-ownership.
+            Asset-backed LLC co-ownership.
           </p>
         </header>
 
@@ -370,7 +370,7 @@ export default async function CostSheetPage({
         <footer className="mt-10 border-t border-rule pt-6 text-[11px] leading-relaxed text-mute">
           <p>
             Illustrative usage-economics for the {v.name}. Co-ownership
-            shares are member-managed Delaware LLC interests, not
+            shares are member-managed LLC interests, not
             registered securities and not offered for investment
             purposes. Modeled outcomes are not guaranteed; actual sale
             price varies by model, mileage, and market. Sole-ownership

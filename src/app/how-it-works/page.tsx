@@ -24,7 +24,7 @@ const TOC_ITEMS = [
 export const metadata = {
   title: "How it works — RYDA",
   description:
-    "Asset-backed co-ownership of curated CPO supercars. Five steps to a key, side-by-side comparison vs solo / rental / club, the 2-year exit doctrine, and the optional rental opt-in.",
+    "Asset-backed co-ownership of curated certified pre owned supercars. Five steps to a key, side-by-side comparison vs solo / rental / club, the 2-year exit doctrine, and the optional rental opt-in.",
 };
 
 // 4-way comparison anchor numbers — same Ferrari 296 GTB illustration
@@ -65,14 +65,14 @@ const ROWS: Row[] = [
   {
     label: "Up-front cost",
     regular: formatUSD(STICKER),
-    rental: "$0",
+    rental: "—",
     club: formatUSD(CLUB_ANNUAL) + " (annual)",
     ryda: formatUSD(RYDA_SHARE_BUYIN),
   },
   {
     label: "Annual carrying / fees",
     regular: formatUSD(CARRYING_REGULAR),
-    rental: "$0",
+    rental: "—",
     club: "Included",
     ryda: formatUSD(RYDA_ANNUAL_OPS),
   },
@@ -113,8 +113,8 @@ const ROWS: Row[] = [
   {
     label: `Recover at exit (${100 - TARGET_DEPRECIATION_PCT}% resale)`,
     regular: `+ ${formatUSD(REGULAR_RESALE)}`,
-    rental: "$0",
-    club: "$0",
+    rental: "—",
+    club: "—",
     ryda: `+ ${formatUSD(RYDA_RESALE)}`,
   },
   {
@@ -147,11 +147,11 @@ export default function HowItWorksPage() {
             How it works · Asset-backed co-ownership
           </p>
           <h1 className="mt-4 max-w-4xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
-            Asset-backed co-ownership in{" "}
-            <span className="italic">five steps.</span>
+            Own a piece of the world&apos;s{" "}
+            <span className="italic">best cars.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
-            Each car is held in a single-purpose Delaware LLC with 10
+            Each car is held in a single-purpose LLC with 10
             shares. Your share is backed by a real, titled vehicle —
             not by a subscription, lease, or rental contract. Verified
             members hold one share or several; RYDA is hired as the
@@ -169,21 +169,21 @@ export default function HowItWorksPage() {
             Co-ownership
           </p>
           <h2 className="mt-3 font-display text-4xl text-ink sm:text-5xl">
-            Own a piece of the world&apos;s best cars.
+            Asset-backed co-ownership in five steps.
           </h2>
           <p className="mt-4 max-w-2xl text-lg text-ink-soft">
             One Ferrari 296 share: $34K up front, ~$7,080/year all-in,
-            ~30 days/year — roughly $236/day in steady-state ops.
+            ~32 days/year — roughly $236/day in steady-state ops.
             Compare with $2,400+/day to rent or $40–80K/yr to own
             outright.
           </p>
 
           <div className="mt-12 grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-5">
-            <Step n="01" title="Verify" body="Apply, complete KYC. Valid US license, clean recent driving record, 28 or older. No accreditation required." />
-            <Step n="02" title="Choose" body="Browse the curated, CPO-only fleet. Every car passes a multi-point Pre-Purchase Inspection before a single share is sold — co-owners are protected from inheriting major powertrain or mechanical issues." />
-            <Step n="03" title="Co-own" body="Join the LLC alongside other members. Sign the Operating Agreement and Management Services Agreement. Fund your share via wire or ACH." />
-            <Step n="04" title="Drive" body="Book your time on the RYDA app. Each share unlocks ~30 days and ~3,000 miles per year (100 mi/day allowance). Hold multiple shares to scale linearly — 5 ≈ 150 days, all 10 ≈ 300 days." />
-            <Step n="05" title="Exit" body="Default: RYDA sells the car at year 2 OR 50,000 miles — whichever comes first — and distributes proceeds pro-rata (we model a ~10% depreciation assumption). Want out sooner? Transfer your share to another verified member after the 12-month minimum hold. RYDA handles the LLC paperwork. 3% transfer fee on member-to-member transfers." />
+            <Step n="01" title="Verify" body="Apply and complete identity verification. Valid US license, clean recent driving record, 28 or older. No accreditation required." />
+            <Step n="02" title="Choose" body="Browse the curated, certified pre owned fleet. Every car passes a multi-point Pre-Purchase Inspection by the dealer before a single share is sold." />
+            <Step n="03" title="Co-own" body="RYDA forms a LLC for up to 5 members to hold the vehicle. You sign the operating agreement and fund your share (2 shares minimum per person)." />
+            <Step n="04" title="Drive" body="Book your time on the RYDA smart calendar. Each share unlocks ~32 days and ~3,200 miles a year (100 mi/day)." />
+            <Step n="05" title="Exit" body="RYDA sells the car at year 2–3 OR 60,000–75,000 miles depending on certified pre owned program. Proceeds split pro-rata. Need out earlier? Transfer your share to another verified member after the 12-month minimum hold. 3% transfer fee on member-to-member transfers." />
           </div>
         </div>
       </section>
@@ -308,25 +308,25 @@ export default function HowItWorksPage() {
 
           <div className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-4">
             <Take
-              title="Solo ownership"
-              good="You'd drive 60+ days a year, you love the operational responsibility (storage, insurance, maintenance, registration), and you have the capital and tolerance for $40–80K/yr in carrying."
+              title="RYDA"
+              good="You'd drive ~32–64 days a year on a specific car (2 shares is the minimum buy). You want real ownership without the operational burden and you'd rather scale entitlement by adding shares than buying a second car."
+              tradeoff="You commit to a specific car for the hold. Earlier exits are possible by transferring to another verified member after the 12-month minimum hold; transfer prices are member-to-member."
+              highlight
+            />
+            <Take
+              title="RYDA vs solo ownership"
+              good="Solo ownership works if you'd drive 60+ days a year, you love the operational responsibility (storage, insurance, maintenance, registration), and you have the capital and tolerance for $40–80K/yr in carrying."
               tradeoff="The asset sits idle 90% of the time. Carrying costs accrue whether you drive or not. Selling takes weeks to months."
             />
             <Take
-              title="Daily rental"
-              good="You drive once or twice a year, you don't want any commitment, and the per-day price is not your primary concern."
+              title="RYDA vs daily rental"
+              good="Daily rental works if you drive once or twice a year, you don't want any commitment, and the per-day price is not your primary concern."
               tradeoff="$2,400+/day adds up fast. No priority on the vehicle you want, no relationship with it, no ownership upside."
             />
             <Take
-              title="Supercar club"
-              good="You want rotating access to many cars, you don't care which specific car, and you don't want to own anything."
+              title="RYDA vs supercar club"
+              good="A club works if you want rotating access to many cars, you don't care which specific car, and you don't want to own anything."
               tradeoff="Annual fees rival co-ownership without an ownership stake. You're a customer of the club, not a co-owner."
-            />
-            <Take
-              title="RYDA"
-              good="You'd drive ~30–60 days a year on a specific car (1–2 shares is the typical buy). You want real ownership without the operational burden, you're comfortable with the 2-year planned exit, and you'd rather scale entitlement by adding shares than buying a second car."
-              tradeoff="You commit to a specific car for the hold. Earlier exits are possible by transferring to another verified member after the 12-month minimum hold; transfer prices are member-to-member."
-              highlight
             />
           </div>
         </div>
@@ -345,17 +345,17 @@ export default function HowItWorksPage() {
             <Reason
               n="01"
               title="A real asset, not a subscription"
-              body="You're not buying a usage right or a monthly contract. Each share is a registered legal interest in a Delaware LLC that holds title to a specific physical vehicle. Substance, not subscription."
+              body="You're not buying a usage right or a monthly contract. Each share is a registered legal interest in an LLC that holds title to a specific physical vehicle. Substance, not subscription."
             />
             <Reason
               n="02"
               title="Financial security through tangible ownership"
-              body="A car in storage doesn't disappear with a company. Even if RYDA dissolved tomorrow, the LLC still holds title to the physical vehicle and you still own your share of the LLC. The asset is real, in a garage, with a VIN you can verify."
+              body="A car in storage is a real, titled asset. The LLC holds title to the physical vehicle and you own a registered share of the LLC. The asset is real, in a garage, with a VIN you can verify — independent of any platform."
             />
             <Reason
               n="03"
               title="Shared costs, not the full burden"
-              body="Insurance, maintenance, tires, detailing, storage, and depreciation reserve all split across up to 10 co-owners. A 1-share holder pays roughly 1/10 of what the solo owner of the same car would."
+              body="Insurance, maintenance, tires, detailing, storage, and depreciation reserve split across the LLC's 10 shares. A 1-share holder pays roughly 10% of what the solo owner of the same car would."
             />
             <Reason
               n="04"
@@ -370,7 +370,7 @@ export default function HowItWorksPage() {
             <Reason
               n="06"
               title="Bigger share = more usage time"
-              body="1 share ≈ 30 days + 3,000 mi/yr. 5 shares ≈ 150 days. 10 shares ≈ year-round access — effectively solo ownership with professional ops on top. Linear scaling, no premium for size."
+              body="1 share ≈ 32 days + 3,200 mi/yr. 5 shares ≈ 160 days. 10 shares ≈ year-round access — effectively solo ownership with professional ops on top. Linear scaling, no premium for size."
             />
             <Reason
               n="07"
@@ -428,10 +428,10 @@ export default function HowItWorksPage() {
               Buyer protection
             </p>
             <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
-              <Pillar label="Tested vehicles" body="CPO + multi-point PPI before any share sells." />
+              <Pillar label="Tested vehicles" body="Certified pre owned + multi-point PPI before any share sells." />
               <Pillar label="Verified members" body="28+, KYC, license & record check before joining." />
               <Pillar label="Encrypted data" body="Member docs & payment info secured in transit and at rest." />
-              <Pillar label="Vehicle warranty" body="Manufacturer or independent CPO warranty in force at handover." />
+              <Pillar label="Vehicle warranty" body="Manufacturer or independent certified pre owned warranty in force at handover." />
               <Pillar label="Transparent costs" body="Pass-through ops invoiced at cost; service fee disclosed up front." />
               <Pillar label="Flexible share sale" body="Member-to-member transfers after 12 months; LLC sale at year 2 / 50K mi." />
             </div>
@@ -468,7 +468,7 @@ export default function HowItWorksPage() {
               of annual ops divided by 30 driving days. It&apos;s what
               every day behind the wheel costs you{" "}
               <span className="italic">while you hold the share</span>,
-              ignoring the buy-in. Roughly $7,080 ÷ 30 days.
+              ignoring the buy-in. Roughly $7,080 ÷ 32 days.
             </p>
             <p>
               Year 1 includes the buy-in as real cash. $34K share +
@@ -476,14 +476,14 @@ export default function HowItWorksPage() {
               one-time $1,500 closing fee is added at signing). At 30
               days driven that&apos;s ~$1,369 per driving day in Year 1
               — still below the cost of renting the same Ferrari for
-              the same 30 days ($2,400/day × 30 = $72,000). And you
+              the same 32 days ($2,400/day × 32 = $76,800). And you
               exit with a transferable share, not a stack of receipts.
             </p>
             <p>
               The bigger number is net cost over the full hold.
               RYDA&apos;s doctrine is a 2-year planned exit (or
               {" "}{(HOLDING_MILES_CAP / 1000).toFixed(0)}K-mile cap,
-              whichever comes first): each curated CPO car is held for
+              whichever comes first): each curated certified pre owned car is held for
               ~2 years, then the LLC sells it and proceeds are
               distributed pro-rata. We model {TARGET_DEPRECIATION_PCT}%
               depreciation over the hold — a conservative middle that
@@ -591,7 +591,7 @@ export default function HowItWorksPage() {
           <div className="mt-10 space-y-6">
             <Faq
               q="Are RYDA co-ownership stakes securities?"
-              a="No. RYDA is a luxury access platform, not an investment platform. Each car is held in a member-managed Delaware LLC where you and your co-owners hold authority over material decisions; RYDA is hired as a service provider via a separate Management Services Agreement. Co-ownership stakes are not registered securities and are not offered for investment purposes."
+              a="No. RYDA is a luxury access platform, not an investment platform. Each car is held in a member-managed LLC where you and your co-owners hold authority over material decisions; RYDA is hired as a service provider via a separate Management Services Agreement. Co-ownership stakes are not registered securities and are not offered for investment purposes."
             />
             <Faq
               q="Can I transfer my share whenever I want?"

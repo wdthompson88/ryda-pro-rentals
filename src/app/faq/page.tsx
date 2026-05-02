@@ -15,15 +15,15 @@ const SECTIONS: { title: string; questions: Q[] }[] = [
     questions: [
       {
         q: "What am I actually buying?",
-        a: "A membership interest in a single-purpose Delaware LLC that owns a specific vehicle. The LLC's only assets are the vehicle, its insurance/operating reserves, and a management contract with RYDA. You hold a registered legal interest, not a club point.",
+        a: "A membership interest in a single-purpose LLC that owns a specific vehicle. The LLC's only assets are the vehicle, its insurance/operating reserves, and a management contract with RYDA. You hold a registered legal interest, not a club point.",
       },
       {
         q: "How many co-ownership shares per vehicle?",
-        a: "10 shares per vehicle by default. Each share entitles you to ~30 days and up to ~3,000 miles of usage per year (100 mi/day allowance). A single member can hold one share or several — usage scales linearly.",
+        a: "10 shares per vehicle by default. Each share entitles you to ~32 days and up to ~3,200 miles of usage per year (100 mi/day allowance). A single member can hold one share or several — usage scales linearly.",
       },
       {
         q: "Are RYDA co-ownership stakes securities?",
-        a: "No. RYDA is a luxury access platform, not an investment platform. Each car is held in a member-managed Delaware LLC where you and 5–10 other co-owners hold authority over material decisions; RYDA is hired as a service provider via a separate management agreement. Co-ownership stakes are not registered securities and are not offered for investment purposes. No accredited-investor verification required.",
+        a: "No. RYDA is a luxury access platform, not an investment platform. Each car is held in a member-managed LLC where you and 1–4 other co-owners hold authority over material decisions; RYDA is hired as a service provider via a separate management agreement. Co-ownership stakes are not registered securities and are not offered for investment purposes. No accredited-investor verification required.",
       },
       {
         q: "Can I transfer my share whenever I want?",
@@ -35,7 +35,7 @@ const SECTIONS: { title: string; questions: Q[] }[] = [
       },
       {
         q: "What if a major mechanical issue comes up?",
-        a: "RYDA only acquires Certified Pre-Owned vehicles, and every car gets a documented multi-point Pre-Purchase Inspection by a marque specialist before the LLC closes on it. Powertrain and major mechanical systems are covered by an active CPO warranty during the LLC's first ownership period. Out-of-warranty repairs come from the LLC's maintenance reserve — not from co-owners' pockets. Co-owners aren't on the hook for surprise engine, transmission, or driveline bills.",
+        a: "RYDA only acquires certified pre owned vehicles, and every car gets a documented multi-point Pre-Purchase Inspection by a marque specialist before the LLC closes on it. Powertrain and major mechanical systems are covered by an active certified pre owned warranty during the LLC's first ownership period. Out-of-warranty repairs come from the LLC's maintenance reserve — not from co-owners' pockets. Co-owners aren't on the hook for surprise engine, transmission, or driveline bills.",
       },
       {
         q: "What if the car gets totaled?",

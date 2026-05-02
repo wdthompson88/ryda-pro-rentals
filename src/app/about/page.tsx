@@ -45,7 +45,7 @@ export default function AboutPage() {
               just didn&apos;t exist in the US.
             </p>
             <p>
-              We built RYDA to fill that gap — member-managed Delaware LLCs,
+              We built RYDA to fill that gap — member-managed LLCs,
               professional ops, US markets. Miami first: highest per-capita
               luxury auto density, no state income tax, year-round driving.
             </p>
@@ -78,7 +78,7 @@ export default function AboutPage() {
               None of those was the right answer for us, or for any of our
               friends who actually wanted to drive an exotic. RYDA is the
               fourth answer. It&apos;s a real ownership stake — title held by
-              a single-purpose Delaware LLC where you and up to nine other
+              a single-purpose LLC where you and up to four other
               verified members are the registered owners. We run the
               operations under a separate Management Services Agreement, the
               same way an aviation club runs the jets it doesn&apos;t own.
@@ -86,7 +86,7 @@ export default function AboutPage() {
             <p>
               The math is simple: a $34K share in a Ferrari 296, plus $7,080 a
               year for insurance, storage, maintenance, and reserves, gets you
-              up to 30 days behind the wheel and a real exit at year two. We
+              up to 32 days behind the wheel and a real exit at year two. We
               model the residual at 90% of buy-in. We don&apos;t pretend the
               car appreciates — it depreciates, and the model accounts for it.
               What you walk away with isn&apos;t a return. It&apos;s the
@@ -95,10 +95,10 @@ export default function AboutPage() {
               equity position to pull off.
             </p>
             <p>
-              We&apos;re vetting the first 100 members for our Miami launch.
-              If this fits how you actually want to use a supercar — own a
-              piece, drive it 30 days a year, never deal with the
-              operational side — we&apos;d like to talk.
+              Miami launches Q3 2026. If this fits how you actually want
+              to use a supercar — own a piece, drive it ~32 days a year,
+              never deal with the operational side — sign up and we&apos;ll
+              be in touch.
             </p>
           </div>
 
@@ -209,7 +209,7 @@ export default function AboutPage() {
           <h2 className="font-display text-3xl text-ink sm:text-4xl">Headquarters</h2>
           <dl className="mt-8 grid max-w-2xl grid-cols-1 gap-5 text-sm sm:grid-cols-2">
             <Fact label="Legal entity" value="RYDA LLC" />
-            <Fact label="Formed under" value="Delaware law" />
+            <Fact label="Structure" value="Member-managed LLC per vehicle" />
             <Fact label="Headquarters" value="Miami, FL — by appointment" />
             <Fact label="Operating markets" value="Miami (2026) · LA (2027) · NY (2027)" />
             <Fact label="General" value="hello@ryda.com" />
@@ -227,7 +227,8 @@ export default function AboutPage() {
             Become a member.
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
-            We're vetting early members for the Miami launch.
+            Miami launches Q3 2026. Create your account to browse the
+            fleet and claim a share when membership opens.
           </p>
           <Link
             href="/signup"

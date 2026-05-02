@@ -36,13 +36,13 @@ export default function PressPage() {
           <dl className="mt-10 space-y-5 text-sm">
             <Fact label="Founded" value="2026" />
             <Fact label="Headquarters" value="Miami, FL" />
-            <Fact label="Legal entity" value="RYDA LLC (Delaware)" />
+            <Fact label="Legal entity" value="RYDA LLC" />
             <Fact label="Stage" value="Seed (raising)" />
             <Fact label="Markets" value="Miami (2026), Los Angeles (2027), New York (2027)" />
             <Fact label="Product" value="Daily supercar rentals + member-only fractional co-ownership" />
             <Fact
               label="Model"
-              value="Each vehicle is held in a member-managed single-purpose Delaware LLC. 5–10 verified members co-own and manage the LLC together; RYDA is hired as the operations service provider."
+              value="Each vehicle is held in a member-managed single-purpose LLC. up to 5 verified members co-own and manage the LLC together; RYDA is hired as the operations service provider."
             />
             <Fact
               label="Effective customer cost"

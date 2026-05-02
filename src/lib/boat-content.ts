@@ -1,6 +1,6 @@
-// Body copy for the RYDA Boats marketing surfaces. Same tone as the
-// cars side — direct, asset-backed, no fluff. Lives separately from
-// boat-data.ts so the data file stays focused on the fleet schema.
+// Body copy for the RYDA Boats marketing surfaces. Lives separately
+// from boat-data.ts so the data file stays focused on the fleet
+// schema; this file is just strings.
 
 export const HERO_EYEBROW = "RYDA Boats · Miami launch · Q3 2026";
 export const HERO_HEADLINE = {
@@ -8,16 +8,16 @@ export const HERO_HEADLINE = {
   highlight: "most beautiful boats.",
 };
 export const HERO_SUBHEAD =
-  "Each boat is held in a member-managed Delaware LLC. Up to 10 verified members co-own every hull. RYDA runs the operations end-to-end — slip, captain, fuel, insurance, hurricane prep. Three-year planned exit; transferable to other members after twelve months.";
+  "Each boat is held in a member-managed LLC. Up to 5 verified members co-own every hull, with a 2-share minimum per person. RYDA runs the operations end-to-end — slip, captain, fuel, insurance, hurricane prep. Three-year planned exit; transferable to other members after twelve months.";
 
 export const PORTFOLIO_HERO = {
   eyebrow: "RYDA Portfolio · Boats",
   headline: {
     prefix: "Floating real estate,",
-    highlight: "held in a Delaware LLC.",
+    highlight: "held in an LLC.",
   },
   subhead:
-    "Four flagship hulls in Biscayne Bay today. LA + NY in 2027. Same structure that runs the cars side: 10 co-owners per hull, 30 days/share/year, 1,500 nautical miles included, three-year planned exit.",
+    "Four flagship hulls in Biscayne Bay today. LA + NY in 2027. Up to 5 co-owners per hull (2-share minimum), 32 days/share/year, 1,600 nautical miles included, three-year planned exit.",
 };
 
 // Five-step model for the /boats/how-it-works page (and home overview).
@@ -25,27 +25,27 @@ export const HOW_IT_WORKS_STEPS: { n: string; title: string; body: string }[] = 
   {
     n: "01",
     title: "Verify",
-    body: "Apply, complete identity verification, and confirm RYDA Boats membership requirements (age 28+, driving record / boating record review for any member who'd skipper bareboat).",
+    body: "Apply and complete identity verification.",
   },
   {
     n: "02",
     title: "Choose",
-    body: "Browse the curated fleet. Every boat is buyer-surveyed before a single share is sold — hull, rigging, engine compression, sea trial, and an independent marine survey from a Coast Guard-certified surveyor. Co-owners are protected from inheriting major mechanical or structural issues.",
+    body: "Browse the curated fleet. Every boat passes a multi-point Pre-Purchase Inspection by the dealer before a single share is sold.",
   },
   {
     n: "03",
     title: "Co-own",
-    body: "Up to 10 members form a Delaware LLC together to hold the vessel. Coast Guard documentation is filed in the LLC's name. You sign the operating agreement and the management services agreement, then fund your share to escrow.",
+    body: "RYDA forms a LLC for up to 5 members to hold the vessel. You sign the operating agreement and fund your share (2 shares minimum per person).",
   },
   {
     n: "04",
     title: "Cruise",
-    body: "Book on the RYDA app. Each share unlocks ~30 days and ~1,500 nautical miles a year (50 nm/day allowance). All trips are crewed by default — RYDA-vetted captain, mate, and (for sport yachts) chef. Bareboat is available for USCG-licensed members on the Riva and the Lagoon.",
+    body: "Book your time on the RYDA smart calendar. Each share unlocks ~32 days and ~1,600 nautical miles a year (50 nm/day).",
   },
   {
     n: "05",
     title: "Exit",
-    body: "Default exit: RYDA sells the boat at year 3, distributes proceeds pro-rata. We model a ~15% depreciation hit across the 3-year hold (boats hold differently than cars — a Riva can appreciate, a Pershing depreciates faster). Need out earlier? Transfer your share to another verified member after the 12-month minimum hold.",
+    body: "RYDA sells the boat at year 2–3 OR a defined operating-hours threshold depending on the certified pre owned program. Proceeds split pro-rata. Need out earlier? Transfer your share to another verified member after the 12-month minimum hold.",
   },
 ];
 
@@ -79,10 +79,10 @@ export const FAQ_ITEMS: FaqItem[] = [
   },
   {
     q: "How does Coast Guard documentation work with the LLC?",
-    a: "Each boat is documented federally with the US Coast Guard in the LLC's name (e.g. \"Wajer 55 S RYDA LLC\"). Members are not on the document — the LLC is. State sales-tax mitigation strategies (Delaware sales-tax-free purchase, offshore documentation, or charter-fleet exemptions where applicable) are evaluated case-by-case with the LLC's tax counsel. RYDA does not provide tax advice; we coordinate with the LLC's accountant.",
+    a: "Each boat is documented federally with the US Coast Guard in the LLC's name (e.g. \"Wajer 55 S RYDA LLC\"). Members are not on the document — the LLC is. State sales-tax mitigation strategies (sales-tax-free purchase, offshore documentation, or charter-fleet exemptions where applicable) are evaluated case-by-case with the LLC's tax counsel. RYDA does not provide tax advice; we coordinate with the LLC's accountant.",
   },
   {
     q: "Why is the planned exit 3 years instead of 2 like the cars?",
-    a: "Boats and cars have different depreciation curves. Curated CPO sport cars take a steep first-year hit and then flatten — a 2-year hold optimizes for resale before the next-generation model launches. Boats depreciate more slowly, with classic models (the Aquariva is the obvious example) sometimes appreciating with the right buyer. A 3-year hold lets us realize a stronger residual on the median sale and aligns with the typical owner usage pattern. Same 12-month minimum hold and member-to-member transfer mechanics apply in case you need to exit earlier.",
+    a: "Boats and cars have different depreciation curves. Curated certified pre owned sport cars take a steep first-year hit and then flatten — a 2-year hold optimizes for resale before the next-generation model launches. Boats depreciate more slowly, with classic models (the Aquariva is the obvious example) sometimes appreciating with the right buyer. A 3-year hold lets us realize a stronger residual on the median sale and aligns with the typical owner usage pattern. Same 12-month minimum hold and member-to-member transfer mechanics apply in case you need to exit earlier.",
   },
 ];

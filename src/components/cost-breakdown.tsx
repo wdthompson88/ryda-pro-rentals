@@ -167,7 +167,7 @@ export function CostBreakdown({
 
           <p className="mt-3 text-[11px] text-mute">
             Same {TARGET_DEPRECIATION_PCT}% depreciation assumption applies —
-            our CPO maintenance + 100 mi/day shareholder allowance keep
+            our certified pre owned maintenance + 100 mi/day shareholder allowance keep
             the resale story consistent whether you drive or rent it out.
           </p>
           <p className="mt-1 text-[11px] text-mute">
@@ -180,7 +180,7 @@ export function CostBreakdown({
 
       <div className="border-t border-rule bg-cream-2/40 px-6 py-3">
         <p className="text-[11px] leading-relaxed text-mute">
-          Doctrine: RYDA holds each curated CPO car for {HOLDING_YEARS} years,
+          Doctrine: RYDA holds each curated certified pre owned car for {HOLDING_YEARS} years,
           then sells it and distributes proceeds pro-rata. Modeled at{" "}
           {TARGET_DEPRECIATION_PCT}% depreciation — actual sale price varies
           by model, mileage, and market conditions.

@@ -60,9 +60,9 @@ export default async function OpenGraphImage() {
           }}
         >
           <span style={{ color: "#D4CFC4" }}>
-            Co-own a curated CPO Ferrari, Lamborghini, or McLaren —&nbsp;
+            Co-own a curated certified pre owned Ferrari, Lamborghini, or McLaren —&nbsp;
           </span>
-          <span style={{ color: "#DC4747" }}>~30 days a year per share.</span>
+          <span style={{ color: "#DC4747" }}>~32 days a year per share.</span>
         </div>
         <div
           style={{
@@ -79,7 +79,7 @@ export default async function OpenGraphImage() {
             fontWeight: 500,
           }}
         >
-          <div>2-yr planned exit · Member-managed Delaware LLC</div>
+          <div>2-yr planned exit · Member-managed LLC</div>
           <div>Miami today</div>
         </div>
       </div>

@@ -36,11 +36,11 @@ export const HELP: HelpCategory[] = [
         slug: "what-is-ryda",
         q: "What is RYDA, in one paragraph?",
         summary:
-          "Supercar co-ownership and rentals. Each vehicle is held in a single-purpose, member-managed Delaware LLC; up to 10 verified members co-own and manage it together. Members can also rent any car in the fleet by the day.",
+          "Supercar co-ownership and rentals. Each vehicle is held in a single-purpose, member-managed LLC; up to 5 verified members co-own and manage it together. Members can also rent any car in the fleet by the day.",
         body: [
           {
             type: "p",
-            text: "RYDA is a US member-managed supercar co-ownership platform. Each vehicle in the fleet is held in a single-purpose Delaware LLC with 10 shares. Each share entitles its holder to ~30 days and ~3,000 miles per year (100 mi/day allowance). Members can hold one share or several — usage and cost scale linearly. A 5-share holder gets ~150 days; a 10-share holder is essentially the solo owner with professional ops.",
+            text: "RYDA is a US member-managed supercar co-ownership platform. Each vehicle in the fleet is held in a single-purpose LLC with 10 shares (up to 5 members). Each share entitles its holder to ~32 days and ~3,200 miles per year (100 mi/day allowance). Members can hold one share or several — usage and cost scale linearly. A 5-share holder gets ~150 days; a 10-share holder is essentially the solo owner with professional ops.",
           },
           {
             type: "p",
@@ -64,7 +64,7 @@ export const HELP: HelpCategory[] = [
           },
           {
             type: "p",
-            text: "A RYDA share is a registered LLC membership interest in a Delaware entity that owns a specific vehicle. You're a partial owner of the actual asset. Three things follow from that:",
+            text: "A RYDA share is a registered LLC membership interest in a entity that owns a specific vehicle. You're a partial owner of the actual asset. Three things follow from that:",
           },
           {
             type: "ul",
@@ -131,7 +131,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Why the structure works without accreditation" },
           {
             type: "p",
-            text: "Each car is held in a Delaware LLC that you and the other verified members manage together — 5 to 10 co-owners total. RYDA operates the car under a separate management services agreement — but the LLC itself is yours. You're not buying a passive investment product; you're buying the right to use a car you and your co-owners actually own. Because the structure is consumption-first (real ownership, real usage rights, no profit expectation), it falls outside SEC investment-contract classification.",
+            text: "Each car is held in an LLC that you and the other verified members manage together — 5 to 10 co-owners total. RYDA operates the car under a separate management services agreement — but the LLC itself is yours. You're not buying a passive investment product; you're buying the right to use a car you and your co-owners actually own. Because the structure is consumption-first (real ownership, real usage rights, no profit expectation), it falls outside SEC investment-contract classification.",
           },
         ],
       },
@@ -281,7 +281,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "1. Pick the vehicle" },
           {
             type: "p",
-            text: "Browse the fleet at /markets, pick a vehicle and the number of shares you want. Each vehicle is held in a separate Delaware LLC. RYDA's default share count is 10 per vehicle.",
+            text: "Browse the fleet at /markets, pick a vehicle and the number of shares you want. Each vehicle is held in a separate LLC. RYDA's default share count is 10 per vehicle.",
           },
           { type: "h3", text: "2. Identity verification (KYC)" },
           {
@@ -342,12 +342,12 @@ export const HELP: HelpCategory[] = [
         slug: "entitlement",
         q: "What does a co-ownership share actually entitle me to?",
         summary:
-          "~30 days and up to ~3,000 miles per share per year (100 mi/day allowance; members can hold 1–10 shares), voting rights on material LLC decisions, and pro-rata participation in the LLC's assets at dissolution.",
+          "~32 days and up to ~3,200 miles per share per year (100 mi/day allowance; members can hold 1–10 shares), voting rights on material LLC decisions, and pro-rata participation in the LLC's assets at dissolution.",
         body: [
           { type: "h3", text: "Usage" },
           {
             type: "p",
-            text: "Each share entitles you to ~30 days and up to ~3,000 miles of vehicle usage per year (100 mi/day allowance), with the exact entitlement set per vehicle when the LLC is formed. Members can hold one share or several — usage scales linearly (5 shares ≈ 150 days; 10 shares ≈ 300 days, with the rest reserved for service and rental pool). Days are booked on a shared calendar with the other co-owners. Fair-use rules cap consecutive days during peak season.",
+            text: "Each share entitles you to ~32 days and up to ~3,200 miles of vehicle usage per year (100 mi/day allowance), with the exact entitlement set per vehicle when the LLC is formed. Members can hold one share or several — usage scales linearly (5 shares ≈ 150 days; 10 shares ≈ 300 days, with the rest reserved for service and rental pool). Days are booked on a shared calendar with the other co-owners. Fair-use rules cap consecutive days during peak season.",
           },
           { type: "h3", text: "Membership" },
           {
@@ -454,7 +454,7 @@ export const HELP: HelpCategory[] = [
               "Transfer paperwork and updated Operating Agreement signatures from the new co-owner.",
               "KYC verification and driving record check on the new co-owner.",
               "Updated certificates of insurance and updated LLC member register entry for the new co-owner.",
-              "Registry update with Delaware Division of Corporations.",
+              "Registry update with the LLC's state registrar.",
               "Onboarding of the new member into the booking calendar with the other co-owners.",
             ],
           },
@@ -514,7 +514,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "What you trade away" },
           {
             type: "p",
-            text: "Three things: exclusive use of the vehicle (you share with 5–9 other co-owners), unilateral decision-making (modifications and sale require co-owner vote), and the 'always there' factor (the car isn't always physically yours).",
+            text: "Three things: exclusive use of the vehicle (you share with 5–4 other co-owners), unilateral decision-making (modifications and sale require co-owner vote), and the 'always there' factor (the car isn't always physically yours).",
           },
           { type: "h3", text: "What you gain" },
           {
@@ -527,7 +527,7 @@ export const HELP: HelpCategory[] = [
           },
           {
             type: "p",
-            text: "Bottom line: if you'd drive a solo-owned exotic 60+ days a year and you love the operational responsibility, buy outright. If you'd drive 10–30 days a year and prefer to outsource the rest, share.",
+            text: "Bottom line: if you'd drive a solo-owned exotic 60+ days a year and you love the operational responsibility, buy outright. If you'd drive 10–32 days a year and prefer to outsource the rest, share.",
           },
         ],
       },
@@ -724,11 +724,11 @@ export const HELP: HelpCategory[] = [
         slug: "mileage",
         q: "Mileage limits and overages",
         summary:
-          "Standard share = 3,000 miles/year (100 mi/day × 30 days). Overages billed at $4/mile. Track miles excluded under the track-day rider.",
+          "Standard share = 3,200 miles/year (100 mi/day × 30 days). Overages billed at $4/mile. Track miles excluded under the track-day rider.",
         body: [
           {
             type: "p",
-            text: "Each share gets ~3,000 miles per year (100 mi/day × ~30 days). Tracking is automatic from vehicle telemetry — you'll see real-time mileage status in your dashboard.",
+            text: "Each share gets ~3,200 miles per year (100 mi/day × ~30 days). Tracking is automatic from vehicle telemetry — you'll see real-time mileage status in your dashboard.",
           },
           { type: "h3", text: "Why a cap exists" },
           {
@@ -1449,7 +1449,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Vehicle management fee" },
           {
             type: "p",
-            text: "All-in fee charged to the LLC, billed quarterly, paid pro-rata by co-owners. On a $340K Ferrari with 10 shares, the LLC's annual fee runs ~$70,800 ($7,080 per share, ~$1,770/quarter for a one-share holder). The fee covers RYDA's service component plus pass-through costs (insurance, storage, scheduled maintenance, depreciation reserves). Range across the fleet: ~7–9% of vehicle value depending on the model.",
+            text: "All-in fee charged to the LLC, billed quarterly, paid pro-rata by co-owners. On a $340K Ferrari with 10 shares (up to 5 members), the LLC's annual fee runs ~$70,800 ($7,080 per share, ~$1,770/quarter for a one-share holder). The fee covers RYDA's service component plus pass-through costs (insurance, storage, scheduled maintenance, depreciation reserves). Range across the fleet: ~7–9% of vehicle value depending on the model.",
           },
           { type: "h3", text: "Per-booking charges" },
           {
@@ -1489,7 +1489,7 @@ export const HELP: HelpCategory[] = [
             type: "ul",
             items: [
               "Annual statement summarizing your contributions, fees paid, and usage for the year.",
-              "Member directory entries for each LLC you co-own (Delaware LLC records).",
+              "Member directory entries for each LLC you co-own (LLC records).",
               "If applicable, a state sales/use tax statement on your buy-in (varies by state).",
               "If the LLC has incidental rental income (e.g., off-utilized days rented to non-members), an informational K-1 reflecting your pro-rata share. Most members will not have this.",
             ],
@@ -1670,7 +1670,7 @@ export const HELP: HelpCategory[] = [
               "Default remedies (what happens if a member stops paying or repeatedly causes damage).",
               "Distribution waterfall (how proceeds flow on a sale or total loss).",
               "Exit terms (12-month minimum hold, member-to-member transfer process, no guaranteed buyer or price).",
-              "Dispute resolution (mandatory mediation, then arbitration in Delaware).",
+              "Dispute resolution (mandatory mediation, then arbitration under AAA rules).",
             ],
           },
           {
@@ -1684,12 +1684,12 @@ export const HELP: HelpCategory[] = [
         slug: "member-managed-llc",
         q: "What is a member-managed LLC, and why does RYDA use it?",
         summary:
-          "It's a Delaware LLC where the members (the co-owners) hold authority over material decisions — not an outside manager. This is what keeps RYDA a luxury access platform, not an investment product.",
+          "It's an LLC where the members (the co-owners) hold authority over material decisions — not an outside manager. This is what keeps RYDA a luxury access platform, not an investment product.",
         body: [
           { type: "h3", text: "Two types of LLC governance" },
           {
             type: "p",
-            text: "Delaware LLCs come in two flavors: manager-managed and member-managed.",
+            text: "LLCs come in two flavors: manager-managed and member-managed.",
           },
           {
             type: "ul",
@@ -1725,11 +1725,11 @@ export const HELP: HelpCategory[] = [
         slug: "securities",
         q: "Are RYDA co-ownership stakes securities?",
         summary:
-          "No. They are LLC membership interests in a member-managed Delaware LLC where you actually co-own and use the vehicle. Not registered securities. Not offered for investment purposes.",
+          "No. They are LLC membership interests in a member-managed LLC where you actually co-own and use the vehicle. Not registered securities. Not offered for investment purposes.",
         body: [
           {
             type: "p",
-            text: "No. RYDA is a luxury access platform, not an investment platform. Each car is held in a member-managed Delaware LLC that you and your co-owners run together. RYDA provides operations under a separate management services agreement. The arrangement is consumption-first — real ownership of a real car, with real usage rights — not a passive investment product.",
+            text: "No. RYDA is a luxury access platform, not an investment platform. Each car is held in a member-managed LLC that you and your co-owners run together. RYDA provides operations under a separate management services agreement. The arrangement is consumption-first — real ownership of a real car, with real usage rights — not a passive investment product.",
           },
           { type: "h3", text: "Why this isn't a security" },
           {
@@ -1827,7 +1827,7 @@ export const HELP: HelpCategory[] = [
         slug: "dispute-resolution",
         q: "How do disagreements between co-owners get resolved?",
         summary:
-          "Most disagreements never escalate — RYDA Operations enforces the Operating Agreement consistently. For ones that do: mandatory mediation first, then arbitration in Delaware.",
+          "Most disagreements never escalate — RYDA Operations enforces the Operating Agreement consistently. For ones that do: mandatory mediation first, then arbitration under AAA rules.",
         body: [
           { type: "h3", text: "Day-to-day governance" },
           {
@@ -1848,9 +1848,9 @@ export const HELP: HelpCategory[] = [
             type: "ul",
             items: [
               "Written notice with 30 days for cure.",
-              "Mandatory mediation (60 days) with a Delaware-based mediator.",
-              "If mediation fails: binding arbitration in Wilmington, Delaware under AAA rules.",
-              "Litigation only as a last resort, with a Delaware forum-selection clause.",
+              "Mandatory mediation (60 days) with a neutral mediator.",
+              "If mediation fails: binding arbitration in under AAA rules under AAA rules.",
+              "Litigation only as a last resort, with a forum-selection clause.",
             ],
           },
           {
@@ -1953,7 +1953,7 @@ export const HELP: HelpCategory[] = [
             type: "ul",
             items: [
               "Trips of 500+ miles or 5+ days: file an extended-trip notification with Service 14 days in advance. Insurance documentation, route filing, mid-trip support pre-arranged.",
-              "Mileage budget: long road trips can eat into your annual 3,000-mile allotment (100 mi/day × 30 days). Plan accordingly or pay the $4/mile overage.",
+              "Mileage budget: long road trips can eat into your annual 3,200-mile allotment (100 mi/day × 30 days). Plan accordingly or pay the $4/mile overage.",
               "Cross-state borders: insurance covers all 50 contiguous states. Mexico and Canada need a separate process.",
             ],
           },

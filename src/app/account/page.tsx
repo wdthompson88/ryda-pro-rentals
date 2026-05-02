@@ -74,7 +74,7 @@ export default function AccountPage() {
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10">
           <h2 className="font-display text-2xl text-ink">Upcoming charges</h2>
           <ul className="mt-6 divide-y divide-rule rounded-xl border border-rule bg-surface">
-            <Charge label="White-glove delivery (Apr 28)" amount="$0" sub="Blue tier — included" />
+            <Charge label="White-glove delivery (Apr 28)" amount="—" sub="Blue tier — included" />
             <Charge label="Q3 management fee · Ferrari 296" amount="$1,700" sub="Due Jul 1, 2026" />
             <Charge label="Q3 management fee · McLaren 750S" amount="$1,500" sub="Due Jul 1, 2026" />
             <Charge label="Annual insurance · Ferrari 296" amount="$1,833" sub="Due Sep 15, 2026" />

@@ -170,12 +170,12 @@ export function BoatCostBreakdown({
 
           <p className="mt-3 text-[11px] text-mute">
             Same {BOATS_TARGET_DEPRECIATION_PCT}% depreciation assumption
-            applies whether you cruise or charter — surveyed CPO hulls and
+            applies whether you cruise or charter — surveyed certified pre owned hulls and
             shareholder mileage caps keep the resale story consistent.
           </p>
           <p className="mt-1 text-[11px] text-mute">
             Illustrative usage-economics only. Co-ownership shares are
-            member-managed Delaware LLC interests, not securities; modeled
+            member-managed LLC interests, not securities; modeled
             outcomes are not guaranteed and not an investment offer.
           </p>
         </div>

@@ -172,7 +172,7 @@ function SignInPageInner() {
                   disabled={
                     submitting || submittingMagic || !email.includes("@") || password.length < 1
                   }
-                  className="inline-flex h-12 w-full items-center justify-center border border-ink bg-ink px-7 text-sm font-medium text-cream transition-colors hover:bg-red hover:border-red disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex h-12 w-full items-center justify-center rounded-full border border-red bg-red px-7 text-sm font-medium text-cream transition-colors hover:bg-red-deep hover:border-red-deep active:bg-red-deep disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {submitting ? "Signing in…" : "Sign in"}
                 </button>
@@ -180,7 +180,8 @@ function SignInPageInner() {
 
               {/* Magic link as secondary action below the form. Subtle
                   rule + tracked label so it reads as "another way" not
-                  "competing primary action." */}
+                  "competing primary action." Red default with subtle
+                  highlight on hover/active per CEO request. */}
               <div className="mt-8 border-t border-rule pt-6 text-center">
                 <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-mute">
                   Or
@@ -189,7 +190,7 @@ function SignInPageInner() {
                   type="button"
                   onClick={onMagicLink}
                   disabled={submitting || submittingMagic || !email.includes("@")}
-                  className="mt-3 text-sm font-medium text-ink-soft underline-offset-4 transition-colors hover:text-ink hover:underline disabled:cursor-not-allowed disabled:opacity-50"
+                  className="mt-3 text-sm font-medium text-red underline-offset-4 transition-colors hover:text-red-deep hover:underline active:text-red-deep disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {submittingMagic ? "Sending…" : "Send me a magic link instead"}
                 </button>

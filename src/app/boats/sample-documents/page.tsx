@@ -18,7 +18,7 @@ const DOCS = [
     items: [
       {
         title: "Operating Agreement (sample)",
-        meta: "Delaware LLC · ~36 pages · v1.0",
+        meta: "LLC · ~36 pages · v1.0",
         purpose:
           "The LLC's constitution. Spells out share allocation, voting thresholds (75% supermajority for sales/modifications), distribution waterfall on dissolution, transfer rules (12-month minimum hold, 3% transfer fee), default remedies for delinquent members, peak-window protection rules, and the rights of each co-owner.",
         signedBy: "Every co-owner at closing",

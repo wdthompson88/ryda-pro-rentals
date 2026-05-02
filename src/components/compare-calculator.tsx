@@ -23,7 +23,7 @@ export function CompareCalculator({
 } = {}) {
   // Educational tool — let users model 1..vehicle.shares regardless of
   // current inventory. Real availability lives on each vehicle's listing.
-  // Defaults reflect the doctrinal CPO 2-year planned exit.
+  // Defaults reflect the doctrinal certified pre owned 2-year planned exit.
   const initial =
     lockedVehicle ?? VEHICLES.find((v) => v.symbol === "F296") ?? VEHICLES[0];
   const [vehicleSymbol, setVehicleSymbol] = useState(initial.symbol);
@@ -63,7 +63,7 @@ export function CompareCalculator({
 
     // Residual: what proceeds you'd get back at exit (LLC sale or
     // member-to-member transfer). Held constant across drive-only and
-    // rental scenarios — CPO maintenance + curated mileage caps keep
+    // rental scenarios — certified pre owned maintenance + curated mileage caps keep
     // the resale story consistent regardless of utilization.
     const residual = Math.round(buyIn * (residualPct / 100));
 
@@ -167,7 +167,7 @@ export function CompareCalculator({
         Co-own vs. rent — your numbers.
       </h3>
       <p className="mt-3 max-w-xl text-sm text-ink-soft">
-        Move the sliders. The math is honest: each curated CPO car is held
+        Move the sliders. The math is honest: each curated certified pre owned car is held
         for {HOLDING_YEARS} years (the default), then sold and proceeds are
         returned pro-rata. The calculator subtracts your estimated share
         sale from your total cash to show real{" "}
@@ -246,7 +246,7 @@ export function CompareCalculator({
           max={5}
           step={1}
           valueLabel={`${holdYears} ${holdYears === 1 ? "year" : "years"}`}
-          subLabel={`Default: ${HOLDING_YEARS}-yr CPO exit baseline · 12-month minimum hold`}
+          subLabel={`Default: ${HOLDING_YEARS}-yr certified pre owned exit baseline · 12-month minimum hold`}
         />
 
         <Slider
@@ -258,7 +258,7 @@ export function CompareCalculator({
           max={100}
           step={5}
           valueLabel={`${residualPct}%`}
-          subLabel={`Default ${DEFAULT_RESIDUAL_PCT}% — assumes ~${TARGET_DEPRECIATION_PCT}% depreciation over ${HOLDING_YEARS} yrs on low-mileage CPO exotics`}
+          subLabel={`Default ${DEFAULT_RESIDUAL_PCT}% — assumes ~${TARGET_DEPRECIATION_PCT}% depreciation over ${HOLDING_YEARS} yrs on low-mileage certified pre owned exotics`}
         />
       </div>
 
@@ -294,7 +294,7 @@ export function CompareCalculator({
             </p>
             <p className="mt-2 text-xs text-mute">
               Same {TARGET_DEPRECIATION_PCT}% depreciation assumption
-              applies — our 100 mi/day allowance + CPO maintenance keep
+              applies — our 100 mi/day allowance + certified pre owned maintenance keep
               the resale story consistent whether you drive or rent it
               out.
             </p>

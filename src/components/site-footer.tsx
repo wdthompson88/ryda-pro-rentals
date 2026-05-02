@@ -17,7 +17,7 @@ export function SiteFooter() {
               <p className="font-display text-3xl text-ink">RYDA</p>
               <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-ink-soft">
                 Luxury vehicle access — Cars, Boats, and (soon) Planes.
-                Member-managed Delaware LLCs, professionally operated.
+                Member-managed LLCs, professionally operated.
                 Miami launching Q3 2026.
               </p>
             </div>
@@ -62,7 +62,6 @@ export function SiteFooter() {
               ["Rent", "/rent"],
               ["Membership", "/membership"],
               ["How it works", "/how-it-works"],
-              ["Track day", "/track-day"],
               ["Insurance", "/insurance"],
               ["Storage", "/storage"],
               ["FAQ", "/faq"],
@@ -89,7 +88,7 @@ export function SiteFooter() {
               ["Trust & safety", "/trust-and-safety"],
               ["Member protection", "/member-protection"],
               ["Sustainability", "/sustainability"],
-              ["Host your car", "/host-your-car"],
+              ["Host your vehicle", "/host-your-car"],
               ["Help center", "/help"],
             ]}
           />
@@ -101,10 +100,6 @@ export function SiteFooter() {
               ["Press", "/press"],
               ["Careers", "/careers"],
               ["Contact", "/contact"],
-              ["RYDA vs Turo", "/vs/turo"],
-              ["RYDA vs Marengo", "/vs/marengo"],
-              ["RYDA vs Supercar Club", "/vs/supercar-club"],
-              ["RYDA Boats vs Boatsetter", "/boats/vs/boatsetter"],
             ]}
           />
         </div>
@@ -113,7 +108,7 @@ export function SiteFooter() {
       {/* Legal bottom strip */}
       <div className="border-t border-rule">
         <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-3 px-6 py-6 text-xs text-mute sm:flex-row sm:items-center sm:px-10">
-          <p>© {new Date().getFullYear()} RYDA LLC · Formed under Delaware law</p>
+          <p>© {new Date().getFullYear()} RYDA LLC · Formed under applicable LLC law</p>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
             <Link href="/legal/privacy" className="hover:text-ink">
               Privacy

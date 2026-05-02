@@ -60,9 +60,9 @@ export default async function OpenGraphImage() {
           }}
         >
           <span style={{ color: "#D4CFC4" }}>
-            Floating real estate, held in a Delaware LLC —&nbsp;
+            Floating real estate, held in an LLC —&nbsp;
           </span>
-          <span style={{ color: "#4A90D9" }}>~30 days a year per share.</span>
+          <span style={{ color: "#4A90D9" }}>~32 days a year per share.</span>
         </div>
         <div
           style={{
@@ -79,7 +79,7 @@ export default async function OpenGraphImage() {
             fontWeight: 500,
           }}
         >
-          <div>3-yr planned exit · Member-managed Delaware LLC</div>
+          <div>3-yr planned exit · Member-managed LLC</div>
           <div>Miami launch · Q3 2026</div>
         </div>
       </div>

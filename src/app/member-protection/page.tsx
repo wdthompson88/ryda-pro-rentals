@@ -49,7 +49,7 @@ export default function MemberProtectionPage() {
             <Step
               n="02"
               title="Release to the LLC"
-              body="Once conditions clear, escrow releases funds to the LLC's bank account — not to RYDA. The LLC is a separate Delaware legal entity with its own bank account, its own EIN, and its own books. RYDA is a vendor to the LLC."
+              body="Once conditions clear, escrow releases funds to the LLC's bank account — not to RYDA. The LLC is a separate legal entity with its own bank account, its own EIN, and its own books. RYDA is a vendor to the LLC."
             />
             <Step
               n="03"
@@ -122,7 +122,7 @@ export default function MemberProtectionPage() {
             </div>
           </div>
           <p className="mt-4 max-w-3xl text-xs text-mute">
-            Co-ownership shares are member-managed Delaware LLC interests.
+            Co-ownership shares are member-managed LLC interests.
             The vehicle is held on title in the LLC's name; you hold a
             registered legal interest in the LLC. Real asset, real
             ownership — not a financial instrument and not an

@@ -1,9 +1,9 @@
 // Boat fleet data — RYDA Boats vertical.
 // Mirrors src/lib/market-data.ts (cars) so the boats surfaces can use
 // equivalent helpers and types. Boats parity intentionally close to
-// cars where it makes sense (10 shares, 30 days/share/yr, two-tier
+// cars where it makes sense (10 shares, 32 days/share/yr, two-tier
 // booking) and explicitly different where the asset class demands it
-// (3-year hold vs cars' 2, 1500 nm/yr instead of miles, captain
+// (3-year hold vs cars' 2, 1,600 nm/yr instead of miles, captain
 // included by default, peak protection adapted for boating season).
 
 import { formatUSD } from "@/lib/market-data";
@@ -299,12 +299,12 @@ export const BOATS: Boat[] = [
 // Boats hold longer than cars (3 vs 2 years) because the asset class
 // has a slower depreciation curve and members typically build a
 // stronger relationship with a boat. We model 15% depreciation across
-// the 3-year hold — slightly steeper than the curated CPO car fleet's
+// the 3-year hold — slightly steeper than the curated certified pre owned car fleet's
 // 10% across 2 years, but still conservative for sport-yacht categories.
 
 export const BOATS_HOLDING_YEARS = 3;
 export const BOATS_TARGET_DEPRECIATION_PCT = 15;
-export const NM_PER_DAY_PER_SHARE = 50; // 30 days × 50 nm = 1,500 nm/yr
+export const NM_PER_DAY_PER_SHARE = 50; // 32 days × 50 nm = 1,600 nm/yr
 export const BOATS_DAYS_PER_SHARE = 30;
 // Engine-hours equivalent of cars' 50K-mile cap. ~2,000 engine hours
 // is the conventional threshold where major service (engines, rigging,

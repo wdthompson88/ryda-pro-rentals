@@ -130,26 +130,34 @@ export default function MiamiPage() {
         </div>
       </section>
 
-      {/* Early members */}
+      {/* Sign up */}
       <section className="border-b border-rule bg-ink py-20 text-cream">
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            Miami member cohort
+            Members · Miami
           </p>
           <h2 className="mt-4 font-display text-4xl font-light sm:text-5xl">
-            The first 100 members.
+            Become a member.
           </h2>
           <p className="mx-auto mt-6 max-w-xl text-base text-cream/70">
-            We're hand-selecting the first 100 members for the Miami launch.
-            Members joining before launch lock in pricing for life. Sign up to
-            be considered.
+            Miami launches Q3 2026. Create your account to browse the
+            fleet, run the numbers, and claim a share when membership
+            opens.
           </p>
-          <Link
-            href="/signup"
-            className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-red hover:text-cream"
-          >
-            Sign up →
-          </Link>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <Link
+              href="/signup"
+              className="inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink transition-colors hover:bg-red hover:text-cream"
+            >
+              Sign up →
+            </Link>
+            <Link
+              href="/signin"
+              className="inline-flex h-12 items-center justify-center rounded-full border border-cream/30 px-7 text-sm font-medium text-cream transition-colors hover:border-red hover:text-red"
+            >
+              Sign in
+            </Link>
+          </div>
         </div>
       </section>
     </>

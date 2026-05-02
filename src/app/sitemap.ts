@@ -2,13 +2,12 @@ import type { MetadataRoute } from "next";
 import { VEHICLES } from "@/lib/market-data";
 import { BOATS } from "@/lib/boat-data";
 import { POSTS as JOURNAL_POSTS } from "@/lib/journal-content";
-import { CARS_VS_SLUGS, BOATS_VS_SLUGS } from "@/lib/vs-comparisons";
 
 // Sitemap of every crawlable, public RYDA route. Generated at build
 // time. Three categories:
 //   1. Static landing pages (hand-maintained list below).
 //   2. Per-vehicle dynamic routes derived from /lib/market-data.
-//   3. Per-boat + per-journal-post + per-vs dynamic routes.
+//   3. Per-boat + per-journal-post dynamic routes.
 //
 // Routes that are gated, member-only, or stub previews (e.g. /portfolio,
 // /onboarding, /bookings/*, /admin/*) are intentionally NOT listed.
@@ -27,7 +26,6 @@ const PUBLIC_ROUTES = [
   "/about",
   "/insurance",
   "/storage",
-  "/track-day",
   "/trust-and-safety",
   "/sustainability",
   "/host-your-car",
@@ -38,7 +36,6 @@ const PUBLIC_ROUTES = [
   "/investors",
   "/inside",
   "/member-protection",
-  "/compare",
   "/careers",
   "/contact",
   "/events",
@@ -137,26 +134,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.6,
     }));
 
-  const carsVsEntries: MetadataRoute.Sitemap = CARS_VS_SLUGS.map((slug) => ({
-    url: `${siteUrl}/vs/${slug}`,
-    lastModified,
-    changeFrequency: "monthly" as const,
-    priority: 0.6,
-  }));
-
-  const boatsVsEntries: MetadataRoute.Sitemap = BOATS_VS_SLUGS.map((slug) => ({
-    url: `${siteUrl}/boats/vs/${slug}`,
-    lastModified,
-    changeFrequency: "monthly" as const,
-    priority: 0.6,
-  }));
-
   return [
     ...staticEntries,
     ...vehicleEntries,
     ...boatEntries,
     ...journalEntries,
-    ...carsVsEntries,
-    ...boatsVsEntries,
   ];
 }

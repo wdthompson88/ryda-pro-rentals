@@ -7,7 +7,7 @@ import { PlanesMissionProfileForm } from "@/components/planes-mission-profile-fo
 export const metadata: Metadata = {
   title: "RYDA Planes — Coming soon",
   description:
-    "RYDA Planes is in design. Fractional access to private aviation, structured the same way as our cars and boats verticals — member-managed Delaware LLCs, professionally operated.",
+    "RYDA Planes is in design. Fractional access to private aviation, structured the same way as our cars and boats verticals — member-managed LLCs, professionally operated.",
 };
 
 export default function PlanesComingSoon() {
@@ -44,7 +44,7 @@ export default function PlanesComingSoon() {
           </h1>
           <p className="mt-7 max-w-2xl text-lg leading-relaxed text-cream/85">
             We&apos;re building Planes the way we built Cars and Boats —
-            member-managed Delaware LLCs, single-airframe per LLC, real
+            member-managed LLCs, single-airframe per LLC, real
             ownership rather than card-time. Different operating model
             (Part 91 vs Part 135 matters), different timelines, same
             doctrine.
@@ -80,7 +80,7 @@ export default function PlanesComingSoon() {
             <Pillar
               eyebrow="01"
               title="Real ownership, not card time"
-              body="NetJets and Wheels Up sell hours against a fleet. We're targeting the original fractional model — a registered ownership stake in a specific airframe, held in a member-managed Delaware LLC."
+              body="NetJets and Wheels Up sell hours against a fleet. We're targeting the original fractional model — a registered ownership stake in a specific airframe, held in a member-managed LLC."
             />
             <Pillar
               eyebrow="02"

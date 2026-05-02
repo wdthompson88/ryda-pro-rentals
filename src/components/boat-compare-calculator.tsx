@@ -23,7 +23,7 @@ export function BoatCompareCalculator({
 } = {}) {
   // Educational tool — let users model 1..boat.shares regardless of
   // current inventory. Real availability lives on each boat's listing.
-  // Defaults reflect the doctrinal CPO 2-year planned exit.
+  // Defaults reflect the doctrinal certified pre owned 2-year planned exit.
   const initial =
     lockedBoat ?? BOATS[0];
   const [boatSlug, setBoatSlug] = useState(initial.slug);
@@ -63,7 +63,7 @@ export function BoatCompareCalculator({
 
     // Residual: what proceeds you'd get back at exit (LLC sale or
     // member-to-member transfer). Held constant across drive-only and
-    // rental scenarios — CPO maintenance + curated mileage caps keep
+    // rental scenarios — certified pre owned maintenance + curated mileage caps keep
     // the resale story consistent regardless of utilization.
     const residual = Math.round(buyIn * (residualPct / 100));
 
@@ -246,7 +246,7 @@ export function BoatCompareCalculator({
           max={5}
           step={1}
           valueLabel={`${holdYears} ${holdYears === 1 ? "year" : "years"}`}
-          subLabel={`Default: ${BOATS_HOLDING_YEARS}-yr CPO exit baseline · 12-month minimum hold`}
+          subLabel={`Default: ${BOATS_HOLDING_YEARS}-yr certified pre owned exit baseline · 12-month minimum hold`}
         />
 
         <Slider
@@ -258,7 +258,7 @@ export function BoatCompareCalculator({
           max={100}
           step={5}
           valueLabel={`${residualPct}%`}
-          subLabel={`Default ${DEFAULT_RESIDUAL_PCT}% — assumes ~${BOATS_TARGET_DEPRECIATION_PCT}% depreciation over ${BOATS_HOLDING_YEARS} yrs on low-mileage CPO exotics`}
+          subLabel={`Default ${DEFAULT_RESIDUAL_PCT}% — assumes ~${BOATS_TARGET_DEPRECIATION_PCT}% depreciation over ${BOATS_HOLDING_YEARS} yrs on low-mileage certified pre owned exotics`}
         />
       </div>
 
@@ -294,7 +294,7 @@ export function BoatCompareCalculator({
             </p>
             <p className="mt-2 text-xs text-mute">
               Same {BOATS_TARGET_DEPRECIATION_PCT}% depreciation assumption
-              applies — our 100 nm/day allowance + CPO maintenance keep
+              applies — our 100 nm/day allowance + certified pre owned maintenance keep
               the resale story consistent whether you drive or rent it
               out.
             </p>

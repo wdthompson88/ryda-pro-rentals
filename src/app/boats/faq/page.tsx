@@ -14,15 +14,15 @@ export const metadata = {
 const SHARED_CO_OWNERSHIP: { q: string; a: string }[] = [
   {
     q: "What am I actually buying?",
-    a: "A membership interest in a single-purpose Delaware LLC that owns a specific yacht. The LLC's only assets are the vessel, its insurance/operating reserves, and a management contract with RYDA. You hold a registered legal interest, not a club point.",
+    a: "A membership interest in a single-purpose LLC that owns a specific yacht. The LLC's only assets are the vessel, its insurance/operating reserves, and a management contract with RYDA. You hold a registered legal interest, not a club point.",
   },
   {
     q: "How many co-ownership shares per hull?",
-    a: "10 shares per hull by default. Each share entitles you to ~30 days and up to ~1,500 nautical miles of usage per year (50 nm/day allowance). A single member can hold one share or several — usage scales linearly.",
+    a: "10 shares per hull by default. Each share entitles you to ~30 days and up to ~1,600 nautical miles of usage per year (50 nm/day allowance). A single member can hold one share or several — usage scales linearly.",
   },
   {
     q: "Are RYDA Boats co-ownership stakes securities?",
-    a: "No. RYDA is a luxury access platform, not an investment platform. Each boat is held in a member-managed Delaware LLC where you and up to 9 other co-owners hold authority over material decisions; RYDA is hired as a service provider via a separate Management Services Agreement. Co-ownership stakes are not registered securities and are not offered for investment purposes. No accredited-investor verification required.",
+    a: "No. RYDA is a luxury access platform, not an investment platform. Each boat is held in a member-managed LLC where you and up to 4 other co-owners hold authority over material decisions; RYDA is hired as a service provider via a separate Management Services Agreement. Co-ownership stakes are not registered securities and are not offered for investment purposes. No accredited-investor verification required.",
   },
   {
     q: "Can I transfer my share whenever I want?",

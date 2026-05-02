@@ -108,7 +108,7 @@ export function OwnershipPrimitives({
           {
             label: "Modeled depreciation",
             value: `${TARGET_DEPRECIATION_PCT}%`,
-            sub: `Across the ${HOLDING_YEARS}-yr hold (curated CPO).`,
+            sub: `Across the ${HOLDING_YEARS}-yr hold (curated certified pre owned).`,
           },
           {
             label: "Transfer min hold",

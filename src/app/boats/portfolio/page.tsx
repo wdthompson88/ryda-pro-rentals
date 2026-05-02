@@ -15,7 +15,7 @@ import { PORTFOLIO_HERO } from "@/lib/boat-content";
 export const metadata: Metadata = {
   title: "RYDA Boats Portfolio — Co-own a yacht in Miami",
   description:
-    "The RYDA Boats portfolio. Member-managed Delaware LLCs hold each curated yacht; up to 10 verified members co-own every hull. Browse Miami today; LA + NY 2027.",
+    "The RYDA Boats portfolio. Member-managed LLCs hold each curated yacht; up to 5 verified members co-own every hull. Browse Miami today; LA + NY 2027.",
 };
 
 const FEATURED_SLUGS = ["wajer-55s", "pershing-6x", "riva-aquariva-super", "lagoon-50"];
@@ -161,7 +161,7 @@ export default function BoatsPortfolioPage() {
         <div className="mx-auto max-w-3xl px-6 py-12 text-center text-xs text-mute sm:px-10">
           <p>
             RYDA Boats is a luxury access platform. Co-ownership stakes
-            are membership interests in member-managed Delaware LLCs —
+            are membership interests in member-managed LLCs —
             not registered securities, not offered for investment
             purposes. See the{" "}
             <Link href="/legal/disclaimer" className="text-marine hover:text-marine-deep">

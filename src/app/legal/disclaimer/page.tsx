@@ -7,11 +7,11 @@ export default function DisclaimerPage() {
     <LegalPage
       title="Co-Ownership Disclaimer"
       lastUpdated="April 28, 2026"
-      intro="RYDA is a luxury access platform. Co-ownership stakes are LLC membership interests in member-managed Delaware LLCs that hold specific vehicles. They are NOT shares of RYDA LLC, NOT registered securities, and NOT offered for investment purposes. This page explains the legal framework for what co-owners are buying, how the LLCs are governed, and what RYDA's role is."
+      intro="RYDA is a luxury access platform. Co-ownership stakes are LLC membership interests in member-managed LLCs that hold specific vehicles. They are NOT shares of RYDA LLC, NOT registered securities, and NOT offered for investment purposes. This page explains the legal framework for what co-owners are buying, how the LLCs are governed, and what RYDA's role is."
       sections={[
         {
           heading: "1. What you are buying",
-          body: "Each co-ownership share on the RYDA platform is a membership interest in a Delaware single-purpose LLC formed to hold and operate a specific vehicle. The LLC's only assets are the vehicle, its insurance and operating reserves, and a Management Services Agreement with RYDA for operational services. The LLC is treated as a partnership for US federal income tax purposes.",
+          body: "Each co-ownership share on the RYDA platform is a membership interest in a single-purpose LLC formed to hold and operate a specific vehicle. The LLC's only assets are the vehicle, its insurance and operating reserves, and a Management Services Agreement with RYDA for operational services. The LLC is treated as a partnership for US federal income tax purposes.",
         },
         {
           heading: "2. The LLC is member-managed",

@@ -96,7 +96,7 @@ export function SearchResults() {
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Try Wajer, Ferrari, charter, Delaware LLC, journal…"
+                placeholder="Try Wajer, Ferrari, charter, LLC, journal…"
                 className="h-full min-w-0 flex-1 bg-transparent text-base text-ink placeholder:text-mute focus:outline-none"
               />
               {query ? (
@@ -222,7 +222,7 @@ function EmptyHint() {
         </li>
         <li>
           <Link href="/search?q=delaware llc" className="hover:text-red">
-            Delaware LLC →
+            LLC →
           </Link>
         </li>
         <li>

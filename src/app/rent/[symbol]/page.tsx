@@ -520,7 +520,7 @@ export default async function RentDetailPage({
             <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
               The RYDA co-ownership fleet runs ~$236/day in steady-state
               ops on a Ferrari versus $2,400/day to rent the same car.
-              See if a curated CPO share fits before your next trip.
+              See if a curated certified pre owned share fits before your next trip.
             </p>
             <Link
               href="/markets"

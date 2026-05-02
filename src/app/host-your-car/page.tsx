@@ -51,7 +51,7 @@ export default function HostYourCarPage() {
             <Option
               eyebrow="OPTION 2"
               title="Bring it into a co-ownership LLC."
-              body="Contribute your car into a member-managed Delaware LLC with up to 10 vetted co-owners. You keep one or more shares, the rest are filled by RYDA-vetted members. You and your co-owners run the LLC together; RYDA handles operations."
+              body="Contribute your car into a member-managed LLC with up to 4 vetted co-owners. You keep one or more shares, the rest are filled by RYDA-vetted members. You and your co-owners run the LLC together; RYDA handles operations."
               points={[
                 "Recover most of your capital while keeping access to the car",
                 "Stay involved as a co-owner, or step away after closing",

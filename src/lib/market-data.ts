@@ -292,9 +292,9 @@ export function formatUSD(n: number, opts: { decimals?: number } = {}) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// CPO doctrine — 2-year planned exit
+// certified pre owned doctrine — 2-year planned exit
 // ─────────────────────────────────────────────────────────────────────────
-// We curate Certified Pre-Owned vehicles and hold each one for ~2 years
+// We curate certified pre owned vehicles and hold each one for ~2 years
 // OR until the odometer crosses ~50,000 miles, whichever comes first.
 // At exit, the LLC sells the car and proceeds are distributed pro-rata.
 // Modeled assumption: the curated fleet depreciates ~10% over the
@@ -314,7 +314,7 @@ export const HOLDING_MILES_CAP = 50_000; // alt sale trigger: whichever comes fi
 export const TARGET_DEPRECIATION_PCT = 10; // % over the full 2-year hold
 
 // Standard shareholder mileage allowance — matches GM LUXE & industry
-// norm. 30 days × 100 mi/day = 3,000 mi/yr per share.
+// norm. 32 days × 100 mi/day = 3,200 mi/yr per share.
 export const MILES_PER_DAY_PER_SHARE = 100;
 export const DAYS_PER_SHARE = 30;
 
@@ -463,7 +463,7 @@ export type ShareEconomics = {
 // pro-rata to the days each share contributes.
 //
 // Depreciation is held constant at TARGET_DEPRECIATION_PCT across both
-// drive-only and rental scenarios — our CPO maintenance + curated mileage
+// drive-only and rental scenarios — our certified pre owned maintenance + curated mileage
 // caps keep the resale story consistent.
 
 export const RENTAL_DEFAULTS = {

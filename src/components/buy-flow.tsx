@@ -236,7 +236,7 @@ function ReviewStep({
       <Section title="What you're buying">
         <Bullet label="Vehicle" value={`${vehicle.year} ${vehicle.name}`} />
         <Bullet label="Position" value={`${shares} of ${vehicle.shares} shares (${sharesPercent}%)`} />
-        <Bullet label="Legal entity" value={`Single-purpose Delaware LLC`} />
+        <Bullet label="Legal entity" value={`Single-purpose LLC`} />
         <Bullet label="Stored in" value={vehicle.market} />
       </Section>
 
@@ -284,7 +284,7 @@ function ReviewStep({
           className="mt-1 h-4 w-4 accent-red"
         />
         <span className="text-ink">
-          I understand I'm joining a member-managed Delaware LLC alongside other co-owners;
+          I understand I'm joining a member-managed LLC alongside other co-owners;
           that this is not an investment and is not offered for investment purposes; that
           co-ownership shares are illiquid for the first 12 months; and that the car will
           depreciate over time.
@@ -447,7 +447,7 @@ function DocumentsStep({
           "Defines fair-use rules during peak and off-season.",
           "Sets remedies if a co-owner stops paying (30-day cure, then forced transfer).",
           "12-month minimum hold; member-to-member transfer mechanics; 3% transfer fee.",
-          "Mandatory mediation, then arbitration in Wilmington, Delaware.",
+          "Mandatory mediation, then arbitration in under AAA rules.",
         ]}
         signed={oaSigned}
         onSign={() => setOaSigned(true)}
@@ -762,7 +762,7 @@ function ConfirmStep({
           <KvRow label="Vehicle" value={`${vehicle.year} ${vehicle.name}`} />
           <KvRow label="Position" value={`${shares} of ${vehicle.shares} shares`} />
           <KvRow label="Amount" value={formatUSD(grandTotal)} />
-          <KvRow label="LLC" value={`${vehicle.name} LLC, Delaware (member-managed)`} />
+          <KvRow label="LLC" value={`${vehicle.name} LLC, (member-managed)`} />
           <KvRow label="Status" value="Pending — funds & verification clearing" />
         </dl>
       </div>

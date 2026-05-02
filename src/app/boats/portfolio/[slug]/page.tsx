@@ -328,7 +328,7 @@ export default async function BoatDetailPage({
           </div>
           <p className="mt-5 text-xs text-mute">
             Both modes draw from your share&apos;s annual entitlement (30 days,
-            1,500 nm). One protected peak window per share before any
+            1,600 nm). One protected peak window per share before any
             co-owner can book a second.
           </p>
         </div>
@@ -435,7 +435,7 @@ export default async function BoatDetailPage({
         <div className="mx-auto max-w-3xl px-6 py-12 text-center text-xs text-mute sm:px-10">
           <p>
             RYDA Boats co-ownership stakes are membership interests in
-            single-purpose member-managed Delaware LLCs — not registered
+            single-purpose member-managed LLCs — not registered
             securities, not offered for investment purposes. Modeled
             depreciation and charter income are illustrative only; actual
             results depend on use, market, and operator. See the{" "}

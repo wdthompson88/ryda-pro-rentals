@@ -31,12 +31,12 @@ const siteUrl =
 export const metadata: Metadata = {
   title: "RYDA — Supercar co-ownership and rentals",
   description:
-    "Co-own or rent a curated CPO Ferrari, Lamborghini, or McLaren in the US. Asset-backed Delaware LLC, professionally operated. Launching in Miami.",
+    "Co-own or rent a curated certified pre owned Ferrari, Lamborghini, or McLaren in the US. Asset-backed LLC, professionally operated. Launching in Miami.",
   metadataBase: new URL(siteUrl),
   openGraph: {
     title: "RYDA — Supercar co-ownership and rentals",
     description:
-      "Co-own or rent a curated supercar with verified members. Asset-backed Delaware LLC, professionally operated. Launching in Miami.",
+      "Co-own or rent a curated supercar with verified members. Asset-backed LLC, professionally operated. Launching in Miami.",
     siteName: "RYDA",
     type: "website",
   },
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "RYDA — Supercar co-ownership and rentals",
     description:
-      "Co-own or rent a curated supercar with verified members. Asset-backed Delaware LLC, professionally operated. Launching in Miami.",
+      "Co-own or rent a curated supercar with verified members. Asset-backed LLC, professionally operated. Launching in Miami.",
   },
 };
 
