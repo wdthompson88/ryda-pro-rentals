@@ -1,10 +1,15 @@
 import Link from "next/link";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 // Slim footer — collapsed from 6 columns to a 3-column layout that
 // reads as a luxury house mark + 2 link groups, plus a quiet bottom
 // strip with legal + disclaimer. Aman / Loro Piana keep marketing
 // footers tight: the prospect doesn't need a sitemap, they need a
 // mark that signs the page off.
+//
+// Theme toggle lives down here (not in the header) — luxury brands
+// own the canonical theme; the toggle is a power-user setting, not
+// a top-level navigation item.
 
 export function SiteFooter() {
   return (
@@ -65,7 +70,7 @@ export function SiteFooter() {
               ["Press", "/press"],
               ["Careers", "/careers"],
               ["Contact", "/contact"],
-              ["Trust &amp; safety", "/trust-and-safety"],
+              ["Trust & safety", "/trust-and-safety"],
             ]}
           />
         </div>
@@ -90,6 +95,7 @@ export function SiteFooter() {
             <Link href="/legal/accessibility" className="hover:text-ink">
               Accessibility
             </Link>
+            <ThemeToggle className="ml-2" />
           </div>
         </div>
       </div>

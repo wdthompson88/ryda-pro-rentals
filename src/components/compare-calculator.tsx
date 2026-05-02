@@ -306,7 +306,7 @@ export function CompareCalculator({
             role="switch"
             aria-checked={optInRental}
             onClick={() => setOptInRental((v) => !v)}
-            className={`group flex shrink-0 items-center gap-3 rounded-full border-2 px-5 py-3 text-sm font-bold uppercase tracking-wider transition-all hover:scale-105 ${
+            className={`group flex shrink-0 items-center gap-3 rounded-full border-2 px-5 py-3 text-sm font-bold uppercase tracking-wider transition-all hover:scale-[1.02] ${
               optInRental
                 ? "border-red bg-red text-cream shadow-lg shadow-red/30"
                 : "border-red bg-cream text-red shadow-md hover:bg-red/5"

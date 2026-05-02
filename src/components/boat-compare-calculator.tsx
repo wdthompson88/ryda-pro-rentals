@@ -306,7 +306,7 @@ export function BoatCompareCalculator({
             role="switch"
             aria-checked={optInRental}
             onClick={() => setOptInRental((v) => !v)}
-            className={`group flex shrink-0 items-center gap-3 rounded-full border-2 px-5 py-3 text-sm font-bold uppercase tracking-wider transition-all hover:scale-105 ${
+            className={`group flex shrink-0 items-center gap-3 rounded-full border-2 px-5 py-3 text-sm font-bold uppercase tracking-wider transition-all hover:scale-[1.02] ${
               optInRental
                 ? "border-marine bg-marine text-cream shadow-lg shadow-marine/30"
                 : "border-marine bg-cream text-marine shadow-md hover:bg-marine/5"

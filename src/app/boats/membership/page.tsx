@@ -79,7 +79,6 @@ const TIERS = [
     priceSub: "/year",
     tagline: "For active members on the water. Priority booking windows, hurricane-prep pass, captain-hours bank, member-to-member share transfers.",
     cta: "Choose Blue",
-    badge: "Most chosen",
   },
   {
     key: "black" as const,
@@ -88,7 +87,6 @@ const TIERS = [
     priceSub: "/year",
     tagline: "Concierge-grade everything. Annual rendezvous, dedicated marine account contact, off-market hull access.",
     cta: "Choose Black",
-    dark: true,
   },
 ];
 
@@ -100,12 +98,12 @@ export default function BoatsMembershipPage() {
       {/* Hero */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-28">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
+          <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-mute">
             RYDA Boats · Membership
           </p>
           <h1 className="mt-4 max-w-4xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
-            Three tiers.{" "}
-            <span className="italic text-marine">Built for the water.</span>
+            Three doors{" "}
+            <span className="italic">into RYDA Boats.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
             Core to browse and charter. Blue or Black to claim a share.
@@ -251,7 +249,6 @@ function TierCard({ tier }: { tier: typeof TIERS[number] }) {
   const isBlue = tier.key === "blue";
   const isBlack = tier.key === "black";
 
-  // For each tier, show the upgrades over the previous tier.
   const above = isBlack ? "blue" : isBlue ? "core" : null;
 
   function isUpgrade(item: { core: CellValue; blue: CellValue; black: CellValue }) {
@@ -265,62 +262,53 @@ function TierCard({ tier }: { tier: typeof TIERS[number] }) {
   const items = FEATURES.flatMap((g) => g.items.filter(isUpgrade)).slice(0, 7);
   const previousLabel = isBlack ? "Everything in Blue, plus" : isBlue ? "Everything in Core, plus" : null;
 
-  // Tier colorways — distinct color per tier, theme-independent so
-  // they look identical in both light + dark modes:
-  //   Core  → marine blue (the entry tier on the boats side)
-  //   Blue  → deeper sapphire (active member)
-  //   Black → pure black (concierge tier)
-  const bg = isBlack
-    ? "bg-black border-black"
+  // Monochrome tier cards — mirrors the cars /membership treatment.
+  // 2px top accent line in the tier color carries the differentiation:
+  // marine Core (entry tier on the boats side) / deeper marine Blue
+  // / GOLD Black (only place gold lands on the boats marketing side).
+  const accentLine = isBlack
+    ? "before:bg-[#C9A66B]" // gold (--ryda-gold)
     : isBlue
-      ? "bg-[#1e40af] border-[#1e40af]"
-      : "bg-[#4A90D9] border-[#4A90D9]";
+      ? "before:bg-[#1e40af]" // deeper sapphire
+      : "before:bg-marine";
 
-  const textOnCard = "text-[#F4F1EC]";
-  const sub = "text-[#F4F1EC]/75";
-  const accent = "text-[#F4F1EC]";
-  const checkColor = "text-[#F4F1EC]";
-
-  const ctaCls = isBlack
-    ? "bg-[#F4F1EC] text-black hover:bg-white"
+  const eyebrowColor = isBlack
+    ? "text-[#C9A66B]"
     : isBlue
-      ? "bg-[#F4F1EC] text-[#1e40af] hover:bg-white"
-      : "bg-[#F4F1EC] text-[#4A90D9] hover:bg-white";
+      ? "text-[#1e40af]"
+      : "text-marine";
 
   return (
     <div
-      className={`relative flex flex-col rounded-2xl border border-rule p-8 ${bg} ${textOnCard}`}
+      className={`relative flex flex-col rounded-none border border-rule bg-surface p-8 before:absolute before:inset-x-0 before:top-0 before:h-[3px] ${accentLine}`}
     >
-      {tier.badge && (
-        <span className="absolute -top-3 left-8 rounded-full bg-marine px-3 py-1 text-xs font-medium text-cream">
-          {tier.badge}
-        </span>
-      )}
-      <p className={`text-xs font-medium uppercase tracking-[0.2em] ${accent}`}>
+      <p className={`text-[10px] font-medium uppercase tracking-[0.22em] ${eyebrowColor}`}>
         RYDA Boats {tier.name}
       </p>
-      <p className="mt-4 font-display text-5xl font-light">
+      <p className="mt-5 font-display text-5xl font-light text-ink">
         {tier.price}
         {tier.priceSub && (
-          <span className={`text-base ${sub}`}>{tier.priceSub}</span>
+          <span className="text-base text-mute">{tier.priceSub}</span>
         )}
       </p>
-      <p className={`mt-3 text-sm ${sub}`}>{tier.tagline}</p>
+      <p className="mt-3 text-[15px] leading-relaxed text-ink-soft">
+        {tier.tagline}
+      </p>
 
       {previousLabel && (
-        <p className={`mt-8 text-xs font-medium uppercase tracking-wider ${sub}`}>
+        <p className="mt-8 text-[10px] font-medium uppercase tracking-[0.2em] text-mute">
           {previousLabel}
         </p>
       )}
 
-      <ul className={`${previousLabel ? "mt-3" : "mt-8"} flex-1 space-y-3 text-sm`}>
+      <ul className={`${previousLabel ? "mt-3" : "mt-8"} flex-1 space-y-3 text-[14px]`}>
         {items.map((f) => (
-          <li key={f.label} className="flex items-start gap-3">
-            <span className={`mt-1 ${checkColor}`}>✓</span>
+          <li key={f.label} className="flex items-start gap-3 text-ink-soft">
+            <span className="mt-1 text-mute">·</span>
             <span>
-              {f.label}
+              <span className="text-ink">{f.label}</span>
               {typeof f[tier.key] === "string" && (
-                <span className="ml-1.5 text-xs italic opacity-80">
+                <span className="ml-1.5 text-xs italic text-mute">
                   ({f[tier.key]})
                 </span>
               )}
@@ -331,9 +319,9 @@ function TierCard({ tier }: { tier: typeof TIERS[number] }) {
 
       <Link
         href={tier.key === "core" ? "/signup?next=/boats" : "/founding-members?vertical=boats"}
-        className={`mt-10 inline-flex h-12 items-center justify-center rounded-full px-7 text-sm font-medium transition-colors ${ctaCls}`}
+        className="mt-10 inline-flex h-12 items-center justify-center border border-ink bg-ink px-7 text-sm font-medium text-cream transition-colors hover:bg-marine hover:border-marine"
       >
-        {tier.cta} →
+        {tier.cta}
       </Link>
     </div>
   );
@@ -346,7 +334,7 @@ function Group({ group }: { group: typeof FEATURES[number] }) {
     <>
       <tr className="border-b border-rule bg-cream-2/40">
         <td colSpan={4} className="px-6 py-3">
-          <span className="text-xs font-medium uppercase tracking-wider text-marine">
+          <span className="text-[10px] font-medium uppercase tracking-[0.22em] text-mute">
             {group.group}
           </span>
         </td>
@@ -364,12 +352,24 @@ function Group({ group }: { group: typeof FEATURES[number] }) {
 }
 
 function Cell({ value, accent }: { value: CellValue; accent?: boolean }) {
-  const bg = accent ? "bg-marine/5" : "";
+  // Quiet ink dot for "included," em-dash for "not." Mirrors cars
+  // /membership Cell treatment after the iter 1 polish — no red ✓
+  // marks, no accent column shading. The dot is wrapped with
+  // role="img" + aria-label so screen readers announce the state.
+  const bg = accent ? "bg-cream-2/40" : "";
   let content: React.ReactNode;
   if (value === true) {
-    content = <span className="text-marine">✓</span>;
+    content = (
+      <span role="img" aria-label="Included">
+        <span aria-hidden className="inline-block h-1.5 w-1.5 rounded-full bg-ink" />
+      </span>
+    );
   } else if (value === false) {
-    content = <span className="text-mute">—</span>;
+    content = (
+      <span role="img" aria-label="Not included" className="text-mute">
+        <span aria-hidden>—</span>
+      </span>
+    );
   } else {
     content = <span className="text-ink">{value}</span>;
   }
@@ -392,7 +392,7 @@ function Detail({ tier, detail }: { tier: string; detail: string }) {
 function Bullet({ children }: { children: React.ReactNode }) {
   return (
     <li className="flex items-start gap-3 leading-relaxed">
-      <span className="mt-1 text-marine">·</span>
+      <span className="mt-1 text-mute">·</span>
       <span>{children}</span>
     </li>
   );

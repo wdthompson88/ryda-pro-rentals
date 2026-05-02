@@ -95,11 +95,11 @@ export function ContactForm() {
   return (
     <form onSubmit={onSubmit} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       {ctaNote ? (
-        <div className="sm:col-span-2 rounded-xl border-l-4 border-red bg-cream-2 px-4 py-3">
-          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-mute">
+        <div className="sm:col-span-2 border-t border-rule pt-4">
+          <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-mute">
             Reference
           </p>
-          <p className="mt-1 text-sm text-ink">{ctaNote}</p>
+          <p className="mt-2 text-[15px] italic text-ink">{ctaNote}</p>
         </div>
       ) : null}
       <Input name="name" label="Full name" required />
@@ -119,7 +119,7 @@ export function ContactForm() {
           htmlFor="contact-message"
           className="block text-xs font-medium uppercase tracking-wider text-mute"
         >
-          Message <span aria-hidden="true" className="text-red">*</span>
+          Message <span aria-hidden="true" className="text-mute">*</span>
           <span className="sr-only">required</span>
         </label>
         <textarea
@@ -141,7 +141,7 @@ export function ContactForm() {
         <button
           type="submit"
           disabled={status === "submitting"}
-          className="h-12 rounded-full bg-ink px-7 text-sm font-medium text-cream transition-colors hover:bg-red disabled:opacity-50"
+          className="h-12 border border-ink bg-ink px-7 text-sm font-medium text-cream transition-colors hover:bg-red hover:border-red disabled:opacity-50"
         >
           {status === "submitting" ? "Sending..." : "Send message"}
         </button>

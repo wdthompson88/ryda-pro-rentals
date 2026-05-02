@@ -344,9 +344,17 @@ function Cell({ value, accent }: { value: CellValue; accent?: boolean }) {
   const bg = accent ? "bg-cream-2/40" : "";
   let content: React.ReactNode;
   if (value === true) {
-    content = <span className="inline-block h-1.5 w-1.5 rounded-full bg-ink" aria-label="Included" />;
+    content = (
+      <span role="img" aria-label="Included">
+        <span aria-hidden className="inline-block h-1.5 w-1.5 rounded-full bg-ink" />
+      </span>
+    );
   } else if (value === false) {
-    content = <span className="text-mute" aria-label="Not included">—</span>;
+    content = (
+      <span role="img" aria-label="Not included" className="text-mute">
+        <span aria-hidden>—</span>
+      </span>
+    );
   } else {
     content = <span className="text-ink">{value}</span>;
   }
