@@ -16,6 +16,9 @@ export const metadata = {
   title: "RYDA Portfolio — Supercars co-owned in the US",
   description:
     "The RYDA portfolio. Member-managed LLCs hold each curated certified pre owned supercar; up to 5 verified members co-own every car. Browse Miami, Los Angeles, and New York.",
+  // The hero image was washing out the headline copy — bumped the
+  // gradient and overlay opacity so the cream text reads cleanly
+  // over the red Ferrari hero from any device width.
 };
 
 // Featured tile: 4 marquee positions, statically rendered (no carousel).
@@ -54,22 +57,23 @@ export default function MarketsPage() {
           />
           <div
             aria-hidden
-            className="absolute inset-0 bg-gradient-to-b from-black/65 via-black/40 to-black/85"
+            className="absolute inset-0 bg-gradient-to-b from-black/85 via-black/65 to-black/90"
           />
         </div>
         <div className="mx-auto max-w-7xl px-6 py-24 text-cream sm:px-10 sm:py-36">
-          <p className="text-xs font-medium uppercase tracking-[0.24em] text-cream/80">
+          <p className="text-xs font-medium uppercase tracking-[0.24em] text-cream">
             RYDA Portfolio
           </p>
           <h1 className="mt-5 max-w-4xl font-display text-5xl font-light leading-[1.05] sm:text-6xl lg:text-7xl">
             The world&apos;s most coveted supercars,{" "}
             <span className="italic">co-owned in the US.</span>
           </h1>
-          <p className="mt-7 max-w-2xl text-lg leading-relaxed text-cream/85">
-            Each car is held in a member-managed LLC. Up to 10
-            verified members co-own every vehicle. RYDA runs operations
-            end-to-end. Two-year planned exit; transferable to other members
-            after twelve months.
+          <p className="mt-7 max-w-2xl text-lg leading-relaxed text-cream">
+            Each car is held in a member-managed LLC with 10 shares
+            split across 1–5 verified co-owners (2-share minimum per
+            person). RYDA runs operations end-to-end. Planned exit at
+            24 months; transferable to other members anytime after the
+            12-month minimum hold.
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
             <Link
@@ -283,7 +287,7 @@ function MarketSection({
           />
           <div
             aria-hidden
-            className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/40 to-black/10"
+            className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/65 to-black/40"
           />
         </div>
         <div className="relative p-6 text-cream sm:p-8 lg:p-10">

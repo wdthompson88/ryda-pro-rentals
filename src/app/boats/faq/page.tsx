@@ -9,7 +9,7 @@ export const metadata = {
 };
 
 // Boats FAQ leverages the same FAQ_ITEMS used in /boats/how-it-works,
-// plus a few co-ownership questions shared with the cars side that
+// plus a few co-ownership questions shared with the rest of RYDA that
 // apply equally to boats.
 const SHARED_CO_OWNERSHIP: { q: string; a: string }[] = [
   {

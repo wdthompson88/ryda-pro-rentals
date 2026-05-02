@@ -5,7 +5,7 @@ import { SiteHeader } from "@/components/site-header";
 export const metadata = {
   title: "About RYDA Boats",
   description:
-    "Why we built RYDA Boats. The same LLC structure that runs the cars side, adapted for marine — surveyed certified pre owned hulls, member-managed LLCs, three-year planned exit.",
+    "Why we built RYDA Boats. Member-managed LLCs, surveyed certified pre owned hulls, professional marine ops, three-year planned exit.",
 };
 
 export default function BoatsAboutPage() {
@@ -20,13 +20,13 @@ export default function BoatsAboutPage() {
             About RYDA Boats
           </p>
           <h1 className="mt-4 max-w-4xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
-            We&apos;re bringing the same structure to the water.
+            Real ownership, on the water.
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
             Solo yacht ownership is unworkable for most. Charter is
-            hollow. RYDA Boats is the third option, built on the same
-            LLC scaffolding that runs the cars side — adapted
-            for marine ops, surveyed certified pre owned hulls, and a three-year hold.
+            hollow. RYDA Boats is the third option — a member-managed
+            LLC per hull, surveyed certified pre owned vessels, and
+            professional marine operations across a three-year hold.
           </p>
         </div>
       </section>
@@ -39,26 +39,26 @@ export default function BoatsAboutPage() {
           </h2>
           <div className="mt-8 space-y-5 text-base leading-relaxed text-ink-soft">
             <p>
-              The cars-side thesis came from running the math on a
-              Lamborghini rental in Miami: $4,200 for three days vs.
-              $300K for the car plus $80K/yr to keep it. The middle
-              option didn&apos;t exist in the US.
+              A 55-foot Wajer is $1.95M to buy and $300K–$400K a year
+              to operate (slip + captain + fuel + insurance + hurricane
+              prep). A weekend charter is $14K–$22K. Most prospective
+              owners drive a 30-day-a-year usage profile. Solo
+              ownership is wildly inefficient at that load.
             </p>
             <p>
-              Yachts have the same shape. A 55-foot Wajer is $1.95M to
-              buy and $300K–$400K a year to operate (slip + captain +
-              fuel + insurance + hurricane prep). A weekend charter is
-              $14K–$22K. Most prospective owners drive a 30-day-a-year
-              usage profile. Solo ownership is wildly inefficient at
-              that load.
+              RYDA Boats is the middle option: a single-purpose LLC
+              holds title to a specific yacht, up to 5 members co-own
+              with a 2-share minimum, and RYDA runs ops under a
+              separate Management Services Agreement. Coast Guard
+              documentation is in the LLC&apos;s name. Members hold
+              registered legal interests, not club points.
             </p>
             <p>
               Boats run on Coast Guard documentation, marine survey
-              workflows, and hurricane-driven seasonality, but the
-              co-ownership structure is identical: a single-purpose
-              LLC holds title, up to 5 members co-own, RYDA
-              runs ops under a separate Management Services Agreement.
-              Same Howey-defense thinking, same legal scaffolding.
+              workflows, and hurricane-driven seasonality. We built
+              the operations stack — slip, captain, fuel, insurance,
+              spring commissioning, fall lay-up, hurricane haul-out —
+              so members can drive the calendar, not the asset.
             </p>
           </div>
         </div>
@@ -185,13 +185,13 @@ export default function BoatsAboutPage() {
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-24">
           <h2 className="font-display text-3xl text-ink sm:text-4xl">
-            The team behind both verticals.
+            The team behind RYDA Boats.
           </h2>
           <p className="mt-3 max-w-2xl text-base text-ink-soft">
             Three co-founders combining executive search, investment
             banking, and three decades of institutional equity markets.
-            The boats vertical runs on the same operational and legal
-            backbone as the cars side.
+            Marine operations are run by a dedicated boats team plus
+            our partner yards in Miami, Connecticut, and the Caribbean.
           </p>
           <Link
             href="/about#founders"

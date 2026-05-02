@@ -179,8 +179,8 @@ export const POSTS: JournalPost[] = [
       "If you'd actually drive 100+ days a year on the same hull, co-ownership is the wrong product. You'd be paying for 30 days of access against a fleet that 9 other people are also booking — peak windows would feel constrained.",
       "Most buyers don't actually drive 100+ days. They drive 22, then feel guilty, then sell at year three with a depreciation hit that erases more than they'd have spent on a co-ownership share. We've watched the cycle.",
       "## What we built RYDA Boats for",
-      "The 30–60 day buyer who wants their actual day on the actual hull, not a club rotation. Same LLC structure as the cars side. Same Howey-defense thinking. Different operating model — slip + crew + hurricane prep — and a 3-year hold instead of 2 because boats run on a different depreciation curve.",
-      "Miami launches Q3 2026 alongside the cars side. We're vetting our first 60 boat members now.",
+      "The 30–60 day buyer who wants their actual day on the actual hull, not a club rotation. Single-purpose LLC per hull, member-managed governance, and a 3-year hold sized to the boats depreciation curve. Operating model is slip + crew + hurricane prep, fully professionally run.",
+      "Miami launches Q3 2026. Create your account to browse the fleet and claim a share when the first hulls go live.",
     ],
   },
   {

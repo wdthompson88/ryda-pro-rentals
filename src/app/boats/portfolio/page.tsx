@@ -138,7 +138,7 @@ export default function BoatsPortfolioPage() {
 
       {/* All hulls — power-filter UI parallel to /markets's MarketsListings.
           Search + brand/location/status/type filters + sort. Renders the
-          same depth of card the cars side does (BoatCard mirrors
+          same depth of card the cars portfolio does (BoatCard mirrors
           VehicleCard exactly). */}
       <section id="all" className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10 sm:py-16">

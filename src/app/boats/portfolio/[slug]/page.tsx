@@ -224,7 +224,7 @@ export default async function BoatDetailPage({
         </div>
       </section>
 
-      {/* Cost breakdown + share value chart — the cars-side parity the
+      {/* Cost breakdown + share value chart — the cars-portfolio parity the
           CEO flagged was missing. Boat economics use 3-yr hold and
           15% depreciation; charter scenario shown when applicable. */}
       <section className="border-b border-rule bg-cream-2">

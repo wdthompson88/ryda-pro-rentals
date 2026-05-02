@@ -71,7 +71,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   },
   {
     q: "How does the charter (rental) opt-in work?",
-    a: "Same model as the cars side — members can opt their unused entitlement into the charter pool. Defaults: 12 owner-use days kept per share, the rest pooled. Charter occupancy is materially lower than car-rental occupancy (35% on a 240-day available pool — 84 booked days/yr per hull), and revenue splits 65/35 (members / RYDA) distributed pro-rata. Caribbean season (Dec–Apr) charters are the highest-revenue window for sport yachts and are typically booked solid by mid-October.",
+    a: "Members can opt their unused entitlement into the charter pool. Defaults: 12 owner-use days kept per share, the rest pooled. Charter occupancy on the boats fleet runs around 35% on a 240-day available pool (84 booked days/yr per hull), and revenue splits 65/35 (members / RYDA) distributed pro-rata. Caribbean season (Dec–Apr) charters are the highest-revenue window for sport yachts and are typically booked solid by mid-October.",
   },
   {
     q: "What's the survey and acquisition process before a boat is listed?",
@@ -82,7 +82,7 @@ export const FAQ_ITEMS: FaqItem[] = [
     a: "Each boat is documented federally with the US Coast Guard in the LLC's name (e.g. \"Wajer 55 S RYDA LLC\"). Members are not on the document — the LLC is. State sales-tax mitigation strategies (sales-tax-free purchase, offshore documentation, or charter-fleet exemptions where applicable) are evaluated case-by-case with the LLC's tax counsel. RYDA does not provide tax advice; we coordinate with the LLC's accountant.",
   },
   {
-    q: "Why is the planned exit 3 years instead of 2 like the cars?",
-    a: "Boats and cars have different depreciation curves. Curated certified pre owned sport cars take a steep first-year hit and then flatten — a 2-year hold optimizes for resale before the next-generation model launches. Boats depreciate more slowly, with classic models (the Aquariva is the obvious example) sometimes appreciating with the right buyer. A 3-year hold lets us realize a stronger residual on the median sale and aligns with the typical owner usage pattern. Same 12-month minimum hold and member-to-member transfer mechanics apply in case you need to exit earlier.",
+    q: "Why a 3-year planned exit?",
+    a: "Boats depreciate slowly, with classic models (the Aquariva is the obvious example) sometimes appreciating with the right buyer. A 3-year hold lets us realize a stronger residual on the median sale and aligns with the typical owner usage pattern. The 12-month minimum hold and member-to-member transfer mechanics still apply in case you need to exit earlier.",
   },
 ];

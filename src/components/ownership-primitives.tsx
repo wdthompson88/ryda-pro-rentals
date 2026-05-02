@@ -55,11 +55,11 @@ export function OwnershipPrimitives({
       ? [
           {
             label: "Co-owners",
-            value: "10",
-            sub: "per hull (max). Each share = 1/10.",
+            value: "1–5",
+            sub: "per hull. 10 shares total, 2-share minimum per person.",
           },
           {
-            label: "Days / share / yr",
+            label: "Allotted annual days per share",
             value: String(BOATS_DAYS_PER_SHARE),
             sub: `Multi-share = ${BOATS_DAYS_PER_SHARE * 2}, ${BOATS_DAYS_PER_SHARE * 3}…`,
           },
@@ -70,28 +70,23 @@ export function OwnershipPrimitives({
           },
           {
             label: "Planned exit",
-            value: `${BOATS_HOLDING_YEARS} yrs`,
-            sub: `LLC sells the hull at year ${BOATS_HOLDING_YEARS}.`,
+            value: `${BOATS_HOLDING_YEARS * 12} mo`,
+            sub: `LLC sells the hull at month ${BOATS_HOLDING_YEARS * 12}.`,
           },
           {
             label: "Modeled depreciation",
             value: `${BOATS_TARGET_DEPRECIATION_PCT}%`,
             sub: `Across the ${BOATS_HOLDING_YEARS}-yr hold (surveyed hulls).`,
           },
-          {
-            label: "Transfer min hold",
-            value: "12 mo",
-            sub: "Then transfer to any verified RYDA member.",
-          },
         ]
       : [
           {
             label: "Co-owners",
-            value: "10",
-            sub: "per car (max). Each share = 1/10.",
+            value: "1–5",
+            sub: "per car. 10 shares total, 2-share minimum per person.",
           },
           {
-            label: "Days / share / yr",
+            label: "Allotted annual days per share",
             value: String(DAYS_PER_SHARE),
             sub: `Multi-share = ${DAYS_PER_SHARE * 2}, ${DAYS_PER_SHARE * 3}…`,
           },
@@ -102,18 +97,13 @@ export function OwnershipPrimitives({
           },
           {
             label: "Planned exit",
-            value: `${HOLDING_YEARS} yrs`,
-            sub: `LLC sells the car at year ${HOLDING_YEARS}.`,
+            value: `${HOLDING_YEARS * 12} mo`,
+            sub: `LLC sells the car at month ${HOLDING_YEARS * 12}.`,
           },
           {
             label: "Modeled depreciation",
             value: `${TARGET_DEPRECIATION_PCT}%`,
             sub: `Across the ${HOLDING_YEARS}-yr hold (curated certified pre owned).`,
-          },
-          {
-            label: "Transfer min hold",
-            value: "12 mo",
-            sub: "Then transfer to any verified RYDA member.",
           },
         ];
 
@@ -121,9 +111,9 @@ export function OwnershipPrimitives({
     return (
       <div className={`rounded-2xl border ${wrapperBorder} ${wrapperBg} p-5`}>
         <p className={`text-[10px] font-medium uppercase tracking-[0.18em] ${eyebrowTone}`}>
-          {title ?? "Every share, in six numbers"}
+          {title ?? "Every share, in five numbers"}
         </p>
-        <div className="mt-4 grid grid-cols-2 gap-x-5 gap-y-4 sm:grid-cols-3 lg:grid-cols-6">
+        <div className="mt-4 grid grid-cols-2 gap-x-5 gap-y-4 sm:grid-cols-3 lg:grid-cols-5">
           {items.map((it) => (
             <div key={it.label}>
               <p className={`text-[10px] uppercase tracking-[0.14em] ${labelTone}`}>
@@ -152,12 +142,12 @@ export function OwnershipPrimitives({
               The numbers, exactly
             </p>
             <h2 className={`mt-3 font-display text-3xl sm:text-4xl ${headlineTone}`}>
-              {title ?? "What every share is, in six numbers."}
+              {title ?? "What every share is, in five numbers."}
             </h2>
           </div>
         </div>
 
-        <div className="mt-10 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-6">
+        <div className="mt-10 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-5">
           {items.map((it) => (
             <div
               key={it.label}

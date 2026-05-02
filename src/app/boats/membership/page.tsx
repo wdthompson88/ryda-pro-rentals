@@ -24,7 +24,7 @@ const FEATURES: { group: string; items: { label: string; core: CellValue; blue: 
       { label: "Claim co-ownership shares · transfer to other members", core: false, blue: true, black: true },
       { label: "In-app messaging with co-owners + captains", core: true, blue: true, black: true },
       { label: "Marine survey + LLC documents", core: true, blue: true, black: true },
-      { label: "Member directory (boats + cars side)", core: false, blue: true, black: true },
+      { label: "Member directory (boats + cars)", core: false, blue: true, black: true },
       { label: "Member-to-member share transfers", core: false, blue: true, black: true },
       { label: "Off-market hull pre-list visibility", core: false, blue: false, black: true },
     ],

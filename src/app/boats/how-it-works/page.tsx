@@ -270,7 +270,7 @@ export default function BoatsHowItWorks() {
             <Reason
               n="08"
               title="Cross-vertical access"
-              body="Boats members can charter from the cars side and vice versa (subject to availability + tier). One membership, two verticals."
+              body="One RYDA membership covers both boats and cars — Boats members can charter cars and car members can charter boats, subject to availability and tier."
             />
             <Reason
               n="09"
