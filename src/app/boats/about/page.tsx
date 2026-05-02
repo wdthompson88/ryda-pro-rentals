@@ -148,27 +148,126 @@ export default function BoatsAboutPage() {
         </div>
       </section>
 
-      {/* Cross-link to cars about */}
-      <section className="bg-ink py-16 text-cream">
-        <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
-            Same team
+      {/* Mission + Values — parallel of /about */}
+      <section className="border-b border-rule bg-cream-2">
+        <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-24">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-mute">
+            Mission
           </p>
-          <h2 className="mt-3 font-display text-2xl sm:text-3xl">
-            RYDA Cars is the original product.
+          <p className="mt-4 max-w-3xl font-display text-2xl leading-tight text-ink sm:text-3xl">
+            &ldquo;To make ownership of exceptional yachts possible for
+            more enthusiasts — responsibly, transparently, and with
+            marine-grade ops handled by the team, not the owner.&rdquo;
+          </p>
+
+          <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            <Value
+              title="Transparency"
+              body="Every co-owner sees every cost, every survey, every captain log. The reserve account is open-book."
+            />
+            <Value
+              title="Marine craft"
+              body="Captains employed via the LLC, surveys by SAMS-accredited surveyors, hurricane prep pre-arranged. The hard parts are pre-solved."
+            />
+            <Value
+              title="Excellence"
+              body="Concierge-grade provisioning, captain dispatch, and slip coordination on every charter and member day."
+            />
+            <Value
+              title="Integrity"
+              body="Asset-backed ownership, single-purpose Delaware LLC per hull, member voting. We do what we say."
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Cross-link to cars about + founders */}
+      <section className="border-b border-rule">
+        <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-24">
+          <h2 className="font-display text-3xl text-ink sm:text-4xl">
+            The team behind both verticals.
           </h2>
-          <p className="mx-auto mt-3 max-w-xl text-base text-cream/70">
-            Same founders, same legal scaffolding, same operational
-            standard. Read the cars-side story and team.
+          <p className="mt-3 max-w-2xl text-base text-ink-soft">
+            Three co-founders combining executive search, investment
+            banking, and three decades of institutional equity markets.
+            The boats vertical runs on the same operational and legal
+            backbone as the cars side.
           </p>
           <Link
-            href="/about"
-            className="mt-7 inline-flex h-11 items-center justify-center rounded-full border border-cream/30 px-6 text-sm font-medium text-cream hover:border-cream"
+            href="/about#founders"
+            className="mt-8 inline-flex h-12 items-center justify-center rounded-full border border-ink px-7 text-sm font-medium text-ink hover:bg-ink hover:text-cream"
           >
-            About RYDA Cars →
+            Meet the founders →
           </Link>
         </div>
       </section>
+
+      {/* HQ — parallel of /about Headquarters */}
+      <section className="border-b border-rule bg-cream-2">
+        <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-24">
+          <h2 className="font-display text-3xl text-ink sm:text-4xl">
+            RYDA Boats operations
+          </h2>
+          <dl className="mt-8 grid max-w-2xl grid-cols-1 gap-5 text-sm sm:grid-cols-2">
+            <Fact label="Legal entity" value="Single-purpose Delaware LLC per hull" />
+            <Fact label="Operating market" value="Miami flagship · launching Q3 2026" />
+            <Fact label="Marina partner" value="Coconut Grove · Island Gardens · Miami Beach Marina" />
+            <Fact label="Captains" value="USCG licensed, employed via the LLC" />
+            <Fact label="Survey partner" value="SAMS-accredited" />
+            <Fact label="Insurance" value="Hagerty Marine / CHUBB / Travelers, agreed-value" />
+            <Fact label="General" value="hello@ryda.com" />
+            <Fact label="Operations" value="boats@ryda.com" />
+          </dl>
+        </div>
+      </section>
+
+      {/* Final CTA — parallel of /about CTA */}
+      <section className="bg-ink py-20 text-cream">
+        <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
+          <h2 className="font-display text-3xl sm:text-4xl">
+            Become a founding boats member.
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
+            The first 60 boats members lock founding pricing on Blue or
+            Black for life. We&apos;re vetting now ahead of the Miami
+            water launch, Q3 2026.
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <Link
+              href="/founding-members?vertical=boats"
+              className="inline-flex h-12 items-center justify-center bg-cream px-7 text-sm font-medium text-ink hover:bg-marine hover:text-cream"
+            >
+              Apply for founding membership →
+            </Link>
+            <Link
+              href="/about"
+              className="inline-flex h-12 items-center justify-center border border-cream/30 px-7 text-sm font-medium text-cream hover:border-cream"
+            >
+              About RYDA Cars
+            </Link>
+          </div>
+        </div>
+      </section>
     </>
+  );
+}
+
+function Value({ title, body }: { title: string; body: string }) {
+  return (
+    <div>
+      <p className="font-display text-lg text-ink">{title}</p>
+      <p className="mt-3 text-sm leading-relaxed text-ink-soft">{body}</p>
+    </div>
+  );
+}
+
+function Fact({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="border-b border-rule pb-3">
+      <dt className="text-[10px] font-medium uppercase tracking-[0.16em] text-mute">
+        {label}
+      </dt>
+      <dd className="mt-1 text-ink">{value}</dd>
+    </div>
   );
 }

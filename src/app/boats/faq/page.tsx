@@ -57,47 +57,62 @@ export default function BoatsFaqPage() {
         </div>
       </section>
 
-      {/* Co-ownership shared section */}
+      {/* Co-ownership shared section — expandable details, matches
+          /faq accordion pattern. */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-3xl px-6 py-16 sm:px-10 sm:py-20">
           <h2 className="font-display text-3xl text-ink sm:text-4xl">
             Co-ownership
           </h2>
-          <ul className="mt-8 space-y-3">
-            {SHARED_CO_OWNERSHIP.map((item, i) => (
-              <li
-                key={i}
-                className="rounded-2xl border border-rule bg-surface p-6"
+          <div className="mt-10 space-y-4">
+            {SHARED_CO_OWNERSHIP.map((qa) => (
+              <details
+                key={qa.q}
+                className="group rounded-xl border border-rule bg-surface p-5"
               >
-                <p className="font-display text-lg text-ink">{item.q}</p>
-                <p className="mt-3 text-sm leading-relaxed text-ink-soft">
-                  {item.a}
+                <summary className="cursor-pointer list-none font-display text-lg text-ink marker:hidden">
+                  <span className="flex items-center justify-between gap-4">
+                    <span>{qa.q}</span>
+                    <span className="text-2xl text-marine transition-transform group-open:rotate-45">
+                      +
+                    </span>
+                  </span>
+                </summary>
+                <p className="mt-4 text-sm leading-relaxed text-ink-soft">
+                  {qa.a}
                 </p>
-              </li>
+              </details>
             ))}
-          </ul>
+          </div>
         </div>
       </section>
 
-      {/* Boat-specific operations */}
+      {/* Boat-specific operations — same expandable pattern */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-3xl px-6 py-16 sm:px-10 sm:py-20">
           <h2 className="font-display text-3xl text-ink sm:text-4xl">
             Operations
           </h2>
-          <ul className="mt-8 space-y-3">
-            {FAQ_ITEMS.map((item, i) => (
-              <li
-                key={i}
-                className="rounded-2xl border border-rule bg-surface p-6"
+          <div className="mt-10 space-y-4">
+            {FAQ_ITEMS.map((qa) => (
+              <details
+                key={qa.q}
+                className="group rounded-xl border border-rule bg-surface p-5"
               >
-                <p className="font-display text-lg text-ink">{item.q}</p>
-                <p className="mt-3 text-sm leading-relaxed text-ink-soft">
-                  {item.a}
+                <summary className="cursor-pointer list-none font-display text-lg text-ink marker:hidden">
+                  <span className="flex items-center justify-between gap-4">
+                    <span>{qa.q}</span>
+                    <span className="text-2xl text-marine transition-transform group-open:rotate-45">
+                      +
+                    </span>
+                  </span>
+                </summary>
+                <p className="mt-4 text-sm leading-relaxed text-ink-soft">
+                  {qa.a}
                 </p>
-              </li>
+              </details>
             ))}
-          </ul>
+          </div>
         </div>
       </section>
 

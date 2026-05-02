@@ -380,6 +380,72 @@ export default async function BoatDetailPage({
           </Link>
         </div>
       </section>
+
+      {/* Sample documents + founder call CTA — parallel to /markets/[symbol]
+          which has its own founders-call CTA strip below the booking
+          policy section. */}
+      <section className="border-b border-rule">
+        <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+            <div className="rounded-2xl border border-rule bg-surface p-8">
+              <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-mute">
+                Documents
+              </p>
+              <h3 className="mt-3 font-display text-2xl text-ink">
+                Read the LLC packet before you wire.
+              </h3>
+              <p className="mt-3 text-sm leading-relaxed text-ink-soft">
+                Operating Agreement, Management Services Agreement, marine
+                survey, USCG documentation, captain employment, hurricane
+                plan, and charter opt-in agreement. Redacted samples
+                available pre-application.
+              </p>
+              <Link
+                href={`/contact?type=Membership&note=${encodeURIComponent(`Sample documents — ${b.name}`)}#form`}
+                className="mt-6 inline-flex h-11 items-center justify-center border border-ink bg-ink px-6 text-sm font-medium text-cream transition-colors hover:bg-marine hover:border-marine"
+              >
+                Request the packet
+              </Link>
+            </div>
+            <div className="rounded-2xl border border-rule bg-surface p-8">
+              <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-mute">
+                Talk to a founder
+              </p>
+              <h3 className="mt-3 font-display text-2xl text-ink">
+                Schedule a 30-minute call.
+              </h3>
+              <p className="mt-3 text-sm leading-relaxed text-ink-soft">
+                Walk through the {b.name} cost sheet, hurricane protocol,
+                slip rotation, and member calendar with a real human. No
+                commitment.
+              </p>
+              <Link
+                href={`/contact?type=Membership&note=${encodeURIComponent(`Schedule a call — ${b.name}`)}#form`}
+                className="mt-6 inline-flex h-11 items-center justify-center border border-ink px-6 text-sm font-medium text-ink transition-colors hover:bg-ink hover:text-cream"
+              >
+                Schedule a call
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Disclaimer — parallel to /markets/[symbol] footer disclaimer */}
+      <section>
+        <div className="mx-auto max-w-3xl px-6 py-12 text-center text-xs text-mute sm:px-10">
+          <p>
+            RYDA Boats co-ownership stakes are membership interests in
+            single-purpose member-managed Delaware LLCs — not registered
+            securities, not offered for investment purposes. Modeled
+            depreciation and charter income are illustrative only; actual
+            results depend on use, market, and operator. See the{" "}
+            <Link href="/legal/disclaimer" className="text-marine hover:text-marine-deep">
+              Co-Ownership Disclaimer
+            </Link>
+            .
+          </p>
+        </div>
+      </section>
     </>
   );
 }
