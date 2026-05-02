@@ -172,8 +172,76 @@ export function BoatCompareCalculator({
         returned pro-rata. The calculator subtracts your estimated share
         sale from your total cash to show real{" "}
         <span className="font-medium text-ink">net cost</span>, and
-        compares it against renting the same car or owning it solo.
+        compares it against chartering the same hull or owning it solo.
       </p>
+
+      {/* Boatculator headline panel — surfaces projected charter
+          income upfront so the offset story is the first number on
+          the page. Tied to live state via numbers.ryda. */}
+      {optInRental && numbers.ryda.rentalIncomeAnnual > 0 ? (
+        <div className="mt-8 rounded-2xl border border-marine bg-marine/5 p-6 sm:p-7">
+          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-marine">
+            Boatculator · Charter income projection
+          </p>
+          <div className="mt-3 grid grid-cols-1 gap-6 sm:grid-cols-3 sm:items-end">
+            <div className="sm:col-span-2">
+              <p className="font-display text-4xl font-light tabular-nums text-ink sm:text-5xl">
+                {formatUSD(numbers.ryda.rentalIncomeAnnual)}
+                <span className="ml-2 align-baseline text-base font-normal text-ink-soft">
+                  /year
+                </span>
+              </p>
+              <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+                Projected from opting{" "}
+                <span className="font-medium text-ink">
+                  {safeShares} share{safeShares > 1 ? "s" : ""}
+                </span>{" "}
+                of the {boat.name} into the RYDA charter pool, at{" "}
+                <span className="font-medium text-ink tabular-nums">
+                  {rentalOccupancy}%
+                </span>{" "}
+                occupancy on{" "}
+                <span className="tabular-nums">
+                  {numbers.rentalEcon.rentablePoolDays}
+                </span>{" "}
+                pooled days. Revenue split{" "}
+                {100 - RENTAL_DEFAULTS_BOATS.defaultManagementFeePct}/
+                {RENTAL_DEFAULTS_BOATS.defaultManagementFeePct} you / RYDA.
+              </p>
+            </div>
+            <div className="rounded-xl border border-marine/30 bg-cream-2/60 p-4 text-center">
+              <p className="text-[10px] font-medium uppercase tracking-wider text-mute">
+                Offsets carrying
+              </p>
+              <p className="mt-1 font-display text-3xl tabular-nums text-ink">
+                {numbers.ryda.annualOps === 0
+                  ? 0
+                  : Math.round(
+                      (numbers.ryda.rentalIncomeAnnual /
+                        numbers.ryda.annualOps) *
+                        100,
+                    )}
+                <span className="text-base text-ink-soft">%</span>
+              </p>
+              <p className="mt-1 text-[11px] text-mute">
+                of {formatUSD(numbers.ryda.annualOps)}/yr ops
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="mt-8 rounded-2xl border border-rule bg-cream-2/60 p-6 sm:p-7">
+          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-mute">
+            Boatculator · Charter income projection
+          </p>
+          <p className="mt-3 text-sm text-ink-soft">
+            Toggle &ldquo;Charter your unused days&rdquo; below to see
+            what opting your share into the charter pool would project.
+            Default occupancy: {RENTAL_DEFAULTS_BOATS.defaultOccupancyPct}%
+            of pooled days booked.
+          </p>
+        </div>
+      )}
 
       {/* Inputs */}
       <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2">
