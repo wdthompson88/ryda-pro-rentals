@@ -1,81 +1,118 @@
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 
-// Slim footer — collapsed from 6 columns to a 3-column layout that
-// reads as a luxury house mark + 2 link groups, plus a quiet bottom
-// strip with legal + disclaimer. Aman / Loro Piana keep marketing
-// footers tight: the prospect doesn't need a sitemap, they need a
-// mark that signs the page off.
-//
-// Theme toggle lives down here (not in the header) — luxury brands
-// own the canonical theme; the toggle is a power-user setting, not
-// a top-level navigation item.
+// Footer — brand row on top + 4 link columns below + legal strip.
+// Pacaso / Brunello pattern: full sitemap visible, but quiet eyebrows
+// and 15px body so the density doesn't shout. Theme toggle lives in
+// the bottom legal strip — power-user setting, not a top-level nav.
 
 export function SiteFooter() {
   return (
     <footer className="border-t border-rule">
-      <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-24">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-10">
-          {/* Brand block */}
-          <div className="lg:col-span-5">
-            <p className="font-display text-3xl text-ink">RYDA</p>
-            <p className="mt-4 max-w-sm text-[15px] leading-relaxed text-ink-soft">
-              Luxury vehicle access — Cars, Boats, and (soon) Planes.
-              Miami, FL · Launching Q3 2026.
-            </p>
-            <Link
-              href="/founding-members"
-              className="mt-7 inline-flex h-12 items-center justify-center border border-ink bg-ink px-7 text-sm font-medium text-cream transition-colors hover:bg-red hover:border-red"
-            >
-              Request membership
-            </Link>
-            <div className="mt-6 flex items-center gap-4 text-xs text-mute">
-              <Link href="/signin" className="hover:text-ink">
-                Sign in
-              </Link>
-              <span className="text-rule">·</span>
-              <Link href="/signup" className="hover:text-ink">
-                Sign up
-              </Link>
-              <span className="text-rule">·</span>
-              <Link href="/search" className="hover:text-ink">
-                Search
-              </Link>
-              <span className="text-rule">·</span>
-              <Link href="/help" className="hover:text-ink">
-                Help center
-              </Link>
+      {/* Brand row — generous, full width */}
+      <div className="border-b border-rule">
+        <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
+          <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-10">
+            <div className="lg:col-span-7">
+              <p className="font-display text-3xl text-ink">RYDA</p>
+              <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-ink-soft">
+                Luxury vehicle access — Cars, Boats, and (soon) Planes.
+                Member-managed Delaware LLCs, concierge-operated.
+                Miami launching Q3 2026.
+              </p>
+            </div>
+            <div className="lg:col-span-5 lg:flex lg:items-end lg:justify-end">
+              <div className="flex flex-col items-start gap-3 lg:items-end">
+                <Link
+                  href="/founding-members"
+                  className="inline-flex h-12 items-center justify-center border border-ink bg-ink px-7 text-sm font-medium text-cream transition-colors hover:bg-red hover:border-red"
+                >
+                  Request membership
+                </Link>
+                <div className="flex flex-wrap items-center gap-x-4 text-xs text-mute">
+                  <Link href="/signin" className="hover:text-ink">
+                    Sign in
+                  </Link>
+                  <span className="text-rule">·</span>
+                  <Link href="/signup" className="hover:text-ink">
+                    Sign up
+                  </Link>
+                  <span className="text-rule">·</span>
+                  <Link href="/search" className="hover:text-ink">
+                    Search
+                  </Link>
+                  <span className="text-rule">·</span>
+                  <Link href="/help" className="hover:text-ink">
+                    Help center
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
+        </div>
+      </div>
 
-          {/* Two link groups, dense */}
+      {/* 4 link columns */}
+      <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
+        <div className="grid grid-cols-2 gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-12">
           <FooterCol
-            title="The portfolio"
+            title="Cars"
             links={[
-              ["Cars", "/cars"],
-              ["Boats", "/boats"],
-              ["Planes", "/planes"],
+              ["Portfolio", "/markets"],
+              ["Rent", "/rent"],
               ["Membership", "/membership"],
               ["How it works", "/how-it-works"],
-              ["Sample documents", "/sample-documents"],
+              ["Concierge ownership", "/concierge-ownership"],
+              ["Track day", "/track-day"],
+              ["Insurance", "/insurance"],
+              ["Storage", "/storage"],
+              ["FAQ", "/faq"],
+            ]}
+          />
+          <FooterCol
+            title="Boats"
+            links={[
+              ["Portfolio", "/boats/portfolio"],
+              ["Charter", "/boats/rent"],
+              ["Membership", "/boats/membership"],
+              ["How it works", "/boats/how-it-works"],
+              ["About boats", "/boats/about"],
+              ["FAQ", "/boats/faq"],
+              ["Sample documents", "/boats/sample-documents"],
+            ]}
+          />
+          <FooterCol
+            title="Resources"
+            links={[
+              ["Journal", "/journal"],
               ["Inside RYDA", "/inside"],
+              ["Sample documents", "/sample-documents"],
+              ["Trust & safety", "/trust-and-safety"],
+              ["Member protection", "/member-protection"],
+              ["Sustainability", "/sustainability"],
+              ["Host your car", "/host-your-car"],
+              ["Concierge", "/concierge"],
+              ["Help center", "/help"],
             ]}
           />
           <FooterCol
             title="Company"
             links={[
               ["About", "/about"],
-              ["Journal", "/journal"],
               ["Investors", "/investors"],
               ["Press", "/press"],
               ["Careers", "/careers"],
               ["Contact", "/contact"],
-              ["Trust & safety", "/trust-and-safety"],
+              ["RYDA vs Turo", "/vs/turo"],
+              ["RYDA vs Marengo", "/vs/marengo"],
+              ["RYDA vs Supercar Club", "/vs/supercar-club"],
+              ["RYDA Boats vs Boatsetter", "/boats/vs/boatsetter"],
             ]}
           />
         </div>
       </div>
 
+      {/* Legal bottom strip */}
       <div className="border-t border-rule">
         <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-3 px-6 py-6 text-xs text-mute sm:flex-row sm:items-center sm:px-10">
           <p>© {new Date().getFullYear()} RYDA LLC · Formed under Delaware law</p>
@@ -111,7 +148,7 @@ function FooterCol({
   links: [string, string][];
 }) {
   return (
-    <div className="text-[15px] lg:col-span-3">
+    <div className="text-[15px]">
       <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-mute">
         {title}
       </p>
