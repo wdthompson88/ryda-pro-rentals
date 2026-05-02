@@ -27,8 +27,6 @@ const PUBLIC_ROUTES = [
   "/how-it-works",
   "/about",
   "/insurance",
-  "/concierge",
-  "/concierge-ownership",
   "/storage",
   "/track-day",
   "/trust-and-safety",

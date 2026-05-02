@@ -23,7 +23,7 @@ const ROLES = [
     title: "Head of Member Experience",
     type: "Full-time · Equity",
     location: "Miami, FL",
-    body: "First touchpoint for every prospective and active member. Run the application process, handover concierge, and member events. Background in private aviation, ultra-luxury hospitality, or wealth management client services.",
+    body: "First touchpoint for every prospective and active member. Run the application process, member handover, and member events. Background in private aviation, ultra-luxury hospitality, or wealth management client services.",
   },
   {
     title: "Senior Full-Stack Engineer",

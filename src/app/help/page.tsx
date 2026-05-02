@@ -124,7 +124,7 @@ export default function HelpCenterPage() {
         <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
             <Strip
-              title="Concierge & roadside"
+              title="Support & roadside"
               detail="24/7 support for active members. One number, real humans, no IVR."
               cta="Call (305) 555-0100"
               href="tel:+13055550100"
@@ -153,7 +153,7 @@ export default function HelpCenterPage() {
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
             We'll write you back within one business day. If it's urgent and
-            you're an active member, call the concierge line.
+            you're an active member, call the support line.
           </p>
           <Link
             href="/contact"

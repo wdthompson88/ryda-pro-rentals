@@ -459,7 +459,7 @@ function DocumentsStep({
         summary={[
           `Engages RYDA as the operating service provider for the LLC.`,
           `Your position: ${shares} of ${boat.shares} shares. Buy-in: ${formatUSD(boat.pricePerShare * shares)}.`,
-          "Defines RYDA's services: storage, insurance, scheduling, maintenance, concierge, member services.",
+          "Defines RYDA's services: storage, insurance, scheduling, maintenance, member services.",
           "Defines the 12% annual management fee charged to the LLC and paid pro-rata by members.",
           "RYDA is a service provider — not a manager of the LLC. Members retain LLC governance.",
           "Acknowledgment that co-ownership is for personal use, not investment.",

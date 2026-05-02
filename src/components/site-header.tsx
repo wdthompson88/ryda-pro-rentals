@@ -17,7 +17,6 @@ const CARS_NAV = [
   { href: "/markets", label: "Portfolio" },
   { href: "/rent", label: "Rent" },
   { href: "/how-it-works", label: "How it works" },
-  { href: "/concierge-ownership", label: "Concierge" },
   { href: "/membership", label: "Membership" },
 ];
 
@@ -67,7 +66,7 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
     <header className={`w-full border-b ${inverted ? "border-cream/20" : "border-rule"}`}>
       {/* Single-row marketing header. Vertical switcher / theme toggle /
           search-icon were demoted to footer per luxury polish — header
-          now reads as concierge brand mark + nav + one CTA, not as
+          now reads as minimal brand mark + nav + one CTA, not as
           a control panel. */}
 
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-5 sm:px-10">

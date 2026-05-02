@@ -46,7 +46,7 @@ const MESSAGES = [
   { from: "You", time: "10:14 AM", text: "I'm in. Driving up Friday morning, leaving Sunday evening.", own: true },
   { from: "Co-owner B", time: "11:02 AM", text: "Going to fly down Saturday and meet you. Co-owner A, can you handle the Ferrari Saturday afternoon?", own: false },
   { from: "Co-owner A", time: "11:08 AM", text: "Of course. I'll do a soft top-down test before I hand off.", own: false },
-  { from: "RYDA Concierge", time: "11:30 AM", text: "I can coordinate hotel parking arrangements + Sunday morning detail. Should I book?", own: false, system: true },
+  { from: "RYDA Service", time: "11:30 AM", text: "I can coordinate hotel parking arrangements + Sunday morning detail. Should I book?", own: false, system: true },
 ];
 
 export default function MessagesPage() {

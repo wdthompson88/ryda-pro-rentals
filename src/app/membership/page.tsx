@@ -34,10 +34,10 @@ const FEATURES: { group: string; items: { label: string; core: CellValue; blue: 
     ],
   },
   {
-    group: "Concierge",
+    group: "Service",
     items: [
       { label: "Free white-glove deliveries / year", core: false, blue: "1", black: "3" },
-      { label: "Free concierge hours / year", core: false, blue: "1", black: "3" },
+      { label: "Free service hours / year", core: false, blue: "1", black: "3" },
       { label: "Free pre-trip vehicle prep / year", core: false, blue: false, black: "1" },
       { label: "24/7 roadside assistance", core: true, blue: true, black: true },
       { label: "Standard handover (pickup)", core: true, blue: true, black: true },
@@ -78,7 +78,7 @@ const TIERS = [
     name: "Black",
     price: "$1,500",
     priceSub: "/year",
-    tagline: "Concierge-grade everything. Travel programming, flagship events, dedicated contact.",
+    tagline: "Premium everything. Travel programming, flagship events, dedicated contact.",
     cta: "Choose Black",
     dark: true,
   },
@@ -188,7 +188,7 @@ export default function MembershipPage() {
             />
             <Math
               tier="Black · $1,500/yr"
-              detail="Concierge-grade everything: a $500 buy-in credit, three deliveries, three concierge hours, waived first acquisition fee, flagship event programming (Pebble, Miami GP, Art Basel), and a dedicated account contact."
+              detail="Premium everything: a $500 buy-in credit, three deliveries, three service hours, waived first acquisition fee, flagship event programming (Pebble, Miami GP, Art Basel), and a dedicated account contact."
             />
           </div>
         </div>

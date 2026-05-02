@@ -13,7 +13,7 @@ import { SPLITTER_MEDIA, type MediaSlot } from "@/lib/media";
 export const metadata: Metadata = {
   title: "RYDA — Luxury vehicle access",
   description:
-    "Co-own or rent the world's most coveted luxury vehicles in the US. Cars · Boats · Planes. Member-managed Delaware LLCs, concierge operated.",
+    "Co-own or rent the world's most coveted luxury vehicles in the US. Cars · Boats · Planes. Member-managed Delaware LLCs, professionally operated.",
 };
 
 type Accent = "red" | "marine" | "neutral";

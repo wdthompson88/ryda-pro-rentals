@@ -54,7 +54,7 @@ export default function TrustAndSafetyPage() {
             />
             <Pillar
               eyebrow="Operations"
-              title="Concierge handover, every booking"
+              title="White-glove handover, every booking"
               body="Vehicles are washed, fueled, and pre-inspected before every member booking. Photo-documented condition both at delivery and return. Any new damage is logged and assigned before the next booking."
             />
             <Pillar

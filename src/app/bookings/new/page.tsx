@@ -548,7 +548,7 @@ function Confirmed({
           <li>· Confirmation email sent</li>
           <li>· 24h pickup-prep reminder goes out the day before</li>
           <li>· Pre-trip checklist available 24h before</li>
-          <li>· Day-of contact: RYDA concierge in your inbox</li>
+          <li>· Day-of contact: RYDA service team in your inbox</li>
         </ul>
       </div>
       <div className="mt-8 flex flex-col gap-2 sm:flex-row sm:justify-center">

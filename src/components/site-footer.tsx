@@ -17,7 +17,7 @@ export function SiteFooter() {
               <p className="font-display text-3xl text-ink">RYDA</p>
               <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-ink-soft">
                 Luxury vehicle access — Cars, Boats, and (soon) Planes.
-                Member-managed Delaware LLCs, concierge-operated.
+                Member-managed Delaware LLCs, professionally operated.
                 Miami launching Q3 2026.
               </p>
             </div>
@@ -62,7 +62,6 @@ export function SiteFooter() {
               ["Rent", "/rent"],
               ["Membership", "/membership"],
               ["How it works", "/how-it-works"],
-              ["Concierge ownership", "/concierge-ownership"],
               ["Track day", "/track-day"],
               ["Insurance", "/insurance"],
               ["Storage", "/storage"],
@@ -91,7 +90,6 @@ export function SiteFooter() {
               ["Member protection", "/member-protection"],
               ["Sustainability", "/sustainability"],
               ["Host your car", "/host-your-car"],
-              ["Concierge", "/concierge"],
               ["Help center", "/help"],
             ]}
           />

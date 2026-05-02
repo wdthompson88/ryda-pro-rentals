@@ -7,7 +7,7 @@ import { PlanesMissionProfileForm } from "@/components/planes-mission-profile-fo
 export const metadata: Metadata = {
   title: "RYDA Planes — Coming soon",
   description:
-    "RYDA Planes is in design. Fractional access to private aviation, structured the same way as our cars and boats verticals — member-managed Delaware LLCs, concierge-operated.",
+    "RYDA Planes is in design. Fractional access to private aviation, structured the same way as our cars and boats verticals — member-managed Delaware LLCs, professionally operated.",
 };
 
 export default function PlanesComingSoon() {
@@ -154,7 +154,7 @@ export default function PlanesComingSoon() {
           <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
             If the Planes thesis resonates, the cars and boats programs
             run the same playbook. Same LLC structure, same exit
-            doctrine, same concierge ops.
+            doctrine, same professional ops.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link

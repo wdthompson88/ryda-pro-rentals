@@ -254,7 +254,7 @@ export default async function BoatCharterDetail({
             />
             <Pillar
               title="Provisioning on request"
-              body="Concierge stocks the galley, ice, drinks, chef on request. Coordinated by RYDA, billed at cost."
+              body="Our team stocks the galley, ice, drinks, chef on request. Coordinated by RYDA, billed at cost."
             />
           </div>
         </div>

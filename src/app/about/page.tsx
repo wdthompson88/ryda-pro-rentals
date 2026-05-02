@@ -41,12 +41,12 @@ export default function AboutPage() {
             <p>
               The math worked, the structure worked, the buyer pool was
               there. The middle ground — real co-ownership of real
-              supercars, with concierge ops and a clean LLC wrapper —
+              supercars, with professional ops and a clean LLC wrapper —
               just didn&apos;t exist in the US.
             </p>
             <p>
               We built RYDA to fill that gap — member-managed Delaware LLCs,
-              concierge ops, US markets. Miami first: highest per-capita
+              professional ops, US markets. Miami first: highest per-capita
               luxury auto density, no state income tax, year-round driving.
             </p>
           </div>
@@ -159,7 +159,7 @@ export default function AboutPage() {
             />
             <Value
               title="Excellence"
-              body="Concierge-grade preparation and handover for every booking. Our standard does not vary."
+              body="Premium preparation and handover for every booking. Our standard does not vary."
             />
             <Value
               title="Integrity"

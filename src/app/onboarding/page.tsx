@@ -244,7 +244,7 @@ function Tier({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
         <TierOption
           name="RYDA Black"
           price="$1,500 / yr"
-          tagline="$500 share credit · 3 deliveries · 3 concierge hrs · flagship events · dedicated contact."
+          tagline="$500 share credit · 3 deliveries · 3 service hrs · flagship events · dedicated contact."
           selected={tier === "black"}
           onClick={() => setTier("black")}
         />

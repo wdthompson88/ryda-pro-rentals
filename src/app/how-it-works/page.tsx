@@ -370,7 +370,7 @@ export default function HowItWorksPage() {
             <Reason
               n="06"
               title="Bigger share = more usage time"
-              body="1 share ≈ 30 days + 3,000 mi/yr. 5 shares ≈ 150 days. 10 shares ≈ year-round access — effectively solo ownership with concierge ops on top. Linear scaling, no premium for size."
+              body="1 share ≈ 30 days + 3,000 mi/yr. 5 shares ≈ 150 days. 10 shares ≈ year-round access — effectively solo ownership with professional ops on top. Linear scaling, no premium for size."
             />
             <Reason
               n="07"
@@ -623,7 +623,7 @@ export default function HowItWorksPage() {
             />
             <Faq
               q="Is there a membership fee?"
-              a="Three tiers. RYDA Core is free. RYDA Blue is $500/year. RYDA Black is $1,500/year — priority booking during peak season, included white-glove delivery, complimentary track-day rider on eligible vehicles, dedicated concierge contact. Founding-100 lock in $350/$1,000 for life."
+              a="Three tiers. RYDA Core is free. RYDA Blue is $500/year. RYDA Black is $1,500/year — priority booking during peak season, included white-glove delivery, complimentary track-day rider on eligible vehicles, dedicated dedicated contact. Founding-100 lock in $350/$1,000 for life."
             />
           </div>
         </div>

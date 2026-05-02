@@ -171,7 +171,7 @@ export default function BoatsAboutPage() {
             />
             <Value
               title="Excellence"
-              body="Concierge-grade provisioning, captain dispatch, and slip coordination on every charter and member day."
+              body="Service-grade provisioning, captain dispatch, and slip coordination on every charter and member day."
             />
             <Value
               title="Integrity"

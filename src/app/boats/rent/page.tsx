@@ -179,7 +179,7 @@ export default function BoatsRentPage() {
             />
             <Pillar
               title="Provisioning on request"
-              body="Concierge stocks the galley, ice, drinks, and chef on request. Coordinated by RYDA, billed at cost."
+              body="Our team stocks the galley, ice, drinks, and chef on request. Coordinated by RYDA, billed at cost."
             />
           </div>
         </div>

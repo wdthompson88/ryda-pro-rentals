@@ -9,7 +9,7 @@ export const metadata = {
 
 // Single source of truth for the boats tier matrix.
 // Mirrors the cars tier shape so members on both sides can read
-// the same row labels — but the events / concierge / priority rows
+// the same row labels — but the events / service team / priority rows
 // are deliberately boat-native (hurricane prep, slip windows,
 // captain-hours bank, charter-pool dibs). Don't reach for car
 // vocabulary here — boats live and die on different ops.
@@ -40,13 +40,13 @@ const FEATURES: { group: string; items: { label: string; core: CellValue; blue: 
     ],
   },
   {
-    group: "Concierge & operations",
+    group: "Service & operations",
     items: [
       { label: "24/7 captain dispatch + dockside help", core: true, blue: true, black: true },
       { label: "Annual hurricane-prep pass (haul, store, re-launch)", core: false, blue: true, black: true },
       { label: "Captain-hours bank (over and above included)", core: false, blue: "2 hrs", black: "8 hrs" },
       { label: "Pre-trip provisioning (food, fuel, ice)", core: false, blue: "1 trip", black: "3 trips" },
-      { label: "Concierge hours / year (itinerary, slips, restaurants)", core: false, blue: "1", black: "3" },
+      { label: "Service hours / year (itinerary, slips, restaurants)", core: false, blue: "1", black: "3" },
       { label: "Dedicated marine account contact", core: false, blue: false, black: true },
     ],
   },
@@ -85,7 +85,7 @@ const TIERS = [
     name: "Black",
     price: "$1,500",
     priceSub: "/year",
-    tagline: "Concierge-grade everything. Annual rendezvous, dedicated marine account contact, off-market hull access.",
+    tagline: "Premium everything. Annual rendezvous, dedicated marine account contact, off-market hull access.",
     cta: "Choose Black",
   },
 ];
@@ -198,7 +198,7 @@ export default function BoatsMembershipPage() {
             />
             <Detail
               tier="Black · $1,500/yr"
-              detail="Concierge-grade everything: $500 buy-in credit, +5 days peak-season priority, 8 captain-hours bank, three provisioning trips, three concierge hours, waived first acquisition fee, annual rendezvous + founders' weekend, off-market hull pre-list visibility, and a dedicated marine account contact."
+              detail="Premium everything: $500 buy-in credit, +5 days peak-season priority, 8 captain-hours bank, three provisioning trips, three service hours, waived first acquisition fee, annual rendezvous + founders' weekend, off-market hull pre-list visibility, and a dedicated marine account contact."
             />
           </div>
         </div>

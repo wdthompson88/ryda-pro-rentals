@@ -274,7 +274,7 @@ export default function BoatsHowItWorks() {
             />
             <Reason
               n="09"
-              title="Concierge-grade ops"
+              title="Service-grade ops"
               body="Provisioning, slip reservations, captain dispatch, charter scheduling, hurricane prep — all single-vendor. Black tier gets dedicated marine account contact."
             />
           </div>

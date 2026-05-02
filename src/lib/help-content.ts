@@ -40,7 +40,7 @@ export const HELP: HelpCategory[] = [
         body: [
           {
             type: "p",
-            text: "RYDA is a US member-managed supercar co-ownership platform. Each vehicle in the fleet is held in a single-purpose Delaware LLC with 10 shares. Each share entitles its holder to ~30 days and ~3,000 miles per year (100 mi/day allowance). Members can hold one share or several — usage and cost scale linearly. A 5-share holder gets ~150 days; a 10-share holder is essentially the solo owner with concierge ops.",
+            text: "RYDA is a US member-managed supercar co-ownership platform. Each vehicle in the fleet is held in a single-purpose Delaware LLC with 10 shares. Each share entitles its holder to ~30 days and ~3,000 miles per year (100 mi/day allowance). Members can hold one share or several — usage and cost scale linearly. A 5-share holder gets ~150 days; a 10-share holder is essentially the solo owner with professional ops.",
           },
           {
             type: "p",
@@ -84,7 +84,7 @@ export const HELP: HelpCategory[] = [
         slug: "membership-tiers",
         q: "Membership tiers explained: Core, Blue, Black",
         summary:
-          "Core is free and lets you browse the fleet. Blue ($500/yr) unlocks co-ownership and rentals. Black ($1,500/yr) adds priority and concierge perks.",
+          "Core is free and lets you browse the fleet. Blue ($500/yr) unlocks co-ownership and rentals. Black ($1,500/yr) adds priority and premium perks.",
         body: [
           { type: "h3", text: "Core — Free" },
           {
@@ -94,12 +94,12 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Blue — $500/year ($350 founding)" },
           {
             type: "p",
-            text: "The standard tier for active co-owners. Includes co-ownership shares, member-to-member transfers, member event invitations, and standard concierge services. Founding-100 members lock in $350/year for life.",
+            text: "The standard tier for active co-owners. Includes co-ownership shares, member-to-member transfers, member event invitations, and standard member services. Founding-100 members lock in $350/year for life.",
           },
           { type: "h3", text: "Black — $1,500/year ($1,000 founding)" },
           {
             type: "p",
-            text: "For high-utilization members. Adds priority booking during peak season, included white-glove delivery, complimentary track-day rider on eligible vehicles, dedicated concierge contact, and first-look access on new fleet additions. Founding-100 lock in $1,000/year for life.",
+            text: "For high-utilization members. Adds priority booking during peak season, included white-glove delivery, complimentary track-day rider on eligible vehicles, dedicated dedicated contact, and first-look access on new fleet additions. Founding-100 lock in $1,000/year for life.",
           },
           {
             type: "callout",
@@ -324,7 +324,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Management Services Agreement (MSA)" },
           {
             type: "p",
-            text: "The MSA is between the LLC and RYDA. It defines the services RYDA provides — storage, insurance procurement, scheduling, maintenance, concierge, member services — and the all-in annual management fee charged to the LLC (~7–9% of vehicle value, covering RYDA's service component plus pass-through costs). RYDA is a service provider engaged by the LLC's members, not a manager of the LLC itself. The MSA can be renewed or terminated by member vote per the Operating Agreement.",
+            text: "The MSA is between the LLC and RYDA. It defines the services RYDA provides — storage, insurance procurement, scheduling, maintenance, member services — and the all-in annual management fee charged to the LLC (~7–9% of vehicle value, covering RYDA's service component plus pass-through costs). RYDA is a service provider engaged by the LLC's members, not a manager of the LLC itself. The MSA can be renewed or terminated by member vote per the Operating Agreement.",
           },
           { type: "h3", text: "Annual documents" },
           {
@@ -683,7 +683,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Force majeure" },
           {
             type: "p",
-            text: "Hurricanes, family emergencies, etc. RYDA Concierge waives fees on case-by-case basis. Just call us — we're not trying to penalize people for legitimate emergencies.",
+            text: "Hurricanes, family emergencies, etc. RYDA Service waives fees on case-by-case basis. Just call us — we're not trying to penalize people for legitimate emergencies.",
           },
         ],
       },
@@ -811,7 +811,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Hurricane protocol" },
           {
             type: "p",
-            text: "Once NOAA issues a hurricane watch or warning for the operating market, RYDA Operations recalls all currently-booked vehicles to climate-controlled indoor storage. Pickup arrangements happen through Concierge — typically a transport driver picks up the vehicle from your location.",
+            text: "Once NOAA issues a hurricane watch or warning for the operating market, RYDA Operations recalls all currently-booked vehicles to climate-controlled indoor storage. Pickup arrangements happen through Service — typically a transport driver picks up the vehicle from your location.",
           },
           { type: "h3", text: "Refunds and rebooking" },
           {
@@ -861,12 +861,12 @@ export const HELP: HelpCategory[] = [
         slug: "lost-keys",
         q: "What if I lose the key fob?",
         summary:
-          "Call Concierge immediately. Replacement keys for exotics range $1,500–$8,000 and require dealer programming. The lost-key fee comes out of the responsible member.",
+          "Call Service immediately. Replacement keys for exotics range $1,500–$8,000 and require dealer programming. The lost-key fee comes out of the responsible member.",
         body: [
           { type: "h3", text: "Immediately" },
           {
             type: "p",
-            text: "Call RYDA Concierge as soon as you realize the key is missing. We'll dispatch a spare via secured courier so you can complete or end your booking. If the vehicle is in a public location, we'll arrange retrieval first.",
+            text: "Call RYDA Service as soon as you realize the key is missing. We'll dispatch a spare via secured courier so you can complete or end your booking. If the vehicle is in a public location, we'll arrange retrieval first.",
           },
           { type: "h3", text: "Replacement cost" },
           {
@@ -968,12 +968,12 @@ export const HELP: HelpCategory[] = [
         slug: "file-claim",
         q: "How to file a claim — step by step",
         summary:
-          "Call RYDA Concierge first (one number, 24/7). Photograph everything. Don't admit fault. We file with the carrier within 24 hours and manage the adjuster.",
+          "Call RYDA Service first (one number, 24/7). Photograph everything. Don't admit fault. We file with the carrier within 24 hours and manage the adjuster.",
         body: [
           { type: "h3", text: "Step 1 — Get safe and call us" },
           {
             type: "p",
-            text: "First priority: medical help if anyone's hurt. Second: move the vehicle out of traffic if it's safe. Third: call the RYDA Concierge line (in your dashboard, on your insurance card, in this help center). One number, 24/7, real human.",
+            text: "First priority: medical help if anyone's hurt. Second: move the vehicle out of traffic if it's safe. Third: call the RYDA Service line (in your dashboard, on your insurance card, in this help center). One number, 24/7, real human.",
           },
           { type: "h3", text: "Step 2 — Document" },
           {
@@ -1001,7 +1001,7 @@ export const HELP: HelpCategory[] = [
         slug: "roadside",
         q: "Roadside assistance & replacement vehicle",
         summary:
-          "24/7 dispatch from the RYDA Concierge line. Replacement vehicle of similar tier within 4 hours, anywhere in the operating market.",
+          "24/7 dispatch from the RYDA Service line. Replacement vehicle of similar tier within 4 hours, anywhere in the operating market.",
         body: [
           { type: "h3", text: "What roadside covers" },
           {
@@ -1115,7 +1115,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Practical advice" },
           {
             type: "p",
-            text: "If a passenger is hurt during a booking, call 911 first, then RYDA Concierge. Don't move them unless safety requires it. Don't admit fault. Document everything as you would any accident scene — the insurance carrier handles the rest.",
+            text: "If a passenger is hurt during a booking, call 911 first, then RYDA Service. Don't move them unless safety requires it. Don't admit fault. Document everything as you would any accident scene — the insurance carrier handles the rest.",
           },
         ],
       },
@@ -1152,7 +1152,7 @@ export const HELP: HelpCategory[] = [
           {
             type: "callout",
             tone: "warn",
-            text: "If you're not sure whether something voids coverage, ask Concierge first. The cost of a 5-minute conversation is much lower than a denied claim.",
+            text: "If you're not sure whether something voids coverage, ask Service first. The cost of a 5-minute conversation is much lower than a denied claim.",
           },
         ],
       },
@@ -1231,7 +1231,7 @@ export const HELP: HelpCategory[] = [
         slug: "report-damage",
         q: "How do I report new damage?",
         summary:
-          "Through the booking-return flow in the app, or by calling Concierge. Pre- and post-booking photo documentation makes attribution straightforward.",
+          "Through the booking-return flow in the app, or by calling Service. Pre- and post-booking photo documentation makes attribution straightforward.",
         body: [
           { type: "h3", text: "At handover" },
           {
@@ -1241,7 +1241,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "During the booking" },
           {
             type: "p",
-            text: "If you notice or cause damage, report it through the app or call Concierge. Faster reporting almost always resolves better — undisclosed damage discovered at return is worse than disclosed damage during the booking.",
+            text: "If you notice or cause damage, report it through the app or call Service. Faster reporting almost always resolves better — undisclosed damage discovered at return is worse than disclosed damage during the booking.",
           },
           { type: "h3", text: "At return" },
           {
@@ -1952,7 +1952,7 @@ export const HELP: HelpCategory[] = [
           {
             type: "ul",
             items: [
-              "Trips of 500+ miles or 5+ days: file an extended-trip notification with Concierge 14 days in advance. Insurance documentation, route filing, mid-trip support pre-arranged.",
+              "Trips of 500+ miles or 5+ days: file an extended-trip notification with Service 14 days in advance. Insurance documentation, route filing, mid-trip support pre-arranged.",
               "Mileage budget: long road trips can eat into your annual 3,000-mile allotment (100 mi/day × 30 days). Plan accordingly or pay the $4/mile overage.",
               "Cross-state borders: insurance covers all 50 contiguous states. Mexico and Canada need a separate process.",
             ],
@@ -1964,7 +1964,7 @@ export const HELP: HelpCategory[] = [
               "Plan fuel stops on premium-fuel station maps in advance — not every interstate exit has 93 octane.",
               "Plan storage: hotels with secured indoor parking are dramatically nicer than hoping for street parking with a Lambo.",
               "Bring a USB-C cable. Modern exotic infotainment is iPhone-default but cables are car-specific.",
-              "Tell Concierge ahead of time if you'll be far from cell coverage. They want to know if something happens.",
+              "Tell Service ahead of time if you'll be far from cell coverage. They want to know if something happens.",
             ],
           },
         ],
@@ -1983,7 +1983,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Major shows" },
           {
             type: "p",
-            text: "If the vehicle is going to be a featured display at a major event (Cars & Coffee Miami's main showcase, a manufacturer event, a museum exhibition), notify Concierge in advance. We'll coordinate a clean prep, possibly arrange transport, and confirm event-specific insurance considerations.",
+            text: "If the vehicle is going to be a featured display at a major event (Cars & Coffee Miami's main showcase, a manufacturer event, a museum exhibition), notify Service in advance. We'll coordinate a clean prep, possibly arrange transport, and confirm event-specific insurance considerations.",
           },
           { type: "h3", text: "Photoshoots — personal" },
           {
@@ -1996,7 +1996,7 @@ export const HELP: HelpCategory[] = [
             items: [
               "Paid photoshoots, brand collaborations, music video appearances, paid social posts: require advance approval and a commercial-use rider.",
               "Commercial use voids the standard policy without the rider — meaning if the car is damaged during a paid shoot, the insurance won't pay.",
-              "RYDA Concierge can quote the commercial rider in 24 hours; cost is typically $750–2,500 per shoot day depending on use.",
+              "RYDA Service can quote the commercial rider in 24 hours; cost is typically $750–2,500 per shoot day depending on use.",
             ],
           },
         ],

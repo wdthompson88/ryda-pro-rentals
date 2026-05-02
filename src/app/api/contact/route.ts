@@ -8,7 +8,6 @@ import { isAllowed, clientIp } from "@/lib/rate-limit";
 // silently downgrade the lead to "Other" and lose triage intent.
 const VALID_TYPES = new Set([
   "Membership",
-  "Concierge Ownership",
   "Rental",
   "Press",
   "Partnership",
@@ -38,7 +37,7 @@ export async function POST(req: Request) {
     const market = VALID_MARKETS.has(String(body.market || "")) ? String(body.market) : "Not sure";
     const message = String(body.message || "").trim().slice(0, 5000);
     // Free-form CTA attribution — what asset / intent / surface produced
-    // this lead (e.g. "Charter request: Wajer 55 S", "Concierge ownership
+    // this lead (e.g. "Charter request: Wajer 55 S", "Boats founding
     // inquiry", "Want LA boats access"). Persists to context column when
     // present (migration 0006); otherwise the route falls back to a
     // context-less insert so the form still works on older deployments.

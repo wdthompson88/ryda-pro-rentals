@@ -30,7 +30,7 @@ export default function InvestorsPage() {
           <p className="mt-7 max-w-2xl text-lg leading-relaxed text-cream/85">
             RYDA is a US member-managed supercar co-ownership platform —
             structured around real LLC ownership of real vehicles, with
-            concierge operations under a separate Management Services
+            professional operations under a separate Management Services
             Agreement. We&apos;re raising a $2.5M seed to launch Miami in
             Q3 2026 and reach 20 vehicles + 120 co-owners + $1.2M ARR by
             Year 3.

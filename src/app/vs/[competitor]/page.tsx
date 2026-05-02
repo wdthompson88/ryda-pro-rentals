@@ -48,7 +48,7 @@ const COMPARISONS: Comparison[] = [
       {
         label: "Operational burden",
         competitor: "Owner handles cleaning, fueling, screening, claims, registration",
-        ryda: "RYDA handles everything end-to-end — concierge ops included in annual contribution",
+        ryda: "RYDA handles everything end-to-end — professional ops included in annual contribution",
       },
       {
         label: "What you walk away with",
