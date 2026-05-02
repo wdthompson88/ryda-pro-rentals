@@ -57,8 +57,8 @@ export const VEHICLES: Vehicle[] = [
     pricePerShare: 34_000,
     annualOpCost: 7_080,
     annualSoloCarrying: 46_000,
-    daysPerYear: 30,
-    milesPerYear: 3_000,
+    daysPerYear: 32,
+    milesPerYear: 3_200,
     effectiveDailyCost: 236,
     cylinders: 6,
     drive: "AWD",
@@ -94,8 +94,8 @@ export const VEHICLES: Vehicle[] = [
     pricePerShare: 90_000,
     annualOpCost: 14_200,
     annualSoloCarrying: 48_000,
-    daysPerYear: 30,
-    milesPerYear: 3_000,
+    daysPerYear: 32,
+    milesPerYear: 3_200,
     effectiveDailyCost: 473,
     cylinders: 12,
     drive: "AWD",
@@ -131,8 +131,8 @@ export const VEHICLES: Vehicle[] = [
     pricePerShare: 37_600,
     annualOpCost: 6_900,
     annualSoloCarrying: 50_000,
-    daysPerYear: 30,
-    milesPerYear: 3_000,
+    daysPerYear: 32,
+    milesPerYear: 3_200,
     effectiveDailyCost: 230,
     cylinders: 8,
     drive: "RWD",
@@ -169,8 +169,8 @@ export const VEHICLES: Vehicle[] = [
     pricePerShare: 48_000,
     annualOpCost: 11_840,
     annualSoloCarrying: 58_000,
-    daysPerYear: 30,
-    milesPerYear: 3_000,
+    daysPerYear: 32,
+    milesPerYear: 3_200,
     effectiveDailyCost: 395,
     cylinders: 12,
     drive: "AWD",
@@ -207,8 +207,8 @@ export const VEHICLES: Vehicle[] = [
     pricePerShare: 51_000,
     annualOpCost: 10_560,
     annualSoloCarrying: 36_000,
-    daysPerYear: 30,
-    milesPerYear: 3_000,
+    daysPerYear: 32,
+    milesPerYear: 3_200,
     effectiveDailyCost: 352,
     cylinders: 12,
     drive: "RWD",
@@ -245,8 +245,8 @@ export const VEHICLES: Vehicle[] = [
     pricePerShare: 119_000,
     annualOpCost: 26_580,
     annualSoloCarrying: 62_000,
-    daysPerYear: 30,
-    milesPerYear: 3_000,
+    daysPerYear: 32,
+    milesPerYear: 3_200,
     effectiveDailyCost: 886,
     cylinders: 8,
     drive: "AWD",
@@ -310,13 +310,13 @@ export function formatUSD(n: number, opts: { decimals?: number } = {}) {
 // sale is the default exit baseline shown in pricing and calculators.
 
 export const HOLDING_YEARS = 2;
-export const HOLDING_MILES_CAP = 50_000; // alt sale trigger: whichever comes first
+export const HOLDING_MILES_CAP = 60_000; // alt sale trigger (~60K-75K depending on certified pre owned program)
 export const TARGET_DEPRECIATION_PCT = 10; // % over the full 2-year hold
 
 // Standard shareholder mileage allowance, matches GM LUXE & industry
 // norm. 32 days × 100 mi/day = 3,200 mi/yr per share.
 export const MILES_PER_DAY_PER_SHARE = 100;
-export const DAYS_PER_SHARE = 30;
+export const DAYS_PER_SHARE = 32;
 
 // ─────────────────────────────────────────────────────────────────────────
 // BOOKING POLICY, two-tier scheduling (inspired by Pacaso SmartStay)

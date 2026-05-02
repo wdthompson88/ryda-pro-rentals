@@ -518,7 +518,7 @@ export default async function RentDetailPage({
               Renting is your test drive. Co-ownership is the relationship.
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
-              The RYDA co-ownership fleet runs ~$236/day in steady-state
+              The RYDA co-ownership fleet runs ~$221/day in steady-state
               ops on a Ferrari versus $2,400/day to rent the same car.
               See if a curated certified pre owned share fits before your next trip.
             </p>

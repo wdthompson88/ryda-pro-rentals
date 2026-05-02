@@ -167,11 +167,11 @@ export default async function VehicleMarketPage({
         </div>
       </section>
 
-      {/* Ownership primitives, six-number trust block right under the
+      {/* Ownership primitives, five-number trust block right under the
           hero so the buyer sees the structure before scrolling further. */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-10 sm:px-10">
-          <OwnershipPrimitives variant="compact" title="What this share is, in six numbers" />
+          <OwnershipPrimitives variant="compact" title="What this share is, in five numbers" />
         </div>
       </section>
 

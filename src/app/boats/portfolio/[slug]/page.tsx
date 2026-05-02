@@ -212,14 +212,14 @@ export default async function BoatDetailPage({
         </div>
       </section>
 
-      {/* Ownership primitives, six-number trust block, parallel to
+      {/* Ownership primitives, five-number trust block, parallel to
           the cars detail page. Marine accent. */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-10 sm:px-10">
           <OwnershipPrimitives
             variant="compact"
             vertical="boats"
-            title="What this share is, in six numbers"
+            title="What this share is, in five numbers"
           />
         </div>
       </section>

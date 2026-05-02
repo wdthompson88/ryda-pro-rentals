@@ -26,12 +26,12 @@ export default function BoatsHowItWorks() {
             <span className="italic">Same doctrine as cars, different ops.</span>
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-ink-soft">
-            Each boat is held in a single-purpose LLC. Up to 10
-            verified members co-own every hull. RYDA runs operations
-            (captain, dockage, insurance, hurricane prep, charter
-            opt-in) under a separate Management Services Agreement.
-            Boats hold for {BOATS_HOLDING_YEARS} years (vs cars at 2) —
-            different depreciation curve, same structure.
+            Each boat is held in a single-purpose LLC with 10 shares
+            split across 1–5 verified co-owners (2-share minimum per
+            person). RYDA runs operations (captain, dockage, insurance,
+            hurricane prep, charter opt-in) under a separate Management
+            Services Agreement. Boats hold for {BOATS_HOLDING_YEARS} years
+            on a different depreciation curve than the cars side.
           </p>
         </div>
       </section>
@@ -64,15 +64,14 @@ export default function BoatsHowItWorks() {
             The numbers, exactly
           </p>
           <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
-            Every share, in six numbers.
+            Every share, in five numbers.
           </h2>
-          <div className="mt-10 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-6">
-            <Stat label="Co-owners per hull" value="10" />
-            <Stat label="Days / share / yr" value="30" />
-            <Stat label="Nautical miles / share / yr" value="1,500" />
-            <Stat label="Planned exit" value={`${BOATS_HOLDING_YEARS} yrs`} />
+          <div className="mt-10 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-5">
+            <Stat label="Co-owners" value="1–5" />
+            <Stat label="Allotted annual days per share" value="32" />
+            <Stat label="Nautical miles / share / yr" value="1,600" />
+            <Stat label="Planned exit" value={`${BOATS_HOLDING_YEARS * 12} mo`} />
             <Stat label="Modeled depreciation" value={`${BOATS_TARGET_DEPRECIATION_PCT}%`} />
-            <Stat label="Transfer min hold" value="12 mo" />
           </div>
         </div>
       </section>

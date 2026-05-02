@@ -111,8 +111,8 @@ export const BOATS: Boat[] = [
     pricePerShare: 195_000,
     annualOpCost: 32_000,
     annualSoloCarrying: 380_000,
-    daysPerYear: 30,
-    nmPerYear: 1_500,
+    daysPerYear: 32,
+    nmPerYear: 1_600,
     effectiveDailyCost: 1_067,
     listingStart: "2026-04-15",
     listingEnd: "2026-10-15",
@@ -159,8 +159,8 @@ export const BOATS: Boat[] = [
     pricePerShare: 420_000,
     annualOpCost: 78_000,
     annualSoloCarrying: 880_000,
-    daysPerYear: 30,
-    nmPerYear: 1_500,
+    daysPerYear: 32,
+    nmPerYear: 1_600,
     effectiveDailyCost: 2_600,
     listingStart: "2026-03-30",
     listingEnd: "2026-09-30",
@@ -211,8 +211,8 @@ export const BOATS: Boat[] = [
     pricePerShare: 75_000,
     annualOpCost: 18_000,
     annualSoloCarrying: 165_000,
-    daysPerYear: 30,
-    nmPerYear: 1_500,
+    daysPerYear: 32,
+    nmPerYear: 1_600,
     effectiveDailyCost: 600,
     listingStart: "2026-04-22",
     listingEnd: "2026-10-22",
@@ -264,8 +264,8 @@ export const BOATS: Boat[] = [
     pricePerShare: 120_000,
     annualOpCost: 28_000,
     annualSoloCarrying: 250_000,
-    daysPerYear: 30,
-    nmPerYear: 1_500,
+    daysPerYear: 32,
+    nmPerYear: 1_600,
     effectiveDailyCost: 933,
     listingStart: "2026-04-10",
     listingEnd: "2026-10-10",
@@ -305,7 +305,7 @@ export const BOATS: Boat[] = [
 export const BOATS_HOLDING_YEARS = 3;
 export const BOATS_TARGET_DEPRECIATION_PCT = 15;
 export const NM_PER_DAY_PER_SHARE = 50; // 32 days × 50 nm = 1,600 nm/yr
-export const BOATS_DAYS_PER_SHARE = 30;
+export const BOATS_DAYS_PER_SHARE = 32;
 // Engine-hours equivalent of cars' 50K-mile cap. ~2,000 engine hours
 // is the conventional threshold where major service (engines, rigging,
 // running gear) starts to dominate the carrying cost, the LLC sells

@@ -37,8 +37,8 @@ const CLUB_ANNUAL = 48_000;
 const CLUB_DAYS_INCLUDED = 30;
 const RYDA_SHARE_BUYIN = 34_000;
 const RYDA_ANNUAL_OPS = 7_080;
-const RYDA_DAYS = 30;
-const ASSUMED_DRIVE_DAYS = 30;
+const RYDA_DAYS = 32;
+const ASSUMED_DRIVE_DAYS = 32;
 const ASSUMED_DRIVE_DAYS_2YR = ASSUMED_DRIVE_DAYS * HOLDING_YEARS;
 const RESIDUAL_PCT = (100 - TARGET_DEPRECIATION_PCT) / 100;
 
@@ -214,7 +214,7 @@ export default function HowItWorksPage() {
           </h2>
           <p className="mt-4 max-w-2xl text-lg text-ink-soft">
             One Ferrari 296 share: $34K up front, ~$7,080/year all-in,
-            ~32 days/year, roughly $236/day in steady-state ops.
+            ~32 days/year, roughly $221/day in steady-state ops.
             Compare with $2,400+/day to rent or $40–80K/yr to own
             outright.
           </p>
@@ -315,7 +315,7 @@ export default function HowItWorksPage() {
             sticker, modeled around a single co-ownership share over a
             {" "}{HOLDING_YEARS}-year hold. Multi-share holders scale
             linearly: a 5-share holder pays ~$170K up front + ~$35K/yr
-            in ops for ~150 days/yr. Solo-ownership carrying assumes
+            in ops for ~160 days/yr. Solo-ownership carrying assumes
             industry averages for insurance, storage, maintenance, and
             depreciation reserve (range: $40–80K/yr depending on the
             car). Club figure represents a mid-tier US/UK supercar club
@@ -500,11 +500,11 @@ export default function HowItWorksPage() {
             How to read the price
           </p>
           <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
-            $236/day is operating cost. Net cost is the real number.
+            $221/day is operating cost. Net cost is the real number.
           </h2>
           <div className="mt-8 space-y-5 text-base leading-relaxed text-ink-soft">
             <p>
-              The $236/day figure is steady-state operating cost: $7,080
+              The $221/day figure is steady-state operating cost: $7,080
               of annual ops divided by 30 driving days. It&apos;s what
               every day behind the wheel costs you{" "}
               <span className="italic">while you hold the share</span>,

@@ -40,7 +40,7 @@ export const HELP: HelpCategory[] = [
         body: [
           {
             type: "p",
-            text: "RYDA is a US member-managed supercar co-ownership platform. Each vehicle in the fleet is held in a single-purpose LLC with 10 shares (up to 5 members). Each share entitles its holder to ~32 days and ~3,200 miles per year (100 mi/day allowance). Members can hold one share or several, usage and cost scale linearly. A 5-share holder gets ~150 days; a 10-share holder is essentially the solo owner with professional ops.",
+            text: "RYDA is a US member-managed supercar co-ownership platform. Each vehicle in the fleet is held in a single-purpose LLC with 10 shares (up to 5 members). Each share entitles its holder to ~32 days and ~3,200 miles per year (100 mi/day allowance). Members can hold one share or several, usage and cost scale linearly. A 5-share holder gets ~160 days; a 10-share holder is essentially the solo owner with professional ops.",
           },
           {
             type: "p",
@@ -131,7 +131,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Why the structure works without accreditation" },
           {
             type: "p",
-            text: "Each car is held in an LLC that you and the other verified members manage together, 5 to 10 co-owners total. RYDA operates the car under a separate management services agreement, but the LLC itself is yours. You're not buying a passive investment product; you're buying the right to use a car you and your co-owners actually own. Because the structure is consumption-first (real ownership, real usage rights, no profit expectation), it falls outside SEC investment-contract classification.",
+            text: "Each car is held in an LLC that you and the other verified members manage together, up to 5 co-owners per vehicle, with a 2-share minimum per person. RYDA operates the car under a separate management services agreement, but the LLC itself is yours. You're not buying a passive investment product; you're buying the right to use a car you and your co-owners actually own. Because the structure is consumption-first (real ownership, real usage rights, no profit expectation), it falls outside SEC investment-contract classification.",
           },
         ],
       },
@@ -188,7 +188,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Per-day comparison" },
           {
             type: "p",
-            text: "On a co-owned Ferrari 296 GTB at $34K per share (1 of 10) with ~30 days entitlement, the effective daily ops cost works out to about $236/day. The rental rate on the same vehicle is $2,400/day. If you'll drive 15+ days a year, co-ownership pays for itself.",
+            text: "On a co-owned Ferrari 296 GTB at $34K per share (1 of 10) with ~32 days entitlement, the effective daily ops cost works out to about $221/day. The rental rate on the same vehicle is $2,400/day. If you'll drive 15+ days a year, co-ownership pays for itself.",
           },
           {
             type: "callout",
@@ -347,7 +347,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Usage" },
           {
             type: "p",
-            text: "Each share entitles you to ~32 days and up to ~3,200 miles of vehicle usage per year (100 mi/day allowance), with the exact entitlement set per vehicle when the LLC is formed. Members can hold one share or several, usage scales linearly (5 shares ≈ 150 days; 10 shares ≈ 300 days, with the rest reserved for service and rental pool). Days are booked on a shared calendar with the other co-owners. Fair-use rules cap consecutive days during peak season.",
+            text: "Each share entitles you to ~32 days and up to ~3,200 miles of vehicle usage per year (100 mi/day allowance), with the exact entitlement set per vehicle when the LLC is formed. Members can hold one share or several, usage scales linearly (5 shares ≈ 160 days; 10 shares ≈ 320 days, with the rest reserved for service and rental pool). Days are booked on a shared calendar with the other co-owners. Fair-use rules cap consecutive days during peak season.",
           },
           { type: "h3", text: "Membership" },
           {
@@ -574,7 +574,7 @@ export const HELP: HelpCategory[] = [
             type: "ul",
             items: [
               "Protects existing members from dilution.",
-              "Provides predictable usage entitlement (10 shares × 30 days = 300 days/yr; the remaining ~65 days are reserved for service, downtime, and the rental pool).",
+              "Provides predictable usage entitlement (10 shares × 32 days = 320 days/yr; the remaining ~45 days are reserved for service, downtime, and the rental pool).",
               "Keeps the co-owner group small enough to coordinate.",
               "Keeps the LLC's member-managed governance simple and stable.",
             ],
@@ -1915,7 +1915,7 @@ export const HELP: HelpCategory[] = [
             type: "ul",
             items: [
               "Trips of 500+ miles or 5+ days: file an extended-trip notification with Service 14 days in advance. Insurance documentation, route filing, mid-trip support pre-arranged.",
-              "Mileage budget: long road trips can eat into your annual 3,200-mile allotment (100 mi/day × 30 days). Plan accordingly or pay the $4/mile overage.",
+              "Mileage budget: long road trips can eat into your annual 3,200-mile allotment (100 mi/day × 32 days). Plan accordingly or pay the $4/mile overage.",
               "Cross-state borders: insurance covers all 50 contiguous states. Mexico and Canada need a separate process.",
             ],
           },

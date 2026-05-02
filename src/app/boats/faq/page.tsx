@@ -18,7 +18,7 @@ const SHARED_CO_OWNERSHIP: { q: string; a: string }[] = [
   },
   {
     q: "How many co-ownership shares per hull?",
-    a: "10 shares per hull by default. Each share entitles you to ~30 days and up to ~1,600 nautical miles of usage per year (50 nm/day allowance). A single member can hold one share or several, usage scales linearly.",
+    a: "10 shares per hull, split across up to 5 co-owners with a 2-share minimum per person. Each share entitles you to ~32 days and up to ~1,600 nautical miles of usage per year (50 nm/day allowance). A single member can hold two shares or more, usage scales linearly.",
   },
   {
     q: "Are RYDA Boats co-ownership stakes securities?",
