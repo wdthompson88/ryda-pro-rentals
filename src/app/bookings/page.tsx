@@ -6,7 +6,7 @@ export const metadata = { title: "Bookings — RYDA" };
 
 const UPCOMING = [
   { vehicle: "McLaren 750S Spider", dates: "May 12 – May 14", duration: "2 days", status: "Confirmed", handover: "Self-pickup · Miami facility", miles: "200 / day" },
-  { vehicle: "Ferrari 296 GTB", dates: "Jun 5 – Jun 8", duration: "3 days", status: "Pending Proposal Coordinator", handover: "White-glove delivery", miles: "Unlimited (track day rider)" },
+  { vehicle: "Ferrari 296 GTB", dates: "Jun 5 – Jun 8", duration: "3 days", status: "Pending Proposal Coordinator", handover: "White-glove delivery", miles: "300 mi included" },
   { vehicle: "Ferrari 296 GTB", dates: "Jul 18 – Jul 21", duration: "3 days", status: "Confirmed", handover: "White-glove delivery", miles: "200 / day" },
 ];
 

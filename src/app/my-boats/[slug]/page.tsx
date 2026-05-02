@@ -315,7 +315,7 @@ export default async function MyVehiclePage({
             />
             <SettingCard
               title="Propose boat preferences"
-              desc="Submit changes to track-day eligibility, fuel policy, or delivery defaults for co-owner vote."
+              desc="Submit changes to fuel policy, or delivery defaults for co-owner vote."
             />
             <SettingCard
               title="LLC member register"

@@ -37,7 +37,6 @@ export default function InsurancePage() {
             <Card title="Agreed-value physical damage" body="Pre-set replacement value for each vehicle. No haircuts at total-loss settlement." />
             <Card title="Multi-driver coverage" body="Every approved RYDA member is named insured during their booking window." />
             <Card title="Roadside assistance" body="24/7 dispatch and replacement vehicle for any covered breakdown." />
-            <Card title="Track-day rider" body="Optional add-on for track-eligible vehicles. Covers on-track incidents on approved circuits." />
             <Card title="Storage coverage" body="Vehicles in RYDA partner storage are insured against theft, fire, and natural disaster." />
           </div>
         </div>
@@ -53,10 +52,6 @@ export default function InsurancePage() {
           </p>
           <ul className="mt-8 space-y-4 text-sm text-ink-soft">
             <NotCovered>Wear-and-tear items: tires, brakes, fluids, light scratches.</NotCovered>
-            <NotCovered>
-              Track use without the track-day rider purchased in advance for
-              that specific booking.
-            </NotCovered>
             <NotCovered>
               Damage caused by gross negligence (driving while impaired,
               racing, off-road use of street cars).

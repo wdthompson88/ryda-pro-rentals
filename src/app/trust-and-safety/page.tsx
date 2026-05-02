@@ -92,10 +92,6 @@ export default function TrustAndSafetyPage() {
               line="Roadside + replacement"
               detail="If a vehicle breaks down or is in an accident during your booking, RYDA dispatches a replacement vehicle of similar tier within 4 hours."
             />
-            <Coverage
-              line="Track-day rider (optional)"
-              detail="Track-eligible vehicles can be booked with the track-day insurance rider — covers driving on a sanctioned course. Some hypercars are not track-eligible by manufacturer warranty; we flag these in the listing."
-            />
           </div>
           <div className="mt-10 rounded-2xl border border-rule bg-cream-2 p-6">
             <p className="text-xs font-medium uppercase tracking-wider text-red">
@@ -207,10 +203,9 @@ export default function TrustAndSafetyPage() {
               a verified household secondary driver on request.
             </li>
             <li>
-              <span className="font-medium text-ink">No off-track motorsport.</span>{" "}
-              Sanctioned track days are fine with the rider. Drag strips,
-              autocross without proper insurance, and street racing are
-              not. We mean it.
+              <span className="font-medium text-ink">No motorsport on RYDA insurance.</span>{" "}
+              Drag strips, autocross without proper insurance, and street
+              racing are not covered. We mean it.
             </li>
             <li>
               <span className="font-medium text-ink">No undocumented modifications.</span>{" "}

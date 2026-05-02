@@ -69,7 +69,7 @@ export default function RentPage() {
             />
             <Pillar
               title="100 miles / day"
-              body="Industry-standard included mileage. Overage at $4/mile. Track day mode unlocks unlimited."
+              body="Industry-standard included mileage. Overage at $4/mile."
             />
           </div>
         </div>

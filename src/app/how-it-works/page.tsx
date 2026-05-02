@@ -611,7 +611,7 @@ export default function HowItWorksPage() {
             />
             <Faq
               q="What's covered by insurance?"
-              a="Each vehicle carries a fleet policy with $1M+ third-party liability and agreed-value physical damage. Co-owners are named insureds. Track day use requires an additional rider."
+              a="Each vehicle carries a fleet policy with $1M+ third-party liability and agreed-value physical damage. Co-owners are named insureds. Damage during sanctioned-track-event use is excluded by the standard policy."
             />
             <Faq
               q="Can I bring a friend in the car?"
@@ -623,7 +623,7 @@ export default function HowItWorksPage() {
             />
             <Faq
               q="Is there a membership fee?"
-              a="Three tiers. RYDA Core is free. RYDA Blue is $500/year. RYDA Black is $1,500/year — priority booking during peak season, included white-glove delivery, complimentary track-day rider on eligible vehicles, dedicated dedicated contact. First-100 lock in $350/$1,000 for life."
+              a="Three tiers. RYDA Core is free. RYDA Blue is $500/year. RYDA Black is $1,500/year — priority booking during peak season, included white-glove delivery, dedicated dedicated contact. First-100 lock in $350/$1,000 for life."
             />
           </div>
         </div>

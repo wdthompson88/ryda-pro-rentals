@@ -99,7 +99,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Black — $1,500/year ($1,000 early)" },
           {
             type: "p",
-            text: "For high-utilization members. Adds priority booking during peak season, included white-glove delivery, complimentary track-day rider on eligible vehicles, dedicated dedicated contact, and first-look access on new fleet additions. Early-100 lock in $1,000/year for life.",
+            text: "For high-utilization members. Adds priority booking during peak season, included white-glove delivery, dedicated dedicated contact, and first-look access on new fleet additions. Early-100 lock in $1,000/year for life.",
           },
           {
             type: "callout",
@@ -595,7 +595,7 @@ export const HELP: HelpCategory[] = [
     icon: "◷",
     title: "Bookings & usage",
     blurb:
-      "Reserving days, fair-use rules, peak-season caps, cancellations, no-shows, track days.",
+      "Reserving days, fair-use rules, peak-season caps, cancellations, no-shows.",
     articles: [
       {
         slug: "how-to-book",
@@ -688,47 +688,14 @@ export const HELP: HelpCategory[] = [
         ],
       },
       {
-        slug: "track-day",
-        q: "Booking a track day",
-        summary:
-          "Track-eligible vehicles can be booked with a track-day rider on the insurance. Some hypercars are not eligible by manufacturer warranty.",
-        body: [
-          { type: "h3", text: "Eligibility" },
-          {
-            type: "p",
-            text: "Each vehicle has a 'track-eligible' flag in its listing. Most modern Ferraris, Porsches, and Lambos qualify. Hybrid hypercars (LaFerrari-class, Aston Valhalla, McLaren P1) are typically not eligible because manufacturers void warranty on track use.",
-          },
-          { type: "h3", text: "How to book" },
-          {
-            type: "p",
-            text: "When you book a track-eligible vehicle, select 'Track day rider' in the booking flow. You'll need to specify which sanctioned event (HPDE / club track day / manufacturer event) and provide the track waiver.",
-          },
-          { type: "h3", text: "What's covered" },
-          {
-            type: "ul",
-            items: [
-              "Vehicle insurance covers on-track incidents during the rider window.",
-              "Mileage cap is removed — track miles don't count against the booking budget.",
-              "RYDA arranges helmet drop and post-track inspection.",
-              "Trailering to/from the track is available at member cost.",
-            ],
-          },
-          {
-            type: "callout",
-            tone: "warn",
-            text: "Track-day rider is per-event. Showing up to a sanctioned event without booking the rider voids coverage and is grounds for membership review.",
-          },
-        ],
-      },
-      {
         slug: "mileage",
         q: "Mileage limits and overages",
         summary:
-          "Standard share = 3,200 miles/year (100 mi/day × 30 days). Overages billed at $4/mile. Track miles excluded under the track-day rider.",
+          "Standard share = 3,200 miles/year (100 mi/day × 32 days). Overages billed at $4/mile.",
         body: [
           {
             type: "p",
-            text: "Each share gets ~3,200 miles per year (100 mi/day × ~30 days). Tracking is automatic from vehicle telemetry — you'll see real-time mileage status in your dashboard.",
+            text: "Each share gets ~3,200 miles per year (100 mi/day × ~32 days). Tracking is automatic from vehicle telemetry — you'll see real-time mileage status in your dashboard.",
           },
           { type: "h3", text: "Why a cap exists" },
           {
@@ -739,11 +706,6 @@ export const HELP: HelpCategory[] = [
           {
             type: "p",
             text: "Going over your annual mileage budget is allowed but billed at $4/mile, charged at the next calendar quarter. The overage fee accrues to the LLC's reserves and offsets future depreciation.",
-          },
-          { type: "h3", text: "Track miles" },
-          {
-            type: "p",
-            text: "Miles driven on a sanctioned track during a track-day rider booking don't count against your annual budget. They're tracked separately and don't trigger overages.",
           },
         ],
       },
@@ -1147,7 +1109,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Track days are different" },
           {
             type: "p",
-            text: "Sanctioned track days WITH the track-day rider are explicitly covered. Track days without the rider void coverage for that booking. The rider has to be booked in advance — you can't add it the morning of an event.",
+            text: "Sanctioned track use is explicitly excluded by our standard insurance.",
           },
           {
             type: "callout",
@@ -1332,7 +1294,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "What can void warranty" },
           {
             type: "p",
-            text: "Track use without manufacturer-approved track-day documentation, aftermarket modifications to powertrain or electronics, or skipped service intervals. We don't allow any of these on RYDA fleet vehicles for this reason.",
+            text: "Aftermarket modifications to powertrain or electronics, or skipped service intervals. We don't allow these on RYDA fleet vehicles for this reason.",
           },
         ],
       },
@@ -1875,13 +1837,13 @@ export const HELP: HelpCategory[] = [
         slug: "aggressive-driving",
         q: "Can I track / drift / launch the car?",
         summary:
-          "Sanctioned track days with the rider: yes. Drag strips, drift events, launch control on public roads: no. Spirited canyon driving: yes, within reason.",
+          "Drag strips, drift events, and launch control on public roads are not covered. Spirited canyon driving is fine within reason.",
         body: [
           { type: "h3", text: "What's allowed" },
           {
             type: "ul",
             items: [
-              "Sanctioned track days (HPDE, club track day, manufacturer track event) on track-eligible vehicles WITH the track-day rider booked in advance.",
+              "Track use is excluded under our standard insurance — RYDA fleet vehicles are not approved for track events.",
               "Spirited driving on public roads — using the powerband, enjoying corners, normal performance driving within posted limits.",
               "Launch control on a closed track. Multiple manufacturers (Ferrari, Lambo) actually require periodic use of launch control to keep transmission systems calibrated — but only on track or private property.",
             ],
@@ -2082,7 +2044,6 @@ const ARTICLE_KEYWORDS: Record<string, string[]> = {
   "bookings/how-to-book": ["book", "reserve", "schedule", "calendar", "availability", "drive", "use the car", "make a booking", "reservation"],
   "bookings/fair-use": ["fair use", "peak", "high season", "summer", "consecutive days", "limit", "weekly cap", "cap", "monopolize", "hog", "block out", "f1", "art basel"],
   "bookings/cancellations": ["cancel", "reschedule", "refund", "no show", "cancellation fee", "change date", "back out", "withdraw"],
-  "bookings/track-day": ["track", "racing", "race", "circuit", "hpde", "lap", "performance driving", "track event", "track day", "porsche club", "ferrari challenge"],
   "bookings/mileage": ["miles", "mileage", "overage", "kilometers", "limit", "annual miles", "$4 per mile", "exceed", "go over", "extra miles"],
   "bookings/passengers": ["passenger", "co-driver", "secondary driver", "spouse", "partner", "friend", "additional driver", "guests", "wife", "husband", "kids ride"],
   "bookings/out-of-state-travel": ["out of state", "another state", "state line", "border", "mexico", "canada", "long distance", "across country", "interstate", "transit"],

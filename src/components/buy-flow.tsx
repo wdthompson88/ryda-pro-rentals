@@ -243,10 +243,6 @@ function ReviewStep({
       <Section title="Annual usage entitlement">
         <Bullet label="Driving days" value={`Up to ${usageDays} days/year`} />
         <Bullet label="Mileage" value={`${usageMiles} miles/year`} />
-        <Bullet
-          label="Track day"
-          value={vehicle.trackEligible ? "Eligible (rider per event)" : "Not eligible"}
-        />
         <Bullet label="Bookings" value="Shared calendar with co-owners. Fair-use rules apply during peak season." />
       </Section>
 

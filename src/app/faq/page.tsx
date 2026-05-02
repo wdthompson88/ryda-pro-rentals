@@ -79,10 +79,6 @@ const SECTIONS: { title: string; questions: Q[] }[] = [
         q: "How do I book my time?",
         a: "Through the RYDA app, on a shared calendar with the other co-owners. Fair-use rules cap consecutive days during high season (May–September) at 7 per share, with 14 days allowed in low season.",
       },
-      {
-        q: "Can I drive on a track?",
-        a: "Yes, on track-eligible vehicles, with our track-day rider. RYDA arranges the insurance, helmet drop, and post-track inspection. Some hypercars are not eligible by manufacturer warranty.",
-      },
     ],
   },
   {
@@ -94,7 +90,7 @@ const SECTIONS: { title: string; questions: Q[] }[] = [
       },
       {
         q: "What's included in a rental?",
-        a: "Full insurance, 100 miles per day, 24/7 roadside, and white-glove delivery if you choose it. Overage is $4/mile. Track-eligible vehicles can be booked with a track-day rider for unlimited miles on track.",
+        a: "Full insurance, 100 miles per day, 24/7 roadside, and white-glove delivery if you choose it. Overage is $4/mile.",
       },
       {
         q: "Why rentals at all? Aren't you focused on ownership?",

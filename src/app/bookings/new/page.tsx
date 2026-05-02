@@ -96,7 +96,7 @@ export default function NewBookingPage() {
     return { start: fmt(start), end: fmt(end), days: 3 };
   });
   const [details, setDetails] = useState({
-    type: "standard" as "standard" | "track" | "event",
+    type: "standard" as "standard" | "event",
     handover: "delivery" as "delivery" | "pickup",
     notes: "",
   });
@@ -400,8 +400,8 @@ function PickDetails({
   onNext,
   vehicle,
 }: {
-  details: { type: "standard" | "track" | "event"; handover: "delivery" | "pickup"; notes: string };
-  onChange: (d: { type: "standard" | "track" | "event"; handover: "delivery" | "pickup"; notes: string }) => void;
+  details: { type: "standard" | "event"; handover: "delivery" | "pickup"; notes: string };
+  onChange: (d: { type: "standard" | "event"; handover: "delivery" | "pickup"; notes: string }) => void;
   onBack: () => void;
   onNext: () => void;
   vehicle: { name: string };
@@ -415,15 +415,14 @@ function PickDetails({
         <p className="text-xs font-medium uppercase tracking-wider text-mute">
           Booking type
         </p>
-        <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
+        <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
           {[
             { k: "standard", t: "Standard drive", s: "Public roads" },
-            { k: "track", t: "Track day", s: "+$250 + rider" },
             { k: "event", t: "Special event", s: "Wedding, gala, photo" },
           ].map((opt) => (
             <button
               key={opt.k}
-              onClick={() => onChange({ ...details, type: opt.k as "standard" | "track" | "event" })}
+              onClick={() => onChange({ ...details, type: opt.k as "standard" | "event" })}
               className={`rounded-xl border p-3 text-left transition-colors ${
                 details.type === opt.k
                   ? "border-red bg-red/5"
@@ -506,7 +505,7 @@ function Review({
         />
         <Row k="Dates" v={`${dates.start} – ${dates.end}`} />
         <Row k="Duration" v={`${dates.days} days`} />
-        <Row k="Type" v={details.type === "standard" ? "Standard drive" : details.type === "track" ? "Track day" : "Special event"} />
+        <Row k="Type" v={details.type === "standard" ? "Standard drive" : "Special event"} />
         <Row k="Handover" v={details.handover === "delivery" ? "White-glove delivery" : "Self-pickup"} />
         {details.notes && <Row k="Notes" v={details.notes} />}
       </ul>
