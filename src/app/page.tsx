@@ -11,7 +11,7 @@ import { SPLITTER_MEDIA, type MediaSlot } from "@/lib/media";
 // images get a subtle Ken-Burns zoom instead.
 
 export const metadata: Metadata = {
-  title: "RYDA, Luxury vehicle access",
+  title: "RYDA — Luxury vehicle access",
   description:
     "Co-own or rent the world's most coveted luxury vehicles in the US. Cars · Boats · Planes. Member-managed LLCs, professionally operated.",
 };

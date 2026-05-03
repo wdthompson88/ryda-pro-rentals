@@ -11,8 +11,9 @@ export const metadata = {
 // Sample co-ownership view for the demo phase. Real version pulls from
 // authenticated member records in Supabase.
 const SEATS = [
-  { symbol: "F296", shares: 1, daysUsed: 18 },
-  { symbol: "MC75", shares: 1, daysUsed: 7 },
+  // 2-share minimum per person; demo numbers reflect that.
+  { symbol: "F296", shares: 2, daysUsed: 18 },
+  { symbol: "MC75", shares: 2, daysUsed: 7 },
 ];
 
 export default function PortfolioPage() {
@@ -117,7 +118,7 @@ export default function PortfolioPage() {
           <ul className="mt-6 divide-y divide-rule rounded-xl border border-rule bg-surface">
             <Activity label="Booking confirmed" detail="Ferrari 296 GTB · Apr 28 – May 1" date="2 hours ago" />
             <Activity label="Inspection report posted" detail="McLaren 750S Spider · 2,140 mi" date="Yesterday" />
-            <Activity label="Quarterly mgmt fee paid" detail="$1,700, Ferrari 296 LLC" date="3 days ago" />
+            <Activity label="Quarterly mgmt fee paid" detail="$3,540, Ferrari 296 LLC" date="3 days ago" />
             <Activity label="New co-owner joined" detail="McLaren 750S LLC, welcome Jordan" date="2 weeks ago" />
             <Activity label="Welcome to RYDA Blue" detail="Annual membership active" date="3 weeks ago" />
           </ul>

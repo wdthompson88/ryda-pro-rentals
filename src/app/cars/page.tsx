@@ -7,7 +7,7 @@ import { Reveal } from "@/components/reveal";
 import { VEHICLES, formatUSD } from "@/lib/market-data";
 
 export const metadata: Metadata = {
-  title: "RYDA Cars, Co-own or rent the world's most exceptional cars",
+  title: "RYDA Cars — Co-own or rent the world's most exceptional cars",
   description:
     "Co-own a certified pre owned Ferrari, Lamborghini or McLaren in a member-managed LLC. Each share unlocks ~32 days a year. Or rent any car in the fleet by the day.",
 };

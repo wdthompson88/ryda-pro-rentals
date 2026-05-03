@@ -193,7 +193,7 @@ export const HELP: HelpCategory[] = [
           {
             type: "callout",
             tone: "info",
-            text: "Many members rent first, then convert that experience into a co-ownership share on the same vehicle. We credit a portion of recent rental payments toward the buy-in, capped at 30 days.",
+            text: "Many members rent first, then convert that experience into a co-ownership share on the same vehicle. We credit a portion of recent rental payments toward the buy-in, capped at the most recent 30 days of payments.",
           },
         ],
       },

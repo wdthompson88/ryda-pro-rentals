@@ -42,7 +42,7 @@ export default function AccountPage() {
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10">
           <h2 className="font-display text-2xl text-ink">Your account</h2>
           <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <Card title="My Cars" desc="2 vehicles · 1 share each" href="/portfolio" />
+            <Card title="My Cars" desc="2 vehicles · 2 shares each" href="/portfolio" />
             <Card title="Bookings" desc="3 upcoming · next May 12" href="/bookings" />
             <Card title="Messages" desc="2 unread" href="/messages" />
             <Card title="Membership" desc="RYDA Blue · renews Apr 27, 2027" href="/membership" />
@@ -62,9 +62,9 @@ export default function AccountPage() {
           <ul className="mt-6 divide-y divide-rule rounded-xl border border-rule bg-surface">
             <Activity label="Booking confirmed" detail="Ferrari 296 GTB · May 12 – May 14" date="2 hours ago" />
             <Activity label="Inspection report posted" detail="McLaren 750S Spider · 2,140 mi" date="Yesterday" />
-            <Activity label="Quarterly mgmt fee paid" detail="$1,700, Ferrari 296 LLC" date="3 days ago" />
+            <Activity label="Quarterly mgmt fee paid" detail="$3,540, Ferrari 296 LLC" date="3 days ago" />
             <Activity label="Welcome to RYDA Blue" detail="Annual membership active" date="2 weeks ago" />
-            <Activity label="Co-ownership share confirmed" detail="McLaren 750S, 1 of 10 shares" date="3 weeks ago" />
+            <Activity label="Co-ownership share confirmed" detail="McLaren 750S, 2 of 10 shares" date="3 weeks ago" />
           </ul>
         </div>
       </section>
@@ -75,9 +75,9 @@ export default function AccountPage() {
           <h2 className="font-display text-2xl text-ink">Upcoming charges</h2>
           <ul className="mt-6 divide-y divide-rule rounded-xl border border-rule bg-surface">
             <Charge label="White-glove delivery (Apr 28)" amount="—" sub="Blue tier, included" />
-            <Charge label="Q3 management fee · Ferrari 296" amount="$1,700" sub="Due Jul 1, 2026" />
-            <Charge label="Q3 management fee · McLaren 750S" amount="$1,500" sub="Due Jul 1, 2026" />
-            <Charge label="Annual insurance · Ferrari 296" amount="$1,833" sub="Due Sep 15, 2026" />
+            <Charge label="Q3 management fee · Ferrari 296" amount="$3,540" sub="Due Jul 1, 2026" />
+            <Charge label="Q3 management fee · McLaren 750S" amount="$3,450" sub="Due Jul 1, 2026" />
+            <Charge label="Annual insurance · Ferrari 296" amount="$3,666" sub="Due Sep 15, 2026" />
           </ul>
         </div>
       </section>

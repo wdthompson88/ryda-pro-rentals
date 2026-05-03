@@ -29,12 +29,12 @@ const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://ryda-web-teal.vercel.app";
 
 export const metadata: Metadata = {
-  title: "RYDA, Supercar co-ownership and rentals",
+  title: "RYDA — Supercar co-ownership and rentals",
   description:
     "Co-own or rent a curated certified pre owned Ferrari, Lamborghini, or McLaren in the US. Asset-backed LLC, professionally operated. Launching in Miami.",
   metadataBase: new URL(siteUrl),
   openGraph: {
-    title: "RYDA, Supercar co-ownership and rentals",
+    title: "RYDA — Supercar co-ownership and rentals",
     description:
       "Co-own or rent a curated supercar with verified members. Asset-backed LLC, professionally operated. Launching in Miami.",
     siteName: "RYDA",
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "RYDA, Supercar co-ownership and rentals",
+    title: "RYDA — Supercar co-ownership and rentals",
     description:
       "Co-own or rent a curated supercar with verified members. Asset-backed LLC, professionally operated. Launching in Miami.",
   },

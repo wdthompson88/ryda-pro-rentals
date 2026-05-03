@@ -85,7 +85,7 @@ export default async function MyVehiclePage({
                 <Stat label="Miles used (yr)" value={`658 / ${(v.milesPerYear * 2).toLocaleString()}`} />
                 <Stat
                   label="Planned reservations"
-                  value={`1 of ${BOOKING_POLICY.planned.activeLimitPerShare} active`}
+                  value={`1 of ${BOOKING_POLICY.planned.activeLimitPerShare * 2} active`}
                 />
                 <Stat label="Short-notice" value="Open · book up to 7 days out" />
               </div>
@@ -144,7 +144,7 @@ export default async function MyVehiclePage({
             <Activity label="Booking confirmed" sub="Apr 28 – May 1" date="2 hr ago" />
             <Activity label="Inspection report posted" sub="2,140 mi · Excellent condition" date="1 day ago" />
             <Activity label="Message from a co-owner" sub='"Booked Pebble Beach hotels..."' date="2 days ago" />
-            <Activity label="Q1 mgmt fee paid" sub="$1,770" date="3 days ago" />
+            <Activity label="Q1 mgmt fee paid" sub={formatUSD(Math.round((v.annualOpCost * 2) / 4))} date="3 days ago" />
           </ul>
         </div>
       </Section>

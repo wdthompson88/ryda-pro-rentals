@@ -118,7 +118,7 @@ export default async function PurchasePage({
             <p>
               Total to wire:{" "}
               <span className="font-display text-lg text-ink tabular-nums">
-                {formatUSD(59_501)}
+                {formatUSD(71_400)}
               </span>
             </p>
             <p className="mt-2 text-xs text-mute">

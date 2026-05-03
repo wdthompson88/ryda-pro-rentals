@@ -7,7 +7,7 @@ import { InvestorInquiryForm } from "@/components/investor-inquiry-form";
 // inquirers. The deck is no longer accessible from the public web.
 
 export const metadata = {
-  title: "RYDA, Investor inquiry",
+  title: "RYDA — Investor inquiry",
   description:
     "Investor inquiry for RYDA, US member-managed supercar co-ownership. Qualified investors receive a confidential deck via email.",
 };

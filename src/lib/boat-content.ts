@@ -55,7 +55,7 @@ export type FaqItem = { q: string; a: string };
 export const FAQ_ITEMS: FaqItem[] = [
   {
     q: "What's actually included in the annual operating cost?",
-    a: "Slip rental at the boat's hailing marina, captain hours for member trips (up to your share's 30 day allowance), fuel up to a generous monthly budget, full agreed-value hull and liability insurance, hurricane prep + haul-out, spring commission and fall lay-up service, USCG documentation renewal, and a maintenance reserve. The big visible costs, slip and crew, are bundled. Excess fuel beyond the monthly budget and any optional add-ons (sport-fishing rigging on the Pershing, dive package, etc.) are billed at cost.",
+    a: "Slip rental at the boat's hailing marina, captain hours for member trips (up to your share's 32 day allowance), fuel up to a generous monthly budget, full agreed-value hull and liability insurance, hurricane prep + haul-out, spring commission and fall lay-up service, USCG documentation renewal, and a maintenance reserve. The big visible costs, slip and crew, are bundled. Excess fuel beyond the monthly budget and any optional add-ons (sport-fishing rigging on the Pershing, dive package, etc.) are billed at cost.",
   },
   {
     q: "Can I skipper the boat myself, or is a captain always required?",

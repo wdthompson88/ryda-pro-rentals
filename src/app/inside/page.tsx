@@ -10,15 +10,17 @@ import { Reveal } from "@/components/reveal";
 import { VEHICLES, formatUSD } from "@/lib/market-data";
 
 export const metadata = {
-  title: "Inside RYDA, What members see — RYDA",
+  title: "Inside RYDA — What members see",
   description:
     "A preview of the member experience: portfolio dashboard, booking calendar, telemetry, sample documents. Sample data, see what you get before you commit.",
 };
 
 export default function InsidePage() {
-  // Mock holdings: 1 share of F296, 1 share of MC75
+  // Mock holdings: 2 shares of F296, 2 shares of MC75 (matches the
+  // 2-share minimum doctrine that everywhere else on the site enforces).
   const f296 = VEHICLES.find((v) => v.symbol === "F296")!;
   const mc75 = VEHICLES.find((v) => v.symbol === "MC75")!;
+  const heldShares = 2;
 
   return (
     <>
@@ -79,10 +81,10 @@ export default function InsidePage() {
                     Total invested
                   </p>
                   <p className="mt-2 font-display text-3xl text-ink tabular-nums">
-                    {formatUSD(f296.pricePerShare + mc75.pricePerShare)}
+                    {formatUSD((f296.pricePerShare + mc75.pricePerShare) * heldShares)}
                   </p>
                   <p className="mt-1 text-xs text-ink-soft">
-                    Across 2 shares · 2 vehicles
+                    Across {heldShares * 2} shares · 2 vehicles
                   </p>
                 </div>
                 <div className="border-b border-rule p-6 lg:border-b-0 lg:border-r">
@@ -92,7 +94,7 @@ export default function InsidePage() {
                   <p className="mt-2 font-display text-3xl text-emerald-600 tabular-nums">
                     {formatUSD(
                       Math.round(
-                        (f296.pricePerShare + mc75.pricePerShare) * 0.95,
+                        (f296.pricePerShare + mc75.pricePerShare) * heldShares * 0.95,
                       ),
                     )}
                   </p>
@@ -105,10 +107,10 @@ export default function InsidePage() {
                     Days used (yr to date)
                   </p>
                   <p className="mt-2 font-display text-3xl text-ink tabular-nums">
-                    14 / 60
+                    14 / {(f296.daysPerYear + mc75.daysPerYear) * heldShares}
                   </p>
                   <p className="mt-1 text-xs text-ink-soft">
-                    46 days remaining across both shares
+                    {(f296.daysPerYear + mc75.daysPerYear) * heldShares - 14} days remaining across both vehicles
                   </p>
                 </div>
               </div>
@@ -134,14 +136,14 @@ export default function InsidePage() {
                         {v.name}
                       </p>
                       <p className="mt-0.5 text-xs text-mute">
-                        1 of {v.shares} shares · {v.market}
+                        {heldShares} of {v.shares} shares · {v.market}
                       </p>
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-medium text-ink tabular-nums">
-                        {formatUSD(v.pricePerShare)}
+                        {formatUSD(v.pricePerShare * heldShares)}
                       </p>
-                      <p className="text-[11px] text-ink-soft">share value</p>
+                      <p className="text-[11px] text-ink-soft">held value</p>
                     </div>
                   </div>
                 ))}

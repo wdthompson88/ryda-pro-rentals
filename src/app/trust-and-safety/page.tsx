@@ -74,7 +74,7 @@ export default function TrustAndSafetyPage() {
             />
             <Pillar
               eyebrow="Vehicles"
-              title="certified pre owned, PPI-inspected before any share is sold"
+              title="Certified pre-owned, PPI-inspected before any share is sold"
               body="Every RYDA vehicle is certified pre owned with a manufacturer or independent certified pre owned program. Before the LLC closes on a car, a multi-point Pre-Purchase Inspection by a marque specialist documents engine, transmission, suspension, electronics and body condition, plus full title and lien search. Co-owners aren't buying surprises; they're buying a documented car."
             />
             <Pillar

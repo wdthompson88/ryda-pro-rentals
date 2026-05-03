@@ -155,8 +155,8 @@ export default function HowItWorksPage() {
             Each car is held in a single-purpose LLC with 10
             shares. Your share is backed by a real, titled vehicle —
             not by a subscription, lease or rental contract. Verified
-            members hold one share or several; RYDA is hired as the
-            operations partner.
+            members hold two shares or more (2-share minimum per
+            person); RYDA is hired as the operations partner.
           </p>
         </div>
       </section>
@@ -395,7 +395,7 @@ export default function HowItWorksPage() {
             <Reason
               n="03"
               title="Shared costs, not the full burden"
-              body="Insurance, maintenance, tires, detailing, storage and depreciation reserve split across the LLC's 10 shares. A 1-share holder pays roughly 10% of what the solo owner of the same car would."
+              body="Insurance, maintenance, tires, detailing, storage and depreciation reserve split across the LLC's 10 shares. Each share carries roughly 10% of what the solo owner of the same car would pay."
             />
             <Reason
               n="04"
@@ -529,6 +529,14 @@ export default function HowItWorksPage() {
               depreciation over the hold, a conservative middle that
               absorbs both the drive-only and rental-opt-in usage
               profiles, given the 100 mi/day shareholder allowance.
+            </p>
+            <p>
+              Illustrative numbers below model a single share for
+              clarity. Most members hold the 2-share minimum, so double
+              every line: $68K buy-in, ~$14,160/yr carrying, ~$96,320
+              spent over 2 years, ~$61,200 resale, net ~$35,120 for
+              ~128 driving days, ~$274 per actual driving day, the same
+              effective rate at any share count.
             </p>
             <p>
               For the F296 at one share over 2 years: $34K buy-in +

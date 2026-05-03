@@ -223,7 +223,7 @@ export default async function VehicleMarketPage({
                 clear, but always verify with your own resale assumption.
               </p>
               <p className="mt-4 text-sm leading-relaxed text-ink-soft">
-                Net result for one share of the {v.name}: roughly{" "}
+                Net result for a single share of the {v.name}, illustrative (most members hold the 2-share minimum, scale linearly): roughly{" "}
                 <span className="font-medium text-ink">
                   {formatUSD(econ.netCost)}
                 </span>{" "}
