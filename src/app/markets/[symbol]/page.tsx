@@ -218,8 +218,8 @@ export default async function VehicleMarketPage({
                 Each RYDA car is a curated certified pre owned held for {HOLDING_YEARS} years.
                 At exit, the LLC sells the vehicle and proceeds are
                 distributed pro-rata to shareholders. We model a{" "}
-                {econ.depreciationPct}% depreciation hit over the full hold
-               , a bar that low-mileage, kept-condition certified pre owned exotics often
+                {econ.depreciationPct}% depreciation hit over the full hold,
+                a bar that low-mileage, kept-condition certified pre owned exotics often
                 clear, but always verify with your own resale assumption.
               </p>
               <p className="mt-4 text-sm leading-relaxed text-ink-soft">
@@ -292,8 +292,8 @@ export default async function VehicleMarketPage({
                 Your scenario, your numbers.
               </h2>
               <p className="mt-3 max-w-2xl text-sm text-ink-soft">
-                Move the sliders to model your own usage on the {v.name}{" "}
-               , buy-in, days driven, hold years, and the optional
+                Move the sliders to model your own usage on the {v.name}:
+                buy-in, days driven, hold years, and the optional
                 rental opt-in. Live math anchored to this car's actual
                 pricing.
               </p>

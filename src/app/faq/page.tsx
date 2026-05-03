@@ -116,8 +116,8 @@ export default function FaqPage() {
             Questions we haven't covered?{" "}
             <Link href="/contact#form" className="text-red hover:text-red-deep">
               Send us a question
-            </Link>{" "}
-           , we add new ones here when they come up.
+            </Link>
+            , we add new ones here when they come up.
           </p>
         </div>
       </section>

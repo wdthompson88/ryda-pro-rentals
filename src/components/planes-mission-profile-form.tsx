@@ -108,8 +108,7 @@ Reply when RYDA Planes opens the member cohort window for this profile.`;
           When the member cohort opens for{" "}
           <span className="text-cream">
             {JET_CLASSES.find((j) => j.value === jetClass)?.label} · {hours} hrs/yr · {base}
-          </span>
-          , you&apos;ll be among the first contacted.
+          </span>, you&apos;ll be among the first contacted.
         </p>
       </div>
     );

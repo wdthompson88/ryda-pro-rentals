@@ -222,8 +222,8 @@ function SignUpPageInner() {
                 className="mt-0.5 h-4 w-4 accent-red"
               />
               <span className="text-ink-soft">
-                I confirm I'm <strong className="text-ink">28 or older</strong>{" "}
-               , required to drive any vehicle in the RYDA fleet.
+                I confirm I'm <strong className="text-ink">28 or older</strong>
+                , required to drive any vehicle in the RYDA fleet.
               </span>
             </label>
 

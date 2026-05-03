@@ -254,8 +254,8 @@ export default async function MyVehiclePage({
       {/* Co-Owners */}
       <Section id="co-owners" title="Co-Owners">
         <p className="text-sm text-ink-soft">
-          {v.slug === "wajer-55s" ? "5" : "3"} other co-owners in this boat. Names anonymized
-          per Co-Owner Agreement.
+          Up to 4 other co-owners in this boat. Names anonymized per
+          Co-Owner Agreement.
         </p>
         <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <Owner initials="RG" prof="Founder · Miami" badge="You" lead={isLead} />
