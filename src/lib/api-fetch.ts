@@ -14,6 +14,11 @@
 
 import { supabase } from "@/lib/supabase";
 
+// Refresh the session when the cached access token is within this
+// window of expiry. Tokens default to 1h; we refresh proactively if
+// less than this remains so the API call carries a fresh JWT.
+const REFRESH_BEFORE_EXPIRY_SECONDS = 60;
+
 export async function authedFetch(
   input: string,
   init: RequestInit = {},
@@ -26,12 +31,43 @@ export async function authedFetch(
   if (supabase) {
     try {
       const { data } = await supabase.auth.getSession();
-      const token = data.session?.access_token;
-      if (token && !headers.has("authorization") && !headers.has("Authorization")) {
+      let session = data.session;
+
+      // supabase-js v2's getSession() returns the cached session
+      // verbatim — it does NOT auto-refresh on read. autoRefreshToken
+      // handles this on a timer, but if the tab was backgrounded /
+      // throttled / restored from disk cache, the timer can miss its
+      // window and we'd send an expired JWT to the API (server
+      // returns 401 with diag=getuser_error:AuthApiError:header).
+      // Detect a stale-or-near-stale token and force-refresh before
+      // attaching.
+      if (session?.expires_at) {
+        const expiresAtMs = session.expires_at * 1000;
+        const refreshThresholdMs =
+          Date.now() + REFRESH_BEFORE_EXPIRY_SECONDS * 1000;
+        if (expiresAtMs <= refreshThresholdMs) {
+          const refresh = await supabase.auth.refreshSession();
+          if (refresh.data.session) {
+            session = refresh.data.session;
+          }
+          // If refresh failed (refresh_token expired, e.g. user
+          // hasn't been on the site in over a week), session stays
+          // stale and we fall through with no header — the API
+          // returns 401 and the caller can route to /signin.
+        }
+      }
+
+      const token = session?.access_token;
+      if (
+        token &&
+        !headers.has("authorization") &&
+        !headers.has("Authorization")
+      ) {
         headers.set("Authorization", `Bearer ${token}`);
       }
     } catch {
-      // getSession() can throw on a corrupt local token; fall through.
+      // getSession() / refreshSession() can throw on a corrupt local
+      // token; fall through to the unauthenticated path.
     }
   }
 
