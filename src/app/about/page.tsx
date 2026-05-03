@@ -185,21 +185,18 @@ export default function AboutPage() {
               name="Ryan Galli"
               role="Co-Founder · CEO / CTO"
               image="/team/ryan.jpg"
-              tags={["Odin Partners NY", "Bucknell Psych"]}
               bio="Co-founder and CEO of RYDA. Currently runs Fixed Income Executive Search at Odin Partners NY, placing senior front-office talent at banks and macro hedge funds. Bucknell Psychology."
             />
             <Founder
               name="Dave Thompson"
               role="Co-Founder · CFO / COO"
               image="/team/dave.jpg"
-              tags={["SolomonEdwards", "Series 79", "Bucknell '21"]}
               bio="Co-founder leading capital structuring and operational diligence. Manager, Private Equity Services at SolomonEdwards. Previously spent 3+ years in Investment Banking at Ziegler covering Healthcare M&A, analyst through senior associate. Diamond Capital Advisors before that. SIE + Series 79 certified. Bucknell Economics."
             />
             <Founder
               name="Stefano Galli"
               role="Co-Founder · CRO / CSO"
               image="/team/stefano.jpg"
-              tags={["Evercore ISI", "Wharton MBA"]}
               bio="Co-founder and strategic advisor with 30+ years in institutional equity markets. Managing Director, Global Equity Sales at Evercore ISI (9+ years). Previously Director of Global Equities Research Sales at Bank of America Merrill Lynch in London, Senior Portfolio Manager at Artio Global Management ($75B AUM at peak) and 8 years in research sales at Merrill Lynch. Wharton MBA, Civil Engineering and Economics at Delaware."
             />
           </div>
