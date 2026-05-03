@@ -15,7 +15,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { requireStripe } from "@/lib/stripe";
 import { requireSupabaseAdmin } from "@/lib/supabase-admin";
-import { getUserFromRequest } from "@/lib/api-auth";
+import { getUserFromRequestWithDiag } from "@/lib/api-auth";
 import { isAllowed, clientIp } from "@/lib/rate-limit";
 
 const RATE_LIMIT = 5;
@@ -29,9 +29,17 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const user = await getUserFromRequest(req);
+  const { user, diag } = await getUserFromRequestWithDiag(req);
   if (!user) {
-    return NextResponse.json({ error: "Sign in required." }, { status: 401 });
+    // Log + surface the diagnostic so production 401s are debuggable.
+    // Categories: no_token_present (no header + no cookie), getuser_error
+    // (token but Supabase rejected it — usually expired), cookie_parse_failed,
+    // no_admin_client (env misconfig).
+    console.warn("[kyc-start · 401]", { diag });
+    return NextResponse.json(
+      { error: "Sign in required.", diag },
+      { status: 401 },
+    );
   }
 
   let admin;
