@@ -1,0 +1,74 @@
+"use client";
+
+// Single source of truth for "is the visitor signed in?" on the
+// client. Used by the header, footer, marketing-page CTAs, and the
+// account page so the auth-CTA UI stays in sync across surfaces.
+//
+// Returns 'loading' on the first render (before getSession resolves)
+// and after that 'anon' or 'authed'. We render the anon state during
+// 'loading' so the SSR markup doesn't shift — server-rendered pages
+// always paint the public CTAs first, then we hide them post-hydration
+// if a session exists.
+
+import { useEffect, useState } from "react";
+import type { User } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabase";
+
+export type AuthStatus = "loading" | "anon" | "authed";
+
+export function useAuthStatus(): { status: AuthStatus; user: User | null } {
+  const [status, setStatus] = useState<AuthStatus>("loading");
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    if (!supabase) {
+      // No backend wired (preview deploy without Supabase env). Treat
+      // as anon so marketing UX still works and there's nothing to
+      // listen to.
+      setStatus("anon");
+      return;
+    }
+
+    let cancelled = false;
+    supabase.auth
+      .getSession()
+      .then(({ data }) => {
+        if (cancelled) return;
+        if (data.session) {
+          setUser(data.session.user);
+          setStatus("authed");
+        } else {
+          setUser(null);
+          setStatus("anon");
+        }
+      })
+      .catch(() => {
+        // getSession() can throw on a corrupt local token; fall back
+        // to anon rather than locking the UI in 'loading'.
+        if (!cancelled) {
+          setUser(null);
+          setStatus("anon");
+        }
+      });
+
+    // Keep the UI in sync with sign-in / sign-out events that happen
+    // in this tab (form submits) or in another tab (storage event).
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (cancelled) return;
+      if (session) {
+        setUser(session.user);
+        setStatus("authed");
+      } else {
+        setUser(null);
+        setStatus("anon");
+      }
+    });
+
+    return () => {
+      cancelled = true;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
+
+  return { status, user };
+}

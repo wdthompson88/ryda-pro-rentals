@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
+import { HiddenWhenAuthed } from "@/components/auth-aware";
 
 export const metadata = {
   title: "Events — RYDA",
@@ -162,12 +163,14 @@ export default function EventsPage() {
             Blue members get monthly meetups; Black members get flagship events
             and priority on travel programming.
           </p>
-          <Link
-            href="/signup"
-            className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-red hover:text-cream"
-          >
-            Apply for membership →
-          </Link>
+          <HiddenWhenAuthed>
+            <Link
+              href="/signup"
+              className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-red hover:text-cream"
+            >
+              Apply for membership →
+            </Link>
+          </HiddenWhenAuthed>
         </div>
       </section>
     </>

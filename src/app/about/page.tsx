@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
+import { HiddenWhenAuthed } from "@/components/auth-aware";
 
 export const metadata = {
   title: "About — RYDA",
@@ -120,12 +121,14 @@ export default function AboutPage() {
           </div>
 
           <div className="mt-10 flex flex-wrap gap-3">
-            <Link
-              href="/signup"
-              className="inline-flex h-12 items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream hover:bg-red"
-            >
-              Sign up →
-            </Link>
+            <HiddenWhenAuthed>
+              <Link
+                href="/signup"
+                className="inline-flex h-12 items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream hover:bg-red"
+              >
+                Sign up →
+              </Link>
+            </HiddenWhenAuthed>
             <Link
               href="/contact?type=Membership#form"
               className="inline-flex h-12 items-center justify-center rounded-full border border-rule px-7 text-sm font-medium text-ink hover:border-ink"
@@ -230,12 +233,14 @@ export default function AboutPage() {
             Miami launches Q3 2026. Create your account to browse the
             fleet and claim a share when membership opens.
           </p>
-          <Link
-            href="/signup"
-            className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-red hover:text-cream"
-          >
-            Apply now →
-          </Link>
+          <HiddenWhenAuthed>
+            <Link
+              href="/signup"
+              className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-red hover:text-cream"
+            >
+              Apply now →
+            </Link>
+          </HiddenWhenAuthed>
         </div>
       </section>
     </>

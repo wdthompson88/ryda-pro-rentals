@@ -4,6 +4,7 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { WaitlistForm } from "@/components/waitlist-form";
 import { Reveal } from "@/components/reveal";
+import { HiddenWhenAuthed } from "@/components/auth-aware";
 import {
   BOATS,
   formatUSD,
@@ -287,20 +288,22 @@ export default function BoatsHome() {
             Create your account to browse the fleet, run the numbers,
             and claim a share when RYDA Boats Miami opens in Q3 2026.
           </p>
-          <div className="mt-10 flex flex-wrap justify-center gap-3">
-            <Link
-              href="/signup"
-              className="inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink transition-colors hover:bg-red hover:text-cream"
-            >
-              Sign up &rarr;
-            </Link>
-            <Link
-              href="/signin"
-              className="inline-flex h-12 items-center justify-center rounded-full border border-cream/30 px-7 text-sm font-medium text-cream transition-colors hover:border-red hover:text-red"
-            >
-              Sign in
-            </Link>
-          </div>
+          <HiddenWhenAuthed>
+            <div className="mt-10 flex flex-wrap justify-center gap-3">
+              <Link
+                href="/signup"
+                className="inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink transition-colors hover:bg-red hover:text-cream"
+              >
+                Sign up &rarr;
+              </Link>
+              <Link
+                href="/signin"
+                className="inline-flex h-12 items-center justify-center rounded-full border border-cream/30 px-7 text-sm font-medium text-cream transition-colors hover:border-red hover:text-red"
+              >
+                Sign in
+              </Link>
+            </div>
+          </HiddenWhenAuthed>
           <p className="mt-6 text-xs text-cream/50">
             Membership is limited to verified individuals 28 years or
             older. RYDA is a luxury access platform, co-ownership

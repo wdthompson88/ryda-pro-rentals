@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { DemoBanner } from "@/components/demo-banner";
+import { SignOutButton } from "@/components/sign-out-button";
 
 export const metadata = { title: "My Account — RYDA" };
 
@@ -12,16 +13,23 @@ export default function AccountPage() {
 
       {/* Hero / status */}
       <section className="border-b border-rule">
-        <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10 sm:py-16">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            Account
-          </p>
-          <h1 className="mt-4 font-display text-4xl font-light text-ink sm:text-5xl">
-            Welcome back.
-          </h1>
-          <p className="mt-2 text-sm text-mute">
-            Member since April 2026 · RYDA Blue · Miami
-          </p>
+        <div className="mx-auto flex max-w-7xl flex-col gap-6 px-6 py-12 sm:flex-row sm:items-end sm:justify-between sm:px-10 sm:py-16">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+              Account
+            </p>
+            <h1 className="mt-4 font-display text-4xl font-light text-ink sm:text-5xl">
+              Welcome back.
+            </h1>
+            <p className="mt-2 text-sm text-mute">
+              Member since April 2026 · RYDA Blue · Miami
+            </p>
+          </div>
+          {/* Sign-out lives in the hero corner — the conventional spot
+              for "I'm signed in, get me out." Calls supabase.auth.signOut
+              and routes to the splitter home; the auth listener swaps
+              every header / marketing CTA back to anon. */}
+          <SignOutButton />
         </div>
       </section>
 

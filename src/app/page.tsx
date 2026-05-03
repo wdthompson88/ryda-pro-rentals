@@ -3,6 +3,7 @@ import Link from "next/link";
 import { SplitterIntro } from "@/components/splitter-intro";
 import { MediaBackground } from "@/components/media-background";
 import { SPLITTER_MEDIA, type MediaSlot } from "@/lib/media";
+import { HiddenWhenAuthed, AuthSwap } from "@/components/auth-aware";
 
 // Splitter, three full-height columns. One ambient b-roll loop per
 // vertical (Lambo / overhead yacht / private jet). Hover lights the
@@ -92,21 +93,36 @@ export default function SplitterPage() {
           >
             Investors
           </Link>
-          {/* Paired auth CTAs in the splitter top bar — Log in (soft
-              cream-on-ink outline) next to Sign up (solid cream),
-              matching the header treatment used on every other page. */}
-          <Link
-            href="/signin"
-            className="hidden rounded-full border border-[#F4F1EC]/30 bg-[#F4F1EC]/10 px-5 py-2 text-sm font-medium text-[#F4F1EC] transition-colors hover:bg-[#F4F1EC] hover:text-[#0E0E10] sm:inline-flex"
-          >
-            Log in
-          </Link>
-          <Link
-            href="/signup"
-            className="inline-flex rounded-full border border-[#F4F1EC] bg-[#F4F1EC] px-5 py-2 text-sm font-medium text-[#0E0E10] transition-colors hover:bg-red hover:text-[#F4F1EC] hover:border-red"
-          >
-            Sign up
-          </Link>
+          {/* Paired auth CTAs in the splitter top bar. Anon members see
+              Log in (soft cream-on-ink outline) next to Sign up (solid
+              cream). Signed-in members see a single "Account" button
+              that takes the Sign-up slot's styling. */}
+          <AuthSwap
+            anon={
+              <>
+                <Link
+                  href="/signin"
+                  className="hidden rounded-full border border-[#F4F1EC]/30 bg-[#F4F1EC]/10 px-5 py-2 text-sm font-medium text-[#F4F1EC] transition-colors hover:bg-[#F4F1EC] hover:text-[#0E0E10] sm:inline-flex"
+                >
+                  Log in
+                </Link>
+                <Link
+                  href="/signup"
+                  className="inline-flex rounded-full border border-[#F4F1EC] bg-[#F4F1EC] px-5 py-2 text-sm font-medium text-[#0E0E10] transition-colors hover:bg-red hover:text-[#F4F1EC] hover:border-red"
+                >
+                  Sign up
+                </Link>
+              </>
+            }
+            authed={
+              <Link
+                href="/account"
+                className="inline-flex rounded-full border border-[#F4F1EC] bg-[#F4F1EC] px-5 py-2 text-sm font-medium text-[#0E0E10] transition-colors hover:bg-red hover:text-[#F4F1EC] hover:border-red"
+              >
+                Account
+              </Link>
+            }
+          />
         </div>
       </div>
 

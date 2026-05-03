@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { PhotoGallery } from "@/components/photo-gallery";
+import { AuthSwap } from "@/components/auth-aware";
 import {
   VEHICLES,
   getVehicleBySymbol,
@@ -278,31 +279,45 @@ export default async function RentDetailPage({
                 </div>
 
                 {/* Renting requires an account (driver-record verification,
-                    insurance binding, deposit hold). Browsing this page is
-                    open; the CTA routes through /signup with `next=` so the
-                    member returns to the same listing's contact form after
-                    creating an account. Existing members hit the "Sign in"
-                    link below the CTA instead. */}
-                <Link
-                  href={`/signup?next=${encodeURIComponent(
-                    `/contact?type=Rental&note=${encodeURIComponent(
-                      `Rental request: ${title} · ${market}`,
-                    )}#form`,
-                  )}&reason=rent`}
-                  className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-red px-7 py-3 text-sm font-semibold text-cream transition-colors hover:bg-red-deep"
-                >
-                  Request rental
-                </Link>
-                <Link
-                  href={`/signin?next=${encodeURIComponent(
-                    `/contact?type=Rental&note=${encodeURIComponent(
-                      `Rental request: ${title} · ${market}`,
-                    )}#form`,
-                  )}&reason=rent`}
-                  className="mt-2 inline-flex w-full items-center justify-center text-xs text-ink-soft hover:text-ink"
-                >
-                  Already a member? Sign in →
-                </Link>
+                    insurance binding, deposit hold). Anon visitors hit
+                    the signup gate first; signed-in members go straight
+                    to the rental request form, no auth-link clutter. */}
+                <AuthSwap
+                  anon={
+                    <>
+                      <Link
+                        href={`/signup?next=${encodeURIComponent(
+                          `/contact?type=Rental&note=${encodeURIComponent(
+                            `Rental request: ${title} · ${market}`,
+                          )}#form`,
+                        )}&reason=rent`}
+                        className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-red px-7 py-3 text-sm font-semibold text-cream transition-colors hover:bg-red-deep"
+                      >
+                        Request rental
+                      </Link>
+                      <Link
+                        href={`/signin?next=${encodeURIComponent(
+                          `/contact?type=Rental&note=${encodeURIComponent(
+                            `Rental request: ${title} · ${market}`,
+                          )}#form`,
+                        )}&reason=rent`}
+                        className="mt-2 inline-flex w-full items-center justify-center text-xs text-ink-soft hover:text-ink"
+                      >
+                        Already a member? Sign in →
+                      </Link>
+                    </>
+                  }
+                  authed={
+                    <Link
+                      href={`/contact?type=Rental&note=${encodeURIComponent(
+                        `Rental request: ${title} · ${market}`,
+                      )}#form`}
+                      className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-red px-7 py-3 text-sm font-semibold text-cream transition-colors hover:bg-red-deep"
+                    >
+                      Request rental
+                    </Link>
+                  }
+                />
                 <p className="mt-3 text-center text-xs text-mute">
                   We'll confirm availability within one business day. Free
                   cancellation up to 7 days before pickup.

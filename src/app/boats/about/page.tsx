@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
+import { HiddenWhenAuthed } from "@/components/auth-aware";
 
 export const metadata = {
   title: "About RYDA Boats",
@@ -132,12 +133,14 @@ export default function BoatsAboutPage() {
           </div>
 
           <div className="mt-10 flex flex-wrap gap-3">
-            <Link
-              href="/signup"
-              className="inline-flex h-12 items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream hover:bg-marine"
-            >
-              Sign up →
-            </Link>
+            <HiddenWhenAuthed>
+              <Link
+                href="/signup"
+                className="inline-flex h-12 items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream hover:bg-marine"
+              >
+                Sign up →
+              </Link>
+            </HiddenWhenAuthed>
             <Link
               href="/contact?type=Membership&note=RYDA+Boats#form"
               className="inline-flex h-12 items-center justify-center rounded-full border border-rule px-7 text-sm font-medium text-ink hover:border-ink"

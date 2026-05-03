@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { supabase } from "@/lib/supabase";
@@ -35,6 +35,23 @@ function SignInPageInner() {
   const [submitting, setSubmitting] = useState(false);
   const [submittingMagic, setSubmittingMagic] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // If a signed-in member lands on /signin (old bookmark, deep link, or
+  // stale tab), bounce to /account — there's nothing to do here for
+  // them. We check once on mount; the auth listener isn't needed
+  // because the only state change we care about is sign-in success,
+  // which already routes to `next` below.
+  useEffect(() => {
+    if (!supabase) return;
+    let cancelled = false;
+    supabase.auth.getSession().then(({ data }) => {
+      if (cancelled) return;
+      if (data.session) router.replace(next);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [router, next]);
 
   const reasonCopy =
     reason === "rent"

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
+import { HiddenWhenAuthed } from "@/components/auth-aware";
 
 export const metadata = {
   title: "Miami — RYDA",
@@ -144,20 +145,22 @@ export default function MiamiPage() {
             fleet, run the numbers, and claim a share when membership
             opens.
           </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Link
-              href="/signup"
-              className="inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink transition-colors hover:bg-red hover:text-cream"
-            >
-              Sign up →
-            </Link>
-            <Link
-              href="/signin"
-              className="inline-flex h-12 items-center justify-center rounded-full border border-cream/30 px-7 text-sm font-medium text-cream transition-colors hover:border-red hover:text-red"
-            >
-              Sign in
-            </Link>
-          </div>
+          <HiddenWhenAuthed>
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              <Link
+                href="/signup"
+                className="inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink transition-colors hover:bg-red hover:text-cream"
+              >
+                Sign up →
+              </Link>
+              <Link
+                href="/signin"
+                className="inline-flex h-12 items-center justify-center rounded-full border border-cream/30 px-7 text-sm font-medium text-cream transition-colors hover:border-red hover:text-red"
+              >
+                Sign in
+              </Link>
+            </div>
+          </HiddenWhenAuthed>
         </div>
       </section>
     </>

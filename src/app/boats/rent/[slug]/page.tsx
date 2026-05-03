@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
+import { AuthSwap } from "@/components/auth-aware";
 import { BOATS, getBoatBySlug, formatUSD } from "@/lib/boat-data";
 
 export async function generateStaticParams() {
@@ -154,12 +155,24 @@ export default async function BoatCharterDetail({
                   </div>
                 </div>
 
-                <Link
-                  href={`/signup?next=${encodeURIComponent(`/contact?type=Rental&note=${encodeURIComponent(`Charter request: ${b.name} · ${b.market}`)}#form`)}&reason=rent`}
-                  className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-marine px-7 py-3 text-sm font-semibold text-cream transition-colors hover:bg-marine-deep"
-                >
-                  Request charter
-                </Link>
+                <AuthSwap
+                  anon={
+                    <Link
+                      href={`/signup?next=${encodeURIComponent(`/contact?type=Rental&note=${encodeURIComponent(`Charter request: ${b.name} · ${b.market}`)}#form`)}&reason=rent`}
+                      className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-marine px-7 py-3 text-sm font-semibold text-cream transition-colors hover:bg-marine-deep"
+                    >
+                      Request charter
+                    </Link>
+                  }
+                  authed={
+                    <Link
+                      href={`/contact?type=Rental&note=${encodeURIComponent(`Charter request: ${b.name} · ${b.market}`)}#form`}
+                      className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-marine px-7 py-3 text-sm font-semibold text-cream transition-colors hover:bg-marine-deep"
+                    >
+                      Request charter
+                    </Link>
+                  }
+                />
                 <p className="mt-3 text-center text-xs text-mute">
                   We&apos;ll confirm availability within one business day.
                 </p>

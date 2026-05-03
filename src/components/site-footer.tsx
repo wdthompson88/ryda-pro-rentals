@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { HiddenWhenAuthed } from "@/components/auth-aware";
 
 // Footer, brand row on top + 4 link columns below + legal strip.
 // Pacaso / Brunello pattern: full sitemap visible, but quiet eyebrows
@@ -23,21 +24,29 @@ export function SiteFooter() {
             </div>
             <div className="lg:col-span-5 lg:flex lg:items-end lg:justify-end">
               <div className="flex flex-col items-start gap-3 lg:items-end">
-                <Link
-                  href="/signup"
-                  className="inline-flex h-12 items-center justify-center border border-ink bg-ink px-7 text-sm font-medium text-cream transition-colors hover:bg-red hover:border-red"
-                >
-                  Sign up
-                </Link>
-                <div className="flex flex-wrap items-center gap-x-4 text-xs text-mute">
-                  <Link href="/signin" className="hover:text-ink">
-                    Sign in
-                  </Link>
-                  <span className="text-rule">·</span>
-                  <Link href="/signup" className="hover:text-ink">
+                {/* Anon: prominent "Sign up" CTA + secondary auth links.
+                    Authed: skip the auth pile; surface the same utility
+                    links (Search / Help center) so the row doesn't
+                    collapse into emptiness for signed-in members. */}
+                <HiddenWhenAuthed>
+                  <Link
+                    href="/signup"
+                    className="inline-flex h-12 items-center justify-center border border-ink bg-ink px-7 text-sm font-medium text-cream transition-colors hover:bg-red hover:border-red"
+                  >
                     Sign up
                   </Link>
-                  <span className="text-rule">·</span>
+                </HiddenWhenAuthed>
+                <div className="flex flex-wrap items-center gap-x-4 text-xs text-mute">
+                  <HiddenWhenAuthed>
+                    <Link href="/signin" className="hover:text-ink">
+                      Sign in
+                    </Link>
+                    <span className="text-rule">·</span>
+                    <Link href="/signup" className="hover:text-ink">
+                      Sign up
+                    </Link>
+                    <span className="text-rule">·</span>
+                  </HiddenWhenAuthed>
                   <Link href="/search" className="hover:text-ink">
                     Search
                   </Link>

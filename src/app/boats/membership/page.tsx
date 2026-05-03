@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
+import { HiddenWhenAuthed } from "@/components/auth-aware";
 
 export const metadata = {
   title: "RYDA Boats Membership, Core, Blue — Black",
@@ -231,12 +232,14 @@ export default function BoatsMembershipPage() {
             Apply by July 2026 to lock early-member pricing on Blue or
             Black for life.
           </p>
-          <Link
-            href="/signup?next=/boats"
-            className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-marine hover:text-cream"
-          >
-            Apply now →
-          </Link>
+          <HiddenWhenAuthed>
+            <Link
+              href="/signup?next=/boats"
+              className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-marine hover:text-cream"
+            >
+              Apply now →
+            </Link>
+          </HiddenWhenAuthed>
         </div>
       </section>
     </>
@@ -317,12 +320,14 @@ function TierCard({ tier }: { tier: typeof TIERS[number] }) {
         ))}
       </ul>
 
-      <Link
-        href={tier.key === "core" ? "/signup?next=/boats" : "/signup?next=/boats"}
-        className="mt-10 inline-flex h-12 items-center justify-center border border-ink bg-ink px-7 text-sm font-medium text-cream transition-colors hover:bg-marine hover:border-marine"
-      >
-        {tier.cta}
-      </Link>
+      <HiddenWhenAuthed>
+        <Link
+          href={tier.key === "core" ? "/signup?next=/boats" : "/signup?next=/boats"}
+          className="mt-10 inline-flex h-12 items-center justify-center border border-ink bg-ink px-7 text-sm font-medium text-cream transition-colors hover:bg-marine hover:border-marine"
+        >
+          {tier.cta}
+        </Link>
+      </HiddenWhenAuthed>
     </div>
   );
 }

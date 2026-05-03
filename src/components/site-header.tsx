@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { AuthSwap } from "@/components/auth-aware";
 
 // RYDA spans three verticals: Cars, Boats, Planes. The header detects
 // which vertical the visitor is in via the pathname and swaps the nav
@@ -67,6 +68,10 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
   const signUpBtn = inverted
     ? "border-cream bg-cream text-ink hover:bg-red hover:text-cream hover:border-red"
     : "border-ink bg-ink text-cream hover:bg-red hover:border-red";
+  // Account button (signed-in state), takes the strong-CTA slot on
+  // its own — same shape as Sign up so the layout doesn't reflow on
+  // hydration.
+  const accountBtn = signUpBtn;
   // Search input theming, tracks the inverted state.
   const searchInput = inverted
     ? "border-cream/30 bg-cream/10 text-cream placeholder:text-cream/50 focus:border-cream focus:ring-cream/20"
@@ -170,18 +175,36 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
               />
             </div>
           </form>
-          <Link
-            href="/signin"
-            className={`hidden rounded-full border px-5 py-2 text-sm font-medium transition-colors sm:inline-flex ${signInBtn}`}
-          >
-            Log in
-          </Link>
-          <Link
-            href="/signup"
-            className={`hidden rounded-full border px-5 py-2 text-sm font-medium transition-colors sm:inline-flex ${signUpBtn}`}
-          >
-            Sign up
-          </Link>
+          {/* Auth slot. Anon members see the paired Log in / Sign up
+              CTAs (the original treatment). Signed-in members see a
+              single "Account" pill that takes the Sign-up slot's
+              styling so the bar doesn't reflow on hydration. */}
+          <AuthSwap
+            anon={
+              <>
+                <Link
+                  href="/signin"
+                  className={`hidden rounded-full border px-5 py-2 text-sm font-medium transition-colors sm:inline-flex ${signInBtn}`}
+                >
+                  Log in
+                </Link>
+                <Link
+                  href="/signup"
+                  className={`hidden rounded-full border px-5 py-2 text-sm font-medium transition-colors sm:inline-flex ${signUpBtn}`}
+                >
+                  Sign up
+                </Link>
+              </>
+            }
+            authed={
+              <Link
+                href="/account"
+                className={`hidden rounded-full border px-5 py-2 text-sm font-medium transition-colors sm:inline-flex ${accountBtn}`}
+              >
+                Account
+              </Link>
+            }
+          />
 
           <button
             type="button"
@@ -285,20 +308,35 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
                 className={`h-10 w-full rounded-full border px-4 text-sm focus:outline-none focus:ring-2 ${searchInput}`}
               />
             </form>
-            <Link
-              href="/signin"
-              onClick={() => setOpen(false)}
-              className={`mt-3 inline-flex h-12 items-center justify-center rounded-full border px-5 text-sm font-medium transition-colors ${signInBtn}`}
-            >
-              Log in
-            </Link>
-            <Link
-              href="/signup"
-              onClick={() => setOpen(false)}
-              className={`mt-2 inline-flex h-12 items-center justify-center rounded-full border px-5 text-sm font-medium transition-colors ${signUpBtn}`}
-            >
-              Sign up
-            </Link>
+            <AuthSwap
+              anon={
+                <>
+                  <Link
+                    href="/signin"
+                    onClick={() => setOpen(false)}
+                    className={`mt-3 inline-flex h-12 items-center justify-center rounded-full border px-5 text-sm font-medium transition-colors ${signInBtn}`}
+                  >
+                    Log in
+                  </Link>
+                  <Link
+                    href="/signup"
+                    onClick={() => setOpen(false)}
+                    className={`mt-2 inline-flex h-12 items-center justify-center rounded-full border px-5 text-sm font-medium transition-colors ${signUpBtn}`}
+                  >
+                    Sign up
+                  </Link>
+                </>
+              }
+              authed={
+                <Link
+                  href="/account"
+                  onClick={() => setOpen(false)}
+                  className={`mt-3 inline-flex h-12 items-center justify-center rounded-full border px-5 text-sm font-medium transition-colors ${accountBtn}`}
+                >
+                  Account
+                </Link>
+              }
+            />
             <div className="mt-2 flex items-center justify-between rounded-lg px-3 py-2">
               <span className="text-xs uppercase tracking-wider text-mute">
                 Theme

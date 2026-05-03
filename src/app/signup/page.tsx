@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { supabase } from "@/lib/supabase";
 import { safeNext } from "@/lib/safe-next";
@@ -23,10 +23,26 @@ export default function SignUpPage() {
 
 function SignUpPageInner() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   // Sanitize `?next=` against open-redirect / javascript: scheme tricks.
   // Anything not a same-origin path falls back to /onboarding.
   const next = safeNext(searchParams.get("next"), "/onboarding");
   const reason = searchParams.get("reason"); // "rent" | "buy" | "checkout"
+
+  // If a signed-in member lands on /signup (clicked an old marketing
+  // link, etc.), bounce them to the gated destination — they don't
+  // need to create another account.
+  useEffect(() => {
+    if (!supabase) return;
+    let cancelled = false;
+    supabase.auth.getSession().then(({ data }) => {
+      if (cancelled) return;
+      if (data.session) router.replace(next);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [router, next]);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");

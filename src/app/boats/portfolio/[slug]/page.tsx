@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
+import { AuthSwap } from "@/components/auth-aware";
 import { BoatCostBreakdown } from "@/components/boat-cost-breakdown";
 import { BoatShareValueChart } from "@/components/boat-share-value-chart";
 import { OwnershipPrimitives } from "@/components/ownership-primitives";
@@ -181,14 +182,30 @@ export default async function BoatDetailPage({
                   </ul>
                 </div>
 
-                <Link
-                  href={`/signup?next=${encodeURIComponent(`/boats/portfolio/${b.slug}/buy?shares=1`)}&reason=buy`}
-                  className={`mt-5 inline-flex h-12 w-full items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream transition-colors hover:bg-marine ${
-                    b.sharesAvailable === 0 ? "pointer-events-none opacity-50" : ""
-                  }`}
-                >
-                  {b.sharesAvailable === 0 ? "All shares taken" : "Reserve a share →"}
-                </Link>
+                {/* Anon hits the signup gate first; signed-in members
+                    skip straight to the buy flow. */}
+                <AuthSwap
+                  anon={
+                    <Link
+                      href={`/signup?next=${encodeURIComponent(`/boats/portfolio/${b.slug}/buy?shares=1`)}&reason=buy`}
+                      className={`mt-5 inline-flex h-12 w-full items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream transition-colors hover:bg-marine ${
+                        b.sharesAvailable === 0 ? "pointer-events-none opacity-50" : ""
+                      }`}
+                    >
+                      {b.sharesAvailable === 0 ? "All shares taken" : "Reserve a share →"}
+                    </Link>
+                  }
+                  authed={
+                    <Link
+                      href={`/boats/portfolio/${b.slug}/buy?shares=1`}
+                      className={`mt-5 inline-flex h-12 w-full items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream transition-colors hover:bg-marine ${
+                        b.sharesAvailable === 0 ? "pointer-events-none opacity-50" : ""
+                      }`}
+                    >
+                      {b.sharesAvailable === 0 ? "All shares taken" : "Reserve a share →"}
+                    </Link>
+                  }
+                />
                 <Link
                   href={`/boats/rent/${b.slug}`}
                   className="mt-3 inline-flex h-11 w-full items-center justify-center rounded-full border border-rule px-5 text-xs font-medium text-ink-soft hover:border-ink hover:text-ink"
