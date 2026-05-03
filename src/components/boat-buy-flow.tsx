@@ -7,11 +7,15 @@ import { Boat, formatUSD } from "@/lib/boat-data";
 
 type StepKey = "review" | "verify" | "documents" | "fund" | "confirm";
 
-// Funding methods, wire/ACH stay as the default direct paths; the rest
-// route the buyer to a partner conversation (we don't underwrite or
-// custody outside funds). Pattern borrowed from Pacaso's
-// "Co-ownership financing partners" treatment.
-type FundingMethod = "wire" | "ach" | "liquidity" | "partner" | "crypto";
+// Funding methods. "card" and "ach" route through Stripe Checkout
+// (the only difference is which payment_method_types Stripe surfaces);
+// "wire" stays as instructional copy with emailed details; "crypto"
+// is referral-only (regulated US exchange partner); "liquidity" is a
+// self-arranged HELOC/SBLOC/pledged-asset line that the member uses
+// to fund a wire; "finance" is a referral to an independent lender
+// who underwrites a co-ownership share loan. RYDA does not extend
+// credit on either path.
+type FundingMethod = "ach" | "wire" | "card" | "crypto" | "liquidity" | "finance";
 
 const STEPS: { key: StepKey; label: string }[] = [
   { key: "review", label: "Review" },
@@ -138,6 +142,8 @@ export function BoatBuyFlow({ boat, initialShares }: Props) {
               fundingMethod={fundingMethod}
               setFundingMethod={setFundingMethod}
               boat={boat}
+              shares={shares}
+              signerName={signature}
               onBack={() => go("documents")}
               onContinue={() => go("confirm")}
             />
@@ -513,6 +519,8 @@ function FundStep({
   fundingMethod,
   setFundingMethod,
   boat,
+  shares,
+  signerName,
   onBack,
   onContinue,
 }: {
@@ -520,25 +528,69 @@ function FundStep({
   fundingMethod: FundingMethod | null;
   setFundingMethod: (v: FundingMethod | null) => void;
   boat: Boat;
+  shares: number;
+  signerName: string;
   onBack: () => void;
   onContinue: () => void;
 }) {
   const [confirmedTransfer, setConfirmedTransfer] = useState(false);
-  // Partner / liquidity-line / crypto paths are referral-only at this
-  // stage; the user just needs to acknowledge they're starting the
-  // partner intro, not actually fund anything live in the buy flow.
-  const ready = fundingMethod !== null && confirmedTransfer;
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const stripePaths: FundingMethod[] = ["card", "ach"];
+  const isStripePath = fundingMethod !== null && stripePaths.includes(fundingMethod);
+  const ready = isStripePath ? true : fundingMethod !== null && confirmedTransfer;
 
   const confirmCopy: Record<FundingMethod, string> = {
+    ach: "Pay by ACH bank transfer on the next page (Stripe Checkout).",
     wire: "I've initiated the wire transfer from my bank with the matching memo.",
-    ach: "I've connected my bank and authorized the ACH transfer.",
-    liquidity:
-      "I've started the draw against my liquidity line and will fund within 5 business days.",
-    partner:
-      "I'd like RYDA to introduce me to a financing partner before I fund.",
+    card: "Pay by card on the next page (Stripe Checkout).",
     crypto:
       "I've initiated the crypto transfer through the regulated exchange partner.",
+    liquidity:
+      "I've started the draw against my liquidity line and will fund within 5 business days.",
+    finance:
+      "I'd like RYDA to introduce me to a financing partner before I fund.",
   };
+
+  async function startStripeCheckout(method: "card" | "ach") {
+    if (submitting) return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/share-purchase/create-checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          boatSlug: boat.slug,
+          shares,
+          name: signerName.trim() || "RYDA member",
+          paymentMethod: method,
+        }),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j.error || `Checkout failed (${res.status}).`);
+      }
+      const j = await res.json();
+      if (typeof j.url === "string") {
+        window.location.href = j.url;
+        return;
+      }
+      throw new Error("Stripe didn't return a redirect URL.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not start checkout.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  function handleSubmit() {
+    if (fundingMethod === "card" || fundingMethod === "ach") {
+      void startStripeCheckout(fundingMethod);
+    } else {
+      onContinue();
+    }
+  }
 
   return (
     <div className="space-y-8">
@@ -557,19 +609,32 @@ function FundStep({
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FundingOption
+          method="ach"
+          label="ACH bank transfer (Stripe)"
+          detail="Free, 3–5 business day settlement. Powered by Stripe Checkout."
+          selected={fundingMethod === "ach"}
+          onSelect={() => setFundingMethod("ach")}
+        />
+        <FundingOption
           method="wire"
           label="Wire transfer"
-          detail="Fastest. Same-day or next-day settlement. Recommended for amounts above $50K."
+          detail="Fastest for large amounts. Same-day or next-day settlement. Recommended for buy-ins above $50K."
           selected={fundingMethod === "wire"}
           onSelect={() => setFundingMethod("wire")}
         />
         <FundingOption
-          method="ach"
-          label="ACH transfer (post-launch)"
-          detail="Free, 3–5 business day settlement. Ships shortly after the Miami launch, wire is the only funding option for now."
-          selected={fundingMethod === "ach"}
-          onSelect={() => setFundingMethod("ach")}
-          disabled
+          method="card"
+          label="Card (Stripe)"
+          detail="Settles immediately. Powered by Stripe Checkout. Card-network fees apply at checkout."
+          selected={fundingMethod === "card"}
+          onSelect={() => setFundingMethod("card")}
+        />
+        <FundingOption
+          method="crypto"
+          label="Crypto (BTC, ETH, USDC)"
+          detail="Routed through a regulated US exchange partner. Conversion to USD on receipt; LLC escrow always holds USD."
+          selected={fundingMethod === "crypto"}
+          onSelect={() => setFundingMethod("crypto")}
         />
         <FundingOption
           method="liquidity"
@@ -579,18 +644,11 @@ function FundStep({
           onSelect={() => setFundingMethod("liquidity")}
         />
         <FundingOption
-          method="partner"
+          method="finance"
           label="Financing partner (referral)"
           detail="We introduce you to a specialty lender. They underwrite; you fund through them. RYDA does not extend credit."
-          selected={fundingMethod === "partner"}
-          onSelect={() => setFundingMethod("partner")}
-        />
-        <FundingOption
-          method="crypto"
-          label="Crypto (BTC, ETH, USDC)"
-          detail="Routed through a regulated US exchange partner. Conversion to USD on receipt; LLC escrow always holds USD."
-          selected={fundingMethod === "crypto"}
-          onSelect={() => setFundingMethod("crypto")}
+          selected={fundingMethod === "finance"}
+          onSelect={() => setFundingMethod("finance")}
         />
       </div>
 
@@ -616,13 +674,43 @@ function FundStep({
       )}
 
       {fundingMethod === "ach" && (
-        <div className="rounded-2xl border border-rule bg-surface p-6">
-          <p className="text-xs font-medium uppercase tracking-wider text-marine">ACH transfer</p>
-          <p className="mt-2 font-display text-xl text-ink">Bank connection ships post-launch</p>
-          <p className="mt-2 text-sm text-ink-soft">
-            ACH (via Plaid) ships shortly after the Miami launch. For now,
-            please complete your buy-in by wire transfer, switch the option
-            above. Wires settle in 1–2 business days.
+        <div className="rounded-2xl border border-marine bg-marine/5 p-6">
+          <p className="text-xs font-medium uppercase tracking-wider text-marine">
+            ACH bank transfer
+          </p>
+          <p className="mt-2 font-display text-xl text-ink">
+            Connect your bank on the next page (Stripe).
+          </p>
+          <p className="mt-3 text-sm text-ink-soft">
+            We never see your bank credentials. Stripe verifies the
+            account, debits the buy-in via ACH, and holds the funds in
+            escrow until your verifications clear, then releases them
+            to the LLC. Settlement is 3–5 business days.
+          </p>
+          <p className="mt-3 text-sm text-ink-soft">
+            Total charged: <span className="font-medium text-ink tabular-nums">{formatUSD(grandTotal)}</span>
+            {" "}(includes 5% acquisition fee, $1,500 closing fee).
+          </p>
+        </div>
+      )}
+
+      {fundingMethod === "card" && (
+        <div className="rounded-2xl border border-marine bg-marine/5 p-6">
+          <p className="text-xs font-medium uppercase tracking-wider text-marine">
+            Card / bank checkout
+          </p>
+          <p className="mt-2 font-display text-xl text-ink">
+            You&apos;ll be redirected to Stripe to complete payment.
+          </p>
+          <p className="mt-3 text-sm text-ink-soft">
+            We never see your card details. Stripe holds the funds
+            until your verification clears, then releases them to the
+            LLC&apos;s escrow account. You&apos;ll come back here to a
+            real-time tracker once payment confirms.
+          </p>
+          <p className="mt-3 text-sm text-ink-soft">
+            Total charged: <span className="font-medium text-ink tabular-nums">{formatUSD(grandTotal)}</span>
+            {" "}(includes 5% acquisition fee, $1,500 closing fee).
           </p>
         </div>
       )}
@@ -650,7 +738,7 @@ function FundStep({
         </div>
       )}
 
-      {fundingMethod === "partner" && (
+      {fundingMethod === "finance" && (
         <div className="rounded-2xl border border-rule bg-surface p-6">
           <p className="text-xs font-medium uppercase tracking-wider text-marine">
             Financing partner (referral)
@@ -707,7 +795,7 @@ function FundStep({
         </div>
       )}
 
-      {fundingMethod && (
+      {fundingMethod && !isStripePath && (
         <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-rule bg-surface p-4 text-sm">
           <input
             type="checkbox"
@@ -719,12 +807,24 @@ function FundStep({
         </label>
       )}
 
+      {error ? (
+        <p className="rounded-xl border border-marine/40 bg-marine/5 px-4 py-3 text-sm text-marine">
+          {error}
+        </p>
+      ) : null}
+
       <ButtonRow
         leftLabel="Back"
         onLeft={onBack}
-        rightLabel="Submit"
-        rightDisabled={!ready}
-        onRight={onContinue}
+        rightLabel={
+          isStripePath
+            ? submitting
+              ? "Opening Stripe…"
+              : "Continue to payment →"
+            : "Submit"
+        }
+        rightDisabled={!ready || submitting}
+        onRight={handleSubmit}
       />
     </div>
   );
@@ -992,11 +1092,12 @@ function FundingOption({
   disabled?: boolean;
 }) {
   const tagLabel: Record<FundingMethod, string> = {
-    wire: "Wire",
     ach: "ACH",
-    liquidity: "Liquidity",
-    partner: "Partner",
+    wire: "Wire",
+    card: "Card",
     crypto: "Crypto",
+    liquidity: "Liquidity",
+    finance: "Finance",
   };
   return (
     <button

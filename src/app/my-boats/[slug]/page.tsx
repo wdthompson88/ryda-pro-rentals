@@ -4,6 +4,7 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { DemoBanner } from "@/components/demo-banner";
 import { BookingTiersExplainer } from "@/components/booking-tiers-explainer";
+import { AssetCalendar } from "@/components/asset-calendar";
 import {
   BOATS,
   getBoatBySlug,
@@ -185,7 +186,7 @@ export default async function MyVehiclePage({
       {/* Bookings */}
       <Section id="bookings" title="Bookings">
         <div className="mb-6 flex items-end justify-between">
-          <p className="text-sm text-ink-soft">Boat calendar, May 2026</p>
+          <p className="text-sm text-ink-soft">Boat calendar</p>
           <Link
             href="/bookings/new"
             className="rounded-full bg-marine px-5 py-2 text-sm font-medium text-cream hover:bg-marine-deep"
@@ -193,45 +194,7 @@ export default async function MyVehiclePage({
             + Book time
           </Link>
         </div>
-        <div className="overflow-hidden rounded-2xl border border-rule bg-surface">
-          <div className="grid grid-cols-7 border-b border-rule text-xs font-medium uppercase tracking-wider text-mute">
-            {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
-              <div key={d} className="px-3 py-3 text-center">
-                {d}
-              </div>
-            ))}
-          </div>
-          <div className="grid grid-cols-7">
-            {Array.from({ length: 35 }).map((_, i) => {
-              const day = i - 4 + 1;
-              const valid = day >= 1 && day <= 31;
-              let badge: { color: string; label: string } | null = null;
-              if (valid) {
-                if (day === 12 || day === 13) badge = { color: "#DC4747", label: "You" };
-                else if (day === 23 || day === 24 || day === 25) badge = { color: "#9A9590", label: "Other" };
-                else if (day === 1) badge = { color: "#3A3A3E", label: "Service" };
-              }
-              return (
-                <div
-                  key={i}
-                  className="aspect-square border-b border-r border-rule p-2 text-xs last:border-r-0 [&:nth-child(7n)]:border-r-0"
-                >
-                  {valid && <span className="text-ink-soft">{day}</span>}
-                  {badge && (
-                    <div className="mt-1">
-                      <span
-                        className="inline-block rounded px-1.5 py-0.5 text-[10px] font-medium text-cream"
-                        style={{ backgroundColor: badge.color }}
-                      >
-                        {badge.label}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        <AssetCalendar boatSlug={v.slug} vertical="boats" />
         <div className="mt-6">
           <BookingTiersExplainer variant="compact" />
         </div>

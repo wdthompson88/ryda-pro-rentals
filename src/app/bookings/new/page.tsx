@@ -85,24 +85,60 @@ export default function NewBookingPage() {
   const [step, setStep] = useState(0);
   const [vehicle, setVehicle] = useState(VEHICLES[0]);
   const [mode, setMode] = useState<BookingMode>("planned");
+  // ISO YYYY-MM-DD canonical so we can POST directly to /api/bookings
+  // and `new Date(d.start)` reparses safely. Display formatting is
+  // derived where shown (Review step + Confirmed step).
   const [dates, setDates] = useState(() => {
-    // Default to "two weeks from today, 3 days" so the demo doesn't go stale
-    // as the calendar moves forward.
     const start = new Date();
     start.setDate(start.getDate() + 14);
     const end = new Date(start);
-    end.setDate(end.getDate() + 3);
-    const fmt = (d: Date) => d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-    return { start: fmt(start), end: fmt(end), days: 3 };
+    end.setDate(end.getDate() + 2); // 3-day inclusive range = +2 to end
+    const iso = (d: Date) => d.toISOString().slice(0, 10);
+    return { start: iso(start), end: iso(end), days: 3 };
   });
   const [details, setDetails] = useState({
     type: "standard" as "standard" | "event",
     handover: "delivery" as "delivery" | "pickup",
     notes: "",
   });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const next = () => setStep((s) => Math.min(s + 1, STEPS.length - 1));
   const back = () => setStep((s) => Math.max(s - 1, 0));
+
+  // Persist the booking on confirm. The conflict-detection lives on
+  // the server (the API returns 409 if dates overlap an existing
+  // booking on the same vehicle); we surface the error inline.
+  async function submitBooking() {
+    if (submitting) return;
+    setSubmitting(true);
+    setSubmitError(null);
+    try {
+      const res = await fetch("/api/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          vehicleSymbol: vehicle.symbol,
+          mode,
+          startDate: dates.start,
+          endDate: dates.end,
+          type: details.type,
+          handover: details.handover,
+          notes: details.notes,
+        }),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j.error || `Booking failed (${res.status}).`);
+      }
+      next();
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : "Could not submit booking.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   if (authState === "checking") {
     return (
@@ -172,7 +208,9 @@ export default function NewBookingPage() {
               details={details}
               mode={mode}
               onBack={back}
-              onConfirm={next}
+              onConfirm={submitBooking}
+              submitting={submitting}
+              error={submitError}
             />
           )}
           {step === 5 && <Confirmed vehicle={vehicle} dates={dates} />}
@@ -360,9 +398,15 @@ function PickDates({
             Start
           </label>
           <input
-            type="text"
-            defaultValue={dates.start}
-            onChange={(e) => onChange({ ...dates, start: e.target.value })}
+            type="date"
+            value={dates.start}
+            min={new Date().toISOString().slice(0, 10)}
+            onChange={(e) => {
+              const start = e.target.value;
+              const end = dates.end < start ? start : dates.end;
+              const days = computeDays(start, end);
+              onChange({ start, end, days });
+            }}
             className="mt-2 h-12 w-full rounded-xl border border-rule bg-cream px-4 text-sm text-ink focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
           />
         </div>
@@ -371,9 +415,14 @@ function PickDates({
             End
           </label>
           <input
-            type="text"
-            defaultValue={dates.end}
-            onChange={(e) => onChange({ ...dates, end: e.target.value })}
+            type="date"
+            value={dates.end}
+            min={dates.start}
+            onChange={(e) => {
+              const end = e.target.value;
+              const days = computeDays(dates.start, end);
+              onChange({ ...dates, end, days });
+            }}
             className="mt-2 h-12 w-full rounded-xl border border-rule bg-cream px-4 text-sm text-ink focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
           />
         </div>
@@ -486,6 +535,8 @@ function Review({
   mode,
   onBack,
   onConfirm,
+  submitting,
+  error,
 }: {
   vehicle: { name: string };
   dates: { start: string; end: string; days: number };
@@ -493,7 +544,23 @@ function Review({
   mode: BookingMode;
   onBack: () => void;
   onConfirm: () => void;
+  submitting?: boolean;
+  error?: string | null;
 }) {
+  // Render ISO dates as short month/day strings without dropping the
+  // canonical state we POST to the API.
+  const fmt = (iso: string) => {
+    if (!iso) return "";
+    const [y, m, d] = iso.split("-").map(Number);
+    if (!y || !m || !d) return iso;
+    const date = new Date(Date.UTC(y, m - 1, d));
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      timeZone: "UTC",
+    });
+  };
   return (
     <div>
       <h2 className="font-display text-2xl text-ink">Review your booking.</h2>
@@ -503,7 +570,7 @@ function Review({
           k="Mode"
           v={mode === "short-notice" ? "Short-notice drive" : "Planned drive"}
         />
-        <Row k="Dates" v={`${dates.start} – ${dates.end}`} />
+        <Row k="Dates" v={`${fmt(dates.start)} – ${fmt(dates.end)}`} />
         <Row k="Duration" v={`${dates.days} days`} />
         <Row k="Type" v={details.type === "standard" ? "Standard drive" : "Special event"} />
         <Row k="Handover" v={details.handover === "delivery" ? "White-glove delivery" : "Self-pickup"} />
@@ -520,7 +587,17 @@ function Review({
           .
         </p>
       </div>
-      <BackNext onBack={onBack} onNext={onConfirm} nextLabel="Confirm booking" />
+      {error ? (
+        <p className="mt-4 rounded-xl border border-red/40 bg-red/5 px-4 py-3 text-sm text-red">
+          {error}
+        </p>
+      ) : null}
+      <BackNext
+        onBack={onBack}
+        onNext={onConfirm}
+        nextLabel={submitting ? "Submitting…" : "Confirm booking"}
+        nextDisabled={submitting}
+      />
     </div>
   );
 }
@@ -532,6 +609,17 @@ function Confirmed({
   vehicle: { name: string };
   dates: { start: string; end: string };
 }) {
+  const fmt = (iso: string) => {
+    if (!iso) return "";
+    const [y, m, d] = iso.split("-").map(Number);
+    if (!y || !m || !d) return iso;
+    return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      timeZone: "UTC",
+    });
+  };
   return (
     <div className="text-center">
       <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-cream-2 text-3xl text-red">
@@ -539,7 +627,7 @@ function Confirmed({
       </div>
       <h2 className="mt-6 font-display text-3xl text-ink">Booking confirmed.</h2>
       <p className="mt-3 text-base text-ink-soft">
-        {vehicle.name} · {dates.start} – {dates.end}
+        {vehicle.name} · {fmt(dates.start)} – {fmt(dates.end)}
       </p>
       <div className="mt-8 rounded-xl border border-rule bg-cream-2/40 p-5 text-left text-sm">
         <p className="font-medium text-ink">Booking confirmation</p>
@@ -574,10 +662,12 @@ function BackNext({
   onBack,
   onNext,
   nextLabel = "Continue",
+  nextDisabled,
 }: {
   onBack: () => void;
   onNext: () => void;
   nextLabel?: string;
+  nextDisabled?: boolean;
 }) {
   return (
     <div className="mt-10 flex gap-3">
@@ -589,12 +679,24 @@ function BackNext({
       </button>
       <button
         onClick={onNext}
-        className="h-12 flex-1 rounded-full bg-red px-7 text-sm font-medium text-cream hover:bg-red-deep"
+        disabled={nextDisabled}
+        className="h-12 flex-1 rounded-full bg-red px-7 text-sm font-medium text-cream hover:bg-red-deep disabled:cursor-not-allowed disabled:opacity-60"
       >
         {nextLabel} →
       </button>
     </div>
   );
+}
+
+// Inclusive day count between two ISO YYYY-MM-DD dates. Used by
+// PickDates to keep the "X days · Y miles" summary in sync with the
+// actual range as the user adjusts inputs.
+function computeDays(startIso: string, endIso: string): number {
+  if (!startIso || !endIso) return 0;
+  const s = new Date(startIso + "T00:00:00Z").getTime();
+  const e = new Date(endIso + "T00:00:00Z").getTime();
+  if (Number.isNaN(s) || Number.isNaN(e) || e < s) return 0;
+  return Math.round((e - s) / (24 * 60 * 60 * 1000)) + 1;
 }
 
 function Row({ k, v }: { k: string; v: string }) {
