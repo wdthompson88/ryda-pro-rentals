@@ -10,7 +10,7 @@
 //   - Token is expired or invalid
 
 import { type NextRequest } from "next/server";
-import { supabaseAdmin } from "@/lib/supabase-admin";
+import { supabaseAuthValidator } from "@/lib/supabase-admin";
 
 export async function getUserFromRequest(
   req: NextRequest | Request,
@@ -27,8 +27,14 @@ export async function getUserFromRequestWithDiag(
   user: { id: string; email: string | null } | null;
   diag: string;
 }> {
-  const admin = supabaseAdmin();
-  if (!admin) return { user: null, diag: "no_admin_client" };
+  // Token validation MUST go through the anon-keyed client, not the
+  // service-role admin client. /auth/v1/user rejects the new
+  // sb_secret_* format as the apikey ("Invalid API key"); it accepts
+  // the sb_publishable_* / anon-JWT form. Bug surfaced as
+  // diag=getuser_error:AuthApiError:401:valid:iss_ok:Invalid_API_key
+  // — the user's JWT was fine, the server's apikey was the wrong one.
+  const validator = supabaseAuthValidator();
+  if (!validator) return { user: null, diag: "no_admin_client" };
 
   // Strategy: try Authorization header first (clean for API clients),
   // then cookies (the browser client uses these by default).
@@ -109,7 +115,7 @@ export async function getUserFromRequestWithDiag(
     tokenAge = "decode_failed";
   }
 
-  const { data, error } = await admin.auth.getUser(token);
+  const { data, error } = await validator.auth.getUser(token);
   if (error) {
     // Token reached us but Supabase rejected it. Surface the error
     // name + status + message + token age + issuer-match.
