@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { authedFetch } from "@/lib/api-fetch";
 
 // AssetCalendar — month grid that reads bookings from /api/bookings
 // for a single asset (vehicle or boat). Falls back to demo badges if
@@ -52,7 +53,7 @@ export function AssetCalendar({
         if (vehicleSymbol) params.set("vehicleSymbol", vehicleSymbol);
         if (boatSlug) params.set("boatSlug", boatSlug);
         params.set("upcoming", "1");
-        const res = await fetch(`/api/bookings?${params.toString()}`);
+        const res = await authedFetch(`/api/bookings?${params.toString()}`);
         if (cancelled) return;
         if (res.ok) {
           const j = await res.json();

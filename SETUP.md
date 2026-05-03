@@ -19,7 +19,7 @@ You need accounts on:
 
 ## 1. Run database migrations (Supabase)
 
-Six migrations live in `supabase/migrations/`. Run them in order.
+Seven migrations live in `supabase/migrations/`. Run them in order.
 
 **Easiest: paste each into the Supabase SQL Editor**
 
@@ -31,6 +31,7 @@ Six migrations live in `supabase/migrations/`. Run them in order.
    - `0010_kyc_verifications.sql`
    - `0011_llc_amendments.sql`
    - `0012_document_signatures.sql`
+   - `0013_purchase_fulfillment_idempotency.sql`
 3. Verify: SQL Editor → run
    ```sql
    select table_name from information_schema.tables
@@ -44,7 +45,7 @@ Six migrations live in `supabase/migrations/`. Run them in order.
 direct connection string, you can run them all at once:
 
 ```bash
-for f in supabase/migrations/00{07,08,09,10,11,12}_*.sql; do
+for f in supabase/migrations/00{07,08,09,10,11,12,13}_*.sql; do
   psql "$DATABASE_URL" -f "$f"
 done
 ```
@@ -127,6 +128,12 @@ Two webhook endpoints — both POST to your deployed origin.
 
 ### 3.2 KYC webhook (Stripe Identity)
 
+You have two valid layouts. Pick one:
+
+**Option A — Two Stripe endpoints (recommended).** Each endpoint gets
+its own signing secret; reusing the share-purchase secret on the KYC
+endpoint will fail signature verification on every event.
+
 - Same dashboard → Add another endpoint
 - Endpoint URL: `https://YOUR-DOMAIN.com/api/kyc/webhook`
 - Events:
@@ -134,14 +141,22 @@ Two webhook endpoints — both POST to your deployed origin.
   - `identity.verification_session.processing`
   - `identity.verification_session.requires_input`
   - `identity.verification_session.canceled`
-- The signing secret here is the SAME endpoint type → if you want a
-  single `STRIPE_WEBHOOK_SECRET` env var for both, copy the same
-  signing secret on both endpoints (Stripe assigns one per endpoint;
-  use the FIRST endpoint's secret for both routes — both routes call
-  `stripe.webhooks.constructEvent` with `STRIPE_WEBHOOK_SECRET`, and
-  invalid signatures will 400). Cleanest is to use the
-  share-purchase endpoint's signing secret as the canonical
-  `STRIPE_WEBHOOK_SECRET`.
+- Reveal that endpoint's signing secret and set:
+  ```bash
+  vercel env add STRIPE_KYC_WEBHOOK_SECRET
+  ```
+  The KYC route reads `STRIPE_KYC_WEBHOOK_SECRET` first, with a
+  fallback to `STRIPE_WEBHOOK_SECRET` (so Option B below stays
+  working without code changes).
+
+**Option B — One Stripe endpoint with all event groups.** Point a
+single endpoint at any one of the routes (typically share-purchase),
+subscribe it to all six event types above plus the three checkout
+events, and you only need `STRIPE_WEBHOOK_SECRET`. The trade-off is
+that Identity events get POSTed to `/api/share-purchase/webhook`,
+which currently ignores them. To use Option B you'd need to add a
+single dispatcher route that fans events out by `event.type`. Most
+teams prefer Option A.
 
 ### 3.3 Verify
 

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Vehicle, formatUSD } from "@/lib/market-data";
+import { authedFetch } from "@/lib/api-fetch";
 
 type StepKey = "review" | "verify" | "documents" | "fund" | "confirm";
 
@@ -325,7 +326,7 @@ function VerifyStep({
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch("/api/kyc/status");
+        const res = await authedFetch("/api/kyc/status");
         if (cancelled) return;
         if (res.ok) {
           const j = await res.json();
@@ -348,7 +349,7 @@ function VerifyStep({
     setKycRunning(true);
     setError(null);
     try {
-      const res = await fetch("/api/kyc/start", {
+      const res = await authedFetch("/api/kyc/start", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ returnUrl: window.location.pathname }),
@@ -615,7 +616,7 @@ function FundStep({
     setSubmitting(true);
     setError(null);
     try {
-      const res = await fetch("/api/share-purchase/create-checkout", {
+      const res = await authedFetch("/api/share-purchase/create-checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

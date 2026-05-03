@@ -7,6 +7,7 @@ import { SiteHeader } from "@/components/site-header";
 import { StepProgress } from "@/components/step-progress";
 import { BOOKING_POLICY } from "@/lib/market-data";
 import { supabase } from "@/lib/supabase";
+import { authedFetch } from "@/lib/api-fetch";
 
 // Booking mode is the first decision after vehicle selection, it sets
 // the calendar validation rules (advance window, consecutive cap,
@@ -115,7 +116,7 @@ export default function NewBookingPage() {
     setSubmitting(true);
     setSubmitError(null);
     try {
-      const res = await fetch("/api/bookings", {
+      const res = await authedFetch("/api/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

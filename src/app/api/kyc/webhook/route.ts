@@ -5,20 +5,23 @@
 //   - identity.verification_session.requires_input
 //   - identity.verification_session.canceled
 //
-// Same secret as the share-purchase webhook (single STRIPE_WEBHOOK_SECRET
-// works for both endpoints if you mount both in the Stripe dashboard;
-// or use a separate secret per endpoint and we'd need a separate env
-// var). For now we reuse STRIPE_WEBHOOK_SECRET.
+// Stripe assigns ONE signing secret per webhook endpoint. If KYC events
+// are mounted on a separate Stripe endpoint than the share-purchase
+// events, they have different `whsec_…` values and reusing the wrong
+// one will 400 every event. We read STRIPE_KYC_WEBHOOK_SECRET first;
+// it falls back to STRIPE_WEBHOOK_SECRET so a single-endpoint setup
+// (one Stripe endpoint with both event groups, dispatched server-side)
+// keeps working with one env var. See SETUP.md §3.2.
 
 import { NextResponse, type NextRequest } from "next/server";
-import { stripe, STRIPE_WEBHOOK_SECRET } from "@/lib/stripe";
+import { stripe, STRIPE_KYC_WEBHOOK_SECRET } from "@/lib/stripe";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import type Stripe from "stripe";
 
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
-  if (!stripe || !STRIPE_WEBHOOK_SECRET) {
+  if (!stripe || !STRIPE_KYC_WEBHOOK_SECRET) {
     return NextResponse.json({ received: true });
   }
   const admin = supabaseAdmin();
@@ -33,7 +36,7 @@ export async function POST(req: NextRequest) {
   const rawBody = await req.text();
   let event: Stripe.Event;
   try {
-    event = stripe.webhooks.constructEvent(rawBody, sig, STRIPE_WEBHOOK_SECRET);
+    event = stripe.webhooks.constructEvent(rawBody, sig, STRIPE_KYC_WEBHOOK_SECRET);
   } catch (err) {
     console.error("[kyc webhook] signature failed", err);
     return NextResponse.json({ error: "Invalid signature." }, { status: 400 });

@@ -186,18 +186,56 @@ export async function GET(req: NextRequest) {
   const boatSlug = url.searchParams.get("boatSlug");
   const upcomingOnly = url.searchParams.get("upcoming") === "1";
 
+  // Authorization: when an asset filter is provided, the caller is asking
+  // for *other co-owners'* bookings on that asset (calendar view). The
+  // RLS policy on `bookings` only allows that read for users who hold an
+  // active share — but this route uses the service-role client (admin)
+  // which BYPASSES RLS, so we must enforce the same check here in code.
+  // Without this, any signed-in user could query any vehicleSymbol or
+  // boatSlug and read every co-owner's booking metadata (including
+  // user_id, dates, and free-text notes). See migration 0009 §RLS.
+  const assetSymbol = vehicleSymbol ? vehicleSymbol.toUpperCase() : null;
+  const assetSlug = boatSlug ? boatSlug.toLowerCase() : null;
+
+  if (assetSymbol || assetSlug) {
+    const holdings = await admin
+      .from("share_holdings")
+      .select("id")
+      .eq("user_id", user.id)
+      .is("transferred_at", null)
+      .eq(assetSymbol ? "vehicle_symbol" : "boat_slug", assetSymbol ?? assetSlug)
+      .limit(1);
+    if (holdings.error) {
+      console.error("[bookings · membership check]", holdings.error);
+      return NextResponse.json(
+        { error: "Could not verify membership." },
+        { status: 500 },
+      );
+    }
+    if (!holdings.data || holdings.data.length === 0) {
+      // Caller doesn't hold a share in this asset — they have no business
+      // seeing other co-owners' bookings. Match RLS behavior: empty list,
+      // not 403 (avoids leaking which assets exist).
+      return NextResponse.json({ bookings: [] });
+    }
+  }
+
+  // Calendar view (asset filter present): return only the minimal fields
+  // a calendar needs. Hide notes/handover/type and any other personal
+  // metadata that belongs to the booking owner. Self-view (no filter)
+  // returns the full row since the user is asking for their own data.
+  const calendarColumns = "id, user_id, vehicle_symbol, boat_slug, start_date, end_date, status";
+  const selectColumns = (assetSymbol || assetSlug) ? calendarColumns : "*";
+
   let query = admin
     .from("bookings")
-    .select("*")
+    .select(selectColumns)
     .order("start_date", { ascending: true });
 
-  // If asset filter provided, return all visible bookings on that asset
-  // (RLS policy already filters to assets the user has shares in).
-  // Otherwise return only the user's own bookings.
-  if (vehicleSymbol) {
-    query = query.eq("vehicle_symbol", vehicleSymbol.toUpperCase());
-  } else if (boatSlug) {
-    query = query.eq("boat_slug", boatSlug.toLowerCase());
+  if (assetSymbol) {
+    query = query.eq("vehicle_symbol", assetSymbol);
+  } else if (assetSlug) {
+    query = query.eq("boat_slug", assetSlug);
   } else {
     query = query.eq("user_id", user.id);
   }

@@ -7,6 +7,7 @@ import { DemoBanner } from "@/components/demo-banner";
 import { formatUSD } from "@/lib/market-data";
 import { VEHICLES } from "@/lib/market-data";
 import { BOATS } from "@/lib/boat-data";
+import { authedFetch } from "@/lib/api-fetch";
 
 // Reads the actual purchase row from /api/share-purchase/[id] and
 // renders the stage tracker against real status. Falls back to a
@@ -112,7 +113,7 @@ export default function PurchasePage({
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch(`/api/share-purchase/${id}`);
+        const res = await authedFetch(`/api/share-purchase/${id}`);
         if (cancelled) return;
         if (res.status === 401) {
           setError("Sign in to view this purchase.");

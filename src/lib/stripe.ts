@@ -33,4 +33,17 @@ export function requireStripe() {
   return stripe;
 }
 
+// Stripe assigns ONE signing secret per webhook endpoint. If you have a
+// separate Stripe dashboard endpoint for the KYC events vs. the share-
+// purchase events (see SETUP.md §3.2), each has its own `whsec_…` and
+// reusing the wrong one will 400 every event ("invalid signature"). The
+// canonical setup:
+//   - STRIPE_WEBHOOK_SECRET      → /api/share-purchase/webhook
+//   - STRIPE_KYC_WEBHOOK_SECRET  → /api/kyc/webhook
+// If you mount BOTH event groups on the same Stripe endpoint pointing at
+// a single internal handler, you'd only need one secret. The per-route
+// constant `KYC_WEBHOOK_SECRET` falls back to STRIPE_WEBHOOK_SECRET so
+// the unified-endpoint setup keeps working with one env var.
 export const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET ?? "";
+export const STRIPE_KYC_WEBHOOK_SECRET =
+  process.env.STRIPE_KYC_WEBHOOK_SECRET ?? process.env.STRIPE_WEBHOOK_SECRET ?? "";

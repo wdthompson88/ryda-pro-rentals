@@ -8,8 +8,17 @@
 //   - payment_intent.payment_failed: flip status to 'failed' (for the
 //     rare card-decline + retry case).
 //
-// Idempotent: re-delivery of a completed event finds the row already
-// 'paid' and short-circuits without double-inserting holdings.
+// Concurrency-idempotent (see migration 0013):
+//   1. Atomic compare-and-set claims the right to fulfill: the row is
+//      flipped pending→paid in a single statement; only one concurrent
+//      delivery gets a non-empty result.
+//   2. Holdings + amendments are upserted with ignoreDuplicates against
+//      unique indexes on (purchase_id, share_index) and (purchase_id,
+//      document_type), so even if the atomic gate is bypassed (manual
+//      status change, etc.) we can't double-insert.
+//   3. fulfilled_at stamps the purchase at the end of the success path.
+//      A redelivery that finds status='paid' AND fulfilled_at IS NULL
+//      repairs partial fulfillment by re-running the side-effects.
 
 import { NextResponse, type NextRequest } from "next/server";
 import { stripe, STRIPE_WEBHOOK_SECRET } from "@/lib/stripe";
@@ -61,56 +70,102 @@ export async function POST(req: NextRequest) {
           break;
         }
 
-        // Idempotency: if already paid, no-op.
-        const existing = await admin
-          .from("share_purchases")
-          .select("id, status, user_id, vehicle_symbol, boat_slug, shares, email, name")
-          .eq("id", purchaseId)
-          .single();
-        if (existing.error || !existing.data) {
-          console.error("[stripe webhook] purchase not found", purchaseId);
-          break;
-        }
-        if (existing.data.status === "paid" || existing.data.status === "closed") {
-          break;
-        }
+        const intentId = typeof session.payment_intent === "string"
+          ? session.payment_intent
+          : session.payment_intent?.id ?? null;
 
-        await admin
+        // Atomic compare-and-set: flip status pending→paid in a single
+        // statement. Only one concurrent delivery wins this update; the
+        // others get an empty result and fall through to the
+        // partial-fulfillment repair check below.
+        const claim = await admin
           .from("share_purchases")
           .update({
             status: "paid",
-            stripe_payment_intent_id: typeof session.payment_intent === "string"
-              ? session.payment_intent
-              : session.payment_intent?.id ?? null,
+            stripe_payment_intent_id: intentId,
             updated_at: new Date().toISOString(),
           })
-          .eq("id", purchaseId);
+          .eq("id", purchaseId)
+          .eq("status", "pending")
+          .select(
+            "id, status, user_id, vehicle_symbol, boat_slug, shares, email, name, fulfilled_at",
+          )
+          .maybeSingle();
 
-        // Create the holdings row(s). Each share is one row so transfers
-        // can target individual shares later. Cap at 10 just in case.
-        const sharesToCreate = Math.min(10, Math.max(1, existing.data.shares));
-        const rows = Array.from({ length: sharesToCreate }, () => ({
-          user_id: existing.data.user_id,
-          vehicle_symbol: existing.data.vehicle_symbol,
-          boat_slug: existing.data.boat_slug,
+        // If we lost the race, re-read so we can decide between
+        // "already fulfilled, no-op" and "partial fulfillment, repair."
+        let purchase = claim.data;
+        if (!purchase) {
+          const reread = await admin
+            .from("share_purchases")
+            .select(
+              "id, status, user_id, vehicle_symbol, boat_slug, shares, email, name, fulfilled_at",
+            )
+            .eq("id", purchaseId)
+            .single();
+          if (reread.error || !reread.data) {
+            console.error("[stripe webhook] purchase not found", purchaseId);
+            break;
+          }
+          purchase = reread.data;
+          // If we didn't claim AND the row is still pending, something
+          // else updated it (operator?) but to a non-paid status —
+          // surface the warning and skip side-effects.
+          if (purchase.status !== "paid") {
+            console.warn(
+              "[stripe webhook] checkout.completed but purchase not paid",
+              { purchaseId, status: purchase.status },
+            );
+            break;
+          }
+        }
+
+        // Already fulfilled (this redelivery has nothing to do).
+        if (purchase.fulfilled_at) {
+          break;
+        }
+
+        // From here we are the canonical fulfiller for this purchase.
+        // Either we won the atomic claim (fresh paid), or we're
+        // repairing a previous delivery that flipped status='paid' but
+        // failed before finishing side-effects. Both paths use the
+        // same idempotent upserts.
+
+        // Holdings: one row per share, indexed 1..N. Unique index on
+        // (purchase_id, share_index) makes upsert with ignoreDuplicates
+        // a true no-op on redelivery.
+        const sharesToCreate = Math.min(10, Math.max(1, purchase.shares));
+        const rows = Array.from({ length: sharesToCreate }, (_, i) => ({
+          user_id: purchase!.user_id,
+          vehicle_symbol: purchase!.vehicle_symbol,
+          boat_slug: purchase!.boat_slug,
           shares: 1,
-          purchase_id: existing.data.id,
+          purchase_id: purchase!.id,
+          share_index: i + 1,
         }));
-        const { error: holdingsErr } = await admin.from("share_holdings").insert(rows);
+        const { error: holdingsErr } = await admin
+          .from("share_holdings")
+          .upsert(rows, {
+            onConflict: "purchase_id,share_index",
+            ignoreDuplicates: true,
+          });
         if (holdingsErr) {
-          console.error("[stripe webhook] failed to insert holdings", holdingsErr);
+          console.error("[stripe webhook] failed to upsert holdings", holdingsErr);
+          // Don't stamp fulfilled_at; this delivery will retry on
+          // redrive. Bail out of fulfillment for now.
+          break;
         }
 
         // Notify the team. Resend no-ops cleanly if the env isn't
         // wired so this is safe in preview deploys.
-        const assetLabel = existing.data.vehicle_symbol ?? existing.data.boat_slug;
+        const assetLabel = purchase.vehicle_symbol ?? purchase.boat_slug;
         await notifyTeam({
           subject: `New share purchase · ${assetLabel}`,
           html: emailLayout(
             "Share purchase confirmed",
             `
-              <p>${escapeHtml(existing.data.name)} (${escapeHtml(existing.data.email)}) just claimed
-              <strong>${existing.data.shares} share${existing.data.shares > 1 ? "s" : ""}</strong>
+              <p>${escapeHtml(purchase.name)} (${escapeHtml(purchase.email)}) just claimed
+              <strong>${purchase.shares} share${purchase.shares > 1 ? "s" : ""}</strong>
               of <strong>${escapeHtml(String(assetLabel))}</strong>.</p>
               <p>Purchase ID: <code>${escapeHtml(purchaseId)}</code></p>
               <p>Stripe session: <code>${escapeHtml(session.id)}</code></p>
@@ -122,13 +177,16 @@ export async function POST(req: NextRequest) {
         // the buyer. Best-effort: a failure here doesn't roll back
         // the purchase; the team gets a follow-up notification and
         // can resend manually. Whole block is wrapped in a try so a
-        // PDF / email failure can't break the main webhook flow.
+        // PDF / email failure can't break the main webhook flow. We
+        // only stamp fulfilled_at when the inner block succeeds —
+        // a redelivery will repair an email-only failure.
+        let amendmentSent = false;
         try {
-          const v = existing.data.vehicle_symbol
-            ? VEHICLES.find((x) => x.symbol === existing.data.vehicle_symbol)
+          const v = purchase.vehicle_symbol
+            ? VEHICLES.find((x) => x.symbol === purchase!.vehicle_symbol)
             : null;
-          const b = existing.data.boat_slug
-            ? BOATS.find((x) => x.slug === existing.data.boat_slug)
+          const b = purchase.boat_slug
+            ? BOATS.find((x) => x.slug === purchase!.boat_slug)
             : null;
           const assetDisplay = v
             ? `${v.year} ${v.name}`
@@ -142,86 +200,118 @@ export async function POST(req: NextRequest) {
               : "RYDA LLC";
           const totalAmount = Number(session.amount_total ?? 0) / 100;
 
-          const pdfBuffer = await renderAmendmentPdf({
-            purchaseId,
-            memberName: existing.data.name,
-            memberEmail: existing.data.email,
-            shares: existing.data.shares,
-            assetLabel: assetDisplay,
-            llcName,
-            effectiveDate: new Date().toISOString().slice(0, 10),
-            totalAmount,
-          });
-
-          // Persist the amendment record before email so we can audit
-          // even if the email send itself fails.
-          const { data: amendmentRow } = await admin
+          // Idempotent amendment row: unique on (purchase_id,
+          // document_type). Upsert with returning so we get the row
+          // whether it existed already or we just created it.
+          const { data: amendmentRow, error: amendmentErr } = await admin
             .from("llc_amendments")
-            .insert({
-              purchase_id: purchaseId,
-              user_id: existing.data.user_id,
-              document_type: "member_register_amendment",
-              vehicle_symbol: existing.data.vehicle_symbol,
-              boat_slug: existing.data.boat_slug,
-              shares: existing.data.shares,
-              member_name: existing.data.name,
-              member_email: existing.data.email,
-              email_attempted_at: new Date().toISOString(),
-            })
-            .select("id")
+            .upsert(
+              {
+                purchase_id: purchaseId,
+                user_id: purchase.user_id,
+                document_type: "member_register_amendment",
+                vehicle_symbol: purchase.vehicle_symbol,
+                boat_slug: purchase.boat_slug,
+                shares: purchase.shares,
+                member_name: purchase.name,
+                member_email: purchase.email,
+                email_attempted_at: new Date().toISOString(),
+              },
+              {
+                onConflict: "purchase_id,document_type",
+                ignoreDuplicates: false,
+              },
+            )
+            .select("id, emailed")
             .single();
+          if (amendmentErr) {
+            console.error("[stripe webhook] amendment upsert failed", amendmentErr);
+            throw amendmentErr;
+          }
 
-          // Send to the buyer with the PDF attached. Resend supports
-          // attachments natively. From + to are validated on the
-          // RYDA notify config.
-          const resendKey = process.env.RESEND_API_KEY;
-          const from = process.env.RYDA_NOTIFY_FROM;
-          if (resendKey && from) {
-            const resend = new Resend(resendKey);
-            const { error: emailError } = await resend.emails.send({
-              from,
-              to: existing.data.email,
-              subject: `Welcome to ${llcName} — your share is recorded`,
-              html: emailLayout(
-                "Your co-ownership is confirmed",
-                `
-                  <p>${escapeHtml(existing.data.name)},</p>
-                  <p>Your ${existing.data.shares} share${existing.data.shares > 1 ? "s" : ""} of
-                  <strong>${escapeHtml(assetDisplay)}</strong> are recorded
-                  in <strong>${escapeHtml(llcName)}</strong>'s member register.
-                  The amendment to the LLC's Operating Agreement is attached
-                  to this email for your records.</p>
-                  <p>What happens next:</p>
-                  <ul>
-                    <li>Your member-area dashboard now shows the asset.</li>
-                    <li>You can book your first session immediately.</li>
-                    <li>The team will be in touch within 1 business day to walk
-                    through onboarding.</li>
-                  </ul>
-                  <p>Reference: <code>${escapeHtml(purchaseId)}</code></p>
-                `,
-              ),
-              attachments: [
-                {
-                  filename: `${llcName.replace(/\s+/g, "-")}-amendment.pdf`,
-                  content: pdfBuffer,
-                },
-              ],
-            });
-            if (!emailError && amendmentRow) {
-              await admin
-                .from("llc_amendments")
-                .update({ emailed: true })
-                .eq("id", amendmentRow.id);
-            } else if (emailError) {
-              console.error("[stripe webhook] amendment email failed", emailError);
-            }
+          // If a prior delivery already marked emailed=true, skip the
+          // PDF render + send and treat fulfillment as complete.
+          if (amendmentRow?.emailed) {
+            amendmentSent = true;
           } else {
-            console.log("[stripe webhook] resend not configured, amendment email skipped");
+            const pdfBuffer = await renderAmendmentPdf({
+              purchaseId,
+              memberName: purchase.name,
+              memberEmail: purchase.email,
+              shares: purchase.shares,
+              assetLabel: assetDisplay,
+              llcName,
+              effectiveDate: new Date().toISOString().slice(0, 10),
+              totalAmount,
+            });
+
+            // Send to the buyer with the PDF attached. Resend supports
+            // attachments natively. From + to are validated on the
+            // RYDA notify config.
+            const resendKey = process.env.RESEND_API_KEY;
+            const from = process.env.RYDA_NOTIFY_FROM;
+            if (resendKey && from) {
+              const resend = new Resend(resendKey);
+              const { error: emailError } = await resend.emails.send({
+                from,
+                to: purchase.email,
+                subject: `Welcome to ${llcName} — your share is recorded`,
+                html: emailLayout(
+                  "Your co-ownership is confirmed",
+                  `
+                    <p>${escapeHtml(purchase.name)},</p>
+                    <p>Your ${purchase.shares} share${purchase.shares > 1 ? "s" : ""} of
+                    <strong>${escapeHtml(assetDisplay)}</strong> are recorded
+                    in <strong>${escapeHtml(llcName)}</strong>'s member register.
+                    The amendment to the LLC's Operating Agreement is attached
+                    to this email for your records.</p>
+                    <p>What happens next:</p>
+                    <ul>
+                      <li>Your member-area dashboard now shows the asset.</li>
+                      <li>You can book your first session immediately.</li>
+                      <li>The team will be in touch within 1 business day to walk
+                      through onboarding.</li>
+                    </ul>
+                    <p>Reference: <code>${escapeHtml(purchaseId)}</code></p>
+                  `,
+                ),
+                attachments: [
+                  {
+                    filename: `${llcName.replace(/\s+/g, "-")}-amendment.pdf`,
+                    content: pdfBuffer,
+                  },
+                ],
+              });
+              if (!emailError && amendmentRow) {
+                await admin
+                  .from("llc_amendments")
+                  .update({ emailed: true })
+                  .eq("id", amendmentRow.id);
+                amendmentSent = true;
+              } else if (emailError) {
+                console.error("[stripe webhook] amendment email failed", emailError);
+              }
+            } else {
+              console.log("[stripe webhook] resend not configured, amendment email skipped");
+              // Treat as fulfilled — no email backend means the team
+              // will manually send the amendment. Don't loop forever.
+              amendmentSent = true;
+            }
           }
         } catch (pdfErr) {
           console.error("[stripe webhook] amendment PDF / email failed", pdfErr);
           // Don't propagate — purchase already paid, team will follow up.
+          // amendmentSent stays false; we won't stamp fulfilled_at, so
+          // a redelivery (or manual replay) repairs.
+        }
+
+        // Stamp fulfilled_at only when holdings + amendment succeeded.
+        if (amendmentSent) {
+          await admin
+            .from("share_purchases")
+            .update({ fulfilled_at: new Date().toISOString() })
+            .eq("id", purchaseId)
+            .is("fulfilled_at", null);
         }
         break;
       }
