@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Vehicle, formatUSD } from "@/lib/market-data";
@@ -316,13 +316,62 @@ function VerifyStep({
   onContinue: () => void;
 }) {
   const [kycRunning, setKycRunning] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  function fakeRunKyc() {
+  // On mount, check whether the user is already verified server-side.
+  // This handles the back-from-Stripe-Identity case (redirect lands
+  // here with ?kyc=ok) and the "I already verified earlier" case.
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/kyc/status");
+        if (cancelled) return;
+        if (res.ok) {
+          const j = await res.json();
+          if (j.verified) setKycComplete(true);
+        }
+      } catch {
+        /* fall through; user can click the button */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [setKycComplete]);
+
+  // Open Stripe Identity in redirect mode. The user lands at Stripe's
+  // hosted page, uploads ID + selfie, and returns to ?kyc=ok. The
+  // webhook flips the row server-side; we re-check on mount.
+  async function startKyc() {
+    if (kycRunning) return;
     setKycRunning(true);
-    setTimeout(() => {
+    setError(null);
+    try {
+      const res = await fetch("/api/kyc/start", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ returnUrl: window.location.pathname }),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j.error || `KYC failed (${res.status}).`);
+      }
+      const j = await res.json();
+      if (j.kycVerified) {
+        setKycComplete(true);
+        return;
+      }
+      if (typeof j.url === "string") {
+        window.location.href = j.url;
+        return;
+      }
+      throw new Error("No verification URL returned.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not start KYC.");
+    } finally {
       setKycRunning(false);
-      setKycComplete(true);
-    }, 2200);
+    }
   }
 
   const ready = kycComplete;
@@ -335,9 +384,10 @@ function VerifyStep({
           Verify your identity
         </h1>
         <p className="mt-3 text-base text-ink-soft">
-          Standard KYC. We use Persona for identity verification, government ID
-          and a selfie match. Required to be added to the LLC's insurance policy
-          and to drive the vehicle. RYDA never sees raw documents.
+          Standard KYC. We use Stripe Identity, government ID and a
+          selfie match. Required to be added to the LLC's insurance
+          policy and to drive the vehicle. RYDA never sees raw
+          documents, Stripe verifies them and returns a pass/fail.
         </p>
       </div>
 
@@ -348,33 +398,34 @@ function VerifyStep({
             <p className="text-xs font-medium uppercase tracking-wider text-red">Identity (KYC)</p>
             <p className="mt-2 font-display text-xl text-ink">Verify your identity</p>
             <p className="mt-2 text-sm text-ink-soft">
-              Government-issued ID + selfie match. Powered by Persona. Typically
-              takes 2–5 minutes. We also pull a clean recent driving record check.
+              Government-issued ID + live selfie. Powered by Stripe
+              Identity. Typically takes 2–5 minutes. You'll be redirected
+              to Stripe to complete the check, then return here.
             </p>
           </div>
           {kycComplete && (
-            <span className="shrink-0 rounded-full bg-ink/5 px-3 py-1 text-xs font-medium text-ink">
+            <span className="shrink-0 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-700">
               Verified ✓
             </span>
           )}
         </div>
 
-        {!kycComplete && !kycRunning && (
+        {!kycComplete && (
           <button
             type="button"
-            onClick={fakeRunKyc}
-            className="mt-5 inline-flex h-11 items-center justify-center rounded-full bg-ink px-6 text-sm font-medium text-cream hover:bg-red"
+            onClick={startKyc}
+            disabled={kycRunning}
+            className="mt-5 inline-flex h-11 items-center justify-center rounded-full bg-ink px-6 text-sm font-medium text-cream transition-colors hover:bg-red disabled:cursor-not-allowed disabled:opacity-60"
           >
-            Start identity verification →
+            {kycRunning ? "Opening Stripe…" : "Start identity verification →"}
           </button>
         )}
 
-        {kycRunning && (
-          <div className="mt-5 flex items-center gap-3 text-sm text-ink-soft">
-            <div className="h-3 w-3 animate-pulse rounded-full bg-red" />
-            <span>Persona is verifying… typically 5–10 seconds.</span>
-          </div>
-        )}
+        {error ? (
+          <p className="mt-4 rounded-xl border border-red/40 bg-red/5 px-4 py-3 text-sm text-red">
+            {error}
+          </p>
+        ) : null}
       </div>
 
       <div className="rounded-2xl border border-rule bg-cream-2/40 p-5 text-sm">

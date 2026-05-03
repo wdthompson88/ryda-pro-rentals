@@ -15,6 +15,10 @@ import { NextResponse, type NextRequest } from "next/server";
 import { stripe, STRIPE_WEBHOOK_SECRET } from "@/lib/stripe";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { notifyTeam, emailLayout, escapeHtml } from "@/lib/notify";
+import { renderAmendmentPdf } from "@/lib/llc-amendment-pdf";
+import { VEHICLES } from "@/lib/market-data";
+import { BOATS } from "@/lib/boat-data";
+import { Resend } from "resend";
 import type Stripe from "stripe";
 
 // Stripe needs the raw body for signature verification. Next.js App
@@ -97,8 +101,8 @@ export async function POST(req: NextRequest) {
           console.error("[stripe webhook] failed to insert holdings", holdingsErr);
         }
 
-        // Notify the team + the buyer. Resend no-ops cleanly if the
-        // env isn't wired so this is safe in preview deploys.
+        // Notify the team. Resend no-ops cleanly if the env isn't
+        // wired so this is safe in preview deploys.
         const assetLabel = existing.data.vehicle_symbol ?? existing.data.boat_slug;
         await notifyTeam({
           subject: `New share purchase · ${assetLabel}`,
@@ -113,6 +117,112 @@ export async function POST(req: NextRequest) {
             `,
           ),
         });
+
+        // Generate + email the LLC member-register amendment PDF to
+        // the buyer. Best-effort: a failure here doesn't roll back
+        // the purchase; the team gets a follow-up notification and
+        // can resend manually. Whole block is wrapped in a try so a
+        // PDF / email failure can't break the main webhook flow.
+        try {
+          const v = existing.data.vehicle_symbol
+            ? VEHICLES.find((x) => x.symbol === existing.data.vehicle_symbol)
+            : null;
+          const b = existing.data.boat_slug
+            ? BOATS.find((x) => x.slug === existing.data.boat_slug)
+            : null;
+          const assetDisplay = v
+            ? `${v.year} ${v.name}`
+            : b
+              ? `${b.year} ${b.name}`
+              : String(assetLabel ?? "");
+          const llcName = v
+            ? `RYDA ${v.symbol} LLC`
+            : b
+              ? `RYDA ${b.slug.toUpperCase()} LLC`
+              : "RYDA LLC";
+          const totalAmount = Number(session.amount_total ?? 0) / 100;
+
+          const pdfBuffer = await renderAmendmentPdf({
+            purchaseId,
+            memberName: existing.data.name,
+            memberEmail: existing.data.email,
+            shares: existing.data.shares,
+            assetLabel: assetDisplay,
+            llcName,
+            effectiveDate: new Date().toISOString().slice(0, 10),
+            totalAmount,
+          });
+
+          // Persist the amendment record before email so we can audit
+          // even if the email send itself fails.
+          const { data: amendmentRow } = await admin
+            .from("llc_amendments")
+            .insert({
+              purchase_id: purchaseId,
+              user_id: existing.data.user_id,
+              document_type: "member_register_amendment",
+              vehicle_symbol: existing.data.vehicle_symbol,
+              boat_slug: existing.data.boat_slug,
+              shares: existing.data.shares,
+              member_name: existing.data.name,
+              member_email: existing.data.email,
+              email_attempted_at: new Date().toISOString(),
+            })
+            .select("id")
+            .single();
+
+          // Send to the buyer with the PDF attached. Resend supports
+          // attachments natively. From + to are validated on the
+          // RYDA notify config.
+          const resendKey = process.env.RESEND_API_KEY;
+          const from = process.env.RYDA_NOTIFY_FROM;
+          if (resendKey && from) {
+            const resend = new Resend(resendKey);
+            const { error: emailError } = await resend.emails.send({
+              from,
+              to: existing.data.email,
+              subject: `Welcome to ${llcName} — your share is recorded`,
+              html: emailLayout(
+                "Your co-ownership is confirmed",
+                `
+                  <p>${escapeHtml(existing.data.name)},</p>
+                  <p>Your ${existing.data.shares} share${existing.data.shares > 1 ? "s" : ""} of
+                  <strong>${escapeHtml(assetDisplay)}</strong> are recorded
+                  in <strong>${escapeHtml(llcName)}</strong>'s member register.
+                  The amendment to the LLC's Operating Agreement is attached
+                  to this email for your records.</p>
+                  <p>What happens next:</p>
+                  <ul>
+                    <li>Your member-area dashboard now shows the asset.</li>
+                    <li>You can book your first session immediately.</li>
+                    <li>The team will be in touch within 1 business day to walk
+                    through onboarding.</li>
+                  </ul>
+                  <p>Reference: <code>${escapeHtml(purchaseId)}</code></p>
+                `,
+              ),
+              attachments: [
+                {
+                  filename: `${llcName.replace(/\s+/g, "-")}-amendment.pdf`,
+                  content: pdfBuffer,
+                },
+              ],
+            });
+            if (!emailError && amendmentRow) {
+              await admin
+                .from("llc_amendments")
+                .update({ emailed: true })
+                .eq("id", amendmentRow.id);
+            } else if (emailError) {
+              console.error("[stripe webhook] amendment email failed", emailError);
+            }
+          } else {
+            console.log("[stripe webhook] resend not configured, amendment email skipped");
+          }
+        } catch (pdfErr) {
+          console.error("[stripe webhook] amendment PDF / email failed", pdfErr);
+          // Don't propagate — purchase already paid, team will follow up.
+        }
         break;
       }
 
