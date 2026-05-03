@@ -72,17 +72,41 @@ export async function getUserFromRequestWithDiag(
     return { user: null, diag: "no_token_present" };
   }
 
+  // Decode the JWT's exp claim WITHOUT verifying — purely for diag.
+  // We need to know if the token is past its expiry vs. some other
+  // failure mode (wrong project, malformed, signature). Don't trust
+  // anything from this; it's just to help debug 401s.
+  let tokenAge: string = "no_exp";
+  try {
+    const payload = token.split(".")[1];
+    if (payload) {
+      const decoded = JSON.parse(
+        Buffer.from(payload, "base64url").toString("utf8"),
+      );
+      if (typeof decoded.exp === "number") {
+        const ageSec = Math.floor(Date.now() / 1000) - decoded.exp;
+        // Negative = still in the future, positive = expired.
+        tokenAge = ageSec >= 0 ? `expired_${ageSec}s` : `valid_${-ageSec}s`;
+      }
+    }
+  } catch {
+    tokenAge = "decode_failed";
+  }
+
   const { data, error } = await admin.auth.getUser(token);
   if (error) {
-    // Token reached us but Supabase rejected it. Usually expired or
-    // signed by a different project. Surface the error name.
+    // Token reached us but Supabase rejected it. Surface the error
+    // name + status + message + token age so we can tell whether it
+    // was expired, wrong-project, or something else.
+    const errStatus = (error as { status?: number }).status ?? "?";
+    const errMsg = (error.message ?? "").slice(0, 60).replace(/[^\w\s.:-]/g, "_");
     return {
       user: null,
-      diag: `getuser_error:${error.name ?? "unknown"}:${source}`,
+      diag: `getuser_error:${error.name ?? "unknown"}:${errStatus}:${tokenAge}:${source}:${errMsg}`,
     };
   }
   if (!data.user) {
-    return { user: null, diag: `getuser_no_user:${source}` };
+    return { user: null, diag: `getuser_no_user:${tokenAge}:${source}` };
   }
   return {
     user: { id: data.user.id, email: data.user.email ?? null },

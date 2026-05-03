@@ -49,11 +49,14 @@ export async function authedFetch(
           const refresh = await supabase.auth.refreshSession();
           if (refresh.data.session) {
             session = refresh.data.session;
+          } else {
+            // Refresh failed (refresh_token also expired, e.g. user
+            // hasn't been on the site in over a week). Don't keep
+            // sending the known-stale token — clear it so the API
+            // returns a clean 401 with no_token_present and the
+            // caller's "Sign in required" copy surfaces.
+            session = null;
           }
-          // If refresh failed (refresh_token expired, e.g. user
-          // hasn't been on the site in over a week), session stays
-          // stale and we fall through with no header — the API
-          // returns 401 and the caller can route to /signin.
         }
       }
 
