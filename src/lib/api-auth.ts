@@ -72,11 +72,15 @@ export async function getUserFromRequestWithDiag(
     return { user: null, diag: "no_token_present" };
   }
 
-  // Decode the JWT's exp claim WITHOUT verifying — purely for diag.
-  // We need to know if the token is past its expiry vs. some other
-  // failure mode (wrong project, malformed, signature). Don't trust
-  // anything from this; it's just to help debug 401s.
+  // Decode the JWT WITHOUT verifying — purely for diag. We surface
+  // (a) tokenAge: expired-seconds-ago / valid-for-seconds, and
+  // (b) issuerDiag: whether the token's `iss` host matches the
+  //     NEXT_PUBLIC_SUPABASE_URL host the server expects. A
+  //     mismatch is the smoking gun for "client and server are
+  //     wired to different Supabase projects".
+  // Don't trust anything from this; it's just to debug 401s.
   let tokenAge: string = "no_exp";
+  let issuerDiag: string = "iss_unknown";
   try {
     const payload = token.split(".")[1];
     if (payload) {
@@ -85,8 +89,20 @@ export async function getUserFromRequestWithDiag(
       );
       if (typeof decoded.exp === "number") {
         const ageSec = Math.floor(Date.now() / 1000) - decoded.exp;
-        // Negative = still in the future, positive = expired.
         tokenAge = ageSec >= 0 ? `expired_${ageSec}s` : `valid_${-ageSec}s`;
+      }
+      const expectedHost = process.env.NEXT_PUBLIC_SUPABASE_URL
+        ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).host
+        : "";
+      const issuerHost =
+        typeof decoded.iss === "string" ? new URL(decoded.iss).host : "";
+      if (issuerHost && expectedHost) {
+        issuerDiag =
+          issuerHost === expectedHost
+            ? "iss_ok"
+            : `iss_mismatch:${issuerHost}_vs_${expectedHost}`;
+      } else {
+        issuerDiag = "iss_missing";
       }
     }
   } catch {
@@ -96,13 +112,12 @@ export async function getUserFromRequestWithDiag(
   const { data, error } = await admin.auth.getUser(token);
   if (error) {
     // Token reached us but Supabase rejected it. Surface the error
-    // name + status + message + token age so we can tell whether it
-    // was expired, wrong-project, or something else.
+    // name + status + message + token age + issuer-match.
     const errStatus = (error as { status?: number }).status ?? "?";
     const errMsg = (error.message ?? "").slice(0, 60).replace(/[^\w\s.:-]/g, "_");
     return {
       user: null,
-      diag: `getuser_error:${error.name ?? "unknown"}:${errStatus}:${tokenAge}:${source}:${errMsg}`,
+      diag: `getuser_error:${error.name ?? "unknown"}:${errStatus}:${tokenAge}:${issuerDiag}:${source}:${errMsg}`,
     };
   }
   if (!data.user) {
