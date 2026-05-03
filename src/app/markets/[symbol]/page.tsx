@@ -29,7 +29,7 @@ export async function generateMetadata({
   const v = getVehicleBySymbol(symbol);
   if (!v) return { title: "RYDA Markets" };
   return {
-    title: `${v.name}, ${formatUSD(v.pricePerShare)} per share | RYDA`,
+    title: `${v.name}, ${formatUSD(v.pricePerShare)} per share — RYDA`,
     description: `Co-own a ${v.year} ${v.name}. ${v.sharesAvailable} of ${v.shares} member-managed LLC shares available.`,
   };
 }

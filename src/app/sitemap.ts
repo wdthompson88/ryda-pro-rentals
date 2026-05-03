@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { VEHICLES } from "@/lib/market-data";
 import { BOATS } from "@/lib/boat-data";
 import { POSTS as JOURNAL_POSTS } from "@/lib/journal-content";
+import { HELP as HELP_CATEGORIES } from "@/lib/help-content";
 
 // Sitemap of every crawlable, public RYDA route. Generated at build
 // time. Three categories:
@@ -134,10 +135,31 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.6,
     }));
 
+  // Per-help-category landing pages and per-article pages. The help
+  // center has dozens of articles across multiple categories; surface
+  // each one to crawlers so support content is discoverable from search.
+  const helpEntries: MetadataRoute.Sitemap = HELP_CATEGORIES.flatMap(
+    (c) => [
+      {
+        url: `${siteUrl}/help/${c.slug}`,
+        lastModified,
+        changeFrequency: "monthly" as const,
+        priority: 0.5,
+      },
+      ...c.articles.map((a) => ({
+        url: `${siteUrl}/help/${c.slug}/${a.slug}`,
+        lastModified,
+        changeFrequency: "monthly" as const,
+        priority: 0.4,
+      })),
+    ],
+  );
+
   return [
     ...staticEntries,
     ...vehicleEntries,
     ...boatEntries,
     ...journalEntries,
+    ...helpEntries,
   ];
 }

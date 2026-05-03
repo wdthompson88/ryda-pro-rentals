@@ -113,7 +113,7 @@ export const BOATS: Boat[] = [
     annualSoloCarrying: 380_000,
     daysPerYear: 32,
     nmPerYear: 1_600,
-    effectiveDailyCost: 1_067,
+    effectiveDailyCost: 1_000,
     listingStart: "2026-04-15",
     listingEnd: "2026-10-15",
     hero:
@@ -161,7 +161,7 @@ export const BOATS: Boat[] = [
     annualSoloCarrying: 880_000,
     daysPerYear: 32,
     nmPerYear: 1_600,
-    effectiveDailyCost: 2_600,
+    effectiveDailyCost: 2_438,
     listingStart: "2026-03-30",
     listingEnd: "2026-09-30",
     // Hero photo, mega-yacht stand-in (placeholder until licensed
@@ -213,7 +213,7 @@ export const BOATS: Boat[] = [
     annualSoloCarrying: 165_000,
     daysPerYear: 32,
     nmPerYear: 1_600,
-    effectiveDailyCost: 600,
+    effectiveDailyCost: 563,
     listingStart: "2026-04-22",
     listingEnd: "2026-10-22",
     // Hero photo, distinct yacht stand-in (verified working Unsplash
@@ -266,7 +266,7 @@ export const BOATS: Boat[] = [
     annualSoloCarrying: 250_000,
     daysPerYear: 32,
     nmPerYear: 1_600,
-    effectiveDailyCost: 933,
+    effectiveDailyCost: 875,
     listingStart: "2026-04-10",
     listingEnd: "2026-10-10",
     // Hero photo, distinct yacht stand-in (verified Unsplash ID
@@ -306,7 +306,7 @@ export const BOATS_HOLDING_YEARS = 3;
 export const BOATS_TARGET_DEPRECIATION_PCT = 15;
 export const NM_PER_DAY_PER_SHARE = 50; // 32 days × 50 nm = 1,600 nm/yr
 export const BOATS_DAYS_PER_SHARE = 32;
-// Engine-hours equivalent of cars' 50K-mile cap. ~2,000 engine hours
+// Engine-hours equivalent of cars' 60K-mile cap. ~2,000 engine hours
 // is the conventional threshold where major service (engines, rigging,
 // running gear) starts to dominate the carrying cost, the LLC sells
 // at year 3 OR 2,000 hrs, whichever hits first.

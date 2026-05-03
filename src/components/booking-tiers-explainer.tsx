@@ -39,7 +39,7 @@ export function BookingTiersExplainer({
           />
         </div>
         <p className="mt-4 text-[11px] text-mute">
-          Both modes draw from your share's annual entitlement (30 days, 3,000
+          Both modes draw from your share's annual entitlement (32 days, 3,200
           mi). One protected peak window per share before any co-owner
           can claim a second.
         </p>
@@ -153,9 +153,9 @@ export function BookingTiersExplainer({
       </div>
 
       <p className="mt-4 text-xs text-mute">
-        Both modes draw from your share&apos;s annual entitlement of 30
-        driving days and 3,000 included miles. Multi-share holders scale
-        linearly, two shares = 60 days, 6,000 miles, 8 active planned
+        Both modes draw from your share&apos;s annual entitlement of 32
+        driving days and 3,200 included miles. Multi-share holders scale
+        linearly, two shares = 64 days, 6,400 miles, 8 active planned
         reservations.
       </p>
     </div>

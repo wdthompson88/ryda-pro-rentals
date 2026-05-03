@@ -43,7 +43,7 @@ export default async function PurchasePage({
             Ferrari 296 GTB
           </h1>
           <p className="mt-1 text-sm text-ink-soft">
-            1 share · {formatUSD(56_667)} + {formatUSD(2_834)} acquisition fee
+            2 shares · {formatUSD(68_000)} + {formatUSD(3_400)} acquisition fee
           </p>
 
           <div className="mt-3 inline-block rounded-full bg-red/10 px-3 py-1 text-xs font-medium text-red">

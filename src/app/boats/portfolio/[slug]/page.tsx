@@ -30,7 +30,7 @@ export async function generateMetadata({
   const b = getBoatBySlug(slug);
   if (!b) return { title: "RYDA Boats" };
   return {
-    title: `${b.name}, ${formatUSD(b.pricePerShare)} per share | RYDA Boats`,
+    title: `${b.name}, ${formatUSD(b.pricePerShare)} per share — RYDA Boats`,
     description: `Co-own the ${b.year} ${b.name} in ${b.market}. ${formatUSD(b.pricePerShare)} per share, ${formatUSD(b.annualOpCost)}/yr all-in operating cost. ${b.sharesAvailable} of ${b.shares} shares available.`,
   };
 }
@@ -327,7 +327,7 @@ export default async function BoatDetailPage({
             />
           </div>
           <p className="mt-5 text-xs text-mute">
-            Both modes draw from your share&apos;s annual entitlement (30 days,
+            Both modes draw from your share&apos;s annual entitlement (32 days,
             1,600 nm). One protected peak window per share before any
             co-owner can book a second.
           </p>

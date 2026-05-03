@@ -30,7 +30,7 @@ export async function generateMetadata({
   const v = getBoatBySlug(slug);
   if (!v) return { title: "RYDA · Cost sheet" };
   return {
-    title: `${v.name} · Cost Sheet | RYDA`,
+    title: `${v.name} · Cost Sheet — RYDA`,
     description: `Sole ownership vs RYDA co-ownership cost comparison for the ${v.name}.`,
     robots: { index: false, follow: false }, // print-only, don't surface in search
   };

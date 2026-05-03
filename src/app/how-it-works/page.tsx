@@ -415,7 +415,7 @@ export default function HowItWorksPage() {
             <Reason
               n="07"
               title="Flexible buying & selling of shares"
-              body="Member-to-member transfers after the 12-month minimum hold. RYDA handles the paperwork. The LLC's planned exit at year 2 (or 50K miles) gives every shareholder a clean liquidity event by default."
+              body="Member-to-member transfers after the 12-month minimum hold. RYDA handles the paperwork. The LLC's planned exit at year 2 (or 60K miles) gives every shareholder a clean liquidity event by default."
             />
             <Reason
               n="08"
@@ -425,7 +425,7 @@ export default function HowItWorksPage() {
             <Reason
               n="09"
               title="Community over solitary ownership"
-              body="Verified members, shared track days, member events, off-market sourcing. The car is a passion asset; the network around it is what makes the asset useful when you're not driving."
+              body="Verified members, member events, off-market sourcing, drive-day meetups. The car is a passion asset; the network around it is what makes the asset useful when you're not driving."
             />
           </div>
         </div>
@@ -473,7 +473,7 @@ export default function HowItWorksPage() {
               <Pillar label="Encrypted data" body="Member docs & payment info secured in transit and at rest." />
               <Pillar label="Vehicle warranty" body="Manufacturer or independent certified pre owned warranty in force at handover." />
               <Pillar label="Transparent costs" body="Pass-through ops invoiced at cost; service fee disclosed up front." />
-              <Pillar label="Flexible share sale" body="Member-to-member transfers after 12 months; LLC sale at year 2 / 50K mi." />
+              <Pillar label="Flexible share sale" body="Member-to-member transfers after 12 months; LLC sale at year 2 / 60K mi." />
             </div>
           </div>
 
@@ -486,7 +486,7 @@ export default function HowItWorksPage() {
               <Pillar label="Resource conservation" body="Cars get driven instead of garaged 350 days a year." />
               <Pillar label="Fair-use rules" body="Calendar caps consecutive peak-season days so no one corners the car." />
               <Pillar label="Professional storage" body="Climate-controlled, 24/7 monitored, insured partner facilities." />
-              <Pillar label="Like-minded community" body="Verified members + shared track days + off-market access." />
+              <Pillar label="Like-minded community" body="Verified members + member events + off-market access." />
               <Pillar label="Online live booking" body="Reserve days from the app; live availability across the calendar." />
             </div>
           </div>
@@ -505,17 +505,17 @@ export default function HowItWorksPage() {
           <div className="mt-8 space-y-5 text-base leading-relaxed text-ink-soft">
             <p>
               The $221/day figure is steady-state operating cost: $7,080
-              of annual ops divided by 30 driving days. It&apos;s what
+              of annual ops divided by 32 driving days. It&apos;s what
               every day behind the wheel costs you{" "}
               <span className="italic">while you hold the share</span>,
-              ignoring the buy-in. Roughly $7,080 ÷ 32 days.
+              ignoring the buy-in.
             </p>
             <p>
               Year 1 includes the buy-in as real cash. $34K share +
               $7,080 ops = $41,080 spent (the table number above; a
-              one-time $1,500 closing fee is added at signing). At 30
-              days driven that&apos;s ~$1,369 per driving day in Year 1
-             , still below the cost of renting the same Ferrari for
+              one-time $1,500 closing fee is added at signing). At 32
+              days driven that&apos;s ~$1,284 per driving day in Year 1,
+              still below the cost of renting the same Ferrari for
               the same 32 days ($2,400/day × 32 = $76,800). And you
               exit with a transferable share, not a stack of receipts.
             </p>
@@ -534,10 +534,10 @@ export default function HowItWorksPage() {
               For the F296 at one share over 2 years: $34K buy-in +
               $7,080 × 2 carrying = $48,160 spent. Resale at 90% of
               buy-in returns ~$30,600.{" "}
-              <strong>Net cost ~$17,560</strong> for 60 driving days ={" "}
-              <strong>~$293 per actual driving day</strong>. That&apos;s
+              <strong>Net cost ~$17,560</strong> for 64 driving days ={" "}
+              <strong>~$274 per actual driving day</strong>. That&apos;s
               the apples-to-apples number to use against rental
-              ($2,400/day × 60 = $144,000). You also exit with cash
+              ($2,400/day × 64 = $153,600). You also exit with cash
               from the sale, not a stack of receipts.
             </p>
           </div>
@@ -580,12 +580,12 @@ export default function HowItWorksPage() {
                 Drive 12 days/yr. Rent the rest.
               </p>
               <p className="mt-3 text-sm leading-relaxed text-ink-soft">
-                Owners reserve 12 days each (120 total). 220 days enter the
-                pool. At 50% occupancy = ~110 booked days @ $2,400/day =
-                $264,000/yr gross. After RYDA&apos;s 35% management fee,
-                shareholders split ~$171,600.{" "}
-                <span className="font-medium text-ink">~$17,160/share/yr</span>{" "}
-               , roughly 2.4× your $7,080/yr carrying cost.
+                Owners reserve 12 days each (120 total). 200 days enter the
+                pool. At 50% occupancy = ~100 booked days @ $2,400/day =
+                $240,000/yr gross. After RYDA&apos;s 35% management fee,
+                shareholders split ~$156,000.{" "}
+                <span className="font-medium text-ink">~$15,600/share/yr</span>,
+                roughly 2.2× your $7,080/yr carrying cost.
               </p>
             </div>
             <div className="rounded-2xl border border-rule bg-surface p-6">

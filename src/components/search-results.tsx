@@ -221,7 +221,7 @@ function EmptyHint() {
           </Link>
         </li>
         <li>
-          <Link href="/search?q=delaware llc" className="hover:text-red">
+          <Link href="/search?q=llc" className="hover:text-red">
             LLC →
           </Link>
         </li>

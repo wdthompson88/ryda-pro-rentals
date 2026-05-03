@@ -66,7 +66,7 @@ export async function generateMetadata({
   const title = listingTitle(r);
   const rate = listingDailyRate(r);
   return {
-    title: `Rent the ${title}, ${formatUSD(rate)}/day | RYDA`,
+    title: `Rent the ${title}, ${formatUSD(rate)}/day — RYDA`,
     description: `Hand-prepared, fully insured, white-glove delivered. ${title} in ${r.vehicle.market}.`,
   };
 }

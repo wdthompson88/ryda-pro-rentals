@@ -24,7 +24,7 @@ export async function generateMetadata({
 }) {
   const { slug } = await params;
   const v = getBoatBySlug(slug);
-  return { title: v ? `${v.name}, My Cars | RYDA` : "My Cars" };
+  return { title: v ? `${v.name}, My Cars — RYDA` : "My Cars" };
 }
 
 export default async function MyVehiclePage({
@@ -79,10 +79,10 @@ export default async function MyVehiclePage({
                 </span>
               )}
               <div className="mt-6 grid grid-cols-2 gap-4 text-sm">
-                <Stat label="Your shares" value={`1 of ${v.shares}`} />
+                <Stat label="Your shares" value={`2 of ${v.shares}`} />
                 <Stat label="Status" value="In slip" />
-                <Stat label="Days used (yr)" value={`8 / ${v.daysPerYear}`} />
-                <Stat label="Nm used (yr)" value={`658 / ${v.nmPerYear.toLocaleString()}`} />
+                <Stat label="Days used (yr)" value={`8 / ${v.daysPerYear * 2}`} />
+                <Stat label="Nm used (yr)" value={`658 / ${(v.nmPerYear * 2).toLocaleString()}`} />
                 <Stat
                   label="Planned reservations"
                   value={`1 of ${BOAT_BOOKING_POLICY.planned.activeLimitPerShare} active`}
@@ -144,7 +144,7 @@ export default async function MyVehiclePage({
             <Activity label="Booking confirmed" sub="Apr 28 – May 1" date="2 hr ago" />
             <Activity label="Inspection report posted" sub="2,140 mi · Excellent condition" date="1 day ago" />
             <Activity label="Message from a co-owner" sub='"Booked Pebble Beach hotels..."' date="2 days ago" />
-            <Activity label="Q1 mgmt fee paid" sub="$1,700" date="3 days ago" />
+            <Activity label="Q1 mgmt fee paid" sub={formatUSD(Math.round((v.annualOpCost * 2) / 4))} date="3 days ago" />
           </ul>
         </div>
       </Section>
@@ -159,25 +159,25 @@ export default async function MyVehiclePage({
         <div className="mt-10">
           <h3 className="font-display text-lg text-ink">Annual breakdown (your share)</h3>
           <ul className="mt-4 space-y-2 text-sm">
-            <Line label="Share buy-in (one-time)" value={formatUSD(v.pricePerShare)} note="Paid Mar 18, 2026" />
-            <Line label="Management fee" value={formatUSD(6_800)} note="Billed quarterly" />
-            <Line label="Insurance" value={formatUSD(3_200)} note="Annual" />
-            <Line label="Maintenance reserve" value={formatUSD(1_800)} note="Held at LLC" />
-            <Line label="Total annual" value={formatUSD(v.annualOpCost)} note="" emphasis />
+            <Line label="Share buy-in (one-time)" value={formatUSD(v.pricePerShare * 2)} note="Paid Mar 18, 2026 · 2 shares" />
+            <Line label="Slip + crew" value={formatUSD(Math.round(v.annualOpCost * 2 * 0.55))} note="Billed quarterly" />
+            <Line label="Hull + liability insurance" value={formatUSD(Math.round(v.annualOpCost * 2 * 0.25))} note="Annual" />
+            <Line label="Hurricane prep + reserve" value={formatUSD(Math.round(v.annualOpCost * 2 * 0.20))} note="Held at LLC" />
+            <Line label="Total annual" value={formatUSD(v.annualOpCost * 2)} note="" emphasis />
           </ul>
         </div>
         <div className="mt-10">
           <h3 className="font-display text-lg text-ink">Recent payments</h3>
           <ul className="mt-4 divide-y divide-rule rounded-xl border border-rule bg-surface">
-            <Pmt label="Q1 2026 management fee" value="$1,700" date="Apr 1" status="Paid" />
-            <Pmt label="Annual insurance" value="$3,200" date="Mar 18" status="Paid" />
-            <Pmt label="Co-ownership buy-in" value="$56,667" date="Mar 18" status="Paid" />
+            <Pmt label="Q1 2026 management fee" value={formatUSD(Math.round((v.annualOpCost * 2) / 4))} date="Apr 1" status="Paid" />
+            <Pmt label="Annual insurance" value={formatUSD(Math.round(v.annualOpCost * 2 * 0.25))} date="Mar 18" status="Paid" />
+            <Pmt label="Co-ownership buy-in" value={formatUSD(v.pricePerShare * 2)} date="Mar 18" status="Paid" />
           </ul>
         </div>
         <div className="mt-10">
           <h3 className="font-display text-lg text-ink">Upcoming charges</h3>
           <ul className="mt-4 divide-y divide-rule rounded-xl border border-rule bg-surface">
-            <Pmt label="Q2 2026 management fee" value="$1,700" date="Jul 1, 2026" status="Pending" />
+            <Pmt label="Q2 2026 management fee" value={formatUSD(Math.round((v.annualOpCost * 2) / 4))} date="Jul 1, 2026" status="Pending" />
           </ul>
         </div>
       </Section>

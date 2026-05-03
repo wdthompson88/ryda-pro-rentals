@@ -27,7 +27,10 @@ export function CompareCalculator({
   const initial =
     lockedVehicle ?? VEHICLES.find((v) => v.symbol === "F296") ?? VEHICLES[0];
   const [vehicleSymbol, setVehicleSymbol] = useState(initial.symbol);
-  const [shares, setShares] = useState(1);
+  // 2-share minimum per person under the new doctrine. Slider floor and
+  // useState default both reflect that so the modeled scenario is
+  // actually purchasable.
+  const [shares, setShares] = useState(2);
   // Default to 12 owner-use days/yr per share, matches the static
   // worked example on /how-it-works and the rental scenario shown in
   // CostBreakdown / cost-sheet (both pull from RENTAL_DEFAULTS).
@@ -283,7 +286,7 @@ export function CompareCalculator({
           label="Shares you'd hold"
           value={safeShares}
           onChange={setShares}
-          min={1}
+          min={2}
           max={maxShares}
           step={1}
           valueLabel={`${safeShares} of ${vehicle.shares}`}

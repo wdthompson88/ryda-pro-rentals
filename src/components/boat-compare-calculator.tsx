@@ -27,7 +27,10 @@ export function BoatCompareCalculator({
   const initial =
     lockedBoat ?? BOATS[0];
   const [boatSlug, setBoatSlug] = useState(initial.slug);
-  const [shares, setShares] = useState(1);
+  // 2-share minimum per person under the new doctrine. Slider floor and
+  // useState default both reflect that so the modeled scenario is
+  // actually purchasable.
+  const [shares, setShares] = useState(2);
   // Default to 12 owner-use days/yr per share, matches the static
   // worked example on /how-it-works and the rental scenario shown in
   // CostBreakdown / cost-sheet (both pull from RENTAL_DEFAULTS_BOATS).
@@ -282,7 +285,7 @@ export function BoatCompareCalculator({
           label="Shares you'd hold"
           value={safeShares}
           onChange={setShares}
-          min={1}
+          min={2}
           max={maxShares}
           step={1}
           valueLabel={`${safeShares} of ${boat.shares}`}
@@ -326,7 +329,7 @@ export function BoatCompareCalculator({
           max={100}
           step={5}
           valueLabel={`${residualPct}%`}
-          subLabel={`Default ${DEFAULT_RESIDUAL_PCT}%, assumes ~${BOATS_TARGET_DEPRECIATION_PCT}% depreciation over ${BOATS_HOLDING_YEARS} yrs on low-mileage certified pre owned exotics`}
+          subLabel={`Default ${DEFAULT_RESIDUAL_PCT}%, assumes ~${BOATS_TARGET_DEPRECIATION_PCT}% depreciation over ${BOATS_HOLDING_YEARS} yrs on surveyed certified pre owned hulls`}
         />
       </div>
 
@@ -362,9 +365,9 @@ export function BoatCompareCalculator({
             </p>
             <p className="mt-2 text-xs text-mute">
               Same {BOATS_TARGET_DEPRECIATION_PCT}% depreciation assumption
-              applies, our 100 nm/day allowance + certified pre owned maintenance keep
-              the resale story consistent whether you drive or rent it
-              out.
+              applies, our 50 nm/day allowance + surveyed-hull maintenance
+              keep the resale story consistent whether you cruise or
+              charter it out.
             </p>
           </div>
 

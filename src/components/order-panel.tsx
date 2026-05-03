@@ -8,9 +8,11 @@ type Props = { vehicle: Vehicle };
 
 export function OrderPanel({ vehicle }: Props) {
   const router = useRouter();
-  const [shares, setShares] = useState("1");
+  // 2-share minimum per person (10 shares per LLC, up to 5 members,
+  // 2 shares each = 10 total). Default and floor are both 2.
+  const [shares, setShares] = useState("2");
 
-  const numericShares = Math.max(1, Math.min(vehicle.sharesAvailable || 1, parseInt(shares || "1", 10) || 1));
+  const numericShares = Math.max(2, Math.min(vehicle.sharesAvailable || 2, parseInt(shares || "2", 10) || 2));
   const buyInCost = numericShares * vehicle.pricePerShare;
   const annualContribution = numericShares * vehicle.annualOpCost;
   const daysPerYear = numericShares * vehicle.daysPerYear;
@@ -47,11 +49,11 @@ export function OrderPanel({ vehicle }: Props) {
             id={`shares-${vehicle.symbol}`}
             type="number"
             inputMode="numeric"
-            min={1}
-            max={vehicle.sharesAvailable || 1}
+            min={2}
+            max={vehicle.sharesAvailable || 2}
             value={shares}
             onChange={(e) => setShares(e.target.value)}
-            aria-label={`Shares to claim, between 1 and ${vehicle.sharesAvailable || 1}`}
+            aria-label={`Shares to claim, between 2 and ${vehicle.sharesAvailable || 2}`}
             className="w-full bg-transparent text-right font-medium text-ink placeholder:text-mute focus:outline-none"
           />
         </Field>

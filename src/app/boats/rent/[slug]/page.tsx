@@ -19,7 +19,7 @@ export async function generateMetadata({
   const b = getBoatBySlug(slug);
   if (!b) return { title: "RYDA Boats Charter" };
   return {
-    title: `Charter the ${b.name}, ${formatUSD(b.rentalDailyRate)}/day | RYDA Boats`,
+    title: `Charter the ${b.name}, ${formatUSD(b.rentalDailyRate)}/day — RYDA Boats`,
     description: `Crewed charter on the ${b.year} ${b.name}. ${b.lengthFt}-foot ${b.category}, captain + mate included, full insurance, white-glove handover. ${b.market}.`,
   };
 }
@@ -271,7 +271,7 @@ export default async function BoatCharterDetail({
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
             Effective ~{formatUSD(b.effectiveDailyCost)}/day in steady-state
-            ops on a 30-day annual allowance vs {formatUSD(b.rentalDailyRate)}/day
+            ops on a 32-day annual allowance vs {formatUSD(b.rentalDailyRate)}/day
             to charter. {b.sharesAvailable} of {b.shares} shares left.
           </p>
           <Link

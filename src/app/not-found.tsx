@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 
-export const metadata = { title: "Not found, RYDA" };
+export const metadata = { title: "Not found — RYDA" };
 
 const POPULAR = [
   { label: "See the fleet", href: "/markets", note: "Co-ownership shares" },

@@ -183,7 +183,7 @@ function Financial({ onNext, onBack }: { onNext: () => void; onBack: () => void 
             "Never, but I want to",
             "A few days a year (rentals, friends' cars)",
             "I own one already and want a second flavor",
-            "Regularly via track days or a club",
+            "Regularly via a club or my own collection",
           ]}
         />
         <Select

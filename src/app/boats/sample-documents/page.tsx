@@ -7,7 +7,7 @@ import { SiteHeader } from "@/components/site-header";
 import { Reveal } from "@/components/reveal";
 
 export const metadata = {
-  title: "Sample documents, RYDA Boats",
+  title: "Sample documents — RYDA Boats",
   description:
     "Preview the legal and operational documents RYDA Boats uses: Operating Agreement, Management Services Agreement, marine survey, Coast Guard documentation, captain agreements.",
 };

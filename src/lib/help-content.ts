@@ -40,7 +40,7 @@ export const HELP: HelpCategory[] = [
         body: [
           {
             type: "p",
-            text: "RYDA is a US member-managed supercar co-ownership platform. Each vehicle in the fleet is held in a single-purpose LLC with 10 shares (up to 5 members). Each share entitles its holder to ~32 days and ~3,200 miles per year (100 mi/day allowance). Members can hold one share or several, usage and cost scale linearly. A 5-share holder gets ~160 days; a 10-share holder is essentially the solo owner with professional ops.",
+            text: "RYDA is a US member-managed supercar co-ownership platform. Each vehicle in the fleet is held in a single-purpose LLC with 10 shares, split across up to 5 members with a 2-share minimum per person. Each share entitles its holder to ~32 days and ~3,200 miles per year (100 mi/day allowance). Usage and cost scale linearly. A 5-share holder gets ~160 days; a 10-share holder is essentially the solo owner with professional ops.",
           },
           {
             type: "p",
@@ -342,12 +342,12 @@ export const HELP: HelpCategory[] = [
         slug: "entitlement",
         q: "What does a co-ownership share actually entitle me to?",
         summary:
-          "~32 days and up to ~3,200 miles per share per year (100 mi/day allowance; members can hold 1–10 shares), voting rights on material LLC decisions, and pro-rata participation in the LLC's assets at dissolution.",
+          "~32 days and up to ~3,200 miles per share per year (100 mi/day allowance; members hold 2–10 shares each), voting rights on material LLC decisions, and pro-rata participation in the LLC's assets at dissolution.",
         body: [
           { type: "h3", text: "Usage" },
           {
             type: "p",
-            text: "Each share entitles you to ~32 days and up to ~3,200 miles of vehicle usage per year (100 mi/day allowance), with the exact entitlement set per vehicle when the LLC is formed. Members can hold one share or several, usage scales linearly (5 shares ≈ 160 days; 10 shares ≈ 320 days, with the rest reserved for service and rental pool). Days are booked on a shared calendar with the other co-owners. Fair-use rules cap consecutive days during peak season.",
+            text: "Each share entitles you to ~32 days and up to ~3,200 miles of vehicle usage per year (100 mi/day allowance), with the exact entitlement set per vehicle when the LLC is formed. Members hold two shares or more, usage scales linearly (5 shares ≈ 160 days; 10 shares ≈ 320 days, with the rest reserved for service and rental pool). Days are booked on a shared calendar with the other co-owners. Fair-use rules cap consecutive days during peak season.",
           },
           { type: "h3", text: "Membership" },
           {
@@ -871,7 +871,7 @@ export const HELP: HelpCategory[] = [
         slug: "coverage",
         q: "What does the insurance cover?",
         summary:
-          "$1M third-party liability, agreed-value physical damage, $500K UM/UIM, roadside, replacement vehicle. Track-day rider is optional.",
+          "$1M third-party liability, agreed-value physical damage, $500K UM/UIM, roadside, replacement vehicle.",
         body: [
           { type: "h3", text: "Liability" },
           {
@@ -892,11 +892,6 @@ export const HELP: HelpCategory[] = [
           {
             type: "p",
             text: "If a vehicle breaks down or is in an accident during your booking, RYDA dispatches a replacement vehicle of similar tier within 4 hours.",
-          },
-          { type: "h3", text: "Track-day rider" },
-          {
-            type: "p",
-            text: "Optional add-on for sanctioned track events on track-eligible vehicles. Required for any on-track use; covers the sanctioned event window.",
           },
         ],
       },
@@ -1106,10 +1101,10 @@ export const HELP: HelpCategory[] = [
               "Fraudulent claims or misrepresentation of facts.",
             ],
           },
-          { type: "h3", text: "Track days are different" },
+          { type: "h3", text: "On-track use is excluded" },
           {
             type: "p",
-            text: "Sanctioned track use is explicitly excluded by our standard insurance.",
+            text: "Sanctioned track use is explicitly excluded by our standard insurance, and RYDA fleet vehicles are not approved for track events.",
           },
           {
             type: "callout",
@@ -1420,7 +1415,6 @@ export const HELP: HelpCategory[] = [
               "Standard delivery & detailing: included in the management fee.",
               "Premium delivery (white-glove to non-default address): $200/booking.",
               "Mileage overage: $4/mile, settled the following month.",
-              "Track-day rider: $750/event for track-eligible vehicles.",
             ],
           },
           { type: "h3", text: "Statements" },
@@ -1548,14 +1542,13 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "How to refer" },
           {
             type: "p",
-            text: "Account → Referral Program in your dashboard. Generate a unique link. Share it however you like, text, email, in person at a track day, social media (within RYDA's brand guidelines). When someone signs up through your link, the credit lands in your account at the qualifying milestone.",
+            text: "Account → Referral Program in your dashboard. Generate a unique link. Share it however you like, text, email, in person at a member event, social media (within RYDA's brand guidelines). When someone signs up through your link, the credit lands in your account at the qualifying milestone.",
           },
           { type: "h3", text: "What credits can be used for" },
           {
             type: "ul",
             items: [
               "Annual membership renewal.",
-              "Track-day rider fees.",
               "Mileage overage charges.",
               "Premium delivery upgrades.",
               "Cannot be applied directly to a co-ownership buy-in (referrals are credits against fees and incidentals, not discounts on the buy-in itself).",

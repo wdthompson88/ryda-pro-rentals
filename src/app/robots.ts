@@ -15,6 +15,7 @@ export default function robots(): MetadataRoute.Robots {
           "/account",
           "/portfolio",
           "/my-cars",
+          "/my-boats",
           "/bookings",
           "/messages",
           "/share-purchase",

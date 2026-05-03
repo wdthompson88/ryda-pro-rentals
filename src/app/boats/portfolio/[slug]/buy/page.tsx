@@ -16,7 +16,7 @@ export async function generateMetadata({
   const v = getBoatBySlug(slug);
   if (!v) return { title: "Claim a co-ownership share — RYDA" };
   return {
-    title: `Claim a share, ${v.name} | RYDA`,
+    title: `Claim a share, ${v.name} — RYDA`,
     description: `Become a co-owner of the ${v.year} ${v.name}. ${formatUSD(v.pricePerShare)} per share.`,
   };
 }
@@ -33,9 +33,11 @@ export default async function BuyPage({
   const v = getBoatBySlug(slug);
   if (!v || v.sharesAvailable <= 0) notFound();
 
+  // 2-share minimum per person under the new doctrine. Default and
+  // floor both 2 so the buy flow opens with a purchasable scenario.
   const requestedShares = Math.max(
-    1,
-    Math.min(v.sharesAvailable, parseInt(sharesParam || "1", 10) || 1),
+    2,
+    Math.min(v.sharesAvailable, parseInt(sharesParam || "2", 10) || 2),
   );
 
   return (

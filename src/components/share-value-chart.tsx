@@ -37,10 +37,11 @@ type YearPoint = {
 function computeAnnualMilesAdded(v: Vehicle): number {
   // Conservative all-in annual usage: assumes typical 12-day shareholder
   // usage × 10 shares + 50% pool occupancy on the leftover days, each at
-  // ~100 mi/day (matching the shareholder allowance).
+  // ~100 mi/day (matching the shareholder allowance). Total available
+  // days = 365 - ~45 service-reserve = 320 (matches RENTAL_DEFAULTS).
   const ownerMiles =
     SHAREHOLDER_DAYS_PER_SHARE_USED * v.shares * 100;
-  const poolDays = 340 - SHAREHOLDER_DAYS_PER_SHARE_USED * v.shares;
+  const poolDays = 320 - SHAREHOLDER_DAYS_PER_SHARE_USED * v.shares;
   const bookedDays = Math.round(poolDays * RENTAL_POOL_OCCUPANCY);
   const rentalMiles = bookedDays * RENTAL_DAYS_PER_BOOKING_AVG;
   return ownerMiles + rentalMiles;

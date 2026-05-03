@@ -42,7 +42,7 @@ export default function BoatsAboutPage() {
               A 55-foot Wajer is $1.95M to buy and $300K–$400K a year
               to operate (slip + captain + fuel + insurance + hurricane
               prep). A weekend charter is $14K–$22K. Most prospective
-              owners drive a 30-day-a-year usage profile. Solo
+              owners drive a 32-day-a-year usage profile. Solo
               ownership is wildly inefficient at that load.
             </p>
             <p>
@@ -78,7 +78,7 @@ export default function BoatsAboutPage() {
               I&apos;ll keep this short. There are three honest ways to
               put a yacht in your life right now. You can buy one, and
               spend $300K–$800K a year keeping it serviceable while
-              actually using it 30 days. You can charter at $14K–$22K
+              actually using it 32 days. You can charter at $14K–$22K
               per day from a marketplace where coverage and quality
               vary by owner. Or you can join a club that hands you
               rotating access to smaller boats for $30K–$60K/yr, fees

@@ -197,7 +197,7 @@ export default function BoatsRentPage() {
           <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
             On a Wajer 55 S, charter runs $14,500/day. A share runs
             $195K + $32K/yr, about $1,067/day in steady-state ops on a
-            30-day allowance. That&apos;s where we want you to land.
+            32-day allowance. That&apos;s where we want you to land.
           </p>
           <Link
             href="/boats/portfolio"

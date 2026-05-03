@@ -59,7 +59,7 @@ export const VEHICLES: Vehicle[] = [
     annualSoloCarrying: 46_000,
     daysPerYear: 32,
     milesPerYear: 3_200,
-    effectiveDailyCost: 236,
+    effectiveDailyCost: 221,
     cylinders: 6,
     drive: "AWD",
     listingStart: "2026-04-15",
@@ -96,7 +96,7 @@ export const VEHICLES: Vehicle[] = [
     annualSoloCarrying: 48_000,
     daysPerYear: 32,
     milesPerYear: 3_200,
-    effectiveDailyCost: 473,
+    effectiveDailyCost: 444,
     cylinders: 12,
     drive: "AWD",
     listingStart: "2026-03-30",
@@ -133,7 +133,7 @@ export const VEHICLES: Vehicle[] = [
     annualSoloCarrying: 50_000,
     daysPerYear: 32,
     milesPerYear: 3_200,
-    effectiveDailyCost: 230,
+    effectiveDailyCost: 216,
     cylinders: 8,
     drive: "RWD",
     listingStart: "2026-04-22",
@@ -171,7 +171,7 @@ export const VEHICLES: Vehicle[] = [
     annualSoloCarrying: 58_000,
     daysPerYear: 32,
     milesPerYear: 3_200,
-    effectiveDailyCost: 395,
+    effectiveDailyCost: 370,
     cylinders: 12,
     drive: "AWD",
     listingStart: "2026-04-10",
@@ -209,7 +209,7 @@ export const VEHICLES: Vehicle[] = [
     annualSoloCarrying: 36_000,
     daysPerYear: 32,
     milesPerYear: 3_200,
-    effectiveDailyCost: 352,
+    effectiveDailyCost: 330,
     cylinders: 12,
     drive: "RWD",
     listingStart: "2026-03-15",
@@ -247,7 +247,7 @@ export const VEHICLES: Vehicle[] = [
     annualSoloCarrying: 62_000,
     daysPerYear: 32,
     milesPerYear: 3_200,
-    effectiveDailyCost: 886,
+    effectiveDailyCost: 831,
     cylinders: 8,
     drive: "AWD",
     listingStart: "2026-04-25",
@@ -295,7 +295,7 @@ export function formatUSD(n: number, opts: { decimals?: number } = {}) {
 // certified pre owned doctrine, 2-year planned exit
 // ─────────────────────────────────────────────────────────────────────────
 // We curate certified pre owned vehicles and hold each one for ~2 years
-// OR until the odometer crosses ~50,000 miles, whichever comes first.
+// OR until the odometer crosses ~60,000 miles, whichever comes first.
 // At exit, the LLC sells the car and proceeds are distributed pro-rata.
 // Modeled assumption: the curated fleet depreciates ~10% over the
 // 2-year hold. We use a flat 10% across drive-only AND rental-opt-in
@@ -306,7 +306,7 @@ export function formatUSD(n: number, opts: { decimals?: number } = {}) {
 // depreciates faster) but a flat rate keeps the calculator honest
 // and simple.
 // Members can still transfer their share to another verified member at
-// any time after the 12-month minimum hold; the 2-year (or 50K-mile)
+// any time after the 12-month minimum hold; the 2-year (or 60K-mile)
 // sale is the default exit baseline shown in pricing and calculators.
 
 export const HOLDING_YEARS = 2;
@@ -468,13 +468,13 @@ export type ShareEconomics = {
 
 export const RENTAL_DEFAULTS = {
   // Total non-service days available in a year
-  daysAvailablePerYear: 340,
+  daysAvailablePerYear: 320,
   // What % of POOLED days actually book. Members get first call on the
   // calendar, so the pool is the leftover (mostly weekday/off-peak)
   // days, harder to fill than a fully-controlled rental fleet's
   // calendar. Industry fleet averages run 200–240 booked days/yr on
-  // 340 available days (~60–70%); the leftover-pool reality is lower.
-  // 50% on a 220-day pool = 110 booked days = ~230 active days/yr
+  // 320 available days (~60–70%); the leftover-pool reality is lower.
+  // 50% on a 200-day pool = 100 booked days = ~220 active days/yr
   // total when combined with member-driven days. Honest middle.
   defaultOccupancyPct: 50,
   // Owners realistically keep some days for themselves before pooling.
@@ -487,7 +487,7 @@ export const RENTAL_DEFAULTS = {
 export type RentalEconomics = {
   ownerUseDaysPerShare: number;   // days each share-holder keeps for self
   ownerUseDaysTotal: number;      // × shares-issued (usually 10)
-  rentablePoolDays: number;       // 340 − ownerUseDaysTotal
+  rentablePoolDays: number;       // 320 − ownerUseDaysTotal
   occupancyPct: number;
   bookedDays: number;             // rentablePoolDays × occupancyPct
   dailyRate: number;
