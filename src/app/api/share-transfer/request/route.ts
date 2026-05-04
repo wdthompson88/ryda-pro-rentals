@@ -132,7 +132,11 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Insert the transfer row.
+  // Insert the transfer row. A partial unique index on
+  // (holding_id) WHERE status IN open-statuses means a parallel
+  // request will hit unique-violation 23505 — surface as the same
+  // 409 the read-then-check above produces, so concurrent
+  // duplicates can't slip past.
   const { data: xfer, error: xferErr } = await admin
     .from("share_transfers")
     .insert({
@@ -148,6 +152,16 @@ export async function POST(req: NextRequest) {
     .select("id, expires_at")
     .single();
   if (xferErr || !xfer) {
+    const code = (xferErr as { code?: string } | null)?.code;
+    if (code === "23505") {
+      return NextResponse.json(
+        {
+          error:
+            "There's already an open transfer request for this share. Cancel that one first.",
+        },
+        { status: 409 },
+      );
+    }
     console.error("[xfer-req · insert]", xferErr);
     return NextResponse.json(
       { error: "Could not record transfer request." },

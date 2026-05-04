@@ -12,13 +12,20 @@ if (dsn) {
     dsn,
     tracesSampleRate: 0.1,
     environment: process.env.VERCEL_ENV ?? "development",
-    // Strip Authorization headers + cookie + bodies from server
-    // events — they routinely contain JWTs and can leak PII.
+    // Strip auth headers + cookies + bodies from server events —
+    // they routinely contain JWTs and can leak PII. Header keys
+    // are case-insensitive in HTTP but JS object keys aren't, so
+    // iterate to catch Authorization / authorization /
+    // AUTHORIZATION etc. instead of relying on Sentry's storage
+    // casing.
     beforeSend(event) {
       if (event.request?.headers) {
-        delete event.request.headers["authorization"];
-        delete event.request.headers["cookie"];
-        delete event.request.headers["set-cookie"];
+        const sensitive = new Set(["authorization", "cookie", "set-cookie"]);
+        for (const k of Object.keys(event.request.headers)) {
+          if (sensitive.has(k.toLowerCase())) {
+            delete event.request.headers[k];
+          }
+        }
       }
       if (event.request) {
         delete event.request.data;

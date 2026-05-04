@@ -1,13 +1,28 @@
-// Admin gating helper. A user is "admin" iff their auth.users
-// row has user_metadata.role === 'admin'. This is set manually
-// per user via the Supabase dashboard or via a one-shot SQL:
+// Admin gating helper. A user is "admin" iff their auth.users row
+// has app_metadata.role === 'admin'.
 //
-//   update auth.users set raw_user_meta_data =
-//     jsonb_set(raw_user_meta_data, '{role}', '"admin"')
+// IMPORTANT: this MUST read app_metadata, NOT user_metadata.
+// user_metadata is user-controlled — anyone can call
+//   supabase.auth.updateUser({ data: { role: 'admin' } })
+// from the browser and grant themselves admin. app_metadata is
+// service-role-only writable; users can't modify their own
+// app_metadata via supabase-js. (Original implementation read
+// user_metadata; that was a self-escalation hole. Fixed per audit.)
+//
+// To grant admin to a user, run this in the Supabase SQL editor or
+// via the Management API:
+//
+//   update auth.users
+//   set raw_app_meta_data = jsonb_set(
+//     coalesce(raw_app_meta_data, '{}'::jsonb), '{role}', '"admin"'
+//   )
 //   where email = 'ops@ryda.com';
 //
-// We deliberately don't expose a self-service "make me admin" path.
-// Roles are added by ops out-of-band.
+// To revoke:
+//
+//   update auth.users
+//   set raw_app_meta_data = raw_app_meta_data - 'role'
+//   where email = 'ops@ryda.com';
 
 import type { NextRequest } from "next/server";
 import { getUserFromRequest } from "@/lib/api-auth";
@@ -20,7 +35,7 @@ export type AdminUser = {
 
 /**
  * Returns the admin user if the request is authenticated AND that
- * user has user_metadata.role === 'admin'. Returns null otherwise.
+ * user has app_metadata.role === 'admin'. Returns null otherwise.
  *
  * Routes that need admin gating do:
  *   const admin = await requireAdmin(req);
@@ -35,12 +50,14 @@ export async function requireAdmin(
   const adminClient = supabaseAdmin();
   if (!adminClient) return null;
 
-  // Pull the auth.users row directly to read user_metadata.role.
-  // We don't trust the JWT-embedded metadata for this check because
-  // it can lag a role change (token has the OLD role until refresh).
+  // Pull the auth.users row directly so we see app_metadata
+  // (service-role only — users can't write to it). We don't trust
+  // the JWT-embedded app_metadata for this check because it can
+  // lag a role change (token has the OLD role until refresh).
   const { data, error } = await adminClient.auth.admin.getUserById(user.id);
   if (error || !data?.user) return null;
-  const meta = data.user.user_metadata as Record<string, unknown> | undefined;
-  if (meta?.role !== "admin") return null;
+  const appMeta = (data.user as { app_metadata?: Record<string, unknown> })
+    .app_metadata;
+  if (appMeta?.role !== "admin") return null;
   return user;
 }

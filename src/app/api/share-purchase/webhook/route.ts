@@ -60,28 +60,24 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid signature." }, { status: 400 });
   }
 
-  // Event-id dedup. The PRIMARY KEY conflict on stripe_events is the
-  // dedup signal: insert succeeds → first time seeing this event,
-  // proceed; insert fails with unique-violation → already processed,
-  // ack quietly. This is belt-and-suspenders alongside the status-
-  // guarded compare-and-sets below — Stripe's recommended pattern.
-  const dedup = await admin
+  // Event-id dedup. We CHECK first, PROCESS the event, then RECORD
+  // on success. Recording up-front would lock out Stripe retries
+  // when our processing returns 500 — Stripe would see a duplicate
+  // and never re-deliver, leaving partially-processed state stuck.
+  //
+  // Race note: two concurrent deliveries for the same event_id
+  // (rare — Stripe normally retries on timeout, not in parallel)
+  // can both pass this check and both process. The status-guarded
+  // compare-and-sets below absorb the actual side effects; worst
+  // case is a duplicate notify-team email, not duplicate fulfillment.
+  const seen = await admin
     .from("stripe_events")
-    .insert({
-      id: event.id,
-      type: event.type,
-      endpoint: "share-purchase",
-    });
-  if (dedup.error) {
-    // 23505 = unique_violation. Anything else is unexpected; log and
-    // continue rather than fail the webhook (a bad write here
-    // shouldn't cause Stripe to retry forever).
-    const code = (dedup.error as { code?: string }).code;
-    if (code === "23505") {
-      console.log("[stripe webhook] duplicate event, skipping", event.id, event.type);
-      return NextResponse.json({ received: true, deduped: true });
-    }
-    console.warn("[stripe webhook] dedup insert failed (non-fatal)", dedup.error);
+    .select("id")
+    .eq("id", event.id)
+    .maybeSingle();
+  if (seen.data) {
+    console.log("[stripe webhook] duplicate event, skipping", event.id, event.type);
+    return NextResponse.json({ received: true, deduped: true });
   }
 
   try {
@@ -141,6 +137,10 @@ export async function POST(req: NextRequest) {
             status: "paid",
             stripe_payment_intent_id: intentId,
             stripe_customer_id: customerId,
+            // Stamp paid_at exactly once. The refund-window math
+            // anchors on paid_at, not updated_at, so future
+            // admin-driven row touches don't shift eligibility.
+            paid_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           })
           .eq("id", purchaseId)
@@ -426,7 +426,24 @@ export async function POST(req: NextRequest) {
     }
   } catch (err) {
     console.error("[stripe webhook handler]", err);
+    // Don't record the event — we want Stripe to retry. The seen-check
+    // above will let the retry through.
     return NextResponse.json({ error: "Handler failed." }, { status: 500 });
+  }
+
+  // Record the event AFTER successful processing. If this insert
+  // fails (unique violation = a parallel delivery already recorded
+  // it; other error = transient), it's non-fatal — the actual work
+  // already landed and the status-guarded compare-and-sets prevent
+  // duplicate side effects on any future retry.
+  const recorded = await admin
+    .from("stripe_events")
+    .insert({ id: event.id, type: event.type, endpoint: "share-purchase" });
+  if (recorded.error) {
+    const code = (recorded.error as { code?: string }).code;
+    if (code !== "23505") {
+      console.warn("[stripe webhook] event-record insert failed", recorded.error);
+    }
   }
 
   return NextResponse.json({ received: true });

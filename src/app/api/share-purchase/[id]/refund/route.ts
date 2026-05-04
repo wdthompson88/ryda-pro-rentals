@@ -76,7 +76,7 @@ export async function POST(
   const { data: purchase, error: purchaseErr } = await admin
     .from("share_purchases")
     .select(
-      "id, user_id, status, shares, vehicle_symbol, boat_slug, name, email, total_cents, stripe_payment_intent_id, fulfilled_at, updated_at",
+      "id, user_id, status, shares, vehicle_symbol, boat_slug, name, email, total_cents, stripe_payment_intent_id, fulfilled_at, paid_at, updated_at",
     )
     .eq("id", purchaseId)
     .eq("user_id", user.id)
@@ -120,10 +120,14 @@ export async function POST(
     });
   }
 
-  // Branch 3 / 4: paid + fulfilled. Window check.
-  const paidAt = purchase.updated_at
-    ? new Date(purchase.updated_at).getTime()
-    : null;
+  // Branch 3 / 4: paid + fulfilled. Window check anchored on
+  // paid_at — that column is stamped EXACTLY ONCE by the webhook
+  // on the pending→paid transition, so it's a stable refund-
+  // eligibility anchor. Falling back to updated_at would let an
+  // admin row touch shift the window in either direction.
+  const paidAtIso = (purchase as { paid_at?: string | null }).paid_at
+    ?? purchase.updated_at;
+  const paidAt = paidAtIso ? new Date(paidAtIso).getTime() : null;
   const ageDays = paidAt
     ? (Date.now() - paidAt) / (1000 * 60 * 60 * 24)
     : Infinity;
@@ -152,18 +156,62 @@ export async function POST(
     });
   }
 
-  try {
-    await stripe.refunds.create({
-      payment_intent: purchase.stripe_payment_intent_id,
-      reason: "requested_by_customer",
-      metadata: {
-        purchaseId: purchase.id,
-        userId: user.id,
-        memberReason: reason || "(none)",
-      },
+  // Compare-and-set FIRST. Two concurrent POSTs both pass the
+  // eligibility checks above, but only one wins this update — the
+  // other hits status='canceled' and gets a clean idempotent
+  // "nothing to refund" branch on retry. We do this BEFORE the
+  // Stripe call so we don't double-fire refunds; if Stripe then
+  // fails, we restore status='paid' below.
+  const claim = await admin
+    .from("share_purchases")
+    .update({
+      status: "canceled",
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", purchase.id)
+    .eq("status", "paid")
+    .select("id")
+    .maybeSingle();
+  if (!claim.data) {
+    // Lost the race. Treat as already-handled.
+    return NextResponse.json({
+      ok: true,
+      action: "already_canceled",
+      message: "This purchase is already canceled.",
     });
+  }
+
+  try {
+    await stripe.refunds.create(
+      {
+        payment_intent: purchase.stripe_payment_intent_id,
+        reason: "requested_by_customer",
+        metadata: {
+          purchaseId: purchase.id,
+          userId: user.id,
+          memberReason: reason || "(none)",
+        },
+      },
+      {
+        // Idempotency key tied to the purchase id so a network-
+        // hiccup retry doesn't issue a second refund. Stripe holds
+        // idempotency keys for 24 hours, plenty for our case.
+        idempotencyKey: `refund:${purchase.id}`,
+      },
+    );
   } catch (err) {
     console.error("[refund · stripe]", err);
+    // Restore status so the member can retry. CAS on
+    // status='canceled' so we only restore the row WE just claimed
+    // (defensive against a parallel admin action).
+    await admin
+      .from("share_purchases")
+      .update({
+        status: "paid",
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", purchase.id)
+      .eq("status", "canceled");
     return NextResponse.json(
       {
         error:
@@ -173,15 +221,7 @@ export async function POST(
     );
   }
 
-  // Mark canceled and best-effort tear down derived state. The
-  // delete-shares + delete-amendment branch is best-effort because
-  // RLS won't reject service-role; if it fails, ops cleans up
-  // manually from the ticket.
-  await admin
-    .from("share_purchases")
-    .update({ status: "canceled", updated_at: new Date().toISOString() })
-    .eq("id", purchase.id);
-
+  // Best-effort tear down derived state.
   await admin
     .from("share_holdings")
     .update({

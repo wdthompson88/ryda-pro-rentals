@@ -82,7 +82,13 @@ export async function POST(
   if (xferErr || !xfer) {
     return NextResponse.json({ error: "Transfer not found." }, { status: 404 });
   }
-  if ((user.email ?? "").toLowerCase() !== xfer.to_user_email) {
+  // Compare both sides lowercased. The request route stores
+  // toEmail lowercase, but defending against future writers that
+  // might insert mixed-case rows costs us nothing.
+  if (
+    (user.email ?? "").toLowerCase() !==
+    (xfer.to_user_email ?? "").toLowerCase()
+  ) {
     // Don't reveal that the transfer exists for someone else.
     return NextResponse.json({ error: "Transfer not found." }, { status: 404 });
   }
@@ -128,7 +134,37 @@ export async function POST(
     return NextResponse.json({ ok: true, status: "rejected" });
   }
 
-  // Accept path: KYC must be verified before we'll progress.
+  // Accept path: re-verify the SENDER still owns the holding (it
+  // could have been refunded, separately transferred, or otherwise
+  // mutated between request and accept — windows are up to 14 days).
+  const { data: holding } = await admin
+    .from("share_holdings")
+    .select("id, user_id, transferred_at")
+    .eq("id", xfer.holding_id)
+    .maybeSingle();
+  if (!holding || holding.user_id !== xfer.from_user_id || holding.transferred_at) {
+    // Sender no longer owns the share. Mark transfer rejected so
+    // both parties see the right state.
+    await admin
+      .from("share_transfers")
+      .update({
+        status: "rejected",
+        ryda_review_note:
+          "Sender no longer holds the share at acceptance time.",
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", xfer.id)
+      .eq("status", "requested");
+    return NextResponse.json(
+      {
+        error:
+          "The sender no longer owns this share. Ask them to start a new transfer.",
+      },
+      { status: 410 },
+    );
+  }
+
+  // KYC must be verified before we'll progress to RYDA review.
   const { data: kyc } = await admin
     .from("kyc_verifications")
     .select("status")

@@ -225,10 +225,27 @@ export async function POST(req: NextRequest) {
     const purchaseId = insert.data.id as string;
     const origin = process.env.NEXT_PUBLIC_SITE_URL ?? new URL(req.url).origin;
 
+    // Resolve to the user's canonical Stripe Customer so saved
+    // payment methods accumulate on ONE customer across purchases.
+    // Without this, each Checkout creates a fresh anonymous
+    // customer keyed by email, fragmenting saved cards across rows
+    // and breaking the billing portal's "most recent customer"
+    // lookup.
+    const customerId = await resolveStripeCustomerId(
+      admin,
+      stripe,
+      user.id,
+      user.email ?? null,
+    );
+
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: paymentMethodTypes,
-      customer_email: user.email ?? undefined,
+      // Pass `customer` when we have one; fall back to email-only
+      // for the rare case where customer minting failed (the
+      // billing portal will repair on next visit).
+      customer: customerId ?? undefined,
+      customer_email: customerId ? undefined : (user.email ?? undefined),
       line_items: [
         {
           quantity: 1,
@@ -277,5 +294,77 @@ export async function POST(req: NextRequest) {
       { error: "Could not create checkout session." },
       { status: 500 },
     );
+  }
+}
+
+// Look up or mint a single canonical Stripe Customer for this user.
+// Lookup chain:
+//   1. user_profiles.stripe_customer_id (canonical home — set by
+//      the billing portal route or by this function on first call)
+//   2. share_purchases.stripe_customer_id (legacy fallback)
+//   3. None → mint with idempotency key keyed on user.id, persist
+//      to user_profiles, return.
+//
+// Idempotency key + persistence makes parallel calls safe: both
+// requests get the SAME Stripe customer back, the upsert's unique
+// constraint on user_id means the second insert overwrites with
+// the same value.
+async function resolveStripeCustomerId(
+  admin: ReturnType<typeof requireSupabaseAdmin>,
+  stripe: ReturnType<typeof requireStripe>,
+  userId: string,
+  email: string | null,
+): Promise<string | null> {
+  try {
+    const { data: profile } = await admin
+      .from("user_profiles")
+      .select("stripe_customer_id, full_name, preferred_name")
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (profile?.stripe_customer_id) {
+      return profile.stripe_customer_id as string;
+    }
+
+    const { data: spRows } = await admin
+      .from("share_purchases")
+      .select("stripe_customer_id")
+      .eq("user_id", userId)
+      .not("stripe_customer_id", "is", null)
+      .order("updated_at", { ascending: false })
+      .limit(1);
+    if (spRows && spRows.length > 0 && spRows[0].stripe_customer_id) {
+      const cached = spRows[0].stripe_customer_id as string;
+      // Persist forward for next time.
+      await admin
+        .from("user_profiles")
+        .upsert(
+          { user_id: userId, stripe_customer_id: cached },
+          { onConflict: "user_id" },
+        );
+      return cached;
+    }
+
+    const customer = await stripe.customers.create(
+      {
+        email: email ?? undefined,
+        name:
+          profile?.full_name || profile?.preferred_name || undefined,
+        metadata: { userId },
+      },
+      { idempotencyKey: `customer-create:${userId}` },
+    );
+    await admin
+      .from("user_profiles")
+      .upsert(
+        { user_id: userId, stripe_customer_id: customer.id },
+        { onConflict: "user_id" },
+      );
+    return customer.id;
+  } catch (err) {
+    // Don't block checkout on a customer-resolution hiccup. Stripe
+    // will create a fresh one keyed by customer_email; the billing
+    // portal will reconcile on next visit.
+    console.warn("[create-checkout · customer resolve]", err);
+    return null;
   }
 }
