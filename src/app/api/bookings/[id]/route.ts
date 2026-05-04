@@ -21,17 +21,18 @@ async function cancelBooking(req: NextRequest, id: string) {
     return NextResponse.json({ error: "Sign in required." }, { status: 401 });
   }
 
-  // Only the booking owner can cancel.
+  // Only the booking owner can cancel. Combine the owner check into
+  // the SELECT (eq user_id) so a 404 covers BOTH "no such id" and
+  // "not your booking" — no existence-leak for someone else's
+  // booking ids.
   const existing = await admin
     .from("bookings")
     .select("id, user_id, status, start_date, end_date, vehicle_symbol, boat_slug")
     .eq("id", id)
-    .single();
+    .eq("user_id", user.id)
+    .maybeSingle();
   if (existing.error || !existing.data) {
     return NextResponse.json({ error: "Booking not found." }, { status: 404 });
-  }
-  if (existing.data.user_id !== user.id) {
-    return NextResponse.json({ error: "Not your booking." }, { status: 403 });
   }
   if (existing.data.status === "canceled" || existing.data.status === "completed") {
     return NextResponse.json(

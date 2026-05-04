@@ -14,7 +14,12 @@ import { authedFetch } from "@/lib/api-fetch";
 
 type BookingRow = {
   id: string;
-  user_id: string;
+  // Calendar GET returns is_self instead of user_id (the route
+  // computes it server-side so no co-owner's user_id leaks to other
+  // co-owners' calendars). Self-view of /api/bookings without an
+  // asset filter still returns user_id — but this component is the
+  // calendar view, so we only need is_self.
+  is_self?: boolean;
   start_date: string;
   end_date: string;
   status: "pending" | "confirmed" | "in-progress" | "completed" | "canceled";
@@ -34,12 +39,10 @@ export function AssetCalendar({
   vehicleSymbol,
   boatSlug,
   vertical = "cars",
-  currentUserId,
 }: {
   vehicleSymbol?: string;
   boatSlug?: string;
   vertical?: Vertical;
-  currentUserId?: string;
 }) {
   const [bookings, setBookings] = useState<BookingRow[] | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -99,7 +102,10 @@ export function AssetCalendar({
         return iso >= b.start_date && iso <= b.end_date;
       });
       if (hit) {
-        const isYou = currentUserId && hit.user_id === currentUserId;
+        // Server stamps is_self (no user_id leakage). currentUserId
+        // prop kept for callers that may pass it; is_self takes
+        // precedence when present.
+        const isYou = hit.is_self === true;
         badge = isYou
           ? { color: "#DC4747", label: "You" }
           : { color: "#9A9590", label: "Other" };

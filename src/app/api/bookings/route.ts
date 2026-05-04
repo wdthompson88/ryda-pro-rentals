@@ -220,12 +220,17 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  // Calendar view (asset filter present): return only the minimal fields
-  // a calendar needs. Hide notes/handover/type and any other personal
-  // metadata that belongs to the booking owner. Self-view (no filter)
-  // returns the full row since the user is asking for their own data.
-  const calendarColumns = "id, user_id, vehicle_symbol, boat_slug, start_date, end_date, status";
-  const selectColumns = (assetSymbol || assetSlug) ? calendarColumns : "*";
+  // Calendar view (asset filter present): return only the minimal
+  // fields a calendar needs. Hide notes/handover/type AND user_id —
+  // returning user_id let any co-owner correlate booking patterns
+  // back to specific members across assets, which is creepier than
+  // members expect from a calendar widget. We compute `is_self` on
+  // the server so the calendar can still render a "You" badge
+  // without learning anyone else's user_id.
+  const isCalendarView = !!(assetSymbol || assetSlug);
+  const calendarColumns =
+    "id, user_id, vehicle_symbol, boat_slug, start_date, end_date, status";
+  const selectColumns = isCalendarView ? calendarColumns : "*";
 
   let query = admin
     .from("bookings")
@@ -251,5 +256,22 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Could not fetch bookings." }, { status: 500 });
   }
 
-  return NextResponse.json({ bookings: data ?? [] });
+  // For calendar view, swap user_id for is_self so cross-owner
+  // identification isn't possible. Self-view leaves rows as-is
+  // (user is asking for their own data; nothing to redact). Going
+  // through `unknown` because supabase-js's ParseQuery generic
+  // doesn't widen to Record<string, unknown> on a string-valued
+  // dynamic select.
+  const rows = (data ?? []) as unknown as Array<Record<string, unknown>>;
+  if (isCalendarView) {
+    const sanitized = rows.map((row) => {
+      const owner = row.user_id;
+      const { user_id: _strip, ...rest } = row;
+      void _strip;
+      return { ...rest, is_self: owner === user.id };
+    });
+    return NextResponse.json({ bookings: sanitized });
+  }
+
+  return NextResponse.json({ bookings: rows });
 }

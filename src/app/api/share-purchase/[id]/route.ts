@@ -20,11 +20,16 @@ export async function GET(
     return NextResponse.json({ error: "Sign in required." }, { status: 401 });
   }
 
+  // Drop `email` from the projection — the caller IS the user and
+  // already knows their email; returning it just expands the
+  // session-token-stolen blast radius. `user_id` matches the caller
+  // by definition (eq filter below) but we keep it in the response
+  // for the existing client type.
   const { id } = await params;
   const { data, error } = await admin
     .from("share_purchases")
     .select(
-      "id, user_id, email, name, vehicle_symbol, boat_slug, shares, price_per_share, acquisition_fee, total_cents, status, created_at, updated_at",
+      "id, user_id, name, vehicle_symbol, boat_slug, shares, price_per_share, acquisition_fee, total_cents, status, created_at, updated_at",
     )
     .eq("id", id)
     .eq("user_id", user.id)

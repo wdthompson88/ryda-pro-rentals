@@ -62,11 +62,29 @@ export async function POST(req: NextRequest) {
 
   try {
     switch (event.type) {
-      case "checkout.session.completed": {
+      case "checkout.session.completed":
+      case "checkout.session.async_payment_succeeded": {
         const session = event.data.object as Stripe.Checkout.Session;
         const purchaseId = session.metadata?.purchaseId;
         if (!purchaseId) {
           console.warn("[stripe webhook] no purchaseId in metadata", session.id);
+          break;
+        }
+
+        // ACH (us_bank_account) Checkout sessions emit
+        // checkout.session.completed BEFORE the bank actually settles
+        // — payment_status is 'unpaid' until settlement, then a
+        // separate checkout.session.async_payment_succeeded fires.
+        // Card payments emit completed with payment_status='paid' in
+        // the same event. Defer fulfillment until payment_status is
+        // 'paid' so we don't mint shares + send the LLC amendment
+        // email on an ACH that may still bounce.
+        if (session.payment_status !== "paid") {
+          console.log("[stripe webhook] checkout completed but payment not settled", {
+            session: session.id,
+            status: session.payment_status,
+            event: event.type,
+          });
           break;
         }
 
@@ -336,6 +354,21 @@ export async function POST(req: NextRequest) {
           .from("share_purchases")
           .update({ status: "failed", updated_at: new Date().toISOString() })
           .eq("stripe_payment_intent_id", intent.id);
+        break;
+      }
+
+      case "checkout.session.async_payment_failed": {
+        // ACH Checkout flow — bank refused the debit (insufficient
+        // funds, account closed). Mark purchase as failed so the
+        // member sees the right state on the tracker page; team
+        // can reach out via the notify pipe if needed.
+        const session = event.data.object as Stripe.Checkout.Session;
+        const purchaseId = session.metadata?.purchaseId;
+        if (!purchaseId) break;
+        await admin
+          .from("share_purchases")
+          .update({ status: "failed", updated_at: new Date().toISOString() })
+          .eq("id", purchaseId);
         break;
       }
 

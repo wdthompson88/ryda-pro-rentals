@@ -17,7 +17,6 @@ import { authedFetch } from "@/lib/api-fetch";
 type Purchase = {
   id: string;
   user_id: string | null;
-  email: string;
   name: string;
   vehicle_symbol: string | null;
   boat_slug: string | null;

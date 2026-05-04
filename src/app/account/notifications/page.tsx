@@ -12,7 +12,7 @@
 //   notif_marketing_enabled = true
 //   notif_booking_updates   = true
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 type Prefs = {
@@ -84,11 +84,17 @@ export default function NotificationsPage() {
     };
   }, []);
 
-  // Save on change. Each toggle/select kicks an updateUser; the call
-  // is debounced to ~250ms so rapid clicks don't fire 5 calls.
-  async function persist(next: Prefs) {
+  // Save on change. Each toggle/select kicks updateUser, but with a
+  // 250ms debounce so rapid clicks (e.g. flipping the digest cadence
+  // from off → daily → weekly while deciding) only fire one save.
+  // We snapshot the latest prefs at flush time so the save reflects
+  // the most recent user intent.
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const latestPrefsRef = useRef<Prefs>(DEFAULTS);
+
+  async function flushSave() {
     if (!supabase) return;
-    setPrefs(next);
+    const next = latestPrefsRef.current;
     setSaving(true);
     setError(null);
     try {
@@ -102,6 +108,16 @@ export default function NotificationsPage() {
     } finally {
       setSaving(false);
     }
+  }
+
+  function persist(next: Prefs) {
+    setPrefs(next);
+    latestPrefsRef.current = next;
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      void flushSave();
+      debounceRef.current = null;
+    }, 250);
   }
 
   function toggle<K extends keyof Prefs>(key: K, value: Prefs[K]) {

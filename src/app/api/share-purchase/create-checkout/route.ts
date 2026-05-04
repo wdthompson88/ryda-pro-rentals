@@ -71,6 +71,52 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Name required." }, { status: 400 });
     }
 
+    // KYC gate. The BuyFlow's VerifyStep walks the user through
+    // Stripe Identity in the UI, but the UI is bypassable — anyone
+    // could POST here directly. Per LLC member-register law and the
+    // operating agreement, we cannot record a member without an
+    // identity check. Re-verify here against the kyc_verifications
+    // table.
+    const admin = requireSupabaseAdmin();
+    const kycCheck = await admin
+      .from("kyc_verifications")
+      .select("id, status, updated_at, verified_outputs")
+      .eq("user_id", user.id)
+      .eq("status", "verified")
+      .order("updated_at", { ascending: false })
+      .limit(1);
+    if (kycCheck.error) {
+      console.error("[create-checkout · kyc lookup]", kycCheck.error);
+      return NextResponse.json(
+        { error: "Could not verify identity status." },
+        { status: 500 },
+      );
+    }
+    if (!kycCheck.data || kycCheck.data.length === 0) {
+      return NextResponse.json(
+        {
+          error:
+            "Identity verification required. Complete KYC before claiming a share.",
+          code: "kyc_required",
+        },
+        { status: 409 },
+      );
+    }
+
+    // Prefer the KYC-verified legal name on the LLC member register
+    // when Stripe Identity returned one. Falls back to the body
+    // `name` (which the BuyFlow collects as a polite default but
+    // shouldn't override a verified legal identity).
+    const verifiedOutputs = kycCheck.data[0].verified_outputs as
+      | { first_name?: string; last_name?: string }
+      | null
+      | undefined;
+    const verifiedName =
+      verifiedOutputs?.first_name && verifiedOutputs?.last_name
+        ? `${verifiedOutputs.first_name} ${verifiedOutputs.last_name}`
+        : null;
+    const memberName = verifiedName ?? name;
+
     // Look up the asset to get the price snapshot. We never trust a
     // client-supplied price; the catalog is authoritative.
     let pricePerShare = 0;
@@ -107,7 +153,6 @@ export async function POST(req: NextRequest) {
     const total = buyIn + acquisitionFee;
     const totalCents = total * 100;
 
-    const admin = requireSupabaseAdmin();
     const stripe = requireStripe();
 
     // Insert pending row first so we have an ID to thread through the
@@ -119,7 +164,7 @@ export async function POST(req: NextRequest) {
       .insert({
         user_id: user.id,
         email: user.email ?? "",
-        name,
+        name: memberName,
         vehicle_symbol: vehicleSymbol,
         boat_slug: boatSlug,
         shares,

@@ -14,6 +14,7 @@
 // the team handles manually for now.
 
 import { useState } from "react";
+import { authedFetch } from "@/lib/api-fetch";
 
 export default function PrivacyPage() {
   return (
@@ -44,17 +45,28 @@ export default function PrivacyPage() {
 function DataExportCard() {
   const [requested, setRequested] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  function onRequest() {
+  async function onRequest() {
     if (submitting) return;
     setSubmitting(true);
-    // Future: POST /api/account/data-export. For now we just show
-    // the confirmation copy — the team picks up via the support
-    // queue.
-    setTimeout(() => {
+    setError(null);
+    try {
+      const res = await authedFetch("/api/account/data-request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ kind: "export" }),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j.error || `Request failed (${res.status}).`);
+      }
       setRequested(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not submit request.");
+    } finally {
       setSubmitting(false);
-    }, 400);
+    }
   }
 
   return (
@@ -67,6 +79,11 @@ function DataExportCard() {
         account, plus PDFs of every agreement you've signed. Delivery is via
         email link, expires after 7 days.
       </p>
+      {error && (
+        <p className="rounded-xl border border-red/40 bg-red/5 px-4 py-3 text-sm text-red">
+          {error}
+        </p>
+      )}
       {!requested ? (
         <button
           type="button"
@@ -156,16 +173,28 @@ function DeleteAccountCard() {
   const [confirmText, setConfirmText] = useState("");
   const [requested, setRequested] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  function onRequest() {
+  async function onRequest() {
     if (submitting) return;
     setSubmitting(true);
-    // Future: POST /api/account/delete-request — opens a support
-    // ticket + emails legal so they can start LLC-share buyback.
-    setTimeout(() => {
+    setError(null);
+    try {
+      const res = await authedFetch("/api/account/data-request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ kind: "delete" }),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j.error || `Request failed (${res.status}).`);
+      }
       setRequested(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not submit request.");
+    } finally {
       setSubmitting(false);
-    }, 400);
+    }
   }
 
   return (
@@ -222,6 +251,11 @@ function DeleteAccountCard() {
               Cancel
             </button>
           </div>
+          {error && (
+            <p className="rounded-xl border border-red/40 bg-red/5 px-4 py-3 text-sm text-red">
+              {error}
+            </p>
+          )}
         </div>
       )}
       {requested && (
