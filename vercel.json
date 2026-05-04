@@ -34,8 +34,9 @@
   },
   "crons": [
     {
+      "_comment": "Daily at 03:00 UTC. Vercel Hobby tier limits to 1 cron/day; if/when the project upgrades to Pro, this can move to hourly ('0 * * * *') for tighter expiry latency. Transfers expire after 14 days so daily granularity is plenty.",
       "path": "/api/cron/expire-transfers",
-      "schedule": "0 * * * *"
+      "schedule": "0 3 * * *"
     }
   ]
 }
