@@ -20,7 +20,9 @@ const RATE_WINDOW_MS = 60_000;
 
 // 5% of buy-in. Mirrors the "$2,834 acquisition fee" on the previously
 // hardcoded /share-purchase tracker (which showed 5% of $56,667).
-const ACQUISITION_FEE_PCT = 5;
+// Re-exported via @/lib/fees so the client buy flows compute the
+// SAME total as Stripe charges. Don't duplicate this constant.
+import { ACQUISITION_FEE_PCT, computeFees } from "@/lib/fees";
 
 export async function POST(req: NextRequest) {
   try {
@@ -148,9 +150,7 @@ export async function POST(req: NextRequest) {
       imageUrl = b.hero;
     }
 
-    const buyIn = pricePerShare * shares;
-    const acquisitionFee = Math.round(buyIn * (ACQUISITION_FEE_PCT / 100));
-    const total = buyIn + acquisitionFee;
+    const { buyIn, acquisitionFee, total } = computeFees(pricePerShare, shares);
     const totalCents = total * 100;
 
     const stripe = requireStripe();
@@ -210,6 +210,10 @@ export async function POST(req: NextRequest) {
         acquisition_fee: acquisitionFee,
         total_cents: totalCents,
         status: "pending",
+        // Stripe-handled paths: card or ach. Non-Stripe paths
+        // (wire/crypto/liquidity/finance) go through /intent and
+        // don't reach this insert.
+        funding_method: requestedMethod === "ach" ? "ach" : "card",
       })
       .select("id")
       .single();

@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Boat, formatUSD } from "@/lib/boat-data";
 import { authedFetch } from "@/lib/api-fetch";
+import { ACQUISITION_FEE_PCT, computeFees } from "@/lib/fees";
 
 type StepKey = "review" | "verify" | "documents" | "fund" | "confirm";
 
@@ -41,13 +42,17 @@ export function BoatBuyFlow({ boat, initialShares }: Props) {
   const [fundingMethod, setFundingMethod] = useState<FundingMethod | null>(null);
 
   const shares = initialShares;
-  const totalPrice = boat.pricePerShare * shares;
+  // Shared fee math with the API (lib/fees.ts) so the buyer-visible
+  // total exactly matches the Stripe charge. acquisitionFee replaces
+  // the old flat $1,500 "closing fee".
+  const { buyIn: totalPrice, acquisitionFee, total: grandTotal } = computeFees(
+    boat.pricePerShare,
+    shares,
+  );
   // All-in annual contribution: insurance + storage + maintenance + reserves
   // + RYDA service fee, scaled per share. The 12% management fee is bundled
   // into annualOpCost, don't show only that piece as the total.
   const annualContribution = boat.annualOpCost * shares;
-  const closingFee = 1500;
-  const grandTotal = totalPrice + closingFee;
 
   const stepIdx = STEPS.findIndex((s) => s.key === step);
 
@@ -107,7 +112,7 @@ export function BoatBuyFlow({ boat, initialShares }: Props) {
               boat={boat}
               shares={shares}
               totalPrice={totalPrice}
-              closingFee={closingFee}
+              acquisitionFee={acquisitionFee}
               grandTotal={grandTotal}
               annualContribution={annualContribution}
               termsAccepted={termsAccepted}
@@ -177,7 +182,7 @@ export function BoatBuyFlow({ boat, initialShares }: Props) {
             <p className="mt-1 font-display text-xl text-ink">{boat.name}</p>
             <dl className="mt-5 space-y-2 border-t border-rule pt-5 text-sm">
               <SummaryRow label={`${shares} share${shares > 1 ? "s" : ""}`} value={formatUSD(totalPrice)} />
-              <SummaryRow label="Closing fee" value={formatUSD(closingFee)} />
+              <SummaryRow label={`${ACQUISITION_FEE_PCT}% acquisition fee`} value={formatUSD(acquisitionFee)} />
               <div className="border-t border-rule pt-3">
                 <SummaryRow
                   label={<span className="font-display text-base text-ink">Total today</span>}
@@ -206,7 +211,7 @@ function ReviewStep({
   boat,
   shares,
   totalPrice,
-  closingFee,
+  acquisitionFee,
   grandTotal,
   annualContribution,
   termsAccepted,
@@ -216,7 +221,7 @@ function ReviewStep({
   boat: Boat;
   shares: number;
   totalPrice: number;
-  closingFee: number;
+  acquisitionFee: number;
   grandTotal: number;
   annualContribution: number;
   termsAccepted: boolean;
@@ -260,7 +265,7 @@ function ReviewStep({
       <Section title="What it costs">
         <Bullet label="Today (one-time)" value={formatUSD(grandTotal)} bold />
         <Bullet label="—  Share buy-in" value={formatUSD(totalPrice)} />
-        <Bullet label="—  Closing & paperwork fee" value={formatUSD(closingFee)} />
+        <Bullet label={`—  ${ACQUISITION_FEE_PCT}% acquisition fee`} value={formatUSD(acquisitionFee)} />
         <Bullet
           label={`Ongoing (per share, year)`}
           value={`~${formatUSD(annualContribution)}`}
@@ -630,11 +635,52 @@ function FundStep({
     }
   }
 
+  // Non-Stripe paths: lands a pending row + ops ticket via the
+  // intent route so the buy flow doesn't silently advance with no
+  // backing record. (Same pattern as buy-flow.tsx.)
+  async function startNonStripeIntent(
+    method: "wire" | "crypto" | "liquidity" | "finance",
+  ) {
+    if (submitting) return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      const res = await authedFetch("/api/share-purchase/intent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          boatSlug: boat.slug,
+          shares,
+          name: signerName.trim() || "RYDA member",
+          fundingMethod: method,
+        }),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j.error || `Reservation failed (${res.status}).`);
+      }
+      const j = await res.json();
+      window.location.href = `/share-purchase/${j.purchaseId}?intent=1`;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not record reservation.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   function handleSubmit() {
     if (fundingMethod === "card" || fundingMethod === "ach") {
       void startStripeCheckout(fundingMethod);
-    } else {
-      onContinue();
+      return;
+    }
+    if (
+      fundingMethod === "wire" ||
+      fundingMethod === "crypto" ||
+      fundingMethod === "liquidity" ||
+      fundingMethod === "finance"
+    ) {
+      void startNonStripeIntent(fundingMethod);
+      return;
     }
   }
 
@@ -735,7 +781,7 @@ function FundStep({
           </p>
           <p className="mt-3 text-sm text-ink-soft">
             Total charged: <span className="font-medium text-ink tabular-nums">{formatUSD(grandTotal)}</span>
-            {" "}(includes 5% acquisition fee, $1,500 closing fee).
+            {" "}(includes 5% acquisition fee).
           </p>
         </div>
       )}
@@ -756,7 +802,7 @@ function FundStep({
           </p>
           <p className="mt-3 text-sm text-ink-soft">
             Total charged: <span className="font-medium text-ink tabular-nums">{formatUSD(grandTotal)}</span>
-            {" "}(includes 5% acquisition fee, $1,500 closing fee).
+            {" "}(includes 5% acquisition fee).
           </p>
         </div>
       )}

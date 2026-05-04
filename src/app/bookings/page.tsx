@@ -1,22 +1,184 @@
+"use client";
+
+// /bookings — member's booking dashboard. Real query against the
+// `bookings` table for upcoming + past, joined with share_holdings
+// to compute the per-asset entitlement bars.
+//
+// Pre-launch this page rendered hardcoded "Ferrari + McLaren" rows
+// regardless of who was logged in. Now it reflects what the member
+// actually owns + has booked.
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { DemoBanner } from "@/components/demo-banner";
+import { supabase } from "@/lib/supabase";
+import { VEHICLES } from "@/lib/market-data";
+import { BOATS } from "@/lib/boat-data";
 
-export const metadata = { title: "Bookings — RYDA" };
+type Booking = {
+  id: string;
+  vehicle_symbol: string | null;
+  boat_slug: string | null;
+  mode: string;
+  start_date: string;
+  end_date: string;
+  days: number;
+  type: string;
+  handover: string;
+  notes: string | null;
+  status: string;
+};
 
-const UPCOMING = [
-  { vehicle: "McLaren 750S Spider", dates: "May 12 – May 14", duration: "2 days", status: "Confirmed", handover: "Self-pickup · Miami facility", miles: "200 / day" },
-  { vehicle: "Ferrari 296 GTB", dates: "Jun 5 – Jun 8", duration: "3 days", status: "Pending Proposal Coordinator", handover: "White-glove delivery", miles: "300 mi included" },
-  { vehicle: "Ferrari 296 GTB", dates: "Jul 18 – Jul 21", duration: "3 days", status: "Confirmed", handover: "White-glove delivery", miles: "200 / day" },
-];
+type Holding = {
+  vehicle_symbol: string | null;
+  boat_slug: string | null;
+};
 
-const PAST = [
-  { vehicle: "McLaren 750S Spider", dates: "Apr 8 – Apr 10", duration: "2 days", miles: "342" },
-  { vehicle: "Ferrari 296 GTB", dates: "Mar 22 – Mar 25", duration: "3 days", miles: "478" },
-  { vehicle: "Ferrari 296 GTB", dates: "Feb 14 – Feb 16", duration: "2 days", miles: "180" },
-];
+type AssetEntitlement = {
+  key: string;
+  name: string;
+  daysAllowance: number;
+  milesAllowance: number;
+  daysUsed: number;
+  milesUsed: number;
+};
+
+const ACTIVE_STATUSES = new Set(["pending", "confirmed", "in-progress"]);
+
+function assetLabel(b: Pick<Booking, "vehicle_symbol" | "boat_slug">): string {
+  if (b.vehicle_symbol) {
+    const v = VEHICLES.find((x) => x.symbol === b.vehicle_symbol);
+    return v ? `${v.year} ${v.name}` : `RYDA ${b.vehicle_symbol}`;
+  }
+  if (b.boat_slug) {
+    const x = BOATS.find((y) => y.slug === b.boat_slug);
+    return x ? `${x.year} ${x.name}` : `RYDA ${b.boat_slug.toUpperCase()}`;
+  }
+  return "RYDA share";
+}
 
 export default function BookingsPage() {
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [entitlements, setEntitlements] = useState<AssetEntitlement[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      const { data: userData } = await supabase.auth.getUser();
+      if (cancelled || !userData.user) {
+        setLoading(false);
+        return;
+      }
+      const userId = userData.user.id;
+
+      const [holdingsRes, bookingsRes] = await Promise.all([
+        supabase
+          .from("share_holdings")
+          .select("vehicle_symbol, boat_slug")
+          .eq("user_id", userId)
+          .is("transferred_at", null),
+        supabase
+          .from("bookings")
+          .select(
+            "id, vehicle_symbol, boat_slug, mode, start_date, end_date, days, type, handover, notes, status",
+          )
+          .eq("user_id", userId)
+          .order("start_date", { ascending: true }),
+      ]);
+      if (cancelled) return;
+
+      const holdings = (holdingsRes.data ?? []) as Holding[];
+      const allBookings = (bookingsRes.data ?? []) as Booking[];
+      setBookings(allBookings);
+
+      // Per-asset entitlement: 1 share = vehicle.daysPerYear days
+      // and milesPerYear miles. Sum allowance per asset over share
+      // count; sum used over current-year active bookings.
+      const yearStart = new Date(new Date().getFullYear(), 0, 1).getTime();
+      const yearEnd = new Date(new Date().getFullYear() + 1, 0, 1).getTime();
+
+      const sharesPerKey = new Map<string, number>();
+      for (const h of holdings) {
+        const key = h.vehicle_symbol
+          ? "v:" + h.vehicle_symbol
+          : "b:" + (h.boat_slug ?? "");
+        sharesPerKey.set(key, (sharesPerKey.get(key) ?? 0) + 1);
+      }
+
+      const usedPerKey = new Map<string, { days: number; miles: number }>();
+      for (const b of allBookings) {
+        if (!ACTIVE_STATUSES.has(b.status) && b.status !== "completed") {
+          continue;
+        }
+        const startMs = new Date(b.start_date).getTime();
+        if (startMs < yearStart || startMs >= yearEnd) continue;
+        const key = b.vehicle_symbol
+          ? "v:" + b.vehicle_symbol
+          : "b:" + (b.boat_slug ?? "");
+        const cur = usedPerKey.get(key) ?? { days: 0, miles: 0 };
+        cur.days += b.days ?? 0;
+        // Estimate miles ~= days * 100 (matches the booking-flow
+        // copy "X days · ~Y mi included"); a real telemetry feed
+        // would replace this when the cars/boats land.
+        cur.miles += (b.days ?? 0) * 100;
+        usedPerKey.set(key, cur);
+      }
+
+      const ents: AssetEntitlement[] = [];
+      for (const [key, shareCount] of sharesPerKey) {
+        let daysAllowance = 0;
+        let milesAllowance = 0;
+        let name = key;
+        if (key.startsWith("v:")) {
+          const v = VEHICLES.find((x) => x.symbol === key.slice(2));
+          if (!v) continue;
+          name = `${v.year} ${v.name}`;
+          daysAllowance = v.daysPerYear * shareCount;
+          milesAllowance = v.milesPerYear * shareCount;
+        } else {
+          const b = BOATS.find((x) => x.slug === key.slice(2));
+          if (!b) continue;
+          name = `${b.year} ${b.name}`;
+          daysAllowance = b.daysPerYear * shareCount;
+          // Boats use engine-hour allowances rather than miles;
+          // surfacing miles=0 here renders as a 0/0 bar that the
+          // UI renders gracefully. We can swap to engine hours in
+          // a follow-up once the boats catalog exposes that.
+          milesAllowance = 0;
+        }
+        const used = usedPerKey.get(key) ?? { days: 0, miles: 0 };
+        ents.push({
+          key,
+          name,
+          daysAllowance,
+          milesAllowance,
+          daysUsed: used.days,
+          milesUsed: used.miles,
+        });
+      }
+      setEntitlements(ents);
+      setLoading(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Split active bookings by past vs future from today.
+  const todayIso = new Date().toISOString().slice(0, 10);
+  const upcoming = bookings.filter(
+    (b) => b.end_date >= todayIso && ACTIVE_STATUSES.has(b.status),
+  );
+  const past = bookings
+    .filter((b) => b.end_date < todayIso || b.status === "completed")
+    .reverse();
+
   return (
     <>
       <SiteHeader />
@@ -29,27 +191,50 @@ export default function BookingsPage() {
             Bookings
           </p>
           <h1 className="mt-4 font-display text-4xl font-light text-ink sm:text-5xl">
-            Schedule across all your vehicles.
+            Schedule across all your shares.
           </h1>
         </div>
       </section>
 
-      {/* Entitlement bars */}
+      {/* Entitlement bars (real, from share_holdings + bookings) */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
           <h2 className="font-display text-xl text-ink">Your usage this year</h2>
-          <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
-            <Entitlement
-              vehicle="Ferrari 296 GTB"
-              days={{ used: 8, total: 64 }}
-              miles={{ used: 658, total: 6_400 }}
-            />
-            <Entitlement
-              vehicle="McLaren 750S Spider"
-              days={{ used: 6, total: 64 }}
-              miles={{ used: 432, total: 6_400 }}
-            />
-          </div>
+          {loading ? (
+            <p className="mt-4 text-sm text-mute">Loading…</p>
+          ) : entitlements.length === 0 ? (
+            <div className="mt-6 rounded-xl border border-dashed border-rule bg-cream-2/40 p-6 text-center">
+              <p className="text-sm text-ink-soft">
+                No co-ownership shares yet — entitlements show up here as soon
+                as your first share lands. Browse the fleet:
+              </p>
+              <div className="mt-4 flex flex-wrap justify-center gap-3">
+                <Link
+                  href="/markets"
+                  className="inline-flex h-10 items-center justify-center rounded-full bg-ink px-5 text-sm font-medium text-cream hover:bg-red"
+                >
+                  Cars
+                </Link>
+                <Link
+                  href="/boats/portfolio"
+                  className="inline-flex h-10 items-center justify-center rounded-full border border-rule px-5 text-sm font-medium text-ink hover:border-ink"
+                >
+                  Boats
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
+              {entitlements.map((e) => (
+                <Entitlement
+                  key={e.key}
+                  vehicle={e.name}
+                  days={{ used: e.daysUsed, total: e.daysAllowance }}
+                  miles={{ used: e.milesUsed, total: e.milesAllowance }}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -57,11 +242,7 @@ export default function BookingsPage() {
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-8 sm:px-10">
           <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex flex-wrap gap-2">
-              <Tag active>All vehicles</Tag>
-              <Tag>Ferrari 296</Tag>
-              <Tag>McLaren 750S</Tag>
-            </div>
+            <div />
             <Link
               href="/bookings/new"
               className="inline-flex h-11 items-center justify-center rounded-full bg-red px-6 text-sm font-medium text-cream transition-colors hover:bg-red-deep"
@@ -72,84 +253,60 @@ export default function BookingsPage() {
         </div>
       </section>
 
-      {/* Calendar mock */}
-      <section className="border-b border-rule">
-        <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
-          <h2 className="font-display text-xl text-ink">May 2026</h2>
-          <div className="mt-6 overflow-hidden rounded-2xl border border-rule bg-surface">
-            <div className="grid grid-cols-7 border-b border-rule text-xs font-medium uppercase tracking-wider text-mute">
-              {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
-                <div key={d} className="px-3 py-3 text-center">{d}</div>
-              ))}
-            </div>
-            <div className="grid grid-cols-7">
-              {Array.from({ length: 35 }, (_, i) => {
-                const dayNum = i - 4 + 1; // start month on Friday-ish
-                const valid = dayNum >= 1 && dayNum <= 31;
-                let badge: { color: string; label: string } | null = null;
-                if (valid) {
-                  if (dayNum === 12 || dayNum === 13) badge = { color: "#DC4747", label: "MC75" };
-                  else if (dayNum >= 1 && dayNum <= 1) badge = { color: "#9A9590", label: "Other" };
-                  else if (dayNum === 28 || dayNum === 29 || dayNum === 30) badge = { color: "#9A9590", label: "Other" };
-                }
-                return (
-                  <div
-                    key={i}
-                    className="aspect-square border-b border-r border-rule p-2 text-xs last:border-r-0 [&:nth-child(7n)]:border-r-0"
-                  >
-                    {valid && <span className="text-ink-soft">{dayNum}</span>}
-                    {badge && (
-                      <div className="mt-1">
-                        <span
-                          className="inline-block rounded px-1.5 py-0.5 text-[10px] font-medium text-cream"
-                          style={{ backgroundColor: badge.color }}
-                        >
-                          {badge.label}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-          <div className="mt-4 flex flex-wrap gap-4 text-xs text-mute">
-            <Legend color="#DC4747" label="Your booking" />
-            <Legend color="#9A9590" label="Other co-owner" />
-            <Legend color="#3A3A3E" label="Service / blackout" />
-            <Legend color="transparent" border label="Available" />
-          </div>
-        </div>
-      </section>
-
       {/* Upcoming */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
           <h2 className="font-display text-xl text-ink">Upcoming</h2>
-          <ul className="mt-6 space-y-3">
-            {UPCOMING.map((b, i) => (
-              <li key={i} className="rounded-xl border border-rule bg-surface p-6">
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <p className="font-display text-lg text-ink">{b.vehicle}</p>
-                  <span
-                    className={`rounded-full px-3 py-1 text-xs font-medium ${
-                      b.status === "Confirmed"
-                        ? "bg-ink/5 text-ink"
-                        : "bg-red/10 text-red"
-                    }`}
-                  >
-                    {b.status}
-                  </span>
-                </div>
-                <div className="mt-3 grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
-                  <Field label="Dates" value={b.dates} />
-                  <Field label="Duration" value={b.duration} />
-                  <Field label="Handover" value={b.handover} />
-                  <Field label="Mileage" value={b.miles} />
-                </div>
-              </li>
-            ))}
-          </ul>
+          {loading ? (
+            <p className="mt-4 text-sm text-mute">Loading…</p>
+          ) : upcoming.length === 0 ? (
+            <div className="mt-6 rounded-xl border border-dashed border-rule bg-cream-2/40 p-6 text-center text-sm text-ink-soft">
+              No upcoming bookings.
+            </div>
+          ) : (
+            <ul className="mt-6 space-y-3">
+              {upcoming.map((b) => (
+                <li
+                  key={b.id}
+                  className="rounded-xl border border-rule bg-surface p-6"
+                >
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <p className="font-display text-lg text-ink">{assetLabel(b)}</p>
+                    <span
+                      className={`rounded-full px-3 py-1 text-xs font-medium ${
+                        b.status === "confirmed"
+                          ? "bg-emerald-500/10 text-emerald-700"
+                          : b.status === "in-progress"
+                            ? "bg-amber-500/15 text-amber-700"
+                            : "bg-red/10 text-red"
+                      }`}
+                    >
+                      {b.status}
+                    </span>
+                  </div>
+                  <div className="mt-3 grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
+                    <Field
+                      label="Dates"
+                      value={`${fmt(b.start_date)} – ${fmt(b.end_date)}`}
+                    />
+                    <Field label="Duration" value={`${b.days} days`} />
+                    <Field
+                      label="Handover"
+                      value={
+                        b.handover === "delivery"
+                          ? "White-glove delivery"
+                          : "Self-pickup"
+                      }
+                    />
+                    <Field label="Type" value={b.type === "event" ? "Special event" : "Standard"} />
+                  </div>
+                  {b.notes && (
+                    <p className="mt-3 text-xs text-mute">{b.notes}</p>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </section>
 
@@ -157,35 +314,44 @@ export default function BookingsPage() {
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
           <h2 className="font-display text-xl text-ink">Past trips</h2>
-          <ul className="mt-6 divide-y divide-rule rounded-xl border border-rule bg-surface">
-            {PAST.map((p, i) => (
-              <li key={i} className="flex items-center justify-between px-5 py-4">
-                <div>
-                  <p className="text-sm font-medium text-ink">{p.vehicle}</p>
-                  <p className="mt-0.5 text-xs text-mute">{p.dates}</p>
-                </div>
-                <div className="text-right text-xs text-mute">
-                  <p>{p.duration}</p>
-                  <p className="mt-0.5 tabular-nums">{p.miles} mi</p>
-                </div>
-              </li>
-            ))}
-          </ul>
+          {loading ? (
+            <p className="mt-4 text-sm text-mute">Loading…</p>
+          ) : past.length === 0 ? (
+            <div className="mt-6 rounded-xl border border-dashed border-rule bg-cream-2/40 p-6 text-center text-sm text-ink-soft">
+              No past trips yet.
+            </div>
+          ) : (
+            <ul className="mt-6 divide-y divide-rule rounded-xl border border-rule bg-surface">
+              {past.map((p) => (
+                <li key={p.id} className="flex items-center justify-between px-5 py-4">
+                  <div>
+                    <p className="text-sm font-medium text-ink">{assetLabel(p)}</p>
+                    <p className="mt-0.5 text-xs text-mute">
+                      {fmt(p.start_date)} – {fmt(p.end_date)}
+                    </p>
+                  </div>
+                  <div className="text-right text-xs text-mute">
+                    <p>{p.days} days</p>
+                    <p className="mt-0.5">{p.status}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
-      </section>
-
-      {/* Footer note */}
-      <section className="bg-ink py-12 text-center text-cream/60">
-        <p className="text-xs">
-          Sample bookings dashboard. Live scheduling launches with the
-          Miami market in Q3 2026.{" "}
-          <Link href="/how-it-works" className="text-red hover:text-red-deep">
-            How booking works →
-          </Link>
-        </p>
       </section>
     </>
   );
+}
+
+// ── view primitives ────────────────────────────────────────────
+
+function fmt(iso: string): string {
+  if (!iso) return "";
+  return new Date(iso + "T00:00:00").toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
 }
 
 function Entitlement({
@@ -197,8 +363,8 @@ function Entitlement({
   days: { used: number; total: number };
   miles: { used: number; total: number };
 }) {
-  const dPct = (days.used / days.total) * 100;
-  const mPct = (miles.used / miles.total) * 100;
+  const dPct = days.total > 0 ? (days.used / days.total) * 100 : 0;
+  const mPct = miles.total > 0 ? (miles.used / miles.total) * 100 : 0;
   return (
     <div className="rounded-xl border border-rule bg-surface p-6">
       <p className="font-display text-base text-ink">{vehicle}</p>
@@ -230,57 +396,21 @@ function Bar({
         </span>
       </div>
       <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-rule">
-        <div className="h-full rounded-full bg-ink" style={{ width: `${pct}%` }} />
+        <div
+          className="h-full rounded-full bg-ink"
+          style={{ width: `${Math.min(100, pct)}%` }}
+        />
       </div>
     </div>
-  );
-}
-
-function Tag({
-  children,
-  active,
-}: {
-  children: React.ReactNode;
-  active?: boolean;
-}) {
-  return (
-    <button
-      className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-        active ? "bg-ink text-cream" : "bg-surface text-ink-soft hover:text-ink"
-      }`}
-    >
-      {children}
-    </button>
-  );
-}
-
-function Legend({
-  color,
-  label,
-  border,
-}: {
-  color: string;
-  label: string;
-  border?: boolean;
-}) {
-  return (
-    <span className="flex items-center gap-2">
-      <span
-        className="inline-block h-3 w-3 rounded-sm"
-        style={{
-          backgroundColor: color,
-          border: border ? "1px solid var(--ryda-rule)" : "none",
-        }}
-      />
-      {label}
-    </span>
   );
 }
 
 function Field({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-xs uppercase tracking-wider text-mute">{label}</p>
+      <p className="text-[10px] font-medium uppercase tracking-wider text-mute">
+        {label}
+      </p>
       <p className="mt-1 text-ink">{value}</p>
     </div>
   );

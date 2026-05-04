@@ -89,6 +89,21 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Re-fetch the overview after every admin action so the UI
+  // reflects the new state. Action components call reload() after
+  // a successful mutation.
+  async function reload() {
+    try {
+      const res = await authedFetch("/api/admin/overview");
+      if (res.status === 401 || res.status === 403) return;
+      if (!res.ok) throw new Error(`Lookup failed (${res.status}).`);
+      const j = (await res.json()) as Overview;
+      setData(j);
+    } catch (e) {
+      console.error("[admin · reload]", e);
+    }
+  }
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -165,7 +180,7 @@ export default function AdminPage() {
 
             <Section title="Recent share purchases">
               <Table
-                columns={["Status", "Asset", "Shares", "Total", "Buyer", "Updated"]}
+                columns={["Status", "Asset", "Shares", "Total", "Buyer", "Updated", ""]}
                 rows={data.recent.purchases.map((p) => [
                   pill(p.status),
                   String(p.vehicle_symbol ?? p.boat_slug ?? "—"),
@@ -173,26 +188,28 @@ export default function AdminPage() {
                   `$${(p.total_cents / 100).toLocaleString()}`,
                   p.email,
                   fmt(p.updated_at),
+                  <PurchaseActions key={`act-${p.id}`} purchase={p} reload={reload} />,
                 ])}
               />
             </Section>
 
             <Section title="Recent bookings">
               <Table
-                columns={["Status", "Asset", "Mode", "Dates", "Created"]}
+                columns={["Status", "Asset", "Mode", "Dates", "Created", ""]}
                 rows={data.recent.bookings.map((b) => [
                   pill(b.status),
                   String(b.vehicle_symbol ?? b.boat_slug ?? "—"),
                   b.mode,
                   `${b.start_date} → ${b.end_date}`,
                   fmt(b.created_at),
+                  <BookingActions key={`bact-${b.id}`} booking={b} reload={reload} />,
                 ])}
               />
             </Section>
 
             <Section title="Recent KYC">
               <Table
-                columns={["Status", "Failure", "User", "Updated"]}
+                columns={["Status", "Failure", "User", "Updated", ""]}
                 rows={data.recent.kyc.map((k) => [
                   pill(k.status),
                   k.failure_code
@@ -200,13 +217,14 @@ export default function AdminPage() {
                     : "—",
                   k.user_id.slice(0, 8),
                   fmt(k.updated_at),
+                  <KycActions key={`kact-${k.id}`} kyc={k} reload={reload} />,
                 ])}
               />
             </Section>
 
             <Section title="Recent share transfers">
               <Table
-                columns={["Status", "Asset", "Shares", "From → To", "Expires", "Updated"]}
+                columns={["Status", "Asset", "Shares", "From → To", "Expires", "Updated", ""]}
                 rows={data.recent.transfers.map((t) => [
                   pill(t.status),
                   String(t.vehicle_symbol ?? t.boat_slug ?? "—"),
@@ -214,6 +232,7 @@ export default function AdminPage() {
                   `${t.from_user_id.slice(0, 8)} → ${t.to_user_email}`,
                   fmt(t.expires_at),
                   fmt(t.updated_at),
+                  <TransferActions key={`tact-${t.id}`} transfer={t} reload={reload} />,
                 ])}
               />
             </Section>
@@ -339,4 +358,278 @@ function fmt(iso: string) {
     hour: "numeric",
     minute: "2-digit",
   });
+}
+
+// ── Admin action buttons ───────────────────────────────────────
+//
+// Each component prompts the admin for a confirmation note (via a
+// browser prompt() — minimal but functional; richer modal can
+// land later) and POSTs to the corresponding admin route. After
+// success, reload() re-fetches the overview so the row reflects
+// the new status without a manual refresh.
+
+function PurchaseActions({
+  purchase,
+  reload,
+}: {
+  purchase: Purchase;
+  reload: () => Promise<void>;
+}) {
+  const [busy, setBusy] = useState<string | null>(null);
+
+  async function call(path: string, label: string) {
+    if (busy) return;
+    const note = window.prompt(`${label}\n\nOptional ops note:`);
+    if (note === null) return; // cancel
+    setBusy(label);
+    try {
+      const res = await authedFetch(path, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ note }),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j.error || `Failed (${res.status}).`);
+      }
+      await reload();
+    } catch (e) {
+      window.alert(e instanceof Error ? e.message : "Action failed.");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  return (
+    <div className="flex flex-wrap gap-1">
+      {purchase.status === "pending" && (
+        <ActionBtn
+          onClick={() =>
+            call(`/api/admin/purchase/${purchase.id}/mark-paid`, "Mark paid")
+          }
+          busy={busy === "Mark paid"}
+        >
+          Mark paid
+        </ActionBtn>
+      )}
+      {purchase.status === "paid" && (
+        <ActionBtn
+          onClick={() =>
+            call(
+              `/api/share-purchase/${purchase.id}/resend-amendment`,
+              "Resend amendment",
+            )
+          }
+          busy={busy === "Resend amendment"}
+        >
+          Resend
+        </ActionBtn>
+      )}
+      {(purchase.status === "paid" || purchase.status === "pending") && (
+        <ActionBtn
+          tone="danger"
+          onClick={() =>
+            call(`/api/share-purchase/${purchase.id}/refund`, "Refund / cancel")
+          }
+          busy={busy === "Refund / cancel"}
+        >
+          Refund
+        </ActionBtn>
+      )}
+    </div>
+  );
+}
+
+function BookingActions({
+  booking,
+  reload,
+}: {
+  booking: Booking;
+  reload: () => Promise<void>;
+}) {
+  const [busy, setBusy] = useState(false);
+
+  async function cancel() {
+    if (busy) return;
+    if (
+      !window.confirm(
+        `Cancel booking on ${booking.vehicle_symbol ?? booking.boat_slug ?? "asset"} (${booking.start_date} → ${booking.end_date})?`,
+      )
+    )
+      return;
+    const note = window.prompt("Optional ops note:") ?? "";
+    setBusy(true);
+    try {
+      const res = await authedFetch(`/api/admin/booking/${booking.id}/cancel`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ note }),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j.error || `Failed (${res.status}).`);
+      }
+      await reload();
+    } catch (e) {
+      window.alert(e instanceof Error ? e.message : "Cancel failed.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (booking.status !== "pending" && booking.status !== "confirmed") {
+    return <span className="text-xs text-mute">—</span>;
+  }
+  return (
+    <ActionBtn tone="danger" onClick={cancel} busy={busy}>
+      Cancel
+    </ActionBtn>
+  );
+}
+
+function KycActions({
+  kyc,
+  reload,
+}: {
+  kyc: Kyc;
+  reload: () => Promise<void>;
+}) {
+  const [busy, setBusy] = useState<string | null>(null);
+
+  async function override(status: string, label: string) {
+    if (busy) return;
+    if (
+      !window.confirm(
+        `Manually flip KYC for user ${kyc.user_id.slice(0, 8)} → ${status}?`,
+      )
+    )
+      return;
+    const note = window.prompt("Optional ops note:") ?? "";
+    setBusy(label);
+    try {
+      const res = await authedFetch("/api/admin/kyc/override", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: kyc.user_id, status, note }),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j.error || `Failed (${res.status}).`);
+      }
+      await reload();
+    } catch (e) {
+      window.alert(e instanceof Error ? e.message : "Override failed.");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  return (
+    <div className="flex flex-wrap gap-1">
+      {kyc.status !== "verified" && (
+        <ActionBtn
+          onClick={() => override("verified", "verify")}
+          busy={busy === "verify"}
+        >
+          Force verify
+        </ActionBtn>
+      )}
+      {kyc.status !== "canceled" && (
+        <ActionBtn
+          tone="danger"
+          onClick={() => override("canceled", "cancel")}
+          busy={busy === "cancel"}
+        >
+          Cancel
+        </ActionBtn>
+      )}
+    </div>
+  );
+}
+
+function TransferActions({
+  transfer,
+  reload,
+}: {
+  transfer: Transfer;
+  reload: () => Promise<void>;
+}) {
+  const [busy, setBusy] = useState<string | null>(null);
+
+  async function ack(action: "approve" | "reject") {
+    if (busy) return;
+    if (
+      !window.confirm(
+        `${action === "approve" ? "APPROVE" : "REJECT"} transfer ${transfer.id.slice(0, 8)}?\n\nApproval moves the share to ${transfer.to_user_email}.`,
+      )
+    )
+      return;
+    const note = window.prompt("Required ops note:") ?? "";
+    if (!note) {
+      window.alert("Note required for transfer ack.");
+      return;
+    }
+    setBusy(action);
+    try {
+      const res = await authedFetch("/api/admin/transfer/ack", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ transferId: transfer.id, action, note }),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j.error || `Failed (${res.status}).`);
+      }
+      await reload();
+    } catch (e) {
+      window.alert(e instanceof Error ? e.message : "Ack failed.");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  if (transfer.status !== "pending_ryda_review") {
+    return <span className="text-xs text-mute">—</span>;
+  }
+  return (
+    <div className="flex flex-wrap gap-1">
+      <ActionBtn onClick={() => ack("approve")} busy={busy === "approve"}>
+        Approve
+      </ActionBtn>
+      <ActionBtn
+        tone="danger"
+        onClick={() => ack("reject")}
+        busy={busy === "reject"}
+      >
+        Reject
+      </ActionBtn>
+    </div>
+  );
+}
+
+function ActionBtn({
+  children,
+  onClick,
+  busy,
+  tone = "default",
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+  busy?: boolean;
+  tone?: "default" | "danger";
+}) {
+  const cls =
+    tone === "danger"
+      ? "border-red/40 text-red hover:bg-red hover:text-cream"
+      : "border-rule text-ink-soft hover:border-ink hover:text-ink";
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={busy}
+      className={`inline-flex h-7 items-center justify-center rounded-full border px-3 text-[11px] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${cls}`}
+    >
+      {busy ? "…" : children}
+    </button>
+  );
 }
