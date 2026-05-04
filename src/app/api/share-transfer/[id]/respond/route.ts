@@ -1,0 +1,184 @@
+// POST /api/share-transfer/[id]/respond
+//
+// Recipient action: accept or reject an incoming share-transfer
+// request. The recipient must be:
+//   - Signed in to a RYDA account
+//   - The named recipient (their auth email matches to_user_email)
+//
+// Body: { action: 'accept' | 'reject', note?: string }
+//
+// On accept:
+//   - Status flips to 'pending_ryda_review'
+//   - to_user_id is filled in with the recipient's auth.uid()
+//   - Recipient KYC must be 'verified' or accept is rejected with 409
+//
+// On reject:
+//   - Status flips to 'rejected'
+//
+// Final move (status → 'completed') happens via /admin acknowledge,
+// which actually updates share_holdings — it's intentionally not
+// in this route so legal review is enforced before the share moves.
+
+import { NextResponse, type NextRequest } from "next/server";
+import { requireSupabaseAdmin } from "@/lib/supabase-admin";
+import { getUserFromRequest } from "@/lib/api-auth";
+import { isAllowed, clientIp } from "@/lib/rate-limit";
+import { notifyTeam, emailLayout, escapeHtml } from "@/lib/notify";
+
+export const runtime = "nodejs";
+
+const RATE_LIMIT = 5;
+const RATE_WINDOW_MS = 60_000;
+
+export async function POST(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  const user = await getUserFromRequest(req);
+  if (!user) {
+    return NextResponse.json({ error: "Sign in required." }, { status: 401 });
+  }
+
+  if (
+    !isAllowed(
+      `xfer-resp:${user.id}:${clientIp(req)}`,
+      RATE_LIMIT,
+      RATE_WINDOW_MS,
+    )
+  ) {
+    return NextResponse.json(
+      { error: "Too many requests. Try again in a minute." },
+      { status: 429 },
+    );
+  }
+
+  let admin;
+  try {
+    admin = requireSupabaseAdmin();
+  } catch {
+    return NextResponse.json({ error: "Backend not configured." }, { status: 500 });
+  }
+
+  const { id: transferId } = await params;
+  const body = await req.json().catch(() => ({}));
+  const action =
+    body.action === "accept" ? "accept" : body.action === "reject" ? "reject" : null;
+  const note = typeof body.note === "string" ? body.note.slice(0, 500) : "";
+  if (!action) {
+    return NextResponse.json(
+      { error: "action must be 'accept' or 'reject'." },
+      { status: 400 },
+    );
+  }
+
+  // Look up the transfer + verify the caller is the named recipient.
+  const { data: xfer, error: xferErr } = await admin
+    .from("share_transfers")
+    .select(
+      "id, holding_id, vehicle_symbol, boat_slug, shares, from_user_id, to_user_email, to_user_id, status, expires_at, member_note",
+    )
+    .eq("id", transferId)
+    .maybeSingle();
+  if (xferErr || !xfer) {
+    return NextResponse.json({ error: "Transfer not found." }, { status: 404 });
+  }
+  if ((user.email ?? "").toLowerCase() !== xfer.to_user_email) {
+    // Don't reveal that the transfer exists for someone else.
+    return NextResponse.json({ error: "Transfer not found." }, { status: 404 });
+  }
+  if (xfer.status !== "requested") {
+    return NextResponse.json(
+      { error: `Transfer is already ${xfer.status}.` },
+      { status: 409 },
+    );
+  }
+  if (new Date(xfer.expires_at).getTime() < Date.now()) {
+    // Auto-expire on read so the row reflects reality going forward.
+    await admin
+      .from("share_transfers")
+      .update({ status: "expired", updated_at: new Date().toISOString() })
+      .eq("id", xfer.id)
+      .eq("status", "requested");
+    return NextResponse.json(
+      { error: "Transfer expired. Ask the sender to start a new one." },
+      { status: 410 },
+    );
+  }
+
+  if (action === "reject") {
+    await admin
+      .from("share_transfers")
+      .update({
+        status: "rejected",
+        to_user_id: user.id,
+        ryda_review_note: note || null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", xfer.id);
+
+    await notifyTeam({
+      subject: `Share-transfer rejected · ${xfer.id}`,
+      html: emailLayout(
+        "Transfer rejected",
+        `<p>Transfer <code>${escapeHtml(xfer.id)}</code> rejected by recipient
+        ${escapeHtml(user.email ?? "(no email)")}.</p>
+        ${note ? `<p>Reason: ${escapeHtml(note)}</p>` : ""}`,
+      ),
+    });
+    return NextResponse.json({ ok: true, status: "rejected" });
+  }
+
+  // Accept path: KYC must be verified before we'll progress.
+  const { data: kyc } = await admin
+    .from("kyc_verifications")
+    .select("status")
+    .eq("user_id", user.id)
+    .eq("status", "verified")
+    .order("created_at", { ascending: false })
+    .limit(1);
+  if (!kyc || kyc.length === 0) {
+    return NextResponse.json(
+      {
+        error:
+          "Complete identity verification before accepting a share transfer.",
+        kycRequired: true,
+      },
+      { status: 409 },
+    );
+  }
+
+  // Atomic compare-and-set: only flip 'requested' → 'pending_ryda_review'.
+  const claim = await admin
+    .from("share_transfers")
+    .update({
+      status: "pending_ryda_review",
+      to_user_id: user.id,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", xfer.id)
+    .eq("status", "requested")
+    .select("id")
+    .maybeSingle();
+
+  if (!claim.data) {
+    // Lost a race — someone else (the sender canceling? another
+    // tab clicking accept twice?) flipped it before us.
+    return NextResponse.json(
+      { error: "Transfer state changed; refresh and try again." },
+      { status: 409 },
+    );
+  }
+
+  await notifyTeam({
+    subject: `Share-transfer accepted · awaiting RYDA acknowledgment · ${xfer.id}`,
+    html: emailLayout(
+      "Transfer accepted, RYDA review needed",
+      `<p>Transfer <code>${escapeHtml(xfer.id)}</code> accepted by
+      ${escapeHtml(user.email ?? "(no email)")}. RYDA legal needs to
+      acknowledge before the share_holdings row moves. Open
+      /admin/transfers/${escapeHtml(xfer.id)} to act.</p>`,
+    ),
+  });
+
+  return NextResponse.json({ ok: true, status: "pending_ryda_review" });
+}

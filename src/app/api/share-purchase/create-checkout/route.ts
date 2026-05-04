@@ -168,7 +168,7 @@ export async function POST(req: NextRequest) {
     const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
     const existingPending = await admin
       .from("share_purchases")
-      .select("id, stripe_checkout_session_id")
+      .select("id, stripe_session_id")
       .eq("user_id", user.id)
       .eq("status", "pending")
       .eq(vehicleSymbol ? "vehicle_symbol" : "boat_slug", vehicleSymbol ?? boatSlug)
@@ -178,10 +178,10 @@ export async function POST(req: NextRequest) {
     if (
       existingPending.data &&
       existingPending.data.length > 0 &&
-      existingPending.data[0].stripe_checkout_session_id
+      existingPending.data[0].stripe_session_id
     ) {
       const existingSession = await stripe.checkout.sessions.retrieve(
-        existingPending.data[0].stripe_checkout_session_id,
+        existingPending.data[0].stripe_session_id,
       );
       if (existingSession.url && existingSession.status === "open") {
         return NextResponse.json({

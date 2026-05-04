@@ -8,7 +8,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
-import { VEHICLES, formatUSD } from "@/lib/market-data";
+import { VEHICLES } from "@/lib/market-data";
 import { BOATS } from "@/lib/boat-data";
 
 type Holding = {
@@ -91,16 +91,20 @@ export default function MembershipPage() {
         </p>
       </header>
 
-      {/* Tier ─────────────────────────────────────────── */}
+      {/* Tier — placeholder until membership_tiers table lands.
+          The /membership marketing page is the source of truth for
+          what each tier includes today; once members can actually
+          buy tiered subscriptions, this card reads from a real
+          subscriptions table. */}
       <section className="rounded-2xl border border-rule bg-surface p-6 sm:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-xs font-medium uppercase tracking-[0.2em] text-mute">
               Current tier
             </p>
-            <p className="mt-2 font-display text-3xl text-ink">RYDA Blue</p>
+            <p className="mt-2 font-display text-3xl text-ink">RYDA Core</p>
             <p className="mt-1 text-sm text-ink-soft">
-              $500/yr · Renews April 27, 2027
+              Free tier · Tiered membership opens with the Miami launch
             </p>
           </div>
           <div className="flex flex-col items-start gap-2 sm:items-end">
@@ -108,21 +112,15 @@ export default function MembershipPage() {
               href="/membership"
               className="inline-flex h-11 items-center justify-center rounded-full border border-ink bg-ink px-6 text-sm font-medium text-cream transition-colors hover:bg-red hover:border-red"
             >
-              Upgrade to Black
-            </Link>
-            <Link
-              href="/membership"
-              className="text-xs text-ink-soft hover:text-ink"
-            >
               Compare tiers →
             </Link>
           </div>
         </div>
         <ul className="mt-5 grid grid-cols-1 gap-2 text-sm text-ink-soft sm:grid-cols-2">
-          <Perk text="1 white-glove delivery / year" />
-          <Perk text="Booking lookahead: 90 days" />
-          <Perk text="Member events: monthly meetups" />
-          <Perk text="Priority on peak weekends" />
+          <Perk text="Co-own shares in any RYDA LLC" />
+          <Perk text="Book time on every asset you hold" />
+          <Perk text="Member-events invitations" />
+          <Perk text="Blue + Black tiers ship at Miami launch" />
         </ul>
       </section>
 
@@ -174,17 +172,18 @@ export default function MembershipPage() {
         </div>
       </section>
 
-      {/* Renewal / billing card ──────────────────────── */}
+      {/* Renewal / billing card — bridge copy until subscriptions
+          ship. Manage payment methods (cards, ACH) is a real flow
+          via Stripe Customer Portal. */}
       <section className="rounded-2xl border border-rule bg-surface p-6 sm:p-8">
-        <h2 className="font-display text-lg text-ink">Renewal & billing</h2>
-        <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <Stat label="Annual fee" value={formatUSD(500)} sub="RYDA Blue" />
-          <Stat label="Next renewal" value="Apr 27, 2027" sub="Auto-renews" />
-          <Stat label="Status" value="Active" sub="Paid through 2027" />
-        </div>
+        <h2 className="font-display text-lg text-ink">Billing</h2>
+        <p className="mt-1 text-xs text-mute">
+          Manage saved cards, default payment method, and download receipts in
+          the Stripe Customer Portal.
+        </p>
         <Link
           href="/account/payments"
-          className="mt-6 inline-flex text-xs font-medium text-red hover:text-red-deep"
+          className="mt-5 inline-flex h-11 items-center justify-center rounded-full bg-ink px-6 text-sm font-medium text-cream transition-colors hover:bg-red"
         >
           Manage payment methods →
         </Link>
@@ -202,12 +201,5 @@ function Perk({ text }: { text: string }) {
   );
 }
 
-function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
-  return (
-    <div className="rounded-xl border border-rule bg-cream-2/40 p-4">
-      <p className="text-xs uppercase tracking-wider text-mute">{label}</p>
-      <p className="mt-1 font-display text-xl text-ink">{value}</p>
-      {sub && <p className="text-xs text-mute">{sub}</p>}
-    </div>
-  );
-}
+// Stat helper retired with the hardcoded "Annual fee / Next renewal /
+// Status" trio. Will return when real subscriptions land.

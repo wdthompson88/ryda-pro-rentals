@@ -1,16 +1,22 @@
 "use client";
 
-// /account/payments — payment-method management. Stripe Customer
-// Portal is the right home for this once members have transacted; we
-// surface a one-click portal-open CTA + a placeholder list for now.
+// /account/payments — payment-method management. Stripe owns the UI
+// for saved cards / ACH / receipts via the Customer Portal; we open
+// it server-side as a member-scoped session so the user lands on a
+// PCI-compliant Stripe-hosted page with a one-click return.
 //
-// We deliberately don't render saved-card numbers in our own UI. The
-// Stripe Customer Portal handles add/remove/default + receipt PDFs +
-// dispute initiation, all PCI-DSS compliant out of the box. The
-// alternative — building card UI ourselves — burns engineering hours
-// and adds compliance scope for no member benefit.
+// We deliberately don't render saved-card numbers or receipt history
+// in our own UI. The Customer Portal handles add/remove/default,
+// receipt PDFs, and dispute initiation natively. Building that
+// ourselves would burn engineering hours and add PCI scope for no
+// member benefit.
+//
+// "Tax documents" stays a copy-only stub — K-1s ship in February of
+// the year following the first co-ownership tax year.
 
+import { useState } from "react";
 import Link from "next/link";
+import { authedFetch } from "@/lib/api-fetch";
 
 export default function PaymentsPage() {
   return (
@@ -29,63 +35,94 @@ export default function PaymentsPage() {
         </p>
       </header>
 
-      <Card title="Saved payment methods">
-        <ListRow
-          icon="$"
-          label="Visa ending 4729"
-          sub="Default · expires 09/28"
-          status="Active"
-        />
-        <ListRow
-          icon="🏦"
-          label="Bank ACH · Chase ••5512"
-          sub="Used for management fees"
-          status="Active"
-        />
-        <ListRow
-          icon="$"
-          label="Mastercard ending 1109"
-          sub="Backup"
-          status="Active"
-        />
-        <button
-          type="button"
-          disabled
-          className={`${btnSecondary} mt-4 cursor-not-allowed opacity-60`}
-        >
-          Open Stripe Customer Portal — wires at first transaction
-        </button>
-        <p className="mt-2 text-[11px] text-mute">
-          The portal session opens at billing.stripe.com via a one-time link
-          we generate from the server (no separate password). Add / remove /
-          set-default + receipt downloads happen there.
-        </p>
-      </Card>
-
-      <Card title="Recent receipts" hint="Last 5 charges. Full history in the portal.">
-        <ListRow icon="●" label="Q2 management fee · Ferrari 296" sub="Apr 1, 2026" status="$3,540" />
-        <ListRow icon="●" label="Q2 management fee · McLaren 750S" sub="Apr 1, 2026" status="$3,450" />
-        <ListRow icon="●" label="Annual membership · RYDA Blue" sub="Apr 27, 2026" status="$500" />
-        <ListRow icon="●" label="Co-ownership share · McLaren 750S" sub="Apr 13, 2026" status="$32,500" />
-        <ListRow icon="●" label="Co-ownership share · Ferrari 296" sub="Apr 13, 2026" status="$28,000" />
-      </Card>
-
-      <Card title="Tax documents" hint="K-1s and 1099-INTs from each LLC you co-own. Generated annually.">
-        <p className="text-sm text-mute">
-          No tax documents yet — your first K-1 ships in early 2027 (covering
-          2026). You'll get an email when it's available; downloads from{" "}
-          <Link href="/account/documents" className="text-red hover:text-red-deep">
-            Documents
-          </Link>
-          .
-        </p>
-      </Card>
+      <BillingPortalCard />
+      <TaxDocsCard />
     </div>
   );
 }
 
-const btnSecondary =
-  "inline-flex h-11 items-center justify-center rounded-full border border-rule bg-cream-2 px-6 text-sm font-medium text-ink transition-colors hover:border-red hover:text-red";
+// ── Billing portal launcher ────────────────────────────────────
+
+function BillingPortalCard() {
+  const [opening, setOpening] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function open() {
+    if (opening) return;
+    setOpening(true);
+    setError(null);
+    try {
+      const res = await authedFetch("/api/account/billing-portal", {
+        method: "POST",
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j.error || `Could not open portal (${res.status}).`);
+      }
+      const j = await res.json();
+      if (typeof j.url === "string") {
+        window.location.href = j.url;
+        return;
+      }
+      throw new Error("No portal URL returned.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not open portal.");
+      setOpening(false);
+    }
+  }
+
+  return (
+    <Card title="Manage payment methods + receipts">
+      <p className="text-sm text-ink-soft">
+        The Customer Portal opens at <code className="text-xs">billing.stripe.com</code>.
+        Add or remove cards, change your default payment method, and download
+        receipts for every charge. Your session is tied to your RYDA account —
+        no extra sign-in.
+      </p>
+      {error && (
+        <p className="rounded-xl border border-red/40 bg-red/5 px-4 py-3 text-sm text-red">
+          {error}
+        </p>
+      )}
+      <button
+        type="button"
+        onClick={open}
+        disabled={opening}
+        className={btnPrimary}
+      >
+        {opening ? "Opening…" : "Open Stripe Customer Portal"}
+      </button>
+      <p className="mt-2 text-[11px] text-mute">
+        Portal is generated fresh each time you click — links expire after one
+        use, so don't bookmark the destination.
+      </p>
+    </Card>
+  );
+}
+
+// ── Tax documents (informational stub) ────────────────────────
+
+function TaxDocsCard() {
+  return (
+    <Card
+      title="Tax documents"
+      hint="K-1 and 1099-INT, generated annually for each LLC."
+    >
+      <p className="text-sm text-mute">
+        Your first K-1 ships in February of the year following your first full
+        tax year of co-ownership. You'll get an email when it's ready;
+        downloads from{" "}
+        <Link href="/account/documents" className="text-red hover:text-red-deep">
+          Documents
+        </Link>
+        .
+      </p>
+    </Card>
+  );
+}
+
+const btnPrimary =
+  "inline-flex h-11 items-center justify-center rounded-full bg-ink px-6 text-sm font-medium text-cream transition-colors hover:bg-red disabled:cursor-not-allowed disabled:opacity-60";
 
 function Card({
   title,
@@ -100,32 +137,7 @@ function Card({
     <section className="rounded-2xl border border-rule bg-surface p-6 sm:p-8">
       <h2 className="font-display text-lg text-ink">{title}</h2>
       {hint && <p className="mt-1 max-w-xl text-xs text-mute">{hint}</p>}
-      <div className="mt-5 space-y-1">{children}</div>
+      <div className="mt-5 space-y-4">{children}</div>
     </section>
-  );
-}
-
-function ListRow({
-  icon,
-  label,
-  sub,
-  status,
-}: {
-  icon: string;
-  label: string;
-  sub: string;
-  status: string;
-}) {
-  return (
-    <div className="flex items-center gap-4 border-b border-rule py-3 last:border-b-0">
-      <span aria-hidden className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-cream-2 text-sm text-ink">
-        {icon}
-      </span>
-      <div className="flex-1">
-        <p className="text-sm font-medium text-ink">{label}</p>
-        <p className="text-xs text-mute">{sub}</p>
-      </div>
-      <p className="text-sm tabular-nums text-ink">{status}</p>
-    </div>
   );
 }

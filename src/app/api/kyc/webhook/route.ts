@@ -42,6 +42,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid signature." }, { status: 400 });
   }
 
+  // Event-id dedup (same pattern as the share-purchase webhook).
+  const dedup = await admin
+    .from("stripe_events")
+    .insert({ id: event.id, type: event.type, endpoint: "kyc" });
+  if (dedup.error) {
+    const code = (dedup.error as { code?: string }).code;
+    if (code === "23505") {
+      return NextResponse.json({ received: true, deduped: true });
+    }
+    console.warn("[kyc webhook] dedup insert failed (non-fatal)", dedup.error);
+  }
+
   // Only Identity events are interesting here.
   if (!event.type.startsWith("identity.verification_session.")) {
     return NextResponse.json({ received: true });

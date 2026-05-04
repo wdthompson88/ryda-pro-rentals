@@ -1,11 +1,12 @@
 "use client";
 
 // /account/notifications — preferences for what kinds of mail/SMS/
-// push the member gets. Persisted to auth.users.user_metadata so we
-// don't need a separate table. Each toggle saves on change (no
-// "Save" button) — small fields, low friction.
+// push the member gets. Persisted to public.user_profiles (RLS
+// scopes to user_id = auth.uid()). Each toggle saves on change with
+// a 250ms debounce — rapid clicks (e.g. flipping the digest cadence
+// off → daily → weekly while deciding) only fire one save.
 //
-// Defaults (also enforced if a key is missing from metadata):
+// Defaults (also enforced if a row hasn't been created yet):
 //   notif_email_digest      = "weekly"
 //   notif_sms_enabled       = false
 //   notif_push_enabled      = true
@@ -31,29 +32,29 @@ const DEFAULTS: Prefs = {
   notif_booking_updates: true,
 };
 
-function fromMeta(meta: Record<string, unknown> | undefined): Prefs {
-  if (!meta) return DEFAULTS;
-  const digest = meta.notif_email_digest;
+function fromRow(row: Record<string, unknown> | null | undefined): Prefs {
+  if (!row) return DEFAULTS;
+  const digest = row.notif_email_digest;
   return {
     notif_email_digest:
       digest === "off" || digest === "daily" || digest === "weekly"
         ? digest
         : DEFAULTS.notif_email_digest,
     notif_sms_enabled:
-      typeof meta.notif_sms_enabled === "boolean"
-        ? meta.notif_sms_enabled
+      typeof row.notif_sms_enabled === "boolean"
+        ? row.notif_sms_enabled
         : DEFAULTS.notif_sms_enabled,
     notif_push_enabled:
-      typeof meta.notif_push_enabled === "boolean"
-        ? meta.notif_push_enabled
+      typeof row.notif_push_enabled === "boolean"
+        ? row.notif_push_enabled
         : DEFAULTS.notif_push_enabled,
     notif_marketing_enabled:
-      typeof meta.notif_marketing_enabled === "boolean"
-        ? meta.notif_marketing_enabled
+      typeof row.notif_marketing_enabled === "boolean"
+        ? row.notif_marketing_enabled
         : DEFAULTS.notif_marketing_enabled,
     notif_booking_updates:
-      typeof meta.notif_booking_updates === "boolean"
-        ? meta.notif_booking_updates
+      typeof row.notif_booking_updates === "boolean"
+        ? row.notif_booking_updates
         : DEFAULTS.notif_booking_updates,
   };
 }
@@ -65,20 +66,35 @@ export default function NotificationsPage() {
   const [error, setError] = useState<string | null>(null);
   const [savedFlash, setSavedFlash] = useState(false);
 
+  // Load the user's user_profiles row (or fall back to DEFAULTS if
+  // the row hasn't been created yet — first save will upsert).
+  const userIdRef = useRef<string | null>(null);
   useEffect(() => {
     if (!supabase) {
       setLoading(false);
       return;
     }
     let cancelled = false;
-    supabase.auth.getUser().then(({ data }) => {
-      if (cancelled || !data.user) {
+    (async () => {
+      const { data: userData } = await supabase.auth.getUser();
+      if (cancelled || !userData.user) {
         setLoading(false);
         return;
       }
-      setPrefs(fromMeta(data.user.user_metadata));
+      userIdRef.current = userData.user.id;
+      const { data: row } = await supabase
+        .from("user_profiles")
+        .select(
+          "notif_email_digest, notif_sms_enabled, notif_push_enabled, notif_marketing_enabled, notif_booking_updates",
+        )
+        .eq("user_id", userData.user.id)
+        .maybeSingle();
+      if (cancelled) return;
+      const p = fromRow(row);
+      setPrefs(p);
+      latestPrefsRef.current = p;
       setLoading(false);
-    });
+    })();
     return () => {
       cancelled = true;
     };
@@ -94,12 +110,22 @@ export default function NotificationsPage() {
 
   async function flushSave() {
     if (!supabase) return;
+    const userId = userIdRef.current;
+    if (!userId) return;
     const next = latestPrefsRef.current;
     setSaving(true);
     setError(null);
     try {
-      // Merge — don't overwrite other metadata keys (full_name etc.).
-      const { error: err } = await supabase.auth.updateUser({ data: { ...next } });
+      // Upsert against user_profiles. Only touches notif_* columns
+      // so other profile fields (full_name, phone, etc.) aren't
+      // affected. RLS scopes both insert + update to user_id =
+      // auth.uid().
+      const { error: err } = await supabase
+        .from("user_profiles")
+        .upsert(
+          { user_id: userId, ...next },
+          { onConflict: "user_id" },
+        );
       if (err) throw err;
       setSavedFlash(true);
       setTimeout(() => setSavedFlash(false), 1800);
@@ -119,6 +145,15 @@ export default function NotificationsPage() {
       debounceRef.current = null;
     }, 250);
   }
+
+  // Clear pending debounce on unmount so React doesn't try to
+  // setSaving / setSavedFlash on an unmounted component (warning,
+  // not a crash, but worth fixing).
+  useEffect(() => {
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, []);
 
   function toggle<K extends keyof Prefs>(key: K, value: Prefs[K]) {
     return () => persist({ ...prefs, [key]: value });

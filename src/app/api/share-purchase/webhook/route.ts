@@ -60,6 +60,30 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid signature." }, { status: 400 });
   }
 
+  // Event-id dedup. The PRIMARY KEY conflict on stripe_events is the
+  // dedup signal: insert succeeds → first time seeing this event,
+  // proceed; insert fails with unique-violation → already processed,
+  // ack quietly. This is belt-and-suspenders alongside the status-
+  // guarded compare-and-sets below — Stripe's recommended pattern.
+  const dedup = await admin
+    .from("stripe_events")
+    .insert({
+      id: event.id,
+      type: event.type,
+      endpoint: "share-purchase",
+    });
+  if (dedup.error) {
+    // 23505 = unique_violation. Anything else is unexpected; log and
+    // continue rather than fail the webhook (a bad write here
+    // shouldn't cause Stripe to retry forever).
+    const code = (dedup.error as { code?: string }).code;
+    if (code === "23505") {
+      console.log("[stripe webhook] duplicate event, skipping", event.id, event.type);
+      return NextResponse.json({ received: true, deduped: true });
+    }
+    console.warn("[stripe webhook] dedup insert failed (non-fatal)", dedup.error);
+  }
+
   try {
     switch (event.type) {
       case "checkout.session.completed":
@@ -103,11 +127,20 @@ export async function POST(req: NextRequest) {
         // settlement event then arrives, we want to recover the
         // member's purchase rather than leave them stuck. (Stripe
         // doesn't formally guarantee event ordering across retries.)
+        // Capture the Stripe Customer id from the session so the
+        // billing portal route can mint a portal URL against the same
+        // customer later. Field is optional on the session.
+        const customerId =
+          typeof session.customer === "string"
+            ? session.customer
+            : session.customer?.id ?? null;
+
         const claim = await admin
           .from("share_purchases")
           .update({
             status: "paid",
             stripe_payment_intent_id: intentId,
+            stripe_customer_id: customerId,
             updated_at: new Date().toISOString(),
           })
           .eq("id", purchaseId)

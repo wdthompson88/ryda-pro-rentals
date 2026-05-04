@@ -3,6 +3,7 @@ import { Inter, Fraunces } from "next/font/google";
 import "./globals.css";
 import { SiteFooter } from "@/components/site-footer";
 import { CookieBanner } from "@/components/cookie-banner";
+import { AnalyticsBootstrap } from "@/components/analytics-bootstrap";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -79,6 +80,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
       </head>
       <body className="min-h-full flex flex-col bg-cream text-ink">
+        <AnalyticsBootstrap />
         <div className="flex-1">{children}</div>
         <SiteFooter />
         <CookieBanner />

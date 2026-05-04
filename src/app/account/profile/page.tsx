@@ -46,10 +46,13 @@ const EMPTY: Profile = {
   country: "US",
 };
 
-function fromMetadata(meta: Record<string, unknown> | undefined): Profile {
-  if (!meta) return EMPTY;
+// Coerce a row from the user_profiles table into the form shape. Nulls
+// from the DB become empty strings so the controlled inputs don't
+// flip from controlled to uncontrolled.
+function fromRow(row: Record<string, unknown> | null | undefined): Profile {
+  if (!row) return EMPTY;
   const get = (k: string) =>
-    typeof meta[k] === "string" ? (meta[k] as string) : "";
+    typeof row[k] === "string" ? (row[k] as string) : "";
   return {
     full_name: get("full_name"),
     preferred_name: get("preferred_name"),
@@ -73,24 +76,38 @@ export default function ProfilePage() {
   const [savedFlash, setSavedFlash] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Load from Supabase auth on mount.
+  // Load from auth (for email) + user_profiles row on mount. The row
+  // is lazily created on first save (upsert), so a brand-new member
+  // sees EMPTY here until they fill it in.
   useEffect(() => {
     if (!supabase) {
       setLoading(false);
       return;
     }
     let cancelled = false;
-    supabase.auth.getUser().then(({ data }) => {
-      if (cancelled || !data.user) {
+    (async () => {
+      const { data: userData } = await supabase.auth.getUser();
+      if (cancelled || !userData.user) {
         setLoading(false);
         return;
       }
-      setEmail(data.user.email ?? "");
-      const p = fromMetadata(data.user.user_metadata);
+      setEmail(userData.user.email ?? "");
+
+      // RLS lets the user read exactly their own row; .maybeSingle()
+      // returns null when the row hasn't been created yet.
+      const { data: row } = await supabase
+        .from("user_profiles")
+        .select(
+          "full_name, preferred_name, phone, date_of_birth, address_line1, address_line2, city, state, postal_code, country",
+        )
+        .eq("user_id", userData.user.id)
+        .maybeSingle();
+      if (cancelled) return;
+      const p = fromRow(row);
       setInitial(p);
       setForm(p);
       setLoading(false);
-    });
+    })();
     return () => {
       cancelled = true;
     };
@@ -108,15 +125,39 @@ export default function ProfilePage() {
     setError(null);
     setSavedFlash(false);
     try {
-      const { data, error: err } = await supabase.auth.updateUser({
-        data: { ...form },
-      });
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData.user) throw new Error("Sign in required.");
+
+      // Upsert against user_profiles. RLS scopes both insert + update
+      // to user_id = auth.uid(); the same call handles "first save"
+      // and "edit existing." Empty strings are stored as NULL via the
+      // ?? null coercion so blank-out behaves predictably.
+      const payload = {
+        user_id: userData.user.id,
+        full_name: form.full_name || null,
+        preferred_name: form.preferred_name || null,
+        phone: form.phone || null,
+        date_of_birth: form.date_of_birth || null,
+        address_line1: form.address_line1 || null,
+        address_line2: form.address_line2 || null,
+        city: form.city || null,
+        state: form.state || null,
+        postal_code: form.postal_code || null,
+        country: form.country || "US",
+      };
+      const { data: row, error: err } = await supabase
+        .from("user_profiles")
+        .upsert(payload, { onConflict: "user_id" })
+        .select(
+          "full_name, preferred_name, phone, date_of_birth, address_line1, address_line2, city, state, postal_code, country",
+        )
+        .single();
       if (err) throw err;
-      const updated = fromMetadata(data.user?.user_metadata);
+
+      const updated = fromRow(row);
       setInitial(updated);
       setForm(updated);
       setSavedFlash(true);
-      // Clear the flash after a few seconds so the page settles.
       setTimeout(() => setSavedFlash(false), 3000);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save profile.");

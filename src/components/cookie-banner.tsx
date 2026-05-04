@@ -40,6 +40,14 @@ export function CookieBanner() {
       // Best-effort persistence, banner will re-appear next visit.
     }
     setConsent(choice);
+    // Storage events don't fire in the same tab that wrote the
+    // value. Emit a custom event so AnalyticsBootstrap can pick up
+    // the consent flip immediately in this tab.
+    try {
+      window.dispatchEvent(new Event("ryda-consent-change"));
+    } catch {
+      // Older browsers / non-window contexts — safe to ignore.
+    }
   }
 
   // Avoid SSR/hydration mismatch, render nothing until we've checked

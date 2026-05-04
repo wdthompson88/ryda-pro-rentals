@@ -1,104 +1,112 @@
 "use client";
 
-// /account/documents — every signed agreement, insurance certificate,
-// and tax form the member has on file. Real OAs / MSAs / Subscription
-// Agreements come from llc_amendments + document_signatures tables;
-// insurance certs and K-1s are uploaded by ops.
+// /account/documents — every signed agreement, generated amendment,
+// and KYC summary the member has on file.
 //
-// Today's view is a stub list ordered by category. Live wiring comes
-// when each file is actually generated/uploaded.
+// Real wiring:
+//   - llc_amendments rows (one per generated amendment / welcome
+//     packet PDF; emailed to the buyer at checkout completion)
+//   - document_signatures rows (signed OA / MSA / Subscription
+//     Agreement requests, populated by Dropbox Sign webhook when
+//     templates are configured)
+//   - kyc_verifications row (the redacted summary of the Stripe
+//     Identity check)
+//
+// Stub categories:
+//   - Insurance certificates — populated when ops uploads them per LLC
+//   - Tax forms (K-1 / 1099-INT) — generated annually
+//
+// Download buttons are present but no-op'd until a Supabase Storage
+// path is wired (separate effort — out of scope for this pass).
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { supabase } from "@/lib/supabase";
 
-type Category = {
-  title: string;
-  hint: string;
-  docs: { name: string; sub: string; status: "available" | "pending" | "soon" }[];
+type Amendment = {
+  id: string;
+  document_type: string;
+  vehicle_symbol: string | null;
+  boat_slug: string | null;
+  member_name: string;
+  emailed: boolean;
+  email_attempted_at: string | null;
+  created_at: string;
 };
 
-const CATEGORIES: Category[] = [
-  {
-    title: "Co-ownership agreements",
-    hint: "Signed at the time of share purchase. One set per LLC.",
-    docs: [
-      {
-        name: "Operating Agreement · RYDA F296 LLC",
-        sub: "Signed Apr 13, 2026",
-        status: "available",
-      },
-      {
-        name: "Management Services Agreement · RYDA F296 LLC",
-        sub: "Signed Apr 13, 2026",
-        status: "available",
-      },
-      {
-        name: "Subscription Agreement · RYDA F296 LLC",
-        sub: "Signed Apr 13, 2026",
-        status: "available",
-      },
-      {
-        name: "Member-register Amendment · RYDA F296 LLC",
-        sub: "Generated Apr 13, 2026",
-        status: "available",
-      },
-      {
-        name: "Operating Agreement · RYDA MC75 LLC",
-        sub: "Signed Apr 13, 2026",
-        status: "available",
-      },
-      {
-        name: "Management Services Agreement · RYDA MC75 LLC",
-        sub: "Signed Apr 13, 2026",
-        status: "available",
-      },
-    ],
-  },
-  {
-    title: "Insurance certificates",
-    hint: "One per LLC. Updated when coverage renews.",
-    docs: [
-      {
-        name: "Certificate of Insurance · Ferrari 296 GTB",
-        sub: "Term: Sep 2026 – Sep 2027",
-        status: "available",
-      },
-      {
-        name: "Certificate of Insurance · McLaren 750S Spider",
-        sub: "Term: Aug 2026 – Aug 2027",
-        status: "available",
-      },
-    ],
-  },
-  {
-    title: "Tax forms",
-    hint: "K-1 and 1099-INT, generated annually for each LLC.",
-    docs: [
-      {
-        name: "K-1 · RYDA F296 LLC · 2026",
-        sub: "Available February 2027",
-        status: "soon",
-      },
-      {
-        name: "K-1 · RYDA MC75 LLC · 2026",
-        sub: "Available February 2027",
-        status: "soon",
-      },
-    ],
-  },
-  {
-    title: "Identity",
-    hint: "Stripe Identity keeps a redacted summary; we don't store the documents themselves.",
-    docs: [
-      {
-        name: "KYC verification summary",
-        sub: "Verified Apr 13, 2026 · Stripe Identity",
-        status: "available",
-      },
-    ],
-  },
-];
+type DocumentSignature = {
+  id: string;
+  document_type: string;
+  status: string;
+  signed_at: string | null;
+  created_at: string;
+  // Joined from share_purchases via the FK relationship. Supabase
+  // returns related rows as an array even for to-one relationships;
+  // we always read [0]. Typed as an array to keep TS happy with the
+  // generated row shape.
+  share_purchases:
+    | Array<{ vehicle_symbol: string | null; boat_slug: string | null }>
+    | null;
+};
+
+type KycRow = {
+  status: string;
+  updated_at: string;
+};
+
+const DOC_LABEL: Record<string, string> = {
+  member_register_amendment: "Member-register amendment",
+  welcome_packet: "Welcome packet",
+  operating_agreement_signed: "Operating Agreement (signed)",
+  operating_agreement: "Operating Agreement",
+  management_services_agreement: "Management Services Agreement",
+  subscription_agreement: "Subscription Agreement",
+};
 
 export default function DocumentsPage() {
+  const [amendments, setAmendments] = useState<Amendment[]>([]);
+  const [signatures, setSignatures] = useState<DocumentSignature[]>([]);
+  const [kyc, setKyc] = useState<KycRow | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      const [amRes, sigRes, kycRes] = await Promise.all([
+        supabase
+          .from("llc_amendments")
+          .select(
+            "id, document_type, vehicle_symbol, boat_slug, member_name, emailed, email_attempted_at, created_at",
+          )
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("document_signatures")
+          .select(
+            "id, document_type, status, signed_at, created_at, share_purchases(vehicle_symbol, boat_slug)",
+          )
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("kyc_verifications")
+          .select("status, updated_at")
+          .order("updated_at", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+      ]);
+      if (cancelled) return;
+      setAmendments((amRes.data as Amendment[]) ?? []);
+      setSignatures((sigRes.data as DocumentSignature[]) ?? []);
+      setKyc(kycRes.data as KycRow | null);
+      setLoading(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <div className="space-y-8">
       <header>
@@ -109,40 +117,133 @@ export default function DocumentsPage() {
           Everything signed, on file.
         </h1>
         <p className="mt-2 max-w-2xl text-sm text-ink-soft">
-          Co-ownership agreements, insurance certificates, tax forms, and
-          identity verification summaries — all in one place. Downloads are
-          links to the file in our document storage; the original signed
-          PDFs live with Dropbox Sign.
+          Co-ownership agreements, generated amendments, KYC verification, and
+          (eventually) insurance certificates and tax forms — all in one place.
+          Signed PDFs live with Dropbox Sign; amendments are stored long-term.
         </p>
       </header>
 
-      {CATEGORIES.map((c) => (
-        <section
-          key={c.title}
-          className="rounded-2xl border border-rule bg-surface p-6 sm:p-8"
-        >
-          <h2 className="font-display text-lg text-ink">{c.title}</h2>
-          <p className="mt-1 text-xs text-mute">{c.hint}</p>
-          <ul className="mt-5 divide-y divide-rule">
-            {c.docs.map((d) => (
-              <li
-                key={d.name}
-                className="flex items-center justify-between gap-4 py-3"
-              >
-                <div>
-                  <p className="text-sm font-medium text-ink">{d.name}</p>
-                  <p className="text-xs text-mute">{d.sub}</p>
-                </div>
-                <DocStatus status={d.status} />
-              </li>
-            ))}
-          </ul>
-        </section>
-      ))}
+      {/* Co-ownership agreements (Dropbox Sign) ───────────── */}
+      <Section
+        title="Co-ownership agreements"
+        hint="Operating Agreement, MSA, and Subscription Agreement signed at the time of share purchase."
+      >
+        {loading ? (
+          <Empty>Loading…</Empty>
+        ) : signatures.length === 0 ? (
+          <Empty>
+            No agreements on file yet. Each share purchase mints one
+            Operating Agreement, one Management Services Agreement, and one
+            Subscription Agreement.
+          </Empty>
+        ) : (
+          <DocList
+            rows={signatures.map((s) => {
+              const linked = s.share_purchases?.[0] ?? null;
+              return {
+                key: s.id,
+                name: docLabel(
+                  s.document_type,
+                  linked?.vehicle_symbol ?? null,
+                  linked?.boat_slug ?? null,
+                ),
+                sub: s.signed_at
+                  ? `Signed ${formatDate(s.signed_at)}`
+                  : `${capitalize(s.status)} · ${formatDate(s.created_at)}`,
+                status: s.status === "signed" ? "available" : "pending",
+              };
+            })}
+          />
+        )}
+      </Section>
+
+      {/* Member-register amendments (server-rendered PDFs) ─── */}
+      <Section
+        title="Member-register amendments"
+        hint="Each share purchase generates an amendment to the LLC's Operating Agreement that records you as a member. We email a copy at the time of purchase and keep one here for re-download."
+      >
+        {loading ? (
+          <Empty>Loading…</Empty>
+        ) : amendments.length === 0 ? (
+          <Empty>
+            No amendments yet. They appear here automatically once a share
+            purchase is paid + fulfilled.
+          </Empty>
+        ) : (
+          <DocList
+            rows={amendments.map((a) => ({
+              key: a.id,
+              name: docLabel(a.document_type, a.vehicle_symbol, a.boat_slug),
+              sub: a.emailed
+                ? `Emailed ${formatDate(a.email_attempted_at ?? a.created_at)}`
+                : a.email_attempted_at
+                  ? `Email pending · ${formatDate(a.email_attempted_at)}`
+                  : `Generated ${formatDate(a.created_at)}`,
+              status: "available",
+            }))}
+          />
+        )}
+      </Section>
+
+      {/* Identity (KYC summary) ─────────────────────────── */}
+      <Section
+        title="Identity"
+        hint="Stripe Identity keeps a redacted summary; we don't store the documents themselves."
+      >
+        {loading ? (
+          <Empty>Loading…</Empty>
+        ) : !kyc ? (
+          <Empty>
+            No verification on file.{" "}
+            <Link
+              href="/account/verification"
+              className="text-red hover:text-red-deep"
+            >
+              Start KYC →
+            </Link>
+          </Empty>
+        ) : (
+          <DocList
+            rows={[
+              {
+                key: "kyc",
+                name: "KYC verification summary",
+                sub: `${capitalize(kyc.status)} · ${formatDate(kyc.updated_at)} · Stripe Identity`,
+                status: kyc.status === "verified" ? "available" : "pending",
+              },
+            ]}
+          />
+        )}
+      </Section>
+
+      {/* Insurance certificates — stub */}
+      <Section
+        title="Insurance certificates"
+        hint="One certificate of insurance per LLC. Updated when coverage renews."
+      >
+        <Empty>
+          Insurance certificates appear here when ops uploads them. Coming with
+          the Miami launch.
+        </Empty>
+      </Section>
+
+      {/* Tax forms — stub */}
+      <Section
+        title="Tax forms"
+        hint="K-1 and 1099-INT, generated annually for each LLC you co-own."
+      >
+        <Empty>
+          Your first K-1 ships in February of the year following your first
+          full tax year of co-ownership.
+        </Empty>
+      </Section>
 
       <p className="text-xs text-mute">
         Need a fresh copy of an agreement?{" "}
-        <Link href="/contact?type=Documents" className="text-red hover:text-red-deep">
+        <Link
+          href="/contact?type=Documents"
+          className="text-red hover:text-red-deep"
+        >
           Contact RYDA legal
         </Link>{" "}
         and we'll re-send the signed PDF directly.
@@ -151,21 +252,90 @@ export default function DocumentsPage() {
   );
 }
 
-function DocStatus({ status }: { status: "available" | "pending" | "soon" }) {
-  if (status === "available") {
-    return (
-      <button
-        type="button"
-        disabled
-        className="inline-flex h-9 items-center justify-center rounded-full border border-rule bg-cream-2 px-4 text-xs font-medium text-ink transition-colors hover:border-red hover:text-red disabled:cursor-not-allowed disabled:opacity-60"
-      >
-        Download → ships at launch
-      </button>
-    );
-  }
+// ── helpers ────────────────────────────────────────────────────
+
+function docLabel(
+  type: string,
+  vehicleSymbol: string | null,
+  boatSlug: string | null,
+): string {
+  const base = DOC_LABEL[type] ?? capitalize(type.replace(/_/g, " "));
+  const llc = vehicleSymbol
+    ? `RYDA ${vehicleSymbol} LLC`
+    : boatSlug
+      ? `RYDA ${boatSlug.toUpperCase()} LLC`
+      : null;
+  return llc ? `${base} · ${llc}` : base;
+}
+
+function capitalize(s: string): string {
+  return s ? s[0].toUpperCase() + s.slice(1) : s;
+}
+
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+// ── view primitives ────────────────────────────────────────────
+
+function Section({
+  title,
+  hint,
+  children,
+}: {
+  title: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
   return (
-    <span className="text-xs text-mute">
-      {status === "soon" ? "Coming soon" : "Pending"}
-    </span>
+    <section className="rounded-2xl border border-rule bg-surface p-6 sm:p-8">
+      <h2 className="font-display text-lg text-ink">{title}</h2>
+      {hint && <p className="mt-1 max-w-xl text-xs text-mute">{hint}</p>}
+      <div className="mt-5">{children}</div>
+    </section>
+  );
+}
+
+function Empty({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="rounded-xl border border-dashed border-rule bg-cream-2/40 p-5 text-center text-sm text-ink-soft">
+      {children}
+    </div>
+  );
+}
+
+type DocRow = {
+  key: string;
+  name: string;
+  sub: string;
+  status: "available" | "pending";
+};
+
+function DocList({ rows }: { rows: DocRow[] }) {
+  return (
+    <ul className="divide-y divide-rule">
+      {rows.map((d) => (
+        <li
+          key={d.key}
+          className="flex items-center justify-between gap-4 py-3"
+        >
+          <div>
+            <p className="text-sm font-medium text-ink">{d.name}</p>
+            <p className="text-xs text-mute">{d.sub}</p>
+          </div>
+          {d.status === "available" ? (
+            <span className="inline-flex h-9 items-center justify-center rounded-full border border-rule bg-cream-2 px-4 text-xs font-medium text-ink-soft">
+              Download — ships at launch
+            </span>
+          ) : (
+            <span className="text-xs text-mute">Pending</span>
+          )}
+        </li>
+      ))}
+    </ul>
   );
 }
