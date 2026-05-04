@@ -19,12 +19,12 @@ reads more luxury; the boxed treatment is more accessible). Apply it
 to both pages and any future auth flows.
 
 ### 2. /inside still references a non-existent domain [S]
-- `inside/page.tsx:74` — fake browser chrome captioned `ryda.app · /portfolio`.
+- `inside/page.tsx:74` — fake browser chrome captioned `ryda.pro · /portfolio`.
 
-`ryda.app` doesn't exist and `/portfolio` is the public sample-data
+`ryda.pro` doesn't exist and `/portfolio` is the public sample-data
 demo, not a real product surface. To a $150K buyer this reads as a
 half-built mock. Replace with the real production domain (after
-`ryda.com` is registered) and a real route like `/account`, OR remove
+`ryda.pro` is registered) and a real route like `/account`, OR remove
 the chrome entirely and replace with a static brand-card mockup.
 
 ### 3. /account/membership ships placeholder tier card [S]

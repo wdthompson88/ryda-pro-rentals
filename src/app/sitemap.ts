@@ -69,13 +69,13 @@ const PUBLIC_ROUTES = [
 
 
 // SEO: when NEXT_PUBLIC_SITE_URL is unset (e.g. preview branches), we
-// fall back to "https://ryda.com" so search engines indexing a
+// fall back to "https://ryda.pro" so search engines indexing a
 // preview deploy don't pollute the canonical URL with a Vercel
 // preview hostname. The ryda-web-teal.vercel.app fallback was a
-// pre-domain placeholder; once ryda.com is registered + DNS'd, the
+// pre-domain placeholder; once ryda.pro is registered + DNS'd, the
 // env var on production should match the same default and this
 // fallback only ever applies to preview / local dev.
-const SITE_URL_DEFAULT = "https://ryda.com";
+const SITE_URL_DEFAULT = "https://ryda.pro";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? SITE_URL_DEFAULT;

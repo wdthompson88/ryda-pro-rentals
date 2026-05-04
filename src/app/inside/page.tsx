@@ -75,7 +75,7 @@ export default function InsidePage() {
                 <span className="h-2.5 w-2.5 rounded-full bg-mute/60" aria-hidden />
                 <span className="h-2.5 w-2.5 rounded-full bg-mute/40" aria-hidden />
                 <p className="ml-3 text-[11px] font-medium uppercase tracking-[0.18em] text-mute">
-                  ryda.com · /account
+                  ryda.pro · /account
                 </p>
               </div>
               {/* Body */}
@@ -179,7 +179,7 @@ export default function InsidePage() {
               <div className="overflow-hidden rounded-2xl border border-rule bg-surface shadow-sm">
                 <div className="border-b border-rule bg-cream-2 px-5 py-3">
                   <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-mute">
-                    ryda.app · /bookings · {f296.name}
+                    ryda.pro · /bookings · {f296.name}
                   </p>
                 </div>
                 <div className="p-6">
@@ -245,7 +245,7 @@ export default function InsidePage() {
               <div className="overflow-hidden rounded-2xl border border-rule bg-surface shadow-sm">
                 <div className="border-b border-rule bg-cream-2 px-5 py-3">
                   <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-mute">
-                    ryda.app · /my-cars/{f296.symbol.toLowerCase()}
+                    ryda.pro · /my-cars/{f296.symbol.toLowerCase()}
                   </p>
                 </div>
                 <div className="grid grid-cols-2 divide-x divide-rule sm:grid-cols-4">
@@ -329,7 +329,7 @@ export default function InsidePage() {
               <div className="overflow-hidden rounded-2xl border border-rule bg-surface shadow-sm">
                 <div className="border-b border-rule bg-cream-2 px-5 py-3">
                   <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-mute">
-                    ryda.app · /documents
+                    ryda.pro · /documents
                   </p>
                 </div>
                 <ul className="divide-y divide-rule">

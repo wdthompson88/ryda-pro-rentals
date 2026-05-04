@@ -31,7 +31,7 @@ export default function CookiesPage() {
         },
         {
           heading: "6. Contact",
-          body: "Email privacy@ryda.com with any cookie-related questions.",
+          body: "Email privacy@ryda.pro with any cookie-related questions.",
         },
       ]}
     />

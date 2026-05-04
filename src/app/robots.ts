@@ -4,7 +4,7 @@ export default function robots(): MetadataRoute.Robots {
   // SEO note: same as sitemap.ts — fallback is the canonical
   // production domain so preview deploys don't leak the Vercel
   // hostname into robots.txt sitemap reference.
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ryda.com";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ryda.pro";
 
   return {
     rules: [

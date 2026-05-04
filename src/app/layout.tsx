@@ -24,14 +24,14 @@ const fraunces = Fraunces({
 // canonical public domain, NOT the per-deployment URL like
 // `ryda-xxxxxx-moocow4844s-projects.vercel.app`, which is gated by
 // Vercel deployment protection and unreachable to OG scrapers.
-// Set NEXT_PUBLIC_SITE_URL on Vercel once a custom domain (ryda.com)
+// Set NEXT_PUBLIC_SITE_URL on Vercel once a custom domain (ryda.pro)
 // is wired up.
-// Default to the canonical production domain — once ryda.com is
+// Default to the canonical production domain — once ryda.pro is
 // registered + DNS'd, NEXT_PUBLIC_SITE_URL on production should
 // match this same value, so this fallback only applies to preview /
 // local dev. Pre-launch, set NEXT_PUBLIC_SITE_URL to the actual
 // preview URL to avoid OG scrapers fetching a non-existent domain.
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ryda.com";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ryda.pro";
 
 export const metadata: Metadata = {
   title: "RYDA — Supercar co-ownership and rentals",

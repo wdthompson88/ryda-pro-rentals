@@ -59,7 +59,7 @@ export default function TermsPage() {
         },
         {
           heading: "13. Contact",
-          body: "RYDA LLC, Miami, FL. Email: legal@ryda.com.",
+          body: "RYDA LLC, Miami, FL. Email: legal@ryda.pro.",
         },
       ]}
     />

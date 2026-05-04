@@ -4,7 +4,7 @@ const apiKey = process.env.RESEND_API_KEY;
 const resend = apiKey ? new Resend(apiKey) : null;
 
 // Sender + recipient are configured via env vars so production uses a verified
-// ryda.com domain sender and a team alias (e.g. team@ryda.com). In dev or
+// ryda.pro domain sender and a team alias (e.g. team@ryda.pro). In dev or
 // when env vars are unset, calls fall back to a no-op so we never accidentally
 // route real form submissions to a personal inbox.
 const FROM = process.env.RYDA_NOTIFY_FROM ?? "";

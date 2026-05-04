@@ -2,7 +2,7 @@
 // signin, signup, and /auth/callback to bounce members back to the
 // gated page they came from.
 //
-// Without this, a link like https://ryda.com/signin?next=https://evil.com
+// Without this, a link like https://ryda.pro/signin?next=https://evil.com
 // would redirect the user off-site after sign-in, classic phishing
 // vector. Worse, `router.push("javascript:alert(1)")` is treated by
 // Next.js's router as a navigation and the JS executes in our origin

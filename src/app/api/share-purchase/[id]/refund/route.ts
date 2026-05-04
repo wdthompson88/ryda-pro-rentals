@@ -337,7 +337,7 @@ export async function POST(
         action: "ticket_filed",
         message: ticket.ok
           ? "Stripe didn't confirm the refund cleanly. Ops will verify in Stripe and reach out within one business day."
-          : "Stripe didn't confirm cleanly and we couldn't file a ticket automatically. Email support@ryda.com with this purchase id.",
+          : "Stripe didn't confirm cleanly and we couldn't file a ticket automatically. Email support@ryda.pro with this purchase id.",
       },
       { status: 202 },
     );

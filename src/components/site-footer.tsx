@@ -121,7 +121,7 @@ export function SiteFooter() {
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
             <p>© {new Date().getFullYear()} RYDA LLC · Formed under applicable LLC law</p>
             {/* Live status (polls /api/health every 60s). Pre-launch
-                substitute for status.ryda.com. */}
+                substitute for status.ryda.pro. */}
             <HealthBadge />
           </div>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1">

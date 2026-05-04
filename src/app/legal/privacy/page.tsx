@@ -27,7 +27,7 @@ export default function PrivacyPage() {
         },
         {
           heading: "5. Your rights",
-          body: "You can access, correct, or delete the personal information we hold about you. California residents have additional rights under the CCPA, including the right to opt out of any data sharing for cross-context behavioral advertising. Email privacy@ryda.com to exercise these rights.",
+          body: "You can access, correct, or delete the personal information we hold about you. California residents have additional rights under the CCPA, including the right to opt out of any data sharing for cross-context behavioral advertising. Email privacy@ryda.pro to exercise these rights.",
         },
         {
           heading: "6. Data retention",
@@ -47,7 +47,7 @@ export default function PrivacyPage() {
         },
         {
           heading: "10. Contact",
-          body: "RYDA LLC, Miami, FL. Email: privacy@ryda.com.",
+          body: "RYDA LLC, Miami, FL. Email: privacy@ryda.pro.",
         },
       ]}
     />

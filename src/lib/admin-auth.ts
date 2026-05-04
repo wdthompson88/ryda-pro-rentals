@@ -16,13 +16,13 @@
 //   set raw_app_meta_data = jsonb_set(
 //     coalesce(raw_app_meta_data, '{}'::jsonb), '{role}', '"admin"'
 //   )
-//   where email = 'ops@ryda.com';
+//   where email = 'ops@ryda.pro';
 //
 // To revoke:
 //
 //   update auth.users
 //   set raw_app_meta_data = raw_app_meta_data - 'role'
-//   where email = 'ops@ryda.com';
+//   where email = 'ops@ryda.pro';
 
 import type { NextRequest } from "next/server";
 import { getUserFromRequest } from "@/lib/api-auth";

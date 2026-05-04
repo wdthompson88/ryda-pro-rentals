@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { SiteHeader } from "@/components/site-header";
+import {
+  BoatRow as Row,
+  HowItWorksCta,
+  HowItWorksPageTemplate,
+  Pillar,
+  Reason,
+  Stance,
+  Stat,
+} from "@/components/shared/how-it-works-page";
 import { HOW_IT_WORKS_STEPS, FAQ_ITEMS } from "@/lib/boat-content";
 import { BOATS_HOLDING_YEARS, BOATS_TARGET_DEPRECIATION_PCT } from "@/lib/boat-data";
 
@@ -12,29 +19,21 @@ export const metadata: Metadata = {
 
 export default function BoatsHowItWorks() {
   return (
-    <>
-      <SiteHeader />
-
-      {/* Hero */}
-      <section className="border-b border-rule">
-        <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-28">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
-            How it works · Boat co-ownership
-          </p>
-          <h1 className="mt-4 max-w-4xl font-display text-5xl font-light leading-tight text-ink sm:text-6xl">
-            Member-managed LLC.{" "}
-            <span className="italic">Same doctrine as cars, different ops.</span>
-          </h1>
-          <p className="mt-6 max-w-2xl text-base leading-relaxed text-ink-soft">
-            Each boat is held in a single-purpose LLC with 10 shares
-            split across 1–5 verified co-owners (2-share minimum per
-            person). RYDA runs operations (captain, dockage, insurance,
-            hurricane prep, charter opt-in) under a separate Management
-            Services Agreement. Boats hold for {BOATS_HOLDING_YEARS} years
-            on a different depreciation curve than the cars side.
-          </p>
-        </div>
-      </section>
+    <HowItWorksPageTemplate
+      accent="marine"
+      hero={{
+        eyebrow: "How it works · Boat co-ownership",
+        title: <>Member-managed LLC. <span className="italic">Same doctrine as cars, different ops.</span></>,
+        body: (
+          <>
+            Each boat is held in a single-purpose LLC with 10 shares split across 1–5 verified co-owners (2-share
+            minimum per person). RYDA runs operations (captain, dockage, insurance, hurricane prep, charter opt-in)
+            under a separate Management Services Agreement. Boats hold for {BOATS_HOLDING_YEARS} years on a different
+            depreciation curve than the cars side.
+          </>
+        ),
+      }}
+    >
 
       {/* 5 steps */}
       <section className="border-b border-rule bg-cream-2">
@@ -237,46 +236,64 @@ export default function BoatsHowItWorks() {
           </h2>
           <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             <Reason
+              accent="marine"
+              card={false}
               n="01"
               title="Marine ops are the cost"
               body="The hull is half the cost of ownership. Slip, captain, insurance, hurricane prep, surveys, and depreciation are the other half. Splitting ten ways turns a $300K/yr drag into a $30K/yr line item."
             />
             <Reason
+              accent="marine"
+              card={false}
               n="02"
               title="You don't actually want to skipper"
               body="Most owners on this tier don't pilot Wajers themselves. Captain-included is the default; you save the operator's license question for a Riva."
             />
             <Reason
+              accent="marine"
+              card={false}
               n="03"
               title="Charter opt-in offsets carry"
               body="Days you don't use go into the charter pool (member-priced). Owners typically recapture 25–40% of annual ops via opt-in. Documented in the cost sheet on every listing."
             />
             <Reason
+              accent="marine"
+              card={false}
               n="04"
               title="Hurricane risk is a structural carry"
               body="Insurance, haul, indoor storage, post-season re-launch. RYDA pre-negotiates with marina partners; the cost is in the share economics, not surprise invoices."
             />
             <Reason
+              accent="marine"
+              card={false}
               n="05"
               title="Surveys are real, not theater"
               body="SAMS-accredited survey at acquisition + annual condition surveys. Members see redacted reports in the LLC document vault. No more dock-tour due diligence."
             />
             <Reason
+              accent="marine"
+              card={false}
               n="06"
               title="3-year planned exit"
               body="Member vote at year 3 to sell, refit, or roll. Modeled 15% depreciation over the period, generous vs the actual flat-to-+5% Wajers and Rivas have shown 2018–2024."
             />
             <Reason
+              accent="marine"
+              card={false}
               n="07"
               title="LLC structure beats club membership"
               body="Yacht club initiations are mostly non-refundable. RYDA shares are real ownership: you're a member of a single-purpose LLC that owns the hull. Sell the share, not your seat."
             />
             <Reason
+              accent="marine"
+              card={false}
               n="08"
               title="Cross-vertical access"
               body="One RYDA membership covers both boats and cars, Boats members can charter cars and car members can charter boats, subject to availability and tier."
             />
             <Reason
+              accent="marine"
+              card={false}
               n="09"
               title="Service-grade ops"
               body="Provisioning, slip reservations, captain dispatch, charter scheduling, hurricane prep, all single-vendor. Black tier gets dedicated marine account contact."
@@ -351,18 +368,18 @@ export default function BoatsHowItWorks() {
             Twelve trust pillars.
           </h2>
           <div className="mt-12 grid grid-cols-1 gap-x-10 gap-y-6 md:grid-cols-2 lg:grid-cols-3">
-            <Pillar label="Member-managed LLC" body="Members vote on material decisions; not passive. established LLC case law is the gold standard for LLC governance." />
-            <Pillar label="Separate Management Services Agreement" body="RYDA is a hired service provider, not the asset owner. Members can fire RYDA and hire someone else." />
-            <Pillar label="Single-purpose LLC per hull" body="No cross-collateralization. Your Pershing 6X share isn't liable for someone else's Lagoon LLC." />
-            <Pillar label="USCG documentation + state title" body="Clean chain of custody. Documents in the LLC vault." />
-            <Pillar label="SAMS marine survey at acquisition" body="Independent surveyor names every defect with photos. Redacted version visible to members." />
-            <Pillar label="Marine-grade insurance, agreed-value" body="LLC named insured, members named additional. Hagerty Marine / CHUBB / Travelers per hull." />
-            <Pillar label="Hurricane plan codified at acquisition" body="Pre-arranged haul, indoor storage, post-storm re-launch. Costs known, not surprise-invoiced." />
-            <Pillar label="Captain employment agreements" body="Captains employed via the LLC, not RYDA. Members see employment terms." />
-            <Pillar label="Charter opt-in agreement" body="Per-day, per-trip, nothing automatic. Members revoke any time." />
-            <Pillar label="Verified members only" body="28+, KYC, ID + credit + (skipper-license check if bareboat)." />
-            <Pillar label="3-yr planned exit + 12-mo transfer market" body="Built-in liquidity. No 'forever' lock-in like club initiations." />
-            <Pillar label="Open-book reserve account" body="Replacement engines, electronics, sail wardrobe. Audited annually, balance visible to members." />
+            <Pillar accent="marine" card={false} label="Member-managed LLC" body="Members vote on material decisions; not passive. established LLC case law is the gold standard for LLC governance." />
+            <Pillar accent="marine" card={false} label="Separate Management Services Agreement" body="RYDA is a hired service provider, not the asset owner. Members can fire RYDA and hire someone else." />
+            <Pillar accent="marine" card={false} label="Single-purpose LLC per hull" body="No cross-collateralization. Your Pershing 6X share isn't liable for someone else's Lagoon LLC." />
+            <Pillar accent="marine" card={false} label="USCG documentation + state title" body="Clean chain of custody. Documents in the LLC vault." />
+            <Pillar accent="marine" card={false} label="SAMS marine survey at acquisition" body="Independent surveyor names every defect with photos. Redacted version visible to members." />
+            <Pillar accent="marine" card={false} label="Marine-grade insurance, agreed-value" body="LLC named insured, members named additional. Hagerty Marine / CHUBB / Travelers per hull." />
+            <Pillar accent="marine" card={false} label="Hurricane plan codified at acquisition" body="Pre-arranged haul, indoor storage, post-storm re-launch. Costs known, not surprise-invoiced." />
+            <Pillar accent="marine" card={false} label="Captain employment agreements" body="Captains employed via the LLC, not RYDA. Members see employment terms." />
+            <Pillar accent="marine" card={false} label="Charter opt-in agreement" body="Per-day, per-trip, nothing automatic. Members revoke any time." />
+            <Pillar accent="marine" card={false} label="Verified members only" body="28+, KYC, ID + credit + (skipper-license check if bareboat)." />
+            <Pillar accent="marine" card={false} label="3-yr planned exit + 12-mo transfer market" body="Built-in liquidity. No 'forever' lock-in like club initiations." />
+            <Pillar accent="marine" card={false} label="Open-book reserve account" body="Replacement engines, electronics, sail wardrobe. Audited annually, balance visible to members." />
           </div>
         </div>
       </section>
@@ -393,115 +410,15 @@ export default function BoatsHowItWorks() {
       </section>
 
       {/* CTA */}
-      <section className="bg-ink py-20 text-cream">
-        <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
-          <h2 className="font-display text-3xl sm:text-4xl">
-            See if a RYDA Boat share fits.
-          </h2>
-          <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
-            Schedule a 30-minute call. Real conversation, real numbers,
-            no commitment.
-          </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Link
-              href="/boats/portfolio"
-              className="inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-marine hover:text-cream"
-            >
-              See the fleet →
-            </Link>
-            <Link
-              href="/contact?type=Membership&note=RYDA+Boats+how-it-works#form"
-              className="inline-flex h-12 items-center justify-center rounded-full border border-cream/30 px-7 text-sm font-medium text-cream hover:border-cream"
-            >
-              Schedule a call
-            </Link>
-          </div>
-        </div>
-      </section>
-    </>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-2xl border border-rule bg-cream-2/40 p-5">
-      <p className="text-[10px] uppercase tracking-[0.16em] text-mute">{label}</p>
-      <p className="mt-2 font-display text-3xl text-ink tabular-nums">{value}</p>
-    </div>
-  );
-}
-
-function Row({
-  label,
-  a,
-  b,
-  c,
-  d,
-  emphasis,
-}: {
-  label: string;
-  a: string;
-  b: string;
-  c: string;
-  d: string;
-  emphasis?: boolean;
-}) {
-  return (
-    <tr className="border-b border-rule last:border-b-0">
-      <td className={`px-6 py-4 ${emphasis ? "font-medium text-ink" : "text-ink"}`}>
-        {label}
-      </td>
-      <td className="bg-marine/5 px-6 py-4 text-center text-ink">{d}</td>
-      <td className="px-6 py-4 text-center text-ink-soft">{a}</td>
-      <td className="px-6 py-4 text-center text-ink-soft">{b}</td>
-      <td className="px-6 py-4 text-center text-ink-soft">{c}</td>
-    </tr>
-  );
-}
-
-function Stance({
-  title,
-  detail,
-  fit,
-}: {
-  title: string;
-  detail: string;
-  fit: "great" | "good" | "not-us";
-}) {
-  const ribbon =
-    fit === "great"
-      ? { label: "Great fit", cls: "bg-marine text-cream" }
-      : fit === "good"
-        ? { label: "Good fit", cls: "border border-marine text-marine" }
-        : { label: "Not our fit", cls: "border border-rule text-mute" };
-  return (
-    <div className="rounded-2xl border border-rule bg-surface p-6">
-      <div className="flex items-start justify-between gap-4">
-        <p className="font-display text-lg text-ink">{title}</p>
-        <span className={`shrink-0 rounded-full px-3 py-1 text-[10px] font-medium uppercase tracking-[0.18em] ${ribbon.cls}`}>
-          {ribbon.label}
-        </span>
-      </div>
-      <p className="mt-3 text-sm leading-relaxed text-ink-soft">{detail}</p>
-    </div>
-  );
-}
-
-function Reason({ n, title, body }: { n: string; title: string; body: string }) {
-  return (
-    <div>
-      <p className="font-display text-sm text-marine">{n}</p>
-      <p className="mt-2 font-display text-lg text-ink">{title}</p>
-      <p className="mt-2 text-sm leading-relaxed text-ink-soft">{body}</p>
-    </div>
-  );
-}
-
-function Pillar({ label, body }: { label: string; body: string }) {
-  return (
-    <div>
-      <p className="font-display text-base text-ink">{label}</p>
-      <p className="mt-2 text-sm leading-relaxed text-ink-soft">{body}</p>
-    </div>
+      <HowItWorksCta
+        accent="marine"
+        title="See if a RYDA Boat share fits."
+        body="Schedule a 30-minute call. Real conversation, real numbers, no commitment."
+        links={[
+          { href: "/boats/portfolio", label: "See the fleet →" },
+          { href: "/contact?type=Membership&note=RYDA+Boats+how-it-works#form", label: "Schedule a call", variant: "secondary" },
+        ]}
+      />
+    </HowItWorksPageTemplate>
   );
 }

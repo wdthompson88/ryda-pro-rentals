@@ -1504,7 +1504,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "If you hold no shares" },
           {
             type: "p",
-            text: "Email hello@ryda.com or use the close-account flow in your dashboard. We deactivate the account, cancel any auto-renewals, and email a final account statement. Membership data is retained per our privacy policy retention schedule.",
+            text: "Email hello@ryda.pro or use the close-account flow in your dashboard. We deactivate the account, cancel any auto-renewals, and email a final account statement. Membership data is retained per our privacy policy retention schedule.",
           },
           { type: "h3", text: "If you hold one or more shares" },
           {

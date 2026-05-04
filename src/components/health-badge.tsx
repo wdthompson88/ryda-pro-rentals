@@ -5,9 +5,9 @@
 // "Degraded · <which>" / "Offline".
 //
 // Used in the footer as an honest "we know how the lights are" signal,
-// pre-launch substitute for status.ryda.com (which requires a paid
+// pre-launch substitute for status.ryda.pro (which requires a paid
 // statuspage account and a custom subdomain). After the real status
-// page launches, swap this for a link to status.ryda.com.
+// page launches, swap this for a link to status.ryda.pro.
 //
 // The /api/health endpoint masks probe details on production (round 1
 // audit fix), so this widget only knows up/degraded/down — not which

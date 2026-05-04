@@ -1,7 +1,14 @@
 import Link from "next/link";
-import { SiteHeader } from "@/components/site-header";
-import { StickyToc } from "@/components/sticky-toc";
 import { BookingTiersExplainer } from "@/components/booking-tiers-explainer";
+import {
+  Faq,
+  HowItWorksPageTemplate,
+  Pillar,
+  Reason,
+  SimpleStep,
+  Step,
+  Take,
+} from "@/components/shared/how-it-works-page";
 import {
   formatUSD,
   HOLDING_YEARS,
@@ -138,30 +145,16 @@ const ROWS: Row[] = [
 
 export default function HowItWorksPage() {
   return (
-    <>
-      <SiteHeader />
-
-      {/* Hero */}
-      <section className="border-b border-rule">
-        <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-28">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            How it works · Asset-backed co-ownership
-          </p>
-          <h1 className="mt-4 max-w-4xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
-            Own a piece of the world&apos;s{" "}
-            <span className="italic">best cars.</span>
-          </h1>
-          <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
-            Each car is held in a single-purpose LLC with 10
-            shares. Your share is backed by a real, titled vehicle —
-            not by a subscription, lease or rental contract. Verified
-            members hold two shares or more (2-share minimum per
-            person); RYDA is hired as the operations partner.
-          </p>
-        </div>
-      </section>
-
-      <StickyToc items={TOC_ITEMS} />
+    <HowItWorksPageTemplate
+      accent="red"
+      tocItems={TOC_ITEMS}
+      hero={{
+        eyebrow: "How it works · Asset-backed co-ownership",
+        title: <>Own a piece of the world&apos;s <span className="italic">best cars.</span></>,
+        body:
+          "Each car is held in a single-purpose LLC with 10 shares. Your share is backed by a real, titled vehicle — not by a subscription, lease or rental contract. Verified members hold two shares or more (2-share minimum per person); RYDA is hired as the operations partner.",
+      }}
+    >
 
       {/* Turo-style 3-step explainer, the simple version of the doctrine
           for first-time visitors. The technical 5-step lifecycle below
@@ -681,158 +674,6 @@ export default function HowItWorksPage() {
           </div>
         </div>
       </section>
-    </>
-  );
-}
-
-function Step({ n, title, body }: { n: string; title: string; body: string }) {
-  return (
-    <div>
-      <p className="font-display text-2xl text-red">{n}</p>
-      <p className="mt-2 font-display text-xl text-ink">{title}</p>
-      <p className="mt-3 text-sm leading-relaxed text-ink-soft">{body}</p>
-    </div>
-  );
-}
-
-// Bigger sibling of Step, used in the Turo-style 3-step explainer
-// at the top of the page. Larger numerals, a small line-art icon, more
-// whitespace, fewer words per step. The technical 5-step lifecycle
-// still uses Step.
-type StepIcon = "search" | "signature" | "key";
-
-function SimpleStep({
-  n,
-  title,
-  body,
-  icon,
-}: {
-  n: string;
-  title: string;
-  body: string;
-  icon: StepIcon;
-}) {
-  return (
-    <div>
-      <div className="flex items-baseline gap-5">
-        <p className="font-display text-6xl font-light leading-none text-red sm:text-7xl">
-          {n}
-        </p>
-        <span className="text-ink/40" aria-hidden>
-          <StepGlyph kind={icon} />
-        </span>
-      </div>
-      <p className="mt-5 font-display text-2xl text-ink">{title}</p>
-      <p className="mt-3 text-base leading-relaxed text-ink-soft">{body}</p>
-    </div>
-  );
-}
-
-// Tiny line-art glyphs for the 3-step explainer. Stroked in
-// currentColor so they tint with whatever wraps them. Designed to feel
-// like a hand-drawn marginalia mark, not a UI button.
-function StepGlyph({ kind }: { kind: StepIcon }) {
-  const common = {
-    width: 28,
-    height: 28,
-    viewBox: "0 0 28 28",
-    fill: "none",
-    stroke: "currentColor",
-    strokeWidth: 1.4,
-    strokeLinecap: "round" as const,
-    strokeLinejoin: "round" as const,
-  };
-  if (kind === "search") {
-    return (
-      <svg {...common} aria-hidden>
-        <circle cx="11" cy="11" r="7" />
-        <line x1="16.5" y1="16.5" x2="23" y2="23" />
-      </svg>
-    );
-  }
-  if (kind === "signature") {
-    return (
-      <svg {...common} aria-hidden>
-        <path d="M3 21c2-1 4-7 6-7s2 4 4 4 3-9 5-9 2 6 4 6 3-2 3-2" />
-        <line x1="3" y1="25" x2="25" y2="25" />
-      </svg>
-    );
-  }
-  // key
-  return (
-    <svg {...common} aria-hidden>
-      <circle cx="9" cy="14" r="4.5" />
-      <line x1="13.5" y1="14" x2="25" y2="14" />
-      <line x1="20" y1="14" x2="20" y2="18" />
-      <line x1="24" y1="14" x2="24" y2="17" />
-    </svg>
-  );
-}
-
-function Take({
-  title,
-  good,
-  tradeoff,
-  highlight,
-}: {
-  title: string;
-  good: string;
-  tradeoff: string;
-  highlight?: boolean;
-}) {
-  return (
-    <div
-      className={`rounded-2xl border p-6 ${
-        highlight ? "border-red bg-red/5" : "border-rule bg-surface"
-      }`}
-    >
-      <p
-        className={`font-display text-xl ${
-          highlight ? "text-red" : "text-ink"
-        }`}
-      >
-        {title}
-      </p>
-      <p className="mt-4 text-xs font-medium uppercase tracking-wider text-mute">
-        Right for you if
-      </p>
-      <p className="mt-2 text-sm leading-relaxed text-ink-soft">{good}</p>
-      <p className="mt-5 text-xs font-medium uppercase tracking-wider text-mute">
-        The trade-off
-      </p>
-      <p className="mt-2 text-sm leading-relaxed text-ink-soft">{tradeoff}</p>
-    </div>
-  );
-}
-
-function Reason({ n, title, body }: { n: string; title: string; body: string }) {
-  return (
-    <div className="rounded-2xl border border-rule bg-surface p-6">
-      <p className="font-display text-2xl text-red">{n}</p>
-      <p className="mt-2 font-display text-lg text-ink">{title}</p>
-      <p className="mt-3 text-sm leading-relaxed text-ink-soft">{body}</p>
-    </div>
-  );
-}
-
-function Pillar({ label, body }: { label: string; body: string }) {
-  return (
-    <div className="rounded-xl border border-rule bg-surface p-4">
-      <p className="text-xs font-medium uppercase tracking-wider text-red">
-        {label}
-      </p>
-      <p className="mt-1.5 text-xs leading-relaxed text-ink-soft">{body}</p>
-    </div>
-  );
-}
-
-function Faq({ q, a }: { q: string; a: string }) {
-  return (
-    <details className="rounded-2xl border border-rule bg-surface p-6 open:bg-cream-2/40">
-      <summary className="cursor-pointer text-base font-medium text-ink">
-        {q}
-      </summary>
-      <p className="mt-3 text-sm leading-relaxed text-ink-soft">{a}</p>
-    </details>
+    </HowItWorksPageTemplate>
   );
 }

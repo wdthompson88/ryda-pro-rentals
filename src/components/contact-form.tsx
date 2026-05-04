@@ -149,7 +149,7 @@ export function ContactForm() {
       {status === "error" && (
         <p className="sm:col-span-2 text-sm text-red">
           {errorMessage ||
-            "Something went wrong. Try emailing hello@ryda.com instead."}
+            "Something went wrong. Try emailing hello@ryda.pro instead."}
         </p>
       )}
     </form>

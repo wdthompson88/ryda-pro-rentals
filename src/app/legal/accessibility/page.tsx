@@ -27,7 +27,7 @@ export default function AccessibilityPage() {
         },
         {
           heading: "5. Feedback",
-          body: "If you experience an accessibility barrier, please tell us. Email accessibility@ryda.com with a description of the problem, the URL, and what device/browser you were using. We treat accessibility issues as priority bugs and aim to acknowledge within 2 business days.",
+          body: "If you experience an accessibility barrier, please tell us. Email accessibility@ryda.pro with a description of the problem, the URL, and what device/browser you were using. We treat accessibility issues as priority bugs and aim to acknowledge within 2 business days.",
         },
         {
           heading: "6. Assessment approach",

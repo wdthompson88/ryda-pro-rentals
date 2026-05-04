@@ -191,7 +191,7 @@ export function HelpChat() {
       const text =
         err instanceof Error && err.message
           ? err.message
-          : "Something went wrong sending that. Email hello@ryda.com directly and we'll pick it up from there.";
+          : "Something went wrong sending that. Email hello@ryda.pro directly and we'll pick it up from there.";
       setMessages((all) => [
         ...all,
         {
