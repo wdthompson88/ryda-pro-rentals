@@ -267,7 +267,7 @@ function Stat({
 }) {
   const cls =
     tone === "ok"
-      ? "text-emerald-700"
+      ? "text-success-deep"
       : tone === "warn"
         ? "text-red"
         : "text-mute";
@@ -335,7 +335,7 @@ function pill(status: string) {
           : "off";
   const cls =
     tone === "ok"
-      ? "bg-emerald-500/10 text-emerald-700"
+      ? "bg-success/10 text-success-deep"
       : tone === "warn"
         ? "bg-red/10 text-red"
         : tone === "info"

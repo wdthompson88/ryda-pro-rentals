@@ -3,10 +3,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { AuthSwap } from "@/components/auth-aware";
-import { BoatCostBreakdown } from "@/components/boat-cost-breakdown";
-import { BoatShareValueChart } from "@/components/boat-share-value-chart";
+import CostBreakdown, {
+  buildCostBreakdownConfig,
+} from "@/components/shared/cost-breakdown";
+import ShareValueChart, {
+  buildShareValueChartConfig,
+} from "@/components/shared/share-value-chart";
 import { OwnershipPrimitives } from "@/components/ownership-primitives";
-import { BoatCompareCalculator } from "@/components/boat-compare-calculator";
+import CompareCalculator from "@/components/shared/compare-calculator";
 import {
   BOATS,
   getBoatBySlug,
@@ -14,6 +18,7 @@ import {
   computeBoatShareEconomics,
   BOATS_HOLDING_YEARS,
   BOATS_TARGET_DEPRECIATION_PCT,
+  RENTAL_DEFAULTS_BOATS,
   BOAT_BOOKING_POLICY,
   type Boat,
 } from "@/lib/boat-data";
@@ -46,6 +51,35 @@ export default async function BoatDetailPage({
   if (!b) notFound();
 
   const econ = computeBoatShareEconomics(b);
+  const costBreakdownConfig = buildCostBreakdownConfig(b, "boats");
+  const shareValueChartConfig = buildShareValueChartConfig(b, "boats");
+  const compareCalculatorConfig = {
+    vertical: "boats",
+    holdingYears: BOATS_HOLDING_YEARS,
+    targetDepreciationPct: BOATS_TARGET_DEPRECIATION_PCT,
+    rentalDefaults: RENTAL_DEFAULTS_BOATS,
+    accent: "marine",
+    labels: {
+      asset: "Boat",
+      assetLower: "boat",
+      assetHeldCopy: "curated surveyed hull",
+      calculatorName: "Boatculator",
+      rentalIncomeName: "Charter income projection",
+      rentalPoolName: "charter pool",
+      rentalVerb: "chartering",
+      rentalToggleVerb: "Charter",
+      rentalAdjectiveTitle: "Charter",
+      rentalAdjectiveLower: "charter",
+      useDays: "cruising days",
+      useDaysAdjective: "cruise",
+      residualAssumption: "surveyed certified pre owned hulls",
+      rentalMarketCopy:
+        "Miami Caribbean charter pools average 200-240 booked days/yr.",
+      resaleConsistencyCopy:
+        "our 50 nm/day allowance + surveyed-hull maintenance keep the resale story consistent whether you cruise or charter it out.",
+      exitAssetName: "boat",
+    },
+  } as const;
 
   // Schema.org Product + Vehicle JSON-LD so boat listings rank
   // alongside cars on search-engine SERPs. Without this, Google
@@ -263,7 +297,7 @@ export default async function BoatDetailPage({
               </p>
             </div>
             <div className="lg:col-span-7">
-              <BoatCostBreakdown boat={b} shares={1} />
+              <CostBreakdown config={costBreakdownConfig} shares={1} />
             </div>
           </div>
         </div>
@@ -290,7 +324,7 @@ export default async function BoatDetailPage({
               </p>
             </div>
             <div className="lg:col-span-7">
-              <BoatShareValueChart boat={b} />
+              <ShareValueChart config={shareValueChartConfig} />
             </div>
           </div>
         </div>
@@ -313,7 +347,7 @@ export default async function BoatDetailPage({
             shifts your {BOATS_HOLDING_YEARS}-year net.
           </p>
           <div className="mt-10">
-            <BoatCompareCalculator lockedBoat={b} />
+            <CompareCalculator config={compareCalculatorConfig} lockedAsset={b} />
           </div>
         </div>
       </section>

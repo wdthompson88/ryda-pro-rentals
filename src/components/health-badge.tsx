@@ -74,7 +74,7 @@ export function HealthBadge() {
 
   const dotColor =
     status === "ok"
-      ? "bg-emerald-500"
+      ? "bg-success"
       : status === "degraded"
         ? "bg-amber-500"
         : "bg-red";

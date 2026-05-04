@@ -81,7 +81,12 @@ export default function MemberProtectionPage() {
             platform behind it disappears?
           </p>
           <div className="mt-10 overflow-hidden rounded-2xl border border-rule bg-surface">
-            <div className="overflow-x-auto">
+            <div
+              className="overflow-x-auto"
+              role="region"
+              aria-label="Member protection table — scroll horizontally to see all columns"
+              tabIndex={0}
+            >
               <table className="w-full min-w-[640px] text-sm">
                 <thead className="border-b border-rule bg-cream-2 text-xs font-medium uppercase tracking-wider text-ink-soft">
                   <tr>

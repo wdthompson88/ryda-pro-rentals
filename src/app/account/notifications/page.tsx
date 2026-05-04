@@ -246,7 +246,7 @@ export default function NotificationsPage() {
             ) : saving ? (
               <span>Saving…</span>
             ) : savedFlash ? (
-              <span className="text-emerald-700">Saved.</span>
+              <span className="text-success-deep">Saved.</span>
             ) : (
               <span>Changes save automatically.</span>
             )}

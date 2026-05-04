@@ -517,7 +517,7 @@ function ErrorBanner({ children }: { children: React.ReactNode }) {
 
 function SuccessBanner({ children }: { children: React.ReactNode }) {
   return (
-    <p className="rounded-xl border border-emerald-500/40 bg-emerald-500/5 px-4 py-3 text-sm text-emerald-700">
+    <p className="rounded-xl border border-success/40 bg-success/5 px-4 py-3 text-sm text-success-deep">
       {children}
     </p>
   );

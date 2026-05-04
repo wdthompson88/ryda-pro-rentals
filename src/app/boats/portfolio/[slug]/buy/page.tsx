@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
-import { BoatBuyFlow } from "@/components/boat-buy-flow";
+import BuyFlow from "@/components/shared/buy-flow";
 import { BOATS, getBoatBySlug, formatUSD } from "@/lib/boat-data";
 
 export async function generateStaticParams() {
@@ -39,11 +39,44 @@ export default async function BuyPage({
     2,
     Math.min(v.sharesAvailable, parseInt(sharesParam || "2", 10) || 2),
   );
+  const buyFlowConfig = {
+    vertical: "boats",
+    accent: "marine",
+    returnHref: `/boats/portfolio/${v.slug.toLowerCase()}`,
+    returnLabel: v.hullId,
+    checkoutAssetKey: "boatSlug",
+    checkoutAssetValue: v.slug,
+    labels: {
+      asset: "Boat",
+      assetLower: "boat",
+      storageLabel: "Hailing port",
+      storageValue: v.market,
+      usageDays: "Cruising days",
+      distanceLabel: "Nautical miles",
+      distanceValue: `${v.nmPerYear.toLocaleString()} nm/year`,
+      insuranceUse: "operate the boat",
+      operationVerb: "operate",
+      depreciationAsset: "boat",
+      kycUse: "boat",
+      noteAsset: "boat",
+      walkthroughTitle: "Boat walkthrough",
+      walkthroughBody:
+        "A 30-minute walkthrough on the boat (controls, etiquette, condition baseline) before your first cruise.",
+      marketsHref: "/boats/portfolio",
+      marketsLabel: "Back to markets",
+    },
+    extraReviewBullets: [
+      {
+        label: "Caribbean charter",
+        value: v.captainIncluded ? "Eligible (crewed)" : "Not eligible",
+      },
+    ],
+  } as const;
 
   return (
     <>
       <SiteHeader />
-      <BoatBuyFlow boat={v} initialShares={requestedShares} />
+      <BuyFlow asset={v} initialShares={requestedShares} config={buyFlowConfig} />
     </>
   );
 }

@@ -236,8 +236,8 @@ export default function TransferPage({
 
       {/* Action area */}
       {done ? (
-        <section className="rounded-2xl border border-emerald-500/40 bg-emerald-500/5 p-6">
-          <p className="font-medium text-emerald-700">
+        <section className="rounded-2xl border border-success/40 bg-success/5 p-6">
+          <p className="font-medium text-success-deep">
             {done === "accepted"
               ? "Accepted. RYDA legal will acknowledge within 1–2 business days, then we move the share into your member-area."
               : "Declined. The sender has been notified."}

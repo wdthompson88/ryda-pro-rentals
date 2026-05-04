@@ -272,7 +272,7 @@ function Pill({
 }) {
   const cls =
     tone === "ok"
-      ? "bg-emerald-500/10 text-emerald-700"
+      ? "bg-success/10 text-success-deep"
       : tone === "wait"
         ? "bg-amber-500/15 text-amber-700"
         : tone === "warn"

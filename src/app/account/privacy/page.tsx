@@ -94,7 +94,7 @@ function DataExportCard() {
           {submitting ? "Requesting…" : "Request my data"}
         </button>
       ) : (
-        <p className="rounded-xl border border-emerald-500/40 bg-emerald-500/5 px-4 py-3 text-sm text-emerald-700">
+        <p className="rounded-xl border border-success/40 bg-success/5 px-4 py-3 text-sm text-success-deep">
           Request received. We'll email a download link within 30 days
           (typically 1–3 business days).
         </p>
@@ -156,7 +156,7 @@ function CookieRow({
           required
             ? "bg-mute/15 text-mute"
             : enabled
-              ? "bg-emerald-500/10 text-emerald-700"
+              ? "bg-success/10 text-success-deep"
               : "bg-mute/10 text-mute"
         }`}
       >

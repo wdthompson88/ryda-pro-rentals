@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
-import { BuyFlow } from "@/components/buy-flow";
+import BuyFlow from "@/components/shared/buy-flow";
 import { VEHICLES, getVehicleBySymbol, formatUSD } from "@/lib/market-data";
 
 export async function generateStaticParams() {
@@ -40,11 +40,38 @@ export default async function BuyPage({
     2,
     Math.min(v.sharesAvailable, parseInt(sharesParam || "2", 10) || 2),
   );
+  const buyFlowConfig = {
+    vertical: "cars",
+    accent: "red",
+    returnHref: `/markets/${v.symbol.toLowerCase()}`,
+    returnLabel: v.ticker,
+    checkoutAssetKey: "vehicleSymbol",
+    checkoutAssetValue: v.symbol,
+    labels: {
+      asset: "Vehicle",
+      assetLower: "vehicle",
+      storageLabel: "Stored in",
+      storageValue: v.market,
+      usageDays: "Driving days",
+      distanceLabel: "Mileage",
+      distanceValue: `${v.milesPerYear.toLocaleString()} miles/year`,
+      insuranceUse: "drive the vehicle",
+      operationVerb: "drive",
+      depreciationAsset: "car",
+      kycUse: "vehicle",
+      noteAsset: "car",
+      walkthroughTitle: "Vehicle walkthrough",
+      walkthroughBody:
+        "A 30-minute walkthrough on the vehicle (controls, etiquette, condition baseline) before your first drive.",
+      marketsHref: "/markets",
+      marketsLabel: "Back to markets",
+    },
+  } as const;
 
   return (
     <>
       <SiteHeader />
-      <BuyFlow vehicle={v} initialShares={requestedShares} />
+      <BuyFlow asset={v} initialShares={requestedShares} config={buyFlowConfig} />
     </>
   );
 }

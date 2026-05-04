@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Boat, formatUSD } from "@/lib/boat-data";
+import { formatUSD, type Vehicle } from "@/lib/market-data";
+import { type Boat } from "@/lib/boat-data";
 import { authedFetch } from "@/lib/api-fetch";
 import { ACQUISITION_FEE_PCT, computeFees } from "@/lib/fees";
 
@@ -19,6 +20,138 @@ type StepKey = "review" | "verify" | "documents" | "fund" | "confirm";
 // credit on either path.
 type FundingMethod = "ach" | "wire" | "card" | "crypto" | "liquidity" | "finance";
 
+type BuyAsset = Vehicle | Boat;
+
+export type BuyFlowConfig = {
+  vertical: "cars" | "boats";
+  accent: "red" | "marine";
+  returnHref: string;
+  returnLabel: string;
+  checkoutAssetKey: "vehicleSymbol" | "boatSlug";
+  checkoutAssetValue: string;
+  labels: {
+    asset: string;
+    assetLower: string;
+    storageLabel: string;
+    storageValue: string;
+    usageDays: string;
+    distanceLabel: string;
+    distanceValue: string;
+    insuranceUse: string;
+    operationVerb: string;
+    depreciationAsset: string;
+    kycUse: string;
+    noteAsset: string;
+    walkthroughTitle: string;
+    walkthroughBody: string;
+    marketsHref: string;
+    marketsLabel: string;
+  };
+  extraReviewBullets?: readonly { label: string; value: string }[];
+};
+
+export function buildBuyFlowConfig(
+  asset: Vehicle,
+  vertical: "cars",
+): BuyFlowConfig;
+export function buildBuyFlowConfig(
+  asset: Boat,
+  vertical: "boats",
+): BuyFlowConfig;
+export function buildBuyFlowConfig(
+  asset: BuyAsset,
+  vertical: "cars" | "boats",
+): BuyFlowConfig {
+  if (vertical === "boats") {
+    const boat = asset as Boat;
+    return {
+      vertical,
+      accent: "marine",
+      returnHref: `/boats/portfolio/${boat.slug.toLowerCase()}`,
+      returnLabel: boat.hullId,
+      checkoutAssetKey: "boatSlug",
+      checkoutAssetValue: boat.slug,
+      labels: {
+        asset: "Boat",
+        assetLower: "boat",
+        storageLabel: "Hailing port",
+        storageValue: boat.market,
+        usageDays: "Cruising days",
+        distanceLabel: "Nautical miles",
+        distanceValue: `${(boat.nmPerYear).toLocaleString()} nm/year`,
+        insuranceUse: "operate the boat",
+        operationVerb: "operate",
+        depreciationAsset: "boat",
+        kycUse: "boat",
+        noteAsset: "boat",
+        walkthroughTitle: "Boat walkthrough",
+        walkthroughBody:
+          "A 30-minute walkthrough on the boat (controls, etiquette, condition baseline) before your first cruise.",
+        marketsHref: "/boats/portfolio",
+        marketsLabel: "Back to markets",
+      },
+      extraReviewBullets: [
+        {
+          label: "Caribbean charter",
+          value: boat.captainIncluded ? "Eligible (crewed)" : "Not eligible",
+        },
+      ],
+    };
+  }
+
+  const vehicle = asset as Vehicle;
+  return {
+    vertical,
+    accent: "red",
+    returnHref: `/markets/${vehicle.symbol.toLowerCase()}`,
+    returnLabel: vehicle.ticker,
+    checkoutAssetKey: "vehicleSymbol",
+    checkoutAssetValue: vehicle.symbol,
+    labels: {
+      asset: "Vehicle",
+      assetLower: "vehicle",
+      storageLabel: "Stored in",
+      storageValue: vehicle.market,
+      usageDays: "Driving days",
+      distanceLabel: "Mileage",
+      distanceValue: `${(vehicle.milesPerYear).toLocaleString()} miles/year`,
+      insuranceUse: "drive the vehicle",
+      operationVerb: "drive",
+      depreciationAsset: "car",
+      kycUse: "vehicle",
+      noteAsset: "car",
+      walkthroughTitle: "Vehicle walkthrough",
+      walkthroughBody:
+        "A 30-minute walkthrough on the vehicle (controls, etiquette, condition baseline) before your first drive.",
+      marketsHref: "/markets",
+      marketsLabel: "Back to markets",
+    },
+  };
+}
+
+const buyAccentClasses = {
+  red: {
+    text: "text-red",
+    border: "border-red",
+    borderError: "border-red/40",
+    bg: "bg-red",
+    bgSoft: "bg-red/5",
+    hoverBg: "hover:bg-red",
+    focus: "focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20",
+    accent: "accent-red",
+  },
+  marine: {
+    text: "text-marine",
+    border: "border-marine",
+    borderError: "border-marine/40",
+    bg: "bg-marine",
+    bgSoft: "bg-marine/5",
+    hoverBg: "hover:bg-marine",
+    focus: "focus:border-marine focus:outline-none focus:ring-2 focus:ring-marine/20",
+    accent: "accent-marine",
+  },
+} as const;
+
 const STEPS: { key: StepKey; label: string }[] = [
   { key: "review", label: "Review" },
   { key: "verify", label: "Verify" },
@@ -28,11 +161,13 @@ const STEPS: { key: StepKey; label: string }[] = [
 ];
 
 type Props = {
-  boat: Boat;
+  asset: BuyAsset;
   initialShares: number;
+  config: BuyFlowConfig;
 };
 
-export function BoatBuyFlow({ boat, initialShares }: Props) {
+export default function BuyFlow({ asset, initialShares, config }: Props) {
+  const accent = buyAccentClasses[config.accent];
   const [step, setStep] = useState<StepKey>("review");
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [kycComplete, setKycComplete] = useState(false);
@@ -46,13 +181,13 @@ export function BoatBuyFlow({ boat, initialShares }: Props) {
   // total exactly matches the Stripe charge. acquisitionFee replaces
   // the old flat $1,500 "closing fee".
   const { buyIn: totalPrice, acquisitionFee, total: grandTotal } = computeFees(
-    boat.pricePerShare,
+    asset.pricePerShare,
     shares,
   );
   // All-in annual contribution: insurance + storage + maintenance + reserves
   // + RYDA service fee, scaled per share. The 12% management fee is bundled
   // into annualOpCost, don't show only that piece as the total.
-  const annualContribution = boat.annualOpCost * shares;
+  const annualContribution = asset.annualOpCost * shares;
 
   const stepIdx = STEPS.findIndex((s) => s.key === step);
 
@@ -67,10 +202,10 @@ export function BoatBuyFlow({ boat, initialShares }: Props) {
       <div className="border-b border-rule bg-cream/90 backdrop-blur sticky top-0 z-10">
         <div className="mx-auto max-w-5xl px-6 py-5 sm:px-10">
           <Link
-            href={`/boats/portfolio/${boat.slug.toLowerCase()}`}
+            href={config.returnHref}
             className="text-xs font-medium uppercase tracking-[0.2em] text-mute hover:text-ink"
           >
-            ← Cancel and return to {boat.hullId}
+            ← Cancel and return to {config.returnLabel}
           </Link>
           <div className="mt-4 flex items-center gap-2 text-xs">
             {STEPS.map((s, i) => (
@@ -78,7 +213,7 @@ export function BoatBuyFlow({ boat, initialShares }: Props) {
                 <div
                   className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold ${
                     i < stepIdx
-                      ? "bg-marine text-cream"
+                      ? `${accent.bg} text-cream`
                       : i === stepIdx
                       ? "bg-ink text-cream"
                       : "border border-rule bg-surface text-mute"
@@ -95,7 +230,7 @@ export function BoatBuyFlow({ boat, initialShares }: Props) {
                 </span>
                 {i < STEPS.length - 1 && (
                   <div
-                    className={`h-px flex-1 ${i < stepIdx ? "bg-marine" : "bg-rule"}`}
+                    className={`h-px flex-1 ${i < stepIdx ? accent.bg : "bg-rule"}`}
                   />
                 )}
               </div>
@@ -109,7 +244,8 @@ export function BoatBuyFlow({ boat, initialShares }: Props) {
         <main className="lg:col-span-8">
           {step === "review" && (
             <ReviewStep
-              boat={boat}
+              asset={asset}
+              config={config}
               shares={shares}
               totalPrice={totalPrice}
               acquisitionFee={acquisitionFee}
@@ -122,6 +258,7 @@ export function BoatBuyFlow({ boat, initialShares }: Props) {
           )}
           {step === "verify" && (
             <VerifyStep
+              config={config}
               kycComplete={kycComplete}
               setKycComplete={setKycComplete}
               onBack={() => go("review")}
@@ -130,7 +267,8 @@ export function BoatBuyFlow({ boat, initialShares }: Props) {
           )}
           {step === "documents" && (
             <DocumentsStep
-              boat={boat}
+              asset={asset}
+              config={config}
               shares={shares}
               oaSigned={oaSigned}
               setOaSigned={setOaSigned}
@@ -144,10 +282,11 @@ export function BoatBuyFlow({ boat, initialShares }: Props) {
           )}
           {step === "fund" && (
             <FundStep
+              config={config}
               grandTotal={grandTotal}
               fundingMethod={fundingMethod}
               setFundingMethod={setFundingMethod}
-              boat={boat}
+              asset={asset}
               shares={shares}
               signerName={signature}
               onBack={() => go("documents")}
@@ -156,7 +295,8 @@ export function BoatBuyFlow({ boat, initialShares }: Props) {
           )}
           {step === "confirm" && (
             <ConfirmStep
-              boat={boat}
+              asset={asset}
+              config={config}
               shares={shares}
               grandTotal={grandTotal}
             />
@@ -168,18 +308,18 @@ export function BoatBuyFlow({ boat, initialShares }: Props) {
           <div className="sticky top-32 rounded-2xl border border-rule bg-surface p-6">
             <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl bg-cream-2">
               <Image
-                src={boat.hero}
-                alt={`${boat.year} ${boat.name}`}
+                src={asset.hero}
+                alt={`${asset.year} ${asset.name}`}
                 fill
                 sizes="(min-width: 1024px) 33vw, 100vw"
-                className={`object-cover ${boat.flipImage ? "-scale-x-100" : ""}`}
-                style={{ objectPosition: boat.imagePosition ?? "center" }}
+                className={`object-cover ${asset.flipImage ? "-scale-x-100" : ""}`}
+                style={{ objectPosition: asset.imagePosition ?? "center" }}
               />
             </div>
-            <p className="mt-4 text-xs uppercase tracking-wider text-marine">
-              {boat.year} · {boat.brand}
+            <p className={`mt-4 text-xs uppercase tracking-wider ${accent.text}`}>
+              {asset.year} · {asset.brand}
             </p>
-            <p className="mt-1 font-display text-xl text-ink">{boat.name}</p>
+            <p className="mt-1 font-display text-xl text-ink">{asset.name}</p>
             <dl className="mt-5 space-y-2 border-t border-rule pt-5 text-sm">
               <SummaryRow label={`${shares} share${shares > 1 ? "s" : ""}`} value={formatUSD(totalPrice)} />
               <SummaryRow label={`${ACQUISITION_FEE_PCT}% acquisition fee`} value={formatUSD(acquisitionFee)} />
@@ -208,7 +348,8 @@ export function BoatBuyFlow({ boat, initialShares }: Props) {
 // ── Step 1: Review ──────────────────────────────────────────────
 
 function ReviewStep({
-  boat,
+  asset,
+  config,
   shares,
   totalPrice,
   acquisitionFee,
@@ -218,7 +359,8 @@ function ReviewStep({
   setTermsAccepted,
   onContinue,
 }: {
-  boat: Boat;
+  asset: BuyAsset;
+  config: BuyFlowConfig;
   shares: number;
   totalPrice: number;
   acquisitionFee: number;
@@ -228,14 +370,14 @@ function ReviewStep({
   setTermsAccepted: (v: boolean) => void;
   onContinue: () => void;
 }) {
-  const sharesPercent = Math.round((shares / boat.shares) * 1000) / 10;
-  const usageDays = boat.daysPerYear * shares;
-  const usageMiles = (boat.nmPerYear * shares).toLocaleString();
+  const accent = buyAccentClasses[config.accent];
+  const sharesPercent = Math.round((shares / asset.shares) * 1000) / 10;
+  const usageDays = asset.daysPerYear * shares;
 
   return (
     <div className="space-y-8">
       <div>
-        <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">Step 1 of 5</p>
+        <p className={`text-xs font-medium uppercase tracking-[0.2em] ${accent.text}`}>Step 1 of 5</p>
         <h1 className="mt-3 font-display text-4xl font-light text-ink sm:text-5xl">
           Review your share
         </h1>
@@ -245,24 +387,23 @@ function ReviewStep({
         </p>
       </div>
 
-      <Section title="What you're buying">
-        <Bullet label="Boat" value={`${boat.year} ${boat.name}`} />
-        <Bullet label="Position" value={`${shares} of ${boat.shares} shares (${sharesPercent}%)`} />
+      <Section accent={config.accent} title="What you're buying">
+        <Bullet label={config.labels.asset} value={`${asset.year} ${asset.name}`} />
+        <Bullet label="Position" value={`${shares} of ${asset.shares} shares (${sharesPercent}%)`} />
         <Bullet label="Legal entity" value={`Single-purpose LLC`} />
-        <Bullet label="Hailing port" value={boat.market} />
+        <Bullet label={config.labels.storageLabel} value={config.labels.storageValue} />
       </Section>
 
-      <Section title="Annual usage entitlement">
-        <Bullet label="Cruising days" value={`Up to ${usageDays} days/year`} />
-        <Bullet label="Nautical miles" value={`${usageMiles} nm/year`} />
-        <Bullet
-          label="Caribbean charter"
-          value={boat.captainIncluded ? "Eligible (crewed)" : "Not eligible"}
-        />
+      <Section accent={config.accent} title="Annual usage entitlement">
+        <Bullet label={config.labels.usageDays} value={`Up to ${usageDays} days/year`} />
+        <Bullet label={config.labels.distanceLabel} value={config.labels.distanceValue} />
+        {config.extraReviewBullets?.map((bullet) => (
+          <Bullet key={bullet.label} label={bullet.label} value={bullet.value} />
+        ))}
         <Bullet label="Bookings" value="Shared calendar with co-owners. Fair-use rules apply during peak season." />
       </Section>
 
-      <Section title="What it costs">
+      <Section accent={config.accent} title="What it costs">
         <Bullet label="Today (one-time)" value={formatUSD(grandTotal)} bold />
         <Bullet label="—  Share buy-in" value={formatUSD(totalPrice)} />
         <Bullet label={`—  ${ACQUISITION_FEE_PCT}% acquisition fee`} value={formatUSD(acquisitionFee)} />
@@ -282,9 +423,9 @@ function ReviewStep({
         <ul className="mt-3 list-disc space-y-2 pl-5 text-ink-soft">
           <li>12-month minimum hold from your closing date before transferring your share.</li>
           <li>The LLC is member-managed, you and your co-owners hold authority over material decisions.</li>
-          <li>You'll be added to the boat's insurance policy at closing.</li>
-          <li>Any boat modifications, sale, or replacement requires a 75% co-owner vote.</li>
-          <li>Co-ownership stakes are not investments and the boat will depreciate over time.</li>
+          <li>You'll be added to the {config.labels.assetLower}'s insurance policy at closing.</li>
+          <li>Any {config.labels.assetLower} modifications, sale, or replacement requires a 75% co-owner vote.</li>
+          <li>Co-ownership stakes are not investments and the {config.labels.depreciationAsset} will depreciate over time.</li>
         </ul>
       </div>
 
@@ -293,17 +434,18 @@ function ReviewStep({
           type="checkbox"
           checked={termsAccepted}
           onChange={(e) => setTermsAccepted(e.target.checked)}
-          className="mt-1 h-4 w-4 accent-marine"
+          className={`mt-1 h-4 w-4 ${accent.accent}`}
         />
         <span className="text-ink">
           I understand I'm joining a member-managed LLC alongside other co-owners;
           that this is not an investment and is not offered for investment purposes; that
-          co-ownership shares are illiquid for the first 12 months; and that the boat will
+          co-ownership shares are illiquid for the first 12 months; and that the {config.labels.depreciationAsset} will
           depreciate over time.
         </span>
       </label>
 
       <ButtonRow
+        accent={config.accent}
         rightLabel="Continue to verification"
         rightDisabled={!termsAccepted}
         onRight={onContinue}
@@ -315,16 +457,19 @@ function ReviewStep({
 // ── Step 2: Verify ──────────────────────────────────────────────
 
 function VerifyStep({
+  config,
   kycComplete,
   setKycComplete,
   onBack,
   onContinue,
 }: {
+  config: BuyFlowConfig;
   kycComplete: boolean;
   setKycComplete: (v: boolean) => void;
   onBack: () => void;
   onContinue: () => void;
 }) {
+  const accent = buyAccentClasses[config.accent];
   const [kycRunning, setKycRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -383,14 +528,14 @@ function VerifyStep({
   return (
     <div className="space-y-8">
       <div>
-        <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">Step 2 of 5</p>
+        <p className={`text-xs font-medium uppercase tracking-[0.2em] ${accent.text}`}>Step 2 of 5</p>
         <h1 className="mt-3 font-display text-4xl font-light text-ink sm:text-5xl">
           Verify your identity
         </h1>
         <p className="mt-3 text-base text-ink-soft">
           Standard KYC. We use Stripe Identity, government ID and a
           selfie match. Required to be added to the LLC's insurance
-          policy and to operate the boat. RYDA never sees raw
+          policy and to {config.labels.insuranceUse}. RYDA never sees raw
           documents, Stripe verifies them and returns a pass/fail.
         </p>
       </div>
@@ -399,7 +544,7 @@ function VerifyStep({
       <div className="rounded-2xl border border-rule bg-surface p-6">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-marine">Identity (KYC)</p>
+            <p className={`text-xs font-medium uppercase tracking-wider ${accent.text}`}>Identity (KYC)</p>
             <p className="mt-2 font-display text-xl text-ink">Verify your identity</p>
             <p className="mt-2 text-sm text-ink-soft">
               Government-issued ID + live selfie. Powered by Stripe
@@ -408,7 +553,7 @@ function VerifyStep({
             </p>
           </div>
           {kycComplete && (
-            <span className="shrink-0 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-700">
+            <span className="shrink-0 rounded-full bg-success/10 px-3 py-1 text-xs font-medium text-success-deep">
               Verified ✓
             </span>
           )}
@@ -419,14 +564,14 @@ function VerifyStep({
             type="button"
             onClick={startKyc}
             disabled={kycRunning}
-            className="mt-5 inline-flex h-11 items-center justify-center rounded-full bg-ink px-6 text-sm font-medium text-cream transition-colors hover:bg-marine disabled:cursor-not-allowed disabled:opacity-60"
+            className={`mt-5 inline-flex h-11 items-center justify-center rounded-full bg-ink px-6 text-sm font-medium text-cream transition-colors ${accent.hoverBg} disabled:cursor-not-allowed disabled:opacity-60`}
           >
             {kycRunning ? "Opening Stripe…" : "Start identity verification →"}
           </button>
         )}
 
         {error ? (
-          <p className="mt-4 rounded-xl border border-marine/40 bg-marine/5 px-4 py-3 text-sm text-marine">
+          <p className={`mt-4 rounded-xl border ${accent.borderError} ${accent.bgSoft} px-4 py-3 text-sm ${accent.text}`}>
             {error}
           </p>
         ) : null}
@@ -438,11 +583,13 @@ function VerifyStep({
           RYDA is a luxury access platform, not an investment product. We do
           not require accredited-investor verification. Co-ownership stakes
           are not registered securities and are not offered for investment
-          purposes, you're buying the right to use a real car you co-own.
+          purposes — you&apos;re buying the right to use a real {config.labels.noteAsset}{" "}
+          you co-own.
         </p>
       </div>
 
       <ButtonRow
+        accent={config.accent}
         leftLabel="Back"
         onLeft={onBack}
         rightLabel="Continue to documents"
@@ -456,7 +603,8 @@ function VerifyStep({
 // ── Step 3: Documents ──────────────────────────────────────────────
 
 function DocumentsStep({
-  boat,
+  asset,
+  config,
   shares,
   oaSigned,
   setOaSigned,
@@ -467,7 +615,8 @@ function DocumentsStep({
   onBack,
   onContinue,
 }: {
-  boat: Boat;
+  asset: BuyAsset;
+  config: BuyFlowConfig;
   shares: number;
   oaSigned: boolean;
   setOaSigned: (v: boolean) => void;
@@ -478,12 +627,13 @@ function DocumentsStep({
   onBack: () => void;
   onContinue: () => void;
 }) {
+  const accent = buyAccentClasses[config.accent];
   const ready = oaSigned && msaSigned && signature.trim().length >= 4;
 
   return (
     <div className="space-y-8">
       <div>
-        <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">Step 3 of 5</p>
+        <p className={`text-xs font-medium uppercase tracking-[0.2em] ${accent.text}`}>Step 3 of 5</p>
         <h1 className="mt-3 font-display text-4xl font-light text-ink sm:text-5xl">
           Sign your documents
         </h1>
@@ -496,7 +646,8 @@ function DocumentsStep({
       </div>
 
       <DocCard
-        title={`${boat.name} LLC, Operating Agreement`}
+        accent={config.accent}
+        title={`${asset.name} LLC, Operating Agreement`}
         meta="34 pages · Reviewed by counsel · Member-managed structure"
         summary={[
           "The LLC is member-managed, you and your co-owners hold authority over material decisions.",
@@ -511,11 +662,12 @@ function DocumentsStep({
       />
 
       <DocCard
-        title={`${boat.name} LLC, Management Services Agreement`}
+        accent={config.accent}
+        title={`${asset.name} LLC, Management Services Agreement`}
         meta={`12 pages · LLC ↔ RYDA · Your ${shares} share${shares > 1 ? "s" : ""}`}
         summary={[
           `Engages RYDA as the operating service provider for the LLC.`,
-          `Your position: ${shares} of ${boat.shares} shares. Buy-in: ${formatUSD(boat.pricePerShare * shares)}.`,
+          `Your position: ${shares} of ${asset.shares} shares. Buy-in: ${formatUSD(asset.pricePerShare * shares)}.`,
           "Defines RYDA's services: storage, insurance, scheduling, maintenance, member services.",
           "Defines the 12% annual management fee charged to the LLC and paid pro-rata by members.",
           "RYDA is a service provider, not a manager of the LLC. Members retain LLC governance.",
@@ -527,7 +679,7 @@ function DocumentsStep({
 
       {/* Signature */}
       <div className="rounded-2xl border border-rule bg-surface p-6">
-        <p className="text-xs font-medium uppercase tracking-wider text-marine">E-signature</p>
+        <p className={`text-xs font-medium uppercase tracking-wider ${accent.text}`}>E-signature</p>
         <label
           htmlFor="buy-flow-signature"
           className="mt-2 block font-display text-xl text-ink"
@@ -548,11 +700,12 @@ function DocumentsStep({
           autoComplete="name"
           required
           aria-required="true"
-          className="mt-5 h-12 w-full rounded-xl border border-rule bg-cream-2/40 px-4 font-display text-xl italic text-ink placeholder:text-mute focus:border-marine focus:outline-none focus:ring-2 focus:ring-marine/20"
+          className={`mt-5 h-12 w-full rounded-xl border border-rule bg-cream-2/40 px-4 font-display text-xl italic text-ink placeholder:text-mute ${accent.focus}`}
         />
       </div>
 
       <ButtonRow
+        accent={config.accent}
         leftLabel="Back"
         onLeft={onBack}
         rightLabel="Continue to funding"
@@ -566,24 +719,27 @@ function DocumentsStep({
 // ── Step 4: Fund ──────────────────────────────────────────────
 
 function FundStep({
+  config,
   grandTotal,
   fundingMethod,
   setFundingMethod,
-  boat,
+  asset,
   shares,
   signerName,
   onBack,
   onContinue,
 }: {
+  config: BuyFlowConfig;
   grandTotal: number;
   fundingMethod: FundingMethod | null;
   setFundingMethod: (v: FundingMethod | null) => void;
-  boat: Boat;
+  asset: BuyAsset;
   shares: number;
   signerName: string;
   onBack: () => void;
   onContinue: () => void;
 }) {
+  const accent = buyAccentClasses[config.accent];
   const [confirmedTransfer, setConfirmedTransfer] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -612,7 +768,7 @@ function FundStep({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          boatSlug: boat.slug,
+          [config.checkoutAssetKey]: config.checkoutAssetValue,
           shares,
           name: signerName.trim() || "RYDA member",
           paymentMethod: method,
@@ -649,7 +805,7 @@ function FundStep({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          boatSlug: boat.slug,
+          [config.checkoutAssetKey]: config.checkoutAssetValue,
           shares,
           name: signerName.trim() || "RYDA member",
           fundingMethod: method,
@@ -687,7 +843,7 @@ function FundStep({
   return (
     <div className="space-y-8">
       <div>
-        <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">Step 4 of 5</p>
+        <p className={`text-xs font-medium uppercase tracking-[0.2em] ${accent.text}`}>Step 4 of 5</p>
         <h1 className="mt-3 font-display text-4xl font-light text-ink sm:text-5xl">
           Fund your share
         </h1>
@@ -695,12 +851,13 @@ function FundStep({
           Send {formatUSD(grandTotal)} to the LLC&apos;s escrow account. Funds
           are held until your documents and verifications clear, then released
           to the LLC and your share is recorded in the LLC&apos;s member
-          register. Five payment paths, pick what fits.
+          register. Six funding paths, pick what fits.
         </p>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <FundingOption
+          accent={config.accent}
           method="ach"
           label="ACH bank transfer (Stripe)"
           detail="Free, 3–5 business day settlement. Powered by Stripe Checkout."
@@ -708,6 +865,7 @@ function FundStep({
           onSelect={() => setFundingMethod("ach")}
         />
         <FundingOption
+          accent={config.accent}
           method="wire"
           label="Wire transfer"
           detail="Fastest for large amounts. Same-day or next-day settlement. Recommended for buy-ins above $50K."
@@ -715,6 +873,7 @@ function FundStep({
           onSelect={() => setFundingMethod("wire")}
         />
         <FundingOption
+          accent={config.accent}
           method="card"
           label="Card (Stripe)"
           detail="Settles immediately. Powered by Stripe Checkout. Card-network fees apply at checkout."
@@ -722,6 +881,7 @@ function FundStep({
           onSelect={() => setFundingMethod("card")}
         />
         <FundingOption
+          accent={config.accent}
           method="crypto"
           label="Crypto (BTC, ETH, USDC)"
           detail="Routed through a regulated US exchange partner. Conversion to USD on receipt; LLC escrow always holds USD."
@@ -729,6 +889,7 @@ function FundStep({
           onSelect={() => setFundingMethod("crypto")}
         />
         <FundingOption
+          accent={config.accent}
           method="liquidity"
           label="Liquidity line"
           detail="HELOC, SBLOC, or pledged-asset line through your existing bank. You wire the funds; we hold the share."
@@ -736,6 +897,7 @@ function FundStep({
           onSelect={() => setFundingMethod("liquidity")}
         />
         <FundingOption
+          accent={config.accent}
           method="finance"
           label="Financing partner (referral)"
           detail="We introduce you to a specialty lender. They underwrite; you fund through them. RYDA does not extend credit."
@@ -746,14 +908,14 @@ function FundStep({
 
       {fundingMethod === "wire" && (
         <div className="rounded-2xl border border-rule bg-surface p-6">
-          <p className="text-xs font-medium uppercase tracking-wider text-marine">Wire instructions</p>
+          <p className={`text-xs font-medium uppercase tracking-wider ${accent.text}`}>Wire instructions</p>
           <p className="mt-2 font-display text-xl text-ink">
-            {boat.name} LLC, Escrow Account
+            {asset.name} LLC, Escrow Account
           </p>
           <p className="mt-3 text-sm text-ink-soft">
             For your security, RYDA never displays escrow bank details in the
             browser. Once you submit this step, we&apos;ll email the verified
-            wire instructions for {boat.name} LLC&apos;s escrow account to
+            wire instructions for {asset.name} LLC&apos;s escrow account to
             your verified inbox, along with your unique reference code and
             the exact amount of {formatUSD(grandTotal)}.
           </p>
@@ -766,8 +928,8 @@ function FundStep({
       )}
 
       {fundingMethod === "ach" && (
-        <div className="rounded-2xl border border-marine bg-marine/5 p-6">
-          <p className="text-xs font-medium uppercase tracking-wider text-marine">
+        <div className={`rounded-2xl border ${accent.border} ${accent.bgSoft} p-6`}>
+          <p className={`text-xs font-medium uppercase tracking-wider ${accent.text}`}>
             ACH bank transfer
           </p>
           <p className="mt-2 font-display text-xl text-ink">
@@ -787,8 +949,8 @@ function FundStep({
       )}
 
       {fundingMethod === "card" && (
-        <div className="rounded-2xl border border-marine bg-marine/5 p-6">
-          <p className="text-xs font-medium uppercase tracking-wider text-marine">
+        <div className={`rounded-2xl border ${accent.border} ${accent.bgSoft} p-6`}>
+          <p className={`text-xs font-medium uppercase tracking-wider ${accent.text}`}>
             Card / bank checkout
           </p>
           <p className="mt-2 font-display text-xl text-ink">
@@ -809,7 +971,7 @@ function FundStep({
 
       {fundingMethod === "liquidity" && (
         <div className="rounded-2xl border border-rule bg-surface p-6">
-          <p className="text-xs font-medium uppercase tracking-wider text-marine">
+          <p className={`text-xs font-medium uppercase tracking-wider ${accent.text}`}>
             Liquidity line
           </p>
           <p className="mt-2 font-display text-xl text-ink">
@@ -832,7 +994,7 @@ function FundStep({
 
       {fundingMethod === "finance" && (
         <div className="rounded-2xl border border-rule bg-surface p-6">
-          <p className="text-xs font-medium uppercase tracking-wider text-marine">
+          <p className={`text-xs font-medium uppercase tracking-wider ${accent.text}`}>
             Financing partner (referral)
           </p>
           <p className="mt-2 font-display text-xl text-ink">
@@ -860,7 +1022,7 @@ function FundStep({
 
       {fundingMethod === "crypto" && (
         <div className="rounded-2xl border border-rule bg-surface p-6">
-          <p className="text-xs font-medium uppercase tracking-wider text-marine">
+          <p className={`text-xs font-medium uppercase tracking-wider ${accent.text}`}>
             Crypto
           </p>
           <p className="mt-2 font-display text-xl text-ink">
@@ -893,19 +1055,20 @@ function FundStep({
             type="checkbox"
             checked={confirmedTransfer}
             onChange={(e) => setConfirmedTransfer(e.target.checked)}
-            className="mt-1 h-4 w-4 accent-marine"
+            className={`mt-1 h-4 w-4 ${accent.accent}`}
           />
           <span className="text-ink">{confirmCopy[fundingMethod]}</span>
         </label>
       )}
 
       {error ? (
-        <p className="rounded-xl border border-marine/40 bg-marine/5 px-4 py-3 text-sm text-marine">
+        <p className={`rounded-xl border ${accent.borderError} ${accent.bgSoft} px-4 py-3 text-sm ${accent.text}`}>
           {error}
         </p>
       ) : null}
 
       <ButtonRow
+        accent={config.accent}
         leftLabel="Back"
         onLeft={onBack}
         rightLabel={
@@ -925,14 +1088,17 @@ function FundStep({
 // ── Step 5: Confirm ──────────────────────────────────────────────
 
 function ConfirmStep({
-  boat,
+  asset,
+  config,
   shares,
   grandTotal,
 }: {
-  boat: Boat;
+  asset: BuyAsset;
+  config: BuyFlowConfig;
   shares: number;
   grandTotal: number;
 }) {
+  const accent = buyAccentClasses[config.accent];
   return (
     <div className="space-y-8">
       <div>
@@ -949,12 +1115,12 @@ function ConfirmStep({
       </div>
 
       <div className="rounded-2xl border border-rule bg-surface p-6">
-        <p className="text-xs font-medium uppercase tracking-wider text-marine">Your co-ownership</p>
+        <p className={`text-xs font-medium uppercase tracking-wider ${accent.text}`}>Your co-ownership</p>
         <dl className="mt-4 space-y-3 text-sm">
-          <KvRow label="Boat" value={`${boat.year} ${boat.name}`} />
-          <KvRow label="Position" value={`${shares} of ${boat.shares} shares`} />
+          <KvRow label={config.labels.asset} value={`${asset.year} ${asset.name}`} />
+          <KvRow label="Position" value={`${shares} of ${asset.shares} shares`} />
           <KvRow label="Amount" value={formatUSD(grandTotal)} />
-          <KvRow label="LLC" value={`${boat.name} LLC, (member-managed)`} />
+          <KvRow label="LLC" value={`${asset.name} LLC, (member-managed)`} />
           <KvRow label="Status" value="Pending, funds & verification clearing" />
         </dl>
       </div>
@@ -963,29 +1129,38 @@ function ConfirmStep({
         <p className="text-xs font-medium uppercase tracking-wider text-mute">What happens next</p>
         <ol className="mt-4 space-y-3">
           <Timeline
+            accent={config.accent}
             n="01"
             title="Verification clears (typically 24h)"
-            body="Persona returns identity verification and driving-record check."
+            body={
+              config.vertical === "cars"
+                ? "Stripe Identity returns identity verification and driving-record check."
+                : "Stripe Identity returns identity verification."
+            }
           />
           <Timeline
+            accent={config.accent}
             n="02"
             title="Funds settle (1–5 business days)"
             body="Wires same-day; ACH 3–5 business days. We'll email when funds clear."
           />
           <Timeline
+            accent={config.accent}
             n="03"
             title="Documents countersigned"
             body="The LLC's existing co-owners (acting collectively, per the Operating Agreement) counter-sign your addition. The Management Services Agreement is executed between the LLC's members and RYDA, RYDA does not bind the LLC unilaterally."
           />
           <Timeline
+            accent={config.accent}
             n="04"
             title="Share recorded; calendar opens"
             body="Your share is officially registered with the LLC. The booking calendar opens for your first reservation."
           />
           <Timeline
+            accent={config.accent}
             n="05"
-            title="Boat walkthrough"
-            body="A 30-minute walkthrough on the boat (controls, etiquette, condition baseline) before your first drive."
+            title={config.labels.walkthroughTitle}
+            body={config.labels.walkthroughBody}
           />
         </ol>
       </div>
@@ -993,15 +1168,15 @@ function ConfirmStep({
       <div className="flex flex-col gap-3 sm:flex-row">
         <Link
           href="/portfolio"
-          className="inline-flex h-12 flex-1 items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream hover:bg-marine"
+          className={`inline-flex h-12 flex-1 items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream ${accent.hoverBg}`}
         >
           Go to my portfolio →
         </Link>
         <Link
-          href="/boats/portfolio"
+          href={config.labels.marketsHref}
           className="inline-flex h-12 flex-1 items-center justify-center rounded-full border border-rule px-7 text-sm font-medium text-ink hover:border-ink"
         >
-          Back to markets
+          {config.labels.marketsLabel}
         </Link>
       </div>
     </div>
@@ -1010,10 +1185,19 @@ function ConfirmStep({
 
 // ── Shared bits ──────────────────────────────────────────────────
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({
+  title,
+  children,
+  accent = "red",
+}: {
+  title: string;
+  children: React.ReactNode;
+  accent?: "red" | "marine";
+}) {
+  const styles = buyAccentClasses[accent];
   return (
     <div className="rounded-2xl border border-rule bg-surface p-6">
-      <p className="text-xs font-medium uppercase tracking-wider text-marine">{title}</p>
+      <p className={`text-xs font-medium uppercase tracking-wider ${styles.text}`}>{title}</p>
       <dl className="mt-4 space-y-3 text-sm">{children}</dl>
     </div>
   );
@@ -1077,18 +1261,21 @@ function KvRow({
 }
 
 function ButtonRow({
+  accent = "red",
   leftLabel,
   onLeft,
   rightLabel,
   rightDisabled,
   onRight,
 }: {
+  accent?: "red" | "marine";
   leftLabel?: string;
   onLeft?: () => void;
   rightLabel: string;
   rightDisabled?: boolean;
   onRight: () => void;
 }) {
+  const styles = buyAccentClasses[accent];
   return (
     <div className="flex flex-col-reverse gap-3 pt-4 sm:flex-row sm:justify-between">
       {leftLabel ? (
@@ -1106,7 +1293,7 @@ function ButtonRow({
         type="button"
         onClick={onRight}
         disabled={rightDisabled}
-        className="inline-flex h-12 items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream hover:bg-marine disabled:cursor-not-allowed disabled:opacity-40"
+        className={`inline-flex h-12 items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream ${styles.hoverBg} disabled:cursor-not-allowed disabled:opacity-40`}
       >
         {rightLabel} →
       </button>
@@ -1115,18 +1302,21 @@ function ButtonRow({
 }
 
 function DocCard({
+  accent = "red",
   title,
   meta,
   summary,
   signed,
   onSign,
 }: {
+  accent?: "red" | "marine";
   title: string;
   meta: string;
   summary: string[];
   signed: boolean;
   onSign: () => void;
 }) {
+  const styles = buyAccentClasses[accent];
   return (
     <div className="rounded-2xl border border-rule bg-surface p-6">
       <div className="flex items-start justify-between gap-4">
@@ -1158,7 +1348,7 @@ function DocCard({
           <button
             type="button"
             onClick={onSign}
-            className="inline-flex h-10 items-center justify-center rounded-full bg-ink px-5 text-sm font-medium text-cream hover:bg-marine"
+            className={`inline-flex h-10 items-center justify-center rounded-full bg-ink px-5 text-sm font-medium text-cream ${styles.hoverBg}`}
           >
             I've reviewed
           </button>
@@ -1169,6 +1359,7 @@ function DocCard({
 }
 
 function FundingOption({
+  accent = "red",
   method,
   label,
   detail,
@@ -1176,6 +1367,7 @@ function FundingOption({
   onSelect,
   disabled = false,
 }: {
+  accent?: "red" | "marine";
   method: FundingMethod;
   label: string;
   detail: string;
@@ -1183,6 +1375,7 @@ function FundingOption({
   onSelect: () => void;
   disabled?: boolean;
 }) {
+  const styles = buyAccentClasses[accent];
   const tagLabel: Record<FundingMethod, string> = {
     ach: "ACH",
     wire: "Wire",
@@ -1198,13 +1391,13 @@ function FundingOption({
       disabled={disabled}
       className={`flex flex-col items-start gap-2 rounded-2xl border p-5 text-left transition-colors ${
         selected
-          ? "border-marine bg-marine/5"
+          ? `${styles.border} ${styles.bgSoft}`
           : disabled
             ? "border-rule bg-surface opacity-60 cursor-not-allowed"
             : "border-rule bg-surface hover:border-ink-soft"
       }`}
     >
-      <span className="text-xs font-medium uppercase tracking-wider text-marine">
+      <span className={`text-xs font-medium uppercase tracking-wider ${styles.text}`}>
         {tagLabel[method]}
       </span>
       <span className="font-display text-lg text-ink">{label}</span>
@@ -1214,17 +1407,20 @@ function FundingOption({
 }
 
 function Timeline({
+  accent = "red",
   n,
   title,
   body,
 }: {
+  accent?: "red" | "marine";
   n: string;
   title: string;
   body: string;
 }) {
+  const styles = buyAccentClasses[accent];
   return (
     <li className="flex gap-5 rounded-xl border border-rule bg-surface p-4">
-      <span className="font-display text-sm text-marine">{n}</span>
+      <span className={`font-display text-sm ${styles.text}`}>{n}</span>
       <div>
         <p className="font-display text-base text-ink">{title}</p>
         <p className="mt-1 text-sm text-ink-soft">{body}</p>

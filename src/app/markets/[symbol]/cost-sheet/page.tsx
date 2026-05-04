@@ -159,12 +159,12 @@ export default async function CostSheetPage({
                     {formatUSD(econ1.buyIn + 1_500)}
                   </td>
                 </tr>
-                <tr className="bg-emerald-500/[0.06]">
-                  <td className="px-5 py-3 font-medium text-emerald-700">
+                <tr className="bg-success/[0.06]">
+                  <td className="px-5 py-3 font-medium text-success-deep">
                     Acquisition savings
                   </td>
                   <td className="px-5 py-3 text-right text-mute">—</td>
-                  <td className="px-5 py-3 text-right font-display text-emerald-700 tabular-nums">
+                  <td className="px-5 py-3 text-right font-display text-success-deep tabular-nums">
                     {formatUSD(savingsAcquisition)}
                   </td>
                 </tr>
@@ -224,12 +224,12 @@ export default async function CostSheetPage({
                     {formatUSD(econ1.annualCarrying)}
                   </td>
                 </tr>
-                <tr className="bg-emerald-500/[0.06]">
-                  <td className="px-5 py-3 font-medium text-emerald-700">
+                <tr className="bg-success/[0.06]">
+                  <td className="px-5 py-3 font-medium text-success-deep">
                     Annual savings
                   </td>
                   <td className="px-5 py-3 text-right text-mute">—</td>
-                  <td className="px-5 py-3 text-right font-display text-emerald-700 tabular-nums">
+                  <td className="px-5 py-3 text-right font-display text-success-deep tabular-nums">
                     {formatUSD(savingsAnnual)}
                   </td>
                 </tr>
@@ -293,12 +293,12 @@ export default async function CostSheetPage({
                     {formatUSD(econ1.netCost)}
                   </td>
                 </tr>
-                <tr className="bg-emerald-500/[0.06]">
-                  <td className="px-5 py-3 font-medium text-emerald-700">
+                <tr className="bg-success/[0.06]">
+                  <td className="px-5 py-3 font-medium text-success-deep">
                     {HOLDING_YEARS}-yr savings vs sole
                   </td>
                   <td className="px-5 py-3 text-right text-mute">—</td>
-                  <td className="px-5 py-3 text-right font-display text-emerald-700 tabular-nums">
+                  <td className="px-5 py-3 text-right font-display text-success-deep tabular-nums">
                     {formatUSD(savings2yrNet)}
                   </td>
                 </tr>
@@ -327,14 +327,14 @@ export default async function CostSheetPage({
                 <p className="text-[10px] uppercase tracking-wider text-mute">
                   Rental income · {HOLDING_YEARS} yrs
                 </p>
-                <p className="mt-1 font-display text-lg text-emerald-700 tabular-nums">
+                <p className="mt-1 font-display text-lg text-success-deep tabular-nums">
                   + {formatUSD(rentalIncome2yr)}
                 </p>
               </div>
               <div
                 className={`rounded-lg border px-4 py-3 ${
                   rentedIsPositive
-                    ? "border-emerald-500 bg-emerald-500/5"
+                    ? "border-success bg-success/5"
                     : "border-rule bg-surface"
                 }`}
               >
@@ -343,7 +343,7 @@ export default async function CostSheetPage({
                 </p>
                 <p
                   className={`mt-1 font-display text-lg tabular-nums ${
-                    rentedIsPositive ? "text-emerald-700" : "text-ink"
+                    rentedIsPositive ? "text-success-deep" : "text-ink"
                   }`}
                 >
                   = {rentedIsPositive ? "+ " : "− "}

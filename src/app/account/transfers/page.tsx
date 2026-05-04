@@ -262,7 +262,7 @@ function pillFor(status: string) {
             : "off";
   const cls =
     tone === "ok"
-      ? "bg-emerald-500/10 text-emerald-700"
+      ? "bg-success/10 text-success-deep"
       : tone === "warn"
         ? "bg-red/10 text-red"
         : tone === "info"

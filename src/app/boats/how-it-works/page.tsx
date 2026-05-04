@@ -92,7 +92,12 @@ export default function BoatsHowItWorks() {
           </p>
 
           <div className="mt-12 overflow-hidden rounded-2xl border border-rule bg-surface">
-            <div className="overflow-x-auto">
+            <div
+              className="overflow-x-auto"
+              role="region"
+              aria-label="Path comparison table — scroll horizontally to see all columns"
+              tabIndex={0}
+            >
               <table className="w-full min-w-[760px] text-sm">
                 <thead className="border-b border-rule bg-cream-2">
                   <tr>

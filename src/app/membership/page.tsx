@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { HiddenWhenAuthed } from "@/components/auth-aware";
+import { earlyPricingCTA } from "@/lib/launch-config";
 
 export const metadata = {
   title: "Membership — RYDA",
@@ -128,7 +129,12 @@ export default function MembershipPage() {
           </p>
 
           <div className="mt-12 overflow-hidden rounded-2xl border border-rule bg-surface">
-            <div className="overflow-x-auto">
+            <div
+              className="overflow-x-auto"
+              role="region"
+              aria-label="Membership tier comparison — scroll horizontally to see all tiers"
+              tabIndex={0}
+            >
             <table className="w-full min-w-[640px] text-sm">
               <thead className="border-b border-rule bg-cream-2">
                 <tr>
@@ -207,15 +213,16 @@ export default function MembershipPage() {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* CTA — date-bound copy auto-flips after the early-pricing
+          deadline (lib/launch-config.ts). One config flip changes
+          this on both /membership and /boats/membership. */}
       <section className="bg-ink py-20 text-cream">
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
           <h2 className="font-display text-4xl font-light sm:text-5xl">
-            Members start in Miami.
+            {earlyPricingCTA().headline}
           </h2>
           <p className="mx-auto mt-6 max-w-xl text-base text-cream/70">
-            Apply by July 2026 to lock early-member pricing on Blue or
-            Black for life.
+            {earlyPricingCTA().body}
           </p>
           <HiddenWhenAuthed>
             <Link
@@ -263,7 +270,7 @@ function TierCard({ tier }: { tier: typeof TIERS[number] }) {
 
   return (
     <div
-      className={`relative flex flex-col rounded-none border border-rule bg-surface p-8 before:absolute before:inset-x-0 before:top-0 before:h-[3px] ${accentLine}`}
+      className={`relative flex flex-col rounded-2xl border border-rule bg-surface p-8 before:absolute before:inset-x-0 before:top-0 before:h-[3px] ${accentLine}`}
     >
       <p
         className={`text-[10px] font-medium uppercase tracking-[0.22em] ${

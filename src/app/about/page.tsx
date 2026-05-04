@@ -14,17 +14,25 @@ export default function AboutPage() {
     <>
       <SiteHeader />
 
-      {/* Hero */}
+      {/* Hero — brand voice harmonized to the editorial-considered
+          register used on /cars and /boats. The previous "We're
+          building the market that should already exist" startup-vision
+          tone read as a pitch deck inside an otherwise editorial site.
+          UI/UX review Tier 2: copy register. */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-28">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
             About
           </p>
           <h1 className="mt-4 max-w-4xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
-            We're building the supercar market that should already exist.
+            A different way to{" "}
+            <span className="italic">own a supercar.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
-            Owning is all-or-nothing. Renting is hollow. RYDA is the third option.
+            Buying one outright costs more than most people care to put in a
+            driveway. Renting is for an afternoon, not a relationship. RYDA
+            is the third option — co-ownership, with professionals operating
+            the car and a clean LLC structure underneath.
           </p>
         </div>
       </section>
@@ -139,8 +147,11 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Mission + Values */}
-      <section className="border-b border-rule bg-cream-2">
+      {/* Mission + Values — kept on default surface (no bg-cream-2)
+          to break the wall of beige that was happening when founder's
+          letter + mission + HQ all stacked back-to-back on the same
+          tinted background. UI/UX review Tier 3: surface alternation. */}
+      <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-24">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
             Mission

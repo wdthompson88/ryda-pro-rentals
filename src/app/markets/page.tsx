@@ -296,6 +296,12 @@ function MarketSection({
               {market.label}
             </h3>
             <span
+              role="status"
+              aria-label={
+                isLive
+                  ? `Status: Live in ${market.label}`
+                  : `Status: Coming ${market.launchLabel} to ${market.label}`
+              }
               className={`rounded-full px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.18em] ${
                 isLive
                   ? "bg-red/95 text-cream"
@@ -341,6 +347,14 @@ function MarketSection({
                     for preview markets (LA, NY), make it explicit that the
                     vehicle is a preview and shares aren't open yet. */}
                 <span
+                  role="status"
+                  aria-label={
+                    !isLive
+                      ? `Status: Preview vehicle, ${market.launchLabel ?? "coming soon"}`
+                      : v.sharesAvailable === 0
+                        ? "Status: Sold out"
+                        : `Status: ${v.sharesAvailable} shares left`
+                  }
                   className={`absolute right-3 top-3 rounded-full px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] backdrop-blur ${
                     !isLive
                       ? "border border-cream/40 bg-black/40 text-cream"
@@ -436,6 +450,12 @@ function FeaturedCard({ vehicle: v }: { vehicle: Vehicle }) {
         className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-black/20"
       />
       <span
+        role="status"
+        aria-label={
+          v.sharesAvailable === 0
+            ? "Status: Sold out"
+            : `Status: ${v.sharesAvailable} shares left`
+        }
         className={`absolute right-4 top-4 rounded-full px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] backdrop-blur ${
           v.sharesAvailable === 0
             ? "bg-mute/90 text-cream"

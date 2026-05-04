@@ -72,12 +72,12 @@ function statusPill(status: Purchase["status"]): { text: string; className: stri
     case "paid":
       return {
         text: "Paid · LLC amendment in flight",
-        className: "bg-emerald-500/10 text-emerald-700",
+        className: "bg-success/10 text-success-deep",
       };
     case "closed":
       return {
         text: "Complete · welcome packet sent",
-        className: "bg-emerald-500/10 text-emerald-700",
+        className: "bg-success/10 text-success-deep",
       };
     case "canceled":
       return { text: "Canceled", className: "bg-mute/15 text-mute" };

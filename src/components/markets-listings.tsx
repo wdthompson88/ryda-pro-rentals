@@ -434,8 +434,11 @@ function VehicleCard({ vehicle: v }: { vehicle: Vehicle }) {
           {v.brand}
         </span>
 
-        {/* Status pill top-right */}
+        {/* Status pill top-right (a11y: role+aria-label so screen
+            readers announce state, not just color). */}
         <span
+          role="status"
+          aria-label={isSold ? "Status: Sold out" : "Status: Available"}
           className={`absolute right-3 top-3 rounded-full px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] backdrop-blur ${
             isSold
               ? "bg-mute/90 text-cream"
@@ -542,7 +545,7 @@ function VehicleCard({ vehicle: v }: { vehicle: Vehicle }) {
             <div
               className={`mt-3 rounded-lg border p-3 ${
                 rentedIsPositive
-                  ? "border-emerald-500/40 bg-emerald-500/5"
+                  ? "border-success/40 bg-success/5"
                   : "border-rule bg-cream-2/40"
               }`}
             >
@@ -578,7 +581,7 @@ function VehicleCard({ vehicle: v }: { vehicle: Vehicle }) {
               <div
                 className={`mt-2 flex items-baseline justify-between border-t pt-2 text-xs ${
                   rentedIsPositive
-                    ? "border-emerald-500/30"
+                    ? "border-success/30"
                     : "border-rule"
                 }`}
               >
@@ -587,7 +590,7 @@ function VehicleCard({ vehicle: v }: { vehicle: Vehicle }) {
                 </span>
                 <span
                   className={`font-display text-base tabular-nums ${
-                    rentedIsPositive ? "text-emerald-600" : "text-red"
+                    rentedIsPositive ? "text-success" : "text-red"
                   }`}
                 >
                   = {rentedIsPositive ? "+ " : "− "}
@@ -646,7 +649,7 @@ function MathRow({
   cost?: boolean;
 }) {
   const tone = positive
-    ? "text-emerald-600"
+    ? "text-success"
     : cost
       ? "text-red"
       : "text-ink";

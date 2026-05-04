@@ -2,9 +2,13 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { OrderPanel } from "@/components/order-panel";
-import { CostBreakdown } from "@/components/cost-breakdown";
-import { ShareValueChart } from "@/components/share-value-chart";
-import { CompareCalculator } from "@/components/compare-calculator";
+import CostBreakdown, {
+  buildCostBreakdownConfig,
+} from "@/components/shared/cost-breakdown";
+import ShareValueChart, {
+  buildShareValueChartConfig,
+} from "@/components/shared/share-value-chart";
+import CompareCalculator from "@/components/shared/compare-calculator";
 import { PhotoGallery } from "@/components/photo-gallery";
 import { OwnershipPrimitives } from "@/components/ownership-primitives";
 import { BookingTiersExplainer } from "@/components/booking-tiers-explainer";
@@ -14,6 +18,8 @@ import {
   formatUSD,
   computeShareEconomics,
   HOLDING_YEARS,
+  TARGET_DEPRECIATION_PCT,
+  RENTAL_DEFAULTS,
 } from "@/lib/market-data";
 
 export async function generateStaticParams() {
@@ -44,6 +50,35 @@ export default async function VehicleMarketPage({
   if (!v) notFound();
 
   const econ = computeShareEconomics(v);
+  const costBreakdownConfig = buildCostBreakdownConfig(v, "cars");
+  const shareValueChartConfig = buildShareValueChartConfig(v, "cars");
+  const compareCalculatorConfig = {
+    vertical: "cars",
+    holdingYears: HOLDING_YEARS,
+    targetDepreciationPct: TARGET_DEPRECIATION_PCT,
+    rentalDefaults: RENTAL_DEFAULTS,
+    accent: "red",
+    labels: {
+      asset: "Vehicle",
+      assetLower: "vehicle",
+      assetHeldCopy: "curated certified pre owned car",
+      calculatorName: "Carculator",
+      rentalIncomeName: "Rental income projection",
+      rentalPoolName: "rental pool",
+      rentalVerb: "renting",
+      rentalToggleVerb: "Rent",
+      rentalAdjectiveTitle: "Rental",
+      rentalAdjectiveLower: "rental",
+      useDays: "driving days",
+      useDaysAdjective: "drive",
+      residualAssumption: "low-mileage certified pre owned exotics",
+      rentalMarketCopy:
+        "Miami exotic-rental fleets average 200-240 booked days/yr.",
+      resaleConsistencyCopy:
+        "our 100 mi/day allowance + certified pre owned maintenance keep the resale story consistent whether you drive or rent it out.",
+      exitAssetName: "car",
+    },
+  } as const;
 
   // Structured data for richer Google search results.
   // We model the listing as a Product (the share itself) with the
@@ -241,7 +276,7 @@ export default async function VehicleMarketPage({
               </Link>
             </div>
             <div className="lg:col-span-7">
-              <CostBreakdown vehicle={v} shares={1} />
+              <CostBreakdown config={costBreakdownConfig} shares={1} />
             </div>
           </div>
         </div>
@@ -273,7 +308,7 @@ export default async function VehicleMarketPage({
               </p>
             </div>
             <div className="lg:col-span-8">
-              <ShareValueChart vehicle={v} />
+              <ShareValueChart config={shareValueChartConfig} />
             </div>
           </div>
         </div>
@@ -306,7 +341,7 @@ export default async function VehicleMarketPage({
               Download cost sheet ↓
             </Link>
           </div>
-          <CompareCalculator lockedVehicle={v} />
+          <CompareCalculator config={compareCalculatorConfig} lockedAsset={v} />
         </div>
       </section>
 

@@ -24,6 +24,12 @@
   /* Boats accent — marine blue. Contrast on cream (#0E0E10) ≈ 5.7:1. */
   --ryda-marine:      #4A90D9;
   --ryda-marine-deep: #6FA8E5;
+  /* Designed-success green — replaces Tailwind's default emerald-* on
+   * cost sheets and "good number" affordances. Tuned to live in the
+   * same temperature family as marine (slightly cool, slightly muted)
+   * so it doesn't read as a Tailwind preset. AA on dark: ~6.1:1. */
+  --ryda-success:      #5FB58A;
+  --ryda-success-deep: #7CCBA1;
 }
 
 /* Light theme — explicit opt-in via data-theme="light" on <html>.
@@ -44,6 +50,9 @@
   /* Boats accent — marine blue, deeper for AA on light. */
   --ryda-marine:      #1E5DAB;
   --ryda-marine-deep: #143C75;
+  /* Designed-success green, deeper for AA on light cream (~5.0:1). */
+  --ryda-success:      #2E8459;
+  --ryda-success-deep: #1F5C3D;
 }
 
 /* Smooth color transitions when toggling themes (but not on load) */
@@ -69,6 +78,8 @@ html.theme-ready * {
   --color-gold:      var(--ryda-gold);
   --color-marine:      var(--ryda-marine);
   --color-marine-deep: var(--ryda-marine-deep);
+  --color-success:      var(--ryda-success);
+  --color-success-deep: var(--ryda-success-deep);
 
   --font-display: var(--font-fraunces);
   --font-sans:    var(--font-inter);

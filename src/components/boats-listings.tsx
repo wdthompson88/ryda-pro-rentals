@@ -378,8 +378,11 @@ function BoatCard({ boat: b }: { boat: Boat }) {
           {b.brand}
         </span>
 
-        {/* Status pill top-right (marine accent on the boats vertical) */}
+        {/* Status pill top-right (marine accent on boats; role+aria
+            so it's announced as state, not just visual color). */}
         <span
+          role="status"
+          aria-label={isSold ? "Status: Sold out" : "Status: Available"}
           className={`absolute right-3 top-3 rounded-full px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] backdrop-blur ${
             isSold ? "bg-mute/90 text-cream" : "bg-marine/95 text-cream"
           }`}
@@ -481,7 +484,7 @@ function BoatCard({ boat: b }: { boat: Boat }) {
             <div
               className={`mt-3 rounded-lg border p-3 ${
                 rentedIsPositive
-                  ? "border-emerald-500/40 bg-emerald-500/5"
+                  ? "border-success/40 bg-success/5"
                   : "border-rule bg-cream-2/40"
               }`}
             >
@@ -517,7 +520,7 @@ function BoatCard({ boat: b }: { boat: Boat }) {
               <div
                 className={`mt-2 flex items-baseline justify-between border-t pt-2 text-xs ${
                   rentedIsPositive
-                    ? "border-emerald-500/30"
+                    ? "border-success/30"
                     : "border-rule"
                 }`}
               >
@@ -526,7 +529,7 @@ function BoatCard({ boat: b }: { boat: Boat }) {
                 </span>
                 <span
                   className={`font-display text-base tabular-nums ${
-                    rentedIsPositive ? "text-emerald-600" : "text-red"
+                    rentedIsPositive ? "text-success" : "text-red"
                   }`}
                 >
                   = {rentedIsPositive ? "+ " : "− "}
@@ -585,7 +588,7 @@ function MathRow({
   cost?: boolean;
 }) {
   const tone = positive
-    ? "text-emerald-600"
+    ? "text-success"
     : cost
       ? "text-red"
       : "text-ink";

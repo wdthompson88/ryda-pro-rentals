@@ -254,11 +254,18 @@ function Field({
   autoComplete?: string;
   required?: boolean;
 }) {
+  // Visual harmonization (UI/UX review #1): /signin and /signup must
+  // share one input language. Previously /signin used bottom-border
+  // underlines (border-0 border-b … focus:ring-0) — luxe-looking but
+  // dropped the focus ring entirely (Tier 3 accessibility issue) and
+  // diverged from /signup's boxed style. Switching to /signup's
+  // boxed input here closes both the visual mismatch and the focus-
+  // ring drop in one change.
   return (
     <div>
       <label
         htmlFor={id}
-        className="block text-[10px] font-medium uppercase tracking-[0.22em] text-mute"
+        className="block text-xs font-medium uppercase tracking-wider text-mute"
       >
         {label}
       </label>
@@ -272,7 +279,7 @@ function Field({
         autoComplete={autoComplete}
         required={required}
         aria-required={required}
-        className="mt-2 h-12 w-full border-0 border-b border-rule bg-transparent px-1 text-[15px] text-ink placeholder:text-mute focus:border-ink focus:outline-none focus:ring-0"
+        className="mt-2 h-12 w-full rounded-xl border border-rule bg-cream px-4 text-sm text-ink placeholder:text-mute focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
       />
     </div>
   );

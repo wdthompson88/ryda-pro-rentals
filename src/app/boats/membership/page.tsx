@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { HiddenWhenAuthed } from "@/components/auth-aware";
+import { earlyPricingCTA } from "@/lib/launch-config";
 
 export const metadata = {
   title: "RYDA Boats Membership, Core, Blue — Black",
@@ -103,14 +104,14 @@ export default function BoatsMembershipPage() {
             RYDA Boats · Membership
           </p>
           <h1 className="mt-4 max-w-4xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
-            Three doors{" "}
-            <span className="italic">into RYDA Boats.</span>
+            Three ways{" "}
+            <span className="italic">aboard.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
-            Core to browse and charter. Blue or Black to claim a share.
-            Boats-specific perks throughout, captain hours, hurricane prep,
-            slip priority, because owning a hull doesn&apos;t look like
-            owning a Ferrari.
+            Charter on the day. Co-own the hull on a 3-year planned exit.
+            Five members per LLC, captain hours, hurricane prep, and slip
+            priority bundled in — because owning a boat is nothing like
+            owning a Ferrari, and we built the membership around that.
           </p>
         </div>
       </section>
@@ -137,7 +138,12 @@ export default function BoatsMembershipPage() {
           </p>
 
           <div className="mt-12 overflow-hidden rounded-2xl border border-rule bg-surface">
-            <div className="overflow-x-auto">
+            <div
+              className="overflow-x-auto"
+              role="region"
+              aria-label="Membership tier comparison — scroll horizontally to see all tiers"
+              tabIndex={0}
+            >
             <table className="w-full min-w-[640px] text-sm">
               <thead className="border-b border-rule bg-cream-2">
                 <tr>
@@ -222,15 +228,15 @@ export default function BoatsMembershipPage() {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* CTA — date-bound body copy uses the shared launch-config
+          flag so it auto-flips after the early-pricing deadline. */}
       <section className="bg-ink py-20 text-cream">
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
           <h2 className="font-display text-4xl font-light sm:text-5xl">
             Boats membership opens with the Miami launch.
           </h2>
           <p className="mx-auto mt-6 max-w-xl text-base text-cream/70">
-            Apply by July 2026 to lock early-member pricing on Blue or
-            Black for life.
+            {earlyPricingCTA().body}
           </p>
           <HiddenWhenAuthed>
             <Link
@@ -283,7 +289,7 @@ function TierCard({ tier }: { tier: typeof TIERS[number] }) {
 
   return (
     <div
-      className={`relative flex flex-col rounded-none border border-rule bg-surface p-8 before:absolute before:inset-x-0 before:top-0 before:h-[3px] ${accentLine}`}
+      className={`relative flex flex-col rounded-2xl border border-rule bg-surface p-8 before:absolute before:inset-x-0 before:top-0 before:h-[3px] ${accentLine}`}
     >
       <p className={`text-[10px] font-medium uppercase tracking-[0.22em] ${eyebrowColor}`}>
         RYDA Boats {tier.name}

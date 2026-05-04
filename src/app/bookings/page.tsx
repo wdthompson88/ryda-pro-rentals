@@ -275,7 +275,7 @@ export default function BookingsPage() {
                     <span
                       className={`rounded-full px-3 py-1 text-xs font-medium ${
                         b.status === "confirmed"
-                          ? "bg-emerald-500/10 text-emerald-700"
+                          ? "bg-success/10 text-success-deep"
                           : b.status === "in-progress"
                             ? "bg-amber-500/15 text-amber-700"
                             : "bg-red/10 text-red"

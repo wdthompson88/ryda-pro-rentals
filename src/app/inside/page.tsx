@@ -26,22 +26,26 @@ export default function InsidePage() {
     <>
       <SiteHeader />
 
-      {/* Hero */}
+      {/* Hero — brand voice harmonized to the editorial register
+          used elsewhere on the site. Previous app-marketing tone
+          ("upcoming member app") didn't match the considered
+          luxury voice on /cars, /boats, /membership.
+          UI/UX review Tier 2: copy register. */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-28">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
             Inside RYDA · Sample data
           </p>
           <h1 className="mt-4 max-w-4xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
-            What you see on{" "}
-            <span className="italic">the inside.</span>
+            What members{" "}
+            <span className="italic">actually see.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
-            A preview of the upcoming member app, modeled with sample
-            holdings so you can see what the experience will look like
-            before you commit. Final views may differ in polish detail.
-            After purchase, sign in to see your actual portfolio,
-            calendar, and documents.
+            Once your share is recorded, the rest of the site recedes.
+            Your portfolio, your bookings, the documents that govern each
+            LLC, the day-to-day of operating cars together — all in one
+            place. Below is a preview, modeled with sample holdings, so
+            you can see what arrives the day you join.
           </p>
         </div>
       </section>
@@ -71,7 +75,7 @@ export default function InsidePage() {
                 <span className="h-2.5 w-2.5 rounded-full bg-mute/60" aria-hidden />
                 <span className="h-2.5 w-2.5 rounded-full bg-mute/40" aria-hidden />
                 <p className="ml-3 text-[11px] font-medium uppercase tracking-[0.18em] text-mute">
-                  ryda.app · /portfolio
+                  ryda.com · /account
                 </p>
               </div>
               {/* Body */}
@@ -91,7 +95,7 @@ export default function InsidePage() {
                   <p className="text-xs uppercase tracking-wider text-mute">
                     Modeled share value
                   </p>
-                  <p className="mt-2 font-display text-3xl text-emerald-600 tabular-nums">
+                  <p className="mt-2 font-display text-3xl text-success tabular-nums">
                     {formatUSD(
                       Math.round(
                         (f296.pricePerShare + mc75.pricePerShare) * heldShares * 0.95,

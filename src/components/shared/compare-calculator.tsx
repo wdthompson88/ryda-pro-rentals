@@ -2,8 +2,16 @@
 
 import { useMemo, useState } from "react";
 import {
-  BOATS,
+  VEHICLES,
   formatUSD,
+  HOLDING_YEARS,
+  TARGET_DEPRECIATION_PCT,
+  RENTAL_DEFAULTS,
+  computeRentalEconomics,
+  type Vehicle,
+} from "@/lib/market-data";
+import {
+  BOATS,
   BOATS_HOLDING_YEARS,
   BOATS_TARGET_DEPRECIATION_PCT,
   RENTAL_DEFAULTS_BOATS,
@@ -12,51 +20,200 @@ import {
 } from "@/lib/boat-data";
 
 const RENTAL_FALLBACK = 2_500;
-const DEFAULT_RESIDUAL_PCT = 100 - BOATS_TARGET_DEPRECIATION_PCT; // 90% of buy-in
 
-export function BoatCompareCalculator({
-  lockedBoat,
-}: {
-  /** When set, hides the boat picker and locks math to this boat.
-   *  Used on /boats/portfolio/[slug] so each listing has its own calculator. */
-  lockedBoat?: Boat;
-} = {}) {
-  // Educational tool, let users model 1..boat.shares regardless of
-  // current inventory. Real availability lives on each boat's listing.
+type CompareAsset = Vehicle | Boat;
+
+type RentalEconomics = ReturnType<typeof computeRentalEconomics>;
+
+export type CompareCalculatorConfig<TAsset extends CompareAsset = CompareAsset> = {
+  vertical: "cars" | "boats";
+  holdingYears: number;
+  targetDepreciationPct: number;
+  rentalDefaults: {
+    defaultOccupancyPct: number;
+    defaultManagementFeePct: number;
+  };
+  accent: "red" | "marine";
+  labels: {
+    asset: string;
+    assetLower: string;
+    assetHeldCopy: string;
+    calculatorName: string;
+    rentalIncomeName: string;
+    rentalPoolName: string;
+    rentalVerb: string;
+    rentalToggleVerb: string;
+    /** Adjective form, title-case: "Rental" / "Charter" */
+    rentalAdjectiveTitle: string;
+    /** Adjective/noun form, lower-case: "rental" / "charter" */
+    rentalAdjectiveLower: string;
+    useDays: string;
+    useDaysAdjective: string;
+    residualAssumption: string;
+    rentalMarketCopy: string;
+    resaleConsistencyCopy: string;
+    exitAssetName: string;
+  };
+};
+
+type Props<TAsset extends CompareAsset> = {
+  config: CompareCalculatorConfig<TAsset>;
+  lockedAsset?: TAsset;
+};
+
+const compareAccentClasses = {
+  red: {
+    text: "text-red",
+    border: "border-red",
+    borderSoft: "border-red/30",
+    bg: "bg-red",
+    bgSoft: "bg-red/5",
+    focus: "focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20",
+    hoverBgSoft: "hover:bg-red/5",
+    shadow: "shadow-lg shadow-red/30",
+    range: "accent-red",
+  },
+  marine: {
+    text: "text-marine",
+    border: "border-marine",
+    borderSoft: "border-marine/30",
+    bg: "bg-marine",
+    bgSoft: "bg-marine/5",
+    focus: "focus:border-marine focus:outline-none focus:ring-2 focus:ring-marine/20",
+    hoverBgSoft: "hover:bg-marine/5",
+    shadow: "shadow-lg shadow-marine/30",
+    range: "accent-marine",
+  },
+} as const;
+
+export function buildCompareCalculatorConfig(
+  vertical: "cars",
+): CompareCalculatorConfig<Vehicle>;
+export function buildCompareCalculatorConfig(
+  vertical: "boats",
+): CompareCalculatorConfig<Boat>;
+export function buildCompareCalculatorConfig(
+  vertical: "cars" | "boats",
+): CompareCalculatorConfig {
+  if (vertical === "boats") {
+    return {
+      vertical,
+      holdingYears: BOATS_HOLDING_YEARS,
+      targetDepreciationPct: BOATS_TARGET_DEPRECIATION_PCT,
+      rentalDefaults: RENTAL_DEFAULTS_BOATS,
+      accent: "marine",
+      labels: {
+        asset: "Boat",
+        assetLower: "boat",
+        assetHeldCopy: "curated surveyed hull",
+        calculatorName: "Boatculator",
+        rentalIncomeName: "Charter income projection",
+        rentalPoolName: "charter pool",
+        rentalVerb: "chartering",
+        rentalToggleVerb: "Charter",
+        rentalAdjectiveTitle: "Charter",
+        rentalAdjectiveLower: "charter",
+        useDays: "cruising days",
+        useDaysAdjective: "cruise",
+        residualAssumption:
+          "surveyed certified pre owned hulls",
+        rentalMarketCopy:
+          "Miami Caribbean charter pools average 200-240 booked days/yr.",
+        resaleConsistencyCopy:
+          "our 50 nm/day allowance + surveyed-hull maintenance keep the resale story consistent whether you cruise or charter it out.",
+        exitAssetName: "boat",
+      },
+    };
+  }
+
+  return {
+    vertical,
+    holdingYears: HOLDING_YEARS,
+    targetDepreciationPct: TARGET_DEPRECIATION_PCT,
+    rentalDefaults: RENTAL_DEFAULTS,
+    accent: "red",
+    labels: {
+      asset: "Vehicle",
+      assetLower: "vehicle",
+      assetHeldCopy: "curated certified pre owned car",
+      calculatorName: "Carculator",
+      rentalIncomeName: "Rental income projection",
+      rentalPoolName: "rental pool",
+      rentalVerb: "renting",
+      rentalToggleVerb: "Rent",
+      rentalAdjectiveTitle: "Rental",
+      rentalAdjectiveLower: "rental",
+      useDays: "driving days",
+      useDaysAdjective: "drive",
+      residualAssumption:
+        "low-mileage certified pre owned exotics",
+      rentalMarketCopy:
+        "Miami exotic-rental fleets average 200-240 booked days/yr.",
+      resaleConsistencyCopy:
+        "our 100 mi/day allowance + certified pre owned maintenance keep the resale story consistent whether you drive or rent it out.",
+      exitAssetName: "car",
+    },
+  };
+}
+
+export default function CompareCalculator<TAsset extends CompareAsset>({
+  config,
+  lockedAsset,
+}: Props<TAsset>) {
+  const accent = compareAccentClasses[config.accent];
+  const assets = (config.vertical === "boats" ? BOATS : VEHICLES) as TAsset[];
+  const defaultAsset = (config.vertical === "boats"
+    ? BOATS[0]
+    : VEHICLES.find((v) => v.symbol === "F296") ?? VEHICLES[0]) as TAsset;
+  const getAssetKey = (asset: TAsset) =>
+    config.vertical === "boats"
+      ? (asset as Boat).slug
+      : (asset as Vehicle).symbol;
+  const getRentalEconomics = (asset: TAsset, opts: {
+    holdYears: number;
+    occupancyPct: number;
+    ownerUseDaysPerShare: number;
+  }) =>
+    config.vertical === "boats"
+      ? computeBoatRentalEconomics(asset as Boat, opts)
+      : computeRentalEconomics(asset as Vehicle, opts);
+  const defaultResidualPct = 100 - config.targetDepreciationPct;
+  // Educational tool, let users model 1..vehicle.shares regardless of
+  // current inventory. Real availability lives on each vehicle's listing.
   // Defaults reflect the doctrinal certified pre owned 2-year planned exit.
   const initial =
-    lockedBoat ?? BOATS[0];
-  const [boatSlug, setBoatSlug] = useState(initial.slug);
+    lockedAsset ?? defaultAsset;
+  const [assetKey, setAssetKey] = useState(getAssetKey(initial));
   // 2-share minimum per person under the new doctrine. Slider floor and
   // useState default both reflect that so the modeled scenario is
   // actually purchasable.
   const [shares, setShares] = useState(2);
   // Default to 12 owner-use days/yr per share, matches the static
   // worked example on /how-it-works and the rental scenario shown in
-  // CostBreakdown / cost-sheet (both pull from RENTAL_DEFAULTS_BOATS).
+  // CostBreakdown / cost-sheet (both pull from RENTAL_DEFAULTS).
   const [days, setDays] = useState(12);
-  const [holdYears, setHoldYears] = useState(BOATS_HOLDING_YEARS);
-  const [residualPct, setResidualPct] = useState(DEFAULT_RESIDUAL_PCT);
+  const [holdYears, setHoldYears] = useState(config.holdingYears);
+  const [residualPct, setResidualPct] = useState(defaultResidualPct);
   // Rental opt-in defaults to ON, most members will want the rental
   // income surfaced in their projection. The button text flips to
   // "Opt out" so the action is explicit when the toggle is ON.
   const [optInRental, setOptInRental] = useState(true);
   const [rentalOccupancy, setRentalOccupancy] = useState(
-    RENTAL_DEFAULTS_BOATS.defaultOccupancyPct,
+    config.rentalDefaults.defaultOccupancyPct,
   );
 
-  const boat: Boat = lockedBoat
-    ?? BOATS.find((v) => v.slug === boatSlug)
+  const vehicle: TAsset = lockedAsset
+    ?? assets.find((v) => getAssetKey(v) === assetKey)
     ?? initial;
 
-  const maxShares = boat.shares; // total shares per LLC (educational cap)
+  const maxShares = vehicle.shares; // total shares per LLC (educational cap)
   const safeShares = Math.min(shares, maxShares);
-  const maxDays = boat.daysPerYear * safeShares; // scales with share count
+  const maxDays = vehicle.daysPerYear * safeShares; // scales with share count
 
   const numbers = useMemo(() => {
-    const buyIn = boat.pricePerShare * safeShares;
-    const annualOps = boat.annualOpCost * safeShares;
-    const rentalDaily = boat.rentalDailyRate || RENTAL_FALLBACK;
+    const buyIn = vehicle.pricePerShare * safeShares;
+    const annualOps = vehicle.annualOpCost * safeShares;
+    const rentalDaily = vehicle.rentalDailyRate || RENTAL_FALLBACK;
 
     // Cap days to what this share count actually unlocks
     const cappedDays = Math.min(days, maxDays);
@@ -75,7 +232,7 @@ export function BoatCompareCalculator({
     // share count). The pool of rentable days is the rest of the calendar
     // across ALL shares.
     const ownerUseDaysPerShare = Math.round(cappedDays / safeShares);
-    const rentalEcon = computeBoatRentalEconomics(boat, {
+    const rentalEcon = getRentalEconomics(vehicle, {
       holdYears,
       occupancyPct: rentalOccupancy,
       ownerUseDaysPerShare,
@@ -92,8 +249,8 @@ export function BoatCompareCalculator({
     // Regular ownership: same hold period, full sticker + carrying.
     // Apply the same residual % the user picked, depreciation hits the
     // whole car, not just one share.
-    const regularBuyIn = boat.fullPrice;
-    const regularAnnualCarrying = boat.annualSoloCarrying;
+    const regularBuyIn = vehicle.fullPrice;
+    const regularAnnualCarrying = vehicle.annualSoloCarrying;
     const regularTotalCash = regularBuyIn + regularAnnualCarrying * holdYears;
     const regularResidual = Math.round(regularBuyIn * (residualPct / 100));
     const regularEconomicCost = regularTotalCash - regularResidual;
@@ -148,7 +305,8 @@ export function BoatCompareCalculator({
       cappedDays,
     };
   }, [
-    boat,
+    vehicle,
+    config,
     safeShares,
     days,
     holdYears,
@@ -163,28 +321,29 @@ export function BoatCompareCalculator({
       id="calculator"
       className="rounded-2xl border border-rule bg-surface p-6 sm:p-10"
     >
-      <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
+      <p className={`text-xs font-medium uppercase tracking-[0.2em] ${accent.text}`}>
         Run the math on your usage
       </p>
       <h3 className="mt-3 font-display text-2xl text-ink sm:text-3xl">
-        Co-own vs. rent, your numbers.
+        Co-own vs. {config.labels.rentalVerb}, your numbers.
       </h3>
       <p className="mt-3 max-w-xl text-sm text-ink-soft">
-        Move the sliders. The math is honest: each curated surveyed hull is held
-        for {BOATS_HOLDING_YEARS} years (the default), then sold and proceeds are
+        Move the sliders. The math is honest: each {config.labels.assetHeldCopy} is held
+        for {config.holdingYears} years (the default), then sold and proceeds are
         returned pro-rata. The calculator subtracts your estimated share
         sale from your total cash to show real{" "}
         <span className="font-medium text-ink">net cost</span>, and
-        compares it against chartering the same hull or owning it solo.
+        compares it against {config.labels.rentalVerb} the same {config.labels.exitAssetName} or owning it solo.
       </p>
 
-      {/* Boatculator headline panel — surfaces projected charter
-          income upfront so the offset story is the first number on
-          the page. Tied to live state via numbers.ryda. */}
+      {/* Carculator headline panel — Turo-inspired "earnings projection"
+          at the top of the calculator. Surfaces the rental-income number
+          upfront so the reader sees the offset story before scrolling
+          through sliders. Tied to live state via numbers.ryda. */}
       {optInRental && numbers.ryda.rentalIncomeAnnual > 0 ? (
-        <div className="mt-8 rounded-2xl border border-marine bg-marine/5 p-6 sm:p-7">
-          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-marine">
-            Boatculator · Charter income projection
+        <div className={`mt-8 rounded-2xl border ${accent.border} ${accent.bgSoft} p-6 sm:p-7`}>
+          <p className={`text-[10px] font-bold uppercase tracking-[0.22em] ${accent.text}`}>
+            {config.labels.calculatorName} · {config.labels.rentalIncomeName}
           </p>
           <div className="mt-3 grid grid-cols-1 gap-6 sm:grid-cols-3 sm:items-end">
             <div className="sm:col-span-2">
@@ -199,7 +358,7 @@ export function BoatCompareCalculator({
                 <span className="font-medium text-ink">
                   {safeShares} share{safeShares > 1 ? "s" : ""}
                 </span>{" "}
-                of the {boat.name} into the RYDA charter pool, at{" "}
+                of the {vehicle.name} into the RYDA {config.labels.rentalPoolName}, at{" "}
                 <span className="font-medium text-ink tabular-nums">
                   {rentalOccupancy}%
                 </span>{" "}
@@ -208,11 +367,11 @@ export function BoatCompareCalculator({
                   {numbers.rentalEcon.rentablePoolDays}
                 </span>{" "}
                 pooled days. Revenue split{" "}
-                {100 - RENTAL_DEFAULTS_BOATS.defaultManagementFeePct}/
-                {RENTAL_DEFAULTS_BOATS.defaultManagementFeePct} you / RYDA.
+                {100 - config.rentalDefaults.defaultManagementFeePct}/
+                {config.rentalDefaults.defaultManagementFeePct} you / RYDA.
               </p>
             </div>
-            <div className="rounded-xl border border-marine/30 bg-cream-2/60 p-4 text-center">
+            <div className={`rounded-xl border ${accent.borderSoft} bg-cream-2/60 p-4 text-center`}>
               <p className="text-[10px] font-medium uppercase tracking-wider text-mute">
                 Offsets carrying
               </p>
@@ -235,13 +394,13 @@ export function BoatCompareCalculator({
       ) : (
         <div className="mt-8 rounded-2xl border border-rule bg-cream-2/60 p-6 sm:p-7">
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-mute">
-            Boatculator · Charter income projection
+            {config.labels.calculatorName} · {config.labels.rentalIncomeName}
           </p>
           <p className="mt-3 text-sm text-ink-soft">
-            Toggle &ldquo;Charter your unused days&rdquo; below to see
-            what opting your share into the charter pool would project.
-            Default occupancy: {RENTAL_DEFAULTS_BOATS.defaultOccupancyPct}%
-            of pooled days booked.
+            Toggle &ldquo;{config.labels.rentalToggleVerb} your unused days&rdquo; below to see what
+            opting your share into the {config.labels.rentalPoolName} would project. Default
+            occupancy: {config.rentalDefaults.defaultOccupancyPct}% of pooled
+            days booked.
           </p>
         </div>
       )}
@@ -250,32 +409,32 @@ export function BoatCompareCalculator({
       <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2">
         <div>
           <label
-            htmlFor="calc-boat"
+            htmlFor="calc-asset"
             className="block text-xs font-medium uppercase tracking-wider text-mute"
           >
-            Boat
+            {config.labels.asset}
           </label>
-          {lockedBoat ? (
+          {lockedAsset ? (
             <div className="mt-2 flex h-12 w-full items-center rounded-xl border border-rule bg-cream-2 px-4 text-sm font-medium text-ink">
-              {lockedBoat.year} {lockedBoat.name}
+              {lockedAsset.year} {lockedAsset.name}
             </div>
           ) : (
             <select
-              id="calc-boat"
-              value={boatSlug}
-              onChange={(e) => setBoatSlug(e.target.value)}
-              className="mt-2 h-12 w-full rounded-xl border border-rule bg-cream-2 px-4 text-sm text-ink focus:border-marine focus:outline-none focus:ring-2 focus:ring-marine/20"
+              id="calc-asset"
+              value={assetKey}
+              onChange={(e) => setAssetKey(e.target.value)}
+              className={`mt-2 h-12 w-full rounded-xl border border-rule bg-cream-2 px-4 text-sm text-ink ${accent.focus}`}
             >
-              {BOATS.map((v) => (
-                <option key={v.slug} value={v.slug}>
+              {assets.map((v) => (
+                <option key={getAssetKey(v)} value={getAssetKey(v)}>
                   {v.year} {v.name}
                 </option>
               ))}
             </select>
           )}
           <p className="mt-2 text-xs text-mute">
-            {formatUSD(boat.pricePerShare)} per share ·{" "}
-            {formatUSD(boat.annualOpCost)}/yr ops · ~{boat.daysPerYear}{" "}
+            {formatUSD(vehicle.pricePerShare)} per share ·{" "}
+            {formatUSD(vehicle.annualOpCost)}/yr ops · ~{vehicle.daysPerYear}{" "}
             days/share
           </p>
         </div>
@@ -288,15 +447,16 @@ export function BoatCompareCalculator({
           min={2}
           max={maxShares}
           step={1}
-          valueLabel={`${safeShares} of ${boat.shares}`}
+          valueLabel={`${safeShares} of ${vehicle.shares}`}
           subLabel={`Unlocks ~${maxDays} days/yr · buy-in ${formatUSD(
-            boat.pricePerShare * safeShares,
+            vehicle.pricePerShare * safeShares,
           )}`}
+          accent={config.accent}
         />
 
         <Slider
           id="calc-days"
-          label="Days you'd actually drive per year"
+          label={`Days you'd actually ${config.labels.useDaysAdjective} per year`}
           value={Math.min(days, maxDays)}
           onChange={setDays}
           min={5}
@@ -306,6 +466,7 @@ export function BoatCompareCalculator({
             Math.min(days, maxDays) === 1 ? "day" : "days"
           }`}
           subLabel={`Cap: ${maxDays} (your share entitlement at ${safeShares} share${safeShares > 1 ? "s" : ""})`}
+          accent={config.accent}
         />
 
         <Slider
@@ -317,7 +478,8 @@ export function BoatCompareCalculator({
           max={5}
           step={1}
           valueLabel={`${holdYears} ${holdYears === 1 ? "year" : "years"}`}
-          subLabel={`Default: ${BOATS_HOLDING_YEARS}-yr certified pre owned exit baseline · 12-month minimum hold`}
+          subLabel={`Default: ${config.holdingYears}-yr certified pre owned exit baseline · 12-month minimum hold`}
+          accent={config.accent}
         />
 
         <Slider
@@ -329,7 +491,8 @@ export function BoatCompareCalculator({
           max={100}
           step={5}
           valueLabel={`${residualPct}%`}
-          subLabel={`Default ${DEFAULT_RESIDUAL_PCT}%, assumes ~${BOATS_TARGET_DEPRECIATION_PCT}% depreciation over ${BOATS_HOLDING_YEARS} yrs on surveyed certified pre owned hulls`}
+          subLabel={`Default ${defaultResidualPct}%, assumes ~${config.targetDepreciationPct}% depreciation over ${config.holdingYears} yrs on ${config.labels.residualAssumption}`}
+          accent={config.accent}
         />
       </div>
 
@@ -339,35 +502,33 @@ export function BoatCompareCalculator({
       <div
         className={`mt-10 rounded-2xl border-2 p-6 transition-colors ${
           optInRental
-            ? "border-marine bg-marine/5"
-            : "border-marine/30 bg-cream-2"
+            ? `${accent.border} ${accent.bgSoft}`
+            : `${accent.borderSoft} bg-cream-2`
         }`}
       >
         <div className="flex flex-wrap items-start justify-between gap-6">
           <div className="max-w-xl">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-marine">
-              Rent your unused days · Included by default
+            <p className={`text-xs font-bold uppercase tracking-[0.2em] ${accent.text}`}>
+              {config.labels.rentalToggleVerb} your unused days · Included by default
             </p>
             <h4 className="mt-2 font-display text-2xl text-ink">
               {optInRental
-                ? "Rental income is included in this math."
-                : "Toggle back on to add rental income."}
+                ? `${config.labels.rentalAdjectiveTitle} income is included in this math.`
+                : `Toggle back on to add ${config.labels.rentalAdjectiveLower} income.`}
             </h4>
             <p className="mt-3 text-sm leading-relaxed text-ink-soft">
-              Miami Caribbean charter pools average 200–240 booked days/yr.
+              {config.labels.rentalMarketCopy}
               Shareholders can opt their unused entitlement into the
-              rental pool, RYDA handles bookings, insurance, and
+              {config.labels.rentalPoolName}, RYDA handles bookings, insurance, and
               cleaning. Revenue splits{" "}
-              {100 - RENTAL_DEFAULTS_BOATS.defaultManagementFeePct}/
-              {RENTAL_DEFAULTS_BOATS.defaultManagementFeePct} (you / RYDA),
+              {100 - config.rentalDefaults.defaultManagementFeePct}/
+              {config.rentalDefaults.defaultManagementFeePct} (you / RYDA),
               distributed pro-rata across shares. Opt out for the
-              drive-only number.
+              {config.labels.useDaysAdjective}-only number.
             </p>
             <p className="mt-2 text-xs text-mute">
-              Same {BOATS_TARGET_DEPRECIATION_PCT}% depreciation assumption
-              applies, our 50 nm/day allowance + surveyed-hull maintenance
-              keep the resale story consistent whether you cruise or
-              charter it out.
+              Same {config.targetDepreciationPct}% depreciation assumption
+              applies, {config.labels.resaleConsistencyCopy}
             </p>
           </div>
 
@@ -379,20 +540,20 @@ export function BoatCompareCalculator({
             onClick={() => setOptInRental((v) => !v)}
             className={`group flex shrink-0 items-center gap-3 rounded-full border-2 px-5 py-3 text-sm font-bold uppercase tracking-wider transition-all hover:scale-[1.02] ${
               optInRental
-                ? "border-marine bg-marine text-cream shadow-lg shadow-marine/30"
-                : "border-marine bg-cream text-marine shadow-md hover:bg-marine/5"
+                ? `${accent.border} ${accent.bg} text-cream ${accent.shadow}`
+                : `${accent.border} bg-cream ${accent.text} shadow-md ${accent.hoverBgSoft}`
             }`}
           >
             <span>{optInRental ? "Opt out" : "Opt in"}</span>
             <span
               className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${
-                optInRental ? "bg-cream" : "bg-marine"
+                optInRental ? "bg-cream" : accent.bg
               }`}
             >
               <span
                 className={`inline-block h-4 w-4 transform rounded-full transition-transform ${
                   optInRental
-                    ? "translate-x-6 bg-marine"
+                    ? `translate-x-6 ${accent.bg}`
                     : "translate-x-1 bg-cream"
                 }`}
               />
@@ -404,7 +565,7 @@ export function BoatCompareCalculator({
           <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
             <Slider
               id="calc-rental-occ"
-              label="Rental occupancy (% of pooled days booked)"
+              label={`${config.labels.rentalAdjectiveTitle} occupancy (% of pooled days booked)`}
               value={rentalOccupancy}
               onChange={setRentalOccupancy}
               min={30}
@@ -412,10 +573,11 @@ export function BoatCompareCalculator({
               step={5}
               valueLabel={`${rentalOccupancy}%`}
               subLabel={`At ${rentalOccupancy}% on ${numbers.rentalEcon.rentablePoolDays} pooled days = ~${numbers.rentalEcon.bookedDays} booked days/yr`}
+              accent={config.accent}
             />
             <div className="rounded-2xl border border-rule bg-surface p-5">
               <p className="text-xs uppercase tracking-wider text-mute">
-                Rental income, your share{safeShares > 1 ? "s" : ""}
+                {config.labels.rentalAdjectiveTitle} income, your share{safeShares > 1 ? "s" : ""}
               </p>
               <p className="mt-2 font-display text-2xl text-ink tabular-nums">
                 {formatUSD(numbers.ryda.rentalIncomeAnnual)}
@@ -478,10 +640,11 @@ export function BoatCompareCalculator({
                 valueDetail={`${isPos ? "+" : ""}${returnPct.toFixed(2)}%`}
                 sub={
                   optInRental
-                    ? `${formatUSD(numbers.ryda.rentalIncomePerShare)} rental income + ${formatUSD(numbers.ryda.residual)} sale − ${formatUSD(numbers.ryda.buyIn)} buy-in − ${formatUSD(numbers.ryda.totalCash - numbers.ryda.buyIn)} carrying`
+                    ? `${formatUSD(numbers.ryda.rentalIncomePerShare)} ${config.labels.rentalAdjectiveLower} income + ${formatUSD(numbers.ryda.residual)} sale − ${formatUSD(numbers.ryda.buyIn)} buy-in − ${formatUSD(numbers.ryda.totalCash - numbers.ryda.buyIn)} carrying`
                     : `${formatUSD(numbers.ryda.residual)} sale − ${formatUSD(numbers.ryda.buyIn)} buy-in − ${formatUSD(numbers.ryda.totalCash - numbers.ryda.buyIn)} carrying`
                 }
                 accent
+                accentColor={config.accent}
                 positive={numbers.ryda.economicCost < 0}
               />
             );
@@ -500,7 +663,7 @@ export function BoatCompareCalculator({
             <div
               className={`mt-4 rounded-2xl border p-5 ${
                 isPositive
-                  ? "border-emerald-500/40 bg-emerald-500/5"
+                  ? "border-success/40 bg-success/5"
                   : "border-rule bg-cream-2/40"
               }`}
             >
@@ -513,6 +676,7 @@ export function BoatCompareCalculator({
                   label="Share price (your buy-in)"
                   value={formatUSD(numbers.ryda.buyIn)}
                   cost
+                  accent={config.accent}
                 />
                 <CalcMathRow
                   sign="−"
@@ -521,13 +685,15 @@ export function BoatCompareCalculator({
                     numbers.ryda.totalCash - numbers.ryda.buyIn,
                   )}
                   cost
+                  accent={config.accent}
                 />
                 {optInRental ? (
                   <CalcMathRow
                     sign="+"
-                    label={`Projected rental income (${holdYears} yrs)`}
+                    label={`Projected ${config.labels.rentalAdjectiveLower} income (${holdYears} yrs)`}
                     value={formatUSD(numbers.ryda.rentalIncomePerShare)}
                     positive
+                    accent={config.accent}
                   />
                 ) : null}
                 <CalcMathRow
@@ -535,12 +701,13 @@ export function BoatCompareCalculator({
                   label={`Projected sale at exit (${residualPct}% of buy-in)`}
                   value={formatUSD(numbers.ryda.residual)}
                   positive
+                  accent={config.accent}
                 />
               </dl>
               <div
                 className={`mt-3 flex items-baseline justify-between gap-4 border-t pt-3 ${
                   isPositive
-                    ? "border-emerald-500/30"
+                    ? "border-success/30"
                     : "border-rule"
                 }`}
               >
@@ -549,7 +716,7 @@ export function BoatCompareCalculator({
                 </span>
                 <span
                   className={`font-display text-2xl tabular-nums ${
-                    isPositive ? "text-emerald-600" : "text-ink"
+                    isPositive ? "text-success" : "text-ink"
                   }`}
                 >
                   = {isPositive ? "+ " : "− "}
@@ -574,7 +741,7 @@ export function BoatCompareCalculator({
       {/* Results, alternatives */}
       <div className="mt-8">
         <p className="text-xs font-medium uppercase tracking-wider text-mute">
-          The alternatives, same {numbers.ryda.totalDays} cruising days
+          The alternatives, same {numbers.ryda.totalDays} {config.labels.useDays}
         </p>
         <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <ResultCard
@@ -585,7 +752,7 @@ export function BoatCompareCalculator({
             )}/yr carrying × ${holdYears}, less ${formatUSD(numbers.regular.residual)} residual`}
           />
           <ResultCard
-            label="Renting the same days"
+            label={`${config.labels.rentalAdjectiveTitle === "Rental" ? "Renting" : "Chartering"} the same days`}
             value={formatUSD(numbers.rental.total)}
             sub={`${formatUSD(numbers.rental.perDay)}/day × ${
               numbers.ryda.totalDays
@@ -597,7 +764,7 @@ export function BoatCompareCalculator({
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="rounded-2xl border border-rule bg-cream-2/40 p-6">
           <p className="text-xs font-medium uppercase tracking-wider text-mute">
-            Saved vs. renting
+            Saved vs. {config.labels.rentalVerb}
           </p>
           <p className="mt-2 font-display text-3xl text-ink sm:text-4xl tabular-nums">
             {numbers.savings >= 0 ? "" : "−"}
@@ -615,7 +782,7 @@ export function BoatCompareCalculator({
             <span className="font-medium text-ink tabular-nums">
               {formatUSD(numbers.rental.perDay)}
             </span>
-            /day renting.
+            /day {config.labels.rentalVerb}.
           </p>
         </div>
         <div className="rounded-2xl border border-rule bg-cream-2/40 p-6">
@@ -635,7 +802,7 @@ export function BoatCompareCalculator({
       </div>
 
       <p className="mt-4 text-xs text-mute">
-        Default exit: RYDA sells the boat at year {BOATS_HOLDING_YEARS} and
+        Default exit: RYDA sells the {config.labels.exitAssetName} at year {config.holdingYears} and
         distributes proceeds pro-rata. Earlier exits are possible by
         transferring shares to another verified member after the 12-month
         minimum hold; transfer prices are member-to-member.
@@ -648,9 +815,11 @@ export function BoatCompareCalculator({
           <span className="tabular-nums">
             {numbers.ryda.unusedDaysPerYear}
           </span>{" "}
-          entitled days/yr unused. RYDA still wins on cost per actually-driven
-          day, but if your real usage is much lower than your share count
-          unlocks, fewer shares is the more honest economic answer.
+          entitled days/yr unused. RYDA still wins on cost per day actually
+          {" "}
+          {config.labels.useDaysAdjective}, but if your real usage is much
+          lower than your share count unlocks, fewer shares is the more
+          honest economic answer.
         </p>
       )}
     </div>
@@ -667,6 +836,7 @@ function Slider({
   step,
   valueLabel,
   subLabel,
+  accent = "red",
 }: {
   id: string;
   label: string;
@@ -677,7 +847,9 @@ function Slider({
   step: number;
   valueLabel: string;
   subLabel?: string;
+  accent?: "red" | "marine";
 }) {
+  const styles = compareAccentClasses[accent];
   return (
     <div>
       <div className="flex items-baseline justify-between">
@@ -699,7 +871,7 @@ function Slider({
         step={step}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="mt-3 h-2 w-full cursor-pointer appearance-none rounded-full bg-rule accent-marine"
+        className={`mt-3 h-2 w-full cursor-pointer appearance-none rounded-full bg-rule ${styles.range}`}
       />
       {subLabel && <p className="mt-2 text-xs text-mute">{subLabel}</p>}
     </div>
@@ -712,17 +884,19 @@ function CalcMathRow({
   value,
   positive,
   cost,
+  accent = "red",
 }: {
   sign: "+" | "−";
   label: string;
   value: string;
   positive?: boolean;
   cost?: boolean;
+  accent?: "red" | "marine";
 }) {
   const tone = positive
-    ? "text-emerald-600"
+    ? "text-success"
     : cost
-      ? "text-marine"
+      ? compareAccentClasses[accent].text
       : "text-ink";
   return (
     <div className="flex items-baseline justify-between gap-3">
@@ -742,6 +916,7 @@ function ResultCard({
   sub,
   accent,
   positive,
+  accentColor = "red",
 }: {
   label: string;
   value: string;
@@ -751,13 +926,15 @@ function ResultCard({
   sub: string;
   accent?: boolean;
   positive?: boolean;
+  accentColor?: "red" | "marine";
 }) {
+  const styles = compareAccentClasses[accentColor];
   const borderColor = positive
-    ? "border-emerald-500 bg-emerald-500/5"
+    ? "border-success bg-success/5"
     : accent
-      ? "border-marine bg-marine/5"
+      ? `${styles.border} ${styles.bgSoft}`
       : "border-rule bg-cream-2/40";
-  const textColor = positive ? "text-emerald-600" : "text-ink";
+  const textColor = positive ? "text-success" : "text-ink";
 
   return (
     <div className={`rounded-2xl border p-6 ${borderColor}`}>

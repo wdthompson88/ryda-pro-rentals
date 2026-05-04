@@ -246,7 +246,11 @@ export default function ProfilePage() {
                   {...field("date_of_birth")}
                 />
               </Field>
-              <Field label="" hint="" />
+              {/* Empty grid spacer — was previously a <Field label="" />
+                  which screen readers announce as "(blank label)".
+                  Plain div keeps the 2-col grid balanced without
+                  emitting a labeled-but-empty form control. */}
+              <div aria-hidden="true" />
             </Row>
           </Section>
 
@@ -328,7 +332,7 @@ export default function ProfilePage() {
             </p>
           ) : null}
           {savedFlash ? (
-            <p className="rounded-xl border border-emerald-500/40 bg-emerald-500/5 px-4 py-3 text-sm text-emerald-700">
+            <p className="rounded-xl border border-success/40 bg-success/5 px-4 py-3 text-sm text-success-deep">
               Profile saved.
             </p>
           ) : null}

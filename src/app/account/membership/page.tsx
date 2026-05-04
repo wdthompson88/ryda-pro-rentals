@@ -91,20 +91,23 @@ export default function MembershipPage() {
         </p>
       </header>
 
-      {/* Tier — placeholder until membership_tiers table lands.
-          The /membership marketing page is the source of truth for
-          what each tier includes today; once members can actually
-          buy tiered subscriptions, this card reads from a real
-          subscriptions table. */}
+      {/* Tier — pre-launch state. Tiered subscriptions (Friend /
+          Founder / Founder+) ship with the Miami launch when the
+          membership_tiers table lands. Until then we render an
+          honest pre-launch state — NOT a fake "RYDA Core · Free"
+          card that would mislead members who paid for one of the
+          tiers post-launch. UI/UX review #3. */}
       <section className="rounded-2xl border border-rule bg-surface p-6 sm:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-xs font-medium uppercase tracking-[0.2em] text-mute">
-              Current tier
+              Membership tier
             </p>
-            <p className="mt-2 font-display text-3xl text-ink">RYDA Core</p>
+            <p className="mt-2 font-display text-3xl text-ink">Pre-launch member</p>
             <p className="mt-1 text-sm text-ink-soft">
-              Free tier · Tiered membership opens with the Miami launch
+              Tiered membership (Friend, Founder, Founder+) opens with the
+              Miami launch in Q3 2026. Your tier and renewal will appear here
+              once subscriptions go live.
             </p>
           </div>
           <div className="flex flex-col items-start gap-2 sm:items-end">
@@ -112,15 +115,15 @@ export default function MembershipPage() {
               href="/membership"
               className="inline-flex h-11 items-center justify-center rounded-full border border-ink bg-ink px-6 text-sm font-medium text-cream transition-colors hover:bg-red hover:border-red"
             >
-              Compare tiers →
+              See tier benefits →
             </Link>
           </div>
         </div>
         <ul className="mt-5 grid grid-cols-1 gap-2 text-sm text-ink-soft sm:grid-cols-2">
           <Perk text="Co-own shares in any RYDA LLC" />
           <Perk text="Book time on every asset you hold" />
-          <Perk text="Member-events invitations" />
-          <Perk text="Blue + Black tiers ship at Miami launch" />
+          <Perk text="Member-events invitations at launch" />
+          <Perk text="Tier perks unlock at Miami launch" />
         </ul>
       </section>
 

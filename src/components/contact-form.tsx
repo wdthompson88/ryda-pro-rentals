@@ -129,7 +129,7 @@ export function ContactForm() {
           minLength={20}
           rows={5}
           aria-required="true"
-          className="mt-2 w-full border-0 border-b border-rule bg-transparent px-1 py-3 text-[15px] text-ink placeholder:text-mute focus:border-ink focus:outline-none focus:ring-0"
+          className="mt-2 w-full border-0 border-b border-rule bg-transparent px-1 py-3 text-[15px] text-ink placeholder:text-mute focus:border-ink focus:outline-none focus:ring-2 focus:ring-red/20"
           placeholder="Tell us a bit about what you're looking for..."
         />
       </div>
@@ -198,7 +198,7 @@ function Input({
                 ? "tel"
                 : undefined
         }
-        className="mt-2 h-12 w-full border-0 border-b border-rule bg-transparent px-1 text-[15px] text-ink placeholder:text-mute focus:border-ink focus:outline-none focus:ring-0"
+        className="mt-2 h-12 w-full border-0 border-b border-rule bg-transparent px-1 text-[15px] text-ink placeholder:text-mute focus:border-ink focus:outline-none focus:ring-2 focus:ring-red/20"
       />
     </div>
   );
@@ -232,7 +232,7 @@ function Select({
         value={value}
         onChange={onChange ? (e) => onChange(e.target.value) : undefined}
         defaultValue={value === undefined ? options[0] : undefined}
-        className="mt-2 h-12 w-full border-0 border-b border-rule bg-transparent px-1 text-[15px] text-ink focus:border-ink focus:outline-none focus:ring-0"
+        className="mt-2 h-12 w-full border-0 border-b border-rule bg-transparent px-1 text-[15px] text-ink focus:border-ink focus:outline-none focus:ring-2 focus:ring-red/20"
       >
         {options.map((o) => (
           <option key={o} value={o}>

@@ -32,7 +32,7 @@ export function SiteFooter() {
                 <HiddenWhenAuthed>
                   <Link
                     href="/signup"
-                    className="inline-flex h-12 items-center justify-center border border-ink bg-ink px-7 text-sm font-medium text-cream transition-colors hover:bg-red hover:border-red"
+                    className="inline-flex h-12 items-center justify-center rounded-full border border-ink bg-ink px-7 text-sm font-medium text-cream transition-colors hover:bg-red hover:border-red"
                   >
                     Sign up
                   </Link>
@@ -42,16 +42,16 @@ export function SiteFooter() {
                     <Link href="/signin" className="hover:text-ink">
                       Sign in
                     </Link>
-                    <span className="text-rule">·</span>
+                    <span className="text-rule" aria-hidden="true">·</span>
                     <Link href="/signup" className="hover:text-ink">
                       Sign up
                     </Link>
-                    <span className="text-rule">·</span>
+                    <span className="text-rule" aria-hidden="true">·</span>
                   </HiddenWhenAuthed>
                   <Link href="/search" className="hover:text-ink">
                     Search
                   </Link>
-                  <span className="text-rule">·</span>
+                  <span className="text-rule" aria-hidden="true">·</span>
                   <Link href="/help" className="hover:text-ink">
                     Help center
                   </Link>
