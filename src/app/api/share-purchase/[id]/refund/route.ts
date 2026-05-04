@@ -88,22 +88,37 @@ export async function POST(
     );
   }
 
-  // Branch 1: pending / failed / canceled. Just mark canceled if not
-  // already; nothing to refund.
-  if (
-    purchase.status === "pending" ||
-    purchase.status === "failed" ||
-    purchase.status === "canceled"
-  ) {
+  // Branch 1: pending / failed. Mark canceled and file a ticket
+  // so ops has visibility (member may want to talk through what
+  // happened, or there could be a partial-state issue we should
+  // investigate). Already-canceled rows return idempotent ok.
+  if (purchase.status === "canceled") {
+    return NextResponse.json({
+      ok: true,
+      action: "already_canceled",
+      message: "This purchase is already canceled.",
+    });
+  }
+  if (purchase.status === "pending" || purchase.status === "failed") {
     await admin
       .from("share_purchases")
       .update({ status: "canceled", updated_at: new Date().toISOString() })
       .eq("id", purchase.id)
-      .neq("status", "canceled"); // don't bump updated_at for already-canceled rows
+      .neq("status", "canceled");
+    await fileTicket(
+      admin,
+      purchase,
+      user,
+      reason,
+      `cancel_${purchase.status}`,
+    );
     return NextResponse.json({
       ok: true,
       action: "marked_canceled",
-      message: "Nothing to refund — the purchase never charged.",
+      message:
+        purchase.status === "pending"
+          ? "Marked canceled — the purchase never charged."
+          : "Marked canceled — the original payment had already failed.",
     });
   }
 
@@ -200,33 +215,82 @@ export async function POST(
       },
     );
   } catch (err) {
-    console.error("[refund · stripe]", err);
-    // Restore status so the member can retry. CAS on
-    // status='canceled' so we only restore the row WE just claimed
-    // (defensive against a parallel admin action).
-    await admin
-      .from("share_purchases")
-      .update({
-        status: "paid",
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", purchase.id)
-      .eq("status", "canceled");
+    // Stripe errors fall in two camps:
+    //
+    //   - Definite-failure: validation errors, idempotency
+    //     conflicts, etc. — Stripe definitely didn't process the
+    //     refund. Safe to restore status='paid' so the member can
+    //     retry. type === 'StripeInvalidRequestError' is the
+    //     reliable signal.
+    //
+    //   - Indeterminate: network timeout, 502 from Stripe gateway,
+    //     etc. — the refund may have actually succeeded server-
+    //     side; restoring status='paid' could let the member fire
+    //     a SECOND refund. We use the SAME idempotency key on
+    //     retry, but the key only holds for 24 hours, so a slow
+    //     retry past that window could double-refund.
+    //
+    // Conservative path: only restore on definite-failure errors;
+    // for indeterminate errors, leave status='canceled' and route
+    // a ticket so ops can verify in Stripe + reconcile manually.
+    const stripeErrType = (err as { type?: string } | null)?.type;
+    const isDefiniteFailure =
+      stripeErrType === "StripeInvalidRequestError" ||
+      stripeErrType === "StripeIdempotencyError";
+
+    console.error("[refund · stripe]", { type: stripeErrType, err });
+
+    if (isDefiniteFailure) {
+      await admin
+        .from("share_purchases")
+        .update({
+          status: "paid",
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", purchase.id)
+        .eq("status", "canceled");
+      return NextResponse.json(
+        {
+          error:
+            "Stripe refund failed. Try again or contact support if it persists.",
+        },
+        { status: 502 },
+      );
+    }
+
+    // Indeterminate — leave status='canceled', file a ticket, tell
+    // the member ops will verify.
+    await fileTicket(
+      admin,
+      purchase,
+      user,
+      reason,
+      "stripe_indeterminate_error",
+    );
     return NextResponse.json(
       {
-        error:
-          "Stripe refund failed. Try again or contact support if it persists.",
+        ok: true,
+        action: "ticket_filed",
+        message:
+          "Stripe didn't confirm the refund cleanly. Ops will verify in Stripe and reach out within one business day.",
       },
-      { status: 502 },
+      { status: 202 },
     );
   }
 
-  // Best-effort tear down derived state.
+  // Best-effort tear down derived state. We set BOTH transferred_at
+  // (so existing "is this share still held" filters across the
+  // codebase keep working with a single column check) AND
+  // refunded_at (so a future transfer-history UI can distinguish
+  // "refunded" from "transferred to another member"). transferred
+  // _to_user_id stays null since no one received the share.
+  const nowIso = new Date().toISOString();
   await admin
     .from("share_holdings")
     .update({
-      transferred_at: new Date().toISOString(),
+      transferred_at: nowIso,
       transferred_to_user_id: null,
+      refunded_at: nowIso,
     })
     .eq("purchase_id", purchase.id)
     .is("transferred_at", null);

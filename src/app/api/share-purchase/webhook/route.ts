@@ -80,6 +80,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ received: true, deduped: true });
   }
 
+  // Track whether the event was "fully handled" so we know whether
+  // to record it in stripe_events (and prevent Stripe retries) at
+  // the end. Default true; the only branch that may set it false is
+  // the checkout-completed path when amendment generation fails —
+  // we want Stripe to retry that case so the partial fulfillment
+  // can repair itself.
+  let fullyHandled = true;
+
   try {
     switch (event.type) {
       case "checkout.session.completed":
@@ -209,9 +217,13 @@ export async function POST(req: NextRequest) {
           });
         if (holdingsErr) {
           console.error("[stripe webhook] failed to upsert holdings", holdingsErr);
-          // Don't stamp fulfilled_at; this delivery will retry on
-          // redrive. Bail out of fulfillment for now.
-          break;
+          // Throw, don't break — break would let the handler return
+          // 200 + record the event, locking out Stripe retries. We
+          // want a 500 + retry so a transient holding-insert error
+          // can recover. The outer try/catch turns this into 500.
+          throw new Error(
+            `holdings upsert failed for purchase ${purchase.id}: ${holdingsErr.message ?? "unknown"}`,
+          );
         }
 
         // Notify the team. Resend no-ops cleanly if the env isn't
@@ -364,12 +376,19 @@ export async function POST(req: NextRequest) {
         }
 
         // Stamp fulfilled_at only when holdings + amendment succeeded.
+        // If amendment failed we leave fulfilled_at null AND mark
+        // the event as not-fully-handled so it isn't recorded in
+        // stripe_events — that way Stripe's retry can drive the
+        // amendment generation to completion. (Status guard on the
+        // CAS prevents double fulfillment when the retry succeeds.)
         if (amendmentSent) {
           await admin
             .from("share_purchases")
             .update({ fulfilled_at: new Date().toISOString() })
             .eq("id", purchaseId)
             .is("fulfilled_at", null);
+        } else {
+          fullyHandled = false;
         }
         break;
       }
@@ -431,19 +450,26 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Handler failed." }, { status: 500 });
   }
 
-  // Record the event AFTER successful processing. If this insert
-  // fails (unique violation = a parallel delivery already recorded
-  // it; other error = transient), it's non-fatal — the actual work
-  // already landed and the status-guarded compare-and-sets prevent
-  // duplicate side effects on any future retry.
-  const recorded = await admin
-    .from("stripe_events")
-    .insert({ id: event.id, type: event.type, endpoint: "share-purchase" });
-  if (recorded.error) {
-    const code = (recorded.error as { code?: string }).code;
-    if (code !== "23505") {
-      console.warn("[stripe webhook] event-record insert failed", recorded.error);
+  // Record the event ONLY when it was fully handled. If a
+  // partial fulfillment is in progress (amendment generation
+  // failed), don't record — let Stripe's retry drive it home.
+  // If this insert fails (unique violation = parallel delivery
+  // already recorded it; other = transient), it's non-fatal.
+  if (fullyHandled) {
+    const recorded = await admin
+      .from("stripe_events")
+      .insert({ id: event.id, type: event.type, endpoint: "share-purchase" });
+    if (recorded.error) {
+      const code = (recorded.error as { code?: string }).code;
+      if (code !== "23505") {
+        console.warn("[stripe webhook] event-record insert failed", recorded.error);
+      }
     }
+  } else {
+    console.log(
+      "[stripe webhook] partial fulfillment, leaving event unrecorded for retry",
+      event.id,
+    );
   }
 
   return NextResponse.json({ received: true });

@@ -10,7 +10,8 @@
 //
 // Uses the service-role client (bypasses RLS) intentionally —
 // admins need to see across all users. Gating is enforced by
-// requireAdmin() on user_metadata.role === 'admin'.
+// requireAdmin() on app_metadata.role === 'admin' (service-role-
+// only writable; user-controlled user_metadata is NOT trusted).
 
 import { NextResponse, type NextRequest } from "next/server";
 import { requireSupabaseAdmin } from "@/lib/supabase-admin";

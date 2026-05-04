@@ -42,16 +42,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid signature." }, { status: 400 });
   }
 
-  // Event-id dedup (same pattern as the share-purchase webhook).
-  const dedup = await admin
+  // Event-id dedup (same SELECT-first pattern as the share-purchase
+  // webhook). We CHECK existence, PROCESS the event, then RECORD
+  // on success. Recording up-front would lock out Stripe retries
+  // when our update returns 500.
+  const seen = await admin
     .from("stripe_events")
-    .insert({ id: event.id, type: event.type, endpoint: "kyc" });
-  if (dedup.error) {
-    const code = (dedup.error as { code?: string }).code;
-    if (code === "23505") {
-      return NextResponse.json({ received: true, deduped: true });
-    }
-    console.warn("[kyc webhook] dedup insert failed (non-fatal)", dedup.error);
+    .select("id")
+    .eq("id", event.id)
+    .maybeSingle();
+  if (seen.data) {
+    return NextResponse.json({ received: true, deduped: true });
   }
 
   // Only Identity events are interesting here.
@@ -93,7 +94,19 @@ export async function POST(req: NextRequest) {
 
   if (error) {
     console.error("[kyc webhook] update failed", error);
+    // Don't record the event so Stripe retries reach us.
     return NextResponse.json({ error: "Update failed." }, { status: 500 });
+  }
+
+  // Record on success only.
+  const recorded = await admin
+    .from("stripe_events")
+    .insert({ id: event.id, type: event.type, endpoint: "kyc" });
+  if (recorded.error) {
+    const code = (recorded.error as { code?: string }).code;
+    if (code !== "23505") {
+      console.warn("[kyc webhook] event-record insert failed", recorded.error);
+    }
   }
 
   return NextResponse.json({ received: true });

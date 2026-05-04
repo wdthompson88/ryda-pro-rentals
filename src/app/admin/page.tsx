@@ -4,9 +4,10 @@
 //
 // Gating: client-side this page just checks supabase.auth.getUser()
 // and bounces to /signin if anon. The TRUE gate is the
-// /api/admin/overview server route (requireAdmin on user_metadata
-// .role === 'admin'). A non-admin who lands here sees a "no
-// permission" empty state — no data leaks because the API call
+// /api/admin/overview server route (requireAdmin on
+// app_metadata.role === 'admin' — service-role-only writable, so
+// users can't self-promote). A non-admin who lands here sees a
+// "no permission" empty state; no data leaks because the API call
 // 403s before returning anything.
 //
 // Intentionally minimal: counts + 20 most-recent rows per category.

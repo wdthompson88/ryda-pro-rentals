@@ -334,13 +334,17 @@ async function resolveStripeCustomerId(
       .limit(1);
     if (spRows && spRows.length > 0 && spRows[0].stripe_customer_id) {
       const cached = spRows[0].stripe_customer_id as string;
-      // Persist forward for next time.
-      await admin
+      // Persist forward for next time. Non-fatal if it fails;
+      // we'll just resolve from share_purchases again next call.
+      const fwd = await admin
         .from("user_profiles")
         .upsert(
           { user_id: userId, stripe_customer_id: cached },
           { onConflict: "user_id" },
         );
+      if (fwd.error) {
+        console.warn("[create-checkout · forward-persist failed]", fwd.error);
+      }
       return cached;
     }
 
@@ -353,12 +357,15 @@ async function resolveStripeCustomerId(
       },
       { idempotencyKey: `customer-create:${userId}` },
     );
-    await admin
+    const persist = await admin
       .from("user_profiles")
       .upsert(
         { user_id: userId, stripe_customer_id: customer.id },
         { onConflict: "user_id" },
       );
+    if (persist.error) {
+      console.warn("[create-checkout · customer persist failed]", persist.error);
+    }
     return customer.id;
   } catch (err) {
     // Don't block checkout on a customer-resolution hiccup. Stripe

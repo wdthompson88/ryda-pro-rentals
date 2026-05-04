@@ -6,13 +6,15 @@
 // any of that UI ourselves — Stripe owns the PCI scope.
 //
 // Lookup chain:
-//   1. share_purchases.stripe_customer_id (set on first checkout
-//      session that completes for this user)
-//   2. If no row has a customer_id yet, fall back to creating a
-//      bare Customer with email/name from auth + user_profiles.
-//   3. Open the portal session against that customer with a
-//      return_url back to /account/payments so members land where
-//      they came from.
+//   1. user_profiles.stripe_customer_id (canonical home — set
+//      here on first call OR by the share-purchase webhook on a
+//      paid checkout when no prior row existed)
+//   2. share_purchases.stripe_customer_id (legacy fallback — older
+//      purchases predating the canonical-home wiring may have it
+//      here only)
+//   3. None → mint a Customer with idempotency key keyed on
+//      user.id so parallel calls don't fragment, persist to
+//      user_profiles via upsert.
 //
 // Idempotent — calling twice mints two short-lived portal URLs but
 // always against the same Stripe Customer.
@@ -114,6 +116,14 @@ export async function POST(req: NextRequest) {
       )
       .select("stripe_customer_id")
       .single();
+    if (upsert.error) {
+      // Non-fatal — Stripe has the customer, we just couldn't
+      // cache the id. Next call will mint again with the same
+      // idempotency key (Stripe returns the same customer for 24h)
+      // and try to persist again. Log so it's visible if it keeps
+      // happening.
+      console.warn("[billing-portal] customer-id persist failed", upsert.error);
+    }
     customerId = (upsert.data?.stripe_customer_id as string | undefined) ?? customer.id;
   }
 
