@@ -34,23 +34,149 @@ const fraunces = Fraunces({
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ryda.pro";
 
 export const metadata: Metadata = {
-  title: "RYDA — Supercar co-ownership and rentals",
+  title: {
+    default: "RYDA — Supercar co-ownership and rentals",
+    template: "%s · RYDA",
+  },
   description:
-    "Co-own or rent a curated certified pre owned Ferrari, Lamborghini, or McLaren in the US. Asset-backed LLC, professionally operated. Launching in Miami.",
+    "Co-own or rent a curated certified pre owned Ferrari, Lamborghini, or McLaren in the US. Asset-backed LLC, professionally operated. Launching in Miami Q3 2026.",
   metadataBase: new URL(siteUrl),
+  // Canonical anchor for the home page. Per-page metadata can override
+  // alternates.canonical for routes that should self-canonicalize
+  // (which is most of them — Next 16 auto-includes a canonical link).
+  alternates: {
+    canonical: "/",
+  },
+  // Search-engine directives. Default is "index, follow" but spelling
+  // it out helps the rare crawler that defaults to "noindex".
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  // Verification meta tags — populated post-launch when Search Console
+  // / Bing Webmaster Tools assign per-domain verification codes.
+  // Submitting via DNS TXT (which we already control) is preferred,
+  // but the meta-tag fallback is ready when you want it.
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+    other: process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION
+      ? { "msvalidate.01": process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION }
+      : undefined,
+  },
   openGraph: {
     title: "RYDA — Supercar co-ownership and rentals",
     description:
-      "Co-own or rent a curated supercar with verified members. Asset-backed LLC, professionally operated. Launching in Miami.",
+      "Co-own or rent a curated supercar with verified members. Asset-backed LLC, professionally operated. Launching in Miami Q3 2026.",
     siteName: "RYDA",
     type: "website",
+    locale: "en_US",
+    url: siteUrl,
   },
   twitter: {
     card: "summary_large_image",
     title: "RYDA — Supercar co-ownership and rentals",
     description:
-      "Co-own or rent a curated supercar with verified members. Asset-backed LLC, professionally operated. Launching in Miami.",
+      "Co-own or rent a curated supercar with verified members. Asset-backed LLC, professionally operated. Launching in Miami Q3 2026.",
   },
+  // Categorization helps some crawlers and embeds.
+  category: "Luxury vehicle co-ownership",
+  applicationName: "RYDA",
+};
+
+// Schema.org Organization + WebSite + Service JSON-LD for the home
+// document. This populates the Google knowledge panel + sitelinks
+// when the brand starts to rank, AND gives crawlers a structured
+// description of what RYDA is. The site-wide WebSite block is the
+// most important — it's what tells Google "this domain is RYDA",
+// not "this is some text about supercars."
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${siteUrl}#organization`,
+      name: "RYDA",
+      legalName: "RYDA LLC",
+      url: siteUrl,
+      logo: `${siteUrl}/opengraph-image`,
+      description:
+        "Asset-backed co-ownership of certified pre-owned Ferraris, Lamborghinis, McLarens, and curated boats. Member-managed single-purpose LLCs. Professional operations. Launching Q3 2026 in Miami; LA + NY 2027.",
+      foundingDate: "2026",
+      areaServed: [
+        { "@type": "City", name: "Miami" },
+        { "@type": "City", name: "Los Angeles" },
+        { "@type": "City", name: "New York" },
+      ],
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: "Miami",
+        addressRegion: "FL",
+        addressCountry: "US",
+      },
+      contactPoint: [
+        {
+          "@type": "ContactPoint",
+          contactType: "customer support",
+          email: "support@ryda.pro",
+          availableLanguage: ["en"],
+        },
+      ],
+      sameAs: [
+        // Populate as social profiles ship. These help search engines
+        // build the brand-entity graph (knowledge panel etc).
+        // "https://twitter.com/rydaclub",
+        // "https://www.linkedin.com/company/ryda",
+        // "https://www.instagram.com/ryda",
+      ],
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${siteUrl}#website`,
+      url: siteUrl,
+      name: "RYDA",
+      description:
+        "Co-own or rent a Ferrari, Lamborghini, McLaren, or boat in the US. Asset-backed LLC, professionally operated.",
+      publisher: { "@id": `${siteUrl}#organization` },
+      inLanguage: "en-US",
+      potentialAction: {
+        "@type": "SearchAction",
+        target: {
+          "@type": "EntryPoint",
+          urlTemplate: `${siteUrl}/search?q={search_term_string}`,
+        },
+        "query-input": "required name=search_term_string",
+      },
+    },
+    {
+      "@type": "Service",
+      "@id": `${siteUrl}#service`,
+      serviceType: "Luxury vehicle co-ownership",
+      provider: { "@id": `${siteUrl}#organization` },
+      areaServed: [
+        { "@type": "City", name: "Miami" },
+        { "@type": "City", name: "Los Angeles" },
+        { "@type": "City", name: "New York" },
+      ],
+      offers: {
+        "@type": "Offer",
+        priceCurrency: "USD",
+        availability: "https://schema.org/PreOrder",
+        url: `${siteUrl}/cars`,
+        category: "Co-ownership share",
+      },
+      audience: {
+        "@type": "PeopleAudience",
+        suggestedMinAge: 28,
+      },
+    },
+  ],
 };
 
 // No-flash theme bootstrap. Reads localStorage before React hydrates
@@ -82,6 +208,17 @@ export default function RootLayout({
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
+        {/* Site-wide Organization + WebSite + Service Schema.org graph.
+            This is what Google reads to populate the brand knowledge
+            panel + sitelinks search box. Without this, the search
+            snippet defaults to whatever Google extracts from the
+            <meta description> alone. */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationJsonLd),
+          }}
+        />
       </head>
       <body className="min-h-full flex flex-col bg-cream text-ink">
         <AnalyticsBootstrap />
