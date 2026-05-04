@@ -100,11 +100,32 @@ export async function POST(
   }
   if (new Date(xfer.expires_at).getTime() < Date.now()) {
     // Auto-expire on read so the row reflects reality going forward.
-    await admin
+    // CAS-guarded so a parallel cron's flip doesn't get clobbered.
+    const expClaim = await admin
       .from("share_transfers")
       .update({ status: "expired", updated_at: new Date().toISOString() })
       .eq("id", xfer.id)
-      .eq("status", "requested");
+      .eq("status", "requested")
+      .select("id")
+      .maybeSingle();
+    // Only ping ops if WE were the one who flipped it (recipient
+    // visited a stale link — interesting signal vs cron-bulk-expire).
+    if (expClaim.data) {
+      try {
+        await notifyTeam({
+          subject: `Share-transfer expired on recipient visit · ${xfer.id}`,
+          html: emailLayout(
+            "Transfer expired (recipient-triggered)",
+            `<p>Transfer <code>${escapeHtml(xfer.id)}</code> expired
+            when recipient ${escapeHtml(user.email ?? "(no email)")} opened
+            the link. Sender may want to know.</p>`,
+          ),
+        });
+      } catch (err) {
+        // Non-fatal — the flip happened.
+        console.error("[xfer-respond · expired notify]", err);
+      }
+    }
     return NextResponse.json(
       { error: "Transfer expired. Ask the sender to start a new one." },
       { status: 410 },
@@ -112,7 +133,10 @@ export async function POST(
   }
 
   if (action === "reject") {
-    await admin
+    // CAS-guarded reject (mirrors the accept path below). If a
+    // sender's cancel beat us here, the predicate fails and we
+    // surface 409 instead of silently overwriting the cancel state.
+    const claim = await admin
       .from("share_transfers")
       .update({
         status: "rejected",
@@ -120,7 +144,16 @@ export async function POST(
         ryda_review_note: note || null,
         updated_at: new Date().toISOString(),
       })
-      .eq("id", xfer.id);
+      .eq("id", xfer.id)
+      .eq("status", "requested")
+      .select("id")
+      .maybeSingle();
+    if (!claim.data) {
+      return NextResponse.json(
+        { error: "Transfer state changed; refresh and try again." },
+        { status: 409 },
+      );
+    }
 
     await notifyTeam({
       subject: `Share-transfer rejected · ${xfer.id}`,

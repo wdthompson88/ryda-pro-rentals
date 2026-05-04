@@ -17,9 +17,24 @@
 // hour of latency between expiry and status flip is fine).
 
 import { NextResponse, type NextRequest } from "next/server";
+import { timingSafeEqual } from "node:crypto";
 import { requireSupabaseAdmin } from "@/lib/supabase-admin";
 
 export const runtime = "nodejs";
+
+// Constant-time bearer-token compare. `===` on strings short-circuits
+// on the first mismatched byte, leaking the secret length over enough
+// requests; timingSafeEqual operates on equal-length buffers so the
+// comparison time depends only on length, which we pre-check.
+function bearerMatches(got: string, expected: string): boolean {
+  const prefix = "Bearer ";
+  if (!got.startsWith(prefix)) return false;
+  const gotToken = got.slice(prefix.length);
+  if (gotToken.length !== expected.length) return false;
+  const a = Buffer.from(gotToken, "utf8");
+  const b = Buffer.from(expected, "utf8");
+  return timingSafeEqual(a, b);
+}
 
 export async function GET(req: NextRequest) {
   // Auth — Vercel cron passes a Bearer token from CRON_SECRET.
@@ -32,7 +47,7 @@ export async function GET(req: NextRequest) {
     );
   }
   const got = req.headers.get("authorization") ?? "";
-  if (got !== `Bearer ${expected}`) {
+  if (!bearerMatches(got, expected)) {
     return NextResponse.json({ error: "Forbidden." }, { status: 403 });
   }
 
@@ -60,5 +75,58 @@ export async function GET(req: NextRequest) {
 
   const count = data?.length ?? 0;
   console.log(`[cron · expire-transfers] expired ${count} row(s)`);
-  return NextResponse.json({ ok: true, expired: count });
+
+  // Bundled drift-detection pass — Hobby tier limits us to 1
+  // cron/day, so we piggy-back the "stuck-paid" check onto this
+  // route. Surfaces share_purchases rows where status='paid' but
+  // fulfilled_at IS NULL > 1 hour, which would indicate a webhook
+  // partial-fulfillment that never repaired itself. Reported via
+  // notifyTeam if any rows match. Required for the PDF Sentry alert
+  // rule "stuck paid >1h needs ops attention."
+  try {
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    const drift = await admin
+      .from("share_purchases")
+      .select("id, user_id, vehicle_symbol, boat_slug, paid_at")
+      .eq("status", "paid")
+      .is("fulfilled_at", null)
+      .lt("paid_at", oneHourAgo)
+      .limit(20);
+    if (drift.error) {
+      console.error("[cron · drift-detect]", drift.error);
+    } else if (drift.data && drift.data.length > 0) {
+      console.warn(
+        `[cron · drift-detect] ${drift.data.length} stuck paid >1h`,
+        drift.data.map((r) => r.id),
+      );
+      // Best-effort notify — don't fail the cron if email's down.
+      const { notifyTeam, emailLayout, escapeHtml } = await import("@/lib/notify");
+      const ids = drift.data.map((r) => r.id);
+      try {
+        await notifyTeam({
+          subject: `Drift alert: ${ids.length} stuck-paid purchase(s) >1h`,
+          html: emailLayout(
+            "Stuck paid + null fulfilled_at",
+            `<p>Daily drift check found <strong>${ids.length}</strong>
+            purchase(s) at status=paid with fulfilled_at IS NULL for
+            longer than 1 hour. Re-run the manual fulfillment route
+            (<code>POST /api/admin/purchase/&lt;id&gt;/mark-paid</code>)
+            on each, or investigate via the audit log.</p>
+            <ul>${ids.map((id) => `<li><code>${escapeHtml(id)}</code></li>`).join("")}</ul>`,
+          ),
+        });
+      } catch (err) {
+        console.error("[cron · drift-detect · notify]", err);
+      }
+    }
+    return NextResponse.json({
+      ok: true,
+      expired: count,
+      stuck_paid: drift.data?.length ?? 0,
+    });
+  } catch (err) {
+    console.error("[cron · drift-detect · uncaught]", err);
+    // Drift check failure shouldn't fail the whole cron.
+    return NextResponse.json({ ok: true, expired: count });
+  }
 }

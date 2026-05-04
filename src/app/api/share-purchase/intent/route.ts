@@ -135,8 +135,38 @@ export async function POST(req: NextRequest) {
     assetDisplay = `${b.year} ${b.name}`;
   }
 
-  const { buyIn, acquisitionFee, total } = computeFees(pricePerShare, shares);
+  const { acquisitionFee, total } = computeFees(pricePerShare, shares);
   const totalCents = total * 100;
+
+  // Dedup: if this user already has a recent (≤5 min) pending row for
+  // the SAME asset + funding method + shares + total_cents, surface
+  // that one instead of minting a duplicate. Matches the create-
+  // checkout dedup pattern; protects against double-click and
+  // network retries creating two ops tickets. Including shares +
+  // total_cents in the match ensures a buyer who changed quantity
+  // gets a fresh row rather than the previous quote.
+  // Codex round-2 catch.
+  const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+  const existing = await admin
+    .from("share_purchases")
+    .select("id, funding_method")
+    .eq("user_id", user.id)
+    .eq("status", "pending")
+    .eq("funding_method", fundingMethod)
+    .eq("shares", shares)
+    .eq("total_cents", totalCents)
+    .eq(vehicleSymbol ? "vehicle_symbol" : "boat_slug", vehicleSymbol ?? boatSlug)
+    .gte("created_at", fiveMinAgo)
+    .order("created_at", { ascending: false })
+    .limit(1);
+  if (existing.data && existing.data.length > 0) {
+    return NextResponse.json({
+      purchaseId: existing.data[0].id,
+      status: "pending",
+      fundingMethod,
+      deduped: true,
+    });
+  }
 
   const { data: row, error: insertErr } = await admin
     .from("share_purchases")

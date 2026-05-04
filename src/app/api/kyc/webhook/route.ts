@@ -42,22 +42,24 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid signature." }, { status: 400 });
   }
 
-  // Event-id dedup (same SELECT-first pattern as the share-purchase
-  // webhook). We CHECK existence, PROCESS the event, then RECORD
-  // on success. Recording up-front would lock out Stripe retries
-  // when our update returns 500.
+  // Filter to KYC events FIRST so we don't poison the dedup table
+  // for non-KYC events that happened to hit this endpoint. Codex
+  // round-3 catch.
+  if (!event.type.startsWith("identity.verification_session.")) {
+    return NextResponse.json({ received: true, ignored: event.type });
+  }
+
+  // Event-id dedup, scoped by endpoint (migration 0020). Without the
+  // endpoint filter, a share-purchase event recorded with
+  // endpoint='share-purchase' could dedup-poison this lookup.
   const seen = await admin
     .from("stripe_events")
     .select("id")
     .eq("id", event.id)
+    .eq("endpoint", "kyc")
     .maybeSingle();
   if (seen.data) {
     return NextResponse.json({ received: true, deduped: true });
-  }
-
-  // Only Identity events are interesting here.
-  if (!event.type.startsWith("identity.verification_session.")) {
-    return NextResponse.json({ received: true });
   }
 
   const session = event.data.object as Stripe.Identity.VerificationSession;
@@ -87,10 +89,27 @@ export async function POST(req: NextRequest) {
     update.failure_reason = session.last_error.reason ?? null;
   }
 
-  const { error } = await admin
+  // CAS guard: don't allow a stale/late-delivered 'processing' or
+  // 'requires_action' event to clobber a row already at 'verified'.
+  // Stripe doesn't guarantee event order across retries, so an old
+  // 'processing' event could land after the 'verified' event for the
+  // same session. The terminal-state guard ensures verified stays
+  // verified. We allow 'verified' to be set from any prior status,
+  // and 'canceled' to land from any non-verified status. Claude
+  // round-2 catch.
+  let q = admin
     .from("kyc_verifications")
     .update(update)
     .eq("stripe_verification_id", session.id);
+  if (status !== "verified" && status !== "canceled") {
+    // Don't downgrade verified rows; only update if not already verified.
+    q = q.neq("status", "verified");
+  } else if (status === "canceled") {
+    // Don't cancel a verified row (cancellation should only land
+    // before/during processing, not after verification).
+    q = q.neq("status", "verified");
+  }
+  const { error } = await q;
 
   if (error) {
     console.error("[kyc webhook] update failed", error);

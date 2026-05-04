@@ -155,22 +155,22 @@ export async function POST(req: NextRequest) {
 
     const stripe = requireStripe();
 
-    // Double-click guard: if this user already has a pending purchase
-    // for the same asset within the last 5 minutes, return its
-    // existing Stripe URL instead of creating a duplicate. Two side
-    // effects this fixes:
-    //   1. We don't double-mint share_holdings if both pendings
-    //      somehow get paid (the holdings unique constraint catches
-    //      it but cleaner to avoid).
-    //   2. Inventory hold isn't double-counted in future "shares
-    //      available" math (catalog is static today; this is
-    //      forward-looking).
+    // Double-click / app-retry guard: if this user already has a
+    // pending purchase for the EXACT SAME (asset, shares, funding)
+    // within 5 minutes, return its Stripe URL instead of minting a
+    // duplicate row + session. The dedup match must include shares
+    // + funding so a user who changes from "buy 2" to "buy 10" — or
+    // from card to ACH — doesn't get the previous quote's session.
+    // Codex round-2 catch.
     const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+    const fundingMethodForDedup = requestedMethod === "ach" ? "ach" : "card";
     const existingPending = await admin
       .from("share_purchases")
       .select("id, stripe_session_id")
       .eq("user_id", user.id)
       .eq("status", "pending")
+      .eq("shares", shares)
+      .eq("funding_method", fundingMethodForDedup)
       .eq(vehicleSymbol ? "vehicle_symbol" : "boat_slug", vehicleSymbol ?? boatSlug)
       .gte("created_at", fiveMinAgo)
       .order("created_at", { ascending: false })
@@ -242,43 +242,51 @@ export async function POST(req: NextRequest) {
       user.email ?? null,
     );
 
-    const session = await stripe.checkout.sessions.create({
-      mode: "payment",
-      payment_method_types: paymentMethodTypes,
-      // Pass `customer` when we have one; fall back to email-only
-      // for the rare case where customer minting failed (the
-      // billing portal will repair on next visit).
-      customer: customerId ?? undefined,
-      customer_email: customerId ? undefined : (user.email ?? undefined),
-      line_items: [
-        {
-          quantity: 1,
-          price_data: {
-            currency: "usd",
-            unit_amount: totalCents,
-            product_data: {
-              name: `${shares} share${shares > 1 ? "s" : ""} · ${displayName}`,
-              description: `RYDA co-ownership share. Includes ${ACQUISITION_FEE_PCT}% acquisition fee. Member-managed LLC.`,
-              images: imageUrl ? [imageUrl] : undefined,
+    const session = await stripe.checkout.sessions.create(
+      {
+        mode: "payment",
+        payment_method_types: paymentMethodTypes,
+        // Pass `customer` when we have one; fall back to email-only
+        // for the rare case where customer minting failed (the
+        // billing portal will repair on next visit).
+        customer: customerId ?? undefined,
+        customer_email: customerId ? undefined : (user.email ?? undefined),
+        line_items: [
+          {
+            quantity: 1,
+            price_data: {
+              currency: "usd",
+              unit_amount: totalCents,
+              product_data: {
+                name: `${shares} share${shares > 1 ? "s" : ""} · ${displayName}`,
+                description: `RYDA co-ownership share. Includes ${ACQUISITION_FEE_PCT}% acquisition fee. Member-managed LLC.`,
+                images: imageUrl ? [imageUrl] : undefined,
+              },
             },
           },
+        ],
+        // Returning to /share-purchase/[id] lets the tracker page fetch
+        // the row and render real status. The cancel path drops back to
+        // the listing without confusing copy.
+        success_url: `${origin}/share-purchase/${purchaseId}?ok=1`,
+        cancel_url: vehicleSymbol
+          ? `${origin}/markets/${vehicleSymbol.toLowerCase()}?canceled=1`
+          : `${origin}/boats/portfolio/${boatSlug}?canceled=1`,
+        metadata: {
+          purchaseId,
+          userId: user.id,
+          vehicleSymbol: vehicleSymbol ?? "",
+          boatSlug: boatSlug ?? "",
+          shares: String(shares),
         },
-      ],
-      // Returning to /share-purchase/[id] lets the tracker page fetch
-      // the row and render real status. The cancel path drops back to
-      // the listing without confusing copy.
-      success_url: `${origin}/share-purchase/${purchaseId}?ok=1`,
-      cancel_url: vehicleSymbol
-        ? `${origin}/markets/${vehicleSymbol.toLowerCase()}?canceled=1`
-        : `${origin}/boats/portfolio/${boatSlug}?canceled=1`,
-      metadata: {
-        purchaseId,
-        userId: user.id,
-        vehicleSymbol: vehicleSymbol ?? "",
-        boatSlug: boatSlug ?? "",
-        shares: String(shares),
       },
-    });
+      // Idempotency: a network retry between Stripe creating the
+      // session and the lambda returning would otherwise mint a
+      // second session. Keyed on purchaseId (which we just inserted),
+      // so a retry returns the SAME session URL without a duplicate
+      // backend session.
+      { idempotencyKey: `checkout-session:${purchaseId}` },
+    );
 
     // Stash the Stripe session id on the row so the webhook can
     // reconcile by either id (event payload contains both).

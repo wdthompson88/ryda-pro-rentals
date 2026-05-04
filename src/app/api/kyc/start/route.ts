@@ -17,6 +17,7 @@ import { requireStripe } from "@/lib/stripe";
 import { requireSupabaseAdmin } from "@/lib/supabase-admin";
 import { getUserFromRequestWithDiag } from "@/lib/api-auth";
 import { isAllowed, clientIp } from "@/lib/rate-limit";
+import { safeNext } from "@/lib/safe-next";
 
 const RATE_LIMIT = 5;
 const RATE_WINDOW_MS = 60_000;
@@ -74,35 +75,58 @@ export async function POST(req: NextRequest) {
 
   const origin = process.env.NEXT_PUBLIC_SITE_URL ?? new URL(req.url).origin;
   const body = await req.json().catch(() => ({}));
-  const returnUrl = typeof body.returnUrl === "string" && body.returnUrl.startsWith("/")
-    ? body.returnUrl
-    : "/account";
+  // Validate returnUrl through the same allow-list used by sign-in
+  // redirect flow. Naive `startsWith("/")` lets `/foo?x=1`,
+  // `/\evil.com`, or `/?...&injection=…` through — each value would
+  // mint a new Stripe Identity session due to the idempotency key
+  // including the returnUrl. safeNext canonicalizes the path and
+  // rejects anything that would create a bypass. Claude round-2 catch.
+  const rawReturnUrl =
+    typeof body.returnUrl === "string" ? body.returnUrl : null;
+  const returnUrl = safeNext(rawReturnUrl, "/account");
 
-  const session = await stripe.identity.verificationSessions.create({
-    type: "document",
-    metadata: {
-      userId: user.id,
-      returnUrl,
-    },
-    options: {
-      document: {
-        // Require live capture (anti-spoofing) and ID document type
-        // detection so the user can upload license, passport, etc.
-        require_live_capture: true,
-        require_matching_selfie: true,
+  // Idempotency key keyed on userId + returnUrl: a double-click /
+  // network retry returns the SAME session instead of minting a
+  // second live verification (which would charge us twice and
+  // create two placeholder rows in kyc_verifications).
+  const session = await stripe.identity.verificationSessions.create(
+    {
+      type: "document",
+      metadata: {
+        userId: user.id,
+        returnUrl,
       },
+      options: {
+        document: {
+          // Require live capture (anti-spoofing) and ID document type
+          // detection so the user can upload license, passport, etc.
+          require_live_capture: true,
+          require_matching_selfie: true,
+        },
+      },
+      return_url: appendKycOk(`${origin}${returnUrl}`),
     },
-    return_url: `${origin}${returnUrl}?kyc=ok`,
-  });
+    { idempotencyKey: `kyc-start:${user.id}:${returnUrl}` },
+  );
 
-  // Insert the placeholder row. The webhook will update status later.
-  const { error } = await admin.from("kyc_verifications").insert({
-    user_id: user.id,
-    stripe_verification_id: session.id,
-    status: "requires_input",
-  });
+  // Upsert the placeholder row, keyed on stripe_verification_id.
+  // Why upsert: the idempotencyKey on the Stripe call returns the
+  // SAME session.id on retry, so a plain INSERT would 23505 on the
+  // unique stripe_verification_id constraint. With upsert, a retry
+  // is a no-op and we still return the same URL. The webhook
+  // updates status later. Codex round-2 catch.
+  const { error } = await admin
+    .from("kyc_verifications")
+    .upsert(
+      {
+        user_id: user.id,
+        stripe_verification_id: session.id,
+        status: "requires_input",
+      },
+      { onConflict: "stripe_verification_id", ignoreDuplicates: true },
+    );
   if (error) {
-    console.error("[kyc-start · insert]", error);
+    console.error("[kyc-start · upsert]", error);
     return NextResponse.json(
       { error: "Could not start verification." },
       { status: 500 },
@@ -115,4 +139,11 @@ export async function POST(req: NextRequest) {
     url: session.url,
     clientSecret: session.client_secret,
   });
+}
+
+// Append `?kyc=ok` to a URL safely. If the URL already has a query
+// string, append with `&` instead. Avoids the malformed `…?x=1?kyc=ok`
+// pattern that arises from naive concat. Claude round-2 catch.
+function appendKycOk(url: string): string {
+  return url.includes("?") ? `${url}&kyc=ok` : `${url}?kyc=ok`;
 }

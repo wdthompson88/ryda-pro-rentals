@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
-import { WaitlistForm } from "@/components/waitlist-form";
 import { Reveal } from "@/components/reveal";
 import { HiddenWhenAuthed } from "@/components/auth-aware";
 import {

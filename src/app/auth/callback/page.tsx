@@ -3,7 +3,8 @@
 // /auth/callback, landing page for Supabase magic-link / OAuth flows.
 // The Supabase client picks up the auth credentials from the URL hash
 // (PKCE flow) on mount, then we route the user back to the `next=`
-// destination they came from (or /portfolio as a sane default).
+// destination they came from (or /account as a sane default — the
+// authenticated overview, not /portfolio which is the public sample).
 //
 // This page is intentionally minimal, it's a transient redirect, not
 // a destination. If Supabase isn't configured, it just routes home so
@@ -28,8 +29,9 @@ function Inner() {
   const router = useRouter();
   const params = useSearchParams();
   // Sanitize `?next=` against open-redirect / javascript: scheme tricks.
-  // Anything not a same-origin path falls back to /portfolio.
-  const next = safeNext(params.get("next"), "/portfolio");
+  // Anything not a same-origin path falls back to /account (the
+  // authenticated overview). /portfolio is the public sample-data demo.
+  const next = safeNext(params.get("next"), "/account");
   const [status, setStatus] = useState<"verifying" | "ok" | "error">(
     "verifying",
   );

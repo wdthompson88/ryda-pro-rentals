@@ -3,7 +3,7 @@ import Link from "next/link";
 import { SplitterIntro } from "@/components/splitter-intro";
 import { MediaBackground } from "@/components/media-background";
 import { SPLITTER_MEDIA, type MediaSlot } from "@/lib/media";
-import { HiddenWhenAuthed, AuthSwap } from "@/components/auth-aware";
+import { AuthSwap } from "@/components/auth-aware";
 
 // Splitter, three full-height columns. One ambient b-roll loop per
 // vertical (Lambo / overhead yacht / private jet). Hover lights the

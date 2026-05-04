@@ -25,8 +25,9 @@ function SignInPageInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
   // Sanitize `?next=` against open-redirect / javascript: scheme tricks.
-  // Anything not a same-origin path falls back to /portfolio.
-  const next = safeNext(searchParams.get("next"), "/portfolio");
+  // Anything not a same-origin path falls back to /account (real
+  // authenticated overview). /portfolio is the public sample-data demo.
+  const next = safeNext(searchParams.get("next"), "/account");
   const reason = searchParams.get("reason"); // "rent" | "buy" | "checkout", gives copy a hook
 
   const [email, setEmail] = useState("");
@@ -222,7 +223,7 @@ function SignInPageInner() {
           <div className="mt-10 border-t border-rule pt-6 text-center text-sm text-ink-soft">
             New to RYDA?{" "}
             <Link
-              href={`/signup${next !== "/portfolio" ? `?next=${encodeURIComponent(next)}` : ""}`}
+              href={`/signup${next !== "/account" ? `?next=${encodeURIComponent(next)}` : ""}`}
               className="font-medium text-ink hover:text-red"
             >
               Create an account →

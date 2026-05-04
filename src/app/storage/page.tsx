@@ -130,7 +130,7 @@ export default function StoragePage() {
             />
             <Faq
               q="What if I move the car out of Miami?"
-              a="We arrange transport via our partner carrier. See /transport (coming soon) for pricing."
+              a="We arrange transport via our partner carrier. Email ops for a quote — typical out-of-state moves run $1,200–$3,000 enclosed depending on distance."
             />
           </div>
         </div>

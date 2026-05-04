@@ -165,6 +165,21 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (insert.error || !insert.data) {
+    // Postgres exclusion-constraint error code is 23P01. Migration
+    // 0021 enforces non-overlap at the database level so the TOCTOU
+    // race between the conflict check above and this INSERT can't
+    // double-book. Surface as 409 with the same shape as the app-
+    // level conflict response. Codex round-3 catch.
+    const code = (insert.error as { code?: string } | null)?.code;
+    if (code === "23P01") {
+      return NextResponse.json(
+        {
+          error: "Those dates overlap with an existing booking on this vehicle.",
+          conflict: { reason: "exclusion_violation" },
+        },
+        { status: 409 },
+      );
+    }
     console.error("[bookings · insert]", insert.error);
     return NextResponse.json({ error: "Could not create booking." }, { status: 500 });
   }

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { HiddenWhenAuthed } from "@/components/auth-aware";
+import { HealthBadge } from "@/components/health-badge";
 
 // Footer, brand row on top + 4 link columns below + legal strip.
 // Pacaso / Brunello pattern: full sitemap visible, but quiet eyebrows
@@ -117,7 +118,12 @@ export function SiteFooter() {
       {/* Legal bottom strip */}
       <div className="border-t border-rule">
         <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-3 px-6 py-6 text-xs text-mute sm:flex-row sm:items-center sm:px-10">
-          <p>© {new Date().getFullYear()} RYDA LLC · Formed under applicable LLC law</p>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+            <p>© {new Date().getFullYear()} RYDA LLC · Formed under applicable LLC law</p>
+            {/* Live status (polls /api/health every 60s). Pre-launch
+                substitute for status.ryda.com. */}
+            <HealthBadge />
+          </div>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
             <Link href="/legal/privacy" className="hover:text-ink">
               Privacy

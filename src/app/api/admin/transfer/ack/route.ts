@@ -138,7 +138,11 @@ export async function POST(req: NextRequest) {
   // in the recipient's namespace (we use sequential 1..N per
   // recipient share). purchase_id stays null because the transfer
   // didn't go through a purchase.
-  const newRows = Array.from({ length: xfer.shares }, (_, i) => ({
+  // Defense-in-depth: bound shares to [1,10] even though migration
+  // 0016 has a CHECK ≤10. If the constraint is ever relaxed we don't
+  // mass-insert.
+  const sharesToCreate = Math.min(10, Math.max(1, xfer.shares));
+  const newRows = Array.from({ length: sharesToCreate }, () => ({
     user_id: xfer.to_user_id!,
     vehicle_symbol: xfer.vehicle_symbol,
     boat_slug: xfer.boat_slug,
@@ -151,26 +155,107 @@ export async function POST(req: NextRequest) {
   if (insertNew.error) {
     // We already moved the old holding. Roll it back so the share
     // is at least intact on the sender — ops will reconcile.
+    // SCOPED rollback: only undo IF the holding still shows our
+    // exact transferred_to_user_id (matches the recipient on this
+    // transfer). If a parallel admin click or refund already wiped
+    // it, the predicate fails and we leave the row alone — better
+    // a stuck state ops resolves than wiping a different transfer's
+    // legitimate move-out.
     console.error("[admin · transfer ack · insert new]", insertNew.error);
     await admin
       .from("share_holdings")
       .update({ transferred_at: null, transferred_to_user_id: null })
-      .eq("id", oldHolding.data.id);
+      .eq("id", oldHolding.data.id)
+      .eq("transferred_to_user_id", xfer.to_user_id!)
+      .eq("transferred_at", nowIso);
     return NextResponse.json(
       { error: "Could not insert recipient holdings; sender share restored." },
       { status: 500 },
     );
   }
 
-  // 3. Flip the transfer to 'completed'.
-  await admin
+  // 3. Flip the transfer to 'completed'. CAS-guarded: only flip if
+  // the status is still 'pending_ryda_review'. If a parallel admin
+  // click already finalized it, we surface 409 — but the holdings
+  // are now the source of truth, so the audit log records what we
+  // saw. Without the CAS, a parallel reject racing in here could
+  // overwrite 'rejected' with 'completed' silently.
+  const finalize = await admin
     .from("share_transfers")
     .update({
       status: "completed",
       ryda_review_note: note || null,
       updated_at: nowIso,
     })
-    .eq("id", xfer.id);
+    .eq("id", xfer.id)
+    .eq("status", "pending_ryda_review")
+    .select("id")
+    .maybeSingle();
+
+  if (!finalize.data) {
+    // Lost the final CAS — a parallel reject (or another admin click)
+    // raced in after we moved the source holding + minted recipient
+    // rows. We must undo BOTH side effects so the share_holdings
+    // ledger reflects reality:
+    //   a) Delete the recipient holdings we just inserted (scoped by
+    //      to_user_id + acquired_at so we only touch our minted rows;
+    //      these were just inserted, no other process should match).
+    //   b) Restore the source holding (CAS-scoped to our exact stamp
+    //      so we don't wipe a different transfer's legitimate move).
+    //
+    // If either undo fails the audit log records the warning and
+    // ops triages from there — but the caller still gets 409.
+    const undoNew = await admin
+      .from("share_holdings")
+      .delete()
+      .eq("user_id", xfer.to_user_id!)
+      .eq("acquired_at", nowIso)
+      .is("purchase_id", null)
+      .is("share_index", null)
+      .or(
+        `vehicle_symbol.eq.${xfer.vehicle_symbol ?? "__null__"},boat_slug.eq.${xfer.boat_slug ?? "__null__"}`,
+      );
+    if (undoNew.error) {
+      console.error("[admin · transfer ack · undo new]", undoNew.error);
+    }
+    const undoOld = await admin
+      .from("share_holdings")
+      .update({ transferred_at: null, transferred_to_user_id: null })
+      .eq("id", oldHolding.data.id)
+      .eq("transferred_to_user_id", xfer.to_user_id!)
+      .eq("transferred_at", nowIso);
+    if (undoOld.error) {
+      console.error("[admin · transfer ack · undo old]", undoOld.error);
+    }
+
+    console.warn(
+      "[admin · transfer ack · finalize CAS lost — rolled back holdings]",
+      { transferId: xfer.id, oldHoldingId: oldHolding.data.id },
+    );
+    await recordAdminAction(admin, {
+      adminUserId: adminUser.id,
+      action: "transfer_ack",
+      targetType: "share_transfer",
+      targetId: xfer.id,
+      details: {
+        warning: "finalize_cas_lost_rolled_back",
+        from_user_id: xfer.from_user_id,
+        to_user_id: xfer.to_user_id,
+        shares: xfer.shares,
+        old_holding_id: oldHolding.data.id,
+        undo_new_error: undoNew.error?.message ?? null,
+        undo_old_error: undoOld.error?.message ?? null,
+        note: note || null,
+      },
+    });
+    return NextResponse.json(
+      {
+        error:
+          "Transfer state changed during acknowledgment. Holdings rolled back; refresh and inspect audit log.",
+      },
+      { status: 409 },
+    );
+  }
 
   await recordAdminAction(admin, {
     adminUserId: adminUser.id,

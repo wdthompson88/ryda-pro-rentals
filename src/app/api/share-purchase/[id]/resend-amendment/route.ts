@@ -4,11 +4,11 @@
 // paid share-purchase. Used when:
 //   - The original webhook-driven email bounced or got marked spam
 //   - The member lost their copy and wants it again
-//   - Ops needs to re-send (with admin role flag — TODO when admin
-//     tools land)
+//   - Ops re-sends from /admin (admin role can resend any purchase)
 //
-// Auth: the purchase owner only. The route returns 404 to non-owners
-// to avoid leaking purchase ids.
+// Auth: the purchase owner OR an admin (app_metadata.role='admin').
+// Owner-only routes return 404 to non-owners to avoid leaking purchase
+// ids; admin path bypasses the owner filter and is audit-logged.
 //
 // Idempotency: doesn't create a new llc_amendments row — updates the
 // existing one's email_attempted_at + emailed flag. Re-sending three
@@ -17,6 +17,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { requireSupabaseAdmin } from "@/lib/supabase-admin";
 import { getUserFromRequest } from "@/lib/api-auth";
+import { requireAdmin } from "@/lib/admin-auth";
+import { recordAdminAction } from "@/lib/admin-audit";
 import { isAllowed, clientIp } from "@/lib/rate-limit";
 import { renderAmendmentPdf } from "@/lib/llc-amendment-pdf";
 import { emailLayout, escapeHtml } from "@/lib/notify";
@@ -63,17 +65,23 @@ export async function POST(
 
   const { id: purchaseId } = await params;
 
-  // Look up the purchase. Restrict to the owner; non-owners get 404
-  // (uniform with existing /api/share-purchase/[id] route to avoid
-  // leaking which purchase ids exist).
-  const { data: purchase, error: purchaseErr } = await admin
+  // Auth split: admin can resend ANY purchase; owners can resend
+  // their own. The /admin/page.tsx Resend button hits this route
+  // and was previously broken (404'd for admins) because the
+  // .eq("user_id", user.id) filter rejected non-owner admin reads.
+  const adminUser = await requireAdmin(req);
+  const isAdminCaller = !!adminUser;
+
+  let lookup = admin
     .from("share_purchases")
     .select(
       "id, user_id, status, shares, vehicle_symbol, boat_slug, name, email, total_cents, fulfilled_at",
     )
-    .eq("id", purchaseId)
-    .eq("user_id", user.id)
-    .maybeSingle();
+    .eq("id", purchaseId);
+  if (!isAdminCaller) {
+    lookup = lookup.eq("user_id", user.id);
+  }
+  const { data: purchase, error: purchaseErr } = await lookup.maybeSingle();
   if (purchaseErr || !purchase) {
     return NextResponse.json(
       { error: "Purchase not found." },
@@ -182,6 +190,21 @@ export async function POST(
     })
     .eq("purchase_id", purchase.id)
     .eq("document_type", "member_register_amendment");
+
+  // Audit-log the admin path. Owner self-serve resends don't need
+  // audit (the email itself is the receipt).
+  if (isAdminCaller && adminUser) {
+    await recordAdminAction(admin, {
+      adminUserId: adminUser.id,
+      action: "resend_amendment",
+      targetType: "share_purchase",
+      targetId: purchase.id,
+      details: {
+        recipient: purchase.email,
+        owner_user_id: purchase.user_id,
+      },
+    });
+  }
 
   return NextResponse.json({ ok: true });
 }

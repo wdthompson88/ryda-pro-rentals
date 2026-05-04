@@ -60,10 +60,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid signature." }, { status: 400 });
   }
 
-  // Event-id dedup. We CHECK first, PROCESS the event, then RECORD
-  // on success. Recording up-front would lock out Stripe retries
-  // when our processing returns 500 — Stripe would see a duplicate
-  // and never re-deliver, leaving partially-processed state stuck.
+  // Event-id dedup, scoped by endpoint. We CHECK first, PROCESS the
+  // event, then RECORD on success. Recording up-front would lock out
+  // Stripe retries when our processing returns 500.
+  //
+  // The endpoint filter is critical (migration 0020): without it, a
+  // misrouted event recorded by the OTHER webhook (e.g. KYC event
+  // hits the share-purchase endpoint, gets recorded with
+  // endpoint='share-purchase') would dedup-poison the legitimate
+  // KYC webhook delivery later.
   //
   // Race note: two concurrent deliveries for the same event_id
   // (rare — Stripe normally retries on timeout, not in parallel)
@@ -74,6 +79,7 @@ export async function POST(req: NextRequest) {
     .from("stripe_events")
     .select("id")
     .eq("id", event.id)
+    .eq("endpoint", "share-purchase")
     .maybeSingle();
   if (seen.data) {
     console.log("[stripe webhook] duplicate event, skipping", event.id, event.type);
@@ -451,8 +457,11 @@ export async function POST(req: NextRequest) {
       }
 
       default:
-        // We don't subscribe to other events; ignore quietly.
-        break;
+        // We don't subscribe to other events; ignore quietly AND
+        // skip recording the event so we don't poison the per-
+        // endpoint dedup table for an event that doesn't belong to
+        // this endpoint. Codex round-3 catch.
+        return NextResponse.json({ received: true, ignored: event.type });
     }
   } catch (err) {
     console.error("[stripe webhook handler]", err);

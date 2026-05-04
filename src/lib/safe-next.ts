@@ -11,7 +11,12 @@
 // Rules: only allow same-origin paths (`/whatever`). Reject anything
 // that could be interpreted as an external URL or a non-http(s) scheme.
 
-const FALLBACK = "/portfolio";
+// Sign-in / auth-callback fallback. Was `/portfolio` — but that route
+// is the public sample-data demo, not the member dashboard. Members
+// who hit a sign-in flow with no ?next= param land on /account, the
+// real authenticated overview. /portfolio remains for the marketing
+// preview surface only.
+const FALLBACK = "/account";
 
 /**
  * Sanitize a `next=` value. Returns `fallback` if input is unsafe.

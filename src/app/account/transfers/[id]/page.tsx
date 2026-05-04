@@ -61,9 +61,13 @@ export default function TransferPage({
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState<"accepted" | "rejected" | null>(null);
 
-  // Load transfer + KYC. RLS on share_transfers allows the recipient
-  // to read by `to_user_email` matching their JWT email; the row
-  // returns null for non-recipients (page shows a 404-ish state).
+  // Load transfer + KYC. RLS on share_transfers (migration 0016) lets
+  // the recipient read by `to_user_email` matching their JWT email;
+  // the row returns null for non-recipients (page shows a 404-ish state).
+  // RLS on kyc_verifications (migration 0010) scopes by user_id =
+  // auth.uid(), but we add an explicit `.eq("user_id", user.id)`
+  // filter here as defense-in-depth so a future RLS-policy mistake
+  // doesn't fail open.
   useEffect(() => {
     if (!supabase) {
       setLoading(false);
@@ -72,6 +76,8 @@ export default function TransferPage({
     }
     let cancelled = false;
     (async () => {
+      const userRes = await supabase.auth.getUser();
+      const userId = userRes.data.user?.id ?? null;
       const [xferRes, kycRes] = await Promise.all([
         supabase
           .from("share_transfers")
@@ -80,12 +86,15 @@ export default function TransferPage({
           )
           .eq("id", id)
           .maybeSingle(),
-        supabase
-          .from("kyc_verifications")
-          .select("status")
-          .order("created_at", { ascending: false })
-          .limit(1)
-          .maybeSingle(),
+        userId
+          ? supabase
+              .from("kyc_verifications")
+              .select("status")
+              .eq("user_id", userId)
+              .order("created_at", { ascending: false })
+              .limit(1)
+              .maybeSingle()
+          : Promise.resolve({ data: null }),
       ]);
       if (cancelled) return;
       setTransfer((xferRes.data as Transfer | null) ?? null);

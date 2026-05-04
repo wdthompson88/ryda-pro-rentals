@@ -1,8 +1,14 @@
 // POST /api/share-purchase/[id]/refund
 //
-// Member-initiated refund + cancellation request for a share
-// purchase. Per the Operating Agreement (and the cancellation copy
-// in the buy flow), three eligibility windows:
+// Member-initiated OR admin-initiated refund + cancellation request
+// for a share purchase. Owner self-serves; admins (app_metadata.role
+// === 'admin') can refund any purchase, audit-logged via
+// recordAdminAction. The /admin Refund button hits this route, so
+// without the admin path it would 404 for any purchase the admin
+// doesn't personally own. Codex round-3 catch.
+//
+// Per the Operating Agreement (and the cancellation copy in the
+// buy flow), three eligibility windows:
 //
 //   - 'pending' / 'failed' / 'canceled': nothing to refund. Just
 //     mark canceled and return.
@@ -25,6 +31,8 @@ import { NextResponse, type NextRequest } from "next/server";
 import { requireStripe } from "@/lib/stripe";
 import { requireSupabaseAdmin } from "@/lib/supabase-admin";
 import { getUserFromRequest } from "@/lib/api-auth";
+import { requireAdmin } from "@/lib/admin-auth";
+import { recordAdminAction } from "@/lib/admin-audit";
 import { isAllowed, clientIp } from "@/lib/rate-limit";
 import { notifyTeam, emailLayout, escapeHtml } from "@/lib/notify";
 
@@ -72,15 +80,21 @@ export async function POST(
   const body = await req.json().catch(() => ({}));
   const reason = typeof body.reason === "string" ? body.reason.slice(0, 500) : "";
 
-  // Owner-only. Non-owners get 404 to avoid leaking purchase ids.
-  const { data: purchase, error: purchaseErr } = await admin
+  // Auth split: admin can refund ANY purchase; owner can refund
+  // their own. Non-owners get 404 to avoid leaking purchase ids.
+  const adminUser = await requireAdmin(req);
+  const isAdminCaller = !!adminUser;
+
+  let lookup = admin
     .from("share_purchases")
     .select(
       "id, user_id, status, shares, vehicle_symbol, boat_slug, name, email, total_cents, stripe_payment_intent_id, fulfilled_at, paid_at, updated_at",
     )
-    .eq("id", purchaseId)
-    .eq("user_id", user.id)
-    .maybeSingle();
+    .eq("id", purchaseId);
+  if (!isAdminCaller) {
+    lookup = lookup.eq("user_id", user.id);
+  }
+  const { data: purchase, error: purchaseErr } = await lookup.maybeSingle();
   if (purchaseErr || !purchase) {
     return NextResponse.json(
       { error: "Purchase not found." },
@@ -165,8 +179,13 @@ export async function POST(
     ? (Date.now() - paidAt) / (1000 * 60 * 60 * 24)
     : Infinity;
 
-  if (ageDays > SELF_SERVE_REFUND_WINDOW_DAYS) {
-    // Past the self-serve window. File a ticket; legal will handle.
+  if (!isAdminCaller && ageDays > SELF_SERVE_REFUND_WINDOW_DAYS) {
+    // Past the self-serve window for member callers. File a ticket;
+    // legal will handle. Admin callers bypass this gate — by the
+    // time an admin clicks Refund on /admin, ops/legal have already
+    // decided the refund is appropriate, so we route them straight
+    // to the Stripe call below + an audit log row. Codex round-4
+    // catch.
     const ticket = await fileTicket(
       admin,
       purchase,
@@ -324,14 +343,20 @@ export async function POST(
     );
   }
 
-  // Best-effort tear down derived state. We set BOTH transferred_at
-  // (so existing "is this share still held" filters across the
-  // codebase keep working with a single column check) AND
-  // refunded_at (so a future transfer-history UI can distinguish
-  // "refunded" from "transferred to another member"). transferred
-  // _to_user_id stays null since no one received the share.
+  // Tear down derived state. We set BOTH transferred_at (so
+  // existing "is this share still held" filters across the codebase
+  // keep working with a single column check) AND refunded_at (so a
+  // future transfer-history UI can distinguish "refunded" from
+  // "transferred to another member"). transferred_to_user_id stays
+  // null since no one received the share.
+  //
+  // CRITICAL post-Stripe-success step: if this DB update fails OR
+  // updates fewer rows than expected, the member is refunded but
+  // some/all of their share_holdings still show as active (a free
+  // share). Verify by row-count match against purchase.shares.
+  // Codex round-3 + round-4 catch.
   const nowIso = new Date().toISOString();
-  await admin
+  const deactivate = await admin
     .from("share_holdings")
     .update({
       transferred_at: nowIso,
@@ -339,7 +364,37 @@ export async function POST(
       refunded_at: nowIso,
     })
     .eq("purchase_id", purchase.id)
-    .is("transferred_at", null);
+    .is("transferred_at", null)
+    .select("id");
+
+  const deactivatedCount = deactivate.data?.length ?? 0;
+  // Note: shares might be > deactivatedCount if some rows were
+  // already transferred away (transferred_at not null) — those
+  // shares are no longer the buyer's to refund-deactivate, but
+  // ops should still know about it. We expect exactly
+  // purchase.shares rows; mismatch → critical ticket.
+  if (deactivate.error || deactivatedCount !== purchase.shares) {
+    console.error(
+      "[refund · CRITICAL holdings deactivation incomplete AFTER successful Stripe refund]",
+      {
+        purchaseId: purchase.id,
+        userId: user.id,
+        expected: purchase.shares,
+        actual: deactivatedCount,
+        error: deactivate.error,
+      },
+    );
+    // Force a critical ticket. If this also fails we've still
+    // successfully refunded; ops will notice via the Stripe
+    // dashboard reconciliation, but log loudly so monitoring catches it.
+    await fileTicket(
+      admin,
+      purchase,
+      user,
+      `${reason}\n\nDeactivation mismatch: expected ${purchase.shares}, got ${deactivatedCount}`,
+      "refund_holdings_deactivation_incomplete",
+    );
+  }
 
   // The amendment + signature rows stay for audit (we generated +
   // emailed them). A future "rescinded" doc_type could supersede
@@ -350,12 +405,36 @@ export async function POST(
   // member's money IS coming back but ops loses the audit trail.
   // Don't fail the response on a ticket error — log loudly so we
   // notice it in monitoring instead.
-  const ticket = await fileTicket(admin, purchase, user, reason, "self_serve_refund");
+  const ticket = await fileTicket(
+    admin,
+    purchase,
+    user,
+    reason,
+    isAdminCaller ? "admin_refund" : "self_serve_refund",
+  );
   if (!ticket.ok) {
     console.error(
       "[refund · ticket failed AFTER successful Stripe refund]",
       { purchaseId: purchase.id, userId: user.id },
     );
+  }
+
+  // Audit-log admin-initiated refunds. Owner self-serve refunds
+  // don't need audit (the Stripe refund + canceled state IS the
+  // record).
+  if (isAdminCaller && adminUser) {
+    await recordAdminAction(admin, {
+      adminUserId: adminUser.id,
+      action: "refund_issued",
+      targetType: "share_purchase",
+      targetId: purchase.id,
+      details: {
+        owner_user_id: purchase.user_id,
+        shares: purchase.shares,
+        total_cents: purchase.total_cents,
+        member_reason: reason || null,
+      },
+    });
   }
 
   return NextResponse.json({

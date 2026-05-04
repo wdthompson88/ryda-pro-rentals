@@ -37,30 +37,45 @@ export async function POST(
   const body = await req.json().catch(() => ({}));
   const note = typeof body.note === "string" ? body.note.slice(0, 500) : "";
 
-  // Atomic CAS pending → paid + stamp paid_at exactly once.
-  const claim = await admin
+  // ORDER: holdings FIRST, then status flip + paid_at + fulfilled_at
+  // in one update. Previous order (status→paid first, then upsert)
+  // could leave a row at status='paid', paid_at=now, fulfilled_at=null,
+  // holdings=missing if the upsert errored — exactly the drift the
+  // PDF Sentry rule warns about. Now: if holdings fails we never
+  // flip status, so retries are clean and ops never sees the orphan.
+  //
+  // Repair path: any row stuck at status='paid' AND fulfilled_at=null
+  // (legacy from BEFORE this fix order, or from a future bug) can be
+  // re-run through this route. We accept either pending or partially-
+  // fulfilled paid rows on lookup, then no-op the status flip if it's
+  // already paid (only the holdings + fulfilled_at stamp run).
+  const lookup = await admin
     .from("share_purchases")
-    .update({
-      status: "paid",
-      paid_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", purchaseId)
-    .eq("status", "pending")
     .select(
-      "id, user_id, vehicle_symbol, boat_slug, shares, funding_method",
+      "id, user_id, vehicle_symbol, boat_slug, shares, funding_method, status, fulfilled_at, paid_at",
     )
+    .eq("id", purchaseId)
     .maybeSingle();
-  if (!claim.data) {
+  if (!lookup.data) {
     return NextResponse.json(
-      { error: "Purchase not found or not in pending status." },
+      { error: "Purchase not found." },
+      { status: 404 },
+    );
+  }
+  const isPending = lookup.data.status === "pending";
+  const isStuckPaid =
+    lookup.data.status === "paid" && lookup.data.fulfilled_at === null;
+  if (!isPending && !isStuckPaid) {
+    return NextResponse.json(
+      { error: `Purchase status is ${lookup.data.status}; nothing to do.` },
       { status: 409 },
     );
   }
-  const purchase = claim.data;
+  const purchase = lookup.data;
 
-  // Mint share_holdings rows (same pattern as the webhook). Cap
-  // at 10 defensively — schema check enforces ≤10 too.
+  // 1. Mint share_holdings rows FIRST (idempotent on
+  // (purchase_id, share_index) so a retry after a partial flip is
+  // safe). Cap at 10 defensively — schema check enforces ≤10 too.
   const sharesToCreate = Math.min(10, Math.max(1, purchase.shares));
   const rows = Array.from({ length: sharesToCreate }, (_, i) => ({
     user_id: purchase.user_id,
@@ -78,23 +93,80 @@ export async function POST(
     });
   if (upsert.error) {
     console.error("[admin · mark-paid · holdings]", upsert.error);
-    // Don't roll back the status flip — ops can re-run this route
-    // (idempotent on holdings) once they fix whatever broke.
     return NextResponse.json(
       {
         error:
-          "Status set to paid but holdings upsert failed. Re-run this endpoint to retry.",
+          "Holdings upsert failed; purchase status unchanged. Re-run this endpoint to retry.",
       },
       { status: 500 },
     );
   }
 
-  // Stamp fulfilled_at last.
-  await admin
-    .from("share_purchases")
-    .update({ fulfilled_at: new Date().toISOString() })
-    .eq("id", purchase.id)
-    .is("fulfilled_at", null);
+  // 2. Stamp the right fields based on whether this was a fresh
+  // pending row or a stuck-paid repair.
+  const nowIso = new Date().toISOString();
+  if (isPending) {
+    // Fresh pending → paid: stamp status, paid_at, fulfilled_at, in
+    // one CAS update. Guards against a parallel mark-paid advancing
+    // the row between our lookup and write.
+    const claim = await admin
+      .from("share_purchases")
+      .update({
+        status: "paid",
+        paid_at: nowIso,
+        fulfilled_at: nowIso,
+        updated_at: nowIso,
+      })
+      .eq("id", purchase.id)
+      .eq("status", "pending")
+      .select("id")
+      .maybeSingle();
+    if (!claim.data) {
+      // Lost the race — another path already flipped status. We
+      // already minted holdings (step 1) speculatively; if the
+      // status flipped to paid, holdings being there is correct
+      // (the other path also wanted them). If status flipped to
+      // canceled / failed, holdings are now ORPHANED on an unpaid
+      // purchase. Roll back the holdings we just inserted so the
+      // ledger doesn't show ownership for canceled work.
+      //
+      // Re-read to find out which case we're in.
+      const reread = await admin
+        .from("share_purchases")
+        .select("status")
+        .eq("id", purchase.id)
+        .maybeSingle();
+      if (reread.data?.status !== "paid") {
+        // Not paid — clean up the holdings we minted. Idempotent
+        // delete scoped tightly to (purchase_id, share_index range)
+        // so we only touch what we just inserted.
+        const cleanup = await admin
+          .from("share_holdings")
+          .delete()
+          .eq("purchase_id", purchase.id);
+        if (cleanup.error) {
+          console.error(
+            "[admin · mark-paid · holdings rollback]",
+            cleanup.error,
+          );
+        }
+      }
+      return NextResponse.json(
+        { error: "Purchase status changed by another process." },
+        { status: 409 },
+      );
+    }
+  } else {
+    // Stuck-paid repair: holdings just upserted (idempotent), now
+    // stamp fulfilled_at if missing. CAS on fulfilled_at IS NULL so
+    // a parallel repair doesn't double-stamp.
+    await admin
+      .from("share_purchases")
+      .update({ fulfilled_at: nowIso, updated_at: nowIso })
+      .eq("id", purchase.id)
+      .eq("status", "paid")
+      .is("fulfilled_at", null);
+  }
 
   await recordAdminAction(admin, {
     adminUserId: adminUser.id,
