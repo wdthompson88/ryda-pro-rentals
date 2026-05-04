@@ -105,13 +105,19 @@ export async function POST(
       .update({ status: "canceled", updated_at: new Date().toISOString() })
       .eq("id", purchase.id)
       .neq("status", "canceled");
-    await fileTicket(
+    const ticket = await fileTicket(
       admin,
       purchase,
       user,
       reason,
       `cancel_${purchase.status}`,
     );
+    if (!ticket.ok) {
+      return NextResponse.json(
+        { error: "Could not record cancellation. Try again or contact support." },
+        { status: 500 },
+      );
+    }
     return NextResponse.json({
       ok: true,
       action: "marked_canceled",
@@ -126,7 +132,19 @@ export async function POST(
   // sort out why fulfillment failed AND whether to reverse anything
   // that did partially land.
   if (purchase.status === "paid" && !purchase.fulfilled_at) {
-    await fileTicket(admin, purchase, user, reason, "paid_unfulfilled");
+    const ticket = await fileTicket(
+      admin,
+      purchase,
+      user,
+      reason,
+      "paid_unfulfilled",
+    );
+    if (!ticket.ok) {
+      return NextResponse.json(
+        { error: "Could not record request. Try again or contact support." },
+        { status: 500 },
+      );
+    }
     return NextResponse.json({
       ok: true,
       action: "ticket_filed",
@@ -149,7 +167,19 @@ export async function POST(
 
   if (ageDays > SELF_SERVE_REFUND_WINDOW_DAYS) {
     // Past the self-serve window. File a ticket; legal will handle.
-    await fileTicket(admin, purchase, user, reason, "out_of_window");
+    const ticket = await fileTicket(
+      admin,
+      purchase,
+      user,
+      reason,
+      "out_of_window",
+    );
+    if (!ticket.ok) {
+      return NextResponse.json(
+        { error: "Could not record request. Try again or contact support." },
+        { status: 500 },
+      );
+    }
     return NextResponse.json({
       ok: true,
       action: "ticket_filed",
@@ -162,7 +192,19 @@ export async function POST(
   if (!purchase.stripe_payment_intent_id) {
     // Edge case — paid status but no payment intent recorded.
     // Treat as ticket; ops will sort it out from the Stripe side.
-    await fileTicket(admin, purchase, user, reason, "paid_no_intent");
+    const ticket = await fileTicket(
+      admin,
+      purchase,
+      user,
+      reason,
+      "paid_no_intent",
+    );
+    if (!ticket.ok) {
+      return NextResponse.json(
+        { error: "Could not record request. Try again or contact support." },
+        { status: 500 },
+      );
+    }
     return NextResponse.json({
       ok: true,
       action: "ticket_filed",
@@ -259,8 +301,11 @@ export async function POST(
     }
 
     // Indeterminate — leave status='canceled', file a ticket, tell
-    // the member ops will verify.
-    await fileTicket(
+    // the member ops will verify. If the ticket persistence fails
+    // here we still return ok (the row IS canceled and the Stripe
+    // state is what ops will verify against; member shouldn't
+    // retry). Surface a softer warning in the message instead.
+    const ticket = await fileTicket(
       admin,
       purchase,
       user,
@@ -271,8 +316,9 @@ export async function POST(
       {
         ok: true,
         action: "ticket_filed",
-        message:
-          "Stripe didn't confirm the refund cleanly. Ops will verify in Stripe and reach out within one business day.",
+        message: ticket.ok
+          ? "Stripe didn't confirm the refund cleanly. Ops will verify in Stripe and reach out within one business day."
+          : "Stripe didn't confirm cleanly and we couldn't file a ticket automatically. Email support@ryda.com with this purchase id.",
       },
       { status: 202 },
     );
@@ -299,8 +345,18 @@ export async function POST(
   // emailed them). A future "rescinded" doc_type could supersede
   // them; for now we just leave them as historical.
 
-  // File a ticket regardless so ops sees the cancellation.
-  await fileTicket(admin, purchase, user, reason, "self_serve_refund");
+  // File a ticket regardless so ops sees the cancellation. The
+  // refund already succeeded; if this ticket-persistence fails the
+  // member's money IS coming back but ops loses the audit trail.
+  // Don't fail the response on a ticket error — log loudly so we
+  // notice it in monitoring instead.
+  const ticket = await fileTicket(admin, purchase, user, reason, "self_serve_refund");
+  if (!ticket.ok) {
+    console.error(
+      "[refund · ticket failed AFTER successful Stripe refund]",
+      { purchaseId: purchase.id, userId: user.id },
+    );
+  }
 
   return NextResponse.json({
     ok: true,
@@ -325,14 +381,16 @@ async function fileTicket(
   user: { id: string; email: string | null },
   memberReason: string,
   branch: string,
-) {
+): Promise<{ ok: boolean }> {
   const asset =
     purchase.vehicle_symbol ?? purchase.boat_slug ?? "asset";
   const subject = `Refund/cancel · ${branch} · ${user.email ?? user.id}`;
 
   // Persist to contact_messages first (durable). Email the team
-  // best-effort after.
-  await admin.from("contact_messages").insert({
+  // best-effort after. Returns ok:false to the caller if the
+  // contact_messages insert fails — the caller should NOT tell the
+  // member "ticket filed" without a durable record.
+  const persist = await admin.from("contact_messages").insert({
     name: purchase.name || user.email || "(no name)",
     email: user.email ?? purchase.email ?? "",
     phone: null,
@@ -348,6 +406,10 @@ async function fileTicket(
       `Member reason: ${memberReason || "(none)"}\n`,
     context: `Refund · ${branch}`,
   });
+  if (persist.error) {
+    console.error("[refund · ticket persist]", persist.error);
+    return { ok: false };
+  }
 
   try {
     await notifyTeam({
@@ -364,6 +426,8 @@ async function fileTicket(
       ),
     });
   } catch (err) {
+    // Email failure is non-fatal — the durable row is the contract.
     console.error("[refund · notify]", err);
   }
+  return { ok: true };
 }

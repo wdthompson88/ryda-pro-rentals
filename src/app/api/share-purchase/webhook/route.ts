@@ -381,12 +381,23 @@ export async function POST(req: NextRequest) {
         // stripe_events — that way Stripe's retry can drive the
         // amendment generation to completion. (Status guard on the
         // CAS prevents double fulfillment when the retry succeeds.)
+        // We also flip fullyHandled on a fulfilled_at write
+        // failure: if that update errors after holdings + amendment
+        // succeeded, the row is paid but fulfilled_at is null —
+        // recording the event here would orphan the row forever.
         if (amendmentSent) {
-          await admin
+          const stamp = await admin
             .from("share_purchases")
             .update({ fulfilled_at: new Date().toISOString() })
             .eq("id", purchaseId)
             .is("fulfilled_at", null);
+          if (stamp.error) {
+            console.error(
+              "[stripe webhook] fulfilled_at stamp failed",
+              stamp.error,
+            );
+            fullyHandled = false;
+          }
         } else {
           fullyHandled = false;
         }
@@ -450,11 +461,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Handler failed." }, { status: 500 });
   }
 
-  // Record the event ONLY when it was fully handled. If a
-  // partial fulfillment is in progress (amendment generation
-  // failed), don't record — let Stripe's retry drive it home.
-  // If this insert fails (unique violation = parallel delivery
-  // already recorded it; other = transient), it's non-fatal.
+  // Two cases:
+  //   - fullyHandled === true  → record the event (so retries
+  //     dedup) and return 200.
+  //   - fullyHandled === false → DON'T record, AND return 500.
+  //     The 500 is critical: Stripe only retries on non-2xx
+  //     responses. Returning 200 here without recording would
+  //     orphan the partial fulfillment forever (Stripe says
+  //     "delivered, done"; we never get another chance).
+  //
+  // For 23505 (parallel-delivery race) on the record insert, we
+  // still return 200 — the other delivery already succeeded so
+  // there's nothing to retry.
   if (fullyHandled) {
     const recorded = await admin
       .from("stripe_events")
@@ -465,12 +483,15 @@ export async function POST(req: NextRequest) {
         console.warn("[stripe webhook] event-record insert failed", recorded.error);
       }
     }
-  } else {
-    console.log(
-      "[stripe webhook] partial fulfillment, leaving event unrecorded for retry",
-      event.id,
-    );
+    return NextResponse.json({ received: true });
   }
 
-  return NextResponse.json({ received: true });
+  console.warn(
+    "[stripe webhook] partial fulfillment — returning 500 so Stripe retries",
+    event.id,
+  );
+  return NextResponse.json(
+    { error: "Partial fulfillment; will retry." },
+    { status: 500 },
+  );
 }
