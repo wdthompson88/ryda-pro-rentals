@@ -92,10 +92,17 @@ export async function POST(req: NextRequest) {
           ? session.payment_intent
           : session.payment_intent?.id ?? null;
 
-        // Atomic compare-and-set: flip status pending→paid in a single
-        // statement. Only one concurrent delivery wins this update; the
-        // others get an empty result and fall through to the
+        // Atomic compare-and-set: flip status to 'paid' in a single
+        // statement. Only one concurrent delivery wins this update;
+        // the others get an empty result and fall through to the
         // partial-fulfillment repair check below.
+        // We accept the transition from BOTH 'pending' AND 'failed'
+        // as eligible. The 'failed' path is the self-heal for
+        // out-of-order Stripe events: if async_payment_failed raced
+        // ahead and stamped the row as failed, but a successful
+        // settlement event then arrives, we want to recover the
+        // member's purchase rather than leave them stuck. (Stripe
+        // doesn't formally guarantee event ordering across retries.)
         const claim = await admin
           .from("share_purchases")
           .update({
@@ -104,7 +111,7 @@ export async function POST(req: NextRequest) {
             updated_at: new Date().toISOString(),
           })
           .eq("id", purchaseId)
-          .eq("status", "pending")
+          .in("status", ["pending", "failed"])
           .select(
             "id, status, user_id, vehicle_symbol, boat_slug, shares, email, name, fulfilled_at",
           )
@@ -350,10 +357,15 @@ export async function POST(req: NextRequest) {
         const intent = event.data.object as Stripe.PaymentIntent;
         // Look up by payment_intent_id rather than metadata, since
         // Stripe doesn't always copy session metadata onto the intent.
+        // Status guard: only flip pending→failed. Without this, an
+        // out-of-order replay arriving after a successful settlement
+        // would stomp a paid+fulfilled row back to failed (Stripe
+        // doesn't guarantee event ordering across retries).
         await admin
           .from("share_purchases")
           .update({ status: "failed", updated_at: new Date().toISOString() })
-          .eq("stripe_payment_intent_id", intent.id);
+          .eq("stripe_payment_intent_id", intent.id)
+          .eq("status", "pending");
         break;
       }
 
@@ -362,13 +374,16 @@ export async function POST(req: NextRequest) {
         // funds, account closed). Mark purchase as failed so the
         // member sees the right state on the tracker page; team
         // can reach out via the notify pipe if needed.
+        // Status guard same reasoning as above — never stomp a row
+        // that's already paid (Stripe ordering is best-effort).
         const session = event.data.object as Stripe.Checkout.Session;
         const purchaseId = session.metadata?.purchaseId;
         if (!purchaseId) break;
         await admin
           .from("share_purchases")
           .update({ status: "failed", updated_at: new Date().toISOString() })
-          .eq("id", purchaseId);
+          .eq("id", purchaseId)
+          .eq("status", "pending");
         break;
       }
 

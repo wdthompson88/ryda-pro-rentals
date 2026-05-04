@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid handover." }, { status: 400 });
   }
   // Date parsing — both dates must be valid ISO YYYY-MM-DD strings,
-  // start <= end, and within the next 365 days.
+  // start <= end, in the future, and within the next 365 days.
   const start = new Date(startDate);
   const end = new Date(endDate);
   if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
@@ -71,6 +71,23 @@ export async function POST(req: NextRequest) {
   }
   if (start > end) {
     return NextResponse.json({ error: "start_date must be ≤ end_date." }, { status: 400 });
+  }
+  const todayMs = new Date(new Date().toISOString().slice(0, 10)).getTime();
+  if (start.getTime() < todayMs) {
+    return NextResponse.json(
+      { error: "start_date must be today or in the future." },
+      { status: 400 },
+    );
+  }
+  // Cap forward window at 365 days from today; the booking-policy
+  // copy says "8–365 days out · planned" so requests beyond that are
+  // outside the policy regardless.
+  const maxAheadMs = todayMs + 365 * 24 * 60 * 60 * 1000;
+  if (end.getTime() > maxAheadMs) {
+    return NextResponse.json(
+      { error: "end_date must be within 365 days of today." },
+      { status: 400 },
+    );
   }
   const days = Math.round((end.getTime() - start.getTime()) / (24 * 60 * 60 * 1000)) + 1;
   if (days < 1 || days > 30) {
@@ -185,6 +202,15 @@ export async function GET(req: NextRequest) {
   const vehicleSymbol = url.searchParams.get("vehicleSymbol");
   const boatSlug = url.searchParams.get("boatSlug");
   const upcomingOnly = url.searchParams.get("upcoming") === "1";
+
+  // Mirror POST: at most one asset filter. Both-or-neither was
+  // previously silently coerced to vehicle-only.
+  if (vehicleSymbol && boatSlug) {
+    return NextResponse.json(
+      { error: "Provide at most one of vehicleSymbol or boatSlug." },
+      { status: 400 },
+    );
+  }
 
   // Authorization: when an asset filter is provided, the caller is asking
   // for *other co-owners'* bookings on that asset (calendar view). The

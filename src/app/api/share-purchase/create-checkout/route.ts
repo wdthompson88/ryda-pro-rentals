@@ -155,6 +155,44 @@ export async function POST(req: NextRequest) {
 
     const stripe = requireStripe();
 
+    // Double-click guard: if this user already has a pending purchase
+    // for the same asset within the last 5 minutes, return its
+    // existing Stripe URL instead of creating a duplicate. Two side
+    // effects this fixes:
+    //   1. We don't double-mint share_holdings if both pendings
+    //      somehow get paid (the holdings unique constraint catches
+    //      it but cleaner to avoid).
+    //   2. Inventory hold isn't double-counted in future "shares
+    //      available" math (catalog is static today; this is
+    //      forward-looking).
+    const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+    const existingPending = await admin
+      .from("share_purchases")
+      .select("id, stripe_checkout_session_id")
+      .eq("user_id", user.id)
+      .eq("status", "pending")
+      .eq(vehicleSymbol ? "vehicle_symbol" : "boat_slug", vehicleSymbol ?? boatSlug)
+      .gte("created_at", fiveMinAgo)
+      .order("created_at", { ascending: false })
+      .limit(1);
+    if (
+      existingPending.data &&
+      existingPending.data.length > 0 &&
+      existingPending.data[0].stripe_checkout_session_id
+    ) {
+      const existingSession = await stripe.checkout.sessions.retrieve(
+        existingPending.data[0].stripe_checkout_session_id,
+      );
+      if (existingSession.url && existingSession.status === "open") {
+        return NextResponse.json({
+          purchaseId: existingPending.data[0].id,
+          sessionId: existingSession.id,
+          url: existingSession.url,
+          deduped: true,
+        });
+      }
+    }
+
     // Insert pending row first so we have an ID to thread through the
     // Stripe metadata. If checkout creation fails after this, the row
     // stays in 'pending' and a janitor (or the user retrying) can clean
