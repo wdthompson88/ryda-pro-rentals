@@ -18,7 +18,10 @@ import { ImageResponse } from "next/og";
 // site nav are visually identical.
 
 export const runtime = "edge";
-export const contentType = "image/png";
+// NOTE: don't export `contentType` here — it's a metadata-image
+// convention valid only on opengraph-image.tsx / icon.tsx etc.
+// Route handlers infer content type from the ImageResponse body
+// (next/og sets image/png automatically). Audit P1.
 
 const SIZE = 1080;
 

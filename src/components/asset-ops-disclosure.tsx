@@ -13,26 +13,31 @@
 
 import type { Vehicle } from "@/lib/market-data";
 
-// Service-partner mapping by brand. Values are placeholder until real
-// dealer relationships are signed; once real, swap in actual partner
-// names + addresses. Keep "TBD" entries from rendering.
+// Service-partner mapping by brand. Audit T1.5 fix: copy is
+// aspirational ("factory-authorized network") rather than naming a
+// specific dealer until contracts are signed. Once real partners are
+// inked, swap in concrete names. Keeps the page useful pre-launch
+// without making specific contractual claims about uncontracted vendors.
 const SERVICE_PARTNER_BY_BRAND: Record<string, string> = {
-  Ferrari: "Ferrari of Fort Lauderdale (factory-authorized)",
-  Lamborghini: "Lamborghini Miami (factory-authorized)",
-  McLaren: "McLaren Miami at Champion Auto Group",
-  "Aston Martin": "Aston Martin Miami",
+  Ferrari: "Factory-authorized Ferrari service network in South Florida",
+  Lamborghini:
+    "Factory-authorized Lamborghini service network in South Florida",
+  McLaren: "Factory-authorized McLaren service network in South Florida",
+  "Aston Martin":
+    "Factory-authorized Aston Martin service network in South Florida",
   // Catch-all for marques we haven't onboarded yet:
 };
 
-// Default ops disclosures shared across all vehicles. Per-vehicle
-// overrides go on Vehicle.opsDisclosure if/when we add that type.
-// Keeping this as a single source of truth simplifies updates as
-// the partner network grows.
+// Default ops disclosures shared across all vehicles. Audit T1.5 fix:
+// storage facility, insurance carrier, and dealer names are described
+// by their CATEGORY (climate-controlled, agreed-value, tier-specialist
+// carrier) rather than by specific brand until contracts are signed.
+// Once partners are inked, swap to concrete names with a single edit.
 const DEFAULT_DISCLOSURE = {
   storage:
-    "Climate-controlled garage in Miami's Wynwood arts district, 24/7 video monitoring, on-site security, segregated bays.",
+    "Climate-controlled garage in Miami, 24/7 video monitoring, on-site security, segregated bays. Specific facility named to seated members through the document vault.",
   insurance:
-    "Agreed-value comprehensive + $1M third-party liability per vehicle, written by Hagerty / Travelers / Chubb tier specialists. Every co-owner named as an insured.",
+    "Agreed-value comprehensive + $1M third-party liability per vehicle, written by a high-value-auto specialty carrier. Every co-owner named as an insured. Carrier and policy number disclosed to seated members through the document vault.",
   telematics:
     "VIN-locked GPS + odometer + speed and geofence alerts via a fleet-grade telematics provider. Member consent recorded in the operating agreement.",
   detailing:
@@ -80,7 +85,7 @@ export function AssetOpsDisclosure({ vehicle }: { vehicle: Vehicle }) {
           {servicePartner && (
             <Disclosure
               label={`${vehicle.brand} service`}
-              body={`${servicePartner}. Service intervals follow the manufacturer's prescribed schedule; service records open to seated members through the document vault.`}
+              body={`${servicePartner}. Service intervals follow the manufacturer's prescribed schedule; specific dealer disclosed to seated members through the document vault. Service records open to all seated members.`}
             />
           )}
           <Disclosure label="Insurance" body={DEFAULT_DISCLOSURE.insurance} />

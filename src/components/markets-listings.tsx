@@ -548,8 +548,14 @@ function VehicleCard({ vehicle: v }: { vehicle: Vehicle }) {
           {/* Three-line spec strip below price block. Combined buy-in
               + annual dues + usage equivalent — Round 2 research
               consensus (Fraxioned has 1+2, Ember has 3, nobody combines
-              all three on one card). */}
-          <div className="mt-3 grid grid-cols-3 gap-3 rounded-lg border border-rule bg-cream-2/40 p-3">
+              all three on one card). All values are PER-SHARE — audit
+              T1.4 fix: explicit "per share" qualifier in the eyebrow
+              and the footer line so members can't misread $7K as the
+              LLC's total dues. */}
+          <p className="mt-3 text-[9px] font-medium uppercase tracking-[0.16em] text-mute">
+            Per share, all-in
+          </p>
+          <div className="mt-1.5 grid grid-cols-3 gap-3 rounded-lg border border-rule bg-cream-2/40 p-3">
             <div>
               <p className="text-[9px] font-medium uppercase tracking-[0.14em] text-mute">
                 Annual dues
@@ -561,11 +567,11 @@ function VehicleCard({ vehicle: v }: { vehicle: Vehicle }) {
             </div>
             <div>
               <p className="text-[9px] font-medium uppercase tracking-[0.14em] text-mute">
-                Usage
+                Drive days
               </p>
               <p className="mt-0.5 text-xs font-medium text-ink tabular-nums">
                 ~{v.daysPerYear}
-                <span className="text-mute font-normal">d/yr</span>
+                <span className="text-mute font-normal">/yr</span>
               </p>
             </div>
             <div>
@@ -579,8 +585,8 @@ function VehicleCard({ vehicle: v }: { vehicle: Vehicle }) {
             </div>
           </div>
           <p className="mt-2 text-[11px] text-mute">
-            You save {formatUSD(stickerSavings)} vs full ownership · all-in,
-            no markup on third-party services
+            You save {formatUSD(stickerSavings)} vs full ownership · no
+            markup on third-party services
           </p>
           {v.rentalAvailable && rental.perShareAnnualIncome > 0 ? (
             <div

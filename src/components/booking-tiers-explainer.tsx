@@ -204,9 +204,8 @@ export function BookingTiersExplainer({
 // Concrete Miami peak event windows — keeps the explainer specific
 // instead of "examples like Art Basel". Order: roughly chronological.
 // Sourced from public event calendars; refresh annually as exact
-// dates firm up. The wins each pick from each window matters more
-// for trust than the exact date — buyers want to know "if I want
-// the F1 weekend, how does that work?"
+// dates firm up. Specificity here is the trust signal — buyers want
+// to know "if I want the F1 weekend, how does that work?"
 const MIAMI_PEAK_WINDOWS: {
   name: string;
   dates: string;

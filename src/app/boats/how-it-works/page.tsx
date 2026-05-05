@@ -69,7 +69,7 @@ export default function BoatsHowItWorks() {
             Exit doctrine
           </p>
           <h2 className="mt-3 font-display text-4xl text-ink sm:text-5xl">
-            How you get off the hull, in detail.
+            How you exit, in detail.
           </h2>
           <p className="mt-4 max-w-2xl text-lg text-ink-soft">
             Two paths — a planned exit at month{" "}
@@ -84,7 +84,7 @@ export default function BoatsHowItWorks() {
                 deeper for the "default" emphasis */}
             <div>
               <div className="flex items-baseline gap-3 flex-wrap">
-                <span className="rounded-full border border-marine/40 bg-marine/15 px-3 py-1 text-[10px] font-medium uppercase tracking-wider text-marine">
+                <span className="rounded-full border border-marine/40 bg-marine/10 px-3 py-1 text-[10px] font-medium uppercase tracking-wider text-marine">
                   Default · Planned exit
                 </span>
                 <span className="text-[10px] uppercase tracking-wider text-mute">

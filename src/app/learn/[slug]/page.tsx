@@ -82,7 +82,7 @@ export default async function LearnArticle({
               then, the intro above captures the shape of the answer.
               For an immediate response, the team is at{" "}
               <Link
-                href="/contact"
+                href="mailto:support@ryda.pro"
                 className="font-medium not-italic text-red hover:underline"
               >
                 support@ryda.pro

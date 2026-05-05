@@ -61,7 +61,10 @@ export const LEARN_STAGES: LearnStage[] = [
   {
     slug: "exit",
     label: "Exit",
-    intro: "Liquidity without a marketplace",
+    // Audit T1.2: "Liquidity" was on the SEC-banlist for new affirmative
+    // uses. "Exits without a marketplace" carries the same idea without
+    // the regulated-securities-vocabulary risk.
+    intro: "Exits without a marketplace",
     description:
       "Both paths — planned exit at year 2 and early member-to-member transfer — explained mechanically, plus tax handling and estate transfer.",
   },
@@ -77,7 +80,7 @@ export const LEARN_ARTICLES: LearnArticle[] = [
       "A RYDA share is a membership interest in a single-purpose LLC that holds title to one specific vehicle. Not a security, not a timeshare, not a token.",
     readMinutes: 5,
     intro:
-      "When you buy a RYDA share, you become a member of a single-purpose LLC that holds clear title to one specific car or yacht. Your share is a membership interest in that LLC, recorded on the LLC's member register, governed by the operating agreement you sign at closing. It's not a financial instrument issued by RYDA. It's not a token on a blockchain. It's not a right to use the car for a fixed week each year (that's a timeshare). And it's not a stake in RYDA the company. The distinction matters for taxes, for liquidity, and for what you can actually expect from us.",
+      "When you buy a RYDA share, you become a member of a single-purpose LLC that holds clear title to one specific car or yacht. Your share is a membership interest in that LLC, recorded on the LLC's member register, governed by the operating agreement you sign at closing. It's not a financial instrument issued by RYDA. It's not a token on a blockchain. It's not a right to use the car for a fixed week each year (that's a timeshare). And it's not a stake in RYDA the company. The distinction matters for taxes, for exit timing, and for what you can actually expect from us.",
   },
   {
     slug: "ryda-vs-timeshare-vs-jet-card",
