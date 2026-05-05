@@ -14,6 +14,9 @@ import { OwnershipPrimitives } from "@/components/ownership-primitives";
 import { BookingTiersExplainer } from "@/components/booking-tiers-explainer";
 import { AssetAnatomySections } from "@/components/asset-anatomy";
 import { AssetOpsDisclosure } from "@/components/asset-ops-disclosure";
+import { RecentComparableSales } from "@/components/recent-comparables";
+import { supabaseAdmin } from "@/lib/supabase-admin";
+import type { VehicleComparable } from "@/lib/vehicle-enrichment";
 import {
   VEHICLES,
   getVehicleBySymbol,
@@ -26,6 +29,61 @@ import {
 
 export async function generateStaticParams() {
   return VEHICLES.map((v) => ({ symbol: v.symbol.toLowerCase() }));
+}
+
+// ISR — re-render at most every 5 min. Lets newly-added comparables
+// surface within minutes without paying the runtime cost of full
+// dynamic rendering on every visit.
+export const revalidate = 300;
+
+// Map a vehicle to its classic.com market page so the comparables
+// block can include a "View live market data on classic.com →"
+// outbound link. Best-effort — if classic.com restructures their
+// URLs, this just degrades to no link (the block still renders).
+function classicComUrlFor(v: { brand: string; name: string; year: number }): string | undefined {
+  const brand = v.brand.toLowerCase().replace(/\s+/g, "-");
+  // Strip the brand prefix from name + slugify ("Ferrari 296 GTB" → "296-gtb")
+  const model = v.name
+    .toLowerCase()
+    .replace(v.brand.toLowerCase(), "")
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  if (!brand || !model) return undefined;
+  return `https://www.classic.com/m/${brand}/${model}/`;
+}
+
+// Fetch hand-curated comparable sales for this vehicle. Returns []
+// if Supabase isn't available (build-time fallback) or if no comps
+// have been curated yet — display block then renders nothing.
+async function getComparablesFor(vehicleSymbol: string): Promise<VehicleComparable[]> {
+  const db = supabaseAdmin();
+  if (!db) return [];
+  const { data, error } = await db
+    .from("vehicle_comparables")
+    .select("*")
+    .eq("vehicle_symbol", vehicleSymbol)
+    .order("sale_date", { ascending: false })
+    .limit(5);
+  if (error) {
+    console.warn("[markets/[symbol]] comparables fetch failed:", error.message);
+    return [];
+  }
+  return (data ?? []).map((r) => ({
+    id: r.id,
+    vehicleSymbol: r.vehicle_symbol,
+    saleDate: r.sale_date,
+    yearMakeModel: r.year_make_model,
+    trimNotes: r.trim_notes,
+    salePriceCents: r.sale_price_cents,
+    sourceName: r.source_name,
+    sourceUrl: r.source_url,
+    lotNumber: r.lot_number,
+    notes: r.notes,
+    curatedBy: r.curated_by,
+    createdAt: r.created_at,
+    updatedAt: r.updated_at,
+  }));
 }
 
 export async function generateMetadata({
@@ -53,6 +111,7 @@ export default async function VehicleMarketPage({
 
   const econ = computeShareEconomics(v);
   const costBreakdownConfig = buildCostBreakdownConfig(v, "cars");
+  const comparables = await getComparablesFor(v.symbol);
   const shareValueChartConfig = buildShareValueChartConfig(v, "cars");
   const compareCalculatorConfig = {
     vertical: "cars",
@@ -252,6 +311,16 @@ export default async function VehicleMarketPage({
           hide this. Always renders (uses sane defaults if vehicle
           doesn't override). */}
       <AssetOpsDisclosure vehicle={v} />
+
+      {/* Recent comparable sales — hand-curated from classic.com /
+          BaT / RM Sotheby's. The valuation moat: cite specific named
+          transactions instead of a black-box "estimated value."
+          Renders nothing until comps are added via /admin/comparables. */}
+      <RecentComparableSales
+        comparables={comparables}
+        code={v.ticker}
+        classicComUrl={classicComUrlFor(v)}
+      />
 
       {/* Two-year cost breakdown */}
       <section className="border-b border-rule">
