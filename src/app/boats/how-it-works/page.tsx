@@ -7,6 +7,7 @@ import {
   Reason,
   Stance,
   Stat,
+  Step,
 } from "@/components/shared/how-it-works-page";
 import { HOW_IT_WORKS_STEPS, FAQ_ITEMS } from "@/lib/boat-content";
 import { BOATS_HOLDING_YEARS, BOATS_TARGET_DEPRECIATION_PCT } from "@/lib/boat-data";
@@ -52,6 +53,177 @@ export default function BoatsHowItWorks() {
                 <p className="mt-3 text-sm leading-relaxed text-ink-soft">{s.body}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Exit / disposition deep-dive — boats variant. Same structure
+          as the cars page (Default · Planned exit / Alternate · Early
+          transfer) but boats-specific copy: 36-month hold, hull
+          instead of car, USCG documentation transfer, charter income
+          truth-up at exit, dock-fee proration. Marine accent
+          throughout to match the boats vertical. */}
+      <section id="exit" className="border-b border-rule">
+        <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
+            Exit doctrine
+          </p>
+          <h2 className="mt-3 font-display text-4xl text-ink sm:text-5xl">
+            How you get off the hull, in detail.
+          </h2>
+          <p className="mt-4 max-w-2xl text-lg text-ink-soft">
+            Two paths — a planned exit at month{" "}
+            {BOATS_HOLDING_YEARS * 12} that the LLC reaches by default,
+            and an earlier member-to-member transfer once the 12-month
+            minimum hold has cleared. Neither path uses a marketplace,
+            an order book, or a public price ticker.
+          </p>
+
+          <div className="mt-12 grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-12">
+            {/* Planned exit — default path, marine accent, slightly
+                deeper for the "default" emphasis */}
+            <div>
+              <div className="flex items-baseline gap-3 flex-wrap">
+                <span className="rounded-full border border-marine/40 bg-marine/15 px-3 py-1 text-[10px] font-medium uppercase tracking-wider text-marine">
+                  Default · Planned exit
+                </span>
+                <span className="text-[10px] uppercase tracking-wider text-mute">
+                  Month {BOATS_HOLDING_YEARS * 12} or condition trigger
+                </span>
+              </div>
+              <p className="mt-4 text-sm text-ink-soft">
+                Every LLC reaches its planned exit at the{" "}
+                {BOATS_HOLDING_YEARS}-year mark, or earlier if the
+                hull surveys below the resale threshold. Members vote
+                75% supermajority to confirm the sale; charter and
+                cruise income are reconciled into the final
+                distribution.
+              </p>
+              <div className="mt-8 grid grid-cols-1 gap-x-6 gap-y-7 sm:grid-cols-2">
+                <Step
+                  n="01"
+                  accent="marine"
+                  title="Trigger"
+                  body={`The LLC's operating agreement names a planned exit at the ${BOATS_HOLDING_YEARS}-yr mark. RYDA notifies members 90 days ahead and books an out-of-water condition survey.`}
+                />
+                <Step
+                  n="02"
+                  accent="marine"
+                  title="Survey + qualification"
+                  body="Independent marine surveyor + three broker comparables (yard-direct, brokerage-listing, auction). Any unsolicited offer is certified with proof of funds, written terms, escrow, and comp memo BEFORE the vote opens. Charter operations pause 30 days pre-survey to clean the bilge for inspection."
+                />
+                <Step
+                  n="03"
+                  accent="marine"
+                  title="Member vote"
+                  body="75% supermajority of membership interests confirms (per the OA). 14-day vote window. A 5%+ competing qualified offer pauses the vote and resets it around the higher bid. Member-Council reviews any minority objection on terms or buyer."
+                />
+                <Step
+                  n="04"
+                  accent="marine"
+                  title="Sale + USCG transfer"
+                  body="RYDA's marine title-and-escrow partner closes. Coast Guard documentation transfers to the buyer; dock fees, captain payroll, and insurance prorate to the closing date."
+                />
+                <Step
+                  n="05"
+                  accent="marine"
+                  title="Distribution"
+                  body={`Proceeds (less ~${BOATS_TARGET_DEPRECIATION_PCT}% modeled depreciation, closing fees, and any unsettled charter receivables) distribute pro-rata to each member's RYDA wallet within 14 days. K-1 issued at year-end.`}
+                />
+              </div>
+            </div>
+
+            {/* Alternate · Early transfer — slightly different from
+                cars: boats need USCG documentation update on every
+                transfer, not just sale. */}
+            <div>
+              <div className="flex items-baseline gap-3 flex-wrap">
+                <span className="rounded-full border border-rule bg-surface px-3 py-1 text-[10px] font-medium uppercase tracking-wider text-ink-soft">
+                  Alternate · Early transfer
+                </span>
+                <span className="text-[10px] uppercase tracking-wider text-mute">
+                  After 12-mo hold
+                </span>
+              </div>
+              <p className="mt-4 text-sm text-ink-soft">
+                Need out before the planned exit? Once your 12-month
+                minimum hold clears, transfer your share directly to
+                another verified RYDA member. RYDA handles the LLC
+                paperwork plus the USCG documentation update. No
+                marketplace, no order book, no auction.
+              </p>
+              {/* Audit T1.4 fix — every Step on the boats page uses
+                  accent="marine" to match the vertical's brand color.
+                  Differentiation between Default and Alternate paths
+                  is carried by the column badges + the alternate's
+                  unfilled "border-rule bg-surface" treatment. */}
+              <div className="mt-8 grid grid-cols-1 gap-x-6 gap-y-7 sm:grid-cols-2">
+                <Step
+                  n="01"
+                  accent="marine"
+                  title="Hold clears"
+                  body="Your minimum 12-month hold from the date you joined the LLC. Capital must be in the LLC long enough that the IRS doesn't reclassify the structure."
+                />
+                <Step
+                  n="02"
+                  accent="marine"
+                  title="Signal intent"
+                  body="From your dashboard, mark your share for transfer. RYDA shares it with verified prospects on the matched waitlist (KYC complete, captaining experience or willing to use our captain pool)."
+                />
+                <Step
+                  n="03"
+                  accent="marine"
+                  title="Direct negotiation"
+                  body="You and the buyer agree on a price between yourselves. Transfer prices are private; RYDA does not publish a price ticker. RYDA can share comps from prior LLCs on request."
+                />
+                <Step
+                  n="04"
+                  accent="marine"
+                  title="LLC + USCG paperwork"
+                  body="RYDA drafts the membership-interest assignment, updates the LLC member register, and refiles the USCG Certificate of Documentation. Existing co-owners ratify per the OA's 75% supermajority."
+                />
+                <Step
+                  n="05"
+                  accent="marine"
+                  title="Settlement"
+                  body="Funds settle through marine escrow within 3–5 business days (USCG documentation update is the gate). RYDA charges a 3% transfer fee on completed transfers."
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Doctrine reaffirmation — boats variant */}
+          <div className="mt-14 grid grid-cols-1 gap-6 rounded-2xl border border-rule bg-cream-2/40 p-6 sm:grid-cols-3 sm:p-8">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.18em] text-marine">
+                Members vote
+              </p>
+              <p className="mt-2 text-sm text-ink-soft">
+                Every disposition (planned or otherwise) goes through
+                a 75% supermajority of membership interests, written
+                into the Operating Agreement.
+              </p>
+            </div>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.18em] text-marine">
+                No public market
+              </p>
+              <p className="mt-2 text-sm text-ink-soft">
+                RYDA does not run an exchange, alternative trading
+                system, or order book. Co-ownership stakes are not
+                registered securities.
+              </p>
+            </div>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.18em] text-marine">
+                K-1, not 1099-B
+              </p>
+              <p className="mt-2 text-sm text-ink-soft">
+                The LLC issues a K-1, not a 1099-B. Charter income is
+                separately reported. Speak with your tax advisor;
+                treatment depends on your overall return.
+              </p>
+            </div>
           </div>
         </div>
       </section>

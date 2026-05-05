@@ -98,7 +98,7 @@ export function buildCostBreakdownConfig(
           </>
         ),
         projectedIncomeLabel: "Projected charter income",
-        depreciationNote: `Same ${BOATS_TARGET_DEPRECIATION_PCT}% depreciation assumption applies whether you cruise or charter, surveyed certified pre owned hulls and shareholder mileage caps keep the resale story consistent.`,
+        depreciationNote: `Same ${BOATS_TARGET_DEPRECIATION_PCT}% depreciation assumption applies whether you cruise or charter, surveyed certified pre owned hulls and per-member usage caps keep the resale story consistent.`,
         doctrine: `Doctrine: RYDA holds each curated hull for ${BOATS_HOLDING_YEARS} years, then sells it and distributes proceeds pro-rata. Modeled at ${BOATS_TARGET_DEPRECIATION_PCT}% depreciation, actual sale price varies by model, condition, and market.`,
       },
     };
@@ -132,7 +132,7 @@ export function buildCostBreakdownConfig(
         </>
       ),
       projectedIncomeLabel: "Projected rental income",
-      depreciationNote: `Same ${TARGET_DEPRECIATION_PCT}% depreciation assumption applies — our certified pre owned maintenance + 100 mi/day shareholder allowance keep the resale story consistent whether you drive or rent it out.`,
+      depreciationNote: `Same ${TARGET_DEPRECIATION_PCT}% depreciation assumption applies — our certified pre owned maintenance + 100 mi/day per-member allowance keep the resale story consistent whether you drive or rent it out.`,
       doctrine: `Doctrine: RYDA holds each curated certified pre owned car for ${HOLDING_YEARS} years, then sells it and distributes proceeds pro-rata. Modeled at ${TARGET_DEPRECIATION_PCT}% depreciation, actual sale price varies by model, mileage, and market conditions.`,
     },
   };

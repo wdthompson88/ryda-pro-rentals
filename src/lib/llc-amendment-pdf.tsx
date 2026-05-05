@@ -140,7 +140,7 @@ export function MemberRegisterAmendment(input: AmendmentInput) {
 
         <Text style={styles.body}>
           This amendment to the Operating Agreement of {input.llcName}
-          ({"the LLC"}) records the addition of a new member-shareholder
+          ({"the LLC"}) records the addition of a new co-owner-member
           alongside the existing co-owners. It is effective on the
           date stated below. The LLC&rsquo;s underlying Operating
           Agreement, executed separately, governs all rights and

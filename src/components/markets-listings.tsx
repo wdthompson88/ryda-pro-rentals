@@ -434,18 +434,26 @@ function VehicleCard({ vehicle: v }: { vehicle: Vehicle }) {
           {v.brand}
         </span>
 
-        {/* Status pill top-right (a11y: role+aria-label so screen
+        {/* Status pill top-right with shares-remaining counter. Round 2
+            research (Fraxioned pattern): the shares-remaining counter
+            is the single highest-converting element on Fraxioned's
+            homepage — creates social proof + scarcity without
+            manipulative urgency. (a11y: role+aria-label so screen
             readers announce state, not just color). */}
         <span
           role="status"
-          aria-label={isSold ? "Status: Sold out" : "Status: Available"}
-          className={`absolute right-3 top-3 rounded-full px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] backdrop-blur ${
+          aria-label={
             isSold
-              ? "bg-mute/90 text-cream"
-              : "bg-red/95 text-cream"
+              ? "Status: Sold out"
+              : `Status: ${v.sharesAvailable} of ${v.shares} shares available`
+          }
+          className={`absolute right-3 top-3 rounded-full px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] backdrop-blur ${
+            isSold ? "bg-mute/90 text-cream" : "bg-red/95 text-cream"
           }`}
         >
-          {isSold ? "Sold out" : "Available"}
+          {isSold
+            ? "Sold out"
+            : `${v.sharesAvailable} of ${v.shares} shares left`}
         </span>
       </div>
 
@@ -537,9 +545,42 @@ function VehicleCard({ vehicle: v }: { vehicle: Vehicle }) {
               </p>
             </div>
           </div>
+          {/* Three-line spec strip below price block. Combined buy-in
+              + annual dues + usage equivalent — Round 2 research
+              consensus (Fraxioned has 1+2, Ember has 3, nobody combines
+              all three on one card). */}
+          <div className="mt-3 grid grid-cols-3 gap-3 rounded-lg border border-rule bg-cream-2/40 p-3">
+            <div>
+              <p className="text-[9px] font-medium uppercase tracking-[0.14em] text-mute">
+                Annual dues
+              </p>
+              <p className="mt-0.5 text-xs font-medium text-ink tabular-nums">
+                {formatUSD(v.annualOpCost)}
+                <span className="text-mute font-normal">/yr</span>
+              </p>
+            </div>
+            <div>
+              <p className="text-[9px] font-medium uppercase tracking-[0.14em] text-mute">
+                Usage
+              </p>
+              <p className="mt-0.5 text-xs font-medium text-ink tabular-nums">
+                ~{v.daysPerYear}
+                <span className="text-mute font-normal">d/yr</span>
+              </p>
+            </div>
+            <div>
+              <p className="text-[9px] font-medium uppercase tracking-[0.14em] text-mute">
+                Mileage
+              </p>
+              <p className="mt-0.5 text-xs font-medium text-ink tabular-nums">
+                {(v.milesPerYear / 1000).toFixed(1)}
+                <span className="text-mute font-normal">K mi/yr</span>
+              </p>
+            </div>
+          </div>
           <p className="mt-2 text-[11px] text-mute">
-            You save {formatUSD(stickerSavings)} vs full ownership · ~30
-            days/yr per share
+            You save {formatUSD(stickerSavings)} vs full ownership · all-in,
+            no markup on third-party services
           </p>
           {v.rentalAvailable && rental.perShareAnnualIncome > 0 ? (
             <div

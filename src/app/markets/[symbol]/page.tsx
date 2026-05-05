@@ -12,6 +12,8 @@ import CompareCalculator from "@/components/shared/compare-calculator";
 import { PhotoGallery } from "@/components/photo-gallery";
 import { OwnershipPrimitives } from "@/components/ownership-primitives";
 import { BookingTiersExplainer } from "@/components/booking-tiers-explainer";
+import { AssetAnatomySections } from "@/components/asset-anatomy";
+import { AssetOpsDisclosure } from "@/components/asset-ops-disclosure";
 import {
   VEHICLES,
   getVehicleBySymbol,
@@ -238,6 +240,19 @@ export default async function VehicleMarketPage({
         </div>
       </section>
 
+      {/* Editorial anatomy: provenance timeline → press quote →
+          originality/condition grid. All three render conditionally,
+          so unpopulated vehicles cleanly skip these sections.
+          Inspired by Rally's asset detail anatomy but with
+          LLC-member-safe nouns (no ticker/IPO/market terms). */}
+      <AssetAnatomySections vehicle={v} />
+
+      {/* Care & custody — Round 2 research: the single biggest
+          credibility delta vs. competitors. Pacaso/Kocomo/Ember all
+          hide this. Always renders (uses sane defaults if vehicle
+          doesn't override). */}
+      <AssetOpsDisclosure vehicle={v} />
+
       {/* Two-year cost breakdown */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-14 sm:px-10">
@@ -252,7 +267,7 @@ export default async function VehicleMarketPage({
               <p className="mt-4 text-sm leading-relaxed text-ink-soft">
                 Each RYDA car is a curated certified pre owned held for {HOLDING_YEARS} years.
                 At exit, the LLC sells the vehicle and proceeds are
-                distributed pro-rata to shareholders. We model a{" "}
+                distributed pro-rata to members. We model a{" "}
                 {econ.depreciationPct}% depreciation hit over the full hold,
                 a bar that low-mileage, kept-condition certified pre owned exotics often
                 clear, but always verify with your own resale assumption.
@@ -295,7 +310,7 @@ export default async function VehicleMarketPage({
               </h2>
               <p className="mt-4 text-sm leading-relaxed text-ink-soft">
                 Every {HOLDING_YEARS} years RYDA sells the car and
-                distributes proceeds pro-rata to shareholders. The chart
+                distributes proceeds pro-rata to members. The chart
                 tracks vehicle value, per-share value, and cumulative
                 miles across the hold so you see exactly what your share
                 is worth on the way out.

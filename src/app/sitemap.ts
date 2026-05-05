@@ -3,6 +3,7 @@ import { VEHICLES } from "@/lib/market-data";
 import { BOATS } from "@/lib/boat-data";
 import { POSTS as JOURNAL_POSTS } from "@/lib/journal-content";
 import { HELP as HELP_CATEGORIES } from "@/lib/help-content";
+import { LEARN_ARTICLES } from "@/lib/learn-content";
 
 // Sitemap of every crawlable, public RYDA route. Generated at build
 // time. Three categories:
@@ -32,6 +33,7 @@ const PUBLIC_ROUTES = [
   "/host-your-car",
   "/help",
   "/faq",
+  "/learn",
   "/journal",
   "/press",
   "/investors",
@@ -163,11 +165,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ],
   );
 
+  // Per-learn-article entries. The /learn hub is the educational
+  // content surface; each article is a standalone SEO landing page.
+  const learnEntries: MetadataRoute.Sitemap = LEARN_ARTICLES.map((a) => ({
+    url: `${siteUrl}/learn/${a.slug}`,
+    lastModified,
+    changeFrequency: "monthly" as const,
+    priority: 0.55,
+  }));
+
   return [
     ...staticEntries,
     ...vehicleEntries,
     ...boatEntries,
     ...journalEntries,
     ...helpEntries,
+    ...learnEntries,
   ];
 }

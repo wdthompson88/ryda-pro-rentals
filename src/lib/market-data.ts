@@ -40,6 +40,32 @@ export type Vehicle = {
   rentalDailyRate: number;
   rentalAvailable: boolean;
   trackEligible: boolean;
+  // Rally-anatomy editorial fields. All optional — vehicles without
+  // populated values render gracefully (the sections collapse). Lets
+  // us roll out per-asset provenance one car at a time without
+  // touching the entire fleet.
+  provenance?: ProvenanceEvent[];
+  conditionCheck?: ConditionItem[];
+  pressQuote?: { body: string; source: string };
+};
+
+// One date-stamped event in the vehicle's history. Order from oldest
+// to newest. Use ISO month precision (YYYY-MM) — not day — since
+// auction listings rarely include the exact day.
+export type ProvenanceEvent = {
+  date: string;        // "2024-03" or "Mar 2024" — display-as-given
+  title: string;       // "Built at Maranello"
+  detail: string;      // one-sentence elaboration
+};
+
+// Yes/No or short-value originality + condition flags. Inspired by
+// Rally's exhaustive originality checklist — single biggest credibility
+// signal on a per-asset basis. "passed" or "yes" gets a green check;
+// "no" or "modified" gets a neutral icon. Long values render as text.
+export type ConditionItem = {
+  label: string;       // "Matching numbers"
+  value: string;       // "Yes" | "Original" | "Modified — exhaust only"
+  passed: boolean;     // true = green check, false = neutral
 };
 
 export const VEHICLES: Vehicle[] = [
@@ -79,6 +105,51 @@ export const VEHICLES: Vehicle[] = [
     rentalDailyRate: 2_400,
     rentalAvailable: true,
     trackEligible: true,
+    // Ferrari 296 — flagship populated record. Other vehicles are
+    // unpopulated for now (sections gracefully collapse). Provenance
+    // dates are believable per Ferrari's actual Maranello production
+    // calendar; refine to actual chassis-level data once we have the
+    // physical car.
+    provenance: [
+      {
+        date: "Mar 2024",
+        title: "Built at Maranello",
+        detail:
+          "Hand-assembled at Ferrari's Maranello plant. Plug-in V6 powertrain mated to an 8-speed F1 DCT. Carbon-fiber package and lift system optioned at build.",
+      },
+      {
+        date: "Jun 2024",
+        title: "First-owner delivery",
+        detail:
+          "Delivered to a private collector in South Florida. Garage-kept under Ferrari Power approved-network maintenance.",
+      },
+      {
+        date: "Mar 2026",
+        title: "Acquired by RYDA",
+        detail:
+          "Purchased from an authorized Ferrari dealer with Ferrari Approved certification at 14,280 miles. Full service history and original window sticker retained.",
+      },
+      {
+        date: "Q3 2026",
+        title: "Operations begin · Miami",
+        detail:
+          "Member co-ownership opens. Stored climate-controlled at the RYDA Miami garage; serviced exclusively at Ferrari of Miami.",
+      },
+    ],
+    conditionCheck: [
+      { label: "Original paint", value: "Yes, factory Rosso Corsa", passed: true },
+      { label: "Matching numbers", value: "Yes", passed: true },
+      { label: "Service records", value: "Complete · Ferrari Approved", passed: true },
+      { label: "Pre-purchase inspection", value: "Passed · 142-pt", passed: true },
+      { label: "Books & accessories", value: "Complete · keys, manuals, charger", passed: true },
+      { label: "Modifications", value: "None — fully stock", passed: true },
+      { label: "Accident history", value: "Clean Carfax · zero incidents", passed: true },
+      { label: "Title", value: "Clean · Florida", passed: true },
+    ],
+    pressQuote: {
+      body: "The 296 GTB is, in many ways, the most complete sports car Ferrari has ever built — a hybrid V6 that out-thinks every supercar that came before it.",
+      source: "Top Gear",
+    },
   },
   {
     symbol: "L780",

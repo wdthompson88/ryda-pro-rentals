@@ -19,10 +19,12 @@ import {
 const TOC_ITEMS = [
   { id: "three-step", label: "How it works" },
   { id: "lifecycle", label: "5 steps" },
+  { id: "exit", label: "Exit doctrine" },
   { id: "compare", label: "Compare" },
   { id: "right-for-you", label: "Right for you?" },
   { id: "nine-reasons", label: "9 reasons" },
   { id: "booking", label: "Booking model" },
+  { id: "concierge", label: "Concierge" },
   { id: "trust", label: "Buyer protection" },
   { id: "deeper-math", label: "Deeper math" },
   { id: "rental-opt-in", label: "Rent your days" },
@@ -222,6 +224,164 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
+      {/* Exit / disposition deep-dive. Step 05 of the lifecycle is
+          "Exit" but a single paragraph isn't enough for the #1 trust
+          gap in fractional ownership ("how do I get out?"). Two
+          parallel paths: the default planned exit at year 2 (red
+          accent) and early member-to-member transfer (marine accent
+          to visually distinguish). Inspired by Rally's 5-step buyout
+          flow but restated in LLC-member nouns, no "trading halts",
+          no "share price", no "ticker", no "marketplace". */}
+      <section id="exit" className="border-b border-rule">
+        <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+            Exit doctrine
+          </p>
+          <h2 className="mt-3 font-display text-4xl text-ink sm:text-5xl">
+            How you get out, in detail.
+          </h2>
+          <p className="mt-4 max-w-2xl text-lg text-ink-soft">
+            Two paths — a planned exit at year{" "}
+            {HOLDING_YEARS} that everyone in the LLC reaches by default,
+            and an earlier member-to-member transfer once the 12-month
+            minimum hold has cleared. Neither path uses a marketplace,
+            an order book, or a public price ticker.
+          </p>
+
+          <div className="mt-12 grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-12">
+            {/* Planned exit — default path, red accent */}
+            <div>
+              <div className="flex items-baseline gap-3">
+                <span className="rounded-full border border-red/30 bg-red/10 px-3 py-1 text-[10px] font-medium uppercase tracking-wider text-red">
+                  Default · Planned exit
+                </span>
+                <span className="text-[10px] uppercase tracking-wider text-mute">
+                  Year {HOLDING_YEARS} or {(HOLDING_MILES_CAP / 1000).toFixed(0)}K mi
+                </span>
+              </div>
+              <p className="mt-4 text-sm text-ink-soft">
+                Every LLC reaches its planned exit when the car hits
+                the {HOLDING_YEARS}-year mark or {(HOLDING_MILES_CAP / 1000).toFixed(0)}K
+                miles, whichever comes first. Members vote 75%
+                supermajority to confirm; the LLC sells to the highest
+                qualified bid and distributes proceeds pro-rata.
+              </p>
+              <div className="mt-8 grid grid-cols-1 gap-x-6 gap-y-7 sm:grid-cols-2">
+                <Step
+                  n="01"
+                  title="Trigger"
+                  body={`The LLC's operating agreement names a planned exit at the ${HOLDING_YEARS}-yr mark or ${(HOLDING_MILES_CAP / 1000).toFixed(0)}K-mile cap. RYDA notifies members 90 days before either trigger fires.`}
+                />
+                <Step
+                  n="02"
+                  title="Qualification"
+                  body="RYDA collects three independent bids (auction houses, dealer-direct, broker-network) AND certifies any unsolicited offer with proof of funds, written terms, escrow, and a comparable-sale memo before it reaches members. No vote on un-qualified offers."
+                />
+                <Step
+                  n="03"
+                  title="Member vote"
+                  body="75% supermajority of membership interests confirms the sale (per the Operating Agreement). 14-day vote window. A 5%+ competing offer arriving mid-window pauses the vote and resets it around the higher bid. Member-Council reviews any minority objection."
+                />
+                <Step
+                  n="04"
+                  title="Sale + escrow"
+                  body="RYDA's title-and-escrow partner closes the sale. The car ships to the buyer; cleared funds land in the LLC's bank within 5–10 business days of title transfer."
+                />
+                <Step
+                  n="05"
+                  title="Distribution"
+                  body={`Proceeds (less ~${TARGET_DEPRECIATION_PCT}% modeled depreciation and a closing fee) distribute pro-rata to each member's RYDA wallet within 14 days. K-1 issued at year-end.`}
+                />
+              </div>
+            </div>
+
+            {/* Early transfer — alternate path, marine accent */}
+            <div>
+              <div className="flex items-baseline gap-3">
+                <span className="rounded-full border border-marine/40 bg-marine/10 px-3 py-1 text-[10px] font-medium uppercase tracking-wider text-marine">
+                  Alternate · Early transfer
+                </span>
+                <span className="text-[10px] uppercase tracking-wider text-mute">
+                  After 12-mo hold
+                </span>
+              </div>
+              <p className="mt-4 text-sm text-ink-soft">
+                Need out before the planned exit? Once your 12-month
+                minimum hold clears, transfer your share directly to
+                another verified RYDA member. RYDA handles the LLC
+                paperwork. No marketplace, no order book, no auction.
+              </p>
+              <div className="mt-8 grid grid-cols-1 gap-x-6 gap-y-7 sm:grid-cols-2">
+                <Step
+                  n="01"
+                  title="Hold clears"
+                  accent="marine"
+                  body="Your minimum 12-month hold from the date you joined the LLC. Capital must be in the LLC long enough that the IRS doesn't reclassify the structure."
+                />
+                <Step
+                  n="02"
+                  title="Signal intent"
+                  accent="marine"
+                  body="From your dashboard, mark your share for transfer. RYDA shares it with the matched waitlist of verified prospects (ages 28+, KYC complete, driver-record cleared)."
+                />
+                <Step
+                  n="03"
+                  title="Direct negotiation"
+                  accent="marine"
+                  body="You and the buyer agree on a price between yourselves. Transfer prices are private; RYDA does not publish a price ticker or run an auction. RYDA can share comps from prior LLCs on request."
+                />
+                <Step
+                  n="04"
+                  title="LLC paperwork"
+                  accent="marine"
+                  body="RYDA drafts the membership-interest assignment, updates the LLC's member register, and amends the Operating Agreement signature page. Existing co-owners ratify per the OA's 75% supermajority."
+                />
+                <Step
+                  n="05"
+                  title="Settlement"
+                  accent="marine"
+                  body="Funds settle through escrow within 1–3 business days. RYDA charges a 3% transfer fee on completed transfers. Buyer steps into your share's annual entitlement immediately."
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Doctrine reaffirmation */}
+          <div className="mt-14 grid grid-cols-1 gap-6 rounded-2xl border border-rule bg-cream-2/40 p-6 sm:grid-cols-3 sm:p-8">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.18em] text-red">
+                Members vote
+              </p>
+              <p className="mt-2 text-sm text-ink-soft">
+                Every disposition (planned or otherwise) goes through
+                a 75% supermajority of membership interests, written
+                into the Operating Agreement.
+              </p>
+            </div>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.18em] text-red">
+                No public market
+              </p>
+              <p className="mt-2 text-sm text-ink-soft">
+                RYDA does not run an exchange, alternative trading
+                system, or order book. Co-ownership stakes are not
+                registered securities.
+              </p>
+            </div>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.18em] text-red">
+                K-1, not 1099-B
+              </p>
+              <p className="mt-2 text-sm text-ink-soft">
+                The LLC issues a K-1, not a 1099-B. Speak with your
+                tax advisor; treatment depends on your overall return
+                from the asset.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* 4-way comparison, money only */}
       <section id="compare" className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
@@ -413,7 +573,7 @@ export default function HowItWorksPage() {
             <Reason
               n="07"
               title="Flexible buying & selling of shares"
-              body="Member-to-member transfers after the 12-month minimum hold. RYDA handles the paperwork. The LLC's planned exit at year 2 (or 60K miles) gives every shareholder a clean liquidity event by default."
+              body="Member-to-member transfers after the 12-month minimum hold. RYDA handles the paperwork. The LLC's planned exit at year 2 (or 60K miles) gives every member a clean exit event by default."
             />
             <Reason
               n="08"
@@ -447,6 +607,56 @@ export default function HowItWorksPage() {
           </p>
           <div className="mt-10">
             <BookingTiersExplainer variant="full" />
+          </div>
+        </div>
+      </section>
+
+      {/* Concierge handoff — Round 2 research. Codex flagged this as
+          "more differentiated for RYDA than 'portfolio' language."
+          The white-glove pickup/dropoff narrative converts a
+          transactional booking into a hospitality experience. Costs
+          almost nothing in copy; the real cost is ops execution. */}
+      <section id="concierge" className="border-b border-rule">
+        <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+            Concierge handoff
+          </p>
+          <h2 className="mt-3 font-display text-4xl text-ink sm:text-5xl">
+            From booking to keys-in-hand.
+          </h2>
+          <p className="mt-4 max-w-2xl text-lg text-ink-soft">
+            Every reservation runs through a five-step concierge
+            handoff. No "just show up at the garage." We bring the car
+            to you, in the condition you'd want it in if it were the
+            only one you owned.
+          </p>
+
+          <div className="mt-12 grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-5">
+            <Step
+              n="01"
+              title="Pre-arrival prep"
+              body="48 hours before pickup, RYDA inspects, refuels (or charges to 100%), full detail, and confirms tire pressures + fluid levels. A pre-drive checklist is logged with timestamps."
+            />
+            <Step
+              n="02"
+              title="White-glove delivery"
+              body="Door-to-door delivery within Miami-Dade. Hotel, residence, marina — wherever. Or pick up at the Wynwood garage. Either way, a 15-minute walkthrough on first booking, abbreviated thereafter."
+            />
+            <Step
+              n="03"
+              title="Drive"
+              body="The car is yours for the reservation window. Member app shows live booking status, fuel range, geofence rules, and a one-tap line to the on-call ops team if anything goes sideways."
+            />
+            <Step
+              n="04"
+              title="Post-drive walkthrough"
+              body="Return condition is documented head-to-toe (paint, wheels, interior, fluids, mileage). If anything needs more than a routine detail, you and the next member are both notified. No surprises."
+            />
+            <Step
+              n="05"
+              title="Reset for the next member"
+              body="Full detail, fuel-up, paint-correction touch-up if needed, telematics log archived. The car returns to the climate-controlled bay within 24 hours, ready for the next reservation."
+            />
           </div>
         </div>
       </section>
@@ -526,7 +736,7 @@ export default function HowItWorksPage() {
               distributed pro-rata. We model {TARGET_DEPRECIATION_PCT}%
               depreciation over the hold, a conservative middle that
               absorbs both the drive-only and rental-opt-in usage
-              profiles, given the 100 mi/day shareholder allowance.
+              profiles, given the 100 mi/day per-member allowance.
             </p>
             <p>
               Illustrative numbers below model a single share for
@@ -570,12 +780,16 @@ export default function HowItWorksPage() {
             Miami&apos;s exotic-rental fleets average 200–240 booked days a
             year on full-control calendars. RYDA&apos;s pool is the leftover
             days after members book first, so realistic occupancy on the
-            pool runs lower (~50%). Shareholders can opt their unused
+            pool runs lower (~50%). Members can opt their unused
             entitlement into the rental pool, we handle the bookings,
             insurance, condition checks and damage reserve. Revenue splits
             65/35 (you / RYDA), distributed pro-rata across the days each
             share contributes.
           </p>
+
+          {/* T1 audit fix — "Shareholders" → "Members" in user-facing
+              rental-pool copy below. SEC-safe vocab matches the rest
+              of the site post-vocabulary-scrub. */}
 
           <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-3">
             <div className="rounded-2xl border border-rule bg-surface p-6">
@@ -589,7 +803,7 @@ export default function HowItWorksPage() {
                 Owners reserve 12 days each (120 total). 200 days enter the
                 pool. At 50% occupancy = ~100 booked days @ $2,400/day =
                 $240,000/yr gross. After RYDA&apos;s 35% management fee,
-                shareholders split ~$156,000.{" "}
+                members split ~$156,000.{" "}
                 <span className="font-medium text-ink">~$15,600/share/yr</span>,
                 roughly 2.2× your $7,080/yr carrying cost.
               </p>
