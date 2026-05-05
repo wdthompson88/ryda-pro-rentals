@@ -4,6 +4,7 @@ import "./globals.css";
 import { SiteFooter } from "@/components/site-footer";
 import { CookieBanner } from "@/components/cookie-banner";
 import { AnalyticsBootstrap } from "@/components/analytics-bootstrap";
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -225,6 +226,11 @@ export default function RootLayout({
         <div className="flex-1">{children}</div>
         <SiteFooter />
         <CookieBanner />
+        {/* Vercel Analytics — cookie-free, GDPR-compliant pageviews +
+            top pages + referrer + geo. Complements PostHog (which is
+            our product-event store, gated by cookie consent). Vercel
+            Analytics doesn't use cookies, so no consent gate needed. */}
+        <Analytics />
       </body>
     </html>
   );
