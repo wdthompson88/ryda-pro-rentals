@@ -157,6 +157,7 @@ export const VEHICLES: Vehicle[] = [
     rentalDailyRate: 1_800,
     rentalAvailable: true,
     trackEligible: true,
+    liveMarketEmbed: "https://www.classic.com/widget/32VWAJSRxMwtVx",
   },
   // 2010 Ferrari 458 Italia
   // The last NA mid-engine V8 Ferrari. Modern collector status approaching.
