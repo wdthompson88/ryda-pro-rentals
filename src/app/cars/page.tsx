@@ -57,37 +57,44 @@ export default function CarsHome() {
             </div>
           </div>
 
-          {/* Editorial vehicle image, links to the listing */}
+          {/* Hero VIDEO — RYDA 15s spot. Autoplays muted on loop so
+              the cars page opens with the full cinematic intro
+              instead of a static image. Falls back to the GT3 hero
+              poster on first paint and on browsers/networks where
+              <video> can't autoplay (iOS Low Power Mode, etc.).
+              Wraps in a click-through to /markets/gt3 since the GT3
+              is the most-featured car in the spot. */}
           <div className="lg:col-span-6">
             <Link
               href={`/markets/${heroVehicle.symbol}`}
-              aria-label={`Open ${heroVehicle.year} ${heroVehicle.name} listing`}
-              className="group relative block aspect-[4/3] w-full overflow-hidden rounded-2xl bg-cream-2 lg:aspect-[5/4]"
+              aria-label={`Open ${heroVehicle.year} ${heroVehicle.name} listing — watch the RYDA hero spot`}
+              className="group relative block aspect-[4/3] w-full overflow-hidden rounded-2xl bg-ink lg:aspect-[5/4]"
             >
-              <Image
-                src={heroVehicle.hero}
-                alt={`${heroVehicle.year} ${heroVehicle.name}`}
-                fill
-                priority
-                sizes="(min-width: 1024px) 50vw, 100vw"
-                className={`object-cover transition-transform duration-700 group-hover:scale-[1.02] ${heroVehicle.flipImage ? "-scale-x-100" : ""}`}
-                style={{ objectPosition: heroVehicle.imagePosition ?? "center" }}
+              <video
+                src="/videos/ryda-hero-spot-15s.mp4"
+                poster={heroVehicle.hero}
+                autoPlay
+                loop
+                muted
+                playsInline
+                preload="metadata"
+                aria-label="RYDA 15-second hero spot — full fleet match-cut reel"
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
               />
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 bg-gradient-to-t from-cream/90 via-cream/30 to-transparent p-5 sm:p-6">
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 bg-gradient-to-t from-[#0E0E10]/90 via-[#0E0E10]/40 to-transparent p-5 sm:p-6">
                 <div>
                   <p className="text-xs uppercase tracking-[0.2em] text-red">
-                    In the fleet
+                    Watch the spot
                   </p>
-                  <p className="mt-1 font-display text-xl text-ink sm:text-2xl">
-                    {heroVehicle.year} {heroVehicle.name}
+                  <p className="mt-1 font-display text-xl text-cream sm:text-2xl">
+                    The full fleet, in 15 seconds.
                   </p>
-                  <p className="mt-1 text-xs text-ink-soft">
-                    {formatUSD(heroVehicle.pricePerShare)} per share ·{" "}
-                    {heroVehicle.sharesAvailable} of {heroVehicle.shares} shares
-                    available
+                  <p className="mt-1 text-xs text-cream/75">
+                    Featuring the {heroVehicle.year} {heroVehicle.name} ·{" "}
+                    {formatUSD(heroVehicle.pricePerShare)}/share
                   </p>
                 </div>
-                <span className="hidden text-sm font-medium text-red sm:inline">
+                <span className="hidden text-sm font-medium text-cream sm:inline">
                   View →
                 </span>
               </div>
