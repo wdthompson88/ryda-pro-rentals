@@ -284,6 +284,7 @@ export const VEHICLES: Vehicle[] = [
     },
     rentalDailyRate: 850,
     rentalAvailable: true,
+    liveMarketEmbed: "https://www.classic.com/widget/7LV4GzuWy6vFr3n",
     trackEligible: true,
   },
   // 2022 Porsche 911 Carrera
