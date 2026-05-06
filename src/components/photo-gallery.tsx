@@ -70,12 +70,17 @@ export function PhotoGallery({
 
   return (
     <>
-      {/* Hero, clickable to open lightbox at index 0 */}
+      {/* Hero — aspect-[4/3] matches the dealer-photo source ratio
+          (1024x768) so the image fills the container with no
+          letterboxing. Background is dark ink instead of cream so any
+          edge that doesn't fill perfectly reads as cinematic, not
+          empty. object-cover + center-bottom bias keeps the car
+          subject in frame even on tighter aspects (mobile/portrait). */}
       <button
         type="button"
         onClick={() => setOpenIndex(0)}
         aria-label={`Open ${alt} photo gallery`}
-        className="group relative block aspect-[16/10] w-full overflow-hidden rounded-2xl bg-cream-2"
+        className="group relative block aspect-[4/3] w-full overflow-hidden rounded-2xl bg-ink"
       >
         <Image
           src={hero}
@@ -86,7 +91,7 @@ export function PhotoGallery({
           className={`object-cover transition-transform duration-500 group-hover:scale-[1.02] ${
             flipFirst ? "-scale-x-100" : ""
           }`}
-          style={{ objectPosition: imagePosition ?? "center" }}
+          style={{ objectPosition: imagePosition ?? "center 55%" }}
           unoptimized={!optimize}
         />
         {photos.length > 1 ? (
@@ -96,7 +101,9 @@ export function PhotoGallery({
         ) : null}
       </button>
 
-      {/* Thumbnail strip below the hero */}
+      {/* Thumbnail strip below the hero — same aspect + dark
+          background as the hero so the strip reads as one cohesive
+          set of images, not a content card. */}
       {thumbs.length > 0 ? (
         <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
           {thumbs.map((src, i) => (
@@ -105,7 +112,7 @@ export function PhotoGallery({
               type="button"
               onClick={() => setOpenIndex(i + 1)}
               aria-label={`Open photo ${i + 2} of ${photos.length}`}
-              className="relative aspect-[4/3] overflow-hidden rounded-lg bg-cream-2 transition-opacity hover:opacity-90"
+              className="relative aspect-[4/3] overflow-hidden rounded-lg bg-ink transition-opacity hover:opacity-90"
             >
               <Image
                 src={src}
@@ -113,6 +120,7 @@ export function PhotoGallery({
                 fill
                 sizes="(min-width: 768px) 20vw, 33vw"
                 className="object-cover"
+                style={{ objectPosition: "center 55%" }}
                 unoptimized={!optimize}
               />
             </button>
