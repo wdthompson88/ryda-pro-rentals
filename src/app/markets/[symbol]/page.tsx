@@ -219,8 +219,22 @@ export default async function VehicleMarketPage({
           <div className="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-12">
             {/* Left column, title + chart (price + change live inside the chart) */}
             <div className="lg:col-span-8">
+              {/* Multi-photo gallery — derives 4 thumbnail photos
+                  from the same /cars/<slug>/{2-5}.webp pattern as the
+                  hero. Vehicles with only a hero (no /N.webp siblings)
+                  fall back to a single-photo gallery automatically;
+                  next/Image 404s are graceful (broken-image placeholder
+                  rather than route crash). */}
               <PhotoGallery
-                photos={[v.hero]}
+                photos={[
+                  v.hero,
+                  ...(v.hero.startsWith("/cars/")
+                    ? [2, 3, 4, 5].map(
+                        (n) =>
+                          v.hero.replace(/\/1\.webp$/, `/${n}.webp`),
+                      )
+                    : []),
+                ]}
                 alt={`${v.year} ${v.name}`}
                 flipFirst={v.flipImage}
                 imagePosition={v.imagePosition}

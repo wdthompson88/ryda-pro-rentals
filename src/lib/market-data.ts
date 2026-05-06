@@ -71,7 +71,8 @@ export type ConditionItem = {
 export const VEHICLES: Vehicle[] = [
   // 2023 Porsche 911 GT3 RS — flagship of the new fleet.
   // 8.7K mi, no accidents, North Miami sourced.
-  // Photo: Crayon (light gray) with bronze center-lock wheels.
+  // Photo: Chalk over black, optioned with red Magnesium center-
+  // lock wheels and matching red GT3 RS livery decals.
   {
     symbol: "GT3",
     ticker: "GT3",
@@ -96,14 +97,14 @@ export const VEHICLES: Vehicle[] = [
     hero: "/cars/gt3/1.webp",
     currentMiles: 8_754,
     description:
-      "Type 992 GT3 RS in Crayon over black, factory-spec aero, bronze center-lock wheels. 518 hp 4.0L flat-six wound to 9,000 rpm. Track-eligible at Homestead-Miami; the most potent road car Porsche builds short of the GT2 RS.",
+      "Type 992 GT3 RS in Chalk over black, factory-spec swan-neck wing, optioned with red Magnesium center-lock wheels and matching GT3 RS livery decals. 518 hp 4.0L flat-six wound to 9,000 rpm. Track-eligible at Homestead-Miami; the most potent road car Porsche builds short of the GT2 RS.",
     specs: {
       engine: "4.0L naturally-aspirated flat-six",
       power: "518 hp",
       zeroToSixty: "3.0s",
       topSpeed: "184 mph",
       transmission: "7-speed PDK",
-      color: "Crayon / Black leather",
+      color: "Chalk / Black leather · red Magnesium wheels",
     },
     rentalDailyRate: 2_400,
     rentalAvailable: true,
@@ -111,7 +112,8 @@ export const VEHICLES: Vehicle[] = [
   },
   // 2020 Lamborghini Huracán EVO Spyder
   // Roof-down V10 theater. Pre-LP4 RWD spec.
-  // Photo: Bianco Monocerus over Nero with red trim.
+  // Photo: Nero Noctis over black with contrast red brake calipers,
+  // forged gloss-black wheels — the murdered-out spec.
   {
     symbol: "HEVO",
     ticker: "HEVO",
@@ -136,14 +138,14 @@ export const VEHICLES: Vehicle[] = [
     hero: "/cars/hevo/1.webp",
     currentMiles: 41_074,
     description:
-      "Bianco Monocerus over Nero. The pre-LP4 EVO Spyder in its purer rear-drive configuration — 5.2L V10 unfiltered through quad exhausts. Roof drops in 17 seconds at up to 31 mph; A1A as nature intended.",
+      "Nero Noctis over black, gloss-black forged wheels, red brake calipers — the all-black spec. The pre-LP4 EVO Spyder in its purer rear-drive configuration: 5.2L V10 unfiltered through quad exhausts. Roof drops in 17 seconds at up to 31 mph; A1A as nature intended.",
     specs: {
       engine: "5.2L naturally-aspirated V10",
       power: "602 hp",
       zeroToSixty: "3.3s",
       topSpeed: "202 mph",
       transmission: "7-speed dual-clutch",
-      color: "Bianco Monocerus / Nero Ade",
+      color: "Nero Noctis / Nero",
     },
     rentalDailyRate: 1_800,
     rentalAvailable: true,
@@ -193,7 +195,8 @@ export const VEHICLES: Vehicle[] = [
   },
   // 2019 Lamborghini Urus
   // The everyday Lamborghini. AWD twin-turbo V8.
-  // Photo: Blu Astraeus over Cuoio brown.
+  // Photo: Grigio Lynx over Cuoio brown, gloss-black diamond-cut
+  // 22-inch wheels.
   // CARFAX 1-Owner.
   {
     symbol: "URS",
@@ -219,14 +222,14 @@ export const VEHICLES: Vehicle[] = [
     hero: "/cars/urs/1.webp",
     currentMiles: 57_434,
     description:
-      "Blu Astraeus over Cuoio. CARFAX 1-Owner. The everyday Lamborghini — 641 hp twin-turbo V8, room for five, air suspension lift, Brembo carbon-ceramics on 21-inch wheels. School run on Tuesday, A1A on Saturday.",
+      "Grigio Lynx over Cuoio. CARFAX 1-Owner. The everyday Lamborghini — 641 hp twin-turbo V8, room for five, air suspension lift, Brembo carbon-ceramics on 22-inch diamond-cut gloss-black wheels. School run on Tuesday, A1A on Saturday.",
     specs: {
       engine: "4.0L twin-turbo V8",
       power: "641 hp",
       zeroToSixty: "3.6s",
       topSpeed: "190 mph",
       transmission: "8-speed automatic",
-      color: "Blu Astraeus / Cuoio Granato",
+      color: "Grigio Lynx / Cuoio Granato",
     },
     rentalDailyRate: 1_100,
     rentalAvailable: true,
@@ -234,7 +237,8 @@ export const VEHICLES: Vehicle[] = [
   },
   // 2023 Chevrolet Corvette Z06
   // 670-hp flat-plane V8, sub-3s 0-60.
-  // Photo: Arctic White over Adrenaline Red interior.
+  // Photo: Silver Flare Metallic over Adrenaline Red, gloss-black
+  // wheels (Jackie Cooper Imports, Tulsa OK).
   {
     symbol: "Z06",
     ticker: "Z06",
@@ -259,14 +263,14 @@ export const VEHICLES: Vehicle[] = [
     hero: "/cars/z06/1.webp",
     currentMiles: 4_084,
     description:
-      "Arctic White over Adrenaline Red. The first flat-plane V8 in a production Corvette: 5.5L LT6 spinning to 8,600 rpm and making 670 hp without a turbo or supercharger. Sub-5K miles. America's mid-engine answer to Maranello.",
+      "Silver Flare Metallic over Adrenaline Red, on gloss-black wheels. The first flat-plane V8 in a production Corvette: 5.5L LT6 spinning to 8,600 rpm and making 670 hp without a turbo or supercharger. Sub-5K miles. America's mid-engine answer to Maranello.",
     specs: {
       engine: "5.5L flat-plane naturally-aspirated V8",
       power: "670 hp",
       zeroToSixty: "2.6s",
       topSpeed: "195 mph",
       transmission: "8-speed dual-clutch",
-      color: "Arctic White / Adrenaline Red",
+      color: "Silver Flare Metallic / Adrenaline Red",
     },
     rentalDailyRate: 850,
     rentalAvailable: true,
@@ -274,7 +278,8 @@ export const VEHICLES: Vehicle[] = [
   },
   // 2022 Porsche 911 Carrera
   // Porsche Certified Pre-Owned. The most usable car in the fleet.
-  // Photo: Racing Yellow over black.
+  // Photo: Aventurine Green Metallic over black (deep gunmetal-
+  // green that reads gray in most light), satin-platinum wheels.
   {
     symbol: "P911",
     ticker: "P911",
@@ -299,14 +304,14 @@ export const VEHICLES: Vehicle[] = [
     hero: "/cars/p911/1.webp",
     currentMiles: 10_200,
     description:
-      "Racing Yellow over black. Type 992 base Carrera, Porsche Certified Pre-Owned. 379 hp 3.0L twin-turbo flat-six — the entry to the 992 platform and arguably the most usable everyday supercar in production. Sport Chrono and Premium packages optioned.",
+      "Aventurine Green Metallic over black (reads as deep gunmetal in most light) on satin-platinum wheels. Type 992 base Carrera, Porsche Certified Pre-Owned. 379 hp 3.0L twin-turbo flat-six — the entry to the 992 platform and arguably the most usable everyday supercar in production. Sport Chrono and Premium packages optioned.",
     specs: {
       engine: "3.0L twin-turbo flat-six",
       power: "379 hp",
       zeroToSixty: "4.0s",
       topSpeed: "182 mph",
       transmission: "8-speed PDK",
-      color: "Racing Yellow / Black leather",
+      color: "Aventurine Green Metallic / Black leather",
     },
     rentalDailyRate: 700,
     rentalAvailable: true,
