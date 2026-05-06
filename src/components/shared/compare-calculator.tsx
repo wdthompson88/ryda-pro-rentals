@@ -164,7 +164,7 @@ export default function CompareCalculator<TAsset extends CompareAsset>({
   const assets = (config.vertical === "boats" ? BOATS : VEHICLES) as TAsset[];
   const defaultAsset = (config.vertical === "boats"
     ? BOATS[0]
-    : VEHICLES.find((v) => v.symbol === "F296") ?? VEHICLES[0]) as TAsset;
+    : VEHICLES.find((v) => v.symbol === "F458") ?? VEHICLES[0]) as TAsset;
   const getAssetKey = (asset: TAsset) =>
     config.vertical === "boats"
       ? (asset as Boat).slug

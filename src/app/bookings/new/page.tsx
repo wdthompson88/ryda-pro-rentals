@@ -19,15 +19,15 @@ const STEPS = ["Vehicle", "Mode", "Dates", "Details", "Review", "Confirmed"];
 
 const VEHICLES = [
   {
-    symbol: "F296",
-    name: "Ferrari 296 GTB",
+    symbol: "F458",
+    name: "Ferrari 458 Italia",
     daysLeft: 42,
     milesLeft: 3_342,
     activePlanned: 1, // already booked planned drives this share has live
   },
   {
-    symbol: "MC75",
-    name: "McLaren 750S Spider",
+    symbol: "P911",
+    name: "Porsche 911 Carrera",
     daysLeft: 44,
     milesLeft: 3_568,
     activePlanned: 0,

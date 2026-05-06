@@ -17,8 +17,8 @@ export default function CarsHome() {
   // cars, but presented twice with different framings (co-own vs rent).
   const featured = VEHICLES.slice(0, 4);
   const featuredRentable = VEHICLES.filter((v) => v.rentalAvailable).slice(0, 4);
-  // Hero image: lead with the Ferrari 296 as the visual anchor.
-  const heroVehicle = VEHICLES.find((v) => v.symbol === "F296") ?? VEHICLES[0];
+  // Hero image: lead with the GT3 RS as the visual anchor.
+  const heroVehicle = VEHICLES.find((v) => v.symbol === "GT3") ?? VEHICLES[0];
 
   return (
     <>

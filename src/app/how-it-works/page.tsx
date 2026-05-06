@@ -747,11 +747,11 @@ export default function HowItWorksPage() {
               effective rate at any share count.
             </p>
             <p>
-              For the F296 at one share over 2 years: $34K buy-in +
-              $7,080 × 2 carrying = $48,160 spent. Resale at 90% of
-              buy-in returns ~$30,600.{" "}
-              <strong>Net cost ~$17,560</strong> for 64 driving days ={" "}
-              <strong>~$274 per actual driving day</strong>. That&apos;s
+              For the F458 at one share over 2 years: $18.9K buy-in +
+              $3,900 × 2 carrying = $26,700 spent. Resale at 90% of
+              buy-in returns ~$17,010.{" "}
+              <strong>Net cost ~$9,690</strong> for 64 driving days ={" "}
+              <strong>~$151 per actual driving day</strong>. That&apos;s
               the apples-to-apples number to use against rental
               ($2,400/day × 64 = $153,600). You also exit with cash
               from the sale, not a stack of receipts.

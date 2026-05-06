@@ -7,8 +7,8 @@ import { VEHICLES, formatUSD } from "@/lib/market-data";
 export const metadata = { title: "My Cars — RYDA" };
 
 const HOLDINGS = [
-  { symbol: "F296", shares: 1, isLeadOwner: true, status: "active" as const },
-  { symbol: "MC75", shares: 1, isLeadOwner: false, status: "active" as const },
+  { symbol: "F458", shares: 1, isLeadOwner: true, status: "active" as const },
+  { symbol: "P911", shares: 1, isLeadOwner: false, status: "active" as const },
 ];
 
 export default function MyCarsPage() {
@@ -67,9 +67,9 @@ export default function MyCarsPage() {
                     <p className="mt-1 font-display text-2xl text-ink">{v.name}</p>
 
                     <div className="mt-5 grid grid-cols-3 gap-3 text-center">
-                      <Mini label="Days used" value={h.symbol === "F296" ? "8" : "6"} sub={`of ${v.daysPerYear}`} />
-                      <Mini label="Miles used" value={h.symbol === "F296" ? "658" : "432"} sub={`of ${v.milesPerYear.toLocaleString()}`} />
-                      <Mini label="Next booking" value={h.symbol === "F296" ? "May 12" : "Jun 5"} sub="3 days" />
+                      <Mini label="Days used" value={h.symbol === "F458" ? "8" : "6"} sub={`of ${v.daysPerYear}`} />
+                      <Mini label="Miles used" value={h.symbol === "F458" ? "658" : "432"} sub={`of ${v.milesPerYear.toLocaleString()}`} />
+                      <Mini label="Next booking" value={h.symbol === "F458" ? "May 12" : "Jun 5"} sub="3 days" />
                     </div>
 
                     <div className="mt-5 flex items-center justify-between border-t border-rule pt-4">

@@ -12,7 +12,7 @@ import {
   BOOKING_POLICY,
 } from "@/lib/market-data";
 
-const OWNED = ["F296", "MC75"];
+const OWNED = ["F458", "P911"];
 
 export async function generateStaticParams() {
   return OWNED.map((s) => ({ symbol: s.toLowerCase() }));
@@ -37,7 +37,7 @@ export default async function MyVehiclePage({
   const v = getVehicleBySymbol(symbol);
   if (!v || !OWNED.includes(v.symbol)) notFound();
 
-  const isLead = v.symbol === "F296";
+  const isLead = v.symbol === "F458";
 
   return (
     <>

@@ -16,10 +16,10 @@ export const metadata = {
 };
 
 export default function InsidePage() {
-  // Mock holdings: 2 shares of F296, 2 shares of MC75 (matches the
+  // Mock holdings: 2 shares of F458, 2 shares of P911 (matches the
   // 2-share minimum doctrine that everywhere else on the site enforces).
-  const f296 = VEHICLES.find((v) => v.symbol === "F296")!;
-  const mc75 = VEHICLES.find((v) => v.symbol === "MC75")!;
+  const f296 = VEHICLES.find((v) => v.symbol === "F458")!;
+  const mc75 = VEHICLES.find((v) => v.symbol === "P911")!;
   const heldShares = 2;
 
   return (
@@ -334,12 +334,12 @@ export default function InsidePage() {
                 </div>
                 <ul className="divide-y divide-rule">
                   {[
-                    ["Operating Agreement", "F296 LLC", "v1.0 · Apr 2026", "PDF"],
-                    ["Management Services Agreement", "F296 LLC", "v1.0 · Apr 2026", "PDF"],
-                    ["Pre-Purchase Inspection Report", "F296 · 14,280 mi", "Apr 18", "PDF"],
-                    ["Certificate of Insurance", "F296 LLC · CHUBB", "Mar 30", "PDF"],
-                    ["Title Evidence", "F296 LLC", "Apr 02", "PDF"],
-                    ["Q1 Condition Report", "F296", "Mar 31", "PDF"],
+                    ["Operating Agreement", "F458 LLC", "v1.0 · Aug 2026", "PDF"],
+                    ["Management Services Agreement", "F458 LLC", "v1.0 · Aug 2026", "PDF"],
+                    ["Pre-Purchase Inspection Report", "F458 · 45,802 mi", "Aug 04", "PDF"],
+                    ["Certificate of Insurance", "F458 LLC · Chubb", "Aug 10", "PDF"],
+                    ["Title Evidence", "F458 LLC", "Aug 12", "PDF"],
+                    ["Q1 Condition Report", "F458", "Sep 30", "PDF"],
                   ].map(([title, owner, date, type]) => (
                     <li key={title}>
                       <Link

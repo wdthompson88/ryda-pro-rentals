@@ -55,7 +55,7 @@ export default function NewLLCPage() {
   const [error, setError] = useState<string | null>(null);
 
   // Auto-fill the LLC name from the chosen asset to save typing.
-  // E.g. F296 → "RYDA F296 LLC".
+  // E.g. F458 → "RYDA F458 LLC".
   const suggestedLlcName = useMemo(() => {
     if (form.assetType === "vehicle" && form.vehicleSymbol) {
       return `RYDA ${form.vehicleSymbol} LLC`;
@@ -220,7 +220,7 @@ export default function NewLLCPage() {
               label="LLC name"
               value={form.llcName || suggestedLlcName}
               onChange={(v) => update("llcName", v)}
-              placeholder={suggestedLlcName || "RYDA F296 LLC"}
+              placeholder={suggestedLlcName || "RYDA F458 LLC"}
               required
             />
             <Select

@@ -25,7 +25,7 @@ export const metadata = {
 // The CEO didn't like the auto-advancing carousel, easier to scan four
 // large cards in a single row than scroll through six. Fall back to the
 // canonical fleet order if any of these symbols disappear from inventory.
-const FEATURED_SYMBOLS = ["F296", "L780", "MC75", "AM-V"];
+const FEATURED_SYMBOLS = ["GT3", "F458", "HEVO", "URS"];
 
 export default function MarketsPage() {
   const featured = FEATURED_SYMBOLS.map((s) =>
