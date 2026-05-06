@@ -47,6 +47,12 @@ export type Vehicle = {
   provenance?: ProvenanceEvent[];
   conditionCheck?: ConditionItem[];
   pressQuote?: { body: string; source: string };
+  // Optional live market-data embed URL (e.g. classic.com widget).
+  // Renders an iframe in the "Live market data" section on the
+  // listing page. Generic naming so we can swap providers later
+  // (Hagerty, BaT, etc.) without renaming. Section gracefully
+  // collapses if not set.
+  liveMarketEmbed?: string;
 };
 
 // One date-stamped event in the vehicle's history. Order from oldest
@@ -109,6 +115,7 @@ export const VEHICLES: Vehicle[] = [
     rentalDailyRate: 2_400,
     rentalAvailable: true,
     trackEligible: true,
+    liveMarketEmbed: "https://www.classic.com/widget/PZW4xru5ZmOsVQl",
   },
   // 2020 Lamborghini Huracán EVO Spyder
   // Roof-down V10 theater. Pre-LP4 RWD spec.
@@ -192,6 +199,7 @@ export const VEHICLES: Vehicle[] = [
     rentalDailyRate: 1_400,
     rentalAvailable: true,
     trackEligible: true,
+    liveMarketEmbed: "https://www.classic.com/widget/jq6D35IyAJ2sRJY",
   },
   // 2019 Lamborghini Urus
   // The everyday Lamborghini. AWD twin-turbo V8.

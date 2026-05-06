@@ -15,6 +15,7 @@ import { BookingTiersExplainer } from "@/components/booking-tiers-explainer";
 import { AssetAnatomySections } from "@/components/asset-anatomy";
 import { AssetOpsDisclosure } from "@/components/asset-ops-disclosure";
 import { RecentComparableSales } from "@/components/recent-comparables";
+import { LiveMarketEmbed } from "@/components/live-market-embed";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import type { VehicleComparable } from "@/lib/vehicle-enrichment";
 import {
@@ -325,6 +326,13 @@ export default async function VehicleMarketPage({
           hide this. Always renders (uses sane defaults if vehicle
           doesn't override). */}
       <AssetOpsDisclosure vehicle={v} />
+
+      {/* Live market data — third-party embedded chart (currently
+          classic.com) showing live recent-sales for this make/model.
+          Renders nothing if vehicle.liveMarketEmbed isn't set. */}
+      {v.liveMarketEmbed && (
+        <LiveMarketEmbed url={v.liveMarketEmbed} code={v.ticker} />
+      )}
 
       {/* Recent comparable sales — hand-curated from classic.com /
           BaT / RM Sotheby's. The valuation moat: cite specific named
