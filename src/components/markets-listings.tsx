@@ -416,11 +416,14 @@ function VehicleCard({ vehicle: v }: { vehicle: Vehicle }) {
       href={`/markets/${v.symbol}`}
       className="group flex flex-col overflow-hidden rounded-2xl border border-rule bg-surface transition-all hover:-translate-y-0.5 hover:border-ink/40 hover:shadow-lg"
     >
-      {/* Image with brand badge + status */}
-      <div className="relative aspect-[16/10] w-full overflow-hidden bg-cream-2">
+      {/* Image with brand badge + status. aspect-[16/9] matches the
+          1024x576 cropped Carfax sources exactly so object-cover fills
+          edge-to-edge with no cream backdrop leaking through. bg-ink
+          (dark) so any pixel-level fallback reads cinematic, not blank. */}
+      <div className="relative aspect-[16/9] w-full overflow-hidden bg-ink">
         <Image
           src={v.hero}
-          alt={`${v.year} ${v.name}`}
+          alt={v.name}
           fill
           sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
           className={`object-cover transition-transform duration-500 group-hover:scale-[1.02] ${

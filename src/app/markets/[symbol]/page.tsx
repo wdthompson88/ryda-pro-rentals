@@ -229,14 +229,17 @@ export default async function VehicleMarketPage({
               <PhotoGallery
                 photos={[
                   v.hero,
+                  // Derive 4 thumbnail siblings from the hero path
+                  // pattern (/cars/<slug>/1.<ext> → 2,3,4,5). Works
+                  // for both .jpg and .webp so the same logic
+                  // survives any future format swap.
                   ...(v.hero.startsWith("/cars/")
-                    ? [2, 3, 4, 5].map(
-                        (n) =>
-                          v.hero.replace(/\/1\.webp$/, `/${n}.webp`),
+                    ? [2, 3, 4, 5].map((n) =>
+                        v.hero.replace(/\/1\.(jpg|webp|png)$/, `/${n}.$1`),
                       )
                     : []),
                 ]}
-                alt={`${v.year} ${v.name}`}
+                alt={v.name}
                 flipFirst={v.flipImage}
                 imagePosition={v.imagePosition}
                 optimize

@@ -82,7 +82,7 @@ export const VEHICLES: Vehicle[] = [
   {
     symbol: "GT3",
     ticker: "GT3",
-    name: "Porsche 911 GT3 RS",
+    name: "2023 Porsche 911 GT3 RS",
     year: 2023,
     market: "Miami",
     category: "Coupe",
@@ -100,7 +100,7 @@ export const VEHICLES: Vehicle[] = [
     drive: "RWD",
     listingStart: "2026-07-15",
     listingEnd: "2027-01-15",
-    hero: "/cars/gt3/1.webp",
+    hero: "/cars/gt3/1.jpg",
     currentMiles: 8_754,
     description:
       "Type 992 GT3 RS in Chalk over black, factory-spec swan-neck wing, optioned with red Magnesium center-lock wheels and matching GT3 RS livery decals. 518 hp 4.0L flat-six wound to 9,000 rpm. Track-eligible at Homestead-Miami; the most potent road car Porsche builds short of the GT2 RS.",
@@ -124,7 +124,7 @@ export const VEHICLES: Vehicle[] = [
   {
     symbol: "HEVO",
     ticker: "HEVO",
-    name: "Lamborghini Huracán EVO Spyder",
+    name: "2020 Lamborghini Huracán EVO Spyder",
     year: 2020,
     market: "Miami",
     category: "Convertible",
@@ -142,7 +142,7 @@ export const VEHICLES: Vehicle[] = [
     drive: "RWD",
     listingStart: "2026-07-22",
     listingEnd: "2027-01-22",
-    hero: "/cars/hevo/1.webp",
+    hero: "/cars/hevo/1.jpg",
     currentMiles: 41_074,
     description:
       "Nero Noctis over black, gloss-black forged wheels, red brake calipers — the all-black spec. The pre-LP4 EVO Spyder in its purer rear-drive configuration: 5.2L V10 unfiltered through quad exhausts. Roof drops in 17 seconds at up to 31 mph; A1A as nature intended.",
@@ -167,7 +167,7 @@ export const VEHICLES: Vehicle[] = [
   {
     symbol: "F458",
     ticker: "F458",
-    name: "Ferrari 458 Italia",
+    name: "2010 Ferrari 458 Italia",
     year: 2010,
     market: "Miami",
     category: "Coupe",
@@ -185,7 +185,7 @@ export const VEHICLES: Vehicle[] = [
     drive: "RWD",
     listingStart: "2026-08-10",
     listingEnd: "2027-02-10",
-    hero: "/cars/f458/1.webp",
+    hero: "/cars/f458/1.jpg",
     currentMiles: 45_802,
     description:
       "Nero Daytona over Nero on aftermarket forged HRE wheels. The last naturally-aspirated mid-engine V8 Ferrari before turbocharging took over the marque. One minor incident reported in 2018, fully repaired and pre-purchase inspection cleared.",
@@ -210,7 +210,7 @@ export const VEHICLES: Vehicle[] = [
   {
     symbol: "URS",
     ticker: "URS",
-    name: "Lamborghini Urus",
+    name: "2019 Lamborghini Urus",
     year: 2019,
     market: "Miami",
     category: "SUV",
@@ -228,7 +228,7 @@ export const VEHICLES: Vehicle[] = [
     drive: "AWD",
     listingStart: "2026-08-25",
     listingEnd: "2027-02-25",
-    hero: "/cars/urs/1.webp",
+    hero: "/cars/urs/1.jpg",
     currentMiles: 57_434,
     description:
       "Grigio Lynx over Cuoio. CARFAX 1-Owner. The everyday Lamborghini — 641 hp twin-turbo V8, room for five, air suspension lift, Brembo carbon-ceramics on 22-inch diamond-cut gloss-black wheels. School run on Tuesday, A1A on Saturday.",
@@ -252,7 +252,7 @@ export const VEHICLES: Vehicle[] = [
   {
     symbol: "Z06",
     ticker: "Z06",
-    name: "Chevrolet Corvette Z06",
+    name: "2023 Chevrolet Corvette Z06",
     year: 2023,
     market: "Miami",
     category: "Coupe",
@@ -270,7 +270,7 @@ export const VEHICLES: Vehicle[] = [
     drive: "RWD",
     listingStart: "2026-09-10",
     listingEnd: "2027-03-10",
-    hero: "/cars/z06/1.webp",
+    hero: "/cars/z06/1.jpg",
     currentMiles: 4_084,
     description:
       "Silver Flare Metallic over Adrenaline Red, on gloss-black wheels. The first flat-plane V8 in a production Corvette: 5.5L LT6 spinning to 8,600 rpm and making 670 hp without a turbo or supercharger. Sub-5K miles. America's mid-engine answer to Maranello.",
@@ -294,7 +294,7 @@ export const VEHICLES: Vehicle[] = [
   {
     symbol: "P911",
     ticker: "P911",
-    name: "Porsche 911 Carrera",
+    name: "2022 Porsche 911 Carrera",
     year: 2022,
     market: "Miami",
     category: "Coupe",
@@ -312,7 +312,7 @@ export const VEHICLES: Vehicle[] = [
     drive: "RWD",
     listingStart: "2026-09-22",
     listingEnd: "2027-03-22",
-    hero: "/cars/p911/1.webp",
+    hero: "/cars/p911/1.jpg",
     currentMiles: 10_200,
     description:
       "Aventurine Green Metallic over black (reads as deep gunmetal in most light) on satin-platinum wheels. Type 992 base Carrera, Porsche Certified Pre-Owned. 379 hp 3.0L twin-turbo flat-six — the entry to the 992 platform and arguably the most usable everyday supercar in production. Sport Chrono and Premium packages optioned.",
@@ -327,6 +327,7 @@ export const VEHICLES: Vehicle[] = [
     rentalDailyRate: 700,
     rentalAvailable: true,
     trackEligible: true,
+    liveMarketEmbed: "https://www.classic.com/widget/W7o4G0uyxY2sMDj",
   },
 ];
 

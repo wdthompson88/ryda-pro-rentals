@@ -70,17 +70,15 @@ export function PhotoGallery({
 
   return (
     <>
-      {/* Hero — aspect-[4/3] matches the dealer-photo source ratio
-          (1024x768) so the image fills the container with no
-          letterboxing. Background is dark ink instead of cream so any
-          edge that doesn't fill perfectly reads as cinematic, not
-          empty. object-cover + center-bottom bias keeps the car
-          subject in frame even on tighter aspects (mobile/portrait). */}
+      {/* Hero — aspect-[16/9] matches the 1024x576 cropped photo
+          dimensions exactly. object-cover fills edge-to-edge with no
+          letterboxing or cream backdrop leak. bg-ink so any pixel
+          edge reads cinematic, not blank. */}
       <button
         type="button"
         onClick={() => setOpenIndex(0)}
         aria-label={`Open ${alt} photo gallery`}
-        className="group relative block aspect-[4/3] w-full overflow-hidden rounded-2xl bg-ink"
+        className="group relative block aspect-[16/9] w-full overflow-hidden rounded-2xl bg-ink"
       >
         <Image
           src={hero}
@@ -112,7 +110,7 @@ export function PhotoGallery({
               type="button"
               onClick={() => setOpenIndex(i + 1)}
               aria-label={`Open photo ${i + 2} of ${photos.length}`}
-              className="relative aspect-[4/3] overflow-hidden rounded-lg bg-ink transition-opacity hover:opacity-90"
+              className="relative aspect-[16/9] overflow-hidden rounded-lg bg-ink transition-opacity hover:opacity-90"
             >
               <Image
                 src={src}
