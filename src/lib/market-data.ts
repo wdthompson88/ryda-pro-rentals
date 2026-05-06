@@ -243,6 +243,7 @@ export const VEHICLES: Vehicle[] = [
     rentalDailyRate: 1_100,
     rentalAvailable: true,
     trackEligible: false,
+    liveMarketEmbed: "https://www.classic.com/widget/1r3RypFEOm1FqDx",
   },
   // 2023 Chevrolet Corvette Z06
   // 670-hp flat-plane V8, sub-3s 0-60.
