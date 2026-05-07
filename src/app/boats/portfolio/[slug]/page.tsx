@@ -22,6 +22,7 @@ import {
   BOAT_BOOKING_POLICY,
   type Boat,
 } from "@/lib/boat-data";
+import { SITE_URL } from "@/lib/site-url";
 
 export async function generateStaticParams() {
   return BOATS.map((b) => ({ slug: b.slug }));
@@ -35,9 +36,33 @@ export async function generateMetadata({
   const { slug } = await params;
   const b = getBoatBySlug(slug);
   if (!b) return { title: "RYDA Boats" };
+  const url = `${SITE_URL}/boats/portfolio/${b.slug}`;
+  const title = `${b.name}, ${formatUSD(b.pricePerShare)} per share — RYDA Boats`;
+  const description = `Co-own the ${b.year} ${b.name} in ${b.market}. ${formatUSD(b.pricePerShare)} per share, ${formatUSD(b.annualOpCost)}/yr all-in operating cost. ${b.sharesAvailable} of ${b.shares} shares available.`;
+  // Per-hull OG image: when sharing a boat link socially we want
+  // the actual hero photo, not the generic site OG. Absolutize the
+  // hero path so social fetchers can resolve it.
+  const heroAbsolute = b.hero.startsWith("http")
+    ? b.hero
+    : `${SITE_URL}${b.hero}`;
   return {
-    title: `${b.name}, ${formatUSD(b.pricePerShare)} per share — RYDA Boats`,
-    description: `Co-own the ${b.year} ${b.name} in ${b.market}. ${formatUSD(b.pricePerShare)} per share, ${formatUSD(b.annualOpCost)}/yr all-in operating cost. ${b.sharesAvailable} of ${b.shares} shares available.`,
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "website",
+      url,
+      title,
+      description,
+      siteName: "RYDA",
+      images: [{ url: heroAbsolute, alt: `${b.year} ${b.name}` }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [heroAbsolute],
+    },
   };
 }
 
@@ -86,9 +111,12 @@ export default async function BoatDetailPage({
   // treats the page as plain copy. The `<` → `<` escape
   // prevents script-context breakout if any field ever contains
   // a literal "</script>".
+  const pageUrl = `${SITE_URL}/boats/portfolio/${b.slug}`;
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
+    "@id": pageUrl,
+    url: pageUrl,
     name: b.name,
     image: b.hero,
     description: `Co-own the ${b.year} ${b.name} in ${b.market}. ${formatUSD(b.pricePerShare)} per share, ${formatUSD(b.annualOpCost)}/yr all-in operating cost.`,
@@ -102,13 +130,30 @@ export default async function BoatDetailPage({
         b.sharesAvailable > 0
           ? "https://schema.org/InStock"
           : "https://schema.org/OutOfStock",
-      url: `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://ryda.pro"}/boats/portfolio/${b.slug}`,
+      url: pageUrl,
     },
     additionalProperty: [
       { "@type": "PropertyValue", name: "Length", value: `${b.lengthFt} ft` },
       { "@type": "PropertyValue", name: "Year", value: String(b.year) },
       { "@type": "PropertyValue", name: "Hailing port", value: b.hailingPort },
       { "@type": "PropertyValue", name: "Shares available", value: String(b.sharesAvailable) },
+    ],
+  };
+  // Breadcrumb trail so Google's SERP renders Home › Boats › <name>
+  // above the listing rather than just the bare URL.
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+      { "@type": "ListItem", position: 2, name: "Boats", item: `${SITE_URL}/boats` },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: "Portfolio",
+        item: `${SITE_URL}/boats/portfolio`,
+      },
+      { "@type": "ListItem", position: 4, name: `${b.year} ${b.name}`, item: pageUrl },
     ],
   };
 
@@ -119,6 +164,12 @@ export default async function BoatDetailPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, "\\u003c"),
         }}
       />
 

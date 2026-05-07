@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { ContactForm } from "@/components/contact-form";
+import { SITE_URL } from "@/lib/site-url";
 
 export function ComingSoonLocation({
   city,
@@ -17,9 +18,48 @@ export function ComingSoonLocation({
   whyHere: string[];
   vehiclePreview: string[];
 }) {
+  // SEO: Place JSON-LD for upcoming markets. We use `Place` (not
+  // `AutomotiveBusiness`) because the location isn't operational
+  // yet — claiming LocalBusiness for a Q3 2027 market would be
+  // misleading to Google. `disambiguatingDescription` carries the
+  // launch quarter so the snippet reads like a coming-soon
+  // location, not an active one.
+  //
+  // Codex round-2 caught that `containedInPlace: Organization` is
+  // schema-invalid — `containedInPlace` expects a Place. We drop
+  // the bad pointer; brand attribution lives on the broader
+  // /locations Organization JSON-LD instead.
+  //
+  // Slug only handles ASCII city names + spaces (current usage:
+  // los-angeles, new-york). Add diacritic normalization if we ever
+  // ship a market like "Saint-Tropez". The "<" -> "<" escape
+  // prevents script-context breakout.
+  const slug = city.toLowerCase().replace(/\s+/g, "-");
+  const placeJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Place",
+    "@id": `${SITE_URL}/locations/${slug}`,
+    name: `RYDA ${city} (coming ${launchQuarter})`,
+    description: intro,
+    disambiguatingDescription: `Future RYDA market opening ${launchQuarter}.`,
+    url: `${SITE_URL}/locations/${slug}`,
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: city,
+      addressRegion: state,
+      addressCountry: "US",
+    },
+  };
+
   return (
     <>
       <SiteHeader />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(placeJsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
 
       {/* Hero */}
       <section className="border-b border-rule">

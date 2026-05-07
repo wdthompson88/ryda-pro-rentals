@@ -1,17 +1,81 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { HiddenWhenAuthed } from "@/components/auth-aware";
+import { SITE_URL } from "@/lib/site-url";
 
 export const metadata = {
   title: "Miami — RYDA",
   description:
     "RYDA's first market. Q3 2026 launch. The story behind Miami, our partner facility, member events, and the member cohort.",
+  alternates: { canonical: `${SITE_URL}/locations/miami` },
 };
 
 export default function MiamiPage() {
+  // SEO: Place + parent Organization JSON-LD describes the Miami
+  // market for Google's knowledge graph without claiming the
+  // location is operational yet.
+  //
+  // Codex round-2 caught that AutomotiveBusiness with 24/7 hours
+  // on a Q3 2026 pre-launch page misrepresents an active business
+  // — Google's Local Business spec is for businesses customers can
+  // visit today. We use `Place` instead and keep the parent-Org
+  // pointer for brand attribution. Once Miami ships and we have a
+  // public-facing partner facility address to share, switch to
+  // `AutomotiveBusiness` with the real `streetAddress` and hours.
+  //
+  // Address is intentionally city-only — the partner facility's
+  // street address is shared at booking per the page copy — and
+  // schema.org allows partial PostalAddress.
+  // The "<" -> "<" escape prevents script-context breakout.
+  const placeJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Place",
+    "@id": `${SITE_URL}/locations/miami`,
+    name: "RYDA Miami (launches Q3 2026)",
+    description:
+      "RYDA's flagship market. Member-managed LLC supercar co-ownership in Miami-Dade. Climate-controlled storage, in-house service, white-glove handover. Membership opens Q3 2026.",
+    url: `${SITE_URL}/locations/miami`,
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Miami",
+      addressRegion: "FL",
+      addressCountry: "US",
+    },
+    containedInPlace: {
+      "@type": "AdministrativeArea",
+      name: "Miami-Dade County",
+    },
+  };
+  const orgJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": SITE_URL,
+    name: "RYDA",
+    url: SITE_URL,
+    areaServed: [
+      { "@type": "City", name: "Miami" },
+      { "@type": "City", name: "Miami Beach" },
+      { "@type": "City", name: "Coral Gables" },
+      { "@type": "City", name: "Coconut Grove" },
+      { "@type": "AdministrativeArea", name: "Miami-Dade County" },
+    ],
+  };
+
   return (
     <>
       <SiteHeader />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(placeJsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(orgJsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
 
       {/* Hero */}
       <section className="border-b border-rule">

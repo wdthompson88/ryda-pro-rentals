@@ -18,6 +18,7 @@ import { RecentComparableSales } from "@/components/recent-comparables";
 import { LiveMarketEmbed } from "@/components/live-market-embed";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import type { VehicleComparable } from "@/lib/vehicle-enrichment";
+import { SITE_URL } from "@/lib/site-url";
 import {
   VEHICLES,
   getVehicleBySymbol,
@@ -95,9 +96,39 @@ export async function generateMetadata({
   const { symbol } = await params;
   const v = getVehicleBySymbol(symbol);
   if (!v) return { title: "RYDA Markets" };
+  const url = `${SITE_URL}/portfolio/${v.symbol.toLowerCase()}`;
+  const title = `${v.name}, ${formatUSD(v.pricePerShare)} per share — RYDA`;
+  const description = `Co-own a ${v.year} ${v.name}. ${v.sharesAvailable} of ${v.shares} member-managed LLC shares available.`;
+  // Per-vehicle OG image: when sharing a portfolio link to LinkedIn /
+  // X / iMessage we want the actual hero photo of the car, not the
+  // generic site-default OG image. v.hero is a /cars/<slug>/1.webp
+  // path; absolutize to a full URL so social platforms can fetch it.
+  const heroAbsolute = v.hero.startsWith("http")
+    ? v.hero
+    : `${SITE_URL}${v.hero}`;
   return {
-    title: `${v.name}, ${formatUSD(v.pricePerShare)} per share — RYDA`,
-    description: `Co-own a ${v.year} ${v.name}. ${v.sharesAvailable} of ${v.shares} member-managed LLC shares available.`,
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      type: "website",
+      url,
+      title,
+      description,
+      siteName: "RYDA",
+      images: [
+        {
+          url: heroAbsolute,
+          alt: `${v.year} ${v.name}`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [heroAbsolute],
+    },
   };
 }
 
@@ -146,7 +177,21 @@ export default async function VehicleMarketPage({
   // We model the listing as a Product (the share itself) with the
   // physical Vehicle as the itemOffered. This way Google reads the
   // page price as the per-share price, not the full vehicle price.
-  const pageUrl = `/portfolio/${v.symbol.toLowerCase()}`;
+  const pageUrl = `${SITE_URL}/portfolio/${v.symbol.toLowerCase()}`;
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Co-Own",
+        item: `${SITE_URL}/portfolio`,
+      },
+      { "@type": "ListItem", position: 3, name: `${v.year} ${v.name}`, item: pageUrl },
+    ],
+  };
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -204,6 +249,12 @@ export default async function VehicleMarketPage({
         // the script body cannot escape its own tag.
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(breadcrumbJsonLd).replace(/</g, "\\u003c"),
         }}
       />
 
