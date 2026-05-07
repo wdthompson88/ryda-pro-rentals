@@ -21,12 +21,23 @@ import type Stripe from "stripe";
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
+  // Security audit C-4: return 503 not 200 when secret unset, so Stripe
+  // retries instead of silently dropping every Identity event and
+  // leaving members stuck unverified.
   if (!stripe || !STRIPE_KYC_WEBHOOK_SECRET) {
-    return NextResponse.json({ received: true });
+    console.error("[kyc webhook] not configured (missing STRIPE_KYC_WEBHOOK_SECRET or STRIPE_WEBHOOK_SECRET)");
+    return NextResponse.json(
+      { error: "KYC webhook backend not configured." },
+      { status: 503 },
+    );
   }
   const admin = supabaseAdmin();
   if (!admin) {
-    return NextResponse.json({ received: true });
+    console.error("[kyc webhook] supabase admin not configured");
+    return NextResponse.json(
+      { error: "Database not configured." },
+      { status: 503 },
+    );
   }
 
   const sig = req.headers.get("stripe-signature");

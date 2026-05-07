@@ -49,13 +49,45 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Bad JSON." }, { status: 400 });
   }
 
+  // Shape guard before HMAC compute. Without this an adversarial JSON
+  // body that omits `event` (or makes it non-object) would throw on the
+  // string-concatenation below, surfacing a 500 instead of a clean 400.
+  // Codex review caught this on Sub-Batch A2.
+  const ev = (payload as { event?: unknown }).event;
+  if (
+    !ev ||
+    typeof ev !== "object" ||
+    typeof (ev as { event_time?: unknown }).event_time !== "string" ||
+    typeof (ev as { event_type?: unknown }).event_type !== "string" ||
+    typeof (ev as { event_hash?: unknown }).event_hash !== "string"
+  ) {
+    return NextResponse.json({ error: "Malformed event." }, { status: 400 });
+  }
+
   // Verify hash: HMAC-SHA256(event_time + event_type, api_key).
+  // SAST S-C-1: use crypto.timingSafeEqual instead of `!==` so the
+  // compare doesn't short-circuit on the first mismatched byte —
+  // otherwise an attacker can timing-analyze the expected hex digest
+  // (which is derived from the API key, so a leak helps key recovery).
+  // Pattern matches `lib/api-auth.ts` cron bearer compare.
   const apiKey = process.env.DROPBOX_SIGN_API_KEY ?? "";
   const expected = crypto
     .createHmac("sha256", apiKey)
     .update(payload.event.event_time + payload.event.event_type)
     .digest("hex");
-  if (expected !== payload.event.event_hash) {
+  const got = payload.event.event_hash;
+  let valid = false;
+  if (typeof got === "string" && got.length === expected.length) {
+    try {
+      valid = crypto.timingSafeEqual(
+        Buffer.from(expected, "utf8"),
+        Buffer.from(got, "utf8"),
+      );
+    } catch {
+      valid = false;
+    }
+  }
+  if (!valid) {
     return NextResponse.json({ error: "Invalid hash." }, { status: 400 });
   }
 

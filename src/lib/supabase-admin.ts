@@ -4,8 +4,11 @@
 //
 // NEVER import this from a client component. The service-role key
 // gives full read/write access to every table; leaking it to the
-// browser is a full-takeover bug.
+// browser is a full-takeover bug. The `server-only` import below
+// turns "client component imports this" from a runtime exfiltration
+// risk into a compile-time error.
 
+import "server-only";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;

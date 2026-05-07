@@ -1,5 +1,7 @@
 // Dropbox Sign (formerly HelloSign) server client.
 // Server-only — never import from a client component.
+// The `server-only` import enforces this at build time so an accidental
+// client-component import becomes a compile-time error.
 //
 // The Dropbox Sign SDK uses API-key auth. Templates for the Operating
 // Agreement and Management Services Agreement live in Dropbox Sign
@@ -9,6 +11,7 @@
 // See https://developers.hellosign.com/docs/embedded-signing/walkthrough
 // for the embedded-signing flow we mount in DocumentsStep.
 
+import "server-only";
 import * as DropboxSign from "@dropbox/sign";
 
 const apiKey = process.env.DROPBOX_SIGN_API_KEY ?? "";
@@ -48,5 +51,9 @@ export function embeddedApi() {
   return client;
 }
 
-export const DROPBOX_SIGN_CLIENT_ID = clientId;
-export const DROPBOX_SIGN_WEBHOOK_API_KEY = apiKey;
+// NOTE: We intentionally do NOT export `apiKey` or `clientId` from this
+// module. The webhook handler reads `process.env.DROPBOX_SIGN_API_KEY`
+// directly for HMAC verification — exporting the key as a named const
+// previously made it trivially importable from a future client module
+// (security audit C-2). With `server-only` above + no exports here,
+// the API key cannot leak into a client bundle.

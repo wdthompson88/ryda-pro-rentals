@@ -36,14 +36,25 @@ import type Stripe from "stripe";
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
+  // Security audit C-4: returning 200 here would silently swallow every
+  // event Stripe delivers when the secret is unset — purchases would
+  // never flip pending→paid and ops would have no signal until members
+  // complain. Return 503 so Stripe retries until the env var lands AND
+  // the misconfiguration shows up in our function logs as 5xx alerts.
   if (!stripe || !STRIPE_WEBHOOK_SECRET) {
-    console.warn("[stripe webhook] not configured, ignoring");
-    return NextResponse.json({ received: true }, { status: 200 });
+    console.error("[stripe webhook] not configured (missing STRIPE_WEBHOOK_SECRET)");
+    return NextResponse.json(
+      { error: "Webhook backend not configured." },
+      { status: 503 },
+    );
   }
   const admin = supabaseAdmin();
   if (!admin) {
-    console.warn("[stripe webhook] supabase admin not configured");
-    return NextResponse.json({ received: true }, { status: 200 });
+    console.error("[stripe webhook] supabase admin not configured");
+    return NextResponse.json(
+      { error: "Database not configured." },
+      { status: 503 },
+    );
   }
 
   const sig = req.headers.get("stripe-signature");

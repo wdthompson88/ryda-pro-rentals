@@ -1,3 +1,7 @@
+// Server-only email helper. The Resend API key must never reach the
+// browser — `server-only` makes that a compile-time error.
+
+import "server-only";
 import { Resend } from "resend";
 
 const apiKey = process.env.RESEND_API_KEY;

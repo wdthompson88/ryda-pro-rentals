@@ -6,7 +6,9 @@
 //
 // The webhook handler at /api/share-purchase/webhook verifies signatures
 // against STRIPE_WEBHOOK_SECRET, so don't expose that key client-side.
+// The `server-only` import enforces this at build time.
 
+import "server-only";
 import Stripe from "stripe";
 
 const apiKey = process.env.STRIPE_SECRET_KEY;

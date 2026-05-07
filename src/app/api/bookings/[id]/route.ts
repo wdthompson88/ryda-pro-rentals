@@ -41,10 +41,15 @@ async function cancelBooking(req: NextRequest, id: string) {
     );
   }
 
+  // Defense in depth: the SELECT above already gated by user_id, but the
+  // UPDATE adds the same predicate so a bug in the lookup (or a future
+  // refactor that splits the lookup into a different scope) cannot let
+  // this UPDATE touch another user's row by id alone. Security audit C-3.
   const { error } = await admin
     .from("bookings")
     .update({ status: "canceled", updated_at: new Date().toISOString() })
-    .eq("id", id);
+    .eq("id", id)
+    .eq("user_id", user.id);
   if (error) {
     console.error("[bookings · cancel]", error);
     return NextResponse.json({ error: "Could not cancel booking." }, { status: 500 });
