@@ -25,7 +25,7 @@ export async function generateMetadata({
 }) {
   const { slug } = await params;
   const v = getBoatBySlug(slug);
-  return { title: v ? `${v.name}, My Boats — RYDA` : "My Cars" };
+  return { title: v ? `${v.name}, My Boats — RYDA` : "My Boats" };
 }
 
 export default async function MyVehiclePage({
@@ -51,7 +51,7 @@ export default async function MyVehiclePage({
             href="/my-boats"
             className="text-xs font-medium uppercase tracking-[0.2em] text-marine hover:text-marine-deep"
           >
-            ← My Cars
+            ← My Boats
           </Link>
           <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-12">
             <div className="lg:col-span-7">
@@ -88,7 +88,10 @@ export default async function MyVehiclePage({
                   label="Planned reservations"
                   value={`1 of ${BOAT_BOOKING_POLICY.planned.activeLimitPerShare * 2} active`}
                 />
-                <Stat label="Short-notice" value="Open · book up to 7 days out" />
+                <Stat
+                  label="Short-notice"
+                  value={`Open · book up to ${BOAT_BOOKING_POLICY.shortNotice.maxDaysAdvance} days out`}
+                />
               </div>
               <div className="mt-6 flex flex-col gap-2">
                 <Link

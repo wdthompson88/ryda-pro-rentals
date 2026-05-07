@@ -374,7 +374,9 @@ export const HOLDING_MILES_CAP = 60_000; // alt sale trigger (~60K-75K depending
 export const TARGET_DEPRECIATION_PCT = 10; // % over the full 2-year hold
 
 // Standard shareholder mileage allowance, matches GM LUXE & industry
-// norm. 32 days × 100 mi/day = 3,200 mi/yr per share.
+// norm. 30 days × 100 mi/day = 3,000 mi/yr per share (matches DAYS_PER_SHARE
+// + MILES_PER_DAY_PER_SHARE constants below; vehicle records use
+// daysPerYear: 30, milesPerYear: 3_000).
 export const MILES_PER_DAY_PER_SHARE = 100;
 export const DAYS_PER_SHARE = 30;
 
