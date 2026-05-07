@@ -21,7 +21,9 @@ import {
 
 const RENTAL_FALLBACK = 2_500;
 
-type CompareAsset = Vehicle | Boat;
+// Exported so the lazy wrapper (lazy-compare-calculator.tsx) can
+// type its forwarded props without duplicating the union.
+export type CompareAsset = Vehicle | Boat;
 
 type RentalEconomics = ReturnType<typeof computeRentalEconomics>;
 

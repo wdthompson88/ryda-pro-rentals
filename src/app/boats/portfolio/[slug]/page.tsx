@@ -10,7 +10,7 @@ import ShareValueChart, {
   buildShareValueChartConfig,
 } from "@/components/shared/share-value-chart";
 import { OwnershipPrimitives } from "@/components/ownership-primitives";
-import CompareCalculator from "@/components/shared/compare-calculator";
+import CompareCalculator from "@/components/shared/lazy-compare-calculator";
 import {
   BOATS,
   getBoatBySlug,

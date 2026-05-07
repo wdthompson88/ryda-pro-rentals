@@ -8,7 +8,7 @@ import CostBreakdown, {
 import ShareValueChart, {
   buildShareValueChartConfig,
 } from "@/components/shared/share-value-chart";
-import CompareCalculator from "@/components/shared/compare-calculator";
+import CompareCalculator from "@/components/shared/lazy-compare-calculator";
 import { PhotoGallery } from "@/components/photo-gallery";
 import { OwnershipPrimitives } from "@/components/ownership-primitives";
 import { BookingTiersExplainer } from "@/components/booking-tiers-explainer";
