@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { BookingTiersExplainer } from "@/components/booking-tiers-explainer";
 import {
-  Faq,
   HowItWorksPageTemplate,
   Pillar,
   Reason,
@@ -17,8 +16,7 @@ import {
 } from "@/lib/market-data";
 
 const TOC_ITEMS = [
-  { id: "three-step", label: "How it works" },
-  { id: "lifecycle", label: "5 steps" },
+  { id: "lifecycle", label: "How it works" },
   { id: "exit", label: "Exit doctrine" },
   { id: "compare", label: "Compare" },
   { id: "right-for-you", label: "Right for you?" },
@@ -26,7 +24,6 @@ const TOC_ITEMS = [
   { id: "booking", label: "Booking model" },
   { id: "concierge", label: "Concierge" },
   { id: "trust", label: "Buyer protection" },
-  { id: "deeper-math", label: "Deeper math" },
   { id: "rental-opt-in", label: "Rent your days" },
   { id: "faq", label: "FAQ" },
 ];
@@ -157,46 +154,6 @@ export default function HowItWorksPage() {
           "Each car is held in a single-purpose LLC with 10 shares. Your share is backed by a real, titled vehicle — not by a subscription, lease or rental contract. Verified members hold two shares or more (2-share minimum per person); RYDA is hired as the operations partner.",
       }}
     >
-
-      {/* Turo-style 3-step explainer, the simple version of the doctrine
-          for first-time visitors. The technical 5-step lifecycle below
-          is the deep dive; this is the elevator pitch. Big numbers,
-          short copy, one icon idea per step. */}
-      <section id="three-step" className="border-b border-rule">
-        <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            How it works
-          </p>
-          <h2 className="mt-3 font-display text-4xl text-ink sm:text-5xl">
-            Three steps to a key.
-          </h2>
-          <div className="mt-12 grid grid-cols-1 gap-12 lg:grid-cols-3">
-            <SimpleStep
-              n="1"
-              icon="search"
-              title="Choose"
-              body="Browse a curated, certified pre owned fleet. Every car has a documented Pre-Purchase Inspection by the dealer before a single share is sold."
-            />
-            <SimpleStep
-              n="2"
-              icon="signature"
-              title="Co-own"
-              body="Buy your share in a member-managed LLC. Up to 5 verified co-owners per car, with a 2-share minimum per person. RYDA runs operations end-to-end."
-            />
-            <SimpleStep
-              n="3"
-              icon="key"
-              title="Drive"
-              body="Book your time on the RYDA smart calendar. Each share unlocks ~32 days and ~3,200 miles a year. Planned exit at 24 months; transfer earlier after the 12-month minimum hold."
-            />
-          </div>
-          <p className="mt-12 max-w-2xl text-base leading-relaxed text-ink-soft">
-            That&apos;s the short version. The technical detail
-            (paperwork, exit math, booking rules) lives in the five-step
-            lifecycle below.
-          </p>
-        </div>
-      </section>
 
       {/* 5-step lifecycle */}
       <section id="lifecycle" className="border-b border-rule bg-cream-2">
@@ -701,71 +658,6 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
-      {/* The deeper math, consolidated honest-math + 2-yr exit story */}
-      <section id="deeper-math" className="border-b border-rule">
-        <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            How to read the price
-          </p>
-          <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
-            $221/day is operating cost. Net cost is the real number.
-          </h2>
-          <div className="mt-8 space-y-5 text-base leading-relaxed text-ink-soft">
-            <p>
-              The $221/day figure is steady-state operating cost: $7,080
-              of annual ops divided by 32 driving days. It&apos;s what
-              every day behind the wheel costs you{" "}
-              <span className="italic">while you hold the share</span>,
-              ignoring the buy-in.
-            </p>
-            <p>
-              Year 1 includes the buy-in as real cash. $34K share +
-              $7,080 ops = $41,080 spent (the table number above; a
-              one-time $1,500 closing fee is added at signing). At 32
-              days driven that&apos;s ~$1,284 per driving day in Year 1,
-              still below the cost of renting the same Ferrari for
-              the same 32 days ($2,400/day × 32 = $76,800). And you
-              exit with a transferable share, not a stack of receipts.
-            </p>
-            <p>
-              The bigger number is net cost over the full hold.
-              RYDA&apos;s doctrine is a 2-year planned exit (or
-              {" "}{(HOLDING_MILES_CAP / 1000).toFixed(0)}K-mile cap,
-              whichever comes first): each curated certified pre owned car is held for
-              ~2 years, then the LLC sells it and proceeds are
-              distributed pro-rata. We model {TARGET_DEPRECIATION_PCT}%
-              depreciation over the hold, a conservative middle that
-              absorbs both the drive-only and rental-opt-in usage
-              profiles, given the 100 mi/day per-member allowance.
-            </p>
-            <p>
-              Illustrative numbers below model a single share for
-              clarity. Most members hold the 2-share minimum, so double
-              every line: $68K buy-in, ~$14,160/yr carrying, ~$96,320
-              spent over 2 years, ~$61,200 resale, net ~$35,120 for
-              ~128 driving days, ~$274 per actual driving day, the same
-              effective rate at any share count.
-            </p>
-            <p>
-              For the F458 at one share over 2 years: $18.9K buy-in +
-              $3,900 × 2 carrying = $26,700 spent. Resale at 90% of
-              buy-in returns ~$17,010.{" "}
-              <strong>Net cost ~$9,690</strong> for 64 driving days ={" "}
-              <strong>~$151 per actual driving day</strong>. That&apos;s
-              the apples-to-apples number to use against rental
-              ($2,400/day × 64 = $153,600). You also exit with cash
-              from the sale, not a stack of receipts.
-            </p>
-          </div>
-          <Link
-            href="/markets"
-            className="mt-10 inline-flex h-12 items-center justify-center rounded-full border border-rule px-7 text-sm font-medium text-ink hover:border-ink"
-          >
-            Run the math on a specific car →
-          </Link>
-        </div>
-      </section>
-
       {/* Rental opt-in for shareholders */}
       <section id="rental-opt-in" className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-5xl px-6 py-20 sm:px-10">
@@ -842,50 +734,28 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
-      {/* FAQ */}
+      {/* FAQ — link out to the dedicated /faq page so this page
+          stays focused on the doctrine narrative. Per user feedback
+          May 2026: FAQ should be its own page, not duplicated here. */}
       <section id="faq" className="border-b border-rule">
-        <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10">
-          <h2 className="font-display text-3xl text-ink sm:text-4xl">
+        <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10 text-center">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+            Questions?
+          </p>
+          <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
             Frequently asked questions.
           </h2>
-          <div className="mt-10 space-y-6">
-            <Faq
-              q="Are RYDA co-ownership stakes securities?"
-              a="No. RYDA is a luxury access platform, not an investment platform. Each car is held in a member-managed LLC where you and your co-owners hold authority over material decisions; RYDA is hired as a service provider via a separate Management Services Agreement. Co-ownership stakes are not registered securities and are not offered for investment purposes."
-            />
-            <Faq
-              q="Can I transfer my share whenever I want?"
-              a="After a 12-month minimum hold, yes, to another verified RYDA member. RYDA handles the LLC paperwork. Settlement takes 1–3 business days. RYDA charges a 3% transfer fee on the sale price."
-            />
-            <Faq
-              q="Can I rent out my share days for income?"
-              a={`Yes, opting into RYDA's rental pool is voluntary, share-by-share. We list the car on /rent, handle bookings, insurance, screening and condition checks. Rental revenue splits 65/35 (you / RYDA) and is distributed pro-rata across the days each share contributes. The pool is whatever days members don't reserve, so realistic pool occupancy is ~50% (full-control fleets clock 60–70%). On that basis, a single Ferrari 296 share can offset ~$15–18K/yr of carrying, typically 2–2.5× your annual ops cost, sometimes enough to bring your two-year net cost down close to zero or below. Same flat ${TARGET_DEPRECIATION_PCT}% depreciation assumption applies in both scenarios. Co-ownership shares are member-managed LLC interests, not securities; rental is a usage offset, not an investment yield.`}
-            />
-            <Faq
-              q="What if a co-owner stops paying?"
-              a="The vehicle LLC has remedies in the Operating Agreement, including forced transfer of the delinquent share. RYDA also keeps a maintenance reserve at the LLC level so vehicle ops continue uninterrupted while it's resolved."
-            />
-            <Faq
-              q="Where are the cars stored?"
-              a="In RYDA-vetted partner storage facilities, climate-controlled, 24/7 monitored, insured. Miami first, with LA and NY following in 2027."
-            />
-            <Faq
-              q="What's covered by insurance?"
-              a="Each vehicle carries a fleet policy with $1M+ third-party liability and agreed-value physical damage. Co-owners are named insureds. Damage during sanctioned-track-event use is excluded by the standard policy."
-            />
-            <Faq
-              q="Can I bring a friend in the car?"
-              a="Yes. Approved additional drivers (28+, clean license, RYDA-verified) can drive too. Passengers are unrestricted."
-            />
-            <Faq
-              q="Why is membership only 28+?"
-              a="Underwriting reality. Insurance carriers price exotic-car policies aggressively for younger drivers. The 28+ minimum keeps premiums manageable and matches the underwriting norm for collector and exotic policies."
-            />
-            <Faq
-              q="Is there a membership fee?"
-              a="Three tiers. RYDA Core is free. RYDA Blue is $500/year. RYDA Black is $1,500/year, priority booking during peak season, included white-glove delivery, dedicated dedicated contact. First-100 lock in $350/$1,000 for life."
-            />
-          </div>
+          <p className="mt-4 max-w-xl mx-auto text-base text-ink-soft">
+            Co-ownership structure, transfers, insurance, taxes,
+            maintenance reserves, member benefits — answered in
+            full on the dedicated FAQ page.
+          </p>
+          <Link
+            href="/faq"
+            className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream hover:bg-red"
+          >
+            Open the FAQ →
+          </Link>
         </div>
       </section>
     </HowItWorksPageTemplate>

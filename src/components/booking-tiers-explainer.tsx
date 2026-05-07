@@ -217,24 +217,9 @@ const MIAMI_PEAK_WINDOWS: {
     note: "Five-day yacht event; A1A traffic pattern doubles as a parade route.",
   },
   {
-    name: "Spring Break + Ultra Music Fest",
-    dates: "late March",
-    note: "Heaviest valet demand of the year on Ocean Drive.",
-  },
-  {
     name: "F1 Miami Grand Prix",
     dates: "early May",
     note: "Hard Rock paddock + Brickell takeover. Highest-bid weekend on the calendar.",
-  },
-  {
-    name: "Memorial Day weekend",
-    dates: "late May",
-    note: "Urban Beach Week kicks off summer; long weekend.",
-  },
-  {
-    name: "Fourth of July",
-    dates: "Jul 4 weekend",
-    note: "Bayfront fireworks; club Friday-Monday.",
   },
   {
     name: "Art Basel Miami Beach",
@@ -245,11 +230,6 @@ const MIAMI_PEAK_WINDOWS: {
     name: "Holiday week + NYE",
     dates: "Dec 26 – Jan 1",
     note: "Snowbird arrivals + South Beach NYE. Locked early.",
-  },
-  {
-    name: "Super Bowl host year",
-    dates: "early Feb (when in MIA)",
-    note: "Only counts in years Miami hosts; otherwise off the list.",
   },
 ];
 

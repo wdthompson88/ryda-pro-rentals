@@ -19,6 +19,12 @@ export default function InsurancePage() {
           <h1 className="mt-4 max-w-3xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
             The hardest part of supercar ownership, handled.
           </h1>
+            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink-soft">
+              Full coverage on every vehicle. Every co-owner is named on
+              the policy. Every claim runs through the LLC, not through
+              you. RYDA negotiates the carriers, RYDA tracks renewals,
+              RYDA handles the paperwork.
+            </p>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
             Insuring a $300,000+ vehicle that's used by multiple drivers with
             varying experience is a non-trivial problem. RYDA carries a

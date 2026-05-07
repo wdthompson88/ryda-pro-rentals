@@ -7,16 +7,15 @@ import { HiddenWhenAuthed } from "@/components/auth-aware";
 import { VEHICLES, formatUSD } from "@/lib/market-data";
 
 export const metadata: Metadata = {
-  title: "RYDA Cars — Co-own or rent the world's most exceptional cars",
+  title: "RYDA Cars — Co-own the world's most exceptional cars",
   description:
-    "Co-own a certified pre owned Ferrari, Lamborghini or McLaren in a member-managed LLC. Each share unlocks ~32 days a year. Or rent any car in the fleet by the day.",
+    "Co-own a certified pre owned Ferrari, Lamborghini or McLaren in a member-managed LLC. Each share unlocks ~30 days a year. Asset-backed, professionally operated.",
 };
 
 export default function CarsHome() {
   // Featured cars for the two parallel sections, same 4 RYDA fleet
   // cars, but presented twice with different framings (co-own vs rent).
   const featured = VEHICLES.slice(0, 4);
-  const featuredRentable = VEHICLES.filter((v) => v.rentalAvailable).slice(0, 4);
   // Hero image: lead with the GT3 RS as the visual anchor.
   const heroVehicle = VEHICLES.find((v) => v.symbol === "GT3") ?? VEHICLES[0];
 
@@ -29,17 +28,17 @@ export default function CarsHome() {
         <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-6 py-20 sm:px-10 sm:py-24 lg:grid-cols-12 lg:gap-12">
           <div className="lg:col-span-6">
             <p className="mb-6 text-xs font-medium uppercase tracking-[0.2em] text-red">
-              Supercar co-ownership and rentals · Miami · Q3 2026
+              Supercar co-ownership · Miami · Q3 2026
             </p>
             <h1 className="font-display text-5xl font-light leading-[1.05] tracking-tight text-ink sm:text-6xl lg:text-7xl">
-              Co-own or rent the world's{" "}
+              Co-own the world's{" "}
               <span className="italic text-red">most exceptional cars.</span>
             </h1>
             <p className="mt-8 max-w-xl text-lg leading-relaxed text-ink-soft">
               Co-own a certified pre owned Ferrari, Lamborghini, or
-              McLaren in a member-managed LLC, each share is ~32 days
-              a year. Or rent any car in the fleet by the day to drive
-              it before you commit.
+              McLaren in a member-managed LLC. Each share is ~30 days
+              a year. Asset-backed; member-managed; professionally
+              operated.
             </p>
             <div className="mt-10 flex flex-wrap justify-center gap-3 sm:justify-start">
               <Link
@@ -47,12 +46,6 @@ export default function CarsHome() {
                 className="inline-flex h-12 items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream transition-colors hover:bg-red"
               >
                 Co-Own a share →
-              </Link>
-              <Link
-                href="/rent"
-                className="inline-flex h-12 items-center justify-center rounded-full border border-rule px-7 text-sm font-medium text-ink hover:border-ink"
-              >
-                Rent by the day →
               </Link>
             </div>
           </div>
@@ -210,66 +203,6 @@ export default function CarsHome() {
                       </p>
                       <span className="text-xs font-medium text-red group-hover:text-red-deep">
                         View →
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Rent, featured rentals (try before you buy) */}
-      <section className="border-b border-rule bg-ink text-cream">
-        <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
-          <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-            <div className="max-w-2xl">
-              <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-                Rent · Featured
-              </p>
-              <h2 className="mt-3 font-display text-3xl sm:text-4xl">
-                Featured rentals, try before you buy.
-              </h2>
-            </div>
-            <Link
-              href="/rent"
-              className="inline-flex h-11 items-center justify-center rounded-full border border-cream/30 px-5 text-sm font-medium text-cream hover:border-cream hover:bg-cream hover:text-ink"
-            >
-              See all rentals →
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {featuredRentable.map((v, i) => (
-              <Reveal key={v.symbol} delayMs={i * 80}>
-                <Link
-                  href={`/rent/${v.symbol.toLowerCase()}`}
-                  className="group block overflow-hidden rounded-xl border border-cream/15 bg-cream/[0.04] transition-colors hover:bg-cream/[0.08]"
-                >
-                  <div className="relative aspect-[16/10] w-full overflow-hidden bg-cream-2">
-                    <Image
-                      src={v.hero}
-                      alt={`${v.year} ${v.name}`}
-                      fill
-                      sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                      className={`object-cover transition-transform duration-500 group-hover:scale-[1.02] ${v.flipImage ? "-scale-x-100" : ""}`}
-                      style={{ objectPosition: v.imagePosition ?? "center" }}
-                    />
-                  </div>
-                  <div className="p-4">
-                    <p className="text-xs text-cream/60">{v.brand}</p>
-                    <p className="mt-1 font-display text-base text-cream">
-                      {v.name}
-                    </p>
-                    <div className="mt-2 flex items-baseline justify-between">
-                      <p>
-                        <span className="font-display text-xl text-cream tabular-nums">
-                          {formatUSD(v.rentalDailyRate)}
-                        </span>
-                        <span className="text-xs text-cream/60">/day</span>
-                      </p>
-                      <span className="text-xs font-medium text-red">
-                        Rent →
                       </span>
                     </div>
                   </div>

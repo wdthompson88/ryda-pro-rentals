@@ -37,7 +37,11 @@ export type MembershipPageData = {
   };
   tiers: MembershipTier[];
   features: MembershipFeatureGroup[];
-  math: {
+  /** Optional per-tier detail breakdown ("what each tier includes").
+   *  Removed from /membership in May 2026 per user feedback (felt
+   *  redundant with the tier comparison cards above). Boats page
+   *  still uses it. */
+  math?: {
     intro: string;
     details: MembershipDetail[];
   };
@@ -149,20 +153,22 @@ export function MembershipPageTemplate({ data }: { data: MembershipPageData }) {
         </div>
       </section>
 
-      <section className="border-b border-rule bg-cream-2">
-        <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10">
-          <h2 className="font-display text-3xl text-ink sm:text-4xl">
-            What each tier includes.
-          </h2>
-          <p className="mt-4 text-base text-ink-soft">{data.math.intro}</p>
+      {data.math && (
+        <section className="border-b border-rule bg-cream-2">
+          <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10">
+            <h2 className="font-display text-3xl text-ink sm:text-4xl">
+              What each tier includes.
+            </h2>
+            <p className="mt-4 text-base text-ink-soft">{data.math.intro}</p>
 
-          <div className="mt-8 space-y-4">
-            {data.math.details.map((detail) => (
-              <Detail key={detail.tier} detail={detail} />
-            ))}
+            <div className="mt-8 space-y-4">
+              {data.math.details.map((detail) => (
+                <Detail key={detail.tier} detail={detail} />
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       <section className="border-b border-rule">
         <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10">

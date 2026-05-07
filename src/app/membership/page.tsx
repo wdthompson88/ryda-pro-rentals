@@ -101,21 +101,6 @@ export default function MembershipPage() {
           },
           tiers: TIERS,
           features: FEATURES,
-          math: {
-            intro: "Membership is structured around access and service, not coupons.",
-            details: [
-              {
-                tier: "Blue · $500/yr",
-                detail:
-                  "Active membership: a $200 buy-in credit, one complimentary white-glove delivery, member-to-member share transfers, member directory, and priority access to new vehicles.",
-              },
-              {
-                tier: "Black · $1,500/yr",
-                detail:
-                  "Premium everything: a $500 buy-in credit, three deliveries, three service hours, waived first acquisition fee, flagship event programming (Pebble, Miami GP, Art Basel), and a dedicated account contact.",
-              },
-            ],
-          },
           eligibility: [
             "28 or older with a valid US driver's license and clean recent record",
             "Pass identity verification (KYC)",
