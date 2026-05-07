@@ -140,12 +140,19 @@ export async function GET(req: NextRequest) {
           session.status === "expired" ||
           (session.status === "open" && ageHours > STALE_STRIPE_HOURS)
         ) {
-          await admin
+          // Codex review caught: must check update.error or summary
+          // lies (claims canceled when Supabase rejected the write).
+          const upd = await admin
             .from("share_purchases")
             .update({ status: "canceled", updated_at: new Date().toISOString() })
             .eq("id", p.id)
             .eq("status", "pending");
-          summary.canceled_stripe_stale += 1;
+          if (upd.error) {
+            console.error("[cron · reconcile · cancel-stripe-stale]", p.id, upd.error);
+            summary.errors += 1;
+          } else {
+            summary.canceled_stripe_stale += 1;
+          }
         } else {
           summary.still_open += 1;
         }
@@ -153,12 +160,17 @@ export async function GET(req: NextRequest) {
         // Non-Stripe funding: ops typically marks paid within a week.
         // Past 7 days with no movement, the row is dead.
         if (ageHours > STALE_NON_STRIPE_HOURS) {
-          await admin
+          const upd = await admin
             .from("share_purchases")
             .update({ status: "canceled", updated_at: new Date().toISOString() })
             .eq("id", p.id)
             .eq("status", "pending");
-          summary.canceled_non_stripe_stale += 1;
+          if (upd.error) {
+            console.error("[cron · reconcile · cancel-non-stripe-stale]", p.id, upd.error);
+            summary.errors += 1;
+          } else {
+            summary.canceled_non_stripe_stale += 1;
+          }
         } else {
           summary.still_open += 1;
         }
