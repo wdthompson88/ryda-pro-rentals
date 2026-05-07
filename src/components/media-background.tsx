@@ -417,7 +417,7 @@ export function MediaBackground({
             autoPlay
             muted
             playsInline
-            preload="auto"
+            preload="metadata"
             aria-hidden
             className="absolute inset-0 h-full w-full object-cover"
             style={{
@@ -433,7 +433,7 @@ export function MediaBackground({
             autoPlay
             muted
             playsInline
-            preload="auto"
+            preload="metadata"
             aria-hidden
             className="absolute inset-0 h-full w-full object-cover"
             style={{

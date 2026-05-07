@@ -222,8 +222,24 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col bg-cream text-ink">
+        {/* a11y audit C-1 (WCAG 2.4.1): keyboard + screen-reader users
+            need a way to bypass the SiteHeader's nav/search/CTA stack
+            on every page. The link is sr-only until focused, then it
+            jumps to the top-left corner with a focus ring. */}
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:rounded-md focus:bg-ink focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-cream focus:outline-2 focus:outline-offset-2 focus:outline-cream"
+        >
+          Skip to main content
+        </a>
         <AnalyticsBootstrap />
-        <div className="flex-1">{children}</div>
+        {/* a11y audit C-2 (WCAG 1.3.1, 4.1.2): every page now has a
+            single <main> landmark. Pages with their own <main> (e.g.
+            the splitter at app/page.tsx) replaced theirs with a div
+            in the same commit so we don't end up with nested mains. */}
+        <main id="main" tabIndex={-1} className="flex-1 outline-none">
+          {children}
+        </main>
         <SiteFooter />
         <CookieBanner />
         {/* Vercel Analytics — cookie-free, GDPR-compliant pageviews +

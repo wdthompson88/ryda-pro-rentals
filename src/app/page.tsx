@@ -70,7 +70,7 @@ const VERTICALS: Vertical[] = [
 
 export default function SplitterPage() {
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#0E0E10] text-[#F4F1EC]">
+    <div className="relative min-h-screen overflow-hidden bg-[#0E0E10] text-[#F4F1EC]">
       <SplitterIntro />
 
       {/* Floating top bar, minimal, hovers over the columns. 3-column
@@ -131,7 +131,7 @@ export default function SplitterPage() {
           <VerticalColumn key={v.href} v={v} index={i} />
         ))}
       </div>
-    </main>
+    </div>
   );
 }
 

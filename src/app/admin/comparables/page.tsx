@@ -58,7 +58,7 @@ export default function ComparablesAdminList() {
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto max-w-5xl px-6 py-12 sm:px-10">
+      <div className="mx-auto max-w-5xl px-6 py-12 sm:px-10">
         <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
           Admin · Comparable sales
         </p>
@@ -120,7 +120,7 @@ export default function ComparablesAdminList() {
             </Link>
           ))}
         </div>
-      </main>
+      </div>
     </>
   );
 }

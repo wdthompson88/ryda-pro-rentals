@@ -76,7 +76,7 @@ export default function VehicleEnrichmentPage() {
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto max-w-3xl px-6 py-12 sm:px-10">
+      <div className="mx-auto max-w-3xl px-6 py-12 sm:px-10">
         <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
           Admin · Vehicle enrichment
         </p>
@@ -218,7 +218,7 @@ export default function VehicleEnrichmentPage() {
             )}
           </div>
         )}
-      </main>
+      </div>
     </>
   );
 }

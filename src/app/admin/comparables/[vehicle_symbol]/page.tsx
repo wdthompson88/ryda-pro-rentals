@@ -121,7 +121,7 @@ export default function VehicleComparablesPage({
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto max-w-4xl px-6 py-12 sm:px-10">
+      <div className="mx-auto max-w-4xl px-6 py-12 sm:px-10">
         <Link
           href="/admin/comparables"
           className="text-xs font-medium uppercase tracking-[0.2em] text-red hover:text-red-deep"
@@ -290,7 +290,7 @@ export default function VehicleComparablesPage({
             </div>
           </form>
         </section>
-      </main>
+      </div>
     </>
   );
 }

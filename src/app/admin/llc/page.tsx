@@ -67,7 +67,7 @@ export default function LLCAdminList() {
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
+      <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
         <div className="flex flex-wrap items-baseline justify-between gap-4">
           <div>
             <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
@@ -166,7 +166,7 @@ export default function LLCAdminList() {
             </table>
           </div>
         )}
-      </main>
+      </div>
     </>
   );
 }

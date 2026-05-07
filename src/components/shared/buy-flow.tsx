@@ -241,7 +241,7 @@ export default function BuyFlow({ asset, initialShares, config }: Props) {
 
       <div className="mx-auto grid max-w-5xl grid-cols-1 gap-10 px-6 py-12 sm:px-10 lg:grid-cols-12">
         {/* Main */}
-        <main className="lg:col-span-8">
+        <div className="lg:col-span-8">
           {step === "review" && (
             <ReviewStep
               asset={asset}
@@ -301,7 +301,7 @@ export default function BuyFlow({ asset, initialShares, config }: Props) {
               grandTotal={grandTotal}
             />
           )}
-        </main>
+        </div>
 
         {/* Sticky summary */}
         <aside className="lg:col-span-4">

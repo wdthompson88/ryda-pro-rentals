@@ -101,8 +101,8 @@ export default async function BoatDetailPage({
       availability:
         b.sharesAvailable > 0
           ? "https://schema.org/InStock"
-          : "https://schema.org/SoldOut",
-      url: `https://ryda-web-teal.vercel.app/boats/portfolio/${b.slug}`,
+          : "https://schema.org/OutOfStock",
+      url: `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://ryda.pro"}/boats/portfolio/${b.slug}`,
     },
     additionalProperty: [
       { "@type": "PropertyValue", name: "Length", value: `${b.lengthFt} ft` },
