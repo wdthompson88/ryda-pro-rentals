@@ -41,6 +41,11 @@ const RECONCILE_AFTER_HOURS = 1;
 const STALE_STRIPE_HOURS = 24; // Stripe sessions auto-expire at 24h
 const STALE_NON_STRIPE_HOURS = 168; // 7 days for wire/crypto/etc.
 const PAGE_SIZE = 50; // cap per-run to avoid timeouts under bursts
+// Re-notify ops about a stuck-paid row at most this often. Codex
+// final-review NEW_REGRESSION fix: without this, the cron pings
+// ops every hour for the same row until manual webhook replay
+// completes — alert fatigue that masks fresh stuck rows.
+const RENOTIFY_AFTER_HOURS = 24;
 
 function bearerMatches(got: string, expected: string): boolean {
   const prefix = "Bearer ";
@@ -62,6 +67,7 @@ type StuckPurchase = {
   boat_slug: string | null;
   total_cents: number | null;
   funding_method: string | null;
+  ops_notified_at: string | null;
   stripe_session_id: string | null;
   created_at: string;
 };
@@ -98,7 +104,7 @@ export async function GET(req: NextRequest) {
   const stuckRes = await admin
     .from("share_purchases")
     .select(
-      "id, user_id, email, shares, vehicle_symbol, boat_slug, total_cents, funding_method, stripe_session_id, created_at",
+      "id, user_id, email, shares, vehicle_symbol, boat_slug, total_cents, funding_method, stripe_session_id, created_at, ops_notified_at",
     )
     .eq("status", "pending")
     .lt("created_at", reconcileBefore)
@@ -182,10 +188,25 @@ export async function GET(req: NextRequest) {
   }
 
   // Notify-team only when we have action items. Quiet successful runs.
-  if (needsManualReplay.length > 0) {
+  // Skip rows we've already notified about within the last
+  // RENOTIFY_AFTER_HOURS window so the same stuck row doesn't ping
+  // ops every hour. Codex final-review NEW_REGRESSION fix.
+  const notifyCutoff = now - RENOTIFY_AFTER_HOURS * 60 * 60 * 1000;
+  const toNotify = needsManualReplay.filter(
+    (p) =>
+      !p.ops_notified_at ||
+      new Date(p.ops_notified_at).getTime() < notifyCutoff,
+  );
+  const suppressedDup = needsManualReplay.length - toNotify.length;
+  // Surface dedup count in the summary so a low alert volume
+  // doesn't hide that the underlying problem is still present.
+  (summary as Record<string, number>).suppressed_already_notified =
+    suppressedDup;
+
+  if (toNotify.length > 0) {
     try {
       await notifyTeam({
-        subject: `Stuck-paid alert: ${needsManualReplay.length} purchase(s) need webhook replay`,
+        subject: `Stuck-paid alert: ${toNotify.length} purchase(s) need webhook replay`,
         html: emailLayout(
           "Stripe shows paid but our DB still says pending",
           `<p>The hourly reconciliation cron found purchases where
@@ -194,7 +215,17 @@ export async function GET(req: NextRequest) {
           <code>checkout.session.completed</code> event from the
           Stripe dashboard for each row — the webhook handler is
           idempotent and will mint holdings + send the amendment.</p>
-          <ul>${needsManualReplay
+          ${
+            suppressedDup > 0
+              ? `<p style="color:#666;font-size:13px;">
+                  (${suppressedDup} additional row${
+                    suppressedDup === 1 ? "" : "s"
+                  } suppressed: already notified within
+                  ${RENOTIFY_AFTER_HOURS}h.)
+                </p>`
+              : ""
+          }
+          <ul>${toNotify
             .map(
               (p) =>
                 `<li><code>${escapeHtml(p.id)}</code> — session
@@ -208,6 +239,26 @@ export async function GET(req: NextRequest) {
             .join("")}</ul>`,
         ),
       });
+
+      // Stamp ops_notified_at so the next cron run skips these
+      // unless they're still stuck after RENOTIFY_AFTER_HOURS.
+      // Best-effort: a stamping failure means we may re-notify
+      // next hour, which is the previous (noisy) behavior — log
+      // but don't 503.
+      const stampErr = await admin
+        .from("share_purchases")
+        .update({ ops_notified_at: new Date().toISOString() })
+        .in(
+          "id",
+          toNotify.map((p) => p.id),
+        );
+      if (stampErr.error) {
+        console.error(
+          "[cron · reconcile-pending · stamp ops_notified_at]",
+          stampErr.error,
+        );
+        summary.errors += 1;
+      }
     } catch (err) {
       console.error("[cron · reconcile-pending · notify]", err);
       summary.errors += 1;
