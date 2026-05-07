@@ -99,6 +99,55 @@ export async function POST(req: NextRequest) {
     return new Response("Hello API Event Received", { status: 200 });
   }
 
+  // Event-id dedup. Closes the SAST attack chain: HMAC verification
+  // (above) catches forged payloads, but a *captured valid* delivery
+  // can still be replayed because the hash is deterministic for the
+  // same payload. Inserting into dropbox_sign_events with a primary-
+  // key conflict short-circuits the second attempt before any
+  // document_signatures mutation. Migration: 0024_dropbox_sign_events_dedup.
+  //
+  // PK is composite (event_hash, signature_request_id) — the
+  // single-column event_hash is HMAC-SHA256(event_time + event_type)
+  // and would collide for legitimate same-second events on different
+  // signature requests (codex round-1 catch). The composite admits
+  // those legitimate collisions while still blocking exact replays.
+  //
+  // Failure mode: the insert can throw if the table doesn't exist
+  // yet (e.g. migration not applied in a stale environment). We
+  // log + continue so a missing table is fail-open during rollout
+  // — preferable to dropping legitimate signature events on the
+  // floor. Once migrations are confirmed everywhere, harden this to
+  // fail-closed by removing the catch-and-continue.
+  let alreadyProcessed = false;
+  try {
+    const { error: insertErr } = await admin
+      .from("dropbox_sign_events")
+      .insert({
+        event_hash: payload.event.event_hash,
+        signature_request_id: reqId,
+        event_type: evtType,
+        event_time: payload.event.event_time,
+      });
+    if (insertErr) {
+      // Postgres returns code "23505" (unique_violation) on PK
+      // conflict; supabase-js surfaces it as `code`. Anything else
+      // is an actual storage failure — log and continue so we
+      // don't drop the side effect.
+      if (insertErr.code === "23505") {
+        alreadyProcessed = true;
+      } else {
+        console.error("[docsign webhook · dedup insert]", insertErr);
+      }
+    }
+  } catch (err) {
+    console.error("[docsign webhook · dedup insert exception]", err);
+  }
+  if (alreadyProcessed) {
+    // Replay or retry — already applied. Acknowledge so Dropbox Sign
+    // stops re-delivering, but skip the side effect.
+    return new Response("Hello API Event Received", { status: 200 });
+  }
+
   if (evtType === "signature_request_all_signed") {
     let signedPdfUrl: string | null = null;
     try {
