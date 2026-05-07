@@ -36,6 +36,10 @@
     {
       "path": "/api/cron/expire-transfers",
       "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/cron/reconcile-pending-purchases",
+      "schedule": "0 * * * *"
     }
   ]
 }
