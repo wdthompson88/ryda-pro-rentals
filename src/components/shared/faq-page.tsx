@@ -29,8 +29,34 @@ export function FaqPageTemplate({ data }: { data: FaqPageData }) {
   const accentText = data.accent === "marine" ? "text-marine" : "text-red";
   const primaryHover = data.accent === "marine" ? "hover:bg-marine" : "hover:bg-red";
 
+  // SEO H2 (audit 12-seo.md): FAQPage JSON-LD makes /faq and /boats/faq
+  // eligible for Google's FAQ rich-result accordion in search SERPs —
+  // doubles visible real estate for navigational queries like
+  // "ryda co-ownership how does it work". Schema is generated from
+  // the same data prop that renders the visible <details>, so they
+  // can never drift apart. The "<" -> "<" escape prevents
+  // script-context breakout if a question/answer ever contains a
+  // literal "</script>".
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: data.sections.flatMap((s) =>
+      s.questions.map((qa) => ({
+        "@type": "Question",
+        name: qa.q,
+        acceptedAnswer: { "@type": "Answer", text: qa.a },
+      })),
+    ),
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-28">
           <p className={`text-xs font-medium uppercase tracking-[0.2em] ${accentText}`}>
