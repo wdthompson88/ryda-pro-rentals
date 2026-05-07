@@ -56,22 +56,18 @@ test.describe('how-it-works', () => {
 });
 
 test.describe('asset detail page', () => {
-  test('Ferrari 296 page renders Rally-anatomy editorial sections', async ({
+  test('Ferrari 458 listing page renders title + ops disclosure', async ({
     page,
   }) => {
-    await page.goto('/markets/f296');
-    // Hashtag-style section eyebrows
-    await expect(page.getByText(/#F296 · provenance/i)).toBeVisible();
+    await page.goto('/markets/f458');
+    // Listing title (year prefix from callsite, name from Vehicle.name).
     await expect(
-      page.getByText(/#F296 · originality/i),
+      page.getByRole('heading', { name: /ferrari 458/i }).first(),
     ).toBeVisible();
-    // Provenance milestones
-    await expect(page.getByText(/built at maranello/i)).toBeVisible();
-    await expect(page.getByText(/acquired by ryda/i)).toBeVisible();
-    // Listing-card / spec-strip sanity check
-    await expect(
-      page.getByRole('heading', { name: /ferrari 296/i }).first(),
-    ).toBeVisible();
+    // Ops disclosure block — shipped on every listing.
+    await expect(page.getByText(/care & custody/i).first()).toBeVisible();
+    // Live market embed section heading (classic.com widget).
+    await expect(page.getByText(/live market data/i).first()).toBeVisible();
   });
 });
 
