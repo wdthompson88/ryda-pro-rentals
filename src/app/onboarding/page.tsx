@@ -134,7 +134,7 @@ function Identity({ onNext, onBack }: { onNext: () => void; onBack: () => void }
     <div>
       <h2 className="font-display text-2xl text-ink">Identity verification.</h2>
       <p className="mt-2 text-sm text-ink-soft">
-        We use Persona to verify your government ID and run a quick liveness
+        We use Stripe Identity to verify your government ID and run a quick liveness
         check. Takes 2–3 minutes.
       </p>
       <div className="mt-8 space-y-4">
@@ -144,10 +144,10 @@ function Identity({ onNext, onBack }: { onNext: () => void; onBack: () => void }
         <Bullet>Soft credit pull (no impact on your score)</Bullet>
       </div>
       <button className="mt-8 h-12 w-full rounded-full bg-red px-7 text-sm font-medium text-cream hover:bg-red-deep">
-        Continue with Persona →
+        Continue with Stripe Identity →
       </button>
       <p className="mt-4 text-center text-xs text-mute">
-        Persona stores verification data, not RYDA. See our{" "}
+        Stripe Identity stores verification data, not RYDA. See our{" "}
         <Link href="/legal/privacy" className="underline hover:text-ink">
           Privacy Policy
         </Link>

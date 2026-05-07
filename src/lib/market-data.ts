@@ -82,7 +82,7 @@ export const VEHICLES: Vehicle[] = [
   {
     symbol: "GT3",
     ticker: "GT3",
-    name: "2023 Porsche 911 GT3 RS",
+    name: "Porsche 911 GT3 RS",
     year: 2023,
     market: "Miami",
     category: "Coupe",
@@ -124,7 +124,7 @@ export const VEHICLES: Vehicle[] = [
   {
     symbol: "HEVO",
     ticker: "HEVO",
-    name: "2020 Lamborghini Huracán EVO Spyder",
+    name: "Lamborghini Huracán EVO Spyder",
     year: 2020,
     market: "Miami",
     category: "Convertible",
@@ -167,7 +167,7 @@ export const VEHICLES: Vehicle[] = [
   {
     symbol: "F458",
     ticker: "F458",
-    name: "2010 Ferrari 458 Italia",
+    name: "Ferrari 458 Italia",
     year: 2010,
     market: "Miami",
     category: "Coupe",
@@ -210,7 +210,7 @@ export const VEHICLES: Vehicle[] = [
   {
     symbol: "URS",
     ticker: "URS",
-    name: "2019 Lamborghini Urus",
+    name: "Lamborghini Urus",
     year: 2019,
     market: "Miami",
     category: "SUV",
@@ -252,7 +252,7 @@ export const VEHICLES: Vehicle[] = [
   {
     symbol: "Z06",
     ticker: "Z06",
-    name: "2023 Chevrolet Corvette Z06",
+    name: "Chevrolet Corvette Z06",
     year: 2023,
     market: "Miami",
     category: "Coupe",
@@ -294,7 +294,7 @@ export const VEHICLES: Vehicle[] = [
   {
     symbol: "P911",
     ticker: "P911",
-    name: "2022 Porsche 911 Carrera",
+    name: "Porsche 911 Carrera",
     year: 2022,
     market: "Miami",
     category: "Coupe",

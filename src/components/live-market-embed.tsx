@@ -39,18 +39,23 @@ export function LiveMarketEmbed({
             visually with the rest of the gallery + anatomy
             sections. Lazy-loaded so it doesn't block the page's
             initial paint. */}
-        <div className="mt-8 overflow-hidden rounded-2xl border border-rule bg-ink">
+        {/* sandbox: deny everything by default, then re-enable only
+            what classic.com's chart needs (scripts to render the
+            chart; same-origin so its API calls work; popups so the
+            "view full market" link can open a new tab). Without this
+            a compromised classic.com widget could redirect top.location
+            or read referrer state. Audit T1-2.
+            Responsive height: aspect-[16/10] sized so the widget
+            scales with the container (was fixed 450px which broke
+            on mobile <400px and felt cramped on desktop). */}
+        <div className="mt-8 overflow-hidden rounded-2xl border border-rule bg-ink aspect-[16/10] sm:aspect-[2/1]">
           <iframe
             src={url}
-            width="100%"
-            height={450}
             loading="lazy"
             title={`${code} live market data`}
-            // referrerPolicy: don't leak the full URL to the embed
-            // host (just the origin), classic.com gets ryda.pro,
-            // not the specific path.
+            sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
             referrerPolicy="strict-origin-when-cross-origin"
-            className="block w-full border-0"
+            className="block h-full w-full border-0"
           />
         </div>
       </div>

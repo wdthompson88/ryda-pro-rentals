@@ -124,7 +124,7 @@ export const HELP: HelpCategory[] = [
             items: [
               "Be 28 years or older.",
               "Hold a valid US driver's license with a clean recent driving record.",
-              "Pass standard KYC (government ID + selfie match through Persona).",
+              "Pass standard KYC (government ID + selfie match via Stripe Identity).",
               "Be willing to be added to the LLC's insurance policy.",
             ],
           },
@@ -286,7 +286,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "2. Identity verification (KYC)" },
           {
             type: "p",
-            text: "We verify identity through Persona or an equivalent third-party. Government ID upload, selfie match, and a clean recent driving record check. Typically takes 5–10 minutes. Required to be added to the LLC's insurance policy.",
+            text: "We verify identity through Stripe Identity. Government ID upload, selfie match, and a clean recent driving record check. Typically takes 5–10 minutes. Required to be added to the LLC's insurance policy.",
           },
           { type: "h3", text: "3. Documents" },
           {
@@ -1466,7 +1466,7 @@ export const HELP: HelpCategory[] = [
         slug: "kyc",
         q: "KYC verification, what we collect and why",
         summary:
-          "Government ID, selfie match, address proof, clean recent driving record. Required before any co-ownership buy-in or member booking. Verified through Persona, RYDA never sees raw documents.",
+          "Government ID, selfie match, address proof, clean recent driving record. Required before any co-ownership buy-in or member booking. Verified through Stripe Identity, RYDA never sees raw documents.",
         body: [
           { type: "h3", text: "What we collect" },
           {
@@ -1486,7 +1486,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Where it's stored" },
           {
             type: "p",
-            text: "Documents are processed by Persona (or equivalent third-party). RYDA never sees raw ID images. We retain only the verification result, ID type, name, address, and DOB, encrypted, in our member system.",
+            text: "Documents are processed by Stripe Identity. RYDA never sees raw ID images. We retain only the verification result, ID type, name, address, and DOB, encrypted, in our member system.",
           },
           { type: "h3", text: "Sharing" },
           {

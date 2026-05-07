@@ -70,6 +70,12 @@ export default function CarsHome() {
               aria-label={`Open ${heroVehicle.year} ${heroVehicle.name} listing — watch the RYDA hero spot`}
               className="group relative block aspect-[4/3] w-full overflow-hidden rounded-2xl bg-ink lg:aspect-[5/4]"
             >
+              {/* Hero video — autoplays muted on loop, but respects
+                  prefers-reduced-motion: when reduced motion is set,
+                  CSS pauses the video and only the poster shows.
+                  aria-hidden: the surrounding <Link> already labels
+                  the click target; the video itself is decorative.
+                  Audit T1-3 + T1-4. */}
               <video
                 src="/videos/ryda-hero-spot-15s.mp4"
                 poster={heroVehicle.hero}
@@ -78,8 +84,19 @@ export default function CarsHome() {
                 muted
                 playsInline
                 preload="metadata"
-                aria-label="RYDA 15-second hero spot — full fleet match-cut reel"
-                className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+                aria-hidden="true"
+                tabIndex={-1}
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.02] motion-reduce:hidden"
+              />
+              {/* Reduced-motion fallback: show the hero photo */}
+              <Image
+                src={heroVehicle.hero}
+                alt=""
+                fill
+                priority
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                className="absolute inset-0 hidden h-full w-full object-cover motion-reduce:block"
+                aria-hidden="true"
               />
               <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 bg-gradient-to-t from-[#0E0E10]/90 via-[#0E0E10]/40 to-transparent p-5 sm:p-6">
                 <div>
