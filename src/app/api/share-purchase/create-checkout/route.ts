@@ -23,6 +23,7 @@ const RATE_WINDOW_MS = 60_000;
 // Re-exported via @/lib/fees so the client buy flows compute the
 // SAME total as Stripe charges. Don't duplicate this constant.
 import { ACQUISITION_FEE_PCT, computeFees } from "@/lib/fees";
+import { requireMinAge } from "@/lib/age";
 
 export async function POST(req: NextRequest) {
   try {
@@ -110,7 +111,11 @@ export async function POST(req: NextRequest) {
     // `name` (which the BuyFlow collects as a polite default but
     // shouldn't override a verified legal identity).
     const verifiedOutputs = kycCheck.data[0].verified_outputs as
-      | { first_name?: string; last_name?: string }
+      | {
+          first_name?: string;
+          last_name?: string;
+          dob?: { day?: number; month?: number; year?: number };
+        }
       | null
       | undefined;
     const verifiedName =
@@ -118,6 +123,20 @@ export async function POST(req: NextRequest) {
         ? `${verifiedOutputs.first_name} ${verifiedOutputs.last_name}`
         : null;
     const memberName = verifiedName ?? name;
+
+    // Age gate. CODEX-CHALLENGE caught this: /legal/terms requires age
+    // 28 but no code path enforced it before this commit. A 22-year-old
+    // who passed Stripe Identity could buy LLC interests, putting RYDA
+    // in breach of its own ToS before its first member. Compute age
+    // from `verified_outputs.dob` and reject under-28 with a clear 409.
+    // Helper + 18 unit tests live in `lib/age.ts` + `lib/__tests__/age.test.ts`.
+    const ageGate = requireMinAge(verifiedOutputs?.dob);
+    if (!ageGate.ok) {
+      return NextResponse.json(
+        { error: ageGate.message, code: ageGate.code },
+        { status: 409 },
+      );
+    }
 
     // Look up the asset to get the price snapshot. We never trust a
     // client-supplied price; the catalog is authoritative.

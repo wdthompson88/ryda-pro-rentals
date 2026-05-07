@@ -24,6 +24,7 @@ import { requireSupabaseAdmin } from "@/lib/supabase-admin";
 import { getUserFromRequest } from "@/lib/api-auth";
 import { isAllowed, clientIp } from "@/lib/rate-limit";
 import { notifyTeam, emailLayout, escapeHtml } from "@/lib/notify";
+import { requireMinAge } from "@/lib/age";
 
 export const runtime = "nodejs";
 
@@ -197,10 +198,14 @@ export async function POST(
     );
   }
 
-  // KYC must be verified before we'll progress to RYDA review.
+  // KYC + age gate must both pass before we'll progress to RYDA review.
+  // Codex caught that this route only checked KYC status — a recipient
+  // under 28 who passed Stripe Identity could still accept a share
+  // transfer, putting RYDA in the same ToS breach as the create-checkout
+  // bypass. Same `requireMinAge()` helper as create-checkout/intent.
   const { data: kyc } = await admin
     .from("kyc_verifications")
-    .select("status")
+    .select("status, verified_outputs")
     .eq("user_id", user.id)
     .eq("status", "verified")
     .order("created_at", { ascending: false })
@@ -212,6 +217,17 @@ export async function POST(
           "Complete identity verification before accepting a share transfer.",
         kycRequired: true,
       },
+      { status: 409 },
+    );
+  }
+  const recipientVerifiedOutputs = kyc[0].verified_outputs as
+    | { dob?: { day?: number; month?: number; year?: number } }
+    | null
+    | undefined;
+  const ageGate = requireMinAge(recipientVerifiedOutputs?.dob);
+  if (!ageGate.ok) {
+    return NextResponse.json(
+      { error: ageGate.message, code: ageGate.code },
       { status: 409 },
     );
   }
