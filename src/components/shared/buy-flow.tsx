@@ -103,7 +103,7 @@ export function buildBuyFlowConfig(
   return {
     vertical,
     accent: "red",
-    returnHref: `/markets/${vehicle.symbol.toLowerCase()}`,
+    returnHref: `/portfolio/${vehicle.symbol.toLowerCase()}`,
     returnLabel: vehicle.ticker,
     checkoutAssetKey: "vehicleSymbol",
     checkoutAssetValue: vehicle.symbol,
@@ -123,7 +123,7 @@ export function buildBuyFlowConfig(
       walkthroughTitle: "Vehicle walkthrough",
       walkthroughBody:
         "A 30-minute walkthrough on the vehicle (controls, etiquette, condition baseline) before your first drive.",
-      marketsHref: "/markets",
+      marketsHref: "/portfolio",
       marketsLabel: "Back to markets",
     },
   };

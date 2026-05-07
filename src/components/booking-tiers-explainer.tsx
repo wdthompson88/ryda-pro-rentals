@@ -2,7 +2,7 @@
 // Pacaso's SmartStay system for cars instead of homes. Drops into:
 //   - /how-it-works (full version)
 //   - /inside (full version, with peak-protection callout)
-//   - /markets/[symbol] FAQ (compact version)
+//   - /portfolio/[symbol] FAQ (compact version)
 //   - /faq (compact version)
 //
 // Pattern: Pacaso made scheduling fairness a trust-proof, not a footnote.

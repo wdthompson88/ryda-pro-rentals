@@ -376,7 +376,7 @@ export default async function CostSheetPage({
             price varies by model, mileage, and market. Sole-ownership
             carrying assumes industry averages for insurance, storage,
             maintenance, and depreciation reserve. Run your own scenario
-            in the calculator on /markets/{v.slug.toLowerCase()}.
+            in the calculator on /portfolio/{v.slug.toLowerCase()}.
           </p>
           <p className="mt-3">
             RYDA · Supercar co-ownership and rentals · Miami · LA · NYC

@@ -513,7 +513,7 @@ export default async function RentDetailPage({
               shares left.
             </p>
             <Link
-              href={`/markets/${r.vehicle.symbol}`}
+              href={`/portfolio/${r.vehicle.symbol}`}
               className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-red hover:text-cream"
             >
               See in the fleet →
@@ -538,7 +538,7 @@ export default async function RentDetailPage({
               See if a curated certified pre owned share fits before your next trip.
             </p>
             <Link
-              href="/markets"
+              href="/portfolio"
               className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-red hover:text-cream"
             >
               See the co-ownership fleet →

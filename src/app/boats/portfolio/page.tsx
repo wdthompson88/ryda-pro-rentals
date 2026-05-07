@@ -136,7 +136,7 @@ export default function BoatsPortfolioPage() {
         </div>
       </section>
 
-      {/* All hulls, power-filter UI parallel to /markets's MarketsListings.
+      {/* All hulls, power-filter UI parallel to /portfolio's PortfolioListings.
           Search + brand/location/status/type filters + sort. Renders the
           same depth of card the cars portfolio does (BoatCard mirrors
           VehicleCard exactly). */}

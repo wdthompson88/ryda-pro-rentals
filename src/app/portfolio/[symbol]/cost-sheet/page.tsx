@@ -1,5 +1,5 @@
 // Print-optimized cost-comparison sheet, one-page PDF-style format.
-// Browser-native print → PDF. Each /markets/[symbol]/cost-sheet renders
+// Browser-native print → PDF. Each /portfolio/[symbol]/cost-sheet renders
 // a single-page sheet for that vehicle with the math anchored to its
 // actual share economics.
 
@@ -77,7 +77,7 @@ export default async function CostSheetPage({
       <div className="border-b border-rule print:hidden">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-6 py-4">
           <Link
-            href={`/markets/${v.symbol}`}
+            href={`/portfolio/${v.symbol}`}
             className="text-xs font-medium uppercase tracking-[0.2em] text-red hover:text-red-deep"
           >
             ← Back to {v.name}
@@ -376,7 +376,7 @@ export default async function CostSheetPage({
             price varies by model, mileage, and market. Sole-ownership
             carrying assumes industry averages for insurance, storage,
             maintenance, and depreciation reserve. Run your own scenario
-            in the calculator on /markets/{v.symbol.toLowerCase()}.
+            in the calculator on /portfolio/{v.symbol.toLowerCase()}.
           </p>
           <p className="mt-3">
             RYDA · Supercar co-ownership and rentals · Miami · LA · NYC

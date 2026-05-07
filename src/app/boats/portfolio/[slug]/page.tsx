@@ -432,7 +432,7 @@ export default async function BoatDetailPage({
         </div>
       </section>
 
-      {/* Sample documents + founder call CTA, parallel to /markets/[symbol]
+      {/* Sample documents + founder call CTA, parallel to /portfolio/[symbol]
           which has its own founders-call CTA strip below the booking
           policy section. */}
       <section className="border-b border-rule">
@@ -481,7 +481,7 @@ export default async function BoatDetailPage({
         </div>
       </section>
 
-      {/* Disclaimer, parallel to /markets/[symbol] footer disclaimer */}
+      {/* Disclaimer, parallel to /portfolio/[symbol] footer disclaimer */}
       <section>
         <div className="mx-auto max-w-3xl px-6 py-12 text-center text-xs text-mute sm:px-10">
           <p>

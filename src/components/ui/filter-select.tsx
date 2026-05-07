@@ -3,7 +3,7 @@
 //
 // Audit found the same ~950-char inline-SVG `bg-[url('data:image/svg+xml...')]`
 // pattern duplicated three times:
-//   - markets-listings.tsx:388
+//   - portfolio-listings.tsx:388
 //   - boats-listings.tsx:324
 //   - rental-listings.tsx:569
 //

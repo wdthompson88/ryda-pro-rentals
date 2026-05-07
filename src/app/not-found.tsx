@@ -4,7 +4,7 @@ import { SiteHeader } from "@/components/site-header";
 export const metadata = { title: "Not found — RYDA" };
 
 const POPULAR = [
-  { label: "See the fleet", href: "/markets", note: "Co-ownership shares" },
+  { label: "See the fleet", href: "/portfolio", note: "Co-ownership shares" },
   { label: "Browse rentals", href: "/rent", note: "Daily rates from $1,200" },
   { label: "How it works", href: "/how-it-works", note: "The 5-step explainer" },
   { label: "Sample documents", href: "/sample-documents", note: "Operating Agreement, MSA, more" },

@@ -68,7 +68,7 @@ export function SiteFooter() {
           <FooterCol
             title="Cars"
             links={[
-              ["Portfolio", "/markets"],
+              ["Portfolio", "/portfolio"],
               ["Rent", "/rent"],
               ["Membership", "/membership"],
               ["How it works", "/how-it-works"],

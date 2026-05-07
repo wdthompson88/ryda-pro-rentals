@@ -39,7 +39,7 @@ export type SearchEntry = {
 const STATIC_PAGES: SearchEntry[] = [
   // Cars
   {
-    href: "/markets",
+    href: "/portfolio",
     title: "RYDA Portfolio",
     subtitle: "Cars · The full fleet, organized by market",
     vertical: "cars",
@@ -219,7 +219,7 @@ const VEHICLE_ENTRIES: SearchEntry[] = VEHICLES.flatMap((v) => {
     .toLowerCase();
 
   const portfolio: SearchEntry = {
-    href: `/markets/${v.symbol.toLowerCase()}`,
+    href: `/portfolio/${v.symbol.toLowerCase()}`,
     title: v.name,
     subtitle: `Cars · ${v.year} · ${v.market} · ${v.specs.power}`,
     vertical: "cars",

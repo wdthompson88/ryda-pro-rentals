@@ -281,7 +281,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "1. Pick the vehicle" },
           {
             type: "p",
-            text: "Browse the fleet at /markets, pick a vehicle and the number of shares you want. Each vehicle is held in a separate LLC. RYDA's default share count is 10 per vehicle.",
+            text: "Browse the fleet at /portfolio, pick a vehicle and the number of shares you want. Each vehicle is held in a separate LLC. RYDA's default share count is 10 per vehicle.",
           },
           { type: "h3", text: "2. Identity verification (KYC)" },
           {
@@ -2016,7 +2016,7 @@ const ARTICLE_KEYWORDS: Record<string, string[]> = {
   "getting-started/vs-timeshare": ["timeshare", "different", "compare", "club", "points", "ownership", "vs timeshare", "is this a timeshare"],
   "getting-started/membership-tiers": ["pricing", "cost", "how much", "tier", "core", "blue", "black", "free", "subscription", "annual fee", "membership cost", "monthly", "yearly", "expensive", "cheap"],
   "getting-started/accreditation": ["accredited", "qualify", "investor", "income requirement", "net worth", "sec", "wealthy", "rich", "qualified", "income", "$200k", "$1m", "net worth"],
-  "getting-started/markets": ["where", "miami", "los angeles", "la", "new york", "ny", "city", "location", "available", "operating cities", "states", "regions"],
+  "getting-started/portfolio": ["where", "miami", "los angeles", "la", "new york", "ny", "city", "location", "available", "operating cities", "states", "regions"],
   "getting-started/rental-vs-ownership": ["rent or buy", "rental vs ownership", "should i rent", "should i buy", "test drive first", "try it out", "before commit", "compare rental"],
   "getting-started/early-member-benefits": ["early", "first 100", "early member", "early member", "what do founders get", "lifetime pricing", "locked rate", "perks"],
   "getting-started/share-financing": ["finance", "loan", "borrow", "financing", "credit", "payment plan", "installments", "monthly payment", "afford"],

@@ -59,7 +59,7 @@ function powerToNumber(spec: string) {
   return m ? Number(m[1]) : 0;
 }
 
-export function MarketsListings() {
+export function PortfolioListings() {
   const [query, setQuery] = useState("");
   const [brand, setBrand] = useState<string>(ANY);
   const [market, setMarket] = useState<string>(ANY);
@@ -413,7 +413,7 @@ function VehicleCard({ vehicle: v }: { vehicle: Vehicle }) {
 
   return (
     <Link
-      href={`/markets/${v.symbol}`}
+      href={`/portfolio/${v.symbol}`}
       className="group flex flex-col overflow-hidden rounded-2xl border border-rule bg-surface transition-all hover:-translate-y-0.5 hover:border-ink/40 hover:shadow-lg"
     >
       {/* Image with brand badge + status. aspect-[16/9] matches the

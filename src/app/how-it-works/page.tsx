@@ -441,7 +441,7 @@ export default function HowItWorksPage() {
           </p>
           <p className="mt-3 text-sm text-ink-soft">
             Want the math on a specific car?{" "}
-            <Link href="/markets" className="font-medium text-red hover:text-red-deep">
+            <Link href="/portfolio" className="font-medium text-red hover:text-red-deep">
               Open any listing
             </Link>{" "}
             to run a calculator anchored to that vehicle, or download a
@@ -726,7 +726,7 @@ export default function HowItWorksPage() {
           </div>
 
           <Link
-            href="/markets"
+            href="/portfolio"
             className="mt-10 inline-flex h-12 items-center justify-center rounded-full bg-red px-7 text-sm font-medium text-cream hover:bg-red-deep"
           >
             Toggle rental income on a specific car →

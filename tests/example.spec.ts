@@ -59,7 +59,7 @@ test.describe('asset detail page', () => {
   test('Ferrari 458 listing page renders title + ops disclosure', async ({
     page,
   }) => {
-    await page.goto('/markets/f458');
+    await page.goto('/portfolio/f458');
     // Listing title (year prefix from callsite, name from Vehicle.name).
     await expect(
       page.getByRole('heading', { name: /ferrari 458/i }).first(),

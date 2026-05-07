@@ -386,7 +386,7 @@ export default function InsidePage() {
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link
-              href="/markets"
+              href="/portfolio"
               className="inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-red hover:text-cream"
             >
               See the fleet →

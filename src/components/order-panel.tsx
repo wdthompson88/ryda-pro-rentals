@@ -27,7 +27,7 @@ export function OrderPanel({ vehicle }: Props) {
     // through /signup with a `next=` so post-signup we land back at the
     // exact buy flow with the chosen share count preserved. The user's
     // intent ("buy") drives the signup copy.
-    const buyHref = `/markets/${vehicle.symbol.toLowerCase()}/buy?shares=${numericShares}`;
+    const buyHref = `/portfolio/${vehicle.symbol.toLowerCase()}/buy?shares=${numericShares}`;
     router.push(
       `/signup?next=${encodeURIComponent(buyHref)}&reason=buy`,
     );

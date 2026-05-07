@@ -13,7 +13,7 @@ import {
 } from "@/lib/boat-data";
 import { Reveal } from "@/components/reveal";
 
-// Boats power-filter listing, parallel of components/markets-listings.tsx.
+// Boats power-filter listing, parallel of components/portfolio-listings.tsx.
 // Same UI shape (search + filter dropdowns + sort + summary strip + card
 // grid), same VehicleCard depth ported as BoatCard. The two listings
 // pages should now read identically across cars and boats verticals.
@@ -333,7 +333,7 @@ function FilterSelect({
   );
 }
 
-// BoatCard, full-depth listing card, mirrors components/markets-listings.tsx
+// BoatCard, full-depth listing card, mirrors components/portfolio-listings.tsx
 // VehicleCard structure:
 //   1. Hero image with brand badge top-left + status pill top-right
 //   2. Title (boat name) + subtitle (year · category)

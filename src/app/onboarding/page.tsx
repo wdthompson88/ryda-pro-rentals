@@ -275,7 +275,7 @@ function Done() {
         </ul>
       </div>
       <Link
-        href="/markets"
+        href="/portfolio"
         className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream hover:bg-red"
       >
         Browse vehicles →

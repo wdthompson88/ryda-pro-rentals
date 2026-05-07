@@ -6,6 +6,21 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.join(__dirname),
   },
+  // 301 redirects from the legacy /markets/* paths to /portfolio/*.
+  // Per user feedback May 2026: "still labeled as 'markets' in the
+  // URL." We renamed the listing index + detail pages to /portfolio
+  // and shifted the original member dashboard to /account/portfolio.
+  // 301s preserve any existing inbound links + Google indexing.
+  async redirects() {
+    return [
+      { source: "/markets", destination: "/portfolio", permanent: true },
+      {
+        source: "/markets/:path*",
+        destination: "/portfolio/:path*",
+        permanent: true,
+      },
+    ];
+  },
   // Allow next/image to optimize the Unsplash hero placeholders we ship
   // with the demo fleet. Replace with our own CDN once licensed assets land.
   images: {

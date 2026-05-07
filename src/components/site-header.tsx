@@ -15,7 +15,7 @@ import { AuthSwap } from "@/components/auth-aware";
 type Vertical = "cars" | "boats" | "planes" | "neutral";
 
 const CARS_NAV = [
-  { href: "/markets", label: "Portfolio" },
+  { href: "/portfolio", label: "Portfolio" },
   { href: "/rent", label: "Rent" },
   { href: "/how-it-works", label: "How it works" },
   { href: "/membership", label: "Membership" },
@@ -38,7 +38,7 @@ function detectVertical(pathname: string | null): Vertical {
   if (pathname.startsWith("/planes")) return "planes";
   if (pathname === "/") return "neutral";
   // Everything else (the existing car-era routes) is the cars vertical:
-  // /markets, /rent, /membership, /how-it-works, /faq, /inside, /journal,
+  // /portfolio, /rent, /membership, /how-it-works, /faq, /inside, /journal,
   // /vs, /sample-documents, etc. plus /cars itself.
   return "cars";
 }

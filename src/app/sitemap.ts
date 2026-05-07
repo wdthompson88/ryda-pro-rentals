@@ -21,7 +21,7 @@ const PUBLIC_ROUTES = [
   "/boats",
   "/planes",
   // Cars marketing surfaces.
-  "/markets",
+  "/portfolio",
   "/rent",
   "/membership",
   "/how-it-works",
@@ -92,13 +92,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const vehicleEntries: MetadataRoute.Sitemap = VEHICLES.flatMap((v) => [
     {
-      url: `${siteUrl}/markets/${v.symbol.toLowerCase()}`,
+      url: `${siteUrl}/portfolio/${v.symbol.toLowerCase()}`,
       lastModified,
       changeFrequency: "weekly" as const,
       priority: 0.8,
     },
     {
-      url: `${siteUrl}/markets/${v.symbol.toLowerCase()}/cost-sheet`,
+      url: `${siteUrl}/portfolio/${v.symbol.toLowerCase()}/cost-sheet`,
       lastModified,
       changeFrequency: "monthly" as const,
       priority: 0.6,

@@ -43,7 +43,7 @@ export default async function BuyPage({
   const buyFlowConfig = {
     vertical: "cars",
     accent: "red",
-    returnHref: `/markets/${v.symbol.toLowerCase()}`,
+    returnHref: `/portfolio/${v.symbol.toLowerCase()}`,
     returnLabel: v.ticker,
     checkoutAssetKey: "vehicleSymbol",
     checkoutAssetValue: v.symbol,
@@ -63,7 +63,7 @@ export default async function BuyPage({
       walkthroughTitle: "Vehicle walkthrough",
       walkthroughBody:
         "A 30-minute walkthrough on the vehicle (controls, etiquette, condition baseline) before your first drive.",
-      marketsHref: "/markets",
+      marketsHref: "/portfolio",
       marketsLabel: "Back to markets",
     },
   } as const;

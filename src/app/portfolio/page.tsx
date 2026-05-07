@@ -1,180 +1,425 @@
+import Image from "next/image";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
-import { DemoBanner } from "@/components/demo-banner";
-import { VEHICLES, formatUSD } from "@/lib/market-data";
+import { PortfolioListings } from "@/components/portfolio-listings";
+import { OwnershipPrimitives } from "@/components/ownership-primitives";
+import { BookingTiersExplainer } from "@/components/booking-tiers-explainer";
+import {
+  VEHICLES,
+  MARKETS,
+  formatUSD,
+  type MarketKey,
+  type Vehicle,
+} from "@/lib/market-data";
 
 export const metadata = {
-  title: "Your shares — RYDA",
-  description: "Your co-ownership shares, usage, and upcoming bookings.",
+  title: "RYDA Portfolio — Supercars co-owned in the US",
+  description:
+    "The RYDA portfolio. Member-managed LLCs hold each curated certified pre owned supercar; up to 5 verified members co-own every car. Browse Miami, Los Angeles and New York.",
+  // The hero image was washing out the headline copy, bumped the
+  // gradient and overlay opacity so the cream text reads cleanly
+  // over the red Ferrari hero from any device width.
 };
 
-// Sample co-ownership view for the demo phase. Real version pulls from
-// authenticated member records in Supabase.
-const SEATS = [
-  // 2-share minimum per person; demo numbers reflect that.
-  { symbol: "F458", shares: 2, daysUsed: 18 },
-  { symbol: "P911", shares: 2, daysUsed: 7 },
-];
+// Featured tile: 4 marquee positions, statically rendered (no carousel).
+// The CEO didn't like the auto-advancing carousel, easier to scan four
+// large cards in a single row than scroll through six. Fall back to the
+// canonical fleet order if any of these symbols disappear from inventory.
+const FEATURED_SYMBOLS = ["GT3", "F458", "HEVO", "URS"];
 
-export default function PortfolioPage() {
-  const positions = SEATS.map((s) => {
-    const v = VEHICLES.find((vv) => vv.symbol === s.symbol)!;
-    const daysAvailable = v.daysPerYear * s.shares;
-    const milesAvailable = v.milesPerYear * s.shares;
-    const annualMgmt = v.annualOpCost * s.shares;
-    return { v, s, daysAvailable, milesAvailable, annualMgmt };
-  });
+export default function MarketsPage() {
+  const featured = FEATURED_SYMBOLS.map((s) =>
+    VEHICLES.find((v) => v.symbol === s),
+  ).filter((v): v is NonNullable<typeof v> => v !== undefined);
 
-  const totalSeats = positions.reduce((n, p) => n + p.s.shares, 0);
-  const totalDays = positions.reduce((n, p) => n + p.daysAvailable, 0);
-  const totalDaysUsed = positions.reduce((n, p) => n + p.s.daysUsed, 0);
-  const totalAnnualMgmt = positions.reduce((n, p) => n + p.annualMgmt, 0);
+  const marketKeys = Object.keys(MARKETS) as MarketKey[];
 
   return (
     <>
       <SiteHeader />
-      <DemoBanner />
 
-      {/* Hero */}
-      <section className="border-b border-rule">
-        <div className="mx-auto max-w-7xl px-6 py-14 sm:px-10 sm:py-20">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            Your shares
+      {/* Cinematic portfolio hero, full-bleed photo. The previous
+          Unsplash ID rendered a Porsche Panamera at run time (not the
+          McLaren that ID was supposed to be). Switched to the
+          confirmed red Ferrari 296 photo, with a tighter
+          `object-position` crop so it doesn't read as a duplicate of
+          the same image used on the cars home hero. */}
+      <section className="relative isolate overflow-hidden border-b border-rule">
+        <div className="absolute inset-0 -z-10">
+          <Image
+            src="https://images.unsplash.com/photo-1592198084033-aade902d1aae?auto=format&fit=crop&w=2400&q=85"
+            alt="Red Ferrari 296 GTB"
+            fill
+            sizes="100vw"
+            priority
+            className="object-cover"
+            style={{ objectPosition: "center 30%" }}
+          />
+          <div
+            aria-hidden
+            className="absolute inset-0 bg-gradient-to-b from-black/85 via-black/65 to-black/90"
+          />
+        </div>
+        <div className="mx-auto max-w-7xl px-6 py-24 text-cream sm:px-10 sm:py-36">
+          <p className="text-xs font-medium uppercase tracking-[0.24em] text-cream">
+            RYDA Portfolio
           </p>
-          <h1 className="mt-4 font-display text-4xl font-light text-ink sm:text-5xl">
-            {totalSeats} share{totalSeats !== 1 ? "s" : ""} across {positions.length} car{positions.length !== 1 ? "s" : ""}.
+          <h1 className="mt-5 max-w-4xl font-display text-5xl font-light leading-[1.05] sm:text-6xl lg:text-7xl">
+            The world&apos;s most coveted supercars,{" "}
+            <span className="italic">co-owned in the US.</span>
           </h1>
-          <div className="mt-8 grid grid-cols-2 gap-6 sm:grid-cols-4">
-            <Stat label="Days available this year" value={String(totalDays)} sub={`${totalDaysUsed} used`} />
-            <Stat label="Days remaining" value={String(totalDays - totalDaysUsed)} sub="across all cars" />
-            <Stat label="Annual mgmt fees" value={formatUSD(totalAnnualMgmt)} sub="per year, total" />
-            <Stat label="Member tier" value="Blue" sub="First-100 locked" />
-          </div>
-        </div>
-      </section>
-
-      {/* Holdings */}
-      <section className="border-b border-rule bg-cream-2">
-        <div className="mx-auto max-w-7xl px-6 py-14 sm:px-10">
-          <h2 className="font-display text-2xl text-ink">Cars you co-own</h2>
-          <div className="mt-6 overflow-hidden rounded-2xl border border-rule bg-surface">
-            <table className="w-full">
-              <thead className="border-b border-rule bg-cream-2 text-xs font-medium uppercase tracking-wider text-ink-soft">
-                <tr>
-                  <th className="px-6 py-4 text-left">Vehicle</th>
-                  <th className="px-6 py-4 text-right">Shares</th>
-                  <th className="hidden px-6 py-4 text-right md:table-cell">Days / yr</th>
-                  <th className="hidden px-6 py-4 text-right md:table-cell">Days used</th>
-                  <th className="hidden px-6 py-4 text-right lg:table-cell">Mgmt / yr</th>
-                  <th className="px-6 py-4 text-right" aria-hidden />
-                </tr>
-              </thead>
-              <tbody>
-                {positions.map((p) => (
-                  <tr
-                    key={p.v.symbol}
-                    className="border-b border-rule last:border-b-0 hover:bg-cream-2/40"
-                  >
-                    <td className="px-6 py-5">
-                      <Link href={`/markets/${p.v.symbol}`} className="block">
-                        <p className="font-display text-lg text-ink">{p.v.name}</p>
-                        <p className="mt-1 text-xs text-mute">
-                          {p.v.year} · {p.v.market}
-                        </p>
-                      </Link>
-                    </td>
-                    <td className="px-6 py-5 text-right tabular-nums text-ink">
-                      {p.s.shares} of {p.v.shares}
-                    </td>
-                    <td className="hidden px-6 py-5 text-right tabular-nums text-ink-soft md:table-cell">
-                      {p.daysAvailable}
-                    </td>
-                    <td className="hidden px-6 py-5 text-right tabular-nums text-ink-soft md:table-cell">
-                      {p.s.daysUsed}
-                    </td>
-                    <td className="hidden px-6 py-5 text-right tabular-nums text-ink-soft lg:table-cell">
-                      {formatUSD(p.annualMgmt)}
-                    </td>
-                    <td className="px-6 py-5 text-right">
-                      <Link
-                        href={`/my-cars/${p.v.symbol.toLowerCase()}`}
-                        className="text-sm font-medium text-red hover:text-red-deep"
-                      >
-                        Manage →
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      {/* Recent activity */}
-      <section className="border-b border-rule">
-        <div className="mx-auto max-w-7xl px-6 py-14 sm:px-10">
-          <h2 className="font-display text-2xl text-ink">Recent activity</h2>
-          <ul className="mt-6 divide-y divide-rule rounded-xl border border-rule bg-surface">
-            <Activity label="Booking confirmed" detail="Ferrari 296 GTB · Apr 28 – May 1" date="2 hours ago" />
-            <Activity label="Inspection report posted" detail="Porsche 911 Carrera · 10,200 mi" date="Yesterday" />
-            <Activity label="Quarterly mgmt fee paid" detail="$3,540, Ferrari 296 LLC" date="3 days ago" />
-            <Activity label="New co-owner joined" detail="P911 LLC, welcome Jordan" date="2 weeks ago" />
-            <Activity label="Welcome to RYDA Blue" detail="Annual membership active" date="3 weeks ago" />
-          </ul>
-        </div>
-      </section>
-
-      {/* CTA, explore more */}
-      <section className="bg-ink py-16 text-cream">
-        <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
-          <h2 className="font-display text-3xl sm:text-4xl">
-            Add another car to your collection.
-          </h2>
-          <p className="mx-auto mt-3 max-w-xl text-base text-cream/70">
-            Most members hold shares in 2–3 different vehicles to vary their
-            experience across the year. Browse what's currently available.
+          <p className="mt-7 max-w-2xl text-lg leading-relaxed text-cream">
+            Each car is held in a member-managed LLC with 10 shares
+            split across 1–5 verified co-owners (2-share minimum per
+            person). RYDA runs operations end-to-end. Planned exit at
+            24 months; transferable to other members anytime after the
+            12-month minimum hold.
           </p>
-          <Link
-            href="/markets"
-            className="mt-6 inline-flex h-12 items-center justify-center rounded-full bg-cream px-6 text-sm font-medium text-ink hover:bg-red hover:text-cream"
-          >
-            See the fleet →
-          </Link>
+          <div className="mt-10 flex flex-wrap gap-3">
+            <Link
+              href="#featured"
+              className="inline-flex h-12 items-center justify-center rounded-full bg-red px-7 text-sm font-medium text-cream hover:bg-red-deep"
+            >
+              See featured vehicles →
+            </Link>
+            <Link
+              href="#all"
+              className="inline-flex h-12 items-center justify-center rounded-full border border-cream/40 px-7 text-sm font-medium text-cream hover:border-cream"
+            >
+              Browse the full portfolio
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Ownership primitives, six numbers above the fold for trust */}
+      <OwnershipPrimitives variant="default" />
+
+      {/* Featured, four static cards, no carousel. */}
+      <section id="featured" className="border-y border-rule bg-cream-2">
+        <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+                Featured
+              </p>
+              <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
+                Currently in the spotlight.
+              </h2>
+              <p className="mt-3 max-w-xl text-sm text-ink-soft">
+                The marquee positions across our active markets, the cars
+                drawing the most member traffic this season.
+              </p>
+            </div>
+            <Link
+              href="#all"
+              className="text-sm font-medium text-red hover:text-red-deep"
+            >
+              See all {VEHICLES.length} vehicles →
+            </Link>
+          </div>
+          <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {featured.map((v) => (
+              <FeaturedCard key={v.symbol} vehicle={v} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Markets, group cards by city Miami / LA / NY (Pacaso pattern) */}
+      <section id="markets" className="border-b border-rule">
+        <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+            By market
+          </p>
+          <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
+            Miami today. LA and NY soon.
+          </h2>
+          <p className="mt-3 max-w-2xl text-sm text-ink-soft">
+            We launch one market at a time. Concentration of fleet,
+            partners and ops talent matters more than spread. Miami is
+            live. LA opens Q2 2027. NY opens Q4 2027.
+          </p>
+
+          <div className="mt-12 space-y-12">
+            {marketKeys.map((key) => {
+              const market = MARKETS[key];
+              const inMarket = VEHICLES.filter((v) => v.market === key);
+              if (inMarket.length === 0 && market.status === "live") return null;
+              return (
+                <MarketSection key={key} market={market} vehicles={inMarket} />
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Booking model explainer, Pacaso SmartStay translation */}
+      <section className="border-b border-rule bg-cream-2">
+        <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
+          <BookingTiersExplainer variant="full" />
+        </div>
+      </section>
+
+      {/* All vehicles, keep the existing power-filter UI for buyers
+          who came to slice by spec rather than browse by city. */}
+      <section id="all" className="border-b border-rule">
+        <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10 sm:py-16">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+            Filter the full portfolio
+          </p>
+          <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
+            All {VEHICLES.length} vehicles.
+          </h2>
+          <p className="mt-3 max-w-2xl text-sm text-ink-soft">
+            Search and filter by brand, market, status, cylinders, body
+            style, or drivetrain. Useful when you know what you&apos;re
+            after.
+          </p>
+        </div>
+        <PortfolioListings />
+      </section>
+
+      {/* Disclaimer */}
+      <section>
+        <div className="mx-auto max-w-3xl px-6 py-12 text-center text-xs text-mute sm:px-10">
+          <p>
+            RYDA is a luxury access platform. Co-ownership stakes are
+            membership interests in member-managed LLCs, not
+            registered securities, not offered for investment purposes.
+            See the{" "}
+            <Link href="/legal/disclaimer" className="text-red hover:text-red-deep">
+              Co-Ownership Disclaimer
+            </Link>
+            .
+          </p>
         </div>
       </section>
     </>
   );
 }
 
-function Stat({ label, value, sub }: { label: string; value: string; sub: string }) {
+function MarketSection({
+  market,
+  vehicles,
+}: {
+  market: (typeof MARKETS)[MarketKey];
+  vehicles: (typeof VEHICLES)[number][];
+}) {
+  const isLive = market.status === "live";
   return (
     <div>
-      <p className="text-xs uppercase tracking-wider text-mute">{label}</p>
-      <p className="mt-1 font-display text-2xl text-ink tabular-nums sm:text-3xl">
-        {value}
-      </p>
-      <p className="mt-1 text-xs text-ink-soft">{sub}</p>
+      {/* Market header card */}
+      <div className="relative overflow-hidden rounded-2xl border border-rule">
+        <div className="absolute inset-0 -z-10">
+          <Image
+            src={market.hero}
+            alt={market.label}
+            fill
+            sizes="(min-width: 1280px) 1100px, 100vw"
+            className="object-cover"
+          />
+          <div
+            aria-hidden
+            className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/65 to-black/40"
+          />
+        </div>
+        <div className="relative p-6 text-cream sm:p-8 lg:p-10">
+          <div className="flex flex-wrap items-baseline gap-3">
+            <h3 className="font-display text-3xl italic sm:text-4xl">
+              {market.label}
+            </h3>
+            <span
+              role="status"
+              aria-label={
+                isLive
+                  ? `Status: Live in ${market.label}`
+                  : `Status: Coming ${market.launchLabel} to ${market.label}`
+              }
+              className={`rounded-full px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.18em] ${
+                isLive
+                  ? "bg-red/95 text-cream"
+                  : "border border-cream/40 text-cream/85"
+              }`}
+            >
+              {isLive ? "Live" : `Coming ${market.launchLabel}`}
+            </span>
+          </div>
+          <p className="mt-3 max-w-xl text-sm leading-relaxed text-cream/80">
+            {market.blurb}
+          </p>
+        </div>
+      </div>
+
+      {/* Cards */}
+      {vehicles.length > 0 ? (
+        <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {vehicles.map((v) => (
+            <Link
+              key={v.symbol}
+              href={
+                isLive
+                  ? `/portfolio/${v.symbol.toLowerCase()}`
+                  : `/contact?type=Membership&note=${encodeURIComponent(
+                      `${market.label} waitlist, interest in ${v.name}`,
+                    )}#form`
+              }
+              className="group flex flex-col overflow-hidden rounded-2xl border border-rule bg-surface transition-all hover:-translate-y-0.5 hover:border-ink/40 hover:shadow-md"
+            >
+              <div className="relative aspect-[16/10] w-full overflow-hidden bg-cream-2">
+                <Image
+                  src={v.hero}
+                  alt={`${v.year} ${v.name}`}
+                  fill
+                  sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                  className={`object-cover transition-transform duration-500 group-hover:scale-[1.02] ${
+                    v.flipImage ? "-scale-x-100" : ""
+                  }`}
+                  style={{ objectPosition: v.imagePosition ?? "center" }}
+                />
+                {/* Status pill, for live markets, surface real share counts;
+                    for preview markets (LA, NY), make it explicit that the
+                    vehicle is a preview and shares aren't open yet. */}
+                <span
+                  role="status"
+                  aria-label={
+                    !isLive
+                      ? `Status: Preview vehicle, ${market.launchLabel ?? "coming soon"}`
+                      : v.sharesAvailable === 0
+                        ? "Status: Sold out"
+                        : `Status: ${v.sharesAvailable} shares left`
+                  }
+                  className={`absolute right-3 top-3 rounded-full px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] backdrop-blur ${
+                    !isLive
+                      ? "border border-cream/40 bg-black/40 text-cream"
+                      : v.sharesAvailable === 0
+                        ? "bg-mute/90 text-cream"
+                        : "bg-red/95 text-cream"
+                  }`}
+                >
+                  {!isLive
+                    ? `Preview · ${market.launchLabel ?? "soon"}`
+                    : v.sharesAvailable === 0
+                      ? "Sold out"
+                      : `${v.sharesAvailable} shares left`}
+                </span>
+              </div>
+              <div className="flex flex-1 flex-col p-5">
+                <p className="text-[11px] uppercase tracking-[0.16em] text-mute">
+                  {v.brand} · {v.year}
+                </p>
+                <p className="mt-1 font-display text-lg italic text-ink">
+                  {v.name.replace(`${v.brand} `, "")}
+                </p>
+                <div className="mt-3 flex items-baseline justify-between border-t border-rule pt-3">
+                  {isLive ? (
+                    <p>
+                      <span className="text-[10px] uppercase tracking-[0.14em] text-mute">
+                        Per share
+                      </span>
+                      <br />
+                      <span className="font-display text-xl text-ink tabular-nums">
+                        {formatUSD(v.pricePerShare)}
+                      </span>
+                    </p>
+                  ) : (
+                    <p>
+                      <span className="text-[10px] uppercase tracking-[0.14em] text-mute">
+                        Pricing at launch
+                      </span>
+                      <br />
+                      <span className="font-display text-sm text-ink-soft">
+                        Notify me first
+                      </span>
+                    </p>
+                  )}
+                  <span className="text-xs font-medium text-red group-hover:text-red-deep">
+                    {isLive ? "View →" : "Join waitlist →"}
+                  </span>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <div className="mt-5 rounded-2xl border border-rule bg-surface p-10 text-center">
+          <p className="font-display text-xl text-ink">
+            Inventory in {market.label} ships with the local launch.
+          </p>
+          <p className="mt-2 text-sm text-ink-soft">
+            Want first-look access?{" "}
+            <Link href="/contact?type=Membership#form" className="text-red underline-offset-4 hover:underline">
+              Email us
+            </Link>{" "}
+            and we&apos;ll add you to the {market.label} waitlist.
+          </p>
+        </div>
+      )}
     </div>
   );
 }
 
-function Activity({
-  label,
-  detail,
-  date,
-}: {
-  label: string;
-  detail: string;
-  date: string;
-}) {
+// Featured card, static, used in the four-up "Currently in the spotlight"
+// row. Same aesthetic as the previous carousel cards (italic display
+// brand naming, dark gradient overlay, status pill, per-share price)
+// but without the snap-scroll / auto-advance.
+function FeaturedCard({ vehicle: v }: { vehicle: Vehicle }) {
   return (
-    <li className="flex flex-col gap-1 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-      <div>
-        <p className="text-sm font-medium text-ink">{label}</p>
-        <p className="mt-1 text-xs text-ink-soft">{detail}</p>
+    <Link
+      href={`/portfolio/${v.symbol.toLowerCase()}`}
+      className="group relative block aspect-[4/5] overflow-hidden rounded-2xl bg-cream-2 transition-shadow hover:shadow-xl"
+    >
+      <Image
+        src={v.hero}
+        alt={`${v.year} ${v.name}`}
+        fill
+        sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+        className={`object-cover transition-transform duration-700 group-hover:scale-[1.02] ${
+          v.flipImage ? "-scale-x-100" : ""
+        }`}
+        style={{ objectPosition: v.imagePosition ?? "center" }}
+      />
+      <div
+        aria-hidden
+        className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 to-black/20"
+      />
+      <span
+        role="status"
+        aria-label={
+          v.sharesAvailable === 0
+            ? "Status: Sold out"
+            : `Status: ${v.sharesAvailable} shares left`
+        }
+        className={`absolute right-4 top-4 rounded-full px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] backdrop-blur ${
+          v.sharesAvailable === 0
+            ? "bg-mute/90 text-cream"
+            : "bg-red/95 text-cream"
+        }`}
+      >
+        {v.sharesAvailable === 0 ? "Sold out" : `${v.sharesAvailable} shares left`}
+      </span>
+      <div className="absolute inset-x-0 bottom-0 p-5 text-cream sm:p-6">
+        <p className="text-[10px] font-medium uppercase tracking-[0.2em] text-cream/70">
+          {v.market} · {v.year}
+        </p>
+        <h3 className="mt-2 font-display text-2xl italic font-light leading-tight sm:text-3xl">
+          {v.brand}
+        </h3>
+        <p className="mt-1 font-display text-base text-cream/95">{v.name}</p>
+        <div className="mt-4 flex items-baseline justify-between border-t border-cream/20 pt-3">
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.14em] text-cream/55">
+              Per share
+            </p>
+            <p className="font-display text-xl tabular-nums">
+              {formatUSD(v.pricePerShare)}
+            </p>
+          </div>
+          <span className="text-xs font-medium text-cream/90 transition-transform group-hover:translate-x-1">
+            View →
+          </span>
+        </div>
       </div>
-      <p className="text-xs text-mute">{date}</p>
-    </li>
+    </Link>
   );
 }

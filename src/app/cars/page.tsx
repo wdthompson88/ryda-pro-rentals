@@ -42,7 +42,7 @@ export default function CarsHome() {
             </p>
             <div className="mt-10 flex flex-wrap justify-center gap-3 sm:justify-start">
               <Link
-                href="/markets"
+                href="/portfolio"
                 className="inline-flex h-12 items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream transition-colors hover:bg-red"
               >
                 Co-Own a share →
@@ -55,11 +55,11 @@ export default function CarsHome() {
               instead of a static image. Falls back to the GT3 hero
               poster on first paint and on browsers/networks where
               <video> can't autoplay (iOS Low Power Mode, etc.).
-              Wraps in a click-through to /markets/gt3 since the GT3
+              Wraps in a click-through to /portfolio/gt3 since the GT3
               is the most-featured car in the spot. */}
           <div className="lg:col-span-6">
             <Link
-              href={`/markets/${heroVehicle.symbol}`}
+              href={`/portfolio/${heroVehicle.symbol}`}
               aria-label={`Open ${heroVehicle.year} ${heroVehicle.name} listing — watch the RYDA hero spot`}
               className="group relative block aspect-[4/3] w-full overflow-hidden rounded-2xl bg-ink lg:aspect-[5/4]"
             >
@@ -113,7 +113,7 @@ export default function CarsHome() {
         </div>
       </section>
 
-      {/* Browse the portfolio, Pacaso-style teaser entry to /markets */}
+      {/* Browse the portfolio, Pacaso-style teaser entry to /portfolio */}
       <section className="relative isolate overflow-hidden border-b border-rule">
         <div className="absolute inset-0 -z-10">
           <Image
@@ -144,7 +144,7 @@ export default function CarsHome() {
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
-              href="/markets"
+              href="/portfolio"
               className="inline-flex h-12 items-center justify-center rounded-full bg-red px-7 text-sm font-medium text-cream hover:bg-red-deep"
             >
               Open the portfolio →
@@ -166,7 +166,7 @@ export default function CarsHome() {
               </h2>
             </div>
             <Link
-              href="/markets"
+              href="/portfolio"
               className="inline-flex h-11 items-center justify-center rounded-full border border-rule px-5 text-sm font-medium text-ink hover:border-ink"
             >
               See all {VEHICLES.length} cars →
@@ -176,7 +176,7 @@ export default function CarsHome() {
             {featured.map((v, i) => (
               <Reveal key={v.symbol} delayMs={i * 80}>
                 <Link
-                  href={`/markets/${v.symbol}`}
+                  href={`/portfolio/${v.symbol}`}
                   className="group block overflow-hidden rounded-xl border border-rule bg-surface transition-shadow hover:shadow-md"
                 >
                   <div className="relative aspect-[16/10] w-full overflow-hidden bg-cream-2">

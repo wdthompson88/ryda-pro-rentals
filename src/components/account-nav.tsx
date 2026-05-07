@@ -17,6 +17,7 @@ type Item = {
 
 const ITEMS: Item[] = [
   { href: "/account", label: "Overview", icon: "◇", hint: "Stats + activity" },
+  { href: "/account/portfolio", label: "Your shares", icon: "◑", hint: "Cars you co-own" },
   { href: "/account/profile", label: "Profile", icon: "◐", hint: "Name, contact, address" },
   { href: "/account/security", label: "Login & security", icon: "◆", hint: "Email, password, sessions" },
   { href: "/account/verification", label: "Verification", icon: "✓", hint: "KYC, driving record" },

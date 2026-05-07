@@ -5,7 +5,7 @@
 //
 // Drops into:
 //   - / (home, hero-adjacent)
-//   - /markets, /markets/[symbol] (cars)
+//   - /portfolio, /portfolio/[symbol] (cars)
 //   - /boats/portfolio, /boats/portfolio/[slug] (boats, pass vertical='boats')
 //   - /how-it-works, /boats/how-it-works (foundational reference)
 

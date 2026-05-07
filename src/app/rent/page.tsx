@@ -91,7 +91,7 @@ export default function RentPage() {
             That's where we want you to land.
           </p>
           <Link
-            href="/markets"
+            href="/portfolio"
             className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-red hover:text-cream"
           >
             See the fleet →

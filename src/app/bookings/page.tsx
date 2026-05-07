@@ -210,7 +210,7 @@ export default function BookingsPage() {
               </p>
               <div className="mt-4 flex flex-wrap justify-center gap-3">
                 <Link
-                  href="/markets"
+                  href="/portfolio"
                   className="inline-flex h-10 items-center justify-center rounded-full bg-ink px-5 text-sm font-medium text-cream hover:bg-red"
                 >
                   Cars

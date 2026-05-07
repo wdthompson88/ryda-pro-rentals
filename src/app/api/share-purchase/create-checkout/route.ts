@@ -270,7 +270,7 @@ export async function POST(req: NextRequest) {
         // the listing without confusing copy.
         success_url: `${origin}/share-purchase/${purchaseId}?ok=1`,
         cancel_url: vehicleSymbol
-          ? `${origin}/markets/${vehicleSymbol.toLowerCase()}?canceled=1`
+          ? `${origin}/portfolio/${vehicleSymbol.toLowerCase()}?canceled=1`
           : `${origin}/boats/portfolio/${boatSlug}?canceled=1`,
         metadata: {
           purchaseId,

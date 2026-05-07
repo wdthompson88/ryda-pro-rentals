@@ -50,7 +50,7 @@ export default function SampleDocumentsPage() {
             title: "Want the packet for a specific car?",
             body:
               "Pick the vehicle you're considering and we'll tailor the redacted packet to that LLC.",
-            links: [{ href: "/markets", label: "Pick a car →" }],
+            links: [{ href: "/portfolio", label: "Pick a car →" }],
           },
         }}
       />

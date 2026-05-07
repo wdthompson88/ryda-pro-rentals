@@ -146,7 +146,7 @@ export default async function VehicleMarketPage({
   // We model the listing as a Product (the share itself) with the
   // physical Vehicle as the itemOffered. This way Google reads the
   // page price as the per-share price, not the full vehicle price.
-  const pageUrl = `/markets/${v.symbol.toLowerCase()}`;
+  const pageUrl = `/portfolio/${v.symbol.toLowerCase()}`;
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -211,7 +211,7 @@ export default async function VehicleMarketPage({
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-10 sm:px-10 sm:py-14">
           <Link
-            href="/markets"
+            href="/portfolio"
             className="text-xs font-medium uppercase tracking-[0.2em] text-red hover:text-red-deep"
           >
             ← Co-Own
@@ -443,7 +443,7 @@ export default async function VehicleMarketPage({
               </p>
             </div>
             <Link
-              href={`/markets/${v.symbol}/cost-sheet`}
+              href={`/portfolio/${v.symbol}/cost-sheet`}
               target="_blank"
               className="inline-flex h-11 items-center justify-center rounded-full border border-rule bg-surface px-5 text-sm font-medium text-ink hover:border-ink"
             >
@@ -513,7 +513,7 @@ export default async function VehicleMarketPage({
               return (
                 <Link
                   key={x.symbol}
-                  href={`/markets/${x.symbol}`}
+                  href={`/portfolio/${x.symbol}`}
                   className="block rounded-xl border border-rule bg-surface p-5 transition-shadow hover:shadow-md"
                 >
                   <p className="text-xs text-mute">{x.brand}</p>

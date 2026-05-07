@@ -143,7 +143,7 @@ export default function MembershipPage() {
                 You don't co-own any RYDA shares yet.
               </p>
               <Link
-                href="/markets"
+                href="/portfolio"
                 className="mt-3 inline-flex h-10 items-center justify-center rounded-full bg-ink px-5 text-sm font-medium text-cream transition-colors hover:bg-red"
               >
                 Browse the fleet →
