@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  com.ryda.marketing-loop.plist — launchd plist template.
+
+  Installs the autonomous content + image-gen loop as a user
+  background job that auto-starts on login and restarts if it
+  crashes.
+
+  Install:
+    1. Replace {{REPO_PATH}} with absolute path to ryda-web checkout,
+       e.g. /Users/yourname/Desktop/APp/ryda-web
+    2. Replace {{NODE_BIN}} with the absolute path to node, e.g.
+       /opt/homebrew/bin/node (run `which node` to find it)
+    3. Replace {{NPM_BIN}} with the absolute path to npm
+       (run `which npm` to find it)
+    4. Save as ~/Library/LaunchAgents/com.ryda.marketing-loop.plist
+    5. Load: launchctl load ~/Library/LaunchAgents/com.ryda.marketing-loop.plist
+    6. Verify: launchctl list | grep com.ryda
+    7. Tail logs: tail -f /tmp/ryda-marketing-loop.{out,err}
+
+  Uninstall:
+    launchctl unload ~/Library/LaunchAgents/com.ryda.marketing-loop.plist
+    rm ~/Library/LaunchAgents/com.ryda.marketing-loop.plist
+
+  Notes:
+    - The loop runs `npm run marketing:start` which syncs markdown
+      drafts then enters the queue-poller loop.
+    - First run will probably hit "not_logged_in" — open the
+      Playwright-launched Chrome window once and log into ChatGPT.
+      The persistent profile at ~/.ryda-marketing/chatgpt-profile/
+      retains cookies for subsequent runs.
+    - If your laptop sleeps, the loop pauses (Vercel cron keeps
+      publishing whatever images already landed).
+    - For true 24/7 background, run this on a Mac mini, an
+      always-on Linux box (rewrite the plist as a systemd unit),
+      or a $5/mo VPS.
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.ryda.marketing-loop</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>{{NPM_BIN}}</string>
+        <string>run</string>
+        <string>marketing:start</string>
+    </array>
+
+    <key>WorkingDirectory</key>
+    <string>{{REPO_PATH}}</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+        <!--
+          Supabase + ChatGPT vars are read from the .env file in
+          {{REPO_PATH}} via the script's own dotenv loading.
+          Don't hardcode secrets here (plist is plaintext on disk).
+        -->
+        <key>QUEUE_POLLER_HEADLESS</key>
+        <string>false</string>
+        <key>QUEUE_POLLER_INTERVAL_MS</key>
+        <string>900000</string>
+    </dict>
+
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>KeepAlive</key>
+    <dict>
+        <key>SuccessfulExit</key>
+        <false/>
+        <key>NetworkState</key>
+        <true/>
+    </dict>
+
+    <key>ThrottleInterval</key>
+    <integer>60</integer>
+
+    <key>StandardOutPath</key>
+    <string>/tmp/ryda-marketing-loop.out</string>
+
+    <key>StandardErrorPath</key>
+    <string>/tmp/ryda-marketing-loop.err</string>
+</dict>
+</plist>
