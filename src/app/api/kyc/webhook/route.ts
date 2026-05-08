@@ -108,10 +108,39 @@ export async function POST(req: NextRequest) {
   // verified. We allow 'verified' to be set from any prior status,
   // and 'canceled' to land from any non-verified status. Claude
   // round-2 catch.
+  //
+  // User-id cross-check (defense-in-depth, threat-model finding):
+  // session.id alone is not enough to scope the UPDATE — it is a
+  // Stripe-issued ID that's deterministic per session. If our HMAC
+  // secret ever leaks (or if a Stripe-side compromise lets an
+  // attacker craft a valid signed payload), they could swap
+  // verified_outputs.dob to bypass the 28+ age gate on a real
+  // user's row. Cross-checking metadata.userId against the row's
+  // user_id ensures the UPDATE only lands when the session
+  // actually belongs to the user we created it for. The session
+  // creator (api/kyc/start/route.ts:96) sets metadata.userId =
+  // user.id at session-create time, so an honest event always
+  // matches; a tampered event with a swapped reqId would have
+  // mismatched metadata.
+  const sessionUserId =
+    typeof session.metadata?.userId === "string"
+      ? session.metadata.userId
+      : null;
+  if (!sessionUserId) {
+    console.error(
+      "[kyc webhook] missing metadata.userId on session",
+      session.id,
+    );
+    return NextResponse.json(
+      { error: "Session metadata missing." },
+      { status: 400 },
+    );
+  }
   let q = admin
     .from("kyc_verifications")
     .update(update)
-    .eq("stripe_verification_id", session.id);
+    .eq("stripe_verification_id", session.id)
+    .eq("user_id", sessionUserId);
   if (status !== "verified" && status !== "canceled") {
     // Don't downgrade verified rows; only update if not already verified.
     q = q.neq("status", "verified");
