@@ -6,9 +6,11 @@
 import { describe, it, expect } from "vitest";
 import {
   buildStoryboard,
+  buildVoScript,
   pickTodaysVehicle,
   LAUNCH_INVENTORY,
   type SpotInput,
+  type Storyboard,
 } from "../storyboard";
 
 const sample: SpotInput = {
@@ -20,6 +22,16 @@ const sample: SpotInput = {
   cta: "RYDA · Q3 launch",
 };
 
+/** Narrow a Storyboard to the brand_broll variant (3 shots) so
+ *  array indexing past [0] is type-safe. Throws if called on a
+ *  conversion_vo storyboard. */
+function asBrandBroll(sb: Storyboard) {
+  if (sb.spotType !== "brand_broll") {
+    throw new Error(`expected brand_broll, got ${sb.spotType}`);
+  }
+  return sb;
+}
+
 describe("buildStoryboard", () => {
   it("returns three 5-second shots adding up to 15s", () => {
     const sb = buildStoryboard(sample);
@@ -30,33 +42,33 @@ describe("buildStoryboard", () => {
   });
 
   it("places shots at consecutive start times", () => {
-    const sb = buildStoryboard(sample);
+    const sb = asBrandBroll(buildStoryboard(sample));
     expect(sb.shots[0].startSec).toBe(0);
     expect(sb.shots[1].startSec).toBe(5);
     expect(sb.shots[2].startSec).toBe(10);
   });
 
   it("assigns the right overlay text per shot", () => {
-    const sb = buildStoryboard(sample);
+    const sb = asBrandBroll(buildStoryboard(sample));
     expect(sb.shots[0].overlay).toBe("458 Italia");
     expect(sb.shots[1].overlay).toBe("$32K for 1/10");
     expect(sb.shots[2].overlay).toBe("RYDA · Q3 launch");
   });
 
   it("includes the vehicle description in every shot prompt", () => {
-    const sb = buildStoryboard(sample);
+    const sb = asBrandBroll(buildStoryboard(sample));
     for (const shot of sb.shots) {
       expect(shot.prompt).toContain("Ferrari 458");
     }
   });
 
   it("references the setting in shot 1 (hero)", () => {
-    const sb = buildStoryboard(sample);
+    const sb = asBrandBroll(buildStoryboard(sample));
     expect(sb.shots[0].prompt).toContain("sunlit garage");
   });
 
   it("uses car-specific kinetic phrasing for cars", () => {
-    const sb = buildStoryboard(sample);
+    const sb = asBrandBroll(buildStoryboard(sample));
     expect(sb.shots[2].prompt).toMatch(/driving|coastal road/i);
     expect(sb.shots[2].prompt).not.toMatch(/wake|on the water/i);
   });
@@ -69,16 +81,18 @@ describe("buildStoryboard", () => {
       vehicleDescription: "Riva Aquariva 33ft",
       setting: "Miami marina at sunrise",
     };
-    const sb = buildStoryboard(boat);
+    const sb = asBrandBroll(buildStoryboard(boat));
     expect(sb.shots[2].prompt).toMatch(/wake|underway|on open water/i);
     expect(sb.shots[2].prompt).not.toMatch(/coastal road|driving/i);
   });
 
   it("respects detailOverride for shot 2", () => {
-    const sb = buildStoryboard({
-      ...sample,
-      detailOverride: "A custom shot description here",
-    });
+    const sb = asBrandBroll(
+      buildStoryboard({
+        ...sample,
+        detailOverride: "A custom shot description here",
+      }),
+    );
     expect(sb.shots[1].prompt).toContain("A custom shot description here");
   });
 
@@ -178,5 +192,90 @@ describe("pickTodaysVehicle", () => {
     const cycleLater = new Date(start);
     cycleLater.setDate(start.getDate() + LAUNCH_INVENTORY.length);
     expect(pickTodaysVehicle(start)).toBe(pickTodaysVehicle(cycleLater));
+  });
+});
+
+describe("buildStoryboard with spotType=conversion_vo", () => {
+  it("returns a single 15-sec shot (not 3 × 5s)", () => {
+    const sb = buildStoryboard({ ...sample, spotType: "conversion_vo" });
+    expect(sb.spotType).toBe("conversion_vo");
+    expect(sb.shots).toHaveLength(1);
+    expect(sb.shots[0].durationSec).toBe(15);
+    expect(sb.totalDurationSec).toBe(15);
+  });
+
+  it("embeds the VO script inside the shot prompt", () => {
+    const sb = buildStoryboard({ ...sample, spotType: "conversion_vo" });
+    if (sb.spotType !== "conversion_vo") throw new Error("expected conversion_vo");
+    // VO script should be in both the dedicated voScript field AND
+    // embedded in the shot prompt as a "VOICE-OVER" instruction.
+    expect(sb.shots[0].prompt).toContain(sb.voScript);
+    expect(sb.shots[0].prompt).toMatch(/OFF-CAMERA NARRATION/);
+    expect(sb.shots[0].prompt).toMatch(/no visible speaker/i);
+  });
+
+  it("VO script avoids legally-shaky 'owns one-tenth of' wording", () => {
+    const sb = buildStoryboard({ ...sample, spotType: "conversion_vo" });
+    if (sb.spotType !== "conversion_vo") throw new Error("expected conversion_vo");
+    // Codex flagged: "owns one-tenth of [a chassis]" is technically
+    // wrong since shares are in the LLC, not the car itself.
+    expect(sb.voScript.toLowerCase()).not.toContain("owns one-tenth");
+    expect(sb.voScript).toMatch(/share/i);
+  });
+
+  it("VO script for cars hits all four trust signals + brand + URL", () => {
+    const sb = buildStoryboard({ ...sample, spotType: "conversion_vo" });
+    if (sb.spotType !== "conversion_vo") throw new Error("expected conversion_vo");
+    expect(sb.voScript).toMatch(/real title/i);
+    expect(sb.voScript).toMatch(/single-purpose llc|llc/i);
+    expect(sb.voScript).toMatch(/no club|not a club|no subscription/i);
+    expect(sb.voScript).toMatch(/RYDA/);
+    expect(sb.voScript).toMatch(/ryda\.pro/i);
+  });
+
+  it("VO script spells out price digits as words for cleaner TTS", () => {
+    const sb = buildStoryboard({ ...sample, spotType: "conversion_vo" });
+    if (sb.spotType !== "conversion_vo") throw new Error("expected conversion_vo");
+    // Sample's hook is "$32K for 1/10" which doesn't have a parseable
+    // amount. Test against an inventory entry instead — index 3 is the
+    // Huracán Spyder at $22,900.
+    const lambo = LAUNCH_INVENTORY.find((v) => v.name === "Huracán Spyder");
+    if (!lambo) throw new Error("inventory missing Huracán Spyder");
+    const sb2 = buildStoryboard({ ...lambo, spotType: "conversion_vo" });
+    if (sb2.spotType !== "conversion_vo") throw new Error("expected conversion_vo");
+    expect(sb2.voScript).toMatch(/twenty-two thousand nine hundred/i);
+    expect(sb2.voScript).not.toMatch(/22,900/);
+  });
+
+  it("includes a single overlay (RYDA wordmark) instead of three", () => {
+    const sb = buildStoryboard({ ...sample, spotType: "conversion_vo" });
+    if (sb.spotType !== "conversion_vo") throw new Error("expected conversion_vo");
+    expect(sb.shots[0].overlay).toMatch(/RYDA/);
+  });
+
+  it("uses different VO script copy for boats", () => {
+    const boat: SpotInput = {
+      ...sample,
+      vehicleType: "boat",
+      name: "Riva Aquariva",
+      vehicleDescription: "Riva Aquariva 33ft",
+      setting: "Miami marina at sunrise",
+      hook: "Member-owned · Q4 2026",
+      cta: "RYDA boats · soon",
+    };
+    const sb = buildStoryboard({ ...boat, spotType: "conversion_vo" });
+    if (sb.spotType !== "conversion_vo") throw new Error("expected conversion_vo");
+    // Boats program is forward-look — VO should reflect that.
+    expect(sb.voScript).toMatch(/Q4|coming/i);
+  });
+});
+
+describe("buildVoScript", () => {
+  it("is exported standalone for cases that don't need a full storyboard", () => {
+    const lambo = LAUNCH_INVENTORY.find((v) => v.name === "Huracán Spyder");
+    if (!lambo) throw new Error("inventory missing Huracán Spyder");
+    const vo = buildVoScript(lambo);
+    expect(vo).toMatch(/twenty-two thousand nine hundred/i);
+    expect(vo).toMatch(/RYDA/);
   });
 });

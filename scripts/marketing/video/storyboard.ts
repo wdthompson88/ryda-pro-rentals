@@ -21,28 +21,57 @@
 
 export type VehicleType = "car" | "boat";
 
+/** What kind of spot are we generating?
+ *
+ *   brand_broll:    Cinematic 3-shot, 5s each, silent. Captions
+ *                   carry the educational lift. Cheap, beautiful,
+ *                   but doesn't explain RYDA without a caption read.
+ *                   Used for top-of-funnel vehicle b-roll.
+ *
+ *   conversion_vo:  Single 15-second clip with off-camera
+ *                   voice-over baked in. The VO does the
+ *                   educational lift so a sound-on viewer
+ *                   understands RYDA without reading the caption.
+ *                   Used when the spot has to convert (member
+ *                   testimonials, launch announcement, paid
+ *                   promotion).
+ *
+ * Different downstream pipelines: brand_broll uses 3-clip concat
+ * via the FFmpeg composer; conversion_vo uses single-clip path
+ * that preserves source audio + optionally ducks a music bed
+ * underneath.
+ */
+export type SpotType = "brand_broll" | "conversion_vo";
+
 export type SpotInput = {
   /** "car" or "boat". Drives the prompt template + Shot 3 motion. */
   vehicleType: VehicleType;
   /** Display name used in Shot 1 overlay. e.g. "458 Italia",
    *  "Riva Aquariva". Keep short — it's overlaid on video. */
   name: string;
-  /** Year + makeyou'd say to a Sora prompt. e.g. "2014 Ferrari 458 Italia
-   *  in Rosso Corsa with cream interior". Drives all 3 shots. */
+  /** Year + make. e.g. "2014 Ferrari 458 Italia in Rosso Corsa
+   *  with cream interior". Used in every shot prompt. */
   vehicleDescription: string;
   /** Setting for the spot. e.g. "Wynwood industrial garage at golden hour"
    *  for cars, "Miami Beach marina at sunrise" for boats. */
   setting: string;
-  /** Text shown 5-10s. e.g. "$32,000 for 1/10". Keep under 24 chars. */
+  /** Text shown 5-10s on brand_broll spots. e.g. "1/10 share · $22,900".
+   *  Keep under 24 chars. */
   hook: string;
-  /** Text shown 10-15s. e.g. "RYDA · Q3 2026 launch". Keep under 32 chars. */
+  /** Text shown 10-15s on brand_broll spots. e.g. "RYDA · Q3 Miami launch".
+   *  Keep under 32 chars. */
   cta: string;
   /** Optional override for Shot 2 detail. Default picks a generic
    *  "interior + dashboard" / "helm + brightwork" line per type. */
   detailOverride?: string;
+  /** Default brand_broll. Pick conversion_vo when the spot has to
+   *  carry the RYDA explainer in 15 sec without a caption read. */
+  spotType?: SpotType;
 };
 
 export type Shot = {
+  /** 1-3 for brand_broll's three 5-second shots, always 1 for
+   *  conversion_vo's single 15-second shot. */
   index: 1 | 2 | 3;
   /** Seconds into the spot when this shot starts. */
   startSec: number;
@@ -54,16 +83,36 @@ export type Shot = {
   overlay: string | null;
 };
 
-export type Storyboard = {
-  totalDurationSec: 15;
-  vehicleType: VehicleType;
-  shots: [Shot, Shot, Shot];
-  /** Composite caption to ship alongside the video on IG / X.
-   *  Carries the educational lift the 15-sec overlays can't —
-   *  what RYDA is, why fractional ownership is different from
-   *  clubs/subscriptions, where to learn more. */
-  caption: string;
-};
+/** Storyboard is a discriminated union: brand_broll = 3 separate
+ *  shots, conversion_vo = a single combined shot whose prompt has
+ *  voice-over instructions baked in. Common fields:
+ *    - totalDurationSec: 15 always
+ *    - vehicleType
+ *    - caption: the post copy that ships alongside the video on
+ *               IG / X. For brand_broll it carries the educational
+ *               lift (since the video is silent); for conversion_vo
+ *               it's secondary because the VO already explains. */
+export type Storyboard =
+  | {
+      spotType: "brand_broll";
+      totalDurationSec: 15;
+      vehicleType: VehicleType;
+      shots: [Shot, Shot, Shot];
+      caption: string;
+    }
+  | {
+      spotType: "conversion_vo";
+      totalDurationSec: 15;
+      vehicleType: VehicleType;
+      /** A single shot covering the full 15s with VO embedded. */
+      shots: [Shot];
+      /** The voice-over script as plain text, separately stored
+       *  for use cases like recording in ElevenLabs or sending to
+       *  a human VO artist. The same VO is also embedded inside
+       *  shots[0].prompt as a "VOICE-OVER" instruction. */
+      voScript: string;
+      caption: string;
+    };
 
 // Style preamble baked into every shot's prompt. Pushes the model
 // toward editorial photo-real instead of CGI / illustration. The
@@ -120,11 +169,186 @@ function buildCaption(input: SpotInput): string {
   return `${hook}\n\n${explainer}\n\n${cta}`;
 }
 
+/** Generate the off-camera narration script for a conversion spot.
+ *  ~25-30 words to fit comfortably in 12-13 seconds at conversational
+ *  pace. Cars + boats get different scripts.
+ *
+ *  Cars: lead with price, hit the four trust signals (real title,
+ *  LLC, no club, no subscription), close with brand + when + URL.
+ *
+ *  Legal-safer phrasing: "buys a one-tenth share of" not "owns
+ *  one-tenth of" — the share is in the LLC that owns the car,
+ *  not the chassis itself. */
+export function buildVoScript(input: SpotInput): string {
+  if (input.vehicleType === "car") {
+    // Pull the share price out of the hook string for natural
+    // narration. Hook format: "1/10 share · $22,900".
+    const priceMatch = input.hook.match(/\$([0-9,]+)/);
+    const priceWords = priceMatch
+      ? formatPriceForVo(priceMatch[1])
+      : "This amount";
+    return `${capitalize(priceWords)} buys a one-tenth share of this ${input.name}. Real title. Single-purpose LLC. No club, no subscription. RYDA launches in Miami Q3. Apply at ryda.pro.`;
+  }
+  return `RYDA's boat program is coming Q4. Member-owned ${input.name}. Single-purpose LLC, full transparency on ops and exit. Apply at ryda.pro.`;
+}
+
+function capitalize(s: string): string {
+  return s.length === 0 ? s : s[0].toUpperCase() + s.slice(1);
+}
+
+/** Convert "$22,900" -> "Twenty-two thousand nine hundred dollars".
+ *  Voice models read digits poorly; spelling out leads to cleaner
+ *  TTS output. Falls back to the digit form if parsing fails. */
+function formatPriceForVo(digits: string): string {
+  const n = parseInt(digits.replace(/,/g, ""), 10);
+  if (!Number.isFinite(n) || n <= 0) return `${digits} dollars`;
+  return `${spellOutNumber(n)} dollars`;
+}
+
+/** Tiny number-to-words for prices up to $999,999. Sufficient for
+ *  every share price in LAUNCH_INVENTORY. */
+function spellOutNumber(n: number): string {
+  const ones = [
+    "zero",
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+    "seven",
+    "eight",
+    "nine",
+    "ten",
+    "eleven",
+    "twelve",
+    "thirteen",
+    "fourteen",
+    "fifteen",
+    "sixteen",
+    "seventeen",
+    "eighteen",
+    "nineteen",
+  ];
+  const tens = [
+    "",
+    "",
+    "twenty",
+    "thirty",
+    "forty",
+    "fifty",
+    "sixty",
+    "seventy",
+    "eighty",
+    "ninety",
+  ];
+  const under100 = (x: number): string => {
+    if (x < 20) return ones[x];
+    const t = Math.floor(x / 10);
+    const o = x % 10;
+    return o === 0 ? tens[t] : `${tens[t]}-${ones[o]}`;
+  };
+  const under1000 = (x: number): string => {
+    if (x < 100) return under100(x);
+    const h = Math.floor(x / 100);
+    const r = x % 100;
+    return r === 0
+      ? `${ones[h]} hundred`
+      : `${ones[h]} hundred ${under100(r)}`;
+  };
+  if (n < 1000) return under1000(n);
+  if (n < 1_000_000) {
+    const k = Math.floor(n / 1000);
+    const r = n % 1000;
+    const kPart = `${under1000(k)} thousand`;
+    return r === 0 ? kPart : `${kPart} ${under1000(r)}`;
+  }
+  // Fallback for numbers we don't expect in inventory.
+  return String(n);
+}
+
+/** Build the single 15-second prompt for a conversion_vo spot. The
+ *  VO is embedded inline so Seedance/Dreamina's voice-control
+ *  feature renders it. The "OFF-CAMERA NARRATION ONLY" line is
+ *  important — without it the model sometimes inserts a visible
+ *  presenter character speaking the lines.
+ *
+ *  Three implied beats inside the single shot, paced so the VO
+ *  has room to land each one. */
+function buildConversionVoPrompt(input: SpotInput): string {
+  const voScript = buildVoScript(input);
+
+  if (input.vehicleType === "car") {
+    return `15-second cinematic commercial for RYDA, a Miami fractional luxury vehicle co-ownership platform.
+
+OFF-CAMERA NARRATION ONLY. No visible speaker, no lips, no presenter.
+Male American voice, calm and confident, age 30s:
+"${voScript}"
+
+VISUAL — three implied beats, smooth cuts, ~5 seconds each:
+
+BEAT 1 (0-5s): Hero exterior. ${input.vehicleDescription} parked in ${input.setting}. Slow push-in from a 3/4 front angle, 50mm lens equivalent. Soft directional light, no people in frame.
+
+BEAT 2 (5-10s): Close detail of the cockpit — steering wheel, gear selector, instrument cluster softly lit, leather and metal in shallow focus. No driver, no hands.
+
+BEAT 3 (10-15s): Tracking shot of the car driving away on a coastal road at golden hour. Camera at the rear quarter panel, panning to follow as it accelerates. Tail lights warm against the light.
+
+AUDIO: subtle engine purr in the background, ambient ocean breeze. Voice-over sits cleanly above the engine — no music bed (added in post if desired).
+
+Style: cinematic editorial commercial. 35mm film aesthetic, natural light, shallow depth of field, restrained color grade. No CGI feel, no lens flares, no rapid camera shake, no on-screen text or watermarks (text overlays added in post).`;
+  }
+
+  // Boat variant
+  return `15-second cinematic commercial for RYDA's boat program (Q4 2026 launch).
+
+OFF-CAMERA NARRATION ONLY. No visible speaker, no lips, no presenter.
+Male American voice, calm and confident, age 30s:
+"${voScript}"
+
+VISUAL — three implied beats, smooth cuts, ~5 seconds each:
+
+BEAT 1 (0-5s): Hero shot of ${input.vehicleDescription} moored in ${input.setting}. Slow drone push-in from above the bow at low altitude. Calm water, no people.
+
+BEAT 2 (5-10s): Close detail of the helm — wheel, gauges, brightwork, teak decking. Soft morning light, no captain visible.
+
+BEAT 3 (10-15s): Tracking shot underway on open water at golden hour. Camera on a follow boat, capturing the wake and the rear quarter. Spray visible.
+
+AUDIO: low engine rumble, water against the hull. Voice-over clean above ambient sound.
+
+Style: cinematic editorial commercial. 35mm film aesthetic, natural light, restrained color grade. No CGI feel, no lens flares, no rapid camera shake, no on-screen text or watermarks.`;
+}
+
 export function buildStoryboard(input: SpotInput): Storyboard {
+  const spotType: SpotType = input.spotType ?? "brand_broll";
+
+  if (spotType === "conversion_vo") {
+    return {
+      spotType: "conversion_vo",
+      totalDurationSec: 15,
+      vehicleType: input.vehicleType,
+      shots: [
+        {
+          index: 1,
+          startSec: 0,
+          durationSec: 15,
+          prompt: buildConversionVoPrompt(input),
+          // One small overlay at the end so the URL is visible to
+          // sound-off viewers. The VO is doing the educational
+          // work; this is just a confirmation/safety net.
+          overlay: "RYDA · ryda.pro",
+        },
+      ],
+      voScript: buildVoScript(input),
+      caption: buildCaption(input),
+    };
+  }
+
+  // brand_broll (default)
   const detailPrompt =
     input.detailOverride ?? defaultDetail(input.vehicleType, input.vehicleDescription);
 
   return {
+    spotType: "brand_broll",
     totalDurationSec: 15,
     vehicleType: input.vehicleType,
     shots: [

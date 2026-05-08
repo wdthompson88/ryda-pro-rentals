@@ -20,9 +20,11 @@ export type VideoOrientation = "vertical" | "landscape" | "square";
  *  pipeline calls this 3 times. */
 export type GenerateClipInput = {
   prompt: string;
-  /** 5 or 10 seconds. Some Sora tiers accept 20; we cap at 10
-   *  for the standard 3x5s template. */
-  durationSec: 5 | 10;
+  /** Clip length in seconds. Brand b-roll uses 5 (3 shots × 5s).
+   *  Conversion VO uses 15 (one continuous clip with VO baked in).
+   *  Seedance 2.0 supports 4-15 via fal.ai; Sora 2 supports up to
+   *  20. We expose the values we actually use. */
+  durationSec: 5 | 10 | 15;
   /** Output orientation. Default "landscape". The composer
    *  re-frames to vertical/landscape independently, so this is
    *  mostly a hint to the model. */

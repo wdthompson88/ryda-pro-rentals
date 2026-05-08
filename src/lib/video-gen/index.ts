@@ -78,9 +78,13 @@ export async function generateClip(
     (options?.vendor ? getAdapter(options.vendor) : null) ??
     getDefaultAdapter();
   if (!adapter) {
+    // Seedance is the default vendor (fal.ai), so the most useful
+    // env hint when nothing's wired is FAL_KEY. We list both since
+    // either unblocks the pipeline; FAL_KEY first since it's the
+    // path we recommend.
     return {
       kind: "not_configured",
-      missingEnv: ["OPENAI_API_KEY"],
+      missingEnv: ["FAL_KEY", "OPENAI_API_KEY"],
     };
   }
   if (!adapter.isConfigured()) {

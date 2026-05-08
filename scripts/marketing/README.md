@@ -1,8 +1,8 @@
 # Autonomous marketing scripts
 
-Local scripts that run from your machine to keep the social-publish
-queue full. Vercel cron drains the queue every 15 min and posts to
-X / LinkedIn / Instagram / email.
+Local scripts that keep the social-publish queue full. Vercel cron
+drains the queue every 15 min and posts to X / LinkedIn / Instagram /
+email.
 
 ## Architecture
 
@@ -10,11 +10,22 @@ X / LinkedIn / Instagram / email.
 ryda-marketing/content/<channel>/<slug>.md   (markdown drafts on disk)
                 ↓ sync-content.ts
         Supabase content_queue                (state machine)
-                ↓ queue-poller.ts             (drives chatgpt.com via Playwright)
+                ↓ queue-poller.ts             (calls OpenAI Images API)
         public/marketing/generated/*.png      (hero images)
                 ↓ Vercel cron (every 15 min)
         X / LinkedIn / IG / email             (live posts)
 ```
+
+Image generation is API-first via `gpt-image-1` (the same model
+behind chatgpt.com's image gen). An earlier iteration tried browser
+automation against chatgpt.com to use a ChatGPT Pro subscription at
+$0 marginal cost — that path was deleted because Cloudflare's bot
+detection blocked Playwright reliably. ChatGPT Pro is for personal
+browsing; this pipeline needs `OPENAI_API_KEY`.
+
+Video generation has its own subdirectory at `video/`. See
+`video/README.md` for the daily-spot pipeline + the daily-brief
+operator workflow.
 
 ## Scripts
 
@@ -22,9 +33,8 @@ ryda-marketing/content/<channel>/<slug>.md   (markdown drafts on disk)
 
 Reads `../ryda-marketing/content/<channel>/<slug>.md`, parses YAML
 frontmatter, upserts rows into `content_queue` keyed by source_file.
-Re-running picks up edits and patches the row. Status:'draft' rows
-get their status updated by markdown changes; rows that have
-progressed past draft (operator approved/scheduled) are protected.
+Re-running picks up edits + patches the row. Operator-modified
+status (anything past `draft`) is protected.
 
 ```bash
 npm run marketing:sync          # write to Supabase
@@ -32,16 +42,6 @@ npm run marketing:sync:dry      # parse + validate, no DB writes
 ```
 
 Required env: `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`.
-
-### `marketing:gen-image` — single image, manual prompt
-
-```bash
-npm run marketing:gen-image -- "A black 911 GT3 RS in a Wynwood garage at golden hour"
-```
-
-Drives chatgpt.com via Playwright using a persistent profile at
-`~/.ryda-marketing/chatgpt-profile/`. Saves to
-`public/marketing/generated/cli-<timestamp>.png`.
 
 ### `marketing:gen-images` — drain "needs image" queue rows once
 
@@ -51,9 +51,12 @@ npm run marketing:gen-images
 
 Scans `content_queue` for Instagram + journal rows where `image_path`
 is null OR points to a file that doesn't exist. Generates up to
-`QUEUE_POLLER_BATCH_SIZE` images per pass (default 5), saves each
-under `public/marketing/generated/`, patches the row's `image_path`
-so the next Vercel cron tick picks it up.
+`QUEUE_POLLER_BATCH_SIZE` images per pass (default 5) via the
+OpenAI Images API at ~$0.06/image (medium quality, 1536×1024).
+Patches the row's `image_path` so the next Vercel cron tick picks
+the image up.
+
+Required env: `OPENAI_API_KEY` (in addition to Supabase env above).
 
 ### `marketing:gen-images:loop` — same, but loops
 
@@ -73,60 +76,67 @@ npm run marketing:start
 `marketing:sync` then `marketing:gen-images:loop`. The autostart
 plist invokes this.
 
+### `marketing:brief` — daily morning brief
+
+```bash
+npm run marketing:brief
+```
+
+See `video/README.md` for the full operator workflow. Generates a
+markdown brief covering today's video spot prompts (for Dreamina),
+scheduled posts, image tasks, queue status, and an action checklist.
+
 ## First-time setup
 
-1. **Set up env**: ensure `NEXT_PUBLIC_SUPABASE_URL` and
-   `SUPABASE_SERVICE_ROLE_KEY` are in your shell or a .env file
-   the script can pick up.
+1. **Set up env**: in `.env.local` (loaded by every script):
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `SUPABASE_SERVICE_ROLE_KEY`
+   - `OPENAI_API_KEY` (for image gen via gpt-image-1)
+   - Optional: `OPENAI_ORG_ID`, `FAL_KEY` (for autonomous video via Seedance)
 
-2. **Sync drafts**: `npm run marketing:sync`. Confirm rows landed
-   in Supabase via the dashboard (`SELECT count(*) FROM content_queue`).
+2. **Apply the migration**: `supabase/migrations/0030_content_queue.sql`
+   creates the queue table. Apply via the Supabase dashboard or
+   `supabase db push`.
 
-3. **First image gen + login**: `npm run marketing:gen-images`. The
-   first invocation will probably return `not_logged_in`. Look for
-   the Playwright-launched Chrome window — it lands on chatgpt.com's
-   login page. Authenticate with your ChatGPT Pro account. Cookies
-   persist in `~/.ryda-marketing/chatgpt-profile/` so subsequent
-   runs reuse the session.
+3. **Sync drafts**: `npm run marketing:sync`. Confirm rows landed.
 
-4. **Run the loop**: `npm run marketing:gen-images:loop`. Watch the
-   first few generations; each takes 30-60s.
+4. **Run image gen**: `npm run marketing:gen-images`. Should generate
+   images for any IG/journal rows missing them.
+
+5. **Generate video spots**: `npm run marketing:brief` to see today's
+   video prompts. Generate the clips in your tool of choice (Dreamina
+   recommended), drop the MP4s, run `marketing:daily-spot --resume`.
 
 ## Autostart on login (macOS)
 
-Use the `com.ryda.marketing-loop.plist.template` in this directory.
-Replace placeholders, save to `~/Library/LaunchAgents/`, and
-`launchctl load`. See the template's header comment for the full
-recipe.
+Use `com.ryda.marketing-loop.plist.template` in this directory.
+Replace placeholders, save to `~/Library/LaunchAgents/`, run
+`launchctl load`. See the template's header comment for the recipe.
 
-## Trade-offs vs OpenAI Images API
+## Image gen pricing (gpt-image-1, May 2026)
 
-| | This (ChatGPT-driven) | OpenAI Images API |
-|--|--|--|
-| **Cost** | $0/image marginal (you already pay $200/mo for Pro) | $0.04-$0.17/image |
-| **Speed** | 30-60s per image | 5-15s per image |
-| **Where it runs** | Your Mac (or always-on box) | Vercel cron, anywhere |
-| **Login required** | Yes, ChatGPT Pro session via browser | Just an API key |
-| **OpenAI ToS** | Browser automation discouraged (light volume rarely enforced) | Fully sanctioned |
-| **Reliability** | UI changes can break selectors | Stable contract |
-| **Volume cap** | ChatGPT rate limits (generous on Pro) | Pay-per-call, no UI limit |
+| Quality | 1024×1024 | 1024×1536 / 1536×1024 |
+|---------|-----------|-----------------------|
+| low     | $0.011    | $0.016                |
+| medium  | $0.042    | $0.063                |
+| high    | $0.167    | $0.25                 |
 
-The system supports both. If you wire `OPENAI_API_KEY` in Vercel
-env, the in-app `/api/admin/generate-image` route uses the API. If
-you don't, this local pipeline is the path.
+Default is `medium` at 1536×1024 (~$0.06/image). Bump to `high` for
+hero artwork; drop to `low` for thumbnails.
 
 ## Troubleshooting
 
-- **Selectors fail after a ChatGPT UI update**: the chatgpt-driver
-  script lists candidate selectors in priority order. Add new ones
-  to `waitForComposer()` in `chatgpt-driver.ts`.
+- **Image generation fails with 401**: check `OPENAI_API_KEY` is set
+  + has billing enabled at platform.openai.com.
 
-- **Login expires**: ChatGPT sessions are long-lived but can drop.
-  Re-run with the visible browser and log in again.
+- **Image generation fails with 429**: bump `QUEUE_POLLER_PAUSE_MS`
+  from 30s to 60s+. OpenAI rate-limits image gen per-account.
 
-- **Rate limits**: bump `QUEUE_POLLER_PAUSE_MS` from 30s to 60s+ if
-  ChatGPT returns "too many requests".
+- **Queue rows aren't syncing**: confirm the markdown frontmatter
+  parses cleanly (`marketing:sync:dry` reports parse errors per file).
+  Common issue: titles with unquoted colons (`title: GT3 RS: track-only`
+  must be `title: "GT3 RS: track-only"`).
 
 - **Image quality is off-brand**: edit the `BRAND_PREAMBLE` in
-  `queue-poller.ts`. Or add per-row `image_prompt` to the
-  markdown frontmatter — it overrides the auto-generated prompt.
+  `queue-poller.ts`. Or add per-row `image_prompt` to the markdown
+  frontmatter — it overrides the auto-generated prompt.

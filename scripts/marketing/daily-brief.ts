@@ -41,6 +41,7 @@ import {
   buildStoryboard,
   pickTodaysVehicle,
   LAUNCH_INVENTORY,
+  type SpotType,
 } from "./video/storyboard";
 
 const BRIEF_DIR = path.join(os.homedir(), ".ryda-marketing", "daily-briefs");
@@ -74,14 +75,29 @@ function daysUntilLaunch(): number {
 function parseArgs(argv: string[]): {
   vehicleIdx: number | null;
   noOpen: boolean;
+  spotType: SpotType;
 } {
-  const out = { vehicleIdx: null as number | null, noOpen: false };
+  const out = {
+    vehicleIdx: null as number | null,
+    noOpen: false,
+    spotType: "brand_broll" as SpotType,
+  };
+  const VALID_SPOT_TYPES = new Set<SpotType>([
+    "brand_broll",
+    "conversion_vo",
+  ]);
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--no-open") out.noOpen = true;
     else if (a === "--vehicle") {
       const idx = parseInt(argv[++i] ?? "", 10);
       if (Number.isInteger(idx)) out.vehicleIdx = idx;
+    } else if (a === "--spot-type") {
+      const v = (argv[++i] ?? "").toLowerCase();
+      if (VALID_SPOT_TYPES.has(v as SpotType)) out.spotType = v as SpotType;
+    } else if (a.startsWith("--spot-type=")) {
+      const v = a.split("=")[1].toLowerCase();
+      if (VALID_SPOT_TYPES.has(v as SpotType)) out.spotType = v as SpotType;
     }
   }
   return out;
@@ -152,13 +168,14 @@ function buildBrief(opts: {
   queueRows: QueueRow[];
   queueError: string | null;
   date: string;
+  spotType: SpotType;
 }): string {
-  const { vehicleIdx, queueRows, queueError, date } = opts;
+  const { vehicleIdx, queueRows, queueError, date, spotType } = opts;
   const vehicle =
     vehicleIdx != null
       ? LAUNCH_INVENTORY[vehicleIdx % LAUNCH_INVENTORY.length]
       : pickTodaysVehicle();
-  const storyboard = buildStoryboard(vehicle);
+  const storyboard = buildStoryboard({ ...vehicle, spotType });
   const stem = `${slugify(vehicle.name)}-${date}`;
   const dropZone = path.join(MANUAL_CLIPS_ROOT, stem);
   const days = daysUntilLaunch();
@@ -187,6 +204,7 @@ function buildBrief(opts: {
   lines.push(`# RYDA Marketing Brief — ${date}`);
   lines.push("");
   lines.push(`**Today's vehicle:** ${vehicle.name} (${vehicle.vehicleType})`);
+  lines.push(`**Spot type:** \`${spotType}\` ${spotType === "conversion_vo" ? "(single 15s clip with VO baked in)" : "(3 silent clips, captions do the educational lift)"}`);
   lines.push(`**Days to Q3 launch:** ${days}`);
   lines.push("");
   if (queueError) {
@@ -197,35 +215,70 @@ function buildBrief(opts: {
   // ---- Section 1: Today's video spot ----
   lines.push("## 1. Today's 15-second video spot");
   lines.push("");
-  lines.push(
-    `Generate 3 clips in **Dreamina** (https://dreamina.capcut.com) — switch to **Video** mode, paste each prompt, hit the arrow to submit. Save each result as \`shot-N.mp4\` into:`,
-  );
-  lines.push("");
-  lines.push("```");
-  lines.push(dropZone);
-  lines.push("```");
-  lines.push("");
-  for (const shot of storyboard.shots) {
+
+  if (storyboard.spotType === "conversion_vo") {
+    // Single-prompt brief — one 15-second clip with VO embedded.
     lines.push(
-      `### Shot ${shot.index} (${shot.durationSec}s, overlay: "${shot.overlay}")`,
+      `**Conversion spot** — single 15s prompt with off-camera narration baked in. Generate ONE clip in **Dreamina** (https://dreamina.capcut.com) — switch to **Video** mode, **enable audio**, paste the prompt below, submit. Save the result as \`spot.mp4\` into:`,
     );
     lines.push("");
     lines.push("```");
-    lines.push(shot.prompt);
+    lines.push(dropZone);
     lines.push("```");
     lines.push("");
+    lines.push(`### The prompt (paste into Dreamina)`);
+    lines.push("");
+    lines.push("```");
+    lines.push(storyboard.shots[0].prompt);
+    lines.push("```");
+    lines.push("");
+    lines.push(`### Voice-over script (for reference / re-recording)`);
+    lines.push("");
+    lines.push("> " + storyboard.voScript);
+    lines.push("");
+    lines.push(`**After spot.mp4 is saved, run:**`);
+    lines.push("");
+    lines.push("```bash");
+    lines.push(
+      `cd /Users/odinpartners/Desktop/APp/ryda-web && npm run marketing:daily-spot -- --vendor=manual --spot-type=conversion_vo --vehicle ${vehicleIdx ?? 0} --resume`,
+    );
+    lines.push("```");
+    lines.push("");
+    lines.push(
+      `Composer preserves the VO audio, optionally ducks a music bed underneath at -30 dB, burns the "RYDA · ryda.pro" overlay in the last 4 seconds, exports vertical (1080×1920) + landscape (1920×1080).`,
+    );
+  } else {
+    // Default brand-broll: 3 separate 5-sec prompts.
+    lines.push(
+      `**Brand b-roll** — 3 silent clips × 5s. Caption carries the educational lift. Generate 3 clips in **Dreamina** (https://dreamina.capcut.com) — switch to **Video** mode, paste each prompt, hit the arrow to submit. Save each result as \`shot-N.mp4\` into:`,
+    );
+    lines.push("");
+    lines.push("```");
+    lines.push(dropZone);
+    lines.push("```");
+    lines.push("");
+    for (const shot of storyboard.shots) {
+      lines.push(
+        `### Shot ${shot.index} (${shot.durationSec}s, overlay: "${shot.overlay}")`,
+      );
+      lines.push("");
+      lines.push("```");
+      lines.push(shot.prompt);
+      lines.push("```");
+      lines.push("");
+    }
+    lines.push("**After all 3 clips are saved, run:**");
+    lines.push("");
+    lines.push("```bash");
+    lines.push(
+      `cd /Users/odinpartners/Desktop/APp/ryda-web && npm run marketing:daily-spot -- --vendor=manual --vehicle ${vehicleIdx ?? 0} --resume`,
+    );
+    lines.push("```");
+    lines.push("");
+    lines.push(
+      `Composer outputs vertical (1080×1920) + landscape (1920×1080) MP4s, drops a draft row in content_queue tagged for Instagram Reels.`,
+    );
   }
-  lines.push("**After all 3 clips are saved, run:**");
-  lines.push("");
-  lines.push("```bash");
-  lines.push(
-    `cd /Users/odinpartners/Desktop/APp/ryda-web && npm run marketing:daily-spot -- --vendor=manual --vehicle ${vehicleIdx ?? 0} --resume`,
-  );
-  lines.push("```");
-  lines.push("");
-  lines.push(
-    `Composer outputs vertical (1080×1920) + landscape (1920×1080) MP4s, drops a draft row in content_queue tagged for Instagram Reels.`,
-  );
   lines.push("");
   lines.push(`**Caption to use with the post:**`);
   lines.push("");
@@ -309,9 +362,19 @@ function buildBrief(opts: {
   // ---- Section 5: Action checklist ----
   lines.push("## 5. Today's checklist");
   lines.push("");
-  lines.push(`- [ ] Generate 3 video clips in Dreamina (see Section 1)`);
-  lines.push(`- [ ] Drop clips into \`${dropZone}\``);
-  lines.push(`- [ ] Run compose: \`npm run marketing:daily-spot -- --vendor=manual --vehicle ${vehicleIdx ?? 0} --resume\``);
+  if (storyboard.spotType === "conversion_vo") {
+    lines.push(`- [ ] Generate ONE 15s clip in Dreamina with audio enabled (see Section 1)`);
+    lines.push(`- [ ] Drop as \`spot.mp4\` into \`${dropZone}\``);
+    lines.push(
+      `- [ ] Run compose: \`npm run marketing:daily-spot -- --vendor=manual --spot-type=conversion_vo --vehicle ${vehicleIdx ?? 0} --resume\``,
+    );
+  } else {
+    lines.push(`- [ ] Generate 3 video clips in Dreamina (see Section 1)`);
+    lines.push(`- [ ] Drop clips into \`${dropZone}\``);
+    lines.push(
+      `- [ ] Run compose: \`npm run marketing:daily-spot -- --vendor=manual --vehicle ${vehicleIdx ?? 0} --resume\``,
+    );
+  }
   if (missingImage.length > 0) {
     lines.push(
       `- [ ] Generate ${missingImage.length} hero image(s) per Section 3`,
@@ -371,6 +434,7 @@ async function main() {
     queueRows: queue.rows,
     queueError: queue.error,
     date,
+    spotType: args.spotType,
   });
 
   await fs.mkdir(BRIEF_DIR, { recursive: true });

@@ -46,10 +46,13 @@ const DEFAULT_AUDIO =
   path.join(os.homedir(), ".ryda-marketing", "audio", "default.mp3");
 
 export type ComposeInput = {
-  /** Three input clip paths in shot order (1-indexed in the spot). */
-  clipPaths: [string, string, string];
+  /** Input clip paths. brand_broll: 3 paths in shot order.
+   *  conversion_vo: 1 path (the full 15-sec clip with VO baked in). */
+  clipPaths: string[];
   /** The storyboard whose shots produced these clips. Used for
-   *  durations + overlay text. */
+   *  durations, overlay text, and to dispatch between the
+   *  multi-clip concat pipeline (brand_broll) and the single-
+   *  clip preserve-audio pipeline (conversion_vo). */
   storyboard: Storyboard;
   /** Output directory. Two files are written into this dir. */
   outDir: string;
@@ -68,7 +71,14 @@ export type ComposeResult =
   | { kind: "ffmpeg_missing" }
   | { kind: "error"; error: string; stderr?: string };
 
-/** Produce both vertical and landscape spots from the three clips. */
+/** Produce both vertical and landscape spots. Dispatches by
+ *  storyboard.spotType:
+ *    - brand_broll:    concat 3 input clips, drop source audio,
+ *                      optionally mix a music bed.
+ *    - conversion_vo:  single 15-sec clip, PRESERVE source audio
+ *                      (the VO baked in by Seedance/Dreamina is
+ *                      the whole point of this mode), optionally
+ *                      duck a music bed underneath. */
 export async function composeSpot(input: ComposeInput): Promise<ComposeResult> {
   const { clipPaths, storyboard, outDir, stem } = input;
 
@@ -81,10 +91,20 @@ export async function composeSpot(input: ComposeInput): Promise<ComposeResult> {
     return { kind: "ffmpeg_missing" };
   }
 
+  // Validate clip count matches spot type.
+  const expected = storyboard.spotType === "conversion_vo" ? 1 : 3;
+  if (clipPaths.length !== expected) {
+    return {
+      kind: "error",
+      error: `Expected ${expected} clip(s) for ${storyboard.spotType}, got ${clipPaths.length}.`,
+    };
+  }
+
   await fs.mkdir(outDir, { recursive: true });
 
   // Audio bed presence check. If the file exists, we mix it; if
-  // not, the spot has whatever audio the AI clips already carry.
+  // not, brand_broll outputs silent and conversion_vo keeps only
+  // the source audio (VO + ambient from the AI generation).
   let audioBed: string | null = null;
   try {
     await fs.access(DEFAULT_AUDIO);
@@ -96,7 +116,12 @@ export async function composeSpot(input: ComposeInput): Promise<ComposeResult> {
   const verticalOut = path.join(outDir, `${stem}-vertical.mp4`);
   const landscapeOut = path.join(outDir, `${stem}-landscape.mp4`);
 
-  const verticalRes = await runFfmpegPipeline({
+  const pipeline =
+    storyboard.spotType === "conversion_vo"
+      ? runSingleClipPipeline
+      : runMultiClipPipeline;
+
+  const verticalRes = await pipeline({
     clipPaths,
     storyboard,
     outPath: verticalOut,
@@ -106,7 +131,7 @@ export async function composeSpot(input: ComposeInput): Promise<ComposeResult> {
   });
   if (verticalRes.kind !== "ok") return verticalRes;
 
-  const landscapeRes = await runFfmpegPipeline({
+  const landscapeRes = await pipeline({
     clipPaths,
     storyboard,
     outPath: landscapeOut,
@@ -125,7 +150,7 @@ export async function composeSpot(input: ComposeInput): Promise<ComposeResult> {
 }
 
 type PipelineInput = {
-  clipPaths: [string, string, string];
+  clipPaths: string[];
   storyboard: Storyboard;
   outPath: string;
   targetW: number;
@@ -133,10 +158,18 @@ type PipelineInput = {
   audioBed: string | null;
 };
 
-/** Build + execute the ffmpeg command for one orientation. */
-async function runFfmpegPipeline(p: PipelineInput): Promise<ComposeResult> {
+/** brand_broll pipeline: concat 3 trimmed/scaled clips + drawtext
+ *  overlays + fade in/out + optional music bed. Drops source audio
+ *  (AI clips often have weird artifacts; cleaner to strip). */
+async function runMultiClipPipeline(p: PipelineInput): Promise<ComposeResult> {
   const { clipPaths, storyboard, outPath, targetW, targetH, audioBed } = p;
   const totalSec = storyboard.totalDurationSec;
+  if (storyboard.spotType !== "brand_broll") {
+    return {
+      kind: "error",
+      error: `runMultiClipPipeline called with non-brand_broll storyboard.`,
+    };
+  }
 
   // -- Inputs section
   const inputs: string[] = [];
@@ -256,6 +289,143 @@ async function runFfmpegPipeline(p: PipelineInput): Promise<ComposeResult> {
         resolve({
           kind: "error",
           error: `ffmpeg exited ${code}`,
+          stderr: stderr.slice(-2000),
+        });
+      }
+    });
+  });
+}
+
+/** conversion_vo pipeline: single 15-sec input clip with VO already
+ *  baked in by Seedance/Dreamina. Preserve source audio (the VO is
+ *  the whole point), optionally mix a music bed UNDER it at low
+ *  volume so the VO stays intelligible.
+ *
+ *  Differences from runMultiClipPipeline:
+ *    - 1 video input instead of 3, no concat
+ *    - Source audio is preserved (input #0's audio stream)
+ *    - Music bed is ducked harder (-30 dB ish) since it's
+ *      sidechained against speech, not silence
+ *    - Single overlay at the end instead of 3 lower-thirds */
+async function runSingleClipPipeline(p: PipelineInput): Promise<ComposeResult> {
+  const { clipPaths, storyboard, outPath, targetW, targetH, audioBed } = p;
+  const totalSec = storyboard.totalDurationSec;
+  if (storyboard.spotType !== "conversion_vo") {
+    return {
+      kind: "error",
+      error: `runSingleClipPipeline called with non-conversion_vo storyboard.`,
+    };
+  }
+  const shot = storyboard.shots[0];
+
+  // -- Inputs: video clip [0], optional music bed [1].
+  const inputs: string[] = ["-i", clipPaths[0]];
+  if (audioBed) inputs.push("-i", audioBed);
+
+  // -- Filter graph
+  const filters: string[] = [];
+
+  // 1. Trim to 15s, scale + crop to target aspect.
+  filters.push(
+    `[0:v]trim=duration=${totalSec},setpts=PTS-STARTPTS,` +
+      `scale=${targetW}:${targetH}:force_original_aspect_ratio=increase,` +
+      `crop=${targetW}:${targetH}[scaled]`,
+  );
+
+  // 2. Optional overlay (the storyboard puts a small "RYDA · ryda.pro"
+  //    burn at the end so sound-off viewers still see the URL).
+  let prevLabel = "scaled";
+  if (shot.overlay) {
+    const text = escapeForDrawtext(shot.overlay);
+    // Show in the last 4 seconds, lower-third position.
+    const start = Math.max(0, totalSec - 4);
+    filters.push(
+      `[${prevLabel}]drawtext=text='${text}':` +
+        `fontcolor=white:fontsize=${Math.round(targetH * 0.04)}:` +
+        `box=1:boxcolor=black@0.5:boxborderw=18:` +
+        `x=(w-text_w)/2:y=h*0.86:` +
+        `enable='between(t,${start},${totalSec})'[laid]`,
+    );
+    prevLabel = "laid";
+  }
+
+  // 3. Fade in/out.
+  filters.push(
+    `[${prevLabel}]fade=t=in:st=0:d=0.25,fade=t=out:st=${totalSec - 0.4}:d=0.4[outv]`,
+  );
+
+  // 4. Audio. Source audio is the AI-generated VO + ambient.
+  //    If a bed file exists, duck it heavily (under -25 dB) so
+  //    the VO remains the primary; otherwise just pass source
+  //    audio through.
+  let audioMap: string;
+  if (audioBed) {
+    // Source audio normalized so VO is consistent across spots.
+    filters.push(`[0:a]atrim=duration=${totalSec},asetpts=PTS-STARTPTS,volume=1.0[srca]`);
+    // Music bed at -30 dB (volume=0.05) so it sits well under speech.
+    filters.push(
+      `[1:a]atrim=duration=${totalSec},asetpts=PTS-STARTPTS,volume=0.05[abed]`,
+    );
+    // amix with duration=first to bound to the source-audio length.
+    filters.push(`[srca][abed]amix=inputs=2:duration=first:dropout_transition=0[outa]`);
+    audioMap = "outa";
+  } else {
+    filters.push(
+      `[0:a]atrim=duration=${totalSec},asetpts=PTS-STARTPTS,volume=1.0[outa]`,
+    );
+    audioMap = "outa";
+  }
+
+  // -- Assemble argv
+  const args = [
+    "-y",
+    ...inputs,
+    "-filter_complex",
+    filters.join(";"),
+    "-map",
+    "[outv]",
+    "-map",
+    `[${audioMap}]`,
+    "-c:a",
+    "aac",
+    "-b:a",
+    "192k", // higher than brand_broll's 128k since speech intelligibility matters
+    "-c:v",
+    "libx264",
+    "-pix_fmt",
+    "yuv420p",
+    "-preset",
+    "medium",
+    "-crf",
+    "20",
+    "-movflags",
+    "+faststart",
+    "-r",
+    "30",
+    outPath,
+  ];
+
+  return new Promise<ComposeResult>((resolve) => {
+    const proc = spawn(FFMPEG_PATH, args, { stdio: ["ignore", "pipe", "pipe"] });
+    let stderr = "";
+    proc.stderr.on("data", (chunk: Buffer) => {
+      stderr += chunk.toString("utf8");
+    });
+    proc.on("error", (err) => {
+      resolve({ kind: "error", error: err.message, stderr });
+    });
+    proc.on("close", (code) => {
+      if (code === 0) {
+        resolve({
+          kind: "ok",
+          vertical: outPath,
+          landscape: outPath,
+          durationSec: totalSec,
+        });
+      } else {
+        resolve({
+          kind: "error",
+          error: `ffmpeg exited ${code} (single-clip pipeline)`,
           stderr: stderr.slice(-2000),
         });
       }

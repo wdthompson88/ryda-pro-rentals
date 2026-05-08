@@ -42,6 +42,7 @@ import {
   buildStoryboard,
   pickTodaysVehicle,
   type SpotInput,
+  type SpotType,
 } from "./storyboard";
 
 // Vendor selection.
@@ -122,6 +123,7 @@ function parseArgs(argv: string[]): {
   vendor: Vendor;
   quality: "standard" | "high";
   resume: boolean;
+  spotType: SpotType;
 } {
   const out = {
     vehicleIdx: null as number | null,
@@ -130,12 +132,17 @@ function parseArgs(argv: string[]): {
     vendor: "manual" as Vendor,
     quality: "standard" as "standard" | "high",
     resume: false,
+    spotType: "brand_broll" as SpotType,
   };
   const VALID_VENDORS = new Set<Vendor>([
     "manual",
     "seedance",
     "sora",
     "mock",
+  ]);
+  const VALID_SPOT_TYPES = new Set<SpotType>([
+    "brand_broll",
+    "conversion_vo",
   ]);
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
@@ -151,6 +158,12 @@ function parseArgs(argv: string[]): {
     } else if (a.startsWith("--vendor=")) {
       const v = a.split("=")[1].toLowerCase();
       if (VALID_VENDORS.has(v as Vendor)) out.vendor = v as Vendor;
+    } else if (a === "--spot-type") {
+      const v = (argv[++i] ?? "").toLowerCase();
+      if (VALID_SPOT_TYPES.has(v as SpotType)) out.spotType = v as SpotType;
+    } else if (a.startsWith("--spot-type=")) {
+      const v = a.split("=")[1].toLowerCase();
+      if (VALID_SPOT_TYPES.has(v as SpotType)) out.spotType = v as SpotType;
     } else if (a === "--quality=high" || a === "--high") {
       out.quality = "high";
     } else if (a === "--quality=standard") {
@@ -167,7 +180,7 @@ function parseArgs(argv: string[]): {
 async function generateClip(
   vendor: Vendor,
   prompt: string,
-  durationSec: 5 | 10,
+  durationSec: 5 | 10 | 15,
   outPath: string,
   quality: "standard" | "high",
 ): Promise<AnyResult> {
@@ -229,24 +242,32 @@ async function writeMarker(stem: string, vehicleName: string): Promise<void> {
   );
 }
 
-/** Auto-vendor path. Generates 3 clips sequentially via the lib's
- *  registry (Seedance / Sora / mock). Exits the process on any
- *  failure so the day-marker doesn't get written. */
+/** Auto-vendor path. Generates clips sequentially via the lib's
+ *  registry (Seedance / Sora / mock). For brand_broll: 3 × 5s
+ *  clips named shot-{1,2,3}.mp4. For conversion_vo: 1 × 15s clip
+ *  named spot.mp4. Exits the process on any failure so the day-
+ *  marker doesn't get written. */
 async function acquireClipsViaApi(
   storyboard: ReturnType<typeof buildStoryboard>,
   tmpDir: string,
   args: ReturnType<typeof parseArgs>,
 ): Promise<string[]> {
   const clipPaths: string[] = [];
-  for (const shot of storyboard.shots) {
-    const clipPath = path.join(tmpDir, `shot-${shot.index}.mp4`);
+  const totalShots = storyboard.shots.length;
+  for (let i = 0; i < storyboard.shots.length; i++) {
+    const shot = storyboard.shots[i];
+    const clipName =
+      storyboard.spotType === "conversion_vo"
+        ? "spot.mp4"
+        : `shot-${shot.index}.mp4`;
+    const clipPath = path.join(tmpDir, clipName);
     console.log(
-      `[daily-spot] generating shot ${shot.index}/3 (${shot.durationSec}s)…`,
+      `[daily-spot] generating ${i + 1}/${totalShots} (${shot.durationSec}s)…`,
     );
     const res = await generateClip(
       args.vendor,
       shot.prompt,
-      shot.durationSec as 5 | 10,
+      shot.durationSec as 5 | 10 | 15,
       clipPath,
       args.quality,
     );
@@ -285,65 +306,103 @@ async function acquireClipsManual(
 ): Promise<string[]> {
   const manualDir = path.join(MANUAL_CLIPS_ROOT, stem);
   await fs.mkdir(manualDir, { recursive: true });
-  const expected = storyboard.shots.map((s) => ({
-    shot: s,
-    mp4: path.join(manualDir, `shot-${s.index}.mp4`),
-  }));
+
+  // Filename convention differs by spot type:
+  //   brand_broll   → shot-1.mp4, shot-2.mp4, shot-3.mp4 (3 files)
+  //   conversion_vo → spot.mp4 (1 file, full 15s with VO baked in)
+  const expected =
+    storyboard.spotType === "conversion_vo"
+      ? [{ shot: storyboard.shots[0], mp4: path.join(manualDir, "spot.mp4") }]
+      : storyboard.shots.map((s) => ({
+          shot: s,
+          mp4: path.join(manualDir, `shot-${s.index}.mp4`),
+        }));
 
   if (!args.resume) {
     // Step 1: write prompts + print copy-paste-friendly UX, then exit.
     const promptsDir = path.join(MANUAL_PROMPTS_ROOT, stem);
     await fs.mkdir(promptsDir, { recursive: true });
     for (const { shot } of expected) {
-      await fs.writeFile(
-        path.join(promptsDir, `shot-${shot.index}.txt`),
-        shot.prompt,
-      );
+      const fname =
+        storyboard.spotType === "conversion_vo"
+          ? "prompt.txt"
+          : `shot-${shot.index}.txt`;
+      await fs.writeFile(path.join(promptsDir, fname), shot.prompt);
     }
     console.log("");
     console.log("=========================================");
-    console.log("MANUAL MODE — generate clips yourself");
+    console.log(`MANUAL MODE — generate ${storyboard.spotType}`);
     console.log("=========================================");
     console.log("");
     console.log(`Stem:      ${stem}`);
     console.log(`Prompts:   ${promptsDir}`);
     console.log(`Drop MP4s: ${manualDir}`);
     console.log("");
-    for (const { shot } of expected) {
+    if (storyboard.spotType === "conversion_vo") {
       console.log(
-        `--- Shot ${shot.index} (${shot.durationSec}s, overlay: "${shot.overlay}") ---`,
+        `--- One 15-second prompt (with VO baked in) ---`,
       );
-      console.log(shot.prompt);
+      console.log(expected[0].shot.prompt);
       console.log("");
+      console.log("=========================================");
+      console.log("NEXT STEPS:");
+      console.log("=========================================");
+      console.log(
+        "1. Open Dreamina (https://dreamina.capcut.com), switch to **Video** mode, ENABLE AUDIO.",
+      );
+      console.log(
+        "2. Paste the prompt above. Submit. (~60-120s on Seedance.)",
+      );
+      console.log("3. Save the MP4 as **spot.mp4** into:");
+      console.log(`     ${manualDir}`);
+      console.log("4. Re-run with --resume to compose:");
+      console.log(
+        `     npm run marketing:daily-spot -- --vendor=manual --spot-type=conversion_vo --vehicle ${args.vehicleIdx ?? 0} --resume`,
+      );
+    } else {
+      for (const { shot } of expected) {
+        console.log(
+          `--- Shot ${shot.index} (${shot.durationSec}s, overlay: "${shot.overlay}") ---`,
+        );
+        console.log(shot.prompt);
+        console.log("");
+      }
+      console.log("=========================================");
+      console.log("NEXT STEPS:");
+      console.log("=========================================");
+      console.log(
+        "1. Open Dreamina (https://dreamina.capcut.com) — or any AI video tool.",
+      );
+      console.log(
+        "2. Paste each prompt above and generate (~60s/clip on Seedance).",
+      );
+      console.log(
+        "3. Save the MP4s as shot-1.mp4, shot-2.mp4, shot-3.mp4 into:",
+      );
+      console.log(`     ${manualDir}`);
+      console.log("4. Re-run with --resume to compose the spot:");
+      console.log(
+        `     npm run marketing:daily-spot -- --vendor=manual --vehicle ${args.vehicleIdx ?? 0} --resume`,
+      );
     }
-    console.log("=========================================");
-    console.log("NEXT STEPS:");
-    console.log("=========================================");
-    console.log("1. Open Dreamina (https://dreamina.capcut.com) — or any AI video tool.");
-    console.log("2. Paste each prompt above and generate (~60s/clip on Seedance).");
-    console.log("3. Save the MP4s as shot-1.mp4, shot-2.mp4, shot-3.mp4 into:");
-    console.log(`     ${manualDir}`);
-    console.log("4. Re-run with --resume to compose the spot:");
-    console.log(
-      `     npm run marketing:daily-spot -- --vendor=manual --vehicle ${args.vehicleIdx ?? 0} --resume`,
-    );
     console.log("");
     process.exit(0);
   }
 
-  // Step 2 (--resume): verify all 3 MP4s are present.
+  // Step 2 (--resume): verify all expected MP4s are present.
   console.log(`[daily-spot] resume: checking ${manualDir}`);
   const clipPaths: string[] = [];
   const missing: string[] = [];
-  for (const { shot, mp4 } of expected) {
+  for (const { mp4 } of expected) {
+    const fname = path.basename(mp4);
     try {
       const stat = await fs.stat(mp4);
       console.log(
-        `[daily-spot]   shot-${shot.index}.mp4 ok (${(stat.size / 1024 / 1024).toFixed(1)} MB)`,
+        `[daily-spot]   ${fname} ok (${(stat.size / 1024 / 1024).toFixed(1)} MB)`,
       );
       clipPaths.push(mp4);
     } catch {
-      missing.push(`shot-${shot.index}.mp4`);
+      missing.push(fname);
     }
   }
   if (missing.length > 0) {
@@ -369,10 +428,11 @@ async function main() {
     args.vehicleIdx != null
       ? LAUNCH_INVENTORY[args.vehicleIdx % LAUNCH_INVENTORY.length]
       : pickTodaysVehicle();
-  console.log(`[daily-spot] vehicle: ${vehicle.name} (${vehicle.vehicleType})`);
-  console.log(`[daily-spot] vendor:  ${args.vendor}`);
+  console.log(`[daily-spot] vehicle:    ${vehicle.name} (${vehicle.vehicleType})`);
+  console.log(`[daily-spot] vendor:     ${args.vendor}`);
+  console.log(`[daily-spot] spot type:  ${args.spotType}`);
 
-  const storyboard = buildStoryboard(vehicle);
+  const storyboard = buildStoryboard({ ...vehicle, spotType: args.spotType });
   const stem = `${slugify(vehicle.name)}-${todayStamp()}`;
   const tmpDir = path.join(TMP_CLIPS_ROOT, stem);
   await fs.mkdir(tmpDir, { recursive: true });
