@@ -23,7 +23,7 @@ const RATE_LIMIT = 5;
 const RATE_WINDOW_MS = 60_000;
 
 export async function POST(req: NextRequest) {
-  if (!isAllowed(`kyc-start:${clientIp(req)}`, RATE_LIMIT, RATE_WINDOW_MS)) {
+  if (!(await isAllowed(`kyc-start:${clientIp(req)}`, RATE_LIMIT, RATE_WINDOW_MS))) {
     return NextResponse.json(
       { error: "Too many requests. Try again in a minute." },
       { status: 429 },

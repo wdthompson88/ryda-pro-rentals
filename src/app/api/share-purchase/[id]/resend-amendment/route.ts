@@ -44,11 +44,11 @@ export async function POST(
   }
 
   if (
-    !isAllowed(
+    !(await isAllowed(
       `resend-amendment:${user.id}:${clientIp(req)}`,
       RATE_LIMIT,
       RATE_WINDOW_MS,
-    )
+    ))
   ) {
     return NextResponse.json(
       { error: "Too many resend requests. Try again in a minute." },

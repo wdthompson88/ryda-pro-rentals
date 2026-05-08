@@ -31,7 +31,7 @@ const VALID_TYPES: DocumentType[] = [
 ];
 
 export async function POST(req: NextRequest) {
-  if (!isAllowed(`docsign:${clientIp(req)}`, RATE_LIMIT, RATE_WINDOW_MS)) {
+  if (!(await isAllowed(`docsign:${clientIp(req)}`, RATE_LIMIT, RATE_WINDOW_MS))) {
     return NextResponse.json(
       { error: "Too many requests. Try again in a minute." },
       { status: 429 },

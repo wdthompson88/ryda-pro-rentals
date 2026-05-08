@@ -35,11 +35,11 @@ export async function POST(req: NextRequest) {
   }
 
   if (
-    !isAllowed(
+    !(await isAllowed(
       `billing-portal:${user.id}:${clientIp(req)}`,
       RATE_LIMIT,
       RATE_WINDOW_MS,
-    )
+    ))
   ) {
     return NextResponse.json(
       { error: "Too many requests. Try again in a minute." },

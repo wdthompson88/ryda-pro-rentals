@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
 
   // Rate-limit key includes user_id so shared-NAT (corporate, dorm)
   // doesn't have one user lock another out at 3/min.
-  if (!isAllowed(`account-dr:${user.id}:${clientIp(req)}`, RATE_LIMIT, RATE_WINDOW_MS)) {
+  if (!(await isAllowed(`account-dr:${user.id}:${clientIp(req)}`, RATE_LIMIT, RATE_WINDOW_MS))) {
     return NextResponse.json(
       { error: "Too many requests. Try again in a minute." },
       { status: 429 },

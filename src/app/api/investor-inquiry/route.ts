@@ -15,7 +15,7 @@ const RATE_WINDOW_MS = 60_000;
 
 export async function POST(req: Request) {
   try {
-    if (!isAllowed(`investor-inquiry:${clientIp(req)}`, RATE_LIMIT, RATE_WINDOW_MS)) {
+    if (!(await isAllowed(`investor-inquiry:${clientIp(req)}`, RATE_LIMIT, RATE_WINDOW_MS))) {
       return NextResponse.json(
         { error: "Too many requests. Try again in a minute." },
         { status: 429 },

@@ -30,6 +30,13 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      // Stub `server-only` for vitest. The package throws at import
+      // time outside Next.js RSC context, breaking tests for any
+      // module that imports it (e.g. lib/rate-limit/upstash.ts).
+      // The runtime guarantee is provided by Next.js's bundler,
+      // not the package code itself, so a no-op stub in tests is
+      // safe.
+      "server-only": path.resolve(__dirname, "./src/test-shims/server-only.ts"),
     },
   },
 });

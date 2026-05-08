@@ -1,0 +1,5 @@
+{
+  "schema_version": 1,
+  "_comment": "Pinned SHA-256 hashes for Dropbox Sign templates. The daily cron at /api/cron/template-hash-check fetches each template from Dropbox Sign + computes the canonical structural hash + compares to the entry below. Mismatch => notify ops (detection only; no automatic gate on sign-requests in v1 — ops manually rotates DROPBOX_SIGN_API_KEY to disable signing if needed). To intentionally update a template: change it in the Dropbox Sign console, run `npx tsx scripts/sync-template-hashes.ts`, commit the new hash. Pre-launch this file is empty and the cron is a no-op. See src/lib/template-hashes.ts for the canonicalization rules.",
+  "templates": {}
+}

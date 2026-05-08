@@ -41,11 +41,11 @@ export async function POST(
   }
 
   if (
-    !isAllowed(
+    !(await isAllowed(
       `xfer-resp:${user.id}:${clientIp(req)}`,
       RATE_LIMIT,
       RATE_WINDOW_MS,
-    )
+    ))
   ) {
     return NextResponse.json(
       { error: "Too many requests. Try again in a minute." },

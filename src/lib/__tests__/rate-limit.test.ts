@@ -10,7 +10,11 @@
 // load shape, or migrate to Upstash Redis (architecture finding).
 
 import { describe, it, expect } from "vitest";
-import { isAllowed, clientIp } from "../rate-limit";
+// Tests target the in-memory adapter directly so they don't need
+// Upstash env vars set. The public `isAllowed` (resolver) is a
+// thin async wrapper over this — separately tested for adapter
+// selection behavior.
+import { isAllowedInMemory as isAllowed, clientIp } from "../rate-limit";
 
 describe("isAllowed — basic token bucket", () => {
   // Use unique keys per test to avoid module-scoped Map pollution.

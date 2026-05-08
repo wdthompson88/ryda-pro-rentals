@@ -55,7 +55,7 @@ const RATE_LIMIT = 50;
 const RATE_WINDOW_MS = 60_000;
 
 export async function POST(req: NextRequest) {
-  if (!isAllowed(`csp-report:${clientIp(req)}`, RATE_LIMIT, RATE_WINDOW_MS)) {
+  if (!(await isAllowed(`csp-report:${clientIp(req)}`, RATE_LIMIT, RATE_WINDOW_MS))) {
     // 204 even on rate-limit so the browser doesn't retry.
     return new NextResponse(null, { status: 204 });
   }

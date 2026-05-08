@@ -51,6 +51,12 @@ export function embeddedApi() {
   return client;
 }
 
+export function templateApi() {
+  const client = new DropboxSign.TemplateApi();
+  client.username = apiKey;
+  return client;
+}
+
 // NOTE: We intentionally do NOT export `apiKey` or `clientId` from this
 // module. The webhook handler reads `process.env.DROPBOX_SIGN_API_KEY`
 // directly for HMAC verification — exporting the key as a named const

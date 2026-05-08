@@ -28,11 +28,11 @@ export async function POST(
     return NextResponse.json({ error: "Sign in required." }, { status: 401 });
   }
   if (
-    !isAllowed(
+    !(await isAllowed(
       `xfer-cancel:${user.id}:${clientIp(req)}`,
       RATE_LIMIT,
       RATE_WINDOW_MS,
-    )
+    ))
   ) {
     return NextResponse.json(
       { error: "Too many requests. Try again in a minute." },

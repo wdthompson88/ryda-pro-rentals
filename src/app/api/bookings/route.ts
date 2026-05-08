@@ -19,7 +19,7 @@ const RATE_WINDOW_MS = 60_000;
 const ACTIVE_STATUSES = ["pending", "confirmed", "in-progress"];
 
 export async function POST(req: NextRequest) {
-  if (!isAllowed(`bookings:${clientIp(req)}`, RATE_LIMIT, RATE_WINDOW_MS)) {
+  if (!(await isAllowed(`bookings:${clientIp(req)}`, RATE_LIMIT, RATE_WINDOW_MS))) {
     return NextResponse.json(
       { error: "Too many requests. Try again in a minute." },
       { status: 429 },
