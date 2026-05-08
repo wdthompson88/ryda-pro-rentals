@@ -32,14 +32,10 @@ import os from "node:os";
 import { createClient } from "@supabase/supabase-js";
 import { loadDotEnvLocal } from "../env-loader";
 
-// Load Supabase + OpenAI env from .env.local before importing
-// modules that read env at module-init time.
+// Load env (FAL_KEY, OPENAI_API_KEY, Supabase) from .env.local
+// BEFORE importing modules that read env at init time.
 loadDotEnvLocal();
 
-import {
-  generateClipViaDreamina,
-  type GenerateClipResult as DreaminaResult,
-} from "./dreamina-driver";
 import { composeSpot } from "./composer";
 import {
   LAUNCH_INVENTORY,
@@ -48,25 +44,22 @@ import {
   type SpotInput,
 } from "./storyboard";
 
-type Vendor = "sora" | "dreamina";
+// Vendor selection. seedance is the default (cheapest credible
+// option, ~$4.50/mo at 720p for daily spots, no death clock).
+// sora is kept until 2026-09-24 for accounts already wired on
+// OPENAI_API_KEY only. mock is for offline tests.
+type Vendor = "seedance" | "sora" | "mock";
 
-// Sora API result has a slightly different shape than the browser-
-// based Dreamina driver. We normalize both to a unified result here.
 type AnyResult =
-  | DreaminaResult
   | {
       kind: "ok";
       path: string;
       sizeBytes: number;
       vendorUrl: string | null;
     }
-  | { kind: "not_logged_in" }
   | { kind: "error"; error: string }
   | { kind: "rate_limited"; retryAfterSec: number | null }
-  | { kind: "not_configured"; missingEnv: string[] }
-  | { kind: "timeout"; stage: "composer" | "video" }
-  | { kind: "no_video_capability"; hint: string }
-  | { kind: "out_of_credits"; hint: string };
+  | { kind: "not_configured"; missingEnv: string[] };
 
 const MARKER_DIR = path.join(os.homedir(), ".ryda-marketing", "daily-markers");
 const TMP_CLIPS_ROOT = path.join(os.homedir(), ".ryda-marketing", "clips");
@@ -101,13 +94,16 @@ function parseArgs(argv: string[]): {
   force: boolean;
   noQueue: boolean;
   vendor: Vendor;
+  quality: "standard" | "high";
 } {
   const out = {
     vehicleIdx: null as number | null,
     force: false,
     noQueue: false,
-    vendor: "sora" as Vendor,
+    vendor: "seedance" as Vendor,
+    quality: "standard" as "standard" | "high",
   };
+  const VALID_VENDORS = new Set<Vendor>(["seedance", "sora", "mock"]);
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--force") out.force = true;
@@ -117,31 +113,34 @@ function parseArgs(argv: string[]): {
       if (Number.isInteger(idx)) out.vehicleIdx = idx;
     } else if (a === "--vendor") {
       const v = (argv[++i] ?? "").toLowerCase();
-      if (v === "sora" || v === "dreamina") out.vendor = v;
-    } else if (a === "--vendor=sora") out.vendor = "sora";
-    else if (a === "--vendor=dreamina") out.vendor = "dreamina";
+      if (VALID_VENDORS.has(v as Vendor)) out.vendor = v as Vendor;
+    } else if (a.startsWith("--vendor=")) {
+      const v = a.split("=")[1].toLowerCase();
+      if (VALID_VENDORS.has(v as Vendor)) out.vendor = v as Vendor;
+    } else if (a === "--quality=high" || a === "--high") {
+      out.quality = "high";
+    } else if (a === "--quality=standard") {
+      out.quality = "standard";
+    }
   }
   return out;
 }
 
-/** Single-clip generation routed by vendor. Sora goes through
- *  the OpenAI API (sora-2 / sora-2-pro); Dreamina stays browser-
- *  driven because they don't expose a public API on trial accounts.
- *  Both branches return discriminated unions sharing `kind` so
- *  the orchestrator's switch handles them uniformly. */
+/** Single-clip generation routed through the video-gen lib. The
+ *  lib's registry handles vendor selection (Seedance default,
+ *  Sora as legacy fallback, mock for tests). The adapter pattern
+ *  means swapping vendors is a one-line CLI flag. */
 async function generateClip(
   vendor: Vendor,
   prompt: string,
   durationSec: 5 | 10,
   outPath: string,
+  quality: "standard" | "high",
 ): Promise<AnyResult> {
-  if (vendor === "dreamina") {
-    return generateClipViaDreamina({ prompt, durationSec, outPath });
-  }
-  // Sora: HTTP API, no browser. Lazy-import so dreamina runs
-  // don't pay the import cost. The video-gen lib auto-picks the
-  // first configured adapter; we don't pass vendor explicitly so
-  // future adapters (Runway, Luma) plug in by env presence.
+  // Map our local Vendor type to the lib's VideoVendor type.
+  const libVendor =
+    vendor === "sora" ? "openai-sora" : vendor === "mock" ? "mock" : "seedance";
+
   const { generateClip: generateClipViaApi } = await import(
     "@/lib/video-gen"
   );
@@ -152,13 +151,12 @@ async function generateClip(
       prompt,
       durationSec,
       orientation: "landscape",
-      quality: "standard",
+      quality,
     },
     outDir,
     filename,
+    { vendor: libVendor },
   );
-  // Adapt the lib's result shape to AnyResult. The lib returns
-  // sizeBytes via the file we just wrote; compute it here.
   if (result.kind === "ok") {
     let sizeBytes = 0;
     try {
@@ -219,8 +217,8 @@ async function main() {
   const tmpDir = path.join(TMP_CLIPS_ROOT, stem);
   await fs.mkdir(tmpDir, { recursive: true });
 
-  // -- Generate the 3 clips. Sequential because Sora throttles
-  //    per-account aggressively and parallel runs trip rate limits.
+  // -- Generate the 3 clips. Sequential because providers
+  //    throttle per-account and parallel runs trip rate limits.
   const clipPaths: string[] = [];
   for (const shot of storyboard.shots) {
     const clipPath = path.join(tmpDir, `shot-${shot.index}.mp4`);
@@ -232,28 +230,13 @@ async function main() {
       shot.prompt,
       shot.durationSec as 5 | 10,
       clipPath,
+      args.quality,
     );
     if (res.kind === "ok") {
       console.log(
         `[daily-spot]   ok: ${(res.sizeBytes / 1024 / 1024).toFixed(1)} MB`,
       );
       clipPaths.push(clipPath);
-    } else if (res.kind === "not_logged_in") {
-      console.error(
-        `[daily-spot] NOT LOGGED IN to ${args.vendor}. Run \`npm run marketing:${args.vendor === "dreamina" ? "dreamina" : "chatgpt"}-check\` to log in, then re-run.`,
-      );
-      process.exit(2);
-    } else if (res.kind === "no_video_capability") {
-      console.error(`[daily-spot] ${res.hint}`);
-      process.exit(3);
-    } else if (res.kind === "out_of_credits") {
-      console.error(`[daily-spot] ${res.hint}`);
-      process.exit(8);
-    } else if (res.kind === "timeout") {
-      console.error(
-        `[daily-spot] timeout at stage=${res.stage} on shot ${shot.index}. ${args.vendor} generation can take >5 min on busy days; try again in an hour.`,
-      );
-      process.exit(4);
     } else if (res.kind === "rate_limited") {
       console.error(
         `[daily-spot] rate limited by ${args.vendor}. Retry after ${res.retryAfterSec ?? "?"}s.`,
@@ -261,17 +244,13 @@ async function main() {
       process.exit(9);
     } else if (res.kind === "not_configured") {
       console.error(
-        `[daily-spot] not configured. Missing env: ${res.missingEnv.join(", ")}.`,
+        `[daily-spot] ${args.vendor} not configured. Missing env: ${res.missingEnv.join(", ")}.\n\nFor Seedance: get a key at https://fal.ai/dashboard/keys and set FAL_KEY in .env.local.`,
       );
       process.exit(10);
-    } else if (res.kind === "error") {
+    } else {
+      // Single error sink — covers the kind:"error" variant.
       console.error(`[daily-spot] error on shot ${shot.index}: ${res.error}`);
       process.exit(5);
-    } else {
-      // Exhaustive check — any new variant added to AnyResult will
-      // get caught here at compile time once we narrow exhaustively.
-      console.error(`[daily-spot] unknown result variant`);
-      process.exit(6);
     }
   }
 

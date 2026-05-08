@@ -54,7 +54,13 @@ export type GenerateClipResult =
   | { kind: "rate_limited"; retryAfterSec: number | null }
   | { kind: "error"; error: string };
 
-export type VideoVendor = "openai-sora" | "runway" | "luma" | "mock";
+export type VideoVendor =
+  | "seedance" // ByteDance Seedance 2.0 via fal.ai (DEFAULT)
+  | "openai-sora" // legacy — API discontinues 2026-09-24
+  | "runway" // not wired
+  | "luma" // not wired
+  | "kling" // not wired
+  | "mock";
 
 export type VideoGenAdapter = {
   vendor: VideoVendor;

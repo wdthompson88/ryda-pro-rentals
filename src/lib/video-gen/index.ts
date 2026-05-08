@@ -19,6 +19,7 @@ import type {
   VideoGenAdapter,
   VideoVendor,
 } from "./types";
+import { seedanceAdapter } from "./seedance";
 import { openAiSoraAdapter } from "./openai-sora";
 import { mockVideoAdapter } from "./mock";
 
@@ -32,18 +33,29 @@ export type {
 } from "./types";
 
 const REGISTRY: Record<VideoVendor, VideoGenAdapter | null> = {
+  // Default. ByteDance Seedance 2.0 via fal.ai. ~10x cheaper than
+  // Sora at equivalent quality, no API death clock, strong physics
+  // on reflective surfaces (cars, boats, glass).
+  seedance: seedanceAdapter,
+  // Legacy. OpenAI announced March 2026 that the Sora API will
+  // discontinue 2026-09-24. We keep the adapter wired through the
+  // shutdown date so existing OPENAI_API_KEY-only setups still work,
+  // but the default adapter no longer prefers it.
   "openai-sora": openAiSoraAdapter,
   // Placeholders so callers can opt into a future adapter by name
   // without TS complaining. When the adapter ships, register it here.
   runway: null,
   luma: null,
+  kling: null,
   mock: mockVideoAdapter,
 };
 
 /** Return the first adapter whose isConfigured() is true, in
  *  preference order. Mock is excluded — production must fail
- *  loudly when no real vendor is wired. */
+ *  loudly when no real vendor is wired.
+ *  Order: Seedance (FAL_KEY) > Sora (OPENAI_API_KEY, legacy). */
 export function getDefaultAdapter(): VideoGenAdapter | null {
+  if (seedanceAdapter.isConfigured()) return seedanceAdapter;
   if (openAiSoraAdapter.isConfigured()) return openAiSoraAdapter;
   return null;
 }
@@ -72,12 +84,16 @@ export async function generateClip(
     };
   }
   if (!adapter.isConfigured()) {
+    const envByVendor: Record<string, string> = {
+      seedance: "FAL_KEY",
+      "openai-sora": "OPENAI_API_KEY",
+      runway: "RUNWAY_API_KEY",
+      luma: "LUMA_API_KEY",
+      kling: "KLING_API_KEY",
+    };
     return {
       kind: "not_configured",
-      missingEnv:
-        adapter.vendor === "openai-sora"
-          ? ["OPENAI_API_KEY"]
-          : [`${adapter.vendor.toUpperCase()}_API_KEY`],
+      missingEnv: [envByVendor[adapter.vendor] ?? `${adapter.vendor.toUpperCase()}_API_KEY`],
     };
   }
   return adapter.generate(input, outDir, filename);
