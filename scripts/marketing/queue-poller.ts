@@ -44,6 +44,11 @@ import { createClient } from "@supabase/supabase-js";
 import path from "node:path";
 import { promises as fs } from "node:fs";
 import { generateImageViaChatGPT, type GenerateResult } from "./chatgpt-driver";
+import { loadDotEnvLocal } from "./env-loader";
+
+// tsx doesn't auto-load .env files. Load Supabase + driver env
+// before reading process.env below.
+loadDotEnvLocal();
 
 const BATCH_SIZE = parseInt(process.env.QUEUE_POLLER_BATCH_SIZE || "5", 10);
 const PAUSE_BETWEEN_MS = parseInt(

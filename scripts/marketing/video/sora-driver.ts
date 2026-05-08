@@ -97,8 +97,13 @@ export async function generateClipViaSora(
     const page = context.pages()[0] ?? (await context.newPage());
 
     await page.goto(SORA_URL, { waitUntil: "domcontentloaded" });
-    const url = page.url();
-    if (url.includes("/auth/") || url.includes("/login")) {
+
+    // First-run grace window: if the Chrome window lands on the
+    // ChatGPT login page, give the user up to 5 minutes to sign
+    // in (with a friendly stdout nudge) before bailing. The next
+    // run picks up the persisted cookies and skips this wait.
+    const loggedIn = await waitForChatGptLogin(page);
+    if (!loggedIn) {
       return { kind: "not_logged_in" };
     }
 
@@ -156,6 +161,37 @@ export async function generateClipViaSora(
       await context.close().catch(() => {});
     }
   }
+}
+
+/** Poll the page URL until it leaves the ChatGPT auth flow.
+ *  On first run the persistent profile is empty, the user lands
+ *  on the login page, and they need a few minutes to authenticate
+ *  in the popped-up Chrome window. Polls for 5 min then gives up. */
+async function waitForChatGptLogin(page: Page): Promise<boolean> {
+  const isAuthUrl = (u: string) =>
+    u.includes("/auth/") || u.includes("/login") || u.includes("/sign");
+  if (!isAuthUrl(page.url())) return true;
+
+  console.log(
+    "[sora-driver] Chrome opened on ChatGPT login page. Sign in with your ChatGPT Pro account in the popped-up window. Waiting up to 5 minutes…",
+  );
+  const deadline = Date.now() + 5 * 60_000;
+  while (Date.now() < deadline) {
+    await new Promise((r) => setTimeout(r, 2000));
+    try {
+      if (!isAuthUrl(page.url())) {
+        console.log("[sora-driver] login detected. Continuing.");
+        return true;
+      }
+    } catch {
+      // Page may be transitioning (about:blank between redirects).
+      // Just retry on the next tick.
+    }
+  }
+  console.error(
+    "[sora-driver] login timeout. Re-run the script after authenticating in chatgpt.com.",
+  );
+  return false;
 }
 
 async function waitForComposer(page: Page) {

@@ -30,6 +30,12 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import os from "node:os";
 import { createClient } from "@supabase/supabase-js";
+import { loadDotEnvLocal } from "../env-loader";
+
+// Load Supabase + ChatGPT env from .env.local. tsx doesn't auto-load
+// .env files, and Next's loader only runs in dev/build. This makes
+// the script Just Work when launched via `npm run`.
+loadDotEnvLocal();
 import { generateClipViaSora } from "./sora-driver";
 import { composeSpot } from "./composer";
 import {

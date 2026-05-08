@@ -42,6 +42,11 @@ import { createClient } from "@supabase/supabase-js";
 import matter from "gray-matter";
 import { promises as fs, type Dirent } from "node:fs";
 import path from "node:path";
+import { loadDotEnvLocal } from "./env-loader";
+
+// tsx doesn't auto-load .env files. Load Supabase env before
+// requireEnv runs at the bottom of this script.
+loadDotEnvLocal();
 
 type Channel = "instagram" | "linkedin" | "x" | "email" | "journal";
 const VALID_CHANNELS: Channel[] = [

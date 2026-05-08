@@ -116,11 +116,11 @@ export async function generateImageViaChatGPT(
 
     await page.goto(CHATGPT_URL, { waitUntil: "domcontentloaded" });
 
-    // Quick check: are we on the login page? If so, bail early
-    // with a clear message rather than getting stuck waiting on
-    // the composer.
-    const url = page.url();
-    if (url.includes("/auth/") || url.includes("/login")) {
+    // First-run grace window: if Chrome lands on the ChatGPT login
+    // page, give the user up to 5 minutes to authenticate in the
+    // popped-up window. Subsequent runs reuse cookies and skip this.
+    const loggedIn = await waitForChatGptLogin(page);
+    if (!loggedIn) {
       return { kind: "not_logged_in" };
     }
 
@@ -177,6 +177,36 @@ export async function generateImageViaChatGPT(
       await context.close().catch(() => {});
     }
   }
+}
+
+/** Poll the page URL until it leaves the ChatGPT auth flow.
+ *  On first run the persistent profile is empty; the user lands
+ *  on the login page and needs a few minutes to authenticate in
+ *  the popped-up Chrome window. Polls for 5 min then gives up. */
+async function waitForChatGptLogin(page: Page): Promise<boolean> {
+  const isAuthUrl = (u: string) =>
+    u.includes("/auth/") || u.includes("/login") || u.includes("/sign");
+  if (!isAuthUrl(page.url())) return true;
+
+  console.log(
+    "[chatgpt-driver] Chrome opened on ChatGPT login page. Sign in with your ChatGPT Pro account in the popped-up window. Waiting up to 5 minutes…",
+  );
+  const deadline = Date.now() + 5 * 60_000;
+  while (Date.now() < deadline) {
+    await new Promise((r) => setTimeout(r, 2000));
+    try {
+      if (!isAuthUrl(page.url())) {
+        console.log("[chatgpt-driver] login detected. Continuing.");
+        return true;
+      }
+    } catch {
+      // Page may be transitioning; retry on the next tick.
+    }
+  }
+  console.error(
+    "[chatgpt-driver] login timeout. Re-run after authenticating in chatgpt.com.",
+  );
+  return false;
 }
 
 /** Wait for the chat composer textarea using a list of candidate
