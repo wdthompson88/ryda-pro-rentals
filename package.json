@@ -20,7 +20,9 @@
     "marketing:gen-image": "tsx scripts/marketing/chatgpt-driver.ts",
     "marketing:gen-images": "tsx scripts/marketing/queue-poller.ts --once",
     "marketing:gen-images:loop": "tsx scripts/marketing/queue-poller.ts --loop",
-    "marketing:start": "npm run marketing:sync && npm run marketing:gen-images:loop"
+    "marketing:start": "npm run marketing:sync && npm run marketing:gen-images:loop",
+    "marketing:daily-spot": "tsx scripts/marketing/video/daily-spot.ts",
+    "marketing:smoke-video": "tsx scripts/marketing/video/__smoke__/composer-smoke.ts"
   },
   "dependencies": {
     "@dropbox/sign": "^1.10.0",
@@ -40,10 +42,12 @@
   "devDependencies": {
     "@playwright/test": "^1.59.1",
     "@tailwindcss/postcss": "^4",
+    "@types/ffmpeg-static": "^3.0.3",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitest/coverage-v8": "^4.1.5",
+    "ffmpeg-static": "^5.3.0",
     "gray-matter": "^4.0.3",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
