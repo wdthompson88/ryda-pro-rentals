@@ -21,11 +21,10 @@ export function HiddenWhenAuthed({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
-export function VisibleWhenAuthed({ children }: { children: ReactNode }) {
-  const { status } = useAuthStatus();
-  if (status !== "authed") return null;
-  return <>{children}</>;
-}
+// VisibleWhenAuthed (the symmetric inverse of HiddenWhenAuthed)
+// removed in the dead-code sweep (May 2026). Anyone needing the
+// inverse can re-add or use AuthSwap below — that's the more
+// expressive primitive when both branches need rendering.
 
 // Render one tree for signed-in users, another for everyone else. Used
 // in the site header so the desktop slot keeps the same overall shape

@@ -27,6 +27,7 @@
 import type { NextRequest } from "next/server";
 import { getUserFromRequestWithDiag } from "@/lib/api-auth";
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import { isAal2 } from "@/lib/mfa-policy";
 
 export type AdminUser = {
   id: string;
@@ -97,7 +98,7 @@ export async function requireAdmin(
   // token is guaranteed non-null when user is non-null (api-auth
   // contract); defensive for the type system.
   const aal = token ? readAalFromJwt(token) : null;
-  if (aal !== "aal2") {
+  if (!isAal2(aal)) {
     if (mfaRequired) {
       console.warn(
         "[admin-auth] denied: admin without aal2 (MFA required)",

@@ -12,11 +12,12 @@
 // encrypt/decrypt themselves. They call read or build helpers and
 // get back the typed jsonb shape they expect.
 
-import {
-  isPiiEncryptionConfigured,
-  encryptJson,
-  decryptVerifiedOutputs,
-} from "./pii-encryption";
+// isPiiEncryptionConfigured intentionally not imported — strict
+// mode keys off env-var presence directly per the round-2 codex
+// catch (a configured-but-malformed key returns false from
+// isPiiEncryptionConfigured, which would have leaked plaintext
+// reads).
+import { encryptJson, decryptVerifiedOutputs } from "./pii-encryption";
 import "server-only";
 
 /** The shape Stripe Identity returns + we consume. */

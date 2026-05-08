@@ -35,6 +35,7 @@ import { requireAdmin } from "@/lib/admin-auth";
 import { recordAdminAction } from "@/lib/admin-audit";
 import { isAllowed, clientIp } from "@/lib/rate-limit";
 import { notifyTeam, emailLayout, escapeHtml } from "@/lib/notify";
+import { blocksRefund } from "@/lib/dispute-status";
 
 export const runtime = "nodejs";
 
@@ -168,8 +169,9 @@ export async function POST(
   // responds in Stripe dashboard; on dispute_won, refund unblocks;
   // on dispute_lost, the funds are already gone (no refund needed).
   if (
-    purchase.dispute_status === "disputed" ||
-    purchase.dispute_status === "dispute_lost"
+    blocksRefund(
+      purchase.dispute_status as "disputed" | "dispute_won" | "dispute_lost" | null,
+    )
   ) {
     return NextResponse.json(
       {
