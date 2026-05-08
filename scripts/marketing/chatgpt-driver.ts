@@ -35,11 +35,15 @@
 //     outPath: "/tmp/output.png",
 //   });
 
-import { chromium, type BrowserContext, type Page } from "playwright";
+import { type BrowserContext, type Page } from "playwright";
 import path from "node:path";
 import os from "node:os";
 import { promises as fs } from "node:fs";
-import { gotoAndClearChallenges, safeEvaluate } from "./playwright-helpers";
+import {
+  gotoAndClearChallenges,
+  launchStealthChromium,
+  safeEvaluate,
+} from "./playwright-helpers";
 
 // Persistent profile dir: cookies + localStorage live here so the
 // user only logs into ChatGPT once. ~/.ryda-marketing/ stays out
@@ -105,13 +109,11 @@ export async function generateImageViaChatGPT(
     // runs so the user only logs in once. We don't use the user's
     // actual Chrome profile (that would clobber their normal
     // browsing) — this is a dedicated automation profile.
-    context = await chromium.launchPersistentContext(PROFILE_DIR, {
+    // launchStealthChromium applies puppeteer-extra-plugin-stealth
+    // so Cloudflare's bot challenge actually clears.
+    context = await launchStealthChromium({
+      profileDir: PROFILE_DIR,
       headless,
-      viewport: { width: 1280, height: 900 },
-      // ChatGPT sometimes detects automation and triggers Cloudflare;
-      // a real-looking UA reduces friction. Not foolproof but helps.
-      userAgent:
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
     });
     const page = context.pages()[0] ?? (await context.newPage());
 

@@ -8,7 +8,19 @@
 // downstream login/composer detection sees the Cloudflare DOM
 // instead of the real app.
 
-import type { Page } from "playwright";
+import type { BrowserContext, Page } from "playwright";
+import { chromium } from "playwright-extra";
+// Stealth plugin patches navigator.webdriver, chrome.runtime, plugin
+// shape, languages, WebGL vendor masking, iframe hooks, and the
+// other ~15 markers Cloudflare uses to flag automation. Without it,
+// Cloudflare serves the unsolvable "Just a moment..." challenge that
+// killed our first chatgpt-check run.
+//
+// Note: the plugin is a CommonJS module without proper TS types, so
+// we import it as `any` and cast. The runtime behavior is correct.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const stealth = require("puppeteer-extra-plugin-stealth")();
+chromium.use(stealth);
 
 /** Run page.evaluate but tolerate the "Execution context was
  *  destroyed" error that fires when the page navigates mid-eval
@@ -108,4 +120,28 @@ export async function gotoAndClearChallenges(
 ): Promise<void> {
   await page.goto(url, { waitUntil: "domcontentloaded" });
   await waitForCloudflareChallenge(page);
+}
+
+/** Launch a persistent Chromium context with the stealth plugin
+ *  applied. All drivers should use this instead of calling
+ *  chromium.launchPersistentContext directly so Cloudflare
+ *  challenges actually clear. */
+export async function launchStealthChromium(opts: {
+  profileDir: string;
+  headless?: boolean;
+  viewport?: { width: number; height: number };
+  userAgent?: string;
+}): Promise<BrowserContext> {
+  return chromium.launchPersistentContext(opts.profileDir, {
+    headless: opts.headless ?? false,
+    viewport: opts.viewport ?? { width: 1280, height: 900 },
+    userAgent:
+      opts.userAgent ??
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
+    // These args harden the stealth profile further:
+    args: [
+      "--disable-blink-features=AutomationControlled",
+      "--disable-features=IsolateOrigins,site-per-process",
+    ],
+  });
 }

@@ -29,12 +29,13 @@
 //      (and most consumer AI services). Light volume rarely
 //      enforced; not contractually clean.
 
-import { chromium, type BrowserContext, type Page } from "playwright";
+import { type BrowserContext, type Page } from "playwright";
 import path from "node:path";
 import os from "node:os";
 import { promises as fs } from "node:fs";
 import {
   gotoAndClearChallenges,
+  launchStealthChromium,
   safeEvaluate,
 } from "../playwright-helpers";
 
@@ -78,11 +79,9 @@ export async function generateClipViaDreamina(
 
   let context: BrowserContext | null = null;
   try {
-    context = await chromium.launchPersistentContext(PROFILE_DIR, {
+    context = await launchStealthChromium({
+      profileDir: PROFILE_DIR,
       headless,
-      viewport: { width: 1280, height: 900 },
-      userAgent:
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
     });
     const page = context.pages()[0] ?? (await context.newPage());
 

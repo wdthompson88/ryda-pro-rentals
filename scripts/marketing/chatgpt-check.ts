@@ -18,12 +18,14 @@
 //   - you suspect the ChatGPT UI changed and the driver's selectors
 //     are stale
 
-import { chromium } from "playwright";
 import path from "node:path";
 import os from "node:os";
 import { promises as fs } from "node:fs";
 import { loadDotEnvLocal } from "./env-loader";
-import { gotoAndClearChallenges } from "./playwright-helpers";
+import {
+  gotoAndClearChallenges,
+  launchStealthChromium,
+} from "./playwright-helpers";
 
 loadDotEnvLocal();
 
@@ -37,12 +39,7 @@ async function main() {
   console.log(`[chatgpt-check] profile dir: ${PROFILE_DIR}`);
   await fs.mkdir(PROFILE_DIR, { recursive: true });
 
-  const context = await chromium.launchPersistentContext(PROFILE_DIR, {
-    headless: false,
-    viewport: { width: 1280, height: 900 },
-    userAgent:
-      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
-  });
+  const context = await launchStealthChromium({ profileDir: PROFILE_DIR });
   const page = context.pages()[0] ?? (await context.newPage());
 
   console.log(`[chatgpt-check] navigating to ${CHATGPT_URL}…`);
