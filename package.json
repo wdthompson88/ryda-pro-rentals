@@ -21,7 +21,8 @@
     "marketing:gen-images:loop": "tsx scripts/marketing/queue-poller.ts --loop",
     "marketing:start": "npm run marketing:sync && npm run marketing:gen-images:loop",
     "marketing:daily-spot": "tsx scripts/marketing/video/daily-spot.ts",
-    "marketing:smoke-video": "tsx scripts/marketing/video/__smoke__/composer-smoke.ts"
+    "marketing:smoke-video": "tsx scripts/marketing/video/__smoke__/composer-smoke.ts",
+    "marketing:brief": "tsx scripts/marketing/daily-brief.ts"
   },
   "dependencies": {
     "@dropbox/sign": "^1.10.0",
@@ -48,8 +49,6 @@
     "@vitest/coverage-v8": "^4.1.5",
     "ffmpeg-static": "^5.3.0",
     "gray-matter": "^4.0.3",
-    "playwright-extra": "^4.3.6",
-    "puppeteer-extra-plugin-stealth": "^2.11.2",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "^5",
