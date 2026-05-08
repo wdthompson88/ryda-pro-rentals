@@ -6,7 +6,13 @@
 // to close, and arrow-key navigation.
 
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type TouchEvent as ReactTouchEvent,
+} from "react";
 
 export function PhotoGallery({
   photos,
@@ -165,6 +171,13 @@ function Lightbox({
   const current = photos[index];
   const closeRef = useRef<HTMLButtonElement | null>(null);
   const lastFocusedRef = useRef<HTMLElement | null>(null);
+  // Touch state for mobile swipe gesture. We track the starting X/Y
+  // of a single touch and the elapsed time. On touchend we compare
+  // against MIN_SWIPE thresholds to decide between "tap" (= ignore;
+  // backdrop click closes) and "swipe" (= cycle photo). Vertical
+  // swipes are deliberately swallowed without action so they don't
+  // accidentally close the dialog.
+  const touchRef = useRef<{ x: number; y: number; t: number } | null>(null);
 
   // a11y: when the lightbox opens, remember what had focus, move focus
   // to the close button, and restore on unmount. Tab + Shift-Tab are
@@ -176,6 +189,34 @@ function Lightbox({
       lastFocusedRef.current?.focus();
     };
   }, []);
+
+  // Mobile swipe → cycle photos. Thresholds tuned for iOS Safari:
+  // ≥50px horizontal travel + ≥2× horizontal vs vertical (so that
+  // diagonal swipes still register, accidental thumb-drags don't).
+  // Capped at 600ms so a slow scroll doesn't accidentally fire.
+  const onTouchStart = (e: ReactTouchEvent) => {
+    if (e.touches.length !== 1) return;
+    const t = e.touches[0];
+    touchRef.current = { x: t.clientX, y: t.clientY, t: Date.now() };
+  };
+  const onTouchEnd = (e: ReactTouchEvent) => {
+    const start = touchRef.current;
+    touchRef.current = null;
+    if (!start) return;
+    const t = e.changedTouches[0];
+    if (!t) return;
+    const dx = t.clientX - start.x;
+    const dy = t.clientY - start.y;
+    const dt = Date.now() - start.t;
+    if (dt > 600) return;
+    if (Math.abs(dx) < 50) return;
+    if (Math.abs(dx) < Math.abs(dy) * 2) return;
+    // Stop the click that would otherwise close the dialog (the
+    // touch sequence ends with a synthesized click on the backdrop).
+    e.stopPropagation();
+    if (dx < 0) onNext();
+    else onPrev();
+  };
 
   // Focus trap: cycle Tab through the dialog's focusable elements only.
   useEffect(() => {
@@ -207,8 +248,10 @@ function Lightbox({
       role="dialog"
       aria-modal="true"
       aria-label={`${alt} photo viewer`}
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-sm touch-pan-y"
       onClick={onClose}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
     >
       {/* Close button (top-right) */}
       <button

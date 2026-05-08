@@ -360,18 +360,25 @@ function BoatCard({ boat: b }: { boat: Boat }) {
       href={`/boats/portfolio/${b.slug}`}
       className="group flex flex-col overflow-hidden rounded-2xl border border-rule bg-surface transition-all hover:-translate-y-0.5 hover:border-ink/40 hover:shadow-lg"
     >
-      {/* Image with brand badge + status */}
+      {/* Image with brand badge + status. Wrapper applies the
+          render-time crop (boats source photos have similar empty
+          backgrounds to cars). See portfolio-listings.tsx
+          VehicleCard for the full reasoning on the two-layer
+          transform structure. */}
       <div className="relative aspect-[16/10] w-full overflow-hidden bg-cream-2">
-        <Image
-          src={b.hero}
-          alt={`${b.year} ${b.name}`}
-          fill
-          sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
-          className={`object-cover transition-transform duration-500 group-hover:scale-[1.02] ${
-            b.flipImage ? "-scale-x-100" : ""
-          }`}
-          style={{ objectPosition: b.imagePosition ?? "center" }}
-        />
+        <div className="absolute inset-0 origin-center scale-[1.14] transition-transform duration-500 group-hover:scale-[1.18]">
+          <Image
+            src={b.hero}
+            alt={`${b.year} ${b.name}`}
+            fill
+            sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+            className="object-cover"
+            style={{
+              objectPosition: b.imagePosition ?? "center 55%",
+              transform: b.flipImage ? "scaleX(-1)" : undefined,
+            }}
+          />
+        </div>
 
         {/* Brand badge top-left */}
         <span className="absolute left-3 top-3 rounded-full bg-cream/95 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] text-ink backdrop-blur">

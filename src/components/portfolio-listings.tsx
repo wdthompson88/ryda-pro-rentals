@@ -417,20 +417,41 @@ function VehicleCard({ vehicle: v }: { vehicle: Vehicle }) {
       className="group flex flex-col overflow-hidden rounded-2xl border border-rule bg-surface transition-all hover:-translate-y-0.5 hover:border-ink/40 hover:shadow-lg"
     >
       {/* Image with brand badge + status. aspect-[16/9] matches the
-          1024x576 cropped Carfax sources exactly so object-cover fills
-          edge-to-edge with no cream backdrop leaking through. bg-ink
-          (dark) so any pixel-level fallback reads cinematic, not blank. */}
+          1024x576 sources exactly so object-cover fills edge-to-edge.
+          bg-ink (dark) so any pixel-level fallback reads cinematic.
+
+          Render-time crop via the wrapper's `transform: scale(1.14)`:
+          the partner-supplied showroom photos have ~15% empty floor +
+          ~10% empty ceiling around the car (turntable + backdrop).
+          The 14% zoom + overflow-hidden + center 55% positioning
+          makes the car visually fill the card. When source photos
+          are reshot/recropped tighter (target: car fills 80%+ of
+          the 16:9 frame), drop scale to 1.0 and reposition to center.
+
+          Why a wrapper with transform instead of class on <Image>:
+          composing scale + scale-x (for v.flipImage) on the same
+          element clobbers via the single `transform` CSS property.
+          Two layers (outer scale, inner flip) compose cleanly. */}
       <div className="relative aspect-[16/9] w-full overflow-hidden bg-ink">
-        <Image
-          src={v.hero}
-          alt={v.name}
-          fill
-          sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
-          className={`object-cover transition-transform duration-500 group-hover:scale-[1.02] ${
-            v.flipImage ? "-scale-x-100" : ""
-          }`}
-          style={{ objectPosition: v.imagePosition ?? "center" }}
-        />
+        {/* Wrapper handles the base + hover scale via Tailwind so
+            the two scale states transition cleanly. The inner
+            <Image> uses style.transform only for the X-flip when
+            v.flipImage is set; it's on a different element so the
+            two transforms don't fight over the single CSS
+            `transform` property. */}
+        <div className="absolute inset-0 origin-center scale-[1.14] transition-transform duration-500 group-hover:scale-[1.18]">
+          <Image
+            src={v.hero}
+            alt={v.name}
+            fill
+            sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+            className="object-cover"
+            style={{
+              objectPosition: v.imagePosition ?? "center 55%",
+              transform: v.flipImage ? "scaleX(-1)" : undefined,
+            }}
+          />
+        </div>
 
         {/* Brand badge top-left */}
         <span className="absolute left-3 top-3 rounded-full bg-cream/95 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] text-ink backdrop-blur">

@@ -22,7 +22,8 @@
     "marketing:gen-images:loop": "tsx scripts/marketing/queue-poller.ts --loop",
     "marketing:start": "npm run marketing:sync && npm run marketing:gen-images:loop",
     "marketing:daily-spot": "tsx scripts/marketing/video/daily-spot.ts",
-    "marketing:smoke-video": "tsx scripts/marketing/video/__smoke__/composer-smoke.ts"
+    "marketing:smoke-video": "tsx scripts/marketing/video/__smoke__/composer-smoke.ts",
+    "marketing:chatgpt-check": "tsx scripts/marketing/chatgpt-check.ts"
   },
   "dependencies": {
     "@dropbox/sign": "^1.10.0",

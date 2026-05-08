@@ -98,10 +98,11 @@ export async function generateClipViaSora(
 
     await page.goto(SORA_URL, { waitUntil: "domcontentloaded" });
 
-    // First-run grace window: if the Chrome window lands on the
-    // ChatGPT login page, give the user up to 5 minutes to sign
-    // in (with a friendly stdout nudge) before bailing. The next
-    // run picks up the persisted cookies and skips this wait.
+    // First-run grace window: if Chrome lands on a login wall
+    // (URL-based redirect OR content-based — ChatGPT now shows
+    // a "Log in / Sign up" page on the bare chatgpt.com URL when
+    // the session cookie is missing), wait up to 5 min for the
+    // user to authenticate.
     const loggedIn = await waitForChatGptLogin(page);
     if (!loggedIn) {
       return { kind: "not_logged_in" };
@@ -163,33 +164,81 @@ export async function generateClipViaSora(
   }
 }
 
-/** Poll the page URL until it leaves the ChatGPT auth flow.
- *  On first run the persistent profile is empty, the user lands
- *  on the login page, and they need a few minutes to authenticate
- *  in the popped-up Chrome window. Polls for 5 min then gives up. */
+/** Determine if the current page is a ChatGPT login wall. Two
+ *  signals — either is sufficient:
+ *    1. URL matches a known auth path (/auth/, /login, /sign,
+ *       auth.openai.com, etc.)
+ *    2. DOM contains a visible "Log in" / "Sign up" button AND
+ *       no chat composer
+ *  ChatGPT-2025 serves the login wall on the bare chatgpt.com URL
+ *  for unauthenticated visitors, so URL-only checks miss it. */
+async function isLoginWall(page: Page): Promise<boolean> {
+  const u = page.url();
+  if (
+    u.includes("/auth/") ||
+    u.includes("/login") ||
+    u.includes("/sign") ||
+    u.includes("auth.openai.com")
+  ) {
+    return true;
+  }
+  // DOM signal: count visible "Log in"/"Sign up" buttons + presence
+  // of the chat composer. Login wall = login buttons present AND
+  // composer absent.
+  const signals = await safeEvaluate(page, () => {
+    const btns = Array.from(
+      document.querySelectorAll("button, a"),
+    ) as HTMLElement[];
+    const visible = (el: HTMLElement) => {
+      const r = el.getBoundingClientRect();
+      return r.width > 0 && r.height > 0;
+    };
+    const loginButton = btns.some((b) => {
+      const t = (b.innerText || "").trim().toLowerCase();
+      return (
+        visible(b) &&
+        (t === "log in" ||
+          t === "sign in" ||
+          t === "sign up" ||
+          t.startsWith("log in to") ||
+          t.startsWith("sign up to"))
+      );
+    });
+    const composer = document.querySelector(
+      '[data-testid="composer-text-input"], #prompt-textarea, textarea[placeholder*="ChatGPT" i], textarea[placeholder*="message" i]',
+    );
+    return { loginButton, composerPresent: Boolean(composer) };
+  });
+  if (!signals) return false; // navigation in flight; retry next tick
+  return signals.loginButton && !signals.composerPresent;
+}
+
+/** Wait until the page is no longer a login wall. Returns true
+ *  when the user is authenticated, false on timeout. */
 async function waitForChatGptLogin(page: Page): Promise<boolean> {
-  const isAuthUrl = (u: string) =>
-    u.includes("/auth/") || u.includes("/login") || u.includes("/sign");
-  if (!isAuthUrl(page.url())) return true;
+  const wallNow = await isLoginWall(page);
+  if (!wallNow) return true;
 
   console.log(
-    "[sora-driver] Chrome opened on ChatGPT login page. Sign in with your ChatGPT Pro account in the popped-up window. Waiting up to 5 minutes…",
+    `[sora-driver] Chrome opened on a ChatGPT login wall (url=${page.url()}). Sign in with your ChatGPT Pro account in the popped-up window. Waiting up to 5 minutes…`,
   );
   const deadline = Date.now() + 5 * 60_000;
   while (Date.now() < deadline) {
-    await new Promise((r) => setTimeout(r, 2000));
+    await new Promise((r) => setTimeout(r, 2500));
     try {
-      if (!isAuthUrl(page.url())) {
-        console.log("[sora-driver] login detected. Continuing.");
+      const stillWall = await isLoginWall(page);
+      if (!stillWall) {
+        console.log(
+          `[sora-driver] login detected (url=${page.url()}). Continuing.`,
+        );
         return true;
       }
     } catch {
-      // Page may be transitioning (about:blank between redirects).
-      // Just retry on the next tick.
+      // Page transitioning — try again.
     }
   }
   console.error(
-    "[sora-driver] login timeout. Re-run the script after authenticating in chatgpt.com.",
+    "[sora-driver] login timeout after 5 min. Re-run after authenticating in chatgpt.com inside the Playwright Chrome window.",
   );
   return false;
 }

@@ -179,32 +179,75 @@ export async function generateImageViaChatGPT(
   }
 }
 
-/** Poll the page URL until it leaves the ChatGPT auth flow.
- *  On first run the persistent profile is empty; the user lands
- *  on the login page and needs a few minutes to authenticate in
- *  the popped-up Chrome window. Polls for 5 min then gives up. */
+/** True when the current page is a ChatGPT login wall. Two
+ *  signals — either is sufficient:
+ *    1. URL matches a known auth path
+ *    2. DOM contains visible "Log in"/"Sign up" buttons AND no
+ *       chat composer (ChatGPT-2025 serves the wall on the bare
+ *       chatgpt.com URL when the session cookie is missing). */
+async function isLoginWall(page: Page): Promise<boolean> {
+  const u = page.url();
+  if (
+    u.includes("/auth/") ||
+    u.includes("/login") ||
+    u.includes("/sign") ||
+    u.includes("auth.openai.com")
+  ) {
+    return true;
+  }
+  const signals = await safeEvaluate(page, () => {
+    const btns = Array.from(
+      document.querySelectorAll("button, a"),
+    ) as HTMLElement[];
+    const visible = (el: HTMLElement) => {
+      const r = el.getBoundingClientRect();
+      return r.width > 0 && r.height > 0;
+    };
+    const loginButton = btns.some((b) => {
+      const t = (b.innerText || "").trim().toLowerCase();
+      return (
+        visible(b) &&
+        (t === "log in" ||
+          t === "sign in" ||
+          t === "sign up" ||
+          t.startsWith("log in to") ||
+          t.startsWith("sign up to"))
+      );
+    });
+    const composer = document.querySelector(
+      '[data-testid="composer-text-input"], #prompt-textarea, textarea[placeholder*="ChatGPT" i], textarea[placeholder*="message" i]',
+    );
+    return { loginButton, composerPresent: Boolean(composer) };
+  });
+  if (!signals) return false; // navigation in flight
+  return signals.loginButton && !signals.composerPresent;
+}
+
+/** Wait until the page is no longer a login wall. */
 async function waitForChatGptLogin(page: Page): Promise<boolean> {
-  const isAuthUrl = (u: string) =>
-    u.includes("/auth/") || u.includes("/login") || u.includes("/sign");
-  if (!isAuthUrl(page.url())) return true;
+  const wallNow = await isLoginWall(page);
+  if (!wallNow) return true;
 
   console.log(
-    "[chatgpt-driver] Chrome opened on ChatGPT login page. Sign in with your ChatGPT Pro account in the popped-up window. Waiting up to 5 minutes…",
+    `[chatgpt-driver] Chrome opened on a ChatGPT login wall (url=${page.url()}). Sign in with your ChatGPT Pro account in the popped-up window. Waiting up to 5 minutes…`,
   );
   const deadline = Date.now() + 5 * 60_000;
   while (Date.now() < deadline) {
-    await new Promise((r) => setTimeout(r, 2000));
+    await new Promise((r) => setTimeout(r, 2500));
     try {
-      if (!isAuthUrl(page.url())) {
-        console.log("[chatgpt-driver] login detected. Continuing.");
+      const stillWall = await isLoginWall(page);
+      if (!stillWall) {
+        console.log(
+          `[chatgpt-driver] login detected (url=${page.url()}). Continuing.`,
+        );
         return true;
       }
     } catch {
-      // Page may be transitioning; retry on the next tick.
+      // transient
     }
   }
   console.error(
-    "[chatgpt-driver] login timeout. Re-run after authenticating in chatgpt.com.",
+    "[chatgpt-driver] login timeout after 5 min. Re-run after authenticating in chatgpt.com inside the Playwright Chrome window.",
   );
   return false;
 }
