@@ -45,17 +45,22 @@ import {
 } from "./storyboard";
 
 // Vendor selection.
-//   seedance: ByteDance Seedance 2.0 via fal.ai REST API (default;
-//             pay-as-you-go, FAL_KEY, ~$4.50/mo at 720p)
-//   sora:     OpenAI Sora API, legacy until 2026-09-24
-//   manual:   user generates clips in any web UI (Dreamina consumer,
-//             Sora.com when it returns, Runway web, etc.) and drops
-//             MP4s in ~/.ryda-marketing/manual-clips/<stem>/. The
-//             pipeline picks them up + composes + queues. No API
-//             call, uses whatever subscription the user is paying
-//             for at margin cost zero.
-//   mock:     tests/dev
-type Vendor = "seedance" | "sora" | "manual" | "mock";
+//   dreamina-auto: drive dreamina.capcut.com via Playwright. Uses
+//                  the user's existing $18-25/mo Dreamina sub at $0
+//                  marginal cost. Default for users with the sub.
+//                  Probe-verified working May 2026 (Akamai/ByteDance
+//                  doesn't block Playwright with stealth on this
+//                  domain, unlike Cloudflare on chatgpt.com).
+//   seedance:      ByteDance Seedance 2.0 via fal.ai REST API.
+//                  Pay-as-you-go, FAL_KEY, ~$4.50/mo at 720p. Use
+//                  if you don't have a Dreamina sub.
+//   sora:          OpenAI Sora API, legacy until 2026-09-24.
+//   manual:        user generates clips in any web UI and drops
+//                  MP4s in ~/.ryda-marketing/manual-clips/<stem>/.
+//                  Use when dreamina-auto breaks (UI changed) or
+//                  for hand-curated hero spots.
+//   mock:          tests/dev
+type Vendor = "dreamina-auto" | "seedance" | "sora" | "manual" | "mock";
 
 type AnyResult =
   | {
@@ -123,11 +128,12 @@ function parseArgs(argv: string[]): {
     vehicleIdx: null as number | null,
     force: false,
     noQueue: false,
-    vendor: "seedance" as Vendor,
+    vendor: "dreamina-auto" as Vendor,
     quality: "standard" as "standard" | "high",
     resume: false,
   };
   const VALID_VENDORS = new Set<Vendor>([
+    "dreamina-auto",
     "seedance",
     "sora",
     "manual",
@@ -269,6 +275,64 @@ async function acquireClipsViaApi(
   return clipPaths;
 }
 
+/** Dreamina-auto path. Drives dreamina.capcut.com via Playwright
+ *  to generate the 3 clips sequentially using the user's existing
+ *  $18-25/mo Dreamina sub. Sequential because Dreamina rate-limits
+ *  parallel prompts on consumer accounts.
+ *
+ *  Pre-req: user has already signed in once via the persistent
+ *  profile at ~/.ryda-marketing/dreamina-profile/. If the driver
+ *  detects a login wall (cookies expired), it returns
+ *  not_logged_in and we exit with a clear message.
+ *
+ *  Selectors are best-effort and may need iteration when Dreamina
+ *  ships UI changes. The driver's helpers (waitForComposer,
+ *  clickGenerate, waitForGeneratedVideo) all carry candidate
+ *  selector lists — first to match wins. */
+async function acquireClipsViaDreaminaAuto(
+  storyboard: ReturnType<typeof buildStoryboard>,
+  tmpDir: string,
+): Promise<string[]> {
+  // Lazy import so non-dreamina-auto runs don't pay the import
+  // cost (Playwright + stealth pull in ~50MB of module code).
+  const { generateClipViaDreamina } = await import("./dreamina-driver");
+  const clipPaths: string[] = [];
+  for (const shot of storyboard.shots) {
+    const clipPath = path.join(tmpDir, `shot-${shot.index}.mp4`);
+    console.log(
+      `[daily-spot] dreamina-auto shot ${shot.index}/3 (${shot.durationSec}s)…`,
+    );
+    const res = await generateClipViaDreamina({
+      prompt: shot.prompt,
+      durationSec: shot.durationSec as 5 | 10,
+      outPath: clipPath,
+    });
+    if (res.kind === "ok") {
+      console.log(
+        `[daily-spot]   ok: ${(res.sizeBytes / 1024 / 1024).toFixed(1)} MB`,
+      );
+      clipPaths.push(clipPath);
+    } else if (res.kind === "not_logged_in") {
+      console.error(
+        `[daily-spot] Dreamina session expired. Open dreamina.capcut.com\nin the persistent profile and sign in again, then re-run.\n\nProfile: ${path.join(os.homedir(), ".ryda-marketing", "dreamina-profile")}`,
+      );
+      process.exit(2);
+    } else if (res.kind === "out_of_credits") {
+      console.error(`[daily-spot] ${res.hint}`);
+      process.exit(8);
+    } else if (res.kind === "timeout") {
+      console.error(
+        `[daily-spot] dreamina-auto timeout at stage=${res.stage} on shot ${shot.index}.\nIf this happens repeatedly, Dreamina's UI may have changed. Either:\n  - Check the selector lists in scripts/marketing/video/dreamina-driver.ts\n  - Fall back to --vendor=manual for today's spot`,
+      );
+      process.exit(4);
+    } else {
+      console.error(`[daily-spot] error on shot ${shot.index}: ${res.error}`);
+      process.exit(5);
+    }
+  }
+  return clipPaths;
+}
+
 /** Manual-vendor path. Two-step UX: first call prints the
  *  storyboard prompts + saves them to disk, then exits. The user
  *  generates the clips in any web UI (Dreamina, Sora.com, Runway,
@@ -383,6 +447,8 @@ async function main() {
 
   if (args.vendor === "manual") {
     clipPaths = await acquireClipsManual(storyboard, stem, args);
+  } else if (args.vendor === "dreamina-auto") {
+    clipPaths = await acquireClipsViaDreaminaAuto(storyboard, tmpDir);
   } else {
     clipPaths = await acquireClipsViaApi(storyboard, tmpDir, args);
   }
