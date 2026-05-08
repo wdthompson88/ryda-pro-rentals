@@ -44,11 +44,18 @@ import {
   type SpotInput,
 } from "./storyboard";
 
-// Vendor selection. seedance is the default (cheapest credible
-// option, ~$4.50/mo at 720p for daily spots, no death clock).
-// sora is kept until 2026-09-24 for accounts already wired on
-// OPENAI_API_KEY only. mock is for offline tests.
-type Vendor = "seedance" | "sora" | "mock";
+// Vendor selection.
+//   seedance: ByteDance Seedance 2.0 via fal.ai REST API (default;
+//             pay-as-you-go, FAL_KEY, ~$4.50/mo at 720p)
+//   sora:     OpenAI Sora API, legacy until 2026-09-24
+//   manual:   user generates clips in any web UI (Dreamina consumer,
+//             Sora.com when it returns, Runway web, etc.) and drops
+//             MP4s in ~/.ryda-marketing/manual-clips/<stem>/. The
+//             pipeline picks them up + composes + queues. No API
+//             call, uses whatever subscription the user is paying
+//             for at margin cost zero.
+//   mock:     tests/dev
+type Vendor = "seedance" | "sora" | "manual" | "mock";
 
 type AnyResult =
   | {
@@ -63,6 +70,21 @@ type AnyResult =
 
 const MARKER_DIR = path.join(os.homedir(), ".ryda-marketing", "daily-markers");
 const TMP_CLIPS_ROOT = path.join(os.homedir(), ".ryda-marketing", "clips");
+
+// Manual-mode dirs. The user drops MP4s into manual-clips/<stem>/
+// and the prompts get written to manual-prompts/<stem>/ for easy
+// copy. Both live under ~/.ryda-marketing/ so they're outside
+// the repo + survive across runs.
+const MANUAL_CLIPS_ROOT = path.join(
+  os.homedir(),
+  ".ryda-marketing",
+  "manual-clips",
+);
+const MANUAL_PROMPTS_ROOT = path.join(
+  os.homedir(),
+  ".ryda-marketing",
+  "manual-prompts",
+);
 const OUT_DIR = path.join(
   process.cwd(),
   "public",
@@ -95,6 +117,7 @@ function parseArgs(argv: string[]): {
   noQueue: boolean;
   vendor: Vendor;
   quality: "standard" | "high";
+  resume: boolean;
 } {
   const out = {
     vehicleIdx: null as number | null,
@@ -102,12 +125,19 @@ function parseArgs(argv: string[]): {
     noQueue: false,
     vendor: "seedance" as Vendor,
     quality: "standard" as "standard" | "high",
+    resume: false,
   };
-  const VALID_VENDORS = new Set<Vendor>(["seedance", "sora", "mock"]);
+  const VALID_VENDORS = new Set<Vendor>([
+    "seedance",
+    "sora",
+    "manual",
+    "mock",
+  ]);
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--force") out.force = true;
     else if (a === "--no-queue") out.noQueue = true;
+    else if (a === "--resume") out.resume = true;
     else if (a === "--vehicle") {
       const idx = parseInt(argv[++i] ?? "", 10);
       if (Number.isInteger(idx)) out.vehicleIdx = idx;
@@ -195,30 +225,14 @@ async function writeMarker(stem: string, vehicleName: string): Promise<void> {
   );
 }
 
-async function main() {
-  const args = parseArgs(process.argv.slice(2));
-
-  if (!args.force && (await alreadyRanToday())) {
-    console.log(
-      `[daily-spot] today's spot already generated (marker present in ${MARKER_DIR}). Use --force to override.`,
-    );
-    process.exit(0);
-  }
-
-  const vehicle: SpotInput =
-    args.vehicleIdx != null
-      ? LAUNCH_INVENTORY[args.vehicleIdx % LAUNCH_INVENTORY.length]
-      : pickTodaysVehicle();
-  console.log(`[daily-spot] vehicle: ${vehicle.name} (${vehicle.vehicleType})`);
-  console.log(`[daily-spot] vendor:  ${args.vendor}`);
-
-  const storyboard = buildStoryboard(vehicle);
-  const stem = `${slugify(vehicle.name)}-${todayStamp()}`;
-  const tmpDir = path.join(TMP_CLIPS_ROOT, stem);
-  await fs.mkdir(tmpDir, { recursive: true });
-
-  // -- Generate the 3 clips. Sequential because providers
-  //    throttle per-account and parallel runs trip rate limits.
+/** Auto-vendor path. Generates 3 clips sequentially via the lib's
+ *  registry (Seedance / Sora / mock). Exits the process on any
+ *  failure so the day-marker doesn't get written. */
+async function acquireClipsViaApi(
+  storyboard: ReturnType<typeof buildStoryboard>,
+  tmpDir: string,
+  args: ReturnType<typeof parseArgs>,
+): Promise<string[]> {
   const clipPaths: string[] = [];
   for (const shot of storyboard.shots) {
     const clipPath = path.join(tmpDir, `shot-${shot.index}.mp4`);
@@ -244,16 +258,143 @@ async function main() {
       process.exit(9);
     } else if (res.kind === "not_configured") {
       console.error(
-        `[daily-spot] ${args.vendor} not configured. Missing env: ${res.missingEnv.join(", ")}.\n\nFor Seedance: get a key at https://fal.ai/dashboard/keys and set FAL_KEY in .env.local.`,
+        `[daily-spot] ${args.vendor} not configured. Missing env: ${res.missingEnv.join(", ")}.\n\nFor Seedance: get a key at https://fal.ai/dashboard/keys and set FAL_KEY in .env.local.\nOr use --vendor=manual to generate clips yourself in a web UI.`,
       );
       process.exit(10);
     } else {
-      // Single error sink — covers the kind:"error" variant.
       console.error(`[daily-spot] error on shot ${shot.index}: ${res.error}`);
       process.exit(5);
     }
   }
+  return clipPaths;
+}
 
+/** Manual-vendor path. Two-step UX: first call prints the
+ *  storyboard prompts + saves them to disk, then exits. The user
+ *  generates the clips in any web UI (Dreamina, Sora.com, Runway,
+ *  etc.) and drops them in ~/.ryda-marketing/manual-clips/<stem>/.
+ *  Re-running with --resume picks them up + composes. */
+async function acquireClipsManual(
+  storyboard: ReturnType<typeof buildStoryboard>,
+  stem: string,
+  args: ReturnType<typeof parseArgs>,
+): Promise<string[]> {
+  const manualDir = path.join(MANUAL_CLIPS_ROOT, stem);
+  await fs.mkdir(manualDir, { recursive: true });
+  const expected = storyboard.shots.map((s) => ({
+    shot: s,
+    mp4: path.join(manualDir, `shot-${s.index}.mp4`),
+  }));
+
+  if (!args.resume) {
+    // Step 1: write prompts + print copy-paste-friendly UX, then exit.
+    const promptsDir = path.join(MANUAL_PROMPTS_ROOT, stem);
+    await fs.mkdir(promptsDir, { recursive: true });
+    for (const { shot } of expected) {
+      await fs.writeFile(
+        path.join(promptsDir, `shot-${shot.index}.txt`),
+        shot.prompt,
+      );
+    }
+    console.log("");
+    console.log("=========================================");
+    console.log("MANUAL MODE — generate clips yourself");
+    console.log("=========================================");
+    console.log("");
+    console.log(`Stem:      ${stem}`);
+    console.log(`Prompts:   ${promptsDir}`);
+    console.log(`Drop MP4s: ${manualDir}`);
+    console.log("");
+    for (const { shot } of expected) {
+      console.log(
+        `--- Shot ${shot.index} (${shot.durationSec}s, overlay: "${shot.overlay}") ---`,
+      );
+      console.log(shot.prompt);
+      console.log("");
+    }
+    console.log("=========================================");
+    console.log("NEXT STEPS:");
+    console.log("=========================================");
+    console.log("1. Open Dreamina (https://dreamina.capcut.com) — or any AI video tool.");
+    console.log("2. Paste each prompt above and generate (~60s/clip on Seedance).");
+    console.log("3. Save the MP4s as shot-1.mp4, shot-2.mp4, shot-3.mp4 into:");
+    console.log(`     ${manualDir}`);
+    console.log("4. Re-run with --resume to compose the spot:");
+    console.log(
+      `     npm run marketing:daily-spot -- --vendor=manual --vehicle ${args.vehicleIdx ?? 0} --resume`,
+    );
+    console.log("");
+    process.exit(0);
+  }
+
+  // Step 2 (--resume): verify all 3 MP4s are present.
+  console.log(`[daily-spot] resume: checking ${manualDir}`);
+  const clipPaths: string[] = [];
+  const missing: string[] = [];
+  for (const { shot, mp4 } of expected) {
+    try {
+      const stat = await fs.stat(mp4);
+      console.log(
+        `[daily-spot]   shot-${shot.index}.mp4 ok (${(stat.size / 1024 / 1024).toFixed(1)} MB)`,
+      );
+      clipPaths.push(mp4);
+    } catch {
+      missing.push(`shot-${shot.index}.mp4`);
+    }
+  }
+  if (missing.length > 0) {
+    console.error(
+      `[daily-spot] missing clips in ${manualDir}: ${missing.join(", ")}\n\nGenerate them in your video tool of choice + drop them in that directory, then re-run.`,
+    );
+    process.exit(11);
+  }
+  return clipPaths;
+}
+
+async function main() {
+  const args = parseArgs(process.argv.slice(2));
+
+  if (!args.force && (await alreadyRanToday())) {
+    console.log(
+      `[daily-spot] today's spot already generated (marker present in ${MARKER_DIR}). Use --force to override.`,
+    );
+    process.exit(0);
+  }
+
+  const vehicle: SpotInput =
+    args.vehicleIdx != null
+      ? LAUNCH_INVENTORY[args.vehicleIdx % LAUNCH_INVENTORY.length]
+      : pickTodaysVehicle();
+  console.log(`[daily-spot] vehicle: ${vehicle.name} (${vehicle.vehicleType})`);
+  console.log(`[daily-spot] vendor:  ${args.vendor}`);
+
+  const storyboard = buildStoryboard(vehicle);
+  const stem = `${slugify(vehicle.name)}-${todayStamp()}`;
+  const tmpDir = path.join(TMP_CLIPS_ROOT, stem);
+  await fs.mkdir(tmpDir, { recursive: true });
+
+  // ---- Acquire the 3 clips. Two paths:
+  //      1. API vendors (seedance/sora/mock): generate via the
+  //         video-gen lib in a sequential loop.
+  //      2. manual vendor: print prompts + wait for the user to
+  //         drop MP4s in the manual-clips dir, then pick up via
+  //         --resume on the second invocation.
+  let clipPaths: string[] = [];
+
+  if (args.vendor === "manual") {
+    clipPaths = await acquireClipsManual(storyboard, stem, args);
+  } else {
+    clipPaths = await acquireClipsViaApi(storyboard, tmpDir, args);
+  }
+
+  // Auto-vendors fall through to compose below; the manual branch
+  // either exits early (step 1) or returns 3 clip paths (step 2).
+  if (clipPaths.length !== 3) {
+    console.error(
+      `[daily-spot] expected 3 clips, got ${clipPaths.length}. Aborting before compose.`,
+    );
+    process.exit(7);
+  }
   // -- Compose with FFmpeg.
   console.log(`[daily-spot] composing ${stem}…`);
   const compose = await composeSpot({
