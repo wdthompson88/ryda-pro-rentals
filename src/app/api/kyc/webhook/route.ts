@@ -16,6 +16,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { stripe, STRIPE_KYC_WEBHOOK_SECRET } from "@/lib/stripe";
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import {
+  buildVerifiedOutputsWrite,
+  type VerifiedOutputs,
+} from "@/lib/kyc-verified-outputs";
 import type Stripe from "stripe";
 
 export const runtime = "nodejs";
@@ -93,7 +97,34 @@ export async function POST(req: NextRequest) {
   if (status === "verified" && session.verified_outputs) {
     // Stripe redacts most fields by default; what comes through is
     // the address + DOB + name proofs the verification produced.
-    update.verified_outputs = session.verified_outputs;
+    // buildVerifiedOutputsWrite returns both the encrypted column
+    // (when KYC_PII_ENCRYPTION_KEY is configured) and the legacy
+    // plaintext column (until the cleanup migration drops it).
+    // Stripe's typed VerifiedOutputs nests Address as a structured
+    // type, while our VerifiedOutputs allows any address shape
+    // (we serialize whole-object). Cast via unknown so the type
+    // bridge is explicit; the runtime payload is JSON-compatible.
+    //
+    // Wrap in try/catch so a malformed KYC_PII_ENCRYPTION_KEY
+    // surfaces as 503 (Stripe retries) instead of a 500 that
+    // could let the malformed-key state persist silently. Codex
+    // round-4 caught this — encryptJson throws inside
+    // buildVerifiedOutputsWrite when env is set but key is
+    // invalid.
+    try {
+      Object.assign(
+        update,
+        buildVerifiedOutputsWrite(
+          session.verified_outputs as unknown as VerifiedOutputs,
+        ),
+      );
+    } catch (err) {
+      console.error("[kyc webhook] encryption failed", err);
+      return NextResponse.json(
+        { error: "Encryption write failed; retry." },
+        { status: 503 },
+      );
+    }
   }
   if (session.last_error) {
     update.failure_code = session.last_error.code ?? null;

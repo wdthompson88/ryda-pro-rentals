@@ -26,6 +26,12 @@ export async function getUserFromRequestWithDiag(
 ): Promise<{
   user: { id: string; email: string | null } | null;
   diag: string;
+  /** The access token we validated. Exposed so callers (e.g.
+   *  admin-auth) can inspect claims like `aal` from the SAME
+   *  token Supabase verified — not re-extract from the request
+   *  and risk a different source winning. Codex round-1 catch
+   *  on the AAL gate. */
+  token: string | null;
 }> {
   // Token validation MUST go through the anon-keyed client, not the
   // service-role admin client. /auth/v1/user rejects the new
@@ -34,7 +40,7 @@ export async function getUserFromRequestWithDiag(
   // diag=getuser_error:AuthApiError:401:valid:iss_ok:Invalid_API_key
   // — the user's JWT was fine, the server's apikey was the wrong one.
   const validator = supabaseAuthValidator();
-  if (!validator) return { user: null, diag: "no_admin_client" };
+  if (!validator) return { user: null, token: null, diag: "no_admin_client" };
 
   // Strategy: try Authorization header first (clean for API clients),
   // then cookies (the browser client uses these by default).
@@ -63,10 +69,10 @@ export async function getUserFromRequestWithDiag(
           token = parsed.access_token;
           source = "cookie_obj";
         } else {
-          return { user: null, diag: "cookie_parsed_but_no_token" };
+          return { user: null, token: null, diag: "cookie_parsed_but_no_token" };
         }
       } catch {
-        return { user: null, diag: "cookie_parse_failed" };
+        return { user: null, token: null, diag: "cookie_parse_failed" };
       }
     }
   }
@@ -75,7 +81,7 @@ export async function getUserFromRequestWithDiag(
     // No header, no cookie. Most common cause: client didn't attach
     // the bearer (old bundle, no session) and we're not getting a
     // cookie either (browser localStorage-only Supabase setup).
-    return { user: null, diag: "no_token_present" };
+    return { user: null, token: null, diag: "no_token_present" };
   }
 
   // Decode the JWT WITHOUT verifying — purely for diag. We surface
@@ -123,14 +129,20 @@ export async function getUserFromRequestWithDiag(
     const errMsg = (error.message ?? "").slice(0, 60).replace(/[^\w\s.:-]/g, "_");
     return {
       user: null,
+      token: null,
       diag: `getuser_error:${error.name ?? "unknown"}:${errStatus}:${tokenAge}:${issuerDiag}:${source}:${errMsg}`,
     };
   }
   if (!data.user) {
-    return { user: null, diag: `getuser_no_user:${tokenAge}:${source}` };
+    return {
+      user: null,
+      token: null,
+      diag: `getuser_no_user:${tokenAge}:${source}`,
+    };
   }
   return {
     user: { id: data.user.id, email: data.user.email ?? null },
+    token,
     diag: `ok:${source}`,
   };
 }

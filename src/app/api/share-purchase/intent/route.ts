@@ -21,6 +21,7 @@ import { notifyTeam, emailLayout, escapeHtml } from "@/lib/notify";
 import { Resend } from "resend";
 import { computeFees } from "@/lib/fees";
 import { requireMinAge } from "@/lib/age";
+import { readVerifiedOutputs } from "@/lib/kyc-verified-outputs";
 import { VEHICLES } from "@/lib/market-data";
 import { BOATS } from "@/lib/boat-data";
 import {
@@ -134,9 +135,11 @@ export async function POST(req: NextRequest) {
   // KYC + age gate. Same gate as create-checkout — every share-purchase
   // path must pass both. Codex caught that this route bypassed the
   // age gate for non-Stripe funding (wire/crypto/liquidity/finance).
+  // readVerifiedOutputs handles the encrypted-vs-plaintext column
+  // dual during the migration period.
   const kyc = await admin
     .from("kyc_verifications")
-    .select("id, verified_outputs")
+    .select("id, verified_outputs, verified_outputs_encrypted")
     .eq("user_id", user.id)
     .eq("status", "verified")
     .order("created_at", { ascending: false })
@@ -147,10 +150,7 @@ export async function POST(req: NextRequest) {
       { status: 409 },
     );
   }
-  const kycVerifiedOutputs = kyc.data[0].verified_outputs as
-    | { dob?: { day?: number; month?: number; year?: number } }
-    | null
-    | undefined;
+  const kycVerifiedOutputs = readVerifiedOutputs(kyc.data[0]);
   const ageGate = requireMinAge(kycVerifiedOutputs?.dob);
   if (!ageGate.ok) {
     return NextResponse.json(

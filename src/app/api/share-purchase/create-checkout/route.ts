@@ -12,6 +12,7 @@ import { requireStripe } from "@/lib/stripe";
 import { requireSupabaseAdmin } from "@/lib/supabase-admin";
 import { getUserFromRequest } from "@/lib/api-auth";
 import { isAllowed, clientIp } from "@/lib/rate-limit";
+import { readVerifiedOutputs } from "@/lib/kyc-verified-outputs";
 import { VEHICLES } from "@/lib/market-data";
 import { BOATS } from "@/lib/boat-data";
 
@@ -83,7 +84,9 @@ export async function POST(req: NextRequest) {
     const admin = requireSupabaseAdmin();
     const kycCheck = await admin
       .from("kyc_verifications")
-      .select("id, status, updated_at, verified_outputs")
+      .select(
+        "id, status, updated_at, verified_outputs, verified_outputs_encrypted",
+      )
       .eq("user_id", user.id)
       .eq("status", "verified")
       .order("updated_at", { ascending: false })
@@ -110,14 +113,10 @@ export async function POST(req: NextRequest) {
     // when Stripe Identity returned one. Falls back to the body
     // `name` (which the BuyFlow collects as a polite default but
     // shouldn't override a verified legal identity).
-    const verifiedOutputs = kycCheck.data[0].verified_outputs as
-      | {
-          first_name?: string;
-          last_name?: string;
-          dob?: { day?: number; month?: number; year?: number };
-        }
-      | null
-      | undefined;
+    //
+    // readVerifiedOutputs handles the encrypted-vs-plaintext column
+    // dual during the migration period (lib/kyc-verified-outputs).
+    const verifiedOutputs = readVerifiedOutputs(kycCheck.data[0]);
     const verifiedName =
       verifiedOutputs?.first_name && verifiedOutputs?.last_name
         ? `${verifiedOutputs.first_name} ${verifiedOutputs.last_name}`

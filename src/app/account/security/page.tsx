@@ -373,6 +373,136 @@ function ChangePasswordCard() {
 // ── Two-factor (stub) ──────────────────────────────────────────
 
 function TwoFactorCard() {
+  // TOTP enrollment via Supabase Auth MFA (Item 8 from .launch-prep
+  // LAUNCH_PLAN.md). Three states:
+  //   - "loading": initial factor list query
+  //   - "off": no verified factors enrolled → show "Enable" button
+  //   - "enrolling": user clicked enable → show QR + verify field
+  //   - "on": ≥1 verified factor → show "Disable" button
+  //
+  // Authenticator app compatibility: any TOTP app that scans
+  // otpauth:// URIs — Google Authenticator, 1Password, Authy, Bitwarden.
+  type Phase = "loading" | "off" | "enrolling" | "on" | "error";
+  const [phase, setPhase] = useState<Phase>("loading");
+  const [error, setError] = useState<string | null>(null);
+  const [factorId, setFactorId] = useState<string | null>(null);
+  const [qrSvg, setQrSvg] = useState<string | null>(null);
+  const [secret, setSecret] = useState<string | null>(null);
+  const [code, setCode] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  // Initial state load.
+  useEffect(() => {
+    if (!supabase) {
+      setPhase("error");
+      setError("Auth client not configured.");
+      return;
+    }
+    let cancelled = false;
+    supabase.auth.mfa
+      .listFactors()
+      .then(({ data, error: err }) => {
+        if (cancelled) return;
+        if (err) {
+          setPhase("error");
+          setError(err.message);
+          return;
+        }
+        const verifiedTotp =
+          data?.totp?.find((f) => f.status === "verified") ?? null;
+        setPhase(verifiedTotp ? "on" : "off");
+        if (verifiedTotp) setFactorId(verifiedTotp.id);
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return;
+        setPhase("error");
+        setError(err instanceof Error ? err.message : "Load failed");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  async function onEnable() {
+    if (!supabase || submitting) return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      // First, clean up any prior unverified enrollment (e.g. user
+      // hit Enable, walked away, came back). Supabase MFA only
+      // allows one in-flight TOTP factor at a time.
+      // Supabase types listFactors().data.totp as verified-only;
+      // unverified factors live on data.all (full list including
+      // pending). Filter manually with a string status check.
+      const { data: factors } = await supabase.auth.mfa.listFactors();
+      const pending = (factors?.all ?? []).find(
+        (f) => f.factor_type === "totp" && f.status !== "verified",
+      );
+      if (pending) {
+        await supabase.auth.mfa.unenroll({ factorId: pending.id });
+      }
+      const { data, error: err } = await supabase.auth.mfa.enroll({
+        factorType: "totp",
+        friendlyName: "RYDA TOTP",
+      });
+      if (err || !data) throw err ?? new Error("enroll failed");
+      setFactorId(data.id);
+      setQrSvg(data.totp.qr_code);
+      setSecret(data.totp.secret);
+      setPhase("enrolling");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Enroll failed");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function onVerify() {
+    if (!supabase || !factorId || submitting) return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      const challenge = await supabase.auth.mfa.challenge({ factorId });
+      if (challenge.error || !challenge.data) throw challenge.error;
+      const verify = await supabase.auth.mfa.verify({
+        factorId,
+        challengeId: challenge.data.id,
+        code: code.trim(),
+      });
+      if (verify.error) throw verify.error;
+      setPhase("on");
+      setQrSvg(null);
+      setSecret(null);
+      setCode("");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Verification failed");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function onDisable() {
+    if (!supabase || !factorId || submitting) return;
+    if (
+      !window.confirm(
+        "Turn off two-factor authentication? Your account will be less secure.",
+      )
+    )
+      return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      const { error: err } = await supabase.auth.mfa.unenroll({ factorId });
+      if (err) throw err;
+      setPhase("off");
+      setFactorId(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Disable failed");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   return (
     <Card
       title="Two-factor authentication"
@@ -380,15 +510,99 @@ function TwoFactorCard() {
     >
       <Row>
         <span className="text-xs uppercase tracking-wider text-mute">Status</span>
-        <span className="text-sm text-ink">Off</span>
+        <span className="text-sm text-ink">
+          {phase === "loading" && "Checking…"}
+          {phase === "off" && "Off"}
+          {phase === "enrolling" && "Setup in progress"}
+          {phase === "on" && (
+            <span className="font-medium text-marine">On</span>
+          )}
+          {phase === "error" && (
+            <span className="text-red">Couldn&apos;t load</span>
+          )}
+        </span>
       </Row>
-      <button type="button" disabled className={`${btnSecondary} cursor-not-allowed opacity-60`}>
-        Enable 2FA — coming Q3 2026
-      </button>
-      <p className="mt-2 text-[11px] text-mute">
-        Will use TOTP via an authenticator app (Google Authenticator, 1Password,
-        Authy). Recovery codes generated at enrollment.
-      </p>
+
+      {phase === "off" && (
+        <>
+          <button
+            type="button"
+            onClick={onEnable}
+            disabled={submitting}
+            className={btnSecondary}
+          >
+            {submitting ? "Setting up…" : "Enable 2FA"}
+          </button>
+          <p className="mt-2 text-[11px] text-mute">
+            Compatible with Google Authenticator, 1Password, Authy, Bitwarden.
+            Required for admins; recommended for everyone.
+          </p>
+        </>
+      )}
+
+      {phase === "enrolling" && qrSvg && (
+        <div className="space-y-3">
+          <p className="text-sm text-ink-soft">
+            Scan this QR with your authenticator app, then enter the 6-digit code.
+          </p>
+          {/* Supabase returns the QR as an inline SVG data URL. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={qrSvg}
+            alt="TOTP QR code"
+            className="h-40 w-40 rounded-lg border border-rule bg-cream-2 p-2"
+          />
+          {secret && (
+            <p className="text-[11px] text-mute">
+              Or enter the secret manually:{" "}
+              <code className="rounded bg-cream-2 px-1 py-0.5 font-mono">
+                {secret}
+              </code>
+            </p>
+          )}
+          <div className="flex gap-2">
+            <input
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              maxLength={6}
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              placeholder="123456"
+              className="flex-1 rounded-lg border border-rule px-3 py-2 font-mono text-base"
+            />
+            <button
+              type="button"
+              onClick={onVerify}
+              disabled={submitting || code.length !== 6}
+              className={btnSecondary}
+            >
+              {submitting ? "Verifying…" : "Verify"}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {phase === "on" && (
+        <>
+          <button
+            type="button"
+            onClick={onDisable}
+            disabled={submitting}
+            className={`${btnSecondary} text-red`}
+          >
+            {submitting ? "Disabling…" : "Turn off 2FA"}
+          </button>
+          <p className="mt-2 text-[11px] text-mute">
+            You&apos;ll be asked for a 6-digit code from your authenticator
+            every time you sign in on a new device.
+          </p>
+        </>
+      )}
+
+      {error && (
+        <p className="mt-2 text-xs text-red">{error}</p>
+      )}
     </Card>
   );
 }

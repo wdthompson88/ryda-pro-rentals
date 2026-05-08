@@ -25,6 +25,7 @@ import { getUserFromRequest } from "@/lib/api-auth";
 import { isAllowed, clientIp } from "@/lib/rate-limit";
 import { notifyTeam, emailLayout, escapeHtml } from "@/lib/notify";
 import { requireMinAge } from "@/lib/age";
+import { readVerifiedOutputs } from "@/lib/kyc-verified-outputs";
 
 export const runtime = "nodejs";
 
@@ -203,9 +204,11 @@ export async function POST(
   // under 28 who passed Stripe Identity could still accept a share
   // transfer, putting RYDA in the same ToS breach as the create-checkout
   // bypass. Same `requireMinAge()` helper as create-checkout/intent.
+  // readVerifiedOutputs handles the encrypted-vs-plaintext column
+  // dual during the migration period.
   const { data: kyc } = await admin
     .from("kyc_verifications")
-    .select("status, verified_outputs")
+    .select("status, verified_outputs, verified_outputs_encrypted")
     .eq("user_id", user.id)
     .eq("status", "verified")
     .order("created_at", { ascending: false })
@@ -220,10 +223,7 @@ export async function POST(
       { status: 409 },
     );
   }
-  const recipientVerifiedOutputs = kyc[0].verified_outputs as
-    | { dob?: { day?: number; month?: number; year?: number } }
-    | null
-    | undefined;
+  const recipientVerifiedOutputs = readVerifiedOutputs(kyc[0]);
   const ageGate = requireMinAge(recipientVerifiedOutputs?.dob);
   if (!ageGate.ok) {
     return NextResponse.json(

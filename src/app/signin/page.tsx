@@ -76,7 +76,18 @@ function SignInPageInner() {
           password,
         });
         if (err) throw err;
-        router.push(next);
+        // MFA step-up. After password sign-in the session is at
+        // aal1. If the user has an enrolled TOTP factor, they
+        // need to step up to aal2 by passing the challenge before
+        // we let them in. Send them to /auth/mfa-challenge with
+        // the post-MFA destination as ?next=.
+        const aalResult =
+          await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+        if (aalResult.data?.nextLevel === "aal2") {
+          router.push(`/auth/mfa-challenge?next=${encodeURIComponent(next)}`);
+        } else {
+          router.push(next);
+        }
       } else {
         // Supabase not configured, simulate success so the demo still
         // runs without env vars wired.
