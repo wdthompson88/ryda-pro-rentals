@@ -31,12 +31,27 @@ import path from "node:path";
 import os from "node:os";
 import { createClient } from "@supabase/supabase-js";
 import { loadDotEnvLocal } from "../env-loader";
+import {
+  generateClipViaDreamina,
+  type GenerateClipResult as DreaminaResult,
+} from "./dreamina-driver";
+// sora result type is structurally compatible with dreamina's plus
+// the no_video_capability variant; we use Dreamina's type here to
+// keep the orchestrator narrowing simple (the extra variants from
+// sora are still handled in the switch since the discriminator is
+// the same `kind` field).
+import type { GenerateClipResult as SoraResult } from "./sora-driver";
+
+type AnyResult = DreaminaResult | SoraResult;
 
 // Load Supabase + ChatGPT env from .env.local. tsx doesn't auto-load
 // .env files, and Next's loader only runs in dev/build. This makes
 // the script Just Work when launched via `npm run`.
 loadDotEnvLocal();
-import { generateClipViaSora } from "./sora-driver";
+
+type Vendor = "sora" | "dreamina";
+// generateClipViaSora is dynamically imported in generateClip()
+// so dreamina runs don't pull in playwright twice.
 import { composeSpot } from "./composer";
 import {
   LAUNCH_INVENTORY,
@@ -77,8 +92,14 @@ function parseArgs(argv: string[]): {
   vehicleIdx: number | null;
   force: boolean;
   noQueue: boolean;
+  vendor: Vendor;
 } {
-  const out = { vehicleIdx: null as number | null, force: false, noQueue: false };
+  const out = {
+    vehicleIdx: null as number | null,
+    force: false,
+    noQueue: false,
+    vendor: "sora" as Vendor,
+  };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--force") out.force = true;
@@ -86,9 +107,31 @@ function parseArgs(argv: string[]): {
     else if (a === "--vehicle") {
       const idx = parseInt(argv[++i] ?? "", 10);
       if (Number.isInteger(idx)) out.vehicleIdx = idx;
-    }
+    } else if (a === "--vendor") {
+      const v = (argv[++i] ?? "").toLowerCase();
+      if (v === "sora" || v === "dreamina") out.vendor = v;
+    } else if (a === "--vendor=sora") out.vendor = "sora";
+    else if (a === "--vendor=dreamina") out.vendor = "dreamina";
   }
   return out;
+}
+
+/** Single-clip generation routed by vendor. Both vendors return
+ *  discriminated unions sharing the same `kind` shape so the
+ *  orchestrator below can switch on it uniformly. */
+async function generateClip(
+  vendor: Vendor,
+  prompt: string,
+  durationSec: 5 | 10,
+  outPath: string,
+): Promise<AnyResult> {
+  if (vendor === "dreamina") {
+    return generateClipViaDreamina({ prompt, durationSec, outPath });
+  }
+  // Lazy-import sora-driver only when used so dreamina runs never
+  // launch ChatGPT's persistent profile (and vice-versa).
+  const { generateClipViaSora } = await import("./sora-driver");
+  return generateClipViaSora({ prompt, durationSec, outPath });
 }
 
 async function alreadyRanToday(): Promise<boolean> {
@@ -126,6 +169,7 @@ async function main() {
       ? LAUNCH_INVENTORY[args.vehicleIdx % LAUNCH_INVENTORY.length]
       : pickTodaysVehicle();
   console.log(`[daily-spot] vehicle: ${vehicle.name} (${vehicle.vehicleType})`);
+  console.log(`[daily-spot] vendor:  ${args.vendor}`);
 
   const storyboard = buildStoryboard(vehicle);
   const stem = `${slugify(vehicle.name)}-${todayStamp()}`;
@@ -140,11 +184,12 @@ async function main() {
     console.log(
       `[daily-spot] generating shot ${shot.index}/3 (${shot.durationSec}s)…`,
     );
-    const res = await generateClipViaSora({
-      prompt: shot.prompt,
-      durationSec: shot.durationSec as 5 | 10,
-      outPath: clipPath,
-    });
+    const res = await generateClip(
+      args.vendor,
+      shot.prompt,
+      shot.durationSec as 5 | 10,
+      clipPath,
+    );
     if (res.kind === "ok") {
       console.log(
         `[daily-spot]   ok: ${(res.sizeBytes / 1024 / 1024).toFixed(1)} MB`,
@@ -152,15 +197,18 @@ async function main() {
       clipPaths.push(clipPath);
     } else if (res.kind === "not_logged_in") {
       console.error(
-        `[daily-spot] NOT LOGGED IN. Open the Playwright Chrome window and log into ChatGPT, then re-run.`,
+        `[daily-spot] NOT LOGGED IN to ${args.vendor}. Run \`npm run marketing:${args.vendor === "dreamina" ? "dreamina" : "chatgpt"}-check\` to log in, then re-run.`,
       );
       process.exit(2);
     } else if (res.kind === "no_video_capability") {
       console.error(`[daily-spot] ${res.hint}`);
       process.exit(3);
+    } else if (res.kind === "out_of_credits") {
+      console.error(`[daily-spot] ${res.hint}`);
+      process.exit(8);
     } else if (res.kind === "timeout") {
       console.error(
-        `[daily-spot] timeout at stage=${res.stage} on shot ${shot.index}. Sora generation can take >5 min on busy days; try again in an hour.`,
+        `[daily-spot] timeout at stage=${res.stage} on shot ${shot.index}. ${args.vendor} generation can take >5 min on busy days; try again in an hour.`,
       );
       process.exit(4);
     } else {

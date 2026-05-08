@@ -23,6 +23,7 @@ import path from "node:path";
 import os from "node:os";
 import { promises as fs } from "node:fs";
 import { loadDotEnvLocal } from "./env-loader";
+import { gotoAndClearChallenges } from "./playwright-helpers";
 
 loadDotEnvLocal();
 
@@ -45,8 +46,8 @@ async function main() {
   const page = context.pages()[0] ?? (await context.newPage());
 
   console.log(`[chatgpt-check] navigating to ${CHATGPT_URL}…`);
-  await page.goto(CHATGPT_URL, { waitUntil: "domcontentloaded" });
-  // Brief settle so any client-side redirect or hydration completes.
+  await gotoAndClearChallenges(page, CHATGPT_URL);
+  // Brief settle so any post-challenge client-side hydration completes.
   await new Promise((r) => setTimeout(r, 3000));
 
   const state = await page

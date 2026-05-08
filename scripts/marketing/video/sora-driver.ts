@@ -31,6 +31,10 @@ import { chromium, type BrowserContext, type Page } from "playwright";
 import path from "node:path";
 import os from "node:os";
 import { promises as fs } from "node:fs";
+import {
+  gotoAndClearChallenges,
+  safeEvaluate,
+} from "../playwright-helpers";
 
 // Reuse the same persistent profile as chatgpt-driver so users
 // only log into ChatGPT once. Sora rides on the ChatGPT account.
@@ -96,7 +100,7 @@ export async function generateClipViaSora(
     });
     const page = context.pages()[0] ?? (await context.newPage());
 
-    await page.goto(SORA_URL, { waitUntil: "domcontentloaded" });
+    await gotoAndClearChallenges(page, SORA_URL);
 
     // First-run grace window: if Chrome lands on a login wall
     // (URL-based redirect OR content-based — ChatGPT now shows
@@ -266,31 +270,6 @@ async function waitForComposer(page: Page) {
     }
   }
   return null;
-}
-
-/** Run page.evaluate but tolerate the "Execution context was
- *  destroyed" error that fires when the page navigates mid-poll
- *  (e.g. ChatGPT redirecting to /c/<conv_id> after a prompt is
- *  submitted). Returns null on navigation; caller retries on the
- *  next tick. */
-async function safeEvaluate<T>(
-  page: Page,
-  fn: () => T,
-): Promise<T | null> {
-  try {
-    return await page.evaluate(fn);
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    if (
-      msg.includes("Execution context was destroyed") ||
-      msg.includes("Target page, context or browser has been closed") ||
-      msg.includes("frame was detached")
-    ) {
-      // Benign navigation — caller will retry on next poll tick.
-      return null;
-    }
-    throw err;
-  }
 }
 
 /** Quick check for the "I can't make videos" / "Sora isn't

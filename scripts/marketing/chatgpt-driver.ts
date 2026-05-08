@@ -39,6 +39,7 @@ import { chromium, type BrowserContext, type Page } from "playwright";
 import path from "node:path";
 import os from "node:os";
 import { promises as fs } from "node:fs";
+import { gotoAndClearChallenges, safeEvaluate } from "./playwright-helpers";
 
 // Persistent profile dir: cookies + localStorage live here so the
 // user only logs into ChatGPT once. ~/.ryda-marketing/ stays out
@@ -114,7 +115,7 @@ export async function generateImageViaChatGPT(
     });
     const page = context.pages()[0] ?? (await context.newPage());
 
-    await page.goto(CHATGPT_URL, { waitUntil: "domcontentloaded" });
+    await gotoAndClearChallenges(page, CHATGPT_URL);
 
     // First-run grace window: if Chrome lands on the ChatGPT login
     // page, give the user up to 5 minutes to authenticate in the
@@ -278,29 +279,6 @@ async function waitForComposer(page: Page) {
     }
   }
   return null;
-}
-
-/** Run page.evaluate but tolerate the "Execution context was
- *  destroyed" error that fires when ChatGPT navigates to
- *  /c/<conv_id> after a prompt is submitted. Returns null on
- *  navigation; caller retries on the next tick. */
-async function safeEvaluate<T>(
-  page: Page,
-  fn: () => T,
-): Promise<T | null> {
-  try {
-    return await page.evaluate(fn);
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    if (
-      msg.includes("Execution context was destroyed") ||
-      msg.includes("Target page, context or browser has been closed") ||
-      msg.includes("frame was detached")
-    ) {
-      return null;
-    }
-    throw err;
-  }
 }
 
 /** Poll for an image URL appearing in the chat. ChatGPT inserts
