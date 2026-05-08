@@ -23,6 +23,11 @@ import { computeFees } from "@/lib/fees";
 import { requireMinAge } from "@/lib/age";
 import { VEHICLES } from "@/lib/market-data";
 import { BOATS } from "@/lib/boat-data";
+import {
+  FUNDING_PATHS,
+  isFundingMethodEnabled,
+  type FundingMethod,
+} from "@/lib/funding-paths";
 
 export const runtime = "nodejs";
 
@@ -30,8 +35,14 @@ const RATE_LIMIT = 5;
 const RATE_WINDOW_MS = 60_000;
 
 // Funding methods this route handles. Stripe-handled methods
-// (card / ach) are explicitly rejected so callers can't accidentally
-// double-mint a row.
+// (card / ach) belong in /create-checkout and are rejected here so
+// callers can't accidentally double-mint a row.
+//
+// Each method here is ALSO gated by FUNDING_PATHS in lib/funding-paths
+// (the launch-time feature flag). Currently disabled pre-launch:
+// crypto (no partner), finance (lending-license exposure). The API
+// rejects 400 if the requested method is disabled — defense-in-
+// depth alongside the buy-flow UI gating.
 const NON_STRIPE_METHODS = ["wire", "crypto", "liquidity", "finance"] as const;
 type NonStripeMethod = (typeof NON_STRIPE_METHODS)[number];
 
@@ -96,6 +107,25 @@ export async function POST(req: NextRequest) {
       {
         error:
           "fundingMethod must be one of: wire, crypto, liquidity, finance. Use create-checkout for card / ach.",
+      },
+      { status: 400 },
+    );
+  }
+
+  // Pre-launch gate: even if the requested method is structurally
+  // valid (in NON_STRIPE_METHODS), reject if it's currently disabled
+  // by FUNDING_PATHS. This is the server-side defense alongside the
+  // buy-flow UI hiding the option — a determined caller bypassing
+  // the UI still hits a 400 here. Currently disabled: crypto (no
+  // regulated exchange partner identified), finance (lending-license
+  // exposure pending Florida counsel sign-off). See lib/funding-
+  // paths.ts for the gate definition + re-enable instructions.
+  if (!isFundingMethodEnabled(fundingMethod)) {
+    return NextResponse.json(
+      {
+        error: `Funding method '${fundingMethod}' is temporarily unavailable.`,
+        comingSoonNote:
+          FUNDING_PATHS[fundingMethod as FundingMethod].comingSoonNote ?? null,
       },
       { status: 400 },
     );

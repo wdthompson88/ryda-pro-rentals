@@ -7,6 +7,7 @@ import { formatUSD, type Vehicle } from "@/lib/market-data";
 import { type Boat } from "@/lib/boat-data";
 import { authedFetch } from "@/lib/api-fetch";
 import { ACQUISITION_FEE_PCT, computeFees } from "@/lib/fees";
+import { FUNDING_PATHS } from "@/lib/funding-paths";
 
 type StepKey = "review" | "verify" | "documents" | "fund" | "confirm";
 
@@ -856,6 +857,11 @@ function FundStep({
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {/* Each tile reads its enabled/disabled state from the
+            FUNDING_PATHS feature flag in lib/funding-paths.ts.
+            Pre-launch the crypto + finance tiles are gated off
+            (regulatory reasons; see lib comments). The flag flips
+            re-open the tiles + the API; no UI changes needed. */}
         <FundingOption
           accent={config.accent}
           method="ach"
@@ -863,6 +869,8 @@ function FundStep({
           detail="Free, 3–5 business day settlement. Powered by Stripe Checkout."
           selected={fundingMethod === "ach"}
           onSelect={() => setFundingMethod("ach")}
+          disabled={!FUNDING_PATHS.ach.enabled}
+          comingSoonNote={FUNDING_PATHS.ach.comingSoonNote}
         />
         <FundingOption
           accent={config.accent}
@@ -871,6 +879,8 @@ function FundStep({
           detail="Fastest for large amounts. Same-day or next-day settlement. Recommended for buy-ins above $50K."
           selected={fundingMethod === "wire"}
           onSelect={() => setFundingMethod("wire")}
+          disabled={!FUNDING_PATHS.wire.enabled}
+          comingSoonNote={FUNDING_PATHS.wire.comingSoonNote}
         />
         <FundingOption
           accent={config.accent}
@@ -879,6 +889,8 @@ function FundStep({
           detail="Settles immediately. Powered by Stripe Checkout. Card-network fees apply at checkout."
           selected={fundingMethod === "card"}
           onSelect={() => setFundingMethod("card")}
+          disabled={!FUNDING_PATHS.card.enabled}
+          comingSoonNote={FUNDING_PATHS.card.comingSoonNote}
         />
         <FundingOption
           accent={config.accent}
@@ -887,6 +899,8 @@ function FundStep({
           detail="Routed through a regulated US exchange partner. Conversion to USD on receipt; LLC escrow always holds USD."
           selected={fundingMethod === "crypto"}
           onSelect={() => setFundingMethod("crypto")}
+          disabled={!FUNDING_PATHS.crypto.enabled}
+          comingSoonNote={FUNDING_PATHS.crypto.comingSoonNote}
         />
         <FundingOption
           accent={config.accent}
@@ -895,6 +909,8 @@ function FundStep({
           detail="HELOC, SBLOC, or pledged-asset line through your existing bank. You wire the funds; we hold the share."
           selected={fundingMethod === "liquidity"}
           onSelect={() => setFundingMethod("liquidity")}
+          disabled={!FUNDING_PATHS.liquidity.enabled}
+          comingSoonNote={FUNDING_PATHS.liquidity.comingSoonNote}
         />
         <FundingOption
           accent={config.accent}
@@ -903,6 +919,8 @@ function FundStep({
           detail="We introduce you to a specialty lender. They underwrite; you fund through them. RYDA does not extend credit."
           selected={fundingMethod === "finance"}
           onSelect={() => setFundingMethod("finance")}
+          disabled={!FUNDING_PATHS.finance.enabled}
+          comingSoonNote={FUNDING_PATHS.finance.comingSoonNote}
         />
       </div>
 
@@ -1366,6 +1384,7 @@ function FundingOption({
   selected,
   onSelect,
   disabled = false,
+  comingSoonNote,
 }: {
   accent?: "red" | "marine";
   method: FundingMethod;
@@ -1374,6 +1393,11 @@ function FundingOption({
   selected: boolean;
   onSelect: () => void;
   disabled?: boolean;
+  /** Optional copy shown when disabled — replaces `detail` and adds a
+   *  small "Coming soon" badge so members understand the path is
+   *  intentional, not broken. Read from FUNDING_PATHS at the call
+   *  site so the gate-decision lives in one place. */
+  comingSoonNote?: string;
 }) {
   const styles = buyAccentClasses[accent];
   const tagLabel: Record<FundingMethod, string> = {
@@ -1384,11 +1408,13 @@ function FundingOption({
     liquidity: "Liquidity",
     finance: "Finance",
   };
+  const showComingSoon = disabled && Boolean(comingSoonNote);
   return (
     <button
       type="button"
       onClick={onSelect}
       disabled={disabled}
+      aria-disabled={disabled}
       className={`flex flex-col items-start gap-2 rounded-2xl border p-5 text-left transition-colors ${
         selected
           ? `${styles.border} ${styles.bgSoft}`
@@ -1397,11 +1423,20 @@ function FundingOption({
             : "border-rule bg-surface hover:border-ink-soft"
       }`}
     >
-      <span className={`text-xs font-medium uppercase tracking-wider ${styles.text}`}>
-        {tagLabel[method]}
+      <span className="flex w-full items-center justify-between gap-2">
+        <span className={`text-xs font-medium uppercase tracking-wider ${styles.text}`}>
+          {tagLabel[method]}
+        </span>
+        {showComingSoon && (
+          <span className="rounded-full border border-rule bg-cream-2 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-ink-soft">
+            Coming soon
+          </span>
+        )}
       </span>
       <span className="font-display text-lg text-ink">{label}</span>
-      <span className="text-sm text-ink-soft">{detail}</span>
+      <span className="text-sm text-ink-soft">
+        {showComingSoon ? comingSoonNote : detail}
+      </span>
     </button>
   );
 }
