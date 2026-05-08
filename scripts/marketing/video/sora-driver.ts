@@ -219,6 +219,31 @@ async function waitForComposer(page: Page) {
   return null;
 }
 
+/** Run page.evaluate but tolerate the "Execution context was
+ *  destroyed" error that fires when the page navigates mid-poll
+ *  (e.g. ChatGPT redirecting to /c/<conv_id> after a prompt is
+ *  submitted). Returns null on navigation; caller retries on the
+ *  next tick. */
+async function safeEvaluate<T>(
+  page: Page,
+  fn: () => T,
+): Promise<T | null> {
+  try {
+    return await page.evaluate(fn);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (
+      msg.includes("Execution context was destroyed") ||
+      msg.includes("Target page, context or browser has been closed") ||
+      msg.includes("frame was detached")
+    ) {
+      // Benign navigation — caller will retry on next poll tick.
+      return null;
+    }
+    throw err;
+  }
+}
+
 /** Quick check for the "I can't make videos" / "Sora isn't
  *  available on your account" reply pattern. Polls for ~10
  *  seconds — this only fires on accounts without Sora access. */
@@ -232,8 +257,10 @@ async function detectNoVideoCapability(page: Page): Promise<boolean> {
     "sora isn't available",
   ];
   while (Date.now() < deadline) {
-    const text = await page.evaluate(() => document.body.innerText.toLowerCase());
-    if (phrases.some((p) => text.includes(p))) return true;
+    const text = await safeEvaluate(page, () =>
+      document.body.innerText.toLowerCase(),
+    );
+    if (text && phrases.some((p) => text.includes(p))) return true;
     await new Promise((r) => setTimeout(r, 1000));
   }
   return false;
@@ -244,7 +271,7 @@ async function detectNoVideoCapability(page: Page): Promise<boolean> {
 async function waitForGeneratedVideo(page: Page): Promise<string | null> {
   const deadline = Date.now() + WAIT_FOR_VIDEO_MS;
   while (Date.now() < deadline) {
-    const url = await page.evaluate((): string | null => {
+    const url = await safeEvaluate(page, (): string | null => {
       // Strategy 1: <video> tag with src or <source> child.
       const videos = Array.from(document.querySelectorAll("video"));
       for (const v of videos) {

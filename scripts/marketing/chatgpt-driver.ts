@@ -237,13 +237,36 @@ async function waitForComposer(page: Page) {
   return null;
 }
 
+/** Run page.evaluate but tolerate the "Execution context was
+ *  destroyed" error that fires when ChatGPT navigates to
+ *  /c/<conv_id> after a prompt is submitted. Returns null on
+ *  navigation; caller retries on the next tick. */
+async function safeEvaluate<T>(
+  page: Page,
+  fn: () => T,
+): Promise<T | null> {
+  try {
+    return await page.evaluate(fn);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (
+      msg.includes("Execution context was destroyed") ||
+      msg.includes("Target page, context or browser has been closed") ||
+      msg.includes("frame was detached")
+    ) {
+      return null;
+    }
+    throw err;
+  }
+}
+
 /** Poll for an image URL appearing in the chat. ChatGPT inserts
  *  generated images as <img> tags whose src is on an OpenAI CDN.
  *  We pick the most-recent qualifying image. */
 async function waitForGeneratedImage(page: Page): Promise<string | null> {
   const deadline = Date.now() + WAIT_FOR_IMAGE_MS;
   while (Date.now() < deadline) {
-    const url = await page.evaluate((): string | null => {
+    const url = await safeEvaluate(page, (): string | null => {
       const imgs = Array.from(document.querySelectorAll("img"));
       // Filter to images from OpenAI's CDNs. Different chats have
       // returned images on a few different hosts over time:
