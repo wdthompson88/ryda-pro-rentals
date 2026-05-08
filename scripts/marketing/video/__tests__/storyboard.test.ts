@@ -82,11 +82,33 @@ describe("buildStoryboard", () => {
     expect(sb.shots[1].prompt).toContain("A custom shot description here");
   });
 
-  it("composes a caption that includes name, hook, CTA", () => {
+  it("composes a caption that does the educational lift on RYDA", () => {
     const sb = buildStoryboard(sample);
+    // Vehicle + share economics in the hook line.
     expect(sb.caption).toContain("458 Italia");
-    expect(sb.caption).toContain("$32K for 1/10");
-    expect(sb.caption).toContain("RYDA · Q3 launch");
+    expect(sb.caption).toContain(sample.hook);
+    // Educational beat — the caption must explain what RYDA is so
+    // a viewer who lands cold understands the product. Lock in the
+    // key positioning words so a future copy edit doesn't silently
+    // drop them.
+    expect(sb.caption).toMatch(/single-purpose llc|on the title|member-managed|shared ownership/i);
+    // CTA: brand + launch + where to act.
+    expect(sb.caption).toMatch(/RYDA/);
+    expect(sb.caption).toMatch(/Q3 2026|Miami launch/i);
+    expect(sb.caption).toMatch(/ryda\.pro/i);
+  });
+
+  it("uses softer language for boat captions (not yet launched)", () => {
+    const boat: SpotInput = {
+      ...sample,
+      vehicleType: "boat",
+      name: "Riva Aquariva",
+      vehicleDescription: "Riva Aquariva 33ft",
+      setting: "Miami marina at sunrise",
+    };
+    const sb = buildStoryboard(boat);
+    // Boats program is forward-look; caption should hint at that.
+    expect(sb.caption).toMatch(/rolling out|soon|alongside the car launch/i);
   });
 
   it("includes the cinematic style preamble in every shot", () => {

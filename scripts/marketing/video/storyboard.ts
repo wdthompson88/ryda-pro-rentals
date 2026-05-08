@@ -58,8 +58,10 @@ export type Storyboard = {
   totalDurationSec: 15;
   vehicleType: VehicleType;
   shots: [Shot, Shot, Shot];
-  /** A single composite caption suitable for Instagram / X
-   *  alongside the video. Pulled together from name + hook + CTA. */
+  /** Composite caption to ship alongside the video on IG / X.
+   *  Carries the educational lift the 15-sec overlays can't —
+   *  what RYDA is, why fractional ownership is different from
+   *  clubs/subscriptions, where to learn more. */
   caption: string;
 };
 
@@ -95,6 +97,29 @@ function shot3KineticPrompt(input: SpotInput): string {
   return `Tracking shot of ${input.vehicleDescription} underway on open water at golden hour. Camera mounted on a follow boat, capturing the wake and the boat from the rear quarter. Spray visible, calm sea. ${SHOT_STYLE}`;
 }
 
+/** Compose the post caption. 3-paragraph structure tuned for IG +
+ *  X: hook line → what-we-are paragraph → call-to-action. Stays
+ *  under 220 chars before the dash so IG doesn't truncate above
+ *  the fold. */
+function buildCaption(input: SpotInput): string {
+  // Hook line: vehicle + share economics. Front-loaded for the
+  // viewer who scans without expanding.
+  const hook = `${input.name} — ${input.hook}.`;
+
+  // What-we-are: the educational beat. Different language for
+  // cars vs boats. Boats program is forward-look so the language
+  // is softer.
+  const explainer =
+    input.vehicleType === "car"
+      ? `Real shared ownership. Single-purpose LLC, you're on the title. Storage, insurance, ops, and exit handled. Member-managed governance, no club, no subscription.`
+      : `Member-owned, member-managed. Single-purpose LLC per asset, full transparency on ops + exit. Boat program rolling out alongside the car launch.`;
+
+  // CTA: brand + when + where to act.
+  const cta = `RYDA. Q3 2026 Miami launch. Apply at ryda.pro.`;
+
+  return `${hook}\n\n${explainer}\n\n${cta}`;
+}
+
 export function buildStoryboard(input: SpotInput): Storyboard {
   const detailPrompt =
     input.detailOverride ?? defaultDetail(input.vehicleType, input.vehicleDescription);
@@ -125,13 +150,29 @@ export function buildStoryboard(input: SpotInput): Storyboard {
         overlay: input.cta,
       },
     ],
-    caption: `${input.name}. ${input.hook}. ${input.cta}.`,
+    caption: buildCaption(input),
   };
 }
 
-/** A small library of pre-built storyboards for the launch
- *  inventory. Daily orchestrator picks one round-robin so we
- *  don't post the same spot twice in a row. */
+/** Pre-built storyboards for the launch inventory.
+ *
+ *  Overlay strategy (each overlay must do work in 5 sec of screen time):
+ *    Shot 1 — `name`:  identify the asset. The hero shot is the
+ *                      visual sell; the overlay just confirms what
+ *                      they're seeing.
+ *    Shot 2 — `hook`:  explain the model. Always cost + "1/10 share"
+ *                      so a viewer who scrolls in mid-spot still
+ *                      gets the fractional-ownership concept.
+ *    Shot 3 — `cta`:   brand + when. Always mentions "RYDA" and
+ *                      "Q3 2026 Miami" so the spot terminates with
+ *                      a clear way to learn more, not a feature
+ *                      detail. (The richer "what is RYDA" lift
+ *                      happens in the caption, not the overlay.)
+ *
+ *  Caption strategy: the post caption (auto-generated from these
+ *  fields by buildStoryboard) carries the educational copy that
+ *  doesn't fit on a 15-second video — what RYDA is, why fractional
+ *  ownership matters, where to learn more. */
 export const LAUNCH_INVENTORY: SpotInput[] = [
   {
     vehicleType: "car",
@@ -139,8 +180,8 @@ export const LAUNCH_INVENTORY: SpotInput[] = [
     vehicleDescription:
       "2014 Ferrari 458 Italia in Rosso Corsa with cream leather interior",
     setting: "a sunlit Wynwood industrial garage with polished concrete floor",
-    hook: "$32,000 for 1/10",
-    cta: "RYDA · Q3 launch",
+    hook: "1/10 share · $32,000",
+    cta: "RYDA · Q3 Miami launch",
   },
   {
     vehicleType: "car",
@@ -148,8 +189,8 @@ export const LAUNCH_INVENTORY: SpotInput[] = [
     vehicleDescription:
       "2023 Porsche 911 GT3 RS in matte grey with the swan-neck rear wing",
     setting: "a Miami industrial garage with fluorescent overheads at night",
-    hook: "$37,500 for 1/10",
-    cta: "Track-eligible",
+    hook: "1/10 share · $37,500",
+    cta: "RYDA · Q3 Miami launch",
   },
   {
     vehicleType: "car",
@@ -157,8 +198,8 @@ export const LAUNCH_INVENTORY: SpotInput[] = [
     vehicleDescription:
       "2023 Lamborghini Urus in Grigio Lynx with black wheels and red brake calipers",
     setting: "a Miami beach causeway at sunset, palm shadows on the body",
-    hook: "$16,100 for 1/10",
-    cta: "RYDA · Q3 launch",
+    hook: "1/10 share · $16,100",
+    cta: "RYDA · Q3 Miami launch",
   },
   {
     vehicleType: "car",
@@ -166,8 +207,8 @@ export const LAUNCH_INVENTORY: SpotInput[] = [
     vehicleDescription:
       "2020 Lamborghini Huracán EVO Spyder in Nero Noctis with red interior",
     setting: "Miami's MacArthur Causeway at golden hour, top down",
-    hook: "$22,900 for 1/10",
-    cta: "V10 theater",
+    hook: "1/10 share · $22,900",
+    cta: "RYDA · Q3 Miami launch",
   },
   {
     vehicleType: "car",
@@ -175,8 +216,8 @@ export const LAUNCH_INVENTORY: SpotInput[] = [
     vehicleDescription:
       "2023 Chevrolet Corvette Z06 in Hypersonic Grey with carbon-fiber wing",
     setting: "a Miami industrial garage with morning sun through skylights",
-    hook: "$10,500 for 1/10",
-    cta: "Flat-plane V8, 670hp",
+    hook: "1/10 share · $10,500",
+    cta: "RYDA · Q3 Miami launch",
   },
   {
     vehicleType: "car",
@@ -184,8 +225,8 @@ export const LAUNCH_INVENTORY: SpotInput[] = [
     vehicleDescription:
       "2024 Porsche 911 Carrera in GT Silver Metallic with black wheels",
     setting: "Wynwood arts district, brick wall behind, late afternoon light",
-    hook: "$13,200 for 1/10",
-    cta: "The everyday icon",
+    hook: "1/10 share · $13,200",
+    cta: "RYDA · Q3 Miami launch",
   },
   // Boat templates — kept ready for when boats ship. Hooks are
   // placeholders; replace with real share economics when announced.
@@ -195,8 +236,8 @@ export const LAUNCH_INVENTORY: SpotInput[] = [
     vehicleDescription:
       "Riva Aquariva Super 33ft mahogany runabout, classic Riva curves",
     setting: "Miami Beach marina at sunrise, calm water, no other boats",
-    hook: "Coming Q4 2026",
-    cta: "Boat program · soon",
+    hook: "Member-owned · Q4 2026",
+    cta: "RYDA boats · soon",
   },
   {
     vehicleType: "boat",
@@ -204,8 +245,8 @@ export const LAUNCH_INVENTORY: SpotInput[] = [
     vehicleDescription:
       "Axopar 37 Sun Top in Ice Grey with twin Mercury 350 outboards",
     setting: "Biscayne Bay at golden hour, light chop on the water",
-    hook: "Coming Q4 2026",
-    cta: "Boat program · soon",
+    hook: "Member-owned · Q4 2026",
+    cta: "RYDA boats · soon",
   },
 ];
 
