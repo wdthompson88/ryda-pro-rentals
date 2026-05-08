@@ -43,12 +43,24 @@
 import { createClient } from "@supabase/supabase-js";
 import path from "node:path";
 import { promises as fs } from "node:fs";
-import { generateImageViaChatGPT, type GenerateResult } from "./chatgpt-driver";
 import { loadDotEnvLocal } from "./env-loader";
 
-// tsx doesn't auto-load .env files. Load Supabase + driver env
+// tsx doesn't auto-load .env files. Load Supabase + OpenAI env
 // before reading process.env below.
 loadDotEnvLocal();
+
+// Lazy-imported in pollOnce() so this script can `tsx`-load
+// without server-only failing if it's run from a non-Next env.
+type ImageApiResult =
+  | { kind: "ok"; path: string }
+  | { kind: "not_configured"; missingEnv: string[] }
+  | { kind: "error"; error: string };
+type ImageApiFn = (
+  input: { prompt: string; quality: "low" | "medium" | "high"; size: string },
+  outDir: string,
+  filename: string,
+) => Promise<ImageApiResult>;
+let generateImageApi: ImageApiFn | null = null;
 
 const BATCH_SIZE = parseInt(process.env.QUEUE_POLLER_BATCH_SIZE || "5", 10);
 const PAUSE_BETWEEN_MS = parseInt(
@@ -212,13 +224,43 @@ async function pollOnce(): Promise<{
       `[queue-poller] (${i + 1}/${needs.length}) row=${row.id.slice(0, 8)} channel=${row.channel}`,
     );
 
-    let result: GenerateResult;
+    if (!generateImageApi) {
+      // Lazy import — pulls in src/lib/image-gen which uses
+      // server-only. Doing this lazily means the script can
+      // tsx-load even if env isn't set up yet.
+      const lib = await import("@/lib/image-gen");
+      generateImageApi = async (input, outDir, filename) => {
+        const r = await lib.generateImage(
+          {
+            prompt: input.prompt,
+            size: input.size as
+              | "1024x1024"
+              | "1024x1536"
+              | "1536x1024"
+              | "1792x1024"
+              | "auto",
+            quality: input.quality,
+          },
+          outDir,
+          filename,
+        );
+        if (r.kind === "ok") {
+          return { kind: "ok", path: r.path };
+        }
+        if (r.kind === "not_configured") {
+          return { kind: "not_configured", missingEnv: r.missingEnv };
+        }
+        return { kind: "error", error: r.error };
+      };
+    }
+
+    let result: ImageApiResult;
     try {
-      result = await generateImageViaChatGPT({
-        prompt,
-        outPath,
-        headless: HEADLESS,
-      });
+      result = await generateImageApi(
+        { prompt, quality: "medium", size: "1536x1024" },
+        OUT_DIR,
+        filename,
+      );
     } catch (err) {
       result = {
         kind: "error",
@@ -238,22 +280,20 @@ async function pollOnce(): Promise<{
         );
         errors += 1;
       } else {
+        const sizeKb = result.path
+          ? Math.round((await fs.stat(result.path)).size / 1024)
+          : 0;
         console.log(
-          `[queue-poller]   ok: ${publicUrl} (${(result.sizeBytes / 1024).toFixed(0)} KB)`,
+          `[queue-poller]   ok: ${publicUrl} (${sizeKb} KB)`,
         );
         generated += 1;
       }
-    } else if (result.kind === "not_logged_in") {
+    } else if (result.kind === "not_configured") {
       console.error(
-        `[queue-poller]   NOT LOGGED IN. Run 'npm run gen-images:login' to authenticate ChatGPT once, then restart the poller.`,
+        `[queue-poller]   NOT CONFIGURED. Missing env: ${(result.missingEnv ?? []).join(", ")}. Set OPENAI_API_KEY in .env.local and re-run.`,
       );
       notLoggedIn = true;
-      // No point continuing this pass — every subsequent row will
-      // hit the same login wall.
       break;
-    } else if (result.kind === "timeout") {
-      console.error(`[queue-poller]   timeout at stage=${result.stage}`);
-      errors += 1;
     } else {
       console.error(`[queue-poller]   error: ${result.error}`);
       errors += 1;
@@ -276,7 +316,7 @@ async function main() {
 
   console.log("[queue-poller] starting");
   console.log(
-    `[queue-poller] config: batch=${BATCH_SIZE} pause=${PAUSE_BETWEEN_MS}ms interval=${POLL_INTERVAL_MS}ms headless=${HEADLESS}`,
+    `[queue-poller] config: batch=${BATCH_SIZE} pause=${PAUSE_BETWEEN_MS}ms interval=${POLL_INTERVAL_MS}ms vendor=openai-images-api`,
   );
 
   do {

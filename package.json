@@ -17,13 +17,11 @@
     "test:e2e:report": "playwright show-report",
     "marketing:sync": "tsx scripts/marketing/sync-content.ts",
     "marketing:sync:dry": "tsx scripts/marketing/sync-content.ts --dry-run",
-    "marketing:gen-image": "tsx scripts/marketing/chatgpt-driver.ts",
     "marketing:gen-images": "tsx scripts/marketing/queue-poller.ts --once",
     "marketing:gen-images:loop": "tsx scripts/marketing/queue-poller.ts --loop",
     "marketing:start": "npm run marketing:sync && npm run marketing:gen-images:loop",
     "marketing:daily-spot": "tsx scripts/marketing/video/daily-spot.ts",
     "marketing:smoke-video": "tsx scripts/marketing/video/__smoke__/composer-smoke.ts",
-    "marketing:chatgpt-check": "tsx scripts/marketing/chatgpt-check.ts",
     "marketing:dreamina-check": "tsx scripts/marketing/dreamina-check.ts"
   },
   "dependencies": {

@@ -36,7 +36,8 @@
     "src/app/api/kyc/webhook/route.ts": { "maxDuration": 15 },
     "src/app/api/share-purchase/[id]/resend-amendment/route.ts": { "maxDuration": 30 },
     "src/app/api/share-purchase/[id]/refund/route.ts": { "maxDuration": 20 },
-    "src/app/api/cron/social-publisher/route.ts": { "maxDuration": 60 }
+    "src/app/api/cron/social-publisher/route.ts": { "maxDuration": 60 },
+    "src/app/api/admin/generate-video/route.ts": { "maxDuration": 600 }
   },
   "crons": [
     {

@@ -31,27 +31,15 @@ import path from "node:path";
 import os from "node:os";
 import { createClient } from "@supabase/supabase-js";
 import { loadDotEnvLocal } from "../env-loader";
+
+// Load Supabase + OpenAI env from .env.local before importing
+// modules that read env at module-init time.
+loadDotEnvLocal();
+
 import {
   generateClipViaDreamina,
   type GenerateClipResult as DreaminaResult,
 } from "./dreamina-driver";
-// sora result type is structurally compatible with dreamina's plus
-// the no_video_capability variant; we use Dreamina's type here to
-// keep the orchestrator narrowing simple (the extra variants from
-// sora are still handled in the switch since the discriminator is
-// the same `kind` field).
-import type { GenerateClipResult as SoraResult } from "./sora-driver";
-
-type AnyResult = DreaminaResult | SoraResult;
-
-// Load Supabase + ChatGPT env from .env.local. tsx doesn't auto-load
-// .env files, and Next's loader only runs in dev/build. This makes
-// the script Just Work when launched via `npm run`.
-loadDotEnvLocal();
-
-type Vendor = "sora" | "dreamina";
-// generateClipViaSora is dynamically imported in generateClip()
-// so dreamina runs don't pull in playwright twice.
 import { composeSpot } from "./composer";
 import {
   LAUNCH_INVENTORY,
@@ -59,6 +47,26 @@ import {
   pickTodaysVehicle,
   type SpotInput,
 } from "./storyboard";
+
+type Vendor = "sora" | "dreamina";
+
+// Sora API result has a slightly different shape than the browser-
+// based Dreamina driver. We normalize both to a unified result here.
+type AnyResult =
+  | DreaminaResult
+  | {
+      kind: "ok";
+      path: string;
+      sizeBytes: number;
+      vendorUrl: string | null;
+    }
+  | { kind: "not_logged_in" }
+  | { kind: "error"; error: string }
+  | { kind: "rate_limited"; retryAfterSec: number | null }
+  | { kind: "not_configured"; missingEnv: string[] }
+  | { kind: "timeout"; stage: "composer" | "video" }
+  | { kind: "no_video_capability"; hint: string }
+  | { kind: "out_of_credits"; hint: string };
 
 const MARKER_DIR = path.join(os.homedir(), ".ryda-marketing", "daily-markers");
 const TMP_CLIPS_ROOT = path.join(os.homedir(), ".ryda-marketing", "clips");
@@ -116,9 +124,11 @@ function parseArgs(argv: string[]): {
   return out;
 }
 
-/** Single-clip generation routed by vendor. Both vendors return
- *  discriminated unions sharing the same `kind` shape so the
- *  orchestrator below can switch on it uniformly. */
+/** Single-clip generation routed by vendor. Sora goes through
+ *  the OpenAI API (sora-2 / sora-2-pro); Dreamina stays browser-
+ *  driven because they don't expose a public API on trial accounts.
+ *  Both branches return discriminated unions sharing `kind` so
+ *  the orchestrator's switch handles them uniformly. */
 async function generateClip(
   vendor: Vendor,
   prompt: string,
@@ -128,10 +138,43 @@ async function generateClip(
   if (vendor === "dreamina") {
     return generateClipViaDreamina({ prompt, durationSec, outPath });
   }
-  // Lazy-import sora-driver only when used so dreamina runs never
-  // launch ChatGPT's persistent profile (and vice-versa).
-  const { generateClipViaSora } = await import("./sora-driver");
-  return generateClipViaSora({ prompt, durationSec, outPath });
+  // Sora: HTTP API, no browser. Lazy-import so dreamina runs
+  // don't pay the import cost. The video-gen lib auto-picks the
+  // first configured adapter; we don't pass vendor explicitly so
+  // future adapters (Runway, Luma) plug in by env presence.
+  const { generateClip: generateClipViaApi } = await import(
+    "@/lib/video-gen"
+  );
+  const outDir = path.dirname(outPath);
+  const filename = path.basename(outPath);
+  const result = await generateClipViaApi(
+    {
+      prompt,
+      durationSec,
+      orientation: "landscape",
+      quality: "standard",
+    },
+    outDir,
+    filename,
+  );
+  // Adapt the lib's result shape to AnyResult. The lib returns
+  // sizeBytes via the file we just wrote; compute it here.
+  if (result.kind === "ok") {
+    let sizeBytes = 0;
+    try {
+      const stat = await fs.stat(result.path);
+      sizeBytes = stat.size;
+    } catch {
+      // best-effort
+    }
+    return {
+      kind: "ok",
+      path: result.path,
+      sizeBytes,
+      vendorUrl: result.vendorUrl,
+    };
+  }
+  return result;
 }
 
 async function alreadyRanToday(): Promise<boolean> {
@@ -211,9 +254,24 @@ async function main() {
         `[daily-spot] timeout at stage=${res.stage} on shot ${shot.index}. ${args.vendor} generation can take >5 min on busy days; try again in an hour.`,
       );
       process.exit(4);
-    } else {
+    } else if (res.kind === "rate_limited") {
+      console.error(
+        `[daily-spot] rate limited by ${args.vendor}. Retry after ${res.retryAfterSec ?? "?"}s.`,
+      );
+      process.exit(9);
+    } else if (res.kind === "not_configured") {
+      console.error(
+        `[daily-spot] not configured. Missing env: ${res.missingEnv.join(", ")}.`,
+      );
+      process.exit(10);
+    } else if (res.kind === "error") {
       console.error(`[daily-spot] error on shot ${shot.index}: ${res.error}`);
       process.exit(5);
+    } else {
+      // Exhaustive check — any new variant added to AnyResult will
+      // get caught here at compile time once we narrow exhaustively.
+      console.error(`[daily-spot] unknown result variant`);
+      process.exit(6);
     }
   }
 
