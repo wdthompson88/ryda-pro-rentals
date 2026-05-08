@@ -97,7 +97,11 @@ function ChallengeInner() {
   }
 
   return (
-    <main className="mx-auto max-w-md px-6 py-16 sm:py-24">
+    // Use <div>, not <main> — root layout has the <main id="main">
+    // landmark (Sub-Batch A3 a11y fix). Nested <main> breaks
+    // skip-to-content for AT users. Caught by accessibility-expert
+    // agent (B-4).
+    <div className="mx-auto max-w-md px-6 py-16 sm:py-24">
       <div className="rounded-2xl border border-rule bg-surface p-8">
         <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
           Sign-in · 2FA
@@ -153,7 +157,7 @@ function ChallengeInner() {
           .
         </p>
       </div>
-    </main>
+    </div>
   );
 }
 

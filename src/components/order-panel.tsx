@@ -92,7 +92,7 @@ export function OrderPanel({ vehicle }: Props) {
         type="button"
         onClick={handleClaim}
         disabled={sold}
-        className="mt-5 w-full rounded-full bg-ink px-7 py-3 text-sm font-semibold text-cream transition-colors hover:bg-red disabled:cursor-not-allowed disabled:opacity-50"
+        className="mt-5 w-full rounded-full bg-ink px-7 py-3 text-sm font-medium text-cream transition-colors hover:bg-red disabled:cursor-not-allowed disabled:opacity-50"
       >
         {sold ? "All shares taken" : `Reserve ${numericShares} share${numericShares > 1 ? "s" : ""} →`}
       </button>

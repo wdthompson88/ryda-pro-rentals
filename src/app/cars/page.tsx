@@ -137,10 +137,9 @@ export default function CarsHome() {
             <span className="not-italic text-red">NY</span> next.
           </h2>
           <p className="mt-5 max-w-xl text-base text-cream/85">
-            The full RYDA portfolio organised by city, featured vehicles,
-            booking model and the path to claiming a share. Inspired by
-            the cleanest fractional-ownership browse experience we&apos;ve
-            seen.
+            The full RYDA portfolio organised by city — featured vehicles,
+            booking model, and the path to claiming a share. One facility,
+            one fleet, one team. Miami first.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link

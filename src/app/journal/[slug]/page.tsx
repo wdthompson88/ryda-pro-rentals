@@ -144,7 +144,7 @@ export default async function JournalPostPage({
           <span>{post.readTime}</span>
         </div>
 
-        <div className="mt-12 space-y-6 text-base leading-relaxed text-ink-soft">
+        <div className="mt-12 space-y-6 text-base leading-relaxed text-ink">
           {post.body.map((paragraph, i) => {
             if (paragraph.startsWith("## ")) {
               return (

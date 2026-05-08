@@ -161,6 +161,11 @@ const STEPS: { key: StepKey; label: string }[] = [
   { key: "confirm", label: "Confirm" },
 ];
 
+// 2-share minimum per buyer under the co-ownership doctrine; mirrors
+// the floor in /portfolio/[symbol]/buy/page.tsx so the in-flow stepper
+// cannot dip below the URL-clamped initial value.
+const MIN_SHARES_PER_BUYER = 2;
+
 type Props = {
   asset: BuyAsset;
   initialShares: number;
@@ -177,7 +182,10 @@ export default function BuyFlow({ asset, initialShares, config }: Props) {
   const [signature, setSignature] = useState("");
   const [fundingMethod, setFundingMethod] = useState<FundingMethod | null>(null);
 
-  const shares = initialShares;
+  // Lifted from a const to state so Step 1 can stepper up/down
+  // without leaving the flow. Sidebar + downstream steps re-render
+  // automatically because computeFees() is called on every render.
+  const [shares, setShares] = useState(initialShares);
   // Shared fee math with the API (lib/fees.ts) so the buyer-visible
   // total exactly matches the Stripe charge. acquisitionFee replaces
   // the old flat $1,500 "closing fee".
@@ -248,6 +256,8 @@ export default function BuyFlow({ asset, initialShares, config }: Props) {
               asset={asset}
               config={config}
               shares={shares}
+              setShares={setShares}
+              maxShares={asset.sharesAvailable}
               totalPrice={totalPrice}
               acquisitionFee={acquisitionFee}
               grandTotal={grandTotal}
@@ -352,6 +362,8 @@ function ReviewStep({
   asset,
   config,
   shares,
+  setShares,
+  maxShares,
   totalPrice,
   acquisitionFee,
   grandTotal,
@@ -363,6 +375,8 @@ function ReviewStep({
   asset: BuyAsset;
   config: BuyFlowConfig;
   shares: number;
+  setShares: (n: number) => void;
+  maxShares: number;
   totalPrice: number;
   acquisitionFee: number;
   grandTotal: number;
@@ -387,6 +401,15 @@ function ReviewStep({
           before you proceed to verification.
         </p>
       </div>
+
+      <SharesStepper
+        accent={config.accent}
+        shares={shares}
+        setShares={setShares}
+        minShares={MIN_SHARES_PER_BUYER}
+        maxShares={maxShares}
+        pricePerShare={asset.pricePerShare}
+      />
 
       <Section accent={config.accent} title="What you're buying">
         <Bullet label={config.labels.asset} value={`${asset.year} ${asset.name}`} />
@@ -1236,6 +1259,84 @@ function Bullet({
       <dd className={`tabular-nums text-ink sm:text-right ${bold ? "font-display text-base" : ""}`}>
         {value}
       </dd>
+    </div>
+  );
+}
+
+// In-flow share count adjuster. Bounds: MIN_SHARES_PER_BUYER ≤ shares
+// ≤ asset.sharesAvailable. setShares is called with a NEW value
+// (immutable update); the parent recomputes fees on the next render
+// and the sticky sidebar re-flows automatically.
+function SharesStepper({
+  accent,
+  shares,
+  setShares,
+  minShares,
+  maxShares,
+  pricePerShare,
+}: {
+  accent: "red" | "marine";
+  shares: number;
+  setShares: (n: number) => void;
+  minShares: number;
+  maxShares: number;
+  pricePerShare: number;
+}) {
+  const styles = buyAccentClasses[accent];
+  const canDecrement = shares > minShares;
+  const canIncrement = shares < maxShares;
+
+  function decrement() {
+    if (canDecrement) setShares(shares - 1);
+  }
+  function increment() {
+    if (canIncrement) setShares(shares + 1);
+  }
+
+  return (
+    <div className="rounded-2xl border border-rule bg-surface p-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className={`text-xs font-medium uppercase tracking-wider ${styles.text}`}>
+            Your position
+          </p>
+          <p className="mt-2 font-display text-xl text-ink">
+            {shares} share{shares > 1 ? "s" : ""} at {formatUSD(pricePerShare)} each
+          </p>
+          <p className="mt-1 text-sm text-ink-soft">
+            Adjust your share count before continuing — pricing updates instantly.
+          </p>
+        </div>
+        <div className="flex items-center gap-3" role="group" aria-label="Adjust share count">
+          <button
+            type="button"
+            onClick={decrement}
+            disabled={!canDecrement}
+            aria-label="Decrease shares"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-rule bg-cream-2/40 text-xl font-medium text-ink hover:border-ink disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            −
+          </button>
+          <span
+            aria-live="polite"
+            className="min-w-[2.5rem] text-center font-display text-2xl tabular-nums text-ink"
+          >
+            {shares}
+          </span>
+          <button
+            type="button"
+            onClick={increment}
+            disabled={!canIncrement}
+            aria-label="Increase shares"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-rule bg-cream-2/40 text-xl font-medium text-ink hover:border-ink disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            +
+          </button>
+        </div>
+      </div>
+      <p className="mt-4 text-xs text-mute">
+        Minimum {minShares} share{minShares > 1 ? "s" : ""} per member · {maxShares} available right now.
+      </p>
     </div>
   );
 }

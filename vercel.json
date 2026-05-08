@@ -35,7 +35,8 @@
     "src/app/api/share-purchase/dispute/route.ts": { "maxDuration": 15 },
     "src/app/api/kyc/webhook/route.ts": { "maxDuration": 15 },
     "src/app/api/share-purchase/[id]/resend-amendment/route.ts": { "maxDuration": 30 },
-    "src/app/api/share-purchase/[id]/refund/route.ts": { "maxDuration": 20 }
+    "src/app/api/share-purchase/[id]/refund/route.ts": { "maxDuration": 20 },
+    "src/app/api/cron/social-publisher/route.ts": { "maxDuration": 60 }
   },
   "crons": [
     {
@@ -49,6 +50,10 @@
     {
       "path": "/api/cron/template-hash-check",
       "schedule": "0 4 * * *"
+    },
+    {
+      "path": "/api/cron/social-publisher",
+      "schedule": "*/15 * * * *"
     }
   ]
 }

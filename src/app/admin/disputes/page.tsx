@@ -103,7 +103,11 @@ export default function AdminDisputesPage() {
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
+      {/* Use <div>, not <main> — root layout already has the
+          <main id="main"> landmark (Sub-Batch A3 a11y fix). Nested
+          <main> elements break skip-to-content semantics for AT
+          users. Caught by accessibility-expert agent (B-4). */}
+      <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
         <div className="flex items-center justify-between">
           <div>
             <Link
@@ -220,7 +224,7 @@ export default function AdminDisputesPage() {
             </table>
           )}
         </div>
-      </main>
+      </div>
     </>
   );
 }

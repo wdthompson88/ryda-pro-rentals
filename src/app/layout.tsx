@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Fraunces } from "next/font/google";
 import "./globals.css";
 import { SiteFooter } from "@/components/site-footer";
@@ -33,6 +33,24 @@ const fraunces = Fraunces({
 // local dev. Pre-launch, set NEXT_PUBLIC_SITE_URL to the actual
 // preview URL to avoid OG scrapers fetching a non-existent domain.
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ryda.pro";
+
+// Viewport meta — REQUIRED for mobile responsive layout to work.
+// Without this, Mobile Safari falls back to a 980-CSS-px desktop
+// viewport and scales the entire site down — every Tailwind sm:/md:
+// rule is silently bypassed on iPhone, body text becomes ~10px,
+// touch targets become ~17px. Caught by mobile-developer agent
+// (B1, May 2026) — was site-breaking on iPhone before this commit.
+// Next.js 16 App Router does NOT auto-emit viewport; must be
+// explicitly exported from the root layout.
+//
+// viewportFit=cover lets us use safe-area-inset-* CSS for the
+// iPhone home indicator + notch (cookie banner + sticky CTAs).
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#fef9f3", // matches bg-cream so the URL bar tints right on iOS
+};
 
 export const metadata: Metadata = {
   title: {

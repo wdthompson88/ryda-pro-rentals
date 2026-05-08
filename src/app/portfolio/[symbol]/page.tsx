@@ -540,10 +540,10 @@ export default async function VehicleMarketPage({
             </span>
           </div>
           <ul className="mt-6 divide-y divide-rule rounded-xl border border-rule bg-surface">
-            <Activity label="New co-owner joined the LLC" detail="Sample event" amount="—" sub="1 share" />
-            <Activity label="Inspection report posted" detail="Sample event" amount="—" sub="Mileage: 2,140 mi" />
-            <Activity label="Share transferred to a new verified member" detail="Sample event" amount="—" sub="1 share" />
-            <Activity label="New co-owners joined the LLC" detail="Sample event" amount="—" sub="2 shares" />
+            <Activity label="New co-owner joined the LLC" detail="Pre-launch illustration — live events begin Q3 2026" amount="—" sub="1 share" />
+            <Activity label="Inspection report posted" detail="Pre-launch illustration — live events begin Q3 2026" amount="—" sub="Mileage: 2,140 mi" />
+            <Activity label="Share transferred to a new verified member" detail="Pre-launch illustration — live events begin Q3 2026" amount="—" sub="1 share" />
+            <Activity label="New co-owners joined the LLC" detail="Pre-launch illustration — live events begin Q3 2026" amount="—" sub="2 shares" />
           </ul>
           <p className="mt-3 text-xs text-mute">
             These rows are illustrative. The live feed of LLC events
