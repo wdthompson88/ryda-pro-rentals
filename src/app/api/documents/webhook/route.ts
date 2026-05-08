@@ -16,6 +16,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { isDropboxSignConfigured, signatureRequestApi } from "@/lib/dropbox-sign";
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import { decideClaimAction } from "@/lib/dropbox-sign-claims";
 import crypto from "crypto";
 
 export const runtime = "nodejs";
@@ -273,33 +274,156 @@ export async function POST(req: NextRequest) {
   // Dropbox Sign protocol change) OR poll Dropbox Sign for the
   // last-event-type per request and cross-check.
 
-  // Mutation FIRST, dedup SECOND (codex round-4 catch). The reverse
-  // ordering would let a transient DB-write failure poison the
-  // dedup table: dedup row recorded → mutation fails → 503 sent →
-  // Dropbox retries → retry hits dedup conflict → 200 ack with no
-  // mutation → permanent loss. By doing the side effect first and
-  // claiming the dedup row only on success, a mutation failure
-  // returns 503 with no dedup row, so the legitimate retry will
-  // re-attempt cleanly.
+  // Claim-then-mark-processed pattern (Item 5 from .launch-prep
+  // LAUNCH_PLAN.md, migration 0027 added the processed_at column).
+  // The earlier "mutation-first, dedup-second" worked but had two
+  // residuals: (a) two concurrent deliveries could both pass HMAC
+  // + state-check + run the mutation before either dedup-recorded
+  // (idempotent UPDATE made this safe but it's "imperfect at-most-
+  // once"); (b) a worker crashing mid-mutation left no dedup row
+  // and the retry re-ran the mutation. With claim-then-mark, the
+  // INSERT happens BEFORE the mutation, marking it as in-flight
+  // (processed_at = NULL); on success we UPDATE processed_at = NOW().
   //
-  // State-machine guards (codex round-5 catch). The migration
-  // 0012 defines status as enum {pending, sent, viewed, signed,
-  // declined, canceled}. Terminal states are signed/declined/
-  // canceled. Without monotonic guards, a captured-and-tampered
-  // 'viewed' or 'canceled' webhook could downgrade a 'signed' row
-  // back to viewed (loses the signed_at + filesUrl) or canceled
-  // (clobbers a real outcome). The `.in("status", [...])` clauses
-  // below restrict each transition to legal source states so
-  // replays/tampers can't regress terminal rows.
+  // Decision logic lives in lib/dropbox-sign-claims (pure function,
+  // unit-tested without Supabase). Three outcomes for an existing
+  // dedup row:
+  //   - already_processed → return 200 ack, no work
+  //   - in_flight (claim < 5min ago) → return 503, let active worker finish
+  //   - take_over (claim >= 5min ago) → previous worker crashed,
+  //     restart processing
+  // No row → claim_and_process (the common path).
+
+  // Step 1: try to claim. Generate a per-request claim token (UUID)
+  // and INSERT with processed_at=NULL. All subsequent CAS ops use
+  // .eq("claim_token", ourToken) so a stale worker's writes can't
+  // trample our active claim. Codex round-2 caught the missing
+  // ownership token.
+  const ourClaimToken = crypto.randomUUID();
+  let proceed = false;
+  let isTakeOver = false;
+  const insertResult = await admin
+    .from("dropbox_sign_events")
+    .insert({
+      event_hash: payload.event.event_hash,
+      signature_request_id: reqId,
+      event_type: evtType,
+      event_time: payload.event.event_time,
+      processed_at: null,
+      claim_token: ourClaimToken,
+    });
+
+  if (!insertResult.error) {
+    proceed = true; // fresh claim
+  } else if (insertResult.error.code === "23505") {
+    // Existing row — fetch it and decide.
+    const lookupResult = await admin
+      .from("dropbox_sign_events")
+      .select("received_at, processed_at, claim_token")
+      .eq("event_hash", payload.event.event_hash)
+      .eq("signature_request_id", reqId)
+      .maybeSingle();
+    if (lookupResult.error) {
+      console.error(
+        "[docsign webhook · existing-claim lookup]",
+        lookupResult.error,
+      );
+      return NextResponse.json(
+        { error: "Claim lookup failed; retry." },
+        { status: 503 },
+      );
+    }
+    const decision = decideClaimAction(lookupResult.data ?? null);
+    if (decision.action === "already_processed") {
+      return new Response("Hello API Event Received", { status: 200 });
+    }
+    if (decision.action === "in_flight") {
+      console.warn(
+        "[docsign webhook · in-flight claim, ageMs=",
+        decision.ageMs,
+        "]",
+      );
+      return NextResponse.json(
+        { error: "Claim in-flight; retry." },
+        { status: 503 },
+      );
+    }
+    // take_over: refresh received_at + STAMP OUR claim_token so
+    // any subsequent stale worker (the original OR another
+    // take-over winner) can't write through our updates. CAS on
+    // the previous claim_token (or processed_at IS NULL if no
+    // token existed pre-migration) to atomically swing ownership.
+    const previousClaimToken = lookupResult.data?.claim_token ?? null;
+    let reclaimQuery = admin
+      .from("dropbox_sign_events")
+      .update({
+        received_at: new Date().toISOString(),
+        claim_token: ourClaimToken,
+      })
+      .eq("event_hash", payload.event.event_hash)
+      .eq("signature_request_id", reqId)
+      .is("processed_at", null);
+    // CAS on previous token: if another worker reclaimed between
+    // our lookup and update, their token differs from what we saw
+    // and the update affects 0 rows.
+    if (previousClaimToken !== null) {
+      reclaimQuery = reclaimQuery.eq("claim_token", previousClaimToken);
+    } else {
+      // Pre-migration legacy row with no token: only proceed if
+      // claim_token is still NULL.
+      reclaimQuery = reclaimQuery.is("claim_token", null);
+    }
+    const reclaimResult = await reclaimQuery.select("event_hash");
+    if (reclaimResult.error || !reclaimResult.data?.length) {
+      console.warn(
+        "[docsign webhook · take-over race lost]",
+        reqId,
+        reclaimResult.error,
+      );
+      return NextResponse.json(
+        { error: "Claim contention; retry." },
+        { status: 503 },
+      );
+    }
+    proceed = true;
+    isTakeOver = true;
+    const ageMs =
+      decision.action === "take_over" ? decision.ageMs : "n/a";
+    console.warn(
+      "[docsign webhook · taking over stale claim, ageMs=",
+      ageMs,
+      "]",
+    );
+  } else {
+    // Non-conflict insert error (table missing, RLS, etc.).
+    console.error("[docsign webhook · claim insert]", insertResult.error);
+    return NextResponse.json(
+      { error: "Claim write temporarily unavailable." },
+      { status: 503 },
+    );
+  }
+
+  if (!proceed) {
+    // Defensive — should be unreachable.
+    return NextResponse.json(
+      { error: "Internal claim resolution error." },
+      { status: 500 },
+    );
+  }
+
+  // Step 2: state-machine-guarded mutation. The migration 0012
+  // defines status as enum {pending, sent, viewed, signed, declined,
+  // canceled}. Terminal states are signed/declined/canceled.
+  // Without monotonic guards, a captured-and-tampered 'viewed' or
+  // 'canceled' webhook could downgrade a 'signed' row back to
+  // viewed/canceled. The .in() clauses restrict each transition
+  // to legal source states.
   //
   // Allowed transitions:
   //   pending|sent|viewed → signed     (all_signed)
   //   pending|sent|viewed → declined   (declined)
   //   pending|sent|viewed → canceled   (canceled)
-  //   pending|sent        → viewed     (viewed)  ← tighter than the
-  //     others because 'viewed' is informational; we don't want a
-  //     replay to even re-stamp updated_at on a row that's already
-  //     viewed/signed/declined/canceled.
+  //   pending|sent        → viewed     (viewed) — tighter (no replay restamp)
   const NON_TERMINAL_PRE_VIEW = ["pending", "sent"] as const;
   const NON_TERMINAL = ["pending", "sent", "viewed"] as const;
   let mutationErr: { message?: string } | null = null;
@@ -339,8 +463,28 @@ export async function POST(req: NextRequest) {
   }
 
   if (mutationErr) {
-    // No dedup row recorded yet — the legitimate retry will pick
-    // this up cleanly.
+    // Mutation failed AFTER we claimed. DELETE the claim row so
+    // the legitimate retry can re-claim immediately (no 5-minute
+    // wait). CAS on our claim_token so we only delete OUR claim —
+    // a parallel worker that took over after us shouldn't have
+    // its row deleted by our slow-failure cleanup. Codex round-2
+    // catch.
+    //
+    // Codex round-3 catch: this DELETE must run for take-over
+    // claims too, not just fresh claims. A take-over worker that
+    // fails leaves a stuck row otherwise — retries are forced
+    // through the 5-minute stale-claim wait window instead of
+    // immediately re-claiming. The CAS on claim_token + null-
+    // processed_at means we only delete a claim WE actively
+    // own, so the original worker's history concern is moot
+    // (the take-over already overwrote received_at).
+    await admin
+      .from("dropbox_sign_events")
+      .delete()
+      .eq("event_hash", payload.event.event_hash)
+      .eq("signature_request_id", reqId)
+      .eq("claim_token", ourClaimToken)
+      .is("processed_at", null);
     console.error("[docsign webhook · mutation]", mutationErr);
     return NextResponse.json(
       { error: "Mutation failed; retry." },
@@ -348,35 +492,23 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Event-id dedup. Recorded ONLY on successful mutation. PK
-  // conflict here means a concurrent delivery did the work in
-  // parallel — that's fine, the UPDATE was idempotent. PK is
-  // composite (event_hash, signature_request_id) — single-column
-  // event_hash is HMAC over (event_time + event_type) only, which
-  // would collide for legitimate same-second events on different
-  // requests (codex round-1 catch). Migration:
-  // 0024_dropbox_sign_events_dedup. Best-effort: if the dedup
-  // insert itself errors after a successful mutation, the worst
-  // outcome is a future replay re-running the (idempotent)
-  // mutation again — log + 200-ack rather than 503ing on a
-  // bookkeeping failure.
-  try {
-    const { error: insertErr } = await admin
-      .from("dropbox_sign_events")
-      .insert({
-        event_hash: payload.event.event_hash,
-        signature_request_id: reqId,
-        event_type: evtType,
-        event_time: payload.event.event_time,
-      });
-    if (insertErr && insertErr.code !== "23505") {
-      console.error(
-        "[docsign webhook · dedup insert (post-mutation, non-fatal)]",
-        insertErr,
-      );
-    }
-  } catch (err) {
-    console.error("[docsign webhook · dedup insert exception]", err);
+  // Step 3: mark the claim processed. CAS on our claim_token so a
+  // stale worker (the original we took over from, or another
+  // parallel worker) can't mark "their" row processed using our
+  // mutation result. If CAS misses, it means we no longer own the
+  // claim — log + ack (the mutation already happened idempotently;
+  // worst case the new owner re-runs it).
+  const markResult = await admin
+    .from("dropbox_sign_events")
+    .update({ processed_at: new Date().toISOString() })
+    .eq("event_hash", payload.event.event_hash)
+    .eq("signature_request_id", reqId)
+    .eq("claim_token", ourClaimToken);
+  if (markResult.error) {
+    console.error(
+      "[docsign webhook · mark-processed (non-fatal)]",
+      markResult.error,
+    );
   }
 
   // Dropbox Sign requires this exact response body to acknowledge.

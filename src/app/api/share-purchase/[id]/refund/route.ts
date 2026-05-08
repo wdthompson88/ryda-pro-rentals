@@ -88,7 +88,7 @@ export async function POST(
   let lookup = admin
     .from("share_purchases")
     .select(
-      "id, user_id, status, shares, vehicle_symbol, boat_slug, name, email, total_cents, stripe_payment_intent_id, fulfilled_at, paid_at, updated_at",
+      "id, user_id, status, shares, vehicle_symbol, boat_slug, name, email, total_cents, stripe_payment_intent_id, fulfilled_at, paid_at, dispute_status, updated_at",
     )
     .eq("id", purchaseId);
   if (!isAdminCaller) {
@@ -102,10 +102,24 @@ export async function POST(
     );
   }
 
+  // Dispute-status gate moved BELOW the pending/failed branch
+  // (codex round-2 catch). Pending/failed cancellations are
+  // bookkeeping only — no Stripe refund call — so they shouldn't
+  // be blocked by a dispute warning. The gate runs before the
+  // paid-refund path so an actual Stripe refund attempt on a
+  // disputed charge gets the explicit 409 instead of a Stripe
+  // API rejection later.
+
   // Branch 1: pending / failed. Mark canceled and file a ticket
   // so ops has visibility (member may want to talk through what
   // happened, or there could be a partial-state issue we should
   // investigate). Already-canceled rows return idempotent ok.
+  // NOTE: dispute-status gate intentionally does NOT apply here
+  // (codex round-2 catch). Cancelling a pending/failed purchase
+  // is bookkeeping only — no Stripe refund call is made — so a
+  // pending row that happened to attract a dispute warning still
+  // needs to be cancelable. The gate kicks in below for actual
+  // Stripe refund attempts.
   if (purchase.status === "canceled") {
     return NextResponse.json({
       ok: true,
@@ -145,6 +159,28 @@ export async function POST(
   // Branch 2: paid but unfulfilled. Don't auto-refund; ops needs to
   // sort out why fulfillment failed AND whether to reverse anything
   // that did partially land.
+  //
+  // Dispute-status gate (per dispute-chargeback-playbook). At this
+  // point we're about to issue a Stripe refund. A disputed purchase
+  // cannot be refunded — Stripe rejects refunds on disputed
+  // charges, and routing the refund through Stripe at all could
+  // be construed as evidence of admission. Resolution path: ops
+  // responds in Stripe dashboard; on dispute_won, refund unblocks;
+  // on dispute_lost, the funds are already gone (no refund needed).
+  if (
+    purchase.dispute_status === "disputed" ||
+    purchase.dispute_status === "dispute_lost"
+  ) {
+    return NextResponse.json(
+      {
+        error:
+          "Cannot refund: this purchase is under dispute. Resolve the dispute via Stripe first.",
+        dispute_status: purchase.dispute_status,
+      },
+      { status: 409 },
+    );
+  }
+
   if (purchase.status === "paid" && !purchase.fulfilled_at) {
     const ticket = await fileTicket(
       admin,
