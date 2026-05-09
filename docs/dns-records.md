@@ -1,6 +1,15 @@
-# RYDA · DNS records to add at Namecheap
+# RYDA · DNS records
 
-Add these to Namecheap → Domain List → `ryda.pro` → Manage → Advanced DNS.
+**Current state (May 2026):**
+- **Domain registrar:** Namecheap (where the domain `ryda.pro` is registered + renews)
+- **DNS host:** Cloudflare (authoritative nameservers `marissa.ns.cloudflare.com` + `plato.ns.cloudflare.com`)
+- **Records:** added at Cloudflare dashboard → DNS → Records
+- **Proxy mode:** all records on "DNS only" (grey cloud icon). Cloudflare proxy is OFF.
+
+To verify the live state: `dig NS ryda.pro +short` should return both Cloudflare nameservers.
+
+To add or change records: https://dash.cloudflare.com → ryda.pro → DNS → Records → Add record. (Earlier docs said Namecheap; that was true through April 2026 when DNS hosting moved to Cloudflare. Domain registration stayed at Namecheap.)
+
 Six records total (Vercel = 3, Resend = 3, optional DMARC = 1).
 
 ## 1. Vercel — apex + www
