@@ -6,7 +6,6 @@ import { SPLITTER_MEDIA, type MediaSlot } from "@/lib/media";
 import { AuthSwap } from "@/components/auth-aware";
 import { RevealStagger, Reveal } from "@/components/reveal";
 import { BrandMarquee } from "@/components/brand-marquee";
-import { ScrollRevealHero } from "@/components/scroll-reveal-hero";
 
 // Splitter, three full-height columns. One ambient b-roll loop per
 // vertical (Lambo / overhead yacht / private jet). Hover lights the
@@ -153,23 +152,6 @@ export default function SplitterPage() {
         ))}
       </RevealStagger>
     </div>
-
-    {/* One scroll-driven cinematic moment between the splitter and
-        the editorial second screen. Single Ferrari poster (already
-        self-hosted at /posters/cars-ferrari.jpg from the Lighthouse
-        pass) starts cropped, expands to full-bleed as the user
-        scrolls. The pattern is canonical luxury-brand motion (Apple
-        product pages, Aman, Tom Ford). Magic MCP suggested the
-        approach; the implementation is a clean tokenized rewrite
-        without the lenis dependency the suggested component pulled
-        in. See ScrollRevealHero for the technique. */}
-    <ScrollRevealHero
-      src="/posters/cars-ferrari.jpg"
-      alt="Ferrari 296 GTB at the Wynwood facility"
-      eyebrow="The actual car. The actual location."
-      caption="Ferrari 296 GTB · 1 of 10 shares available"
-      position="center 35%"
-    />
 
     <BelowFoldEditorial />
     </>
