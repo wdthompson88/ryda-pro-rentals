@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   VEHICLES,
   formatUSD,
@@ -11,7 +12,14 @@ import {
   HOLDING_YEARS,
   type Vehicle,
 } from "@/lib/market-data";
-import { Reveal } from "@/components/reveal";
+import { Reveal, RevealStagger } from "@/components/reveal";
+
+// motion(Link) wraps next/link so framer-motion can drive hover
+// transitions (lift + shadow) instead of Tailwind's linear easing.
+// The card keeps its `group` class for inner image scale-on-hover,
+// which is still better as a CSS group-hover (zero-JS, zero spring
+// overhead per card on a 24-card grid).
+const MotionLink = motion.create(Link);
 
 type SortOption =
   | "featured"
@@ -353,13 +361,18 @@ export function PortfolioListings() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {visible.map((v, i) => (
-              <Reveal key={v.symbol} delayMs={Math.min(i * 60, 400)}>
-                <VehicleCard vehicle={v} />
-              </Reveal>
+          // RevealStagger replaces the per-card delayMs={i*60} pattern.
+          // framer-motion's staggerChildren handles the cascade
+          // automatically, with the bonus that re-orderings (after a
+          // sort change) don't re-trigger animations.
+          <RevealStagger
+            className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
+            staggerMs={60}
+          >
+            {visible.map((v) => (
+              <VehicleCard key={v.symbol} vehicle={v} />
             ))}
-          </div>
+          </RevealStagger>
         )}
       </div>
     </section>
@@ -398,6 +411,7 @@ function FilterSelect({
 }
 
 function VehicleCard({ vehicle: v }: { vehicle: Vehicle }) {
+  const prefersReduce = useReducedMotion();
   const isSold = v.sharesAvailable === 0;
   const stickerSavings = v.fullPrice - v.pricePerShare;
   const econ = computeShareEconomics(v);
@@ -412,9 +426,17 @@ function VehicleCard({ vehicle: v }: { vehicle: Vehicle }) {
   const rentedIsPositive = rentedProfit > 0;
 
   return (
-    <Link
+    // motion(Link) gives the card spring physics on hover instead of
+    // the linear easing Tailwind transition-all produces. We keep
+    // the `group` class so the inner image's group-hover:scale-[1.18]
+    // still fires off the wrapper hover state.
+    <MotionLink
       href={`/portfolio/${v.symbol}`}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-rule bg-surface transition-all hover:-translate-y-0.5 hover:border-ink/40 hover:shadow-lg"
+      className="group flex flex-col overflow-hidden rounded-2xl border border-rule bg-surface hover:border-ink/40"
+      whileHover={
+        prefersReduce ? undefined : { y: -3, boxShadow: "0 12px 30px -10px rgba(0,0,0,0.18)" }
+      }
+      transition={{ type: "spring", stiffness: 320, damping: 24 }}
     >
       {/* Image with brand badge + status. aspect-[16/9] matches the
           1024x576 sources exactly so object-cover fills edge-to-edge.
@@ -691,7 +713,7 @@ function VehicleCard({ vehicle: v }: { vehicle: Vehicle }) {
           </span>
         </div>
       </div>
-    </Link>
+    </MotionLink>
   );
 }
 

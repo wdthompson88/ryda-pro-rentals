@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   BOATS,
   formatUSD,
@@ -11,7 +12,10 @@ import {
   BOATS_HOLDING_YEARS,
   type Boat,
 } from "@/lib/boat-data";
-import { Reveal } from "@/components/reveal";
+import { Reveal, RevealStagger } from "@/components/reveal";
+
+// motion(Link) + spring hover, parallels VehicleCard.
+const MotionLink = motion.create(Link);
 
 // Boats power-filter listing, parallel of components/portfolio-listings.tsx.
 // Same UI shape (search + filter dropdowns + sort + summary strip + card
@@ -289,13 +293,14 @@ export function BoatsListings() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {visible.map((b, i) => (
-              <Reveal key={b.slug} delayMs={Math.min(i * 60, 400)}>
-                <BoatCard boat={b} />
-              </Reveal>
+          <RevealStagger
+            className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
+            staggerMs={60}
+          >
+            {visible.map((b) => (
+              <BoatCard key={b.slug} boat={b} />
             ))}
-          </div>
+          </RevealStagger>
         )}
       </div>
     </section>
@@ -344,6 +349,7 @@ function FilterSelect({
 //   7. Charter opt-in 2-yr math box (green when net positive)
 //   8. Footer: shares-left text + "View details →"
 function BoatCard({ boat: b }: { boat: Boat }) {
+  const prefersReduce = useReducedMotion();
   const isSold = b.sharesAvailable === 0;
   const stickerSavings = b.fullPrice - b.pricePerShare;
   const econ = computeBoatShareEconomics(b);
@@ -356,9 +362,13 @@ function BoatCard({ boat: b }: { boat: Boat }) {
   const rentedIsPositive = rentedProfit > 0;
 
   return (
-    <Link
+    <MotionLink
       href={`/boats/portfolio/${b.slug}`}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-rule bg-surface transition-all hover:-translate-y-0.5 hover:border-ink/40 hover:shadow-lg"
+      className="group flex flex-col overflow-hidden rounded-2xl border border-rule bg-surface hover:border-ink/40"
+      whileHover={
+        prefersReduce ? undefined : { y: -3, boxShadow: "0 12px 30px -10px rgba(0,0,0,0.18)" }
+      }
+      transition={{ type: "spring", stiffness: 320, damping: 24 }}
     >
       {/* Image with brand badge + status. Wrapper applies the
           render-time crop (boats source photos have similar empty
@@ -566,7 +576,7 @@ function BoatCard({ boat: b }: { boat: Boat }) {
           </span>
         </div>
       </div>
-    </Link>
+    </MotionLink>
   );
 }
 

@@ -1,103 +1,190 @@
 "use client";
 
-// Reveal, wraps children in a subtle fade-up animation triggered the
-// first time the element scrolls into view. Two key timing details:
-//   1. We wait one frame after mount before activating the observer,
-//      so the browser definitely paints the initial (hidden) state
-//      before transitioning to visible. Without this, fast networks
-//      paint the visible state directly and the animation never fires.
-//   2. We scope the transition to opacity + transform only, so the
-//      .theme-ready color transitions in globals.css don't fight with
-//      the reveal animation.
+// Reveal + RevealStagger — scroll-triggered fade-up animations
+// powered by framer-motion. The single Reveal preserves the
+// pre-framer-motion API (existing callers in /cars, /boats,
+// /inside, portfolio-listings, boats-listings, sample-documents
+// keep working unchanged) but the implementation now uses
+// motion.div with whileInView + viewport={{once}} which gives:
+//   - Built-in spring physics on the transform
+//   - Free GPU acceleration via the framer-motion compositor
+//   - Automatic cleanup of IntersectionObservers when remounted
+//   - Respects prefers-reduced-motion via useReducedMotion()
+//
+// RevealStagger is the new addition — wraps a list/grid where
+// each direct child should fade up in sequence. Uses framer-
+// motion's variants pattern with staggerChildren so we don't
+// need to compute per-item delays.
+//
+// Why we keep these in one file: they share the same easing,
+// duration defaults, and reduced-motion handling. Anyone reaching
+// for fade-up animation finds both APIs in one place.
 
-import { useEffect, useRef, useState } from "react";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
+import type { ReactNode } from "react";
+
+// Match the previous easing curve so the new implementation is
+// visually identical to the IntersectionObserver+CSS version
+// it replaces. Cubic-bezier(0.22, 1, 0.36, 1) is the same one
+// the old style attribute used.
+const EASE = [0.22, 1, 0.36, 1] as const;
+
+type RevealTag = "div" | "section" | "li" | "article";
 
 export function Reveal({
   children,
   delayMs = 0,
-  as: Tag = "div",
+  as = "div",
   className = "",
-  /** When true, animation runs once then disconnects. Default true. */
+  /** When true (default), animation runs once then disconnects. */
   once = true,
   /** How far the element travels up during the reveal. Default 16px. */
   distance = 16,
   /** Animation duration in ms. Default 700. */
   durationMs = 700,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   delayMs?: number;
-  as?: "div" | "section" | "li" | "article";
+  as?: RevealTag;
   className?: string;
   once?: boolean;
   distance?: number;
   durationMs?: number;
 }) {
-  const ref = useRef<HTMLElement | null>(null);
-  const [visible, setVisible] = useState(false);
+  const reduce = useReducedMotion();
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
+  // Reduced motion → render in the visible state immediately, no
+  // animation. Same behavior as the previous implementation.
+  if (reduce) {
+    const Tag = as;
+    return <Tag className={className}>{children}</Tag>;
+  }
 
-    // Respect users who've asked the OS not to animate.
-    if (
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    ) {
-      setVisible(true);
-      return;
-    }
-
-    // No IntersectionObserver support (very old browsers), show
-    // immediately so content isn't permanently invisible.
-    if (typeof IntersectionObserver === "undefined") {
-      setVisible(true);
-      return;
-    }
-
-    // Wait one animation frame so the browser paints the initial
-    // hidden state before we switch to visible. This guarantees the
-    // transition actually fires.
-    let frameId: number;
-    let obs: IntersectionObserver | null = null;
-    frameId = requestAnimationFrame(() => {
-      obs = new IntersectionObserver(
-        (entries) => {
-          for (const entry of entries) {
-            if (entry.isIntersecting) {
-              setVisible(true);
-              if (once && obs) obs.disconnect();
-            } else if (!once) {
-              setVisible(false);
-            }
-          }
-        },
-        { rootMargin: "0px 0px -8% 0px", threshold: 0.05 },
-      );
-      obs.observe(el);
-    });
-
-    return () => {
-      cancelAnimationFrame(frameId);
-      obs?.disconnect();
-    };
-  }, [once]);
-
-  const style: React.CSSProperties = {
-    transitionProperty: "opacity, transform",
-    transitionDuration: `${durationMs}ms`,
-    transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
-    transitionDelay: delayMs ? `${delayMs}ms` : undefined,
-    opacity: visible ? 1 : 0,
-    transform: visible
-      ? "translate3d(0, 0, 0)"
-      : `translate3d(0, ${distance}px, 0)`,
-    willChange: "opacity, transform",
-  };
+  const Component = motion[as];
 
   return (
-    <Tag ref={ref as never} className={className} style={style}>
+    <Component
+      className={className}
+      initial={{ opacity: 0, y: distance }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once, amount: 0.05, margin: "0px 0px -8% 0px" }}
+      transition={{
+        duration: durationMs / 1000,
+        delay: delayMs / 1000,
+        ease: EASE,
+      }}
+    >
       {children}
-    </Tag>
+    </Component>
   );
+}
+
+// ---- Stagger variants used by RevealStagger ----
+
+const staggerContainer = (staggerSec: number, delaySec: number): Variants => ({
+  initial: {},
+  animate: {
+    transition: {
+      staggerChildren: staggerSec,
+      delayChildren: delaySec,
+    },
+  },
+});
+
+const staggerItem = (distance: number, durationSec: number): Variants => ({
+  initial: { opacity: 0, y: distance },
+  animate: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: durationSec, ease: EASE },
+  },
+});
+
+/** Wrap a list/grid where each direct child should fade up in
+ *  sequence as the container scrolls into view. Children become
+ *  motion items automatically — they don't need to be Reveal
+ *  themselves, but plain elements (divs, Links, Cards, etc).
+ *
+ *  Common usage:
+ *    <RevealStagger className="grid grid-cols-3 gap-6" staggerMs={80}>
+ *      {vehicles.map((v) => <VehicleCard key={v.id} vehicle={v} />)}
+ *    </RevealStagger>
+ *
+ *  The container itself doesn't fade — only the children stagger.
+ *  If you want both, wrap RevealStagger inside a Reveal. */
+export function RevealStagger({
+  children,
+  className = "",
+  as = "div",
+  /** Time between each child's animation start. Default 80ms. */
+  staggerMs = 80,
+  /** Delay before the first child starts. Default 0. */
+  initialDelayMs = 0,
+  /** Per-child travel distance. Default 16px. */
+  distance = 16,
+  /** Per-child animation duration. Default 600ms — slightly faster
+   *  than single-Reveal default since each child is part of a
+   *  rhythm and shouldn't drag. */
+  durationMs = 600,
+  /** Run animation once when scrolled into view (default), or
+   *  re-run on every entry. */
+  once = true,
+}: {
+  children: ReactNode;
+  className?: string;
+  as?: RevealTag;
+  staggerMs?: number;
+  initialDelayMs?: number;
+  distance?: number;
+  durationMs?: number;
+  once?: boolean;
+}) {
+  const reduce = useReducedMotion();
+
+  if (reduce) {
+    const Tag = as;
+    return <Tag className={className}>{children}</Tag>;
+  }
+
+  const Container = motion[as];
+  const itemVariants = staggerItem(distance, durationMs / 1000);
+  const containerVariants = staggerContainer(staggerMs / 1000, initialDelayMs / 1000);
+
+  // We wrap each direct child in a motion.div so the parent's
+  // staggerChildren transition cascades. Using React.Children.map
+  // would force consumers to deal with key-on-fragment issues; the
+  // wrapping approach keeps the API simple — pass any children,
+  // they stagger.
+  return (
+    <Container
+      className={className}
+      initial="initial"
+      whileInView="animate"
+      viewport={{ once, amount: 0.05, margin: "0px 0px -8% 0px" }}
+      variants={containerVariants}
+    >
+      {childrenAsArray(children).map((child, i) => (
+        <motion.div
+          key={(child as { key?: string | number })?.key ?? i}
+          variants={itemVariants}
+          // Inherit display so the wrapper doesn't break grid/flex
+          // layouts. The consumer's className on RevealStagger sets
+          // display: grid (or whatever) and we want children to be
+          // direct grid items, not block-wrapped.
+          style={{ display: "contents" }}
+        >
+          {child}
+        </motion.div>
+      ))}
+    </Container>
+  );
+}
+
+/** Coerce children to an array — handles single element, array,
+ *  fragment, or null. Filters null/false so conditional children
+ *  don't add stagger gaps. */
+function childrenAsArray(children: ReactNode): ReactNode[] {
+  if (children == null || children === false) return [];
+  if (Array.isArray(children)) return children.filter((c) => c != null && c !== false);
+  return [children];
 }
