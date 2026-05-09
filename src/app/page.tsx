@@ -4,12 +4,18 @@ import { SplitterIntro } from "@/components/splitter-intro";
 import { MediaBackground } from "@/components/media-background";
 import { SPLITTER_MEDIA, type MediaSlot } from "@/lib/media";
 import { AuthSwap } from "@/components/auth-aware";
+import { RevealStagger, Reveal } from "@/components/reveal";
 
 // Splitter, three full-height columns. One ambient b-roll loop per
 // vertical (Lambo / overhead yacht / private jet). Hover lights the
 // column up via brightness/saturation lift + scale + red glow. On
 // reduced-motion preference the videos are skipped and the poster
 // images get a subtle Ken-Burns zoom instead.
+//
+// Columns stagger-in via framer-motion as the splitter veil dismisses.
+// Below the splitter sits a single editorial band — founder voice,
+// member criteria, soft cross-links to /about and /inside. This is the
+// only scroll content on /; the splitter remains the page's signature.
 
 export const metadata: Metadata = {
   title: "RYDA — Luxury vehicle access",
@@ -70,6 +76,7 @@ const VERTICALS: Vertical[] = [
 
 export default function SplitterPage() {
   return (
+    <>
     <div className="relative min-h-screen overflow-hidden bg-[#0E0E10] text-[#F4F1EC]">
       <SplitterIntro />
 
@@ -126,12 +133,27 @@ export default function SplitterPage() {
         </div>
       </div>
 
-      <div className="flex min-h-screen flex-col lg:flex-row">
+      {/* Columns stagger-in as the splitter veil dismisses. RevealStagger
+          fires immediately on mount because the columns are already in
+          the viewport — `whileInView` resolves true on first paint. The
+          ~80ms cascade gives Cars → Boats → Planes a left-to-right
+          reveal that mirrors how the eye scans the page. */}
+      <RevealStagger
+        as="div"
+        className="flex min-h-screen flex-col lg:flex-row"
+        staggerMs={80}
+        initialDelayMs={150}
+        distance={20}
+        durationMs={750}
+      >
         {VERTICALS.map((v, i) => (
           <VerticalColumn key={v.href} v={v} index={i} />
         ))}
-      </div>
+      </RevealStagger>
     </div>
+
+    <BelowFoldEditorial />
+    </>
   );
 }
 
@@ -222,5 +244,106 @@ function VerticalColumn({ v, index }: { v: Vertical; index: number }) {
         </div>
       </div>
     </Link>
+  );
+}
+
+// One editorial band below the splitter. Three jobs:
+//   1. Anchor the brand voice — pull-quote from Ryan's founder note
+//      (same paragraph that opens /about's founder letter, lightly
+//      compressed) so the very first words a scroller reads are the
+//      same words the about page speaks in.
+//   2. Telegraph member criteria — four short specs so a serious
+//      visitor can self-qualify without clicking through. We don't sell
+//      from this band; it's a filter, not a funnel.
+//   3. Hand off — soft links into /about (full founder letter) and
+//      /inside (sample member view). No "Sign up" CTA on the homepage;
+//      that lives in the splitter top bar already.
+//
+// Single section, ~70vh on desktop. Cream surface so it visually breaks
+// from the dark splitter. RevealStagger on the criteria grid so each
+// spec arrives in sequence as the visitor scrolls into it.
+function BelowFoldEditorial() {
+  const criteria: { label: string; value: string }[] = [
+    { label: "Age", value: "28 or older" },
+    { label: "License", value: "Valid US driver's license, clean recent record" },
+    { label: "Minimum stake", value: "2 shares per member" },
+    { label: "Verification", value: "Identity check before any wire" },
+  ];
+
+  return (
+    <section className="border-t border-rule bg-cream py-20 sm:py-28">
+      <div className="mx-auto max-w-7xl px-6 sm:px-10">
+        <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
+          {/* Left column: pull-quote in the founder's voice. */}
+          <Reveal as="div" className="lg:col-span-7">
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+              From the founders
+            </p>
+            <p className="mt-6 font-display text-3xl font-light leading-[1.15] text-ink sm:text-4xl">
+              <span className="italic">&ldquo;Buying outright sits idle.</span>{" "}
+              <span className="italic">Renting is hollow.</span>{" "}
+              Co-ownership is the third option — a real stake in a real
+              car, professionally operated, with a clean LLC underneath.&rdquo;
+            </p>
+            <p className="mt-6 text-sm font-medium uppercase tracking-[0.18em] text-mute">
+              Ryan Galli · Co-founder, RYDA
+            </p>
+            <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm">
+              <Link
+                href="/about"
+                className="inline-flex items-center gap-2 font-medium text-ink underline-offset-4 hover:text-red hover:underline"
+              >
+                Read the founder&apos;s notes
+                <span aria-hidden>→</span>
+              </Link>
+              <Link
+                href="/inside"
+                className="inline-flex items-center gap-2 font-medium text-ink-soft underline-offset-4 hover:text-ink hover:underline"
+              >
+                See what members see
+                <span aria-hidden>→</span>
+              </Link>
+            </div>
+          </Reveal>
+
+          {/* Right column: member criteria as a small spec grid. Not a
+              feature list — a filter. Anyone who can't tick all four
+              shouldn't apply, and we'd rather they self-select out
+              here than waste a sales cycle. */}
+          <div className="lg:col-span-5">
+            <Reveal>
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-mute">
+                Membership criteria
+              </p>
+              <p className="mt-3 max-w-md text-sm leading-relaxed text-ink-soft">
+                A short filter so you can self-qualify before you reach
+                out. RYDA is a 100-member founding cohort, not an
+                open-signup platform.
+              </p>
+            </Reveal>
+            <RevealStagger
+              as="div"
+              className="mt-8 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-rule bg-rule sm:grid-cols-2"
+              staggerMs={80}
+              distance={12}
+            >
+              {criteria.map((c) => (
+                <div
+                  key={c.label}
+                  className="bg-surface p-5"
+                >
+                  <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-mute">
+                    {c.label}
+                  </p>
+                  <p className="mt-2 text-sm leading-snug text-ink">
+                    {c.value}
+                  </p>
+                </div>
+              ))}
+            </RevealStagger>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }

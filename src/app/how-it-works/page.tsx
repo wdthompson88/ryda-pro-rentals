@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BookingTiersExplainer } from "@/components/booking-tiers-explainer";
+import { Reveal, RevealStagger } from "@/components/reveal";
 import {
   HowItWorksPageTemplate,
   Pillar,
@@ -158,26 +159,31 @@ export default function HowItWorksPage() {
       {/* 5-step lifecycle */}
       <section id="lifecycle" className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            Co-ownership
-          </p>
-          <h2 className="mt-3 font-display text-4xl text-ink sm:text-5xl">
-            Asset-backed co-ownership in five steps.
-          </h2>
-          <p className="mt-4 max-w-2xl text-lg text-ink-soft">
-            One Ferrari 296 share: $34K up front, ~$7,080/year all-in,
-            ~32 days/year, roughly $221/day in steady-state ops.
-            Compare with $2,400+/day to rent or $40–80K/yr to own
-            outright.
-          </p>
+          <Reveal>
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+              Co-ownership
+            </p>
+            <h2 className="mt-3 font-display text-4xl text-ink sm:text-5xl">
+              Asset-backed co-ownership in five steps.
+            </h2>
+            <p className="mt-4 max-w-2xl text-lg text-ink-soft">
+              One Ferrari 296 share: $34K up front, ~$7,080/year all-in,
+              ~32 days/year, roughly $221/day in steady-state ops.
+              Compare with $2,400+/day to rent or $40–80K/yr to own
+              outright.
+            </p>
+          </Reveal>
 
-          <div className="mt-12 grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-5">
+          <RevealStagger
+            className="mt-12 grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-5"
+            staggerMs={70}
+          >
             <Step n="01" title="Verify" body="Apply and complete identity verification. Valid US license, clean recent driving record, 28 or older. No accreditation required." />
             <Step n="02" title="Choose" body="Browse the curated, certified pre owned fleet. Every car passes a multi-point Pre-Purchase Inspection by the dealer before a single share is sold." />
             <Step n="03" title="Co-own" body="RYDA forms a LLC for up to 5 members to hold the vehicle. You sign the operating agreement and fund your share (2 shares minimum per person)." />
             <Step n="04" title="Drive" body="Book your time on the RYDA smart calendar. Each share unlocks ~32 days and ~3,200 miles a year (100 mi/day)." />
             <Step n="05" title="Exit" body="RYDA sells the car at year 2–3 OR 60,000–75,000 miles depending on certified pre owned program. Proceeds split pro-rata. Need out earlier? Transfer your share to another verified member after the 12-month minimum hold. 3% transfer fee on member-to-member transfers." />
-          </div>
+          </RevealStagger>
         </div>
       </section>
 
@@ -191,23 +197,25 @@ export default function HowItWorksPage() {
           no "share price", no "ticker", no "marketplace". */}
       <section id="exit" className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            Exit doctrine
-          </p>
-          <h2 className="mt-3 font-display text-4xl text-ink sm:text-5xl">
-            How you get out, in detail.
-          </h2>
-          <p className="mt-4 max-w-2xl text-lg text-ink-soft">
-            Two paths — a planned exit at year{" "}
-            {HOLDING_YEARS} that everyone in the LLC reaches by default,
-            and an earlier member-to-member transfer once the 12-month
-            minimum hold has cleared. Neither path uses a marketplace,
-            an order book, or a public price ticker.
-          </p>
+          <Reveal>
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+              Exit doctrine
+            </p>
+            <h2 className="mt-3 font-display text-4xl text-ink sm:text-5xl">
+              How you get out, in detail.
+            </h2>
+            <p className="mt-4 max-w-2xl text-lg text-ink-soft">
+              Two paths — a planned exit at year{" "}
+              {HOLDING_YEARS} that everyone in the LLC reaches by default,
+              and an earlier member-to-member transfer once the 12-month
+              minimum hold has cleared. Neither path uses a marketplace,
+              an order book, or a public price ticker.
+            </p>
+          </Reveal>
 
           <div className="mt-12 grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-12">
             {/* Planned exit — default path, red accent */}
-            <div>
+            <Reveal as="div">
               <div className="flex items-baseline gap-3">
                 <span className="rounded-full border border-red/30 bg-red/10 px-3 py-1 text-[10px] font-medium uppercase tracking-wider text-red">
                   Default · Planned exit
@@ -223,7 +231,10 @@ export default function HowItWorksPage() {
                 supermajority to confirm; the LLC sells to the highest
                 qualified bid and distributes proceeds pro-rata.
               </p>
-              <div className="mt-8 grid grid-cols-1 gap-x-6 gap-y-7 sm:grid-cols-2">
+              <RevealStagger
+                className="mt-8 grid grid-cols-1 gap-x-6 gap-y-7 sm:grid-cols-2"
+                staggerMs={70}
+              >
                 <Step
                   n="01"
                   title="Trigger"
@@ -249,11 +260,11 @@ export default function HowItWorksPage() {
                   title="Distribution"
                   body={`Proceeds (less ~${TARGET_DEPRECIATION_PCT}% modeled depreciation and a closing fee) distribute pro-rata to each member's RYDA wallet within 14 days. K-1 issued at year-end.`}
                 />
-              </div>
-            </div>
+              </RevealStagger>
+            </Reveal>
 
             {/* Early transfer — alternate path, marine accent */}
-            <div>
+            <Reveal as="div">
               <div className="flex items-baseline gap-3">
                 <span className="rounded-full border border-marine/40 bg-marine/10 px-3 py-1 text-[10px] font-medium uppercase tracking-wider text-marine">
                   Alternate · Early transfer
@@ -268,7 +279,10 @@ export default function HowItWorksPage() {
                 another verified RYDA member. RYDA handles the LLC
                 paperwork. No marketplace, no order book, no auction.
               </p>
-              <div className="mt-8 grid grid-cols-1 gap-x-6 gap-y-7 sm:grid-cols-2">
+              <RevealStagger
+                className="mt-8 grid grid-cols-1 gap-x-6 gap-y-7 sm:grid-cols-2"
+                staggerMs={70}
+              >
                 <Step
                   n="01"
                   title="Hold clears"
@@ -299,12 +313,15 @@ export default function HowItWorksPage() {
                   accent="marine"
                   body="Funds settle through escrow within 1–3 business days. RYDA charges a 3% transfer fee on completed transfers. Buyer steps into your share's annual entitlement immediately."
                 />
-              </div>
-            </div>
+              </RevealStagger>
+            </Reveal>
           </div>
 
           {/* Doctrine reaffirmation */}
-          <div className="mt-14 grid grid-cols-1 gap-6 rounded-2xl border border-rule bg-cream-2/40 p-6 sm:grid-cols-3 sm:p-8">
+          <RevealStagger
+            className="mt-14 grid grid-cols-1 gap-6 rounded-2xl border border-rule bg-cream-2/40 p-6 sm:grid-cols-3 sm:p-8"
+            staggerMs={90}
+          >
             <div>
               <p className="text-xs font-medium uppercase tracking-[0.18em] text-red">
                 Members vote
@@ -335,28 +352,31 @@ export default function HowItWorksPage() {
                 from the asset.
               </p>
             </div>
-          </div>
+          </RevealStagger>
         </div>
       </section>
 
       {/* 4-way comparison, money only */}
       <section id="compare" className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            Compare · Three are usage rights. Only RYDA is asset-backed.
-          </p>
-          <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
-            Four ways to think about a Ferrari.
-          </h2>
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-soft">
-            RYDA is structured co-ownership of a real car. Compared
-            against the alternatives, buying outright, renting by the
-            day or joining a club, the math comes out the way most
-            buyers actually use the asset. Numbers below anchor on the
-            Ferrari 296 GTB and a single share over the {HOLDING_YEARS}-year
-            planned exit.
-          </p>
+          <Reveal>
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+              Compare · Three are usage rights. Only RYDA is asset-backed.
+            </p>
+            <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
+              Four ways to think about a Ferrari.
+            </h2>
+            <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-soft">
+              RYDA is structured co-ownership of a real car. Compared
+              against the alternatives, buying outright, renting by the
+              day or joining a club, the math comes out the way most
+              buyers actually use the asset. Numbers below anchor on the
+              Ferrari 296 GTB and a single share over the {HOLDING_YEARS}-year
+              planned exit.
+            </p>
+          </Reveal>
 
+          <Reveal delayMs={120}>
           <div className="mt-10 overflow-hidden rounded-2xl border border-rule bg-surface">
             <div
               className="overflow-x-auto"
@@ -425,6 +445,7 @@ export default function HowItWorksPage() {
               </table>
             </div>
           </div>
+          </Reveal>
           <p className="mt-4 max-w-3xl text-xs text-mute">
             Numbers shown for illustration on the Ferrari 296 GTB at $340K
             sticker, modeled around a single co-ownership share over a
@@ -453,15 +474,20 @@ export default function HowItWorksPage() {
       {/* When each option makes sense */}
       <section id="right-for-you" className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
-          <h2 className="font-display text-3xl text-ink sm:text-4xl">
-            When each option actually makes sense.
-          </h2>
-          <p className="mt-4 max-w-2xl text-base text-ink-soft">
-            We&apos;ll be honest about the trade-offs. Different buyers
-            want different things.
-          </p>
+          <Reveal>
+            <h2 className="font-display text-3xl text-ink sm:text-4xl">
+              When each option actually makes sense.
+            </h2>
+            <p className="mt-4 max-w-2xl text-base text-ink-soft">
+              We&apos;ll be honest about the trade-offs. Different buyers
+              want different things.
+            </p>
+          </Reveal>
 
-          <div className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-4">
+          <RevealStagger
+            className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-4"
+            staggerMs={80}
+          >
             <Take
               title="RYDA"
               good="You'd drive ~32–64 days a year on a specific car (2 shares is the minimum buy). You want real ownership without the operational burden and you'd rather scale entitlement by adding shares than buying a second car."
@@ -483,20 +509,25 @@ export default function HowItWorksPage() {
               good="A club works if you want rotating access to many cars, you don't care which specific car and you don't want to own anything."
               tradeoff="Annual fees rival co-ownership without an ownership stake. You're a customer of the club, not a co-owner."
             />
-          </div>
+          </RevealStagger>
         </div>
       </section>
 
       {/* Why asset-backed co-ownership, 9 reasons */}
       <section id="nine-reasons" className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            Why asset-backed co-ownership
-          </p>
-          <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
-            Nine reasons it makes more sense than the alternatives.
-          </h2>
-          <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <Reveal>
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+              Why asset-backed co-ownership
+            </p>
+            <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
+              Nine reasons it makes more sense than the alternatives.
+            </h2>
+          </Reveal>
+          <RevealStagger
+            className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
+            staggerMs={60}
+          >
             <Reason
               n="01"
               title="A real asset, not a subscription"
@@ -542,7 +573,7 @@ export default function HowItWorksPage() {
               title="Community over solitary ownership"
               body="Verified members, member events, off-market sourcing, drive-day meetups. The car is a passion asset; the network around it is what makes the asset useful when you're not driving."
             />
-          </div>
+          </RevealStagger>
         </div>
       </section>
 
@@ -551,20 +582,24 @@ export default function HowItWorksPage() {
           ever click into the buy flow. */}
       <section id="booking" className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            Booking model
-          </p>
-          <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
-            Two ways to book, short-notice and planned.
-          </h2>
-          <p className="mt-3 max-w-2xl text-base text-ink-soft">
-            Same annual entitlement, two clear modes so you always know what
-            you can grab and what you have to plan ahead. Calendar
-            fairness is enforced by code, not by polite asks.
-          </p>
-          <div className="mt-10">
-            <BookingTiersExplainer variant="full" />
-          </div>
+          <Reveal>
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+              Booking model
+            </p>
+            <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
+              Two ways to book, short-notice and planned.
+            </h2>
+            <p className="mt-3 max-w-2xl text-base text-ink-soft">
+              Same annual entitlement, two clear modes so you always know what
+              you can grab and what you have to plan ahead. Calendar
+              fairness is enforced by code, not by polite asks.
+            </p>
+          </Reveal>
+          <Reveal delayMs={120}>
+            <div className="mt-10">
+              <BookingTiersExplainer variant="full" />
+            </div>
+          </Reveal>
         </div>
       </section>
 
@@ -575,20 +610,25 @@ export default function HowItWorksPage() {
           almost nothing in copy; the real cost is ops execution. */}
       <section id="concierge" className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            Concierge handoff
-          </p>
-          <h2 className="mt-3 font-display text-4xl text-ink sm:text-5xl">
-            From booking to keys-in-hand.
-          </h2>
-          <p className="mt-4 max-w-2xl text-lg text-ink-soft">
-            Every reservation runs through a five-step concierge
-            handoff. No "just show up at the garage." We bring the car
-            to you, in the condition you'd want it in if it were the
-            only one you owned.
-          </p>
+          <Reveal>
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+              Concierge handoff
+            </p>
+            <h2 className="mt-3 font-display text-4xl text-ink sm:text-5xl">
+              From booking to keys-in-hand.
+            </h2>
+            <p className="mt-4 max-w-2xl text-lg text-ink-soft">
+              Every reservation runs through a five-step concierge
+              handoff. No &ldquo;just show up at the garage.&rdquo; We bring the car
+              to you, in the condition you&apos;d want it in if it were the
+              only one you owned.
+            </p>
+          </Reveal>
 
-          <div className="mt-12 grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-5">
+          <RevealStagger
+            className="mt-12 grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-5"
+            staggerMs={70}
+          >
             <Step
               n="01"
               title="Pre-arrival prep"
@@ -614,46 +654,58 @@ export default function HowItWorksPage() {
               title="Reset for the next member"
               body="Full detail, fuel-up, paint-correction touch-up if needed, telematics log archived. The car returns to the climate-controlled bay within 24 hours, ready for the next reservation."
             />
-          </div>
+          </RevealStagger>
         </div>
       </section>
 
       {/* Trust grid, 6 buyer protections + 6 advantages */}
       <section id="trust" className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            Buyer protection & further advantages
-          </p>
-          <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
-            Twelve guardrails on the way in and the way out.
-          </h2>
+          <Reveal>
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+              Buyer protection & further advantages
+            </p>
+            <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
+              Twelve guardrails on the way in and the way out.
+            </h2>
+          </Reveal>
 
           <div className="mt-12">
-            <p className="text-xs font-medium uppercase tracking-wider text-mute">
-              Buyer protection
-            </p>
-            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <Reveal>
+              <p className="text-xs font-medium uppercase tracking-wider text-mute">
+                Buyer protection
+              </p>
+            </Reveal>
+            <RevealStagger
+              className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3"
+              staggerMs={50}
+            >
               <Pillar label="Tested vehicles" body="Certified pre owned + multi-point PPI before any share sells." />
               <Pillar label="Verified members" body="28+, KYC, license & record check before joining." />
               <Pillar label="Encrypted data" body="Member docs & payment info secured in transit and at rest." />
               <Pillar label="Vehicle warranty" body="Manufacturer or independent certified pre owned warranty in force at handover." />
               <Pillar label="Transparent costs" body="Pass-through ops invoiced at cost; service fee disclosed up front." />
               <Pillar label="Flexible share sale" body="Member-to-member transfers after 12 months; LLC sale at year 2 / 60K mi." />
-            </div>
+            </RevealStagger>
           </div>
 
           <div className="mt-10">
-            <p className="text-xs font-medium uppercase tracking-wider text-mute">
-              Further advantages
-            </p>
-            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <Reveal>
+              <p className="text-xs font-medium uppercase tracking-wider text-mute">
+                Further advantages
+              </p>
+            </Reveal>
+            <RevealStagger
+              className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3"
+              staggerMs={50}
+            >
               <Pillar label="Several locations" body="Miami first; LA + NYC online by 2027." />
               <Pillar label="Resource conservation" body="Cars get driven instead of garaged 350 days a year." />
               <Pillar label="Fair-use rules" body="Calendar caps consecutive peak-season days so no one corners the car." />
               <Pillar label="Professional storage" body="Climate-controlled, 24/7 monitored, insured partner facilities." />
               <Pillar label="Like-minded community" body="Verified members + member events + off-market access." />
               <Pillar label="Online live booking" body="Reserve days from the app; live availability across the calendar." />
-            </div>
+            </RevealStagger>
           </div>
         </div>
       </section>
@@ -661,29 +713,34 @@ export default function HowItWorksPage() {
       {/* Rental opt-in for shareholders */}
       <section id="rental-opt-in" className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-5xl px-6 py-20 sm:px-10">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            Optional · Rental opt-in
-          </p>
-          <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
-            Don&apos;t want to drive every day you&apos;re entitled to? Rent
-            it out.
-          </h2>
-          <p className="mt-4 max-w-3xl text-base leading-relaxed text-ink-soft">
-            Miami&apos;s exotic-rental fleets average 200–240 booked days a
-            year on full-control calendars. RYDA&apos;s pool is the leftover
-            days after members book first, so realistic occupancy on the
-            pool runs lower (~50%). Members can opt their unused
-            entitlement into the rental pool, we handle the bookings,
-            insurance, condition checks and damage reserve. Revenue splits
-            65/35 (you / RYDA), distributed pro-rata across the days each
-            share contributes.
-          </p>
+          <Reveal>
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+              Optional · Rental opt-in
+            </p>
+            <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
+              Don&apos;t want to drive every day you&apos;re entitled to? Rent
+              it out.
+            </h2>
+            <p className="mt-4 max-w-3xl text-base leading-relaxed text-ink-soft">
+              Miami&apos;s exotic-rental fleets average 200–240 booked days a
+              year on full-control calendars. RYDA&apos;s pool is the leftover
+              days after members book first, so realistic occupancy on the
+              pool runs lower (~50%). Members can opt their unused
+              entitlement into the rental pool, we handle the bookings,
+              insurance, condition checks and damage reserve. Revenue splits
+              65/35 (you / RYDA), distributed pro-rata across the days each
+              share contributes.
+            </p>
+          </Reveal>
 
           {/* T1 audit fix — "Shareholders" → "Members" in user-facing
               rental-pool copy below. SEC-safe vocab matches the rest
               of the site post-vocabulary-scrub. */}
 
-          <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <RevealStagger
+            className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-3"
+            staggerMs={90}
+          >
             <div className="rounded-2xl border border-rule bg-surface p-6">
               <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
                 Worked example · Ferrari 296
@@ -723,14 +780,16 @@ export default function HowItWorksPage() {
                 <li>· Track-day cars come out of the pool when you take them on track.</li>
               </ul>
             </div>
-          </div>
+          </RevealStagger>
 
-          <Link
-            href="/portfolio"
-            className="mt-10 inline-flex h-12 items-center justify-center rounded-full bg-red px-7 text-sm font-medium text-cream hover:bg-red-deep"
-          >
-            Toggle rental income on a specific car →
-          </Link>
+          <Reveal delayMs={150}>
+            <Link
+              href="/portfolio"
+              className="mt-10 inline-flex h-12 items-center justify-center rounded-full bg-red px-7 text-sm font-medium text-cream hover:bg-red-deep"
+            >
+              Toggle rental income on a specific car →
+            </Link>
+          </Reveal>
         </div>
       </section>
 
@@ -739,23 +798,25 @@ export default function HowItWorksPage() {
           May 2026: FAQ should be its own page, not duplicated here. */}
       <section id="faq" className="border-b border-rule">
         <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10 text-center">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            Questions?
-          </p>
-          <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
-            Frequently asked questions.
-          </h2>
-          <p className="mt-4 max-w-xl mx-auto text-base text-ink-soft">
-            Co-ownership structure, transfers, insurance, taxes,
-            maintenance reserves, member benefits — answered in
-            full on the dedicated FAQ page.
-          </p>
-          <Link
-            href="/faq"
-            className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream hover:bg-red"
-          >
-            Open the FAQ →
-          </Link>
+          <Reveal>
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+              Questions?
+            </p>
+            <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
+              Frequently asked questions.
+            </h2>
+            <p className="mt-4 max-w-xl mx-auto text-base text-ink-soft">
+              Co-ownership structure, transfers, insurance, taxes,
+              maintenance reserves, member benefits — answered in
+              full on the dedicated FAQ page.
+            </p>
+            <Link
+              href="/faq"
+              className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream hover:bg-red"
+            >
+              Open the FAQ →
+            </Link>
+          </Reveal>
         </div>
       </section>
     </HowItWorksPageTemplate>
