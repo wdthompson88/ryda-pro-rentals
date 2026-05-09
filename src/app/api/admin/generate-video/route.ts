@@ -38,10 +38,13 @@ import {
 
 export const runtime = "nodejs";
 // Sora generation can take 60-180s per clip. Vercel hobby limits
-// API routes to 10s; pro to 60s; this needs the longest tier.
-// Set in vercel.json maxDuration → 600 (10 min). For local dev
-// without Vercel, Node has no per-request timeout.
-export const maxDuration = 600;
+// API routes to 10s; pro to 60s; enterprise allows 900s.
+// 300s is the highest cap available below the enterprise tier and
+// is the value the current plan accepts — anything higher fails
+// the deploy with "maxDuration must be between 1 and 300". If
+// generation reliably needs >300s for production loads, upgrade
+// the Vercel plan first, then bump this back up.
+export const maxDuration = 300;
 
 const MAX_PROMPT_LEN = 4000;
 const MAX_STYLE_NOTE_LEN = 2000;
