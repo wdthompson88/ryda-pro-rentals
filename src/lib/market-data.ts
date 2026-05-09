@@ -472,7 +472,7 @@ export const MARKETS: Record<
     status: "live",
     blurb:
       "Highest US per-capita exotic density. Year-round driving, no state income tax. Our Miami flagship fleet runs out of a climate-controlled Wynwood facility.",
-    hero: "https://images.unsplash.com/photo-1535498730771-e735b998cd64?auto=format&fit=crop&w=2000&q=80",
+    hero: "/posters/boats-marina.jpg",
   },
   "Los Angeles": {
     label: "Los Angeles",

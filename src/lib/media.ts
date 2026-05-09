@@ -60,7 +60,7 @@ export const SPLITTER_MEDIA: Record<"cars" | "boats" | "planes", MediaSlot> = {
       PX("16976173", "hd_1920_1080_24fps"), // Ferrari 458 in Zurich (tracking)
     ],
     poster:
-      "https://images.unsplash.com/photo-1592198084033-aade902d1aae?auto=format&fit=crop&w=2400&q=85",
+      "/posters/cars-ferrari.jpg",
     alt: "Red Ferrari supercar",
     position: "center 30%",
   },
@@ -79,7 +79,7 @@ export const SPLITTER_MEDIA: Record<"cars" | "boats" | "planes", MediaSlot> = {
       PX("15288018", "hd_1920_1080_30fps"), // Drone video of luxury yacht docked at port
     ],
     poster:
-      "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?auto=format&fit=crop&w=2400&q=85",
+      "/posters/boats-yacht.jpg",
     alt: "Superyacht on the water at sunset",
     position: "center 50%",
   },
@@ -93,7 +93,7 @@ export const SPLITTER_MEDIA: Record<"cars" | "boats" | "planes", MediaSlot> = {
       "/videos/planes-untitled.mp4",
     ],
     poster:
-      "https://images.unsplash.com/photo-1474302770737-173ee21bab63?auto=format&fit=crop&w=2400&q=85",
+      "/posters/planes-jet.jpg",
     alt: "Private jet on tarmac at dusk",
     position: "center 70%",
   },
@@ -115,32 +115,32 @@ export const HERO_MEDIA: Record<
   "cars-home": {
     videos: [PX("8443860", "hd_1920_1080_30fps")],
     poster:
-      "https://images.unsplash.com/photo-1592198084033-aade902d1aae?auto=format&fit=crop&w=2400&q=85",
+      "/posters/cars-ferrari.jpg",
     alt: "Red Ferrari 296 GTB",
   },
   "cars-portfolio": {
     videos: [PX("16976173", "hd_1920_1080_24fps")],
     poster:
-      "https://images.unsplash.com/photo-1592198084033-aade902d1aae?auto=format&fit=crop&w=2400&q=85",
+      "/posters/cars-ferrari.jpg",
     alt: "Red Ferrari supercar",
     position: "center 30%",
   },
   "boats-home": {
     videos: [PX("14037398", "hd_1920_1080_30fps")],
     poster:
-      "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?auto=format&fit=crop&w=2400&q=85",
+      "/posters/boats-yacht.jpg",
     alt: "Yacht on the water at sunset",
   },
   "boats-portfolio": {
     videos: [PX("7555069", "hd_1920_1080_25fps")],
     poster:
-      "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?auto=format&fit=crop&w=2400&q=85",
+      "/posters/boats-yacht.jpg",
     alt: "Yacht on the water at sunset",
   },
   planes: {
     videos: ["/videos/planes-clouds.mp4"],
     poster:
-      "https://images.unsplash.com/photo-1474302770737-173ee21bab63?auto=format&fit=crop&w=2400&q=85",
+      "/posters/planes-jet.jpg",
     alt: "Above the clouds at sunset",
   },
 };

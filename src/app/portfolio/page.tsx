@@ -47,7 +47,7 @@ export default function MarketsPage() {
       <section className="relative isolate overflow-hidden border-b border-rule">
         <div className="absolute inset-0 -z-10">
           <Image
-            src="https://images.unsplash.com/photo-1592198084033-aade902d1aae?auto=format&fit=crop&w=2400&q=85"
+            src="/posters/cars-ferrari.jpg"
             alt="Red Ferrari 296 GTB"
             fill
             sizes="100vw"

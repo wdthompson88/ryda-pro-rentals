@@ -117,7 +117,7 @@ export default function CarsHome() {
       <section className="relative isolate overflow-hidden border-b border-rule">
         <div className="absolute inset-0 -z-10">
           <Image
-            src="https://images.unsplash.com/photo-1535498730771-e735b998cd64?auto=format&fit=crop&w=2000&q=80"
+            src="/posters/boats-marina.jpg"
             alt="Miami at sunset"
             fill
             sizes="100vw"

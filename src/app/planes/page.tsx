@@ -21,7 +21,7 @@ export default function PlanesComingSoon() {
       <section className="relative isolate min-h-[70vh] overflow-hidden border-b border-rule">
         <div className="absolute inset-0 -z-10">
           <Image
-            src="https://images.unsplash.com/photo-1474302770737-173ee21bab63?auto=format&fit=crop&w=2400&q=80"
+            src="/posters/planes-jet.jpg"
             alt="Private jet on tarmac at dusk"
             fill
             sizes="100vw"

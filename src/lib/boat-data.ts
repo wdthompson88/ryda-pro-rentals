@@ -117,7 +117,7 @@ export const BOATS: Boat[] = [
     listingStart: "2026-04-15",
     listingEnd: "2026-10-15",
     hero:
-      "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?auto=format&fit=crop&w=1920&q=80",
+      "/posters/boats-yacht.jpg",
     currentEngineHours: 280,
     description:
       "The Wajer 55 S is the modern Day Cruiser benchmark, Dutch build quality, three-engine IPS pod drive, and a layout designed for fast-paced bay days and Bimini runs. Ours is finished in Wajer Grey with cream upholstery and a teak deck.",
@@ -384,7 +384,7 @@ export const BOAT_MARKETS: Record<
     blurb:
       "Biscayne Bay flagship. Stiltsville lunch runs, Bimini in two hours, full hurricane prep through our Coconut Grove partner yard. Fleet operates Apr–Nov in market, hauls Dec–Mar.",
     hero:
-      "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?auto=format&fit=crop&w=2400&q=85",
+      "/posters/boats-yacht.jpg",
   },
   "Los Angeles": {
     label: "Los Angeles",
@@ -393,7 +393,7 @@ export const BOAT_MARKETS: Record<
     blurb:
       "Marina del Rey flagship with Catalina runs, Newport Harbor day trips, and Channel Islands overnighters. Year-round-able with the right hull.",
     hero:
-      "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?auto=format&fit=crop&w=2400&q=85",
+      "/posters/boats-yacht.jpg",
   },
   "New York": {
     label: "New York",
@@ -402,7 +402,7 @@ export const BOAT_MARKETS: Record<
     blurb:
       "Sag Harbor + Hudson + Long Island Sound. Northeast summer season runs Apr–Oct; winter haul-out at our Connecticut yard partner.",
     hero:
-      "https://images.unsplash.com/photo-1605281317010-fe5ffe798166?auto=format&fit=crop&w=2400&q=85",
+      "/posters/boats-yacht.jpg",
   },
 };
 

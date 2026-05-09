@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { HiddenWhenAuthed } from "@/components/auth-aware";
-import { HealthBadge } from "@/components/health-badge";
+// HealthBadge is dynamic-imported via HealthBadgeLazy so its ~64KB
+// chunk doesn't load on every marketing page where the user never
+// scrolls to the legal strip. Critical-path bundle saving.
+import { HealthBadgeLazy } from "@/components/health-badge-lazy";
 
 // Footer, brand row on top + 4 link columns below + legal strip.
 // Pacaso / Brunello pattern: full sitemap visible, but quiet eyebrows
@@ -121,8 +124,10 @@ export function SiteFooter() {
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
             <p>© {new Date().getFullYear()} RYDA LLC · Formed under applicable LLC law</p>
             {/* Live status (polls /api/health every 60s). Pre-launch
-                substitute for status.ryda.pro. */}
-            <HealthBadge />
+                substitute for status.ryda.pro. Lazy-loaded on
+                visibility so the badge JS only fetches when this
+                strip actually scrolls into view. */}
+            <HealthBadgeLazy />
           </div>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
             <Link href="/legal/privacy" className="hover:text-ink">
