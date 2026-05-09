@@ -188,7 +188,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Per-day comparison" },
           {
             type: "p",
-            text: "On a co-owned Ferrari 296 GTB at $34K per share (1 of 10) with ~32 days entitlement, the effective daily ops cost works out to about $221/day. The rental rate on the same vehicle is $2,400/day. If you'll drive 15+ days a year, co-ownership pays for itself.",
+            text: "On a co-owned Ferrari 296 GTB at $34K per share (1 of 10) with ~32 days entitlement, the effective daily ops cost works out to about $221/day. The rental rate on the same vehicle is $1,500–3,000/day at the Miami market floor. If you'll drive 15+ days a year, co-ownership pays for itself.",
           },
           {
             type: "callout",

@@ -169,7 +169,8 @@ export default function HowItWorksPage() {
             <p className="mt-4 max-w-2xl text-lg text-ink-soft">
               One Ferrari 296 share: $34K up front, ~$7,080/year all-in,
               ~32 days/year, roughly $221/day in steady-state ops.
-              Compare with $2,400+/day to rent or $40–80K/yr to own
+              Compare with $1,500–3,000/day to rent at the Miami market
+              floor (BluStreet, LUXX, AGEMBRAND), or $40–80K/yr to own
               outright.
             </p>
           </Reveal>
@@ -456,9 +457,22 @@ export default function HowItWorksPage() {
             depreciation reserve (range: $40–80K/yr depending on the
             car). Club figure represents a mid-tier US/UK supercar club
             annual membership; tiers run ~$30K–$80K/yr. Daily rental
-            assumes Miami market rate. Resale assumes
-            {" "}{TARGET_DEPRECIATION_PCT}% depreciation over the hold for
-            both solo ownership and RYDA, applied symmetrically.
+            assumes Miami market rate (BluStreet, LUXX, AGEMBRAND list
+            Ferrari rentals at $1,200–4,000/day; the table uses the
+            $1,500–3,000 mid-band most members will actually pay).
+            Resale assumes {TARGET_DEPRECIATION_PCT}% depreciation over the
+            hold for both solo ownership and RYDA, applied symmetrically.
+          </p>
+          <p className="mt-3 max-w-3xl text-xs text-mute">
+            <span className="font-medium text-ink-soft">The actual
+            Miami market.</span> RYDA isn&apos;t the only option in this
+            wallet. Daily-rental operators at the Miami floor include
+            BluStreet, LUXX, AGEMBRAND, MVP, DRMLXRY, Elite Exotics
+            and Amani. Membership clubs include mph club and Ark
+            Exotics. Each is the right answer for a different use
+            pattern &mdash; daily rental for one-off events, clubs for
+            buyers who want rotating variety, RYDA for buyers who
+            want the relationship with one specific car.
           </p>
           <p className="mt-3 text-sm text-ink-soft">
             Want the math on a specific car?{" "}
@@ -502,7 +516,7 @@ export default function HowItWorksPage() {
             <Take
               title="RYDA vs daily rental"
               good="Daily rental works if you drive once or twice a year, you don't want any commitment and the per-day price is not your primary concern."
-              tradeoff="$2,400+/day adds up fast. No priority on the vehicle you want, no relationship with it, no ownership upside."
+              tradeoff="$1,500–3,000/day adds up fast. No priority on the vehicle you want, no relationship with it, no ownership upside."
             />
             <Take
               title="RYDA vs supercar club"
@@ -598,6 +612,46 @@ export default function HowItWorksPage() {
           <Reveal delayMs={120}>
             <div className="mt-10">
               <BookingTiersExplainer variant="full" />
+            </div>
+          </Reveal>
+
+          {/* Honest answer about peak periods. Per the strategic audit
+              (RYDA_STRATEGIC_AUDIT.md, Codex's "resentment machine"
+              insight): a Ferrari unavailable on the wrong Saturday
+              isn't a Ferrari product. The booking explainer above
+              describes the algorithm; this callout addresses the
+              underlying buyer fear that the algorithm doesn't put
+              into words. */}
+          <Reveal delayMs={200}>
+            <div className="mt-12 rounded-2xl border border-rule bg-cream-2/60 p-6 sm:p-8">
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+                The honest answer about peak periods
+              </p>
+              <h3 className="mt-3 font-display text-2xl text-ink sm:text-3xl">
+                What happens on F1 weekend, Art Basel, or Spring Break?
+              </h3>
+              <div className="mt-5 grid gap-6 text-sm leading-relaxed text-ink-soft sm:grid-cols-2">
+                <p>
+                  Each LLC publishes a list of <span className="font-medium text-ink">10-12 designated peak
+                  events</span> at the start of every year (F1 Miami, Art
+                  Basel, NYE weekend, Memorial Day, etc.). Members rotate
+                  first-pick across them in a published draft order, so
+                  no one member corners the calendar two years running.
+                </p>
+                <p>
+                  Outside those peaks, the standard booking tiers apply.
+                  If you&apos;re bumped from a peak window you previously
+                  held due to a transfer or vote-based reassignment,
+                  RYDA credits you <span className="font-medium text-ink">two off-peak weekend
+                  days</span> at no cost &mdash; the kind of make-good that
+                  proves the policy isn&apos;t a polite fiction.
+                </p>
+              </div>
+              <p className="mt-5 text-sm leading-relaxed text-mute">
+                If your only reason for joining is to drive on F1
+                weekend, RYDA isn&apos;t the right product. Read this
+                section twice.
+              </p>
             </div>
           </Reveal>
         </div>
@@ -750,11 +804,11 @@ export default function HowItWorksPage() {
               </p>
               <p className="mt-3 text-sm leading-relaxed text-ink-soft">
                 Owners reserve 12 days each (120 total). 200 days enter the
-                pool. At 50% occupancy = ~100 booked days @ $2,400/day =
-                $240,000/yr gross. After RYDA&apos;s 35% management fee,
-                members split ~$156,000.{" "}
-                <span className="font-medium text-ink">~$15,600/share/yr</span>,
-                roughly 2.2× your $7,080/yr carrying cost.
+                pool. At 50% occupancy = ~100 booked days @ $1,800/day
+                (Miami market mid-point) = $180,000/yr gross. After
+                RYDA&apos;s 35% management fee, members split ~$117,000.{" "}
+                <span className="font-medium text-ink">~$11,700/share/yr</span>,
+                roughly 1.65× your $7,080/yr carrying cost.
               </p>
             </div>
             <div className="rounded-2xl border border-rule bg-surface p-6">

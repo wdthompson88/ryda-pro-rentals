@@ -43,7 +43,7 @@ export const POSTS: JournalPost[] = [
       "Every RYDA vehicle is certified pre owned with an active manufacturer or independent certified pre owned warranty. The LLC is buying a known asset, not a maintenance gamble. The Operating Agreement gives members real authority, sale, replacement, modification, additional capital calls all require member supermajority, never platform discretion.",
       "## Where this lands",
       "The product is quiet on purpose. RYDA isn't a fund, isn't a marketplace, isn't a club. Each vehicle is an LLC. You're a registered co-owner of a real car alongside up to four other verified members. We're hired by the LLC to run operations, sourcing, storage, insurance, scheduling, maintenance, transfers, under a separate Management Services Agreement.",
-      "Members drive ~32 days a year on a 10-share split. The math comes out to roughly $221 per day in steady-state ops cost once buy-in is amortized, about an order of magnitude below daily rental at $2,400 a day. The remaining 45 days each year are reserved for service and the optional rental pool so the cars don't burn out.",
+      "Members drive ~32 days a year on a 10-share split. The math comes out to roughly $221 per day in steady-state ops cost once buy-in is amortized, about well below daily rental at $1,500–3,000/day at the Miami market floor. The remaining 45 days each year are reserved for service and the optional rental pool so the cars don't burn out.",
       "## What's next",
       "Miami launches Q3 2026. We're vetting our first 100 members now. If you've ever stared at a Ferrari in your driveway and known you'd drive it ten times a year, this was built for you.",
     ],
