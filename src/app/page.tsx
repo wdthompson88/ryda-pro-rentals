@@ -5,6 +5,7 @@ import { MediaBackground } from "@/components/media-background";
 import { SPLITTER_MEDIA, type MediaSlot } from "@/lib/media";
 import { AuthSwap } from "@/components/auth-aware";
 import { RevealStagger, Reveal } from "@/components/reveal";
+import { BrandMarquee } from "@/components/brand-marquee";
 
 // Splitter, three full-height columns. One ambient b-roll loop per
 // vertical (Lambo / overhead yacht / private jet). Hover lights the
@@ -342,6 +343,30 @@ function BelowFoldEditorial() {
               ))}
             </RevealStagger>
           </div>
+        </div>
+
+        {/* Quiet curation strip beneath the editorial. Wordmarks, not
+            logos — luxury houses signal taste through letterforms,
+            not third-party marks. The marquee is incidental, almost
+            decorative; it sits behind the editorial weight above and
+            answers an unstated question ("which marques?") without
+            shouting it. */}
+        <div className="mt-16 border-t border-rule pt-12 sm:mt-20 sm:pt-14">
+          <Reveal>
+            <BrandMarquee
+              eyebrow="Curated from"
+              items={[
+                "Ferrari",
+                "Lamborghini",
+                "Porsche",
+                "McLaren",
+                "Aston Martin",
+                "Wajer",
+                "Pershing",
+                "Riva",
+              ]}
+            />
+          </Reveal>
         </div>
       </div>
     </section>
