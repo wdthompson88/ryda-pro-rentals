@@ -153,6 +153,33 @@ export default function AdminPage() {
             share transfers. Action buttons land in subsequent passes — for
             now use the Supabase dashboard for state changes.
           </p>
+
+          {/* Sub-route nav. Without this, the admin sub-routes
+              (/admin/prospects, /admin/disputes, etc.) are invisible
+              from the dashboard. Each is a separate workstream with
+              its own state. Ordering: pre-customer (prospects) → live
+              ops (disputes, LLC, audit, comparables, vehicle data)
+              roughly mirrors the customer lifecycle. */}
+          <nav className="mt-6 flex flex-wrap gap-2 text-xs">
+            {[
+              { href: "/admin", label: "Triage", note: "this page" },
+              { href: "/admin/prospects", label: "Prospects", note: "founding cohort CRM" },
+              { href: "/admin/disputes", label: "Disputes", note: "Stripe chargebacks" },
+              { href: "/admin/llc", label: "LLCs", note: "formation + members" },
+              { href: "/admin/comparables", label: "Comparables", note: "vehicle market data" },
+              { href: "/admin/vehicle-enrichment", label: "Enrichment", note: "VIN decoder" },
+              { href: "/admin/audit", label: "Audit", note: "admin actions log" },
+            ].map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                title={link.note}
+                className="rounded-full border border-rule bg-cream-2 px-3 py-1 font-medium text-ink-soft transition-colors hover:border-ink hover:text-ink"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
         </header>
 
         {loading ? (
