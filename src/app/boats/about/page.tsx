@@ -38,9 +38,11 @@ export default function BoatsAboutPage() {
               "Miami launches Q3 2026. Create your account to browse the fleet and claim a share when the first hulls go live.",
             ],
             signer: { name: "Ryan Galli", role: "Co-founder & CEO, RYDA", image: "/team/ryan.jpg", bio: "" },
+            // Per dual-audit Finding 2 (May 2026): the founding cohort
+            // wants a captain-and-founder call before signup, not after.
             links: [
-              { href: "/signup", label: "Sign up →", authedHidden: true },
-              { href: "/contact?type=Membership&note=RYDA+Boats#form", label: "Schedule a 30-minute call" },
+              { href: "/contact?type=Membership&note=RYDA+Boats#form", label: "Talk to a founder" },
+              { href: "/signup", label: "Create an account →", authedHidden: true },
             ],
           },
           mission: {
@@ -81,7 +83,8 @@ export default function BoatsAboutPage() {
             body:
               "The first 60 boats members lock early-member pricing on Blue or Black for life. We're vetting now ahead of the Miami water launch, Q3 2026.",
             links: [
-              { href: "/signup?next=/boats", label: "Sign up →" },
+              { href: "/contact?type=Membership&note=RYDA+Boats#form", label: "Talk to a founder" },
+              { href: "/signup?next=/boats", label: "Create an account →" },
               { href: "/about", label: "About RYDA Cars", variant: "secondary" },
             ],
           },

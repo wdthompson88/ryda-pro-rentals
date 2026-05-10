@@ -88,17 +88,43 @@ export function OrderPanel({ vehicle }: Props) {
         </div>
       </div>
 
-      <button
-        type="button"
-        onClick={handleClaim}
-        disabled={sold}
-        className="mt-5 w-full rounded-full bg-ink px-7 py-3 text-sm font-medium text-cream transition-colors hover:bg-red disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        {sold ? "All shares taken" : `Reserve ${numericShares} share${numericShares > 1 ? "s" : ""} →`}
-      </button>
+      {/* Per dual-audit Finding 5 (May 2026): for the founding cohort
+          the right primary action on a $34K-per-share decision is a
+          founder call, not a self-serve buy flow entry. The buy flow
+          stays as-is and lives behind the secondary CTA for buyers who
+          arrive there already qualified. After cohort 1 closes and the
+          operational track record exists, the order can flip back. */}
+      {!sold ? (
+        <a
+          href={`/contact?type=Membership&note=${encodeURIComponent(`I'd like to talk about ${vehicle.name} — ${numericShares} share${numericShares > 1 ? "s" : ""}`)}#form`}
+          className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-ink px-7 py-3 text-sm font-medium text-cream transition-colors hover:bg-red"
+        >
+          Talk to a founder about this car
+        </a>
+      ) : (
+        <button
+          type="button"
+          disabled
+          className="mt-5 w-full rounded-full bg-ink px-7 py-3 text-sm font-medium text-cream opacity-50"
+        >
+          All shares taken
+        </button>
+      )}
+
+      {!sold && (
+        <button
+          type="button"
+          onClick={handleClaim}
+          className="mt-3 w-full rounded-full border border-rule bg-surface px-7 py-3 text-sm font-medium text-ink transition-colors hover:border-ink"
+        >
+          Reserve {numericShares} share{numericShares > 1 ? "s" : ""} directly →
+        </button>
+      )}
 
       <p className="mt-4 text-center text-xs text-mute">
-        12-month minimum hold. Transferable to other verified members.
+        30-minute discovery call. Documents and reservation come after.
+        12-month minimum hold once you join an LLC. Transferable to
+        other verified members.
       </p>
 
       {/* Payment options, Pacaso surfaces these up-front rather than

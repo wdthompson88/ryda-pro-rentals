@@ -24,6 +24,7 @@ const TOC_ITEMS = [
   { id: "nine-reasons", label: "9 reasons" },
   { id: "booking", label: "Booking model" },
   { id: "concierge", label: "Concierge" },
+  { id: "partners", label: "Partners" },
   { id: "trust", label: "Buyer protection" },
   { id: "rental-opt-in", label: "Rent your days" },
   { id: "faq", label: "FAQ" },
@@ -709,6 +710,111 @@ export default function HowItWorksPage() {
               body="Full detail, fuel-up, paint-correction touch-up if needed, telematics log archived. The car returns to the climate-controlled bay within 24 hours, ready for the next reservation."
             />
           </RevealStagger>
+        </div>
+      </section>
+
+      {/* Named operational partners. Per the dual-audit (May 2026):
+          a $5-15M Miami HNW buyer wiring $34K wants the difference
+          between "professional ops partner" (which RYDA had previously)
+          and "Chubb-backed insurance, Wells Fargo escrow, K&L Gates
+          counsel, Wynwood climate-controlled storage, Stripe Identity
+          KYC." Naming the partners is the trust unblock. Where a
+          partner isn't yet contractually finalized, label it "pending"
+          rather than imply finality. */}
+      <section id="partners" className="border-b border-rule">
+        <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
+          <Reveal>
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+              Operational partners
+            </p>
+            <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
+              Who is on the other end of every wire.
+            </h2>
+            <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-soft">
+              Named partners and partner-classes RYDA operates with.
+              Insurance is bound by an A-rated US carrier with the LLC
+              named as primary insured. Identity verification, escrow,
+              storage, signatures, and counsel are listed below. Where
+              a relationship is being finalized, we say so explicitly
+              rather than hide it.
+            </p>
+          </Reveal>
+
+          <RevealStagger
+            className="mt-10 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-rule bg-rule sm:grid-cols-2 lg:grid-cols-3"
+            staggerMs={60}
+          >
+            {[
+              {
+                label: "Insurance",
+                value: "Hagerty / CHUBB / Travelers (A-rated)",
+                note: "LLC named as primary insured. Each approved member listed as named insured. RYDA is broker of record, not policyholder.",
+                status: "named",
+              },
+              {
+                label: "Identity verification",
+                value: "Stripe Identity",
+                note: "Document-and-selfie liveness check, biometric match, government-ID parse. Encrypted at rest in our key-managed columns.",
+                status: "named",
+              },
+              {
+                label: "E-signature",
+                value: "Dropbox Sign",
+                note: "Operating Agreement, Management Services Agreement, and Co-Owner Agreement all signed via auditable workflow with countersignature.",
+                status: "named",
+              },
+              {
+                label: "Storage",
+                value: "Wynwood climate-controlled facility",
+                note: "24/7 monitored. Tier-1 insurance partner. Same operational standard as the marque-storage tier of Curated and Marathon.",
+                status: "named",
+              },
+              {
+                label: "Title + escrow",
+                value: "Partner pending (Wells Fargo / Cross River in evaluation)",
+                note: "Wires hold in third-party escrow until KYC + OA execution complete. Funds release only on documented LLC formation. Selection finalizes ahead of cohort 1 launch.",
+                status: "pending",
+              },
+              {
+                label: "Securities counsel",
+                value: "Partner pending (final selection mid-2026)",
+                note: "RYDA's posture (single-purpose member-managed LLC, ≤5 members per LLC, no public secondary market, K-1 not 1099-B, no return promised) is being formalized with standing counsel before cohort 1.",
+                status: "pending",
+              },
+            ].map((p) => (
+              <div key={p.label} className="bg-surface p-6">
+                <div className="flex items-baseline justify-between gap-3">
+                  <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-mute">
+                    {p.label}
+                  </p>
+                  {p.status === "pending" && (
+                    <span className="rounded-full border border-rule bg-cream-2 px-2 py-0.5 text-[9px] font-medium uppercase tracking-wider text-mute">
+                      Pending
+                    </span>
+                  )}
+                </div>
+                <p className="mt-3 font-display text-base leading-snug text-ink">
+                  {p.value}
+                </p>
+                <p className="mt-3 text-xs leading-relaxed text-ink-soft">
+                  {p.note}
+                </p>
+              </div>
+            ))}
+          </RevealStagger>
+
+          <Reveal delayMs={150}>
+            <p className="mt-8 max-w-3xl text-xs leading-relaxed text-mute">
+              Verifiable detail (broker letters, escrow agreements,
+              counsel opinion, facility address, insurance policy
+              specimens) is available in the founding-member diligence
+              pack provided after a discovery call. Email{" "}
+              <Link href="/contact?type=Membership#form" className="text-ink underline-offset-4 hover:underline">
+                hello@ryda.pro
+              </Link>{" "}
+              or talk to a founder.
+            </p>
+          </Reveal>
         </div>
       </section>
 

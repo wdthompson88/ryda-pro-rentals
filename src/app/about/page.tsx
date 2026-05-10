@@ -59,9 +59,13 @@ export default function AboutPage() {
               "Miami launches Q3 2026. If this fits how you actually want to use a supercar, own a piece, drive it ~32 days a year, never deal with the operational side, sign up and we'll be in touch.",
             ],
             signer: { name: "Ryan Galli", role: "Co-founder & CEO, RYDA", image: "/team/ryan.jpg", bio: "" },
+            // Per dual-audit Finding 2: founding-cohort buyers ($68K
+            // minimum) want a founder call first, not an account.
+            // Talk-to-a-founder is primary; account creation is for
+            // members who already know they want in.
             links: [
-              { href: "/signup", label: "Sign up →", authedHidden: true },
-              { href: "/contact?type=Membership#form", label: "Schedule a 30-minute call" },
+              { href: "/contact?type=Membership#form", label: "Talk to a founder" },
+              { href: "/signup", label: "Create an account →", authedHidden: true },
             ],
           },
           mission: {
@@ -96,8 +100,11 @@ export default function AboutPage() {
           cta: {
             title: "Become a member.",
             body:
-              "Miami launches Q3 2026. Create your account to browse the fleet and claim a share when membership opens.",
-            links: [{ href: "/signup", label: "Apply now →", authedHidden: true }],
+              "Miami launches Q3 2026. The founding cohort closes ahead of launch. Talk to a founder to walk through the structure, the operating agreement, and the specific car you'd want a share in.",
+            links: [
+              { href: "/contact?type=Membership#form", label: "Talk to a founder" },
+              { href: "/signup", label: "Create an account →", authedHidden: true },
+            ],
           },
         }}
       />

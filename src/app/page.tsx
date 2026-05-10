@@ -153,8 +153,85 @@ export default function SplitterPage() {
       </RevealStagger>
     </div>
 
+    {/* Flagship offer band. Sits between the splitter (which sells the
+        brand) and the editorial second screen (which sells the founder
+        voice). Per the dual-audit (Claude + Codex, May 2026): the
+        homepage previously communicated category, not value prop. A
+        $5-15M Miami HNW buyer should know in 5 seconds what the actual
+        offer is. This band is that 5-second answer. Three numbers, one
+        sentence, one CTA. */}
+    <FlagshipOfferBand />
+
     <BelowFoldEditorial />
     </>
+  );
+}
+
+// Single-flow band that answers the "what is this actually" question
+// for a first-time buyer. The splitter shows the brand; this band
+// shows the offer.
+function FlagshipOfferBand() {
+  return (
+    <section className="border-b border-rule bg-cream py-16 sm:py-20">
+      <div className="mx-auto max-w-6xl px-6 sm:px-10">
+        <Reveal>
+          <p className="text-xs font-medium uppercase tracking-[0.22em] text-red">
+            Founding cohort · Miami launch Q3 2026
+          </p>
+          <h2 className="mt-4 max-w-4xl font-display text-4xl font-light leading-[1.1] text-ink sm:text-5xl">
+            Co-own a <span className="italic">Ferrari 296 GTB</span> in
+            Miami. One of ten shares.
+          </h2>
+        </Reveal>
+
+        <Reveal delayMs={120}>
+          <div className="mt-10 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-rule bg-rule sm:grid-cols-3">
+            {[
+              { label: "Buy-in", value: "$34K", note: "per share, 2-share minimum" },
+              { label: "Annual ops", value: "$7,080", note: "all-in, fixed" },
+              { label: "Driving days", value: "~32 / yr", note: "year-2 planned exit" },
+            ].map((stat) => (
+              <div key={stat.label} className="bg-surface p-6 sm:p-7">
+                <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-mute">
+                  {stat.label}
+                </p>
+                <p className="mt-3 font-display text-3xl tabular-nums text-ink sm:text-4xl">
+                  {stat.value}
+                </p>
+                <p className="mt-2 text-xs leading-relaxed text-ink-soft">
+                  {stat.note}
+                </p>
+              </div>
+            ))}
+          </div>
+        </Reveal>
+
+        <Reveal delayMs={200}>
+          <div className="mt-10 flex flex-wrap items-center gap-4">
+            {/* Primary CTA per the dual-audit's Finding 2: "Sign up" is
+                the wrong first-action verb for a $68K minimum. The
+                founding-cohort buyer is one phone call away, not one
+                form submission. */}
+            <Link
+              href="/contact?type=Membership#form"
+              className="inline-flex h-12 items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream hover:bg-red"
+            >
+              Talk to a founder
+            </Link>
+            <Link
+              href="/portfolio/f458"
+              className="inline-flex h-12 items-center justify-center rounded-full border border-rule bg-surface px-7 text-sm font-medium text-ink hover:border-ink"
+            >
+              See the Ferrari →
+            </Link>
+            <p className="text-xs text-mute">
+              30-minute discovery call. No commitment. The deck and the
+              operating-agreement template come after.
+            </p>
+          </div>
+        </Reveal>
+      </div>
+    </section>
   );
 }
 
