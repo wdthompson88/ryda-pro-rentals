@@ -361,7 +361,11 @@ function BelowFoldEditorial() {
                 "Porsche",
                 "McLaren",
                 "Aston Martin",
-                "Pershing",
+                "Bugatti",
+                "Koenigsegg",
+                "Lotus",
+                "Mercedes-Benz",
+                "BMW",
               ]}
             />
           </Reveal>
