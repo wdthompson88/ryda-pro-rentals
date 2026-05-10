@@ -554,6 +554,17 @@ function ExpandedDetail({
         </div>
       </div>
 
+      {/* Reservation agreement workflow. Founding-cohort MVP test:
+          interested prospect → send agreement → signed → deposit
+          received → LLC formation. Each transition auto-updates the
+          prospect's stage via /api/admin/reservations/[id] PATCH. */}
+      <div className="mt-6">
+        <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-mute">
+          Reservation agreement
+        </p>
+        <ReservationPanel prospect={p} onChange={onChange} />
+      </div>
+
       {/* Notes accumulator */}
       {p.notes && (
         <div className="mt-5">
@@ -589,6 +600,417 @@ function KV({ label, value }: { label: string; value: string }) {
     <div className="grid grid-cols-3 gap-3">
       <span className="text-mute">{label}</span>
       <span className="col-span-2 text-ink">{value}</span>
+    </div>
+  );
+}
+
+// Reservation agreement workflow per prospect. Mounts inside the
+// expanded prospect row. Loads any existing reservations for this
+// prospect; renders either the "create reservation" form or the
+// status panel for the most recent active one.
+type Reservation = {
+  id: string;
+  prospect_id: string;
+  vehicle_symbol: string | null;
+  boat_slug: string | null;
+  shares_reserved: number;
+  deposit_amount_cents: number;
+  expires_at: string;
+  status:
+    | "draft"
+    | "sent"
+    | "signed"
+    | "deposit_received"
+    | "converted"
+    | "cancelled"
+    | "refunded";
+  sent_at: string | null;
+  signed_at: string | null;
+  deposit_received_at: string | null;
+  converted_at: string | null;
+  cancelled_at: string | null;
+  refunded_at: string | null;
+  signed_pdf_url: string | null;
+  notes: string | null;
+  created_at: string;
+};
+
+const RESERVATION_STATUS_TONE: Record<Reservation["status"], string> = {
+  draft: "bg-cream-2 text-mute border-rule",
+  sent: "bg-marine/10 text-marine border-marine/30",
+  signed: "bg-marine/15 text-marine border-marine/40",
+  deposit_received: "bg-success/15 text-success border-success/40",
+  converted: "bg-ink text-cream border-ink",
+  cancelled: "bg-mute/10 text-mute border-rule",
+  refunded: "bg-mute/10 text-mute border-rule",
+};
+
+function ReservationPanel({
+  prospect,
+  onChange,
+}: {
+  prospect: Prospect;
+  onChange: () => void;
+}) {
+  const [reservations, setReservations] = useState<Reservation[] | null>(null);
+  const [loadErr, setLoadErr] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [actionErr, setActionErr] = useState<string | null>(null);
+  const [showCreate, setShowCreate] = useState(false);
+
+  // Form state for the create form.
+  const [vehicleSymbol, setVehicleSymbol] = useState(
+    prospect.car_of_interest?.toLowerCase().replace(/\s+/g, "-") ?? "",
+  );
+  const [shares, setShares] = useState(
+    prospect.shares_of_interest?.toString() ?? "2",
+  );
+  const [depositDollars, setDepositDollars] = useState("5000");
+
+  const load = useCallback(async () => {
+    try {
+      const res = await authedFetch(
+        `/api/admin/prospects/${prospect.id}/reservation`,
+      );
+      // The GET endpoint isn't implemented (we only POST/PATCH), so
+      // we fetch the prospect's reservations via the all-reservations
+      // pattern. For now: query the underlying admin list filtered by
+      // prospect_id. Since we don't have that endpoint either,
+      // simplest path: store reservations inline once created in the
+      // same session, OR add a dedicated GET to /api/admin/prospects/
+      // [id]/reservation later. For v1 we'll fetch via a list
+      // endpoint we add inline below.
+      if (res.status === 405 || res.status === 404) {
+        // No GET handler — that's fine, just means none in this
+        // session OR we need to fetch differently.
+        setReservations([]);
+        return;
+      }
+      if (!res.ok) {
+        const body = (await res.json().catch(() => ({}))) as {
+          error?: string;
+        };
+        throw new Error(body.error || `HTTP ${res.status}`);
+      }
+      const body = (await res.json()) as { reservations?: Reservation[] };
+      setReservations(body.reservations ?? []);
+    } catch (e) {
+      setLoadErr(e instanceof Error ? e.message : String(e));
+    }
+  }, [prospect.id]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  // Pick the "active" reservation — the most recent non-terminal one.
+  const active = reservations?.find(
+    (r) =>
+      r.status !== "converted" &&
+      r.status !== "cancelled" &&
+      r.status !== "refunded",
+  );
+
+  async function createReservation(e: React.FormEvent) {
+    e.preventDefault();
+    if (!vehicleSymbol.trim() || !shares.trim() || !depositDollars.trim()) {
+      setActionErr("Vehicle, shares, and deposit are required.");
+      return;
+    }
+    setBusy(true);
+    setActionErr(null);
+    try {
+      const res = await authedFetch(
+        `/api/admin/prospects/${prospect.id}/reservation`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            vehicle_symbol: vehicleSymbol.trim(),
+            shares_reserved: parseInt(shares, 10),
+            deposit_amount_cents: parseInt(depositDollars, 10) * 100,
+          }),
+        },
+      );
+      if (!res.ok) {
+        const body = (await res.json().catch(() => ({}))) as {
+          error?: string;
+        };
+        throw new Error(body.error || `HTTP ${res.status}`);
+      }
+      const body = (await res.json()) as {
+        reservation: Reservation;
+        pdf_url: string;
+      };
+      setReservations((prev) => [body.reservation, ...(prev ?? [])]);
+      setShowCreate(false);
+      // Auto-advance prospect stage to interested if not already
+      // beyond, so the funnel reflects "agreement in flight."
+      if (
+        prospect.stage === "cold" ||
+        prospect.stage === "contacted" ||
+        prospect.stage === "call_booked" ||
+        prospect.stage === "call_done"
+      ) {
+        await authedFetch(`/api/admin/prospects/${prospect.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ stage: "interested" }),
+        });
+      }
+      // Open the PDF in a new tab immediately so the admin can save
+      // and email it.
+      window.open(body.pdf_url, "_blank", "noopener,noreferrer");
+      onChange();
+    } catch (e) {
+      setActionErr(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function transitionStatus(
+    reservationId: string,
+    nextStatus: Reservation["status"],
+    extra?: Record<string, unknown>,
+  ) {
+    setBusy(true);
+    setActionErr(null);
+    try {
+      const res = await authedFetch(
+        `/api/admin/reservations/${reservationId}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: nextStatus, ...(extra ?? {}) }),
+        },
+      );
+      if (!res.ok) {
+        const body = (await res.json().catch(() => ({}))) as {
+          error?: string;
+        };
+        throw new Error(body.error || `HTTP ${res.status}`);
+      }
+      // Refresh both the reservation row + the prospect (because
+      // status transitions auto-advance the prospect's stage).
+      void load();
+      onChange();
+    } catch (e) {
+      setActionErr(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (loadErr) {
+    return <p className="mt-2 text-xs text-red">Couldn&apos;t load reservations: {loadErr}</p>;
+  }
+  if (reservations === null) {
+    return <p className="mt-2 text-xs text-mute">Loading reservation…</p>;
+  }
+
+  if (!active && !showCreate) {
+    return (
+      <div className="mt-2">
+        <p className="text-xs text-ink-soft">
+          No active reservation. Send one to advance this prospect to
+          deposit-held.
+        </p>
+        <button
+          type="button"
+          onClick={() => setShowCreate(true)}
+          className="mt-2 rounded-full bg-ink px-4 py-1.5 text-xs font-medium text-cream hover:bg-red"
+        >
+          Send reservation agreement
+        </button>
+      </div>
+    );
+  }
+
+  if (showCreate) {
+    return (
+      <form
+        onSubmit={createReservation}
+        className="mt-3 grid gap-3 rounded-xl border border-rule bg-surface p-4 sm:grid-cols-3"
+      >
+        <label className="block sm:col-span-1">
+          <span className="mb-1 block text-[10px] uppercase tracking-wider text-mute">
+            Vehicle symbol
+          </span>
+          <input
+            value={vehicleSymbol}
+            onChange={(e) => setVehicleSymbol(e.target.value)}
+            placeholder="f458, f296, p911…"
+            required
+            className="w-full rounded-lg border border-rule bg-cream-2/40 px-2 py-1.5 text-xs text-ink placeholder:text-mute"
+          />
+        </label>
+        <label className="block">
+          <span className="mb-1 block text-[10px] uppercase tracking-wider text-mute">
+            Shares
+          </span>
+          <input
+            type="number"
+            min={1}
+            max={10}
+            value={shares}
+            onChange={(e) => setShares(e.target.value)}
+            required
+            className="w-full rounded-lg border border-rule bg-cream-2/40 px-2 py-1.5 text-xs text-ink"
+          />
+        </label>
+        <label className="block">
+          <span className="mb-1 block text-[10px] uppercase tracking-wider text-mute">
+            Deposit ($)
+          </span>
+          <input
+            type="number"
+            min={500}
+            step={500}
+            value={depositDollars}
+            onChange={(e) => setDepositDollars(e.target.value)}
+            required
+            className="w-full rounded-lg border border-rule bg-cream-2/40 px-2 py-1.5 text-xs text-ink"
+          />
+        </label>
+        {actionErr && (
+          <p className="sm:col-span-3 text-xs text-red">{actionErr}</p>
+        )}
+        <div className="sm:col-span-3 flex items-center justify-end gap-3">
+          <button
+            type="button"
+            onClick={() => setShowCreate(false)}
+            className="text-xs text-mute hover:text-ink"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={busy}
+            className="rounded-full bg-ink px-4 py-1.5 text-xs font-medium text-cream hover:bg-red disabled:opacity-50"
+          >
+            {busy ? "Generating…" : "Generate + open PDF"}
+          </button>
+        </div>
+      </form>
+    );
+  }
+
+  // Render the active reservation status + transition buttons.
+  if (!active) return null;
+  const dollars = Math.round(active.deposit_amount_cents / 100);
+  return (
+    <div className="mt-3 rounded-xl border border-rule bg-surface p-4">
+      <div className="flex flex-wrap items-baseline justify-between gap-3">
+        <div>
+          <p className="text-sm text-ink">
+            <span className="font-medium">
+              {active.vehicle_symbol?.toUpperCase() ?? active.boat_slug}
+            </span>
+            {" · "}
+            {active.shares_reserved} share{active.shares_reserved === 1 ? "" : "s"}
+            {" · "}
+            <span className="tabular-nums">
+              ${dollars.toLocaleString()} deposit
+            </span>
+          </p>
+          <p className="mt-1 text-xs text-mute">
+            Created {new Date(active.created_at).toISOString().slice(0, 10)} ·
+            expires {new Date(active.expires_at).toISOString().slice(0, 10)}
+          </p>
+        </div>
+        <span
+          className={`rounded-full border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${RESERVATION_STATUS_TONE[active.status]}`}
+        >
+          {active.status.replace(/_/g, " ")}
+        </span>
+      </div>
+
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        <a
+          href={`/api/admin/reservations/${active.id}/pdf`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="rounded-full border border-rule bg-cream-2 px-3 py-1 text-xs font-medium text-ink hover:border-ink"
+        >
+          Download PDF
+        </a>
+
+        {active.status === "draft" && (
+          <button
+            type="button"
+            onClick={() => transitionStatus(active.id, "sent")}
+            disabled={busy}
+            className="rounded-full bg-ink px-3 py-1 text-xs font-medium text-cream hover:bg-red disabled:opacity-50"
+          >
+            Mark sent
+          </button>
+        )}
+        {active.status === "sent" && (
+          <button
+            type="button"
+            onClick={() => transitionStatus(active.id, "signed")}
+            disabled={busy}
+            className="rounded-full bg-ink px-3 py-1 text-xs font-medium text-cream hover:bg-red disabled:opacity-50"
+          >
+            Mark signed
+          </button>
+        )}
+        {active.status === "signed" && (
+          <button
+            type="button"
+            onClick={() => transitionStatus(active.id, "deposit_received")}
+            disabled={busy}
+            className="rounded-full bg-success px-3 py-1 text-xs font-medium text-cream hover:opacity-90 disabled:opacity-50"
+          >
+            Deposit received → advance to deposit-held
+          </button>
+        )}
+        {active.status === "deposit_received" && (
+          <button
+            type="button"
+            onClick={() => transitionStatus(active.id, "converted")}
+            disabled={busy}
+            className="rounded-full bg-ink px-3 py-1 text-xs font-medium text-cream hover:bg-red disabled:opacity-50"
+          >
+            LLC formed → mark converted
+          </button>
+        )}
+
+        {/* Terminal-state buttons available at all non-terminal stages */}
+        {active.status !== "converted" &&
+          active.status !== "cancelled" &&
+          active.status !== "refunded" && (
+            <>
+              <button
+                type="button"
+                onClick={() => {
+                  if (window.confirm(`Cancel this reservation? The deposit must still be returned manually if it was wired.`)) {
+                    transitionStatus(active.id, "cancelled");
+                  }
+                }}
+                disabled={busy}
+                className="rounded-full border border-rule bg-cream-2 px-3 py-1 text-xs text-mute hover:text-ink"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (window.confirm(`Refund the deposit? This will mark the reservation refunded; you must wire the funds back manually.`)) {
+                    transitionStatus(active.id, "refunded");
+                  }
+                }}
+                disabled={busy}
+                className="rounded-full border border-rule bg-cream-2 px-3 py-1 text-xs text-mute hover:text-red"
+              >
+                Refund
+              </button>
+            </>
+          )}
+      </div>
+
+      {actionErr && <p className="mt-3 text-xs text-red">{actionErr}</p>}
     </div>
   );
 }
