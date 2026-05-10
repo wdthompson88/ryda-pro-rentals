@@ -13,7 +13,7 @@ import { HOW_IT_WORKS_STEPS, FAQ_ITEMS } from "@/lib/boat-content";
 import { BOATS_HOLDING_YEARS, BOATS_TARGET_DEPRECIATION_PCT } from "@/lib/boat-data";
 
 export const metadata: Metadata = {
-  title: "How RYDA Boats works",
+  title: "How it works — Boats",
   description:
     "Member-managed LLC, up to 5 co-owners per hull, three-year planned exit, charter opt-in to offset ops. Compare to solo ownership, peer-to-peer charter, and yacht clubs.",
 };

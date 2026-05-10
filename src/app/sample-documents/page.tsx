@@ -5,7 +5,7 @@ import {
 } from "@/components/shared/sample-documents-page";
 
 export const metadata = {
-  title: "Sample documents — RYDA",
+  title: "Sample documents",
   description:
     "The legal and operational documents RYDA uses. Request the redacted packet to review with your counsel.",
 };

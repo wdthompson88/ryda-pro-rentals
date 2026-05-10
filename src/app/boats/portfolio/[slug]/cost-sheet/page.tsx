@@ -28,9 +28,9 @@ export async function generateMetadata({
 }) {
   const { slug } = await params;
   const v = getBoatBySlug(slug);
-  if (!v) return { title: "RYDA · Cost sheet" };
+  if (!v) return { title: "Cost sheet" };
   return {
-    title: `${v.name} · Cost Sheet — RYDA`,
+    title: `${v.name} · Cost Sheet`,
     description: `Sole ownership vs RYDA co-ownership cost comparison for the ${v.name}.`,
     robots: { index: false, follow: false }, // print-only, don't surface in search
   };

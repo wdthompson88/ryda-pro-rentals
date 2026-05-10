@@ -10,7 +10,7 @@ import { Reveal } from "@/components/reveal";
 import { VEHICLES, formatUSD } from "@/lib/market-data";
 
 export const metadata = {
-  title: "Inside RYDA — What members see",
+  title: "Inside · What members see",
   description:
     "A preview of the member experience: portfolio dashboard, booking calendar, telemetry, sample documents. Sample data, see what you get before you commit.",
 };

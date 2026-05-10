@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Apply — RYDA",
+  title: "Apply",
   description:
     "Create your RYDA account. Browsing is free; signup unlocks rentals and co-ownership.",
 };

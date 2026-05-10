@@ -3,7 +3,7 @@ import { SiteHeader } from "@/components/site-header";
 import { ContactForm } from "@/components/contact-form";
 
 export const metadata = {
-  title: "Contact — RYDA",
+  title: "Contact",
   description: "Talk to a RYDA membership advisor. Press, partnerships, and investor relations.",
 };
 

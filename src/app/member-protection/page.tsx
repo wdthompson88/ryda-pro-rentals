@@ -2,7 +2,7 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 
 export const metadata = {
-  title: "How your money is protected — RYDA",
+  title: "How your money is protected",
   description:
     "Where your buy-in goes, how the LLC's funds are held, what happens if RYDA fails and what protections members have under the Operating Agreement.",
 };

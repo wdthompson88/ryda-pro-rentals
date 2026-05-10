@@ -2,7 +2,7 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 
 export const metadata = {
-  title: "Sustainability — RYDA",
+  title: "Sustainability",
   description:
     "Six members can share one Ferrari. The math, the environmental impact, and what RYDA does about it.",
 };

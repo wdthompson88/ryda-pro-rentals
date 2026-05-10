@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Investor deck — RYDA",
+  title: "Investor deck",
   description:
     "RYDA investor deck, confidential. Member-managed supercar co-ownership; seed round open.",
 };

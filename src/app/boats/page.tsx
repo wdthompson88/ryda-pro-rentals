@@ -18,7 +18,7 @@ import {
 } from "@/lib/boat-content";
 
 export const metadata: Metadata = {
-  title: "RYDA Boats — Co-own or charter the world's most beautiful boats",
+  title: "Boats — Co-own or charter the world's most beautiful boats",
   description:
     "Boat co-ownership and crewed charter in Miami. Each hull held in a member-managed LLC; up to 5 verified members co-own every boat. Three-year planned exit.",
 };

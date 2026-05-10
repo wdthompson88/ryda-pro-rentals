@@ -4,7 +4,7 @@ import { SiteHeader } from "@/components/site-header";
 import { DemoBanner } from "@/components/demo-banner";
 import { VEHICLES, formatUSD } from "@/lib/market-data";
 
-export const metadata = { title: "My Cars — RYDA" };
+export const metadata = { title: "My Cars" };
 
 const HOLDINGS = [
   { symbol: "F458", shares: 1, isLeadOwner: true, status: "active" as const },

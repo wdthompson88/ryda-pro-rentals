@@ -2,7 +2,7 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 
 export const metadata = {
-  title: "Trust & Safety — RYDA",
+  title: "Trust & Safety",
   description:
     "How RYDA protects co-owners, vehicles and the platform. Member verification, asset vetting, insurance, claims and the standards we hold ourselves to.",
 };

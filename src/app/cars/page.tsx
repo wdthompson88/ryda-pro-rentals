@@ -7,7 +7,7 @@ import { HiddenWhenAuthed } from "@/components/auth-aware";
 import { VEHICLES, formatUSD } from "@/lib/market-data";
 
 export const metadata: Metadata = {
-  title: "RYDA Cars — Co-own the world's most exceptional cars",
+  title: "Cars — Co-own the world's most exceptional cars",
   description:
     "Co-own a certified pre owned Ferrari, Lamborghini or McLaren in a member-managed LLC. Each share unlocks ~30 days a year. Asset-backed, professionally operated.",
 };

@@ -1,7 +1,7 @@
 import { ComingSoonLocation } from "@/components/coming-soon-location";
 
 export const metadata = {
-  title: "Los Angeles — RYDA",
+  title: "Los Angeles",
   description:
     "RYDA Los Angeles. Q1 2027 launch. Join the LA priority list to lock in early-member pricing.",
 };

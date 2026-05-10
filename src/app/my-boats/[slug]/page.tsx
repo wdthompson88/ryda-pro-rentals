@@ -25,7 +25,7 @@ export async function generateMetadata({
 }) {
   const { slug } = await params;
   const v = getBoatBySlug(slug);
-  return { title: v ? `${v.name}, My Boats — RYDA` : "My Boats" };
+  return { title: v ? `${v.name} · My Boats` : "My Boats" };
 }
 
 export default async function MyVehiclePage({

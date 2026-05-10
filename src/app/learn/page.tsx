@@ -15,7 +15,7 @@ import {
 } from "@/lib/learn-content";
 
 export const metadata: Metadata = {
-  title: "Learn — RYDA",
+  title: "Learn",
   description:
     "Understand RYDA's co-ownership model, choose your share, buy with confidence, drive without surprises, and exit cleanly. Plain-language explainers across the full member journey.",
 };

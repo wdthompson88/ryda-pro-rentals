@@ -1,6 +1,6 @@
 import { LegalPage } from "@/components/legal-page";
 
-export const metadata = { title: "Terms of Service — RYDA" };
+export const metadata = { title: "Terms of Service" };
 
 export default function TermsPage() {
   return (

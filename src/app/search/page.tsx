@@ -4,7 +4,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SearchResults } from "@/components/search-results";
 
 export const metadata: Metadata = {
-  title: "Search — RYDA",
+  title: "Search",
   description:
     "Search across the RYDA site, vehicles, boats, journal posts, comparison pages, FAQ.",
 };

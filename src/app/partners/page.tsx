@@ -10,7 +10,7 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 
 export const metadata: Metadata = {
-  title: "Fleet Partner Program — RYDA",
+  title: "Fleet Partner Program",
   description:
     "RYDA's Fleet Partner Program lets exotic-rental operators reach our pre-screened HNW members. List your inventory, hold your rates, keep your client relationships. Miami launch Q3 2026.",
   alternates: { canonical: "/partners" },

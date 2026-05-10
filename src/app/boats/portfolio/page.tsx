@@ -13,7 +13,7 @@ import {
 import { PORTFOLIO_HERO } from "@/lib/boat-content";
 
 export const metadata: Metadata = {
-  title: "RYDA Boats Portfolio — Co-own a yacht in Miami",
+  title: "Boats Portfolio — Co-own a yacht in Miami",
   description:
     "The RYDA Boats portfolio. Member-managed LLCs hold each curated yacht; up to 5 verified members co-own every hull. Browse Miami today; LA + NY 2027.",
 };

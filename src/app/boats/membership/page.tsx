@@ -7,7 +7,7 @@ import {
 import { earlyPricingCTA } from "@/lib/launch-config";
 
 export const metadata = {
-  title: "RYDA Boats Membership, Core, Blue — Black",
+  title: "Boats Membership — Core, Blue — Black",
   description:
     "RYDA Boats membership: Core (free), Blue ($500/yr), Black ($1,500/yr). Co-own or charter. Captain-hours bank, priority slip windows, hurricane prep, marine surveys.",
 };

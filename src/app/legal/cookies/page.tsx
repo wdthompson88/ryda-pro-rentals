@@ -1,6 +1,6 @@
 import { LegalPage } from "@/components/legal-page";
 
-export const metadata = { title: "Cookie Policy — RYDA" };
+export const metadata = { title: "Cookie Policy" };
 
 export default function CookiesPage() {
   return (

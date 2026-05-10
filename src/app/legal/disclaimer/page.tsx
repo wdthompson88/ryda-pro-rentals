@@ -1,6 +1,6 @@
 import { LegalPage } from "@/components/legal-page";
 
-export const metadata = { title: "Co-Ownership Disclaimer — RYDA" };
+export const metadata = { title: "Co-Ownership Disclaimer" };
 
 export default function DisclaimerPage() {
   return (

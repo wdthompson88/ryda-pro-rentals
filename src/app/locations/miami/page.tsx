@@ -4,7 +4,7 @@ import { HiddenWhenAuthed } from "@/components/auth-aware";
 import { SITE_URL } from "@/lib/site-url";
 
 export const metadata = {
-  title: "Miami — RYDA",
+  title: "Miami",
   description:
     "RYDA's first market. Q3 2026 launch. The story behind Miami, our partner facility, member events, and the member cohort.",
   alternates: { canonical: `${SITE_URL}/locations/miami` },

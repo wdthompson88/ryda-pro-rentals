@@ -2,7 +2,7 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 
 export const metadata = {
-  title: "Press — RYDA",
+  title: "Press",
   description:
     "RYDA press kit, brand assets, fact sheet, and media contacts.",
 };

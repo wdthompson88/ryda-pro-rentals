@@ -5,7 +5,7 @@ import { VEHICLES } from "@/lib/market-data";
 import { PARTNER_VEHICLES } from "@/lib/partner-fleet";
 
 export const metadata = {
-  title: "Rent — RYDA",
+  title: "Rent",
   description:
     "Rent a curated supercar by the day. Hand-prepared, fully insured, white-glove delivered. Miami · LA · NYC.",
 };

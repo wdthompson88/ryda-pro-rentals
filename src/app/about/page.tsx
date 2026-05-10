@@ -2,7 +2,7 @@ import { SiteHeader } from "@/components/site-header";
 import { AboutPageTemplate, type AboutPerson } from "@/components/shared/about-page";
 
 export const metadata = {
-  title: "About — RYDA",
+  title: "About",
   description:
     "A US member-managed supercar co-ownership platform. Our story, our team, our mission.",
 };

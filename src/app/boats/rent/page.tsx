@@ -5,7 +5,7 @@ import { SiteHeader } from "@/components/site-header";
 import { BOATS, formatUSD } from "@/lib/boat-data";
 
 export const metadata: Metadata = {
-  title: "RYDA Boats Charter — Yachts by the day in Miami",
+  title: "Boats Charter — Yachts by the day in Miami",
   description:
     "Crewed yacht charter in Miami. Same four hulls as the co-ownership portfolio, available by the day. White-glove handover, RYDA-vetted captain, full insurance.",
 };

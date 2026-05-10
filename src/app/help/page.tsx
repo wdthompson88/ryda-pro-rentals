@@ -3,7 +3,7 @@ import { SiteHeader } from "@/components/site-header";
 import { HELP } from "@/lib/help-content";
 
 export const metadata = {
-  title: "Help Center — RYDA",
+  title: "Help Center",
   description:
     "Answers about RYDA membership, co-ownership, bookings, insurance, maintenance, and account management.",
 };

@@ -1,6 +1,6 @@
 import { LegalPage } from "@/components/legal-page";
 
-export const metadata = { title: "Privacy Policy — RYDA" };
+export const metadata = { title: "Privacy Policy" };
 
 export default function PrivacyPage() {
   return (

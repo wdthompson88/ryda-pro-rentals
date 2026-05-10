@@ -25,7 +25,7 @@ export async function generateMetadata({
 }) {
   const { symbol } = await params;
   const v = getVehicleBySymbol(symbol);
-  return { title: v ? `${v.name}, My Cars — RYDA` : "My Cars" };
+  return { title: v ? `${v.name} · My Cars` : "My Cars" };
 }
 
 export default async function MyVehiclePage({

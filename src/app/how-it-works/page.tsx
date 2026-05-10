@@ -31,7 +31,7 @@ const TOC_ITEMS = [
 ];
 
 export const metadata = {
-  title: "How it works — RYDA",
+  title: "How it works",
   description:
     "Asset-backed co-ownership of curated certified pre owned supercars. Five steps to a key, side-by-side comparison of RYDA vs solo / rental / club, the 24-month exit doctrine and the optional rental opt-in.",
 };

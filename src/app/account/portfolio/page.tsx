@@ -5,7 +5,7 @@ import { LlcSharedCalendar } from "@/components/llc-shared-calendar";
 import { VEHICLES, formatUSD } from "@/lib/market-data";
 
 export const metadata = {
-  title: "Your shares — RYDA",
+  title: "Your shares",
   description: "Your co-ownership shares, usage, and upcoming bookings.",
 };
 

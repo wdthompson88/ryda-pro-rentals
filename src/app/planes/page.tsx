@@ -5,7 +5,7 @@ import { SiteHeader } from "@/components/site-header";
 import { PlanesMissionProfileForm } from "@/components/planes-mission-profile-form";
 
 export const metadata: Metadata = {
-  title: "RYDA Planes, Coming soon",
+  title: "Planes — Coming soon",
   description:
     "RYDA Planes is in design. Fractional access to private aviation, structured the same way as our cars and boats verticals, member-managed LLCs, professionally operated.",
 };

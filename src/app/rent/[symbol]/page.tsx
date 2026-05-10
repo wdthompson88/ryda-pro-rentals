@@ -63,11 +63,11 @@ export async function generateMetadata({
 }) {
   const { symbol } = await params;
   const r = resolve(symbol);
-  if (!r) return { title: "RYDA Rentals" };
+  if (!r) return { title: "Rentals" };
   const title = listingTitle(r);
   const rate = listingDailyRate(r);
   return {
-    title: `Rent the ${title}, ${formatUSD(rate)}/day — RYDA`,
+    title: `Rent the ${title} · ${formatUSD(rate)}/day`,
     description: `Hand-prepared, fully insured, white-glove delivered. ${title} in ${r.vehicle.market}.`,
   };
 }

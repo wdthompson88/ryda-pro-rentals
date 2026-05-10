@@ -19,7 +19,7 @@ import { BrandMarquee } from "@/components/brand-marquee";
 // only scroll content on /; the splitter remains the page's signature.
 
 export const metadata: Metadata = {
-  title: "RYDA — Luxury vehicle access",
+  title: "Luxury vehicle access",
   description:
     "Co-own or rent the world's most coveted luxury vehicles in the US. Cars · Boats · Planes. Member-managed LLCs, professionally operated.",
 };
@@ -47,9 +47,13 @@ const VERTICALS: Vertical[] = [
     href: "/cars",
     label: "Cars",
     tagline: "The road, without limits.",
-    bullet: "Live · Miami today",
+    // Per dual-audit Finding 3 (May 2026): "Live · Miami today"
+    // contradicted "Q3 2026 launch" copy elsewhere. A buyer who
+    // catches that on first read downgrades trust. Now matches the
+    // honest pre-launch state every other surface uses.
+    bullet: "Founding cohort · Miami launch Q3 2026",
     status: "live",
-    pillLabel: "Live",
+    pillLabel: "Founding cohort",
     media: SPLITTER_MEDIA.cars,
     accent: "red",
   },
@@ -57,9 +61,9 @@ const VERTICALS: Vertical[] = [
     href: "/boats",
     label: "Boats",
     tagline: "The sea, where the horizon opens.",
-    bullet: "Live · Miami Q3 2026",
+    bullet: "Founding cohort · Miami launch Q3 2026",
     status: "live",
-    pillLabel: "Live",
+    pillLabel: "Founding cohort",
     media: SPLITTER_MEDIA.boats,
     accent: "marine",
   },
@@ -78,6 +82,15 @@ const VERTICALS: Vertical[] = [
 export default function SplitterPage() {
   return (
     <>
+    {/* Semantic H1 for SEO + a11y. The splitter's "RYDA" wordmark
+        and the Cars/Boats/Planes labels are visually heading-sized
+        but render as <p> tags, so search engines + screen readers
+        previously had no anchor for the page's topic (audit Finding
+        4, May 2026). The visually-hidden H1 below covers both
+        without disrupting the splitter visual. */}
+    <h1 className="sr-only">
+      RYDA — fractional luxury vehicle co-ownership in Miami. Cars, boats, and planes.
+    </h1>
     <div className="relative min-h-screen overflow-hidden bg-[#0E0E10] text-[#F4F1EC]">
       <SplitterIntro />
 

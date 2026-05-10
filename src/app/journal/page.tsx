@@ -4,7 +4,7 @@ import { POSTS } from "@/lib/journal-content";
 import { InlineEmailCapture } from "@/components/inline-email-capture";
 
 export const metadata = {
-  title: "Journal — RYDA",
+  title: "Journal",
   description:
     "RYDA Journal, long-form on supercar co-ownership, vehicle deep-dives, founder posts, and the business behind the brand.",
 };

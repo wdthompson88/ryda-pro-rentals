@@ -95,9 +95,15 @@ export async function generateMetadata({
 }) {
   const { symbol } = await params;
   const v = getVehicleBySymbol(symbol);
-  if (!v) return { title: "RYDA Markets" };
+  if (!v) return { title: "Markets" };
   const url = `${SITE_URL}/portfolio/${v.symbol.toLowerCase()}`;
-  const title = `${v.name}, ${formatUSD(v.pricePerShare)} per share — RYDA`;
+  // Per codex review: split unbranded `pageTitle` (used for
+  // metadata.title — layout's title.template adds " · RYDA"
+  // automatically) from branded `shareTitle` (used for openGraph +
+  // twitter — social platforms don't apply Next's title.template,
+  // so the brand has to be present in the literal string).
+  const pageTitle = `${v.name} · ${formatUSD(v.pricePerShare)} per share`;
+  const shareTitle = `${v.name}, ${formatUSD(v.pricePerShare)} per share — RYDA`;
   const description = `Co-own a ${v.year} ${v.name}. ${v.sharesAvailable} of ${v.shares} member-managed LLC shares available.`;
   // Per-vehicle OG image: when sharing a portfolio link to LinkedIn /
   // X / iMessage we want the actual hero photo of the car, not the
@@ -107,13 +113,13 @@ export async function generateMetadata({
     ? v.hero
     : `${SITE_URL}${v.hero}`;
   return {
-    title,
+    title: pageTitle,
     description,
     alternates: { canonical: url },
     openGraph: {
       type: "website",
       url,
-      title,
+      title: shareTitle,
       description,
       siteName: "RYDA",
       images: [
@@ -125,7 +131,7 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title,
+      title: shareTitle,
       description,
       images: [heroAbsolute],
     },

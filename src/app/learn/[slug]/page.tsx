@@ -25,9 +25,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const article = getArticle(slug);
-  if (!article) return { title: "Learn — RYDA" };
+  if (!article) return { title: "Learn" };
   return {
-    title: `${article.title} — RYDA Learn`,
+    title: `${article.title} · Learn`,
     description: article.excerpt,
   };
 }

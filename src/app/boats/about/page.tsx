@@ -2,7 +2,7 @@ import { SiteHeader } from "@/components/site-header";
 import { AboutPageTemplate } from "@/components/shared/about-page";
 
 export const metadata = {
-  title: "About RYDA Boats",
+  title: "About — Boats",
   description:
     "Why we built RYDA Boats. Member-managed LLCs, surveyed certified pre owned hulls, professional marine ops, three-year planned exit.",
 };

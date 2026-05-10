@@ -3,7 +3,7 @@ import { FaqPageTemplate, type FaqSection } from "@/components/shared/faq-page";
 import { FAQ_ITEMS } from "@/lib/boat-content";
 
 export const metadata = {
-  title: "FAQ — RYDA Boats",
+  title: "Boats FAQ",
   description:
     "Answers to the most common questions about RYDA Boats: co-ownership, captain protocol, slip rotation, hurricane prep, charter opt-in, exit doctrine.",
 };

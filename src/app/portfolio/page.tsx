@@ -13,7 +13,7 @@ import {
 } from "@/lib/market-data";
 
 export const metadata = {
-  title: "RYDA Portfolio — Supercars co-owned in the US",
+  title: "Portfolio — Supercars co-owned in the US",
   description:
     "The RYDA portfolio. Member-managed LLCs hold each curated certified pre owned supercar; up to 5 verified members co-own every car. Browse Miami, Los Angeles and New York.",
   // The hero image was washing out the headline copy, bumped the

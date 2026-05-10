@@ -3,7 +3,7 @@ import { SiteHeader } from "@/components/site-header";
 import { FaqPageTemplate, type FaqSection } from "@/components/shared/faq-page";
 
 export const metadata = {
-  title: "FAQ — RYDA",
+  title: "FAQ",
   description:
     "Answers to the most common questions about RYDA membership, co-ownership, rentals and operations.",
 };
@@ -47,6 +47,12 @@ const SECTIONS: FaqSection[] = [
     ],
   },
 ];
+
+// Note: FAQPage Schema.org JSON-LD is emitted by FaqPageTemplate
+// itself (see src/components/shared/faq-page.tsx). Adding a second
+// page-level <script> would emit the same FAQPage block twice and
+// risk confusing Google's rich-result parser. Per codex review of
+// the cleanup batch.
 
 export default function FaqPage() {
   return (

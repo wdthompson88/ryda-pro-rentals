@@ -35,9 +35,16 @@ export async function generateMetadata({
 }) {
   const { slug } = await params;
   const b = getBoatBySlug(slug);
-  if (!b) return { title: "RYDA Boats" };
+  if (!b) return { title: "Boats" };
   const url = `${SITE_URL}/boats/portfolio/${b.slug}`;
-  const title = `${b.name}, ${formatUSD(b.pricePerShare)} per share — RYDA Boats`;
+  // Per codex review: split unbranded `pageTitle` (used for
+  // metadata.title — layout's title.template adds " · RYDA"
+  // automatically) from branded `shareTitle` (used for openGraph +
+  // twitter — social platforms don't apply Next's title.template,
+  // so the brand has to be present in the literal string). Same
+  // pattern as portfolio/[symbol]/page.tsx.
+  const pageTitle = `${b.name} · ${formatUSD(b.pricePerShare)} per share`;
+  const shareTitle = `${b.name}, ${formatUSD(b.pricePerShare)} per share — RYDA Boats`;
   const description = `Co-own the ${b.year} ${b.name} in ${b.market}. ${formatUSD(b.pricePerShare)} per share, ${formatUSD(b.annualOpCost)}/yr all-in operating cost. ${b.sharesAvailable} of ${b.shares} shares available.`;
   // Per-hull OG image: when sharing a boat link socially we want
   // the actual hero photo, not the generic site OG. Absolutize the
@@ -46,20 +53,20 @@ export async function generateMetadata({
     ? b.hero
     : `${SITE_URL}${b.hero}`;
   return {
-    title,
+    title: pageTitle,
     description,
     alternates: { canonical: url },
     openGraph: {
       type: "website",
       url,
-      title,
+      title: shareTitle,
       description,
       siteName: "RYDA",
       images: [{ url: heroAbsolute, alt: `${b.year} ${b.name}` }],
     },
     twitter: {
       card: "summary_large_image",
-      title,
+      title: shareTitle,
       description,
       images: [heroAbsolute],
     },

@@ -14,8 +14,19 @@ import { safeNext } from "@/lib/safe-next";
 // request a rental). Real auth ships at Miami launch.
 
 export default function SignUpPage() {
+  // The form lives inside a Suspense boundary because it depends on
+  // useSearchParams (Next 16 forces this). That means the SSR HTML
+  // renders the fallback, so any <h1> inside SignUpPageInner is
+  // invisible to crawlers + screen readers until hydration.
+  //
+  // The hidden H1 lives in the Suspense FALLBACK rather than as a
+  // sibling outside it (per codex re-review of the cleanup batch):
+  //   - SSR + non-JS clients get the H1 from the fallback
+  //   - After hydration, the fallback is replaced by SignUpPageInner
+  //     which renders its own visible H1 (line 168 / 210). One H1
+  //     visible at any moment, never two.
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<h1 className="sr-only">Apply for RYDA membership</h1>}>
       <SignUpPageInner />
     </Suspense>
   );

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 
 export const metadata = {
-  title: "Storage — RYDA",
+  title: "Storage",
   description:
     "Premium climate-controlled vehicle storage in Miami. Built for supercars: monitored, insured, on-call delivery.",
 };

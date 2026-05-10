@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 // mentions, search index) so nobody hits a 404.
 
 export const metadata = {
-  title: "Sign up — RYDA",
+  title: "Sign up",
   description: "Join RYDA. Miami launch Q3 2026.",
   robots: { index: false, follow: false },
 };

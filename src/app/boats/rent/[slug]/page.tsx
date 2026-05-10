@@ -18,9 +18,9 @@ export async function generateMetadata({
 }) {
   const { slug } = await params;
   const b = getBoatBySlug(slug);
-  if (!b) return { title: "RYDA Boats Charter" };
+  if (!b) return { title: "Boats Charter" };
   return {
-    title: `Charter the ${b.name}, ${formatUSD(b.rentalDailyRate)}/day — RYDA Boats`,
+    title: `Charter the ${b.name} · ${formatUSD(b.rentalDailyRate)}/day`,
     description: `Crewed charter on the ${b.year} ${b.name}. ${b.lengthFt}-foot ${b.category}, captain + mate included, full insurance, white-glove handover. ${b.market}.`,
   };
 }

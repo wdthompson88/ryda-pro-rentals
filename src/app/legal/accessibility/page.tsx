@@ -1,6 +1,6 @@
 import { LegalPage } from "@/components/legal-page";
 
-export const metadata = { title: "Accessibility Statement — RYDA" };
+export const metadata = { title: "Accessibility Statement" };
 
 export default function AccessibilityPage() {
   return (

@@ -11,7 +11,7 @@ import { SiteHeader } from "@/components/site-header";
 import { MARKETS, type MarketKey } from "@/lib/market-data";
 
 export const metadata: Metadata = {
-  title: "Locations — RYDA",
+  title: "Locations",
   description:
     "Where RYDA operates. Miami launching Q3 2026, Los Angeles + New York 2027. Each market has its own fleet curation, storage partner, and member cohort.",
   alternates: { canonical: "/locations" },

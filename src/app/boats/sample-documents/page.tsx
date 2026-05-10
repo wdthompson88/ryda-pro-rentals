@@ -5,7 +5,7 @@ import {
 } from "@/components/shared/sample-documents-page";
 
 export const metadata = {
-  title: "Sample documents — RYDA Boats",
+  title: "Boats — Sample documents",
   description:
     "Preview the legal and operational documents RYDA Boats uses: Operating Agreement, Management Services Agreement, marine survey, Coast Guard documentation, captain agreements.",
 };

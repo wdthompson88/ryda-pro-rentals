@@ -2,7 +2,7 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 
 export const metadata = {
-  title: "List your car — RYDA",
+  title: "List your car",
   description:
     "Have a supercar sitting in storage? List it on RYDA, earn from rentals, or contribute it to a member-managed LLC and share it with vetted co-owners. We handle insurance, ops, and member services.",
 };

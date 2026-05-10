@@ -2,7 +2,7 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 
 export const metadata = {
-  title: "Insurance — RYDA",
+  title: "Insurance",
   description:
     "How RYDA insures every vehicle, every booking and every co-owner. Built for supercars, not Camrys.",
 };

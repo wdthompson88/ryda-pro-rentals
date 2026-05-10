@@ -14,9 +14,9 @@ export async function generateMetadata({
 }) {
   const { category } = await params;
   const cat = getCategory(category);
-  if (!cat) return { title: "Help — RYDA" };
+  if (!cat) return { title: "Help" };
   return {
-    title: `${cat.title} — RYDA Help`,
+    title: `${cat.title} · Help`,
     description: cat.blurb,
   };
 }

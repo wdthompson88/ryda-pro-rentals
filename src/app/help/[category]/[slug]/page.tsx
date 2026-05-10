@@ -16,9 +16,9 @@ export async function generateMetadata({
 }) {
   const { category, slug } = await params;
   const found = getArticle(category, slug);
-  if (!found) return { title: "Help — RYDA" };
+  if (!found) return { title: "Help" };
   return {
-    title: `${found.article.q} — RYDA Help`,
+    title: `${found.article.q} · Help`,
     description: found.article.summary,
   };
 }

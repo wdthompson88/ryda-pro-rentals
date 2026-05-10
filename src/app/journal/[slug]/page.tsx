@@ -23,11 +23,11 @@ export async function generateMetadata({
 }) {
   const { slug } = await params;
   const post = getPost(slug);
-  if (!post) return { title: "Journal — RYDA" };
+  if (!post) return { title: "Journal" };
   const url = `${SITE_URL}/journal/${post.slug}`;
   const isoDate = toIsoDate(post.date);
   return {
-    title: `${post.title} — RYDA Journal`,
+    title: `${post.title} · Journal`,
     description: post.excerpt,
     alternates: { canonical: url },
     openGraph: {

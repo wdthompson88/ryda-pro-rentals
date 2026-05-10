@@ -2,7 +2,7 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { DemoBanner } from "@/components/demo-banner";
 
-export const metadata = { title: "Messages — RYDA" };
+export const metadata = { title: "Messages" };
 
 // /messages — placeholder until the real co-owner messaging
 // service ships. Pre-launch, this page rendered fake conversations

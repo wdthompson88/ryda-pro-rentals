@@ -2,7 +2,7 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 
 export const metadata = {
-  title: "Careers — RYDA",
+  title: "Careers",
   description: "Open roles at RYDA. We're hiring for the Miami launch.",
 };
 

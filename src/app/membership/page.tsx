@@ -7,7 +7,7 @@ import {
 import { earlyPricingCTA } from "@/lib/launch-config";
 
 export const metadata = {
-  title: "Membership — RYDA",
+  title: "Membership",
   description:
     "RYDA Core (free), Blue ($500/yr), and Black ($1,500/yr). Compare what each tier unlocks.",
 };

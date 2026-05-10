@@ -3,7 +3,7 @@ import { SiteHeader } from "@/components/site-header";
 import { HiddenWhenAuthed } from "@/components/auth-aware";
 
 export const metadata = {
-  title: "Events — RYDA",
+  title: "Events",
   description:
     "RYDA member events. F1 Miami GP weekend, founders' dinners, Cars & Cuban Coffee, track days and more.",
 };
