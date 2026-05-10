@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { DemoBanner } from "@/components/demo-banner";
+import { LlcSharedCalendar } from "@/components/llc-shared-calendar";
 import { VEHICLES, formatUSD } from "@/lib/market-data";
 
 export const metadata = {
@@ -122,6 +123,29 @@ export default function PortfolioPage() {
             <Activity label="New co-owner joined" detail="P911 LLC, welcome Jordan" date="2 weeks ago" />
             <Activity label="Welcome to RYDA Blue" detail="Annual membership active" date="3 weeks ago" />
           </ul>
+        </div>
+      </section>
+
+      {/* Real-data shared calendar — the rest of this page renders
+          hardcoded demo SEATS, but the calendar reads share_holdings
+          + bookings via Supabase RLS. Per the May 2026 site audit's
+          "before launch" list: members need to see their booked days
+          vs co-owners' booked days vs available days. */}
+      <section className="border-b border-rule">
+        <div className="mx-auto max-w-7xl px-6 py-14 sm:px-10 sm:py-20">
+          <div className="mb-6">
+            <p className="text-xs font-medium uppercase tracking-[0.22em] text-red">
+              Live · shared calendar
+            </p>
+            <h2 className="mt-2 font-display text-3xl text-ink sm:text-4xl">
+              Your days vs co-owner days, next 90.
+            </h2>
+            <p className="mt-3 max-w-2xl text-sm text-ink-soft">
+              Booking visibility per LLC you co-own. Co-owner names
+              never appear here — only that the day is taken.
+            </p>
+          </div>
+          <LlcSharedCalendar />
         </div>
       </section>
 

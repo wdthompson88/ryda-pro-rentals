@@ -23,18 +23,42 @@ const PHOTO_SHOTS = [
 
 type Stage = "intro" | "photos" | "condition" | "signoff" | "done";
 
+export type HandoverSubmitInput = {
+  type: "checkin" | "return";
+  odometerMiles: number;
+  fuelLevelPct: number;
+  conditionGood: boolean;
+  conditionNotes: string;
+  photosTakenCount: number;
+  memberSignedName: string;
+};
+
 export function HandoverFlow({
   variant,
   bookingId,
   vehicleName,
+  onSubmit,
 }: {
   variant: "checkin" | "return";
   bookingId: string;
   vehicleName: string;
+  // When the member confirms sign-off, fires with the captured data.
+  // The page-level wrapper translates this to a POST against the
+  // /api/bookings/[id]/handover route + redirects on success.
+  // If undefined (e.g., the static-param demo render path), the
+  // flow still runs locally but doesn't persist.
+  onSubmit?: (input: HandoverSubmitInput) => Promise<void> | void;
 }) {
   const [stage, setStage] = useState<Stage>("intro");
   const [completed, setCompleted] = useState<Set<number>>(new Set());
   const [conditionGood, setConditionGood] = useState<boolean | null>(null);
+  const [conditionNotes, setConditionNotes] = useState("");
+  const [mileage, setMileage] = useState("");
+  const [fuelPct, setFuelPct] = useState("");
+  const [signedName, setSignedName] = useState("");
+  const [confirmChecked, setConfirmChecked] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitErr, setSubmitErr] = useState<string | null>(null);
 
   const isCheckin = variant === "checkin";
   const titleVerb = isCheckin ? "Pickup" : "Return";
@@ -176,28 +200,52 @@ export function HandoverFlow({
             {conditionGood === false && (
               <div className="mt-6 rounded-xl border border-red/30 bg-red/5 p-5">
                 <label className="block text-xs font-medium uppercase tracking-wider text-red">
-                  Describe what's different
+                  Describe what&apos;s different
                 </label>
                 <textarea
                   rows={3}
+                  value={conditionNotes}
+                  onChange={(e) => setConditionNotes(e.target.value)}
                   className="mt-2 w-full rounded-xl border border-rule bg-cream px-4 py-3 text-sm text-ink placeholder:text-mute focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
                   placeholder="Small scuff on the rear-left wheel that wasn't on the Apr 20 report..."
                 />
-                <button className="mt-3 inline-flex h-10 items-center gap-2 rounded-full border border-rule bg-cream px-5 text-xs font-medium text-ink hover:border-ink">
-                  📷 Add photo
-                </button>
+                <p className="mt-2 text-[11px] text-mute">
+                  Photos here in v2 — for now describe in detail and add
+                  via the in-app chat after sign-off. Ops will reconcile.
+                </p>
               </div>
             )}
 
-            <div className="mt-8">
-              <label className="block text-xs font-medium uppercase tracking-wider text-mute">
-                {isCheckin ? "Mileage at pickup" : "Mileage at return"}
-              </label>
-              <input
-                type="text"
-                placeholder="2,140"
-                className="mt-2 h-12 w-full rounded-xl border border-rule bg-cream px-4 text-sm text-ink placeholder:text-mute focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
-              />
+            <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-xs font-medium uppercase tracking-wider text-mute">
+                  {isCheckin ? "Mileage at pickup" : "Mileage at return"}
+                </label>
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  min={0}
+                  value={mileage}
+                  onChange={(e) => setMileage(e.target.value)}
+                  placeholder="2,140"
+                  className="mt-2 h-12 w-full rounded-xl border border-rule bg-cream px-4 text-sm text-ink placeholder:text-mute focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium uppercase tracking-wider text-mute">
+                  Fuel level (%)
+                </label>
+                <input
+                  type="number"
+                  inputMode="numeric"
+                  min={0}
+                  max={100}
+                  value={fuelPct}
+                  onChange={(e) => setFuelPct(e.target.value)}
+                  placeholder="100"
+                  className="mt-2 h-12 w-full rounded-xl border border-rule bg-cream px-4 text-sm text-ink placeholder:text-mute focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
+                />
+              </div>
             </div>
 
             <div className="mt-8 flex gap-3">
@@ -209,7 +257,11 @@ export function HandoverFlow({
               </button>
               <button
                 onClick={() => setStage("signoff")}
-                disabled={conditionGood === null}
+                disabled={
+                  conditionGood === null ||
+                  mileage.trim().length === 0 ||
+                  fuelPct.trim().length === 0
+                }
                 className="h-12 flex-1 rounded-full bg-red px-7 text-sm font-medium text-cream hover:bg-red-deep disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Continue →
@@ -227,31 +279,98 @@ export function HandoverFlow({
                 ? "By signing, you confirm the vehicle was received in the condition above. RYDA receives your photos and condition declaration in real time."
                 : "By signing, you confirm the vehicle was returned in the condition above. RYDA's team will inspect within 24h and post the final report."}
             </p>
-            <div className="mt-8 rounded-xl border border-dashed border-rule bg-cream/40 p-8 text-center">
-              <p className="font-display text-xl text-mute">Tap and draw to sign</p>
-              <p className="mt-2 text-xs text-mute">
-                Signature capture loads on a touch device
-              </p>
+
+            {/* Typed-name signature for v1. Drawn-signature capture
+                (canvas + touch) is a follow-up; the typed name stamped
+                with a server-side timestamp is the same legal weight
+                under E-SIGN as a drawn one for this purpose. */}
+            <div className="mt-8">
+              <label className="block text-xs font-medium uppercase tracking-wider text-mute">
+                Type your full legal name to sign
+              </label>
+              <input
+                type="text"
+                value={signedName}
+                onChange={(e) => setSignedName(e.target.value)}
+                placeholder="Full name as it appears on your driver's license"
+                className="mt-2 h-12 w-full rounded-xl border border-rule bg-cream px-4 text-sm text-ink placeholder:text-mute focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
+              />
             </div>
+
             <label className="mt-6 flex items-start gap-3 text-xs text-ink-soft">
-              <input type="checkbox" className="mt-0.5 accent-red" />
+              <input
+                type="checkbox"
+                checked={confirmChecked}
+                onChange={(e) => setConfirmChecked(e.target.checked)}
+                className="mt-0.5 accent-red"
+              />
               <span>
                 I confirm vehicle{" "}
                 {isCheckin ? "received" : "returned"} in the condition above.
               </span>
             </label>
+
+            {submitErr && (
+              <p className="mt-4 text-xs text-red">{submitErr}</p>
+            )}
+
             <div className="mt-8 flex gap-3">
               <button
                 onClick={() => setStage("condition")}
-                className="h-12 rounded-full border border-rule px-6 text-sm font-medium text-ink-soft hover:border-ink hover:text-ink"
+                disabled={submitting}
+                className="h-12 rounded-full border border-rule px-6 text-sm font-medium text-ink-soft hover:border-ink hover:text-ink disabled:opacity-50"
               >
                 ← Back
               </button>
               <button
-                onClick={() => setStage("done")}
-                className="h-12 flex-1 rounded-full bg-red px-7 text-sm font-medium text-cream hover:bg-red-deep"
+                onClick={async () => {
+                  if (
+                    !signedName.trim() ||
+                    !confirmChecked ||
+                    !mileage ||
+                    !fuelPct ||
+                    conditionGood === null
+                  ) {
+                    setSubmitErr(
+                      "Sign your name and check the confirmation box to continue.",
+                    );
+                    return;
+                  }
+                  setSubmitErr(null);
+                  if (onSubmit) {
+                    setSubmitting(true);
+                    try {
+                      await onSubmit({
+                        type: variant,
+                        odometerMiles: parseInt(mileage, 10),
+                        fuelLevelPct: parseInt(fuelPct, 10),
+                        conditionGood,
+                        conditionNotes: conditionNotes.trim(),
+                        photosTakenCount: completed.size,
+                        memberSignedName: signedName.trim(),
+                      });
+                      setStage("done");
+                    } catch (err) {
+                      setSubmitErr(
+                        err instanceof Error ? err.message : String(err),
+                      );
+                    } finally {
+                      setSubmitting(false);
+                    }
+                  } else {
+                    // No onSubmit wired (e.g., the static-param demo path);
+                    // local-only success state.
+                    setStage("done");
+                  }
+                }}
+                disabled={
+                  submitting ||
+                  !signedName.trim() ||
+                  !confirmChecked
+                }
+                className="h-12 flex-1 rounded-full bg-red px-7 text-sm font-medium text-cream hover:bg-red-deep disabled:cursor-not-allowed disabled:opacity-50"
               >
-                Confirm and complete
+                {submitting ? "Recording…" : "Confirm and complete"}
               </button>
             </div>
           </div>

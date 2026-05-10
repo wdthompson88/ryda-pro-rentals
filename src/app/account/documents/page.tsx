@@ -63,10 +63,20 @@ const DOC_LABEL: Record<string, string> = {
   subscription_agreement: "Subscription Agreement",
 };
 
+// LLC the member is in — used to render per-LLC insurance certificates.
+type MemberLlc = {
+  id: string;
+  llc_name: string;
+  vehicle_symbol: string | null;
+  boat_slug: string | null;
+  insurance_carrier: string | null;
+};
+
 export default function DocumentsPage() {
   const [amendments, setAmendments] = useState<Amendment[]>([]);
   const [signatures, setSignatures] = useState<DocumentSignature[]>([]);
   const [kyc, setKyc] = useState<KycRow | null>(null);
+  const [memberLlcs, setMemberLlcs] = useState<MemberLlc[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -76,30 +86,74 @@ export default function DocumentsPage() {
     }
     let cancelled = false;
     (async () => {
-      const [amRes, sigRes, kycRes] = await Promise.all([
-        supabase
-          .from("llc_amendments")
-          .select(
-            "id, document_type, vehicle_symbol, boat_slug, member_name, emailed, email_attempted_at, created_at",
-          )
-          .order("created_at", { ascending: false }),
-        supabase
-          .from("document_signatures")
-          .select(
-            "id, document_type, status, signed_at, created_at, share_purchases(vehicle_symbol, boat_slug)",
-          )
-          .order("created_at", { ascending: false }),
-        supabase
-          .from("kyc_verifications")
-          .select("status, updated_at")
-          .order("updated_at", { ascending: false })
-          .limit(1)
-          .maybeSingle(),
-      ]);
+      // First pull share_holdings → asset symbols/slugs the member
+      // currently holds. Then fetch the matching llc_entities rows.
+      const holdingsRes = await supabase
+        .from("share_holdings")
+        .select("vehicle_symbol, boat_slug")
+        .is("transferred_at", null);
+      const holdings = (holdingsRes.data ?? []) as Array<{
+        vehicle_symbol: string | null;
+        boat_slug: string | null;
+      }>;
+      const heldVehicleSymbols = Array.from(
+        new Set(holdings.map((h) => h.vehicle_symbol).filter(Boolean) as string[]),
+      );
+      const heldBoatSlugs = Array.from(
+        new Set(holdings.map((h) => h.boat_slug).filter(Boolean) as string[]),
+      );
+
+      const [amRes, sigRes, kycRes, llcVehicleRes, llcBoatRes] =
+        await Promise.all([
+          supabase
+            .from("llc_amendments")
+            .select(
+              "id, document_type, vehicle_symbol, boat_slug, member_name, emailed, email_attempted_at, created_at",
+            )
+            .order("created_at", { ascending: false }),
+          supabase
+            .from("document_signatures")
+            .select(
+              "id, document_type, status, signed_at, created_at, share_purchases(vehicle_symbol, boat_slug)",
+            )
+            .order("created_at", { ascending: false }),
+          supabase
+            .from("kyc_verifications")
+            .select("status, updated_at")
+            .order("updated_at", { ascending: false })
+            .limit(1)
+            .maybeSingle(),
+          // Two queries instead of one OR-clause because Supabase's
+          // PostgREST OR syntax with empty arrays returns 0 rows;
+          // splitting + concatenating client-side handles the empty
+          // case cleanly.
+          heldVehicleSymbols.length
+            ? supabase
+                .from("llc_entities")
+                .select("id, llc_name, vehicle_symbol, boat_slug, insurance_carrier")
+                .in("vehicle_symbol", heldVehicleSymbols)
+            : Promise.resolve({ data: [] }),
+          heldBoatSlugs.length
+            ? supabase
+                .from("llc_entities")
+                .select("id, llc_name, vehicle_symbol, boat_slug, insurance_carrier")
+                .in("boat_slug", heldBoatSlugs)
+            : Promise.resolve({ data: [] }),
+        ]);
       if (cancelled) return;
       setAmendments((amRes.data as Amendment[]) ?? []);
       setSignatures((sigRes.data as DocumentSignature[]) ?? []);
       setKyc(kycRes.data as KycRow | null);
+      const allLlcs = [
+        ...((llcVehicleRes.data as MemberLlc[]) ?? []),
+        ...((llcBoatRes.data as MemberLlc[]) ?? []),
+      ];
+      // Dedup by id in case a member somehow has shares mapped to
+      // both keys for the same LLC.
+      const dedup = Array.from(
+        new Map(allLlcs.map((l) => [l.id, l])).values(),
+      );
+      setMemberLlcs(dedup);
       setLoading(false);
     })();
     return () => {
@@ -216,15 +270,58 @@ export default function DocumentsPage() {
         )}
       </Section>
 
-      {/* Insurance certificates — stub */}
+      {/* Insurance certificates — generated on demand per LLC the
+          member is in. PDF endpoint pulls policy data from
+          llc_entities; if binding is incomplete the cert renders a
+          "Binding pending" banner explicitly, so a cohort-1 member
+          can still produce a structurally-correct cert immediately. */}
       <Section
         title="Insurance certificates"
-        hint="One certificate of insurance per LLC. Updated when coverage renews."
+        hint="One certificate of insurance per LLC, generated on demand. Each lists you as a named insured under the LLC's primary auto policy."
       >
-        <Empty>
-          Insurance certificates appear here when ops uploads them. Coming with
-          the Miami launch.
-        </Empty>
+        {loading ? (
+          <Empty>Loading…</Empty>
+        ) : memberLlcs.length === 0 ? (
+          <Empty>
+            Insurance certificates appear here once you co-own a share in an
+            LLC. The certificate is generated on demand from your active policy
+            data.
+          </Empty>
+        ) : (
+          <ul className="divide-y divide-rule rounded-2xl border border-rule bg-surface">
+            {memberLlcs.map((llc) => {
+              const assetLabel = llc.vehicle_symbol
+                ? llc.vehicle_symbol.toUpperCase()
+                : llc.boat_slug;
+              return (
+                <li
+                  key={llc.id}
+                  className="flex items-center justify-between gap-4 px-5 py-4"
+                >
+                  <div>
+                    <p className="font-medium text-ink">{llc.llc_name}</p>
+                    <p className="mt-1 text-xs text-ink-soft">
+                      {assetLabel} ·{" "}
+                      {llc.insurance_carrier ? (
+                        <>Carrier: {llc.insurance_carrier}</>
+                      ) : (
+                        <span className="text-mute italic">
+                          Binding pending
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                  <a
+                    href={`/api/account/llc/${llc.id}/insurance-certificate`}
+                    className="rounded-full border border-rule bg-cream-2 px-4 py-1.5 text-xs font-medium text-ink hover:border-ink"
+                  >
+                    Download PDF
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </Section>
 
       {/* Tax forms — stub */}
