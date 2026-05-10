@@ -22,6 +22,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { authedFetch } from "@/lib/api-fetch";
 
 type Amendment = {
   id: string;
@@ -86,74 +87,44 @@ export default function DocumentsPage() {
     }
     let cancelled = false;
     (async () => {
-      // First pull share_holdings → asset symbols/slugs the member
-      // currently holds. Then fetch the matching llc_entities rows.
-      const holdingsRes = await supabase
-        .from("share_holdings")
-        .select("vehicle_symbol, boat_slug")
-        .is("transferred_at", null);
-      const holdings = (holdingsRes.data ?? []) as Array<{
-        vehicle_symbol: string | null;
-        boat_slug: string | null;
-      }>;
-      const heldVehicleSymbols = Array.from(
-        new Set(holdings.map((h) => h.vehicle_symbol).filter(Boolean) as string[]),
-      );
-      const heldBoatSlugs = Array.from(
-        new Set(holdings.map((h) => h.boat_slug).filter(Boolean) as string[]),
-      );
-
-      const [amRes, sigRes, kycRes, llcVehicleRes, llcBoatRes] =
-        await Promise.all([
-          supabase
-            .from("llc_amendments")
-            .select(
-              "id, document_type, vehicle_symbol, boat_slug, member_name, emailed, email_attempted_at, created_at",
-            )
-            .order("created_at", { ascending: false }),
-          supabase
-            .from("document_signatures")
-            .select(
-              "id, document_type, status, signed_at, created_at, share_purchases(vehicle_symbol, boat_slug)",
-            )
-            .order("created_at", { ascending: false }),
-          supabase
-            .from("kyc_verifications")
-            .select("status, updated_at")
-            .order("updated_at", { ascending: false })
-            .limit(1)
-            .maybeSingle(),
-          // Two queries instead of one OR-clause because Supabase's
-          // PostgREST OR syntax with empty arrays returns 0 rows;
-          // splitting + concatenating client-side handles the empty
-          // case cleanly.
-          heldVehicleSymbols.length
-            ? supabase
-                .from("llc_entities")
-                .select("id, llc_name, vehicle_symbol, boat_slug, insurance_carrier")
-                .in("vehicle_symbol", heldVehicleSymbols)
-            : Promise.resolve({ data: [] }),
-          heldBoatSlugs.length
-            ? supabase
-                .from("llc_entities")
-                .select("id, llc_name, vehicle_symbol, boat_slug, insurance_carrier")
-                .in("boat_slug", heldBoatSlugs)
-            : Promise.resolve({ data: [] }),
-        ]);
+      // Per codex review of b8dcb2a: llc_entities RLS is admin-only,
+      // so a browser query (even via authenticated supabase-js) returns
+      // 0 rows for members. Fixed by using a server endpoint that runs
+      // the share_holdings → llc_entities join under the service role
+      // and returns only the LLCs the caller actually has shares in.
+      const [amRes, sigRes, kycRes, llcsRes] = await Promise.all([
+        supabase
+          .from("llc_amendments")
+          .select(
+            "id, document_type, vehicle_symbol, boat_slug, member_name, emailed, email_attempted_at, created_at",
+          )
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("document_signatures")
+          .select(
+            "id, document_type, status, signed_at, created_at, share_purchases(vehicle_symbol, boat_slug)",
+          )
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("kyc_verifications")
+          .select("status, updated_at")
+          .order("updated_at", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+        // authedFetch attaches the Supabase JWT from the browser
+        // session — plain fetch doesn't, so the endpoint would 401
+        // and the page would silently show no LLCs (per codex
+        // re-review of the original fix attempt).
+        authedFetch("/api/account/llcs")
+          .then((r) => (r.ok ? r.json() : { llcs: [] }))
+          .catch(() => ({ llcs: [] })),
+      ]);
       if (cancelled) return;
       setAmendments((amRes.data as Amendment[]) ?? []);
       setSignatures((sigRes.data as DocumentSignature[]) ?? []);
       setKyc(kycRes.data as KycRow | null);
-      const allLlcs = [
-        ...((llcVehicleRes.data as MemberLlc[]) ?? []),
-        ...((llcBoatRes.data as MemberLlc[]) ?? []),
-      ];
-      // Dedup by id in case a member somehow has shares mapped to
-      // both keys for the same LLC.
-      const dedup = Array.from(
-        new Map(allLlcs.map((l) => [l.id, l])).values(),
-      );
-      setMemberLlcs(dedup);
+      const llcs = (llcsRes as { llcs?: MemberLlc[] })?.llcs ?? [];
+      setMemberLlcs(llcs);
       setLoading(false);
     })();
     return () => {

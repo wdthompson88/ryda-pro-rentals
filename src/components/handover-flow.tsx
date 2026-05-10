@@ -336,14 +336,29 @@ export function HandoverFlow({
                     );
                     return;
                   }
+                  // Per codex review: parseInt silently coerces "99.9"
+                  // → 99 and "1e3" → 1, which corrupts handover audit
+                  // data. Use Number(...) + integer check so the user
+                  // sees a clear error and the API is guaranteed
+                  // integer values matching the smallint column.
+                  const odo = Number(mileage);
+                  const fuel = Number(fuelPct);
+                  if (!Number.isInteger(odo) || odo < 0) {
+                    setSubmitErr("Mileage must be a whole number (e.g., 2,140).");
+                    return;
+                  }
+                  if (!Number.isInteger(fuel) || fuel < 0 || fuel > 100) {
+                    setSubmitErr("Fuel level must be a whole number from 0 to 100.");
+                    return;
+                  }
                   setSubmitErr(null);
                   if (onSubmit) {
                     setSubmitting(true);
                     try {
                       await onSubmit({
                         type: variant,
-                        odometerMiles: parseInt(mileage, 10),
-                        fuelLevelPct: parseInt(fuelPct, 10),
+                        odometerMiles: odo,
+                        fuelLevelPct: fuel,
                         conditionGood,
                         conditionNotes: conditionNotes.trim(),
                         photosTakenCount: completed.size,

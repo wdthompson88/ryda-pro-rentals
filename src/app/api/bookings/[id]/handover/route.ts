@@ -71,16 +71,21 @@ export async function POST(
   if (
     !isNumber(body.odometer_miles) ||
     !Number.isInteger(body.odometer_miles) ||
-    body.odometer_miles < 0
+    body.odometer_miles < 0 ||
+    body.odometer_miles > 1_000_000 // sanity ceiling — even Enzo's tachometer doesn't go that far
   ) {
-    errors.push("odometer_miles: required, non-negative integer");
+    errors.push("odometer_miles: required, non-negative integer below 1,000,000");
   }
+  // fuel_level_pct must be an integer (DB column is smallint and we
+  // don't want sub-integer percentages corrupting audit data — the
+  // client widget steps in whole percent anyway). Per codex review.
   if (
     !isNumber(body.fuel_level_pct) ||
+    !Number.isInteger(body.fuel_level_pct) ||
     body.fuel_level_pct < 0 ||
     body.fuel_level_pct > 100
   ) {
-    errors.push("fuel_level_pct: required, 0-100");
+    errors.push("fuel_level_pct: required, integer 0-100");
   }
   if (typeof body.condition_good !== "boolean") {
     errors.push("condition_good: required boolean");
@@ -115,43 +120,73 @@ export async function POST(
     );
   }
 
-  // Authenticate ownership: the booking must belong to this user.
-  const { data: booking, error: bookingErr } = await db
-    .from("bookings")
-    .select("id, user_id, status, vehicle_symbol, boat_slug")
-    .eq("id", bookingId)
-    .single();
-
-  if (bookingErr || !booking) {
-    return NextResponse.json(
-      { error: "Booking not found." },
-      { status: 404 },
-    );
-  }
-  if (booking.user_id !== user.id) {
-    return NextResponse.json(
-      { error: "Not your booking." },
-      { status: 403 },
-    );
-  }
-
-  // Validate the state transition.
+  // ATOMICITY (per codex review of b8dcb2a):
+  // We do the conditional UPDATE first — moving bookings.status from
+  // its expected current value to its next value — and only INSERT
+  // the handover if exactly one row transitioned. Concurrent POSTs
+  // from a double-tap (or a network retry) will see the second
+  // UPDATE affect 0 rows and bail before they can insert a duplicate
+  // handover. The cost is one extra round-trip vs the old order; the
+  // benefit is the handover audit-trail can never be out of sync
+  // with the booking's lifecycle state.
+  //
+  // Postgres-side transaction would be tighter still, but the
+  // service-role supabase-js client doesn't expose BEGIN/COMMIT
+  // directly; the conditional-update guard gives us optimistic
+  // concurrency on the same key as the constraint we care about.
   const type = body.type as "checkin" | "return";
-  const allowed =
-    (type === "checkin" && booking.status === "confirmed") ||
-    (type === "return" && booking.status === "in-progress");
-  if (!allowed) {
+  const expectedStatus = type === "checkin" ? "confirmed" : "in-progress";
+  const nextStatus = type === "checkin" ? "in-progress" : "completed";
+  const nowIso = new Date().toISOString();
+
+  // Conditional UPDATE: succeeds only if status is currently the
+  // expected value AND the booking belongs to the caller. Returns
+  // the row(s) affected so we can verify exactly one transitioned.
+  const { data: updated, error: updateErr } = await db
+    .from("bookings")
+    .update({ status: nextStatus })
+    .eq("id", bookingId)
+    .eq("user_id", user.id)
+    .eq("status", expectedStatus)
+    .select("id, status");
+
+  if (updateErr) {
+    return NextResponse.json(
+      { error: `Booking transition failed: ${updateErr.message}` },
+      { status: 500 },
+    );
+  }
+
+  if (!updated || updated.length === 0) {
+    // Either the booking doesn't exist, isn't owned by the caller,
+    // or isn't in the expected status. Disambiguate with a follow-
+    // up read so the client gets a useful error message.
+    const { data: peek } = await db
+      .from("bookings")
+      .select("user_id, status")
+      .eq("id", bookingId)
+      .maybeSingle();
+    if (!peek) {
+      return NextResponse.json(
+        { error: "Booking not found." },
+        { status: 404 },
+      );
+    }
+    if (peek.user_id !== user.id) {
+      return NextResponse.json(
+        { error: "Not your booking." },
+        { status: 403 },
+      );
+    }
     return NextResponse.json(
       {
-        error: `Booking is ${booking.status}; ${type} requires status ${type === "checkin" ? "confirmed" : "in-progress"}.`,
+        error: `Booking is ${peek.status}; ${type} requires status ${expectedStatus}.`,
       },
       { status: 409 },
     );
   }
 
-  const nowIso = new Date().toISOString();
-
-  // Record the handover.
+  // Status transition succeeded — now record the handover.
   const { data: handover, error: handoverErr } = await db
     .from("vehicle_handovers")
     .insert({
@@ -171,23 +206,18 @@ export async function POST(
     .single();
 
   if (handoverErr || !handover) {
-    return NextResponse.json(
-      { error: `Handover insert failed: ${handoverErr?.message ?? "unknown"}` },
-      { status: 500 },
-    );
-  }
-
-  // Transition the booking status.
-  const nextStatus = type === "checkin" ? "in-progress" : "completed";
-  const { error: updateErr } = await db
-    .from("bookings")
-    .update({ status: nextStatus })
-    .eq("id", bookingId);
-
-  if (updateErr) {
+    // Rollback the status transition we just made so the booking
+    // doesn't get stuck in an in-progress state with no handover
+    // record. Best-effort — if this rollback also fails, ops will
+    // see the inconsistency in /admin and reconcile.
+    await db
+      .from("bookings")
+      .update({ status: expectedStatus })
+      .eq("id", bookingId)
+      .eq("status", nextStatus);
     return NextResponse.json(
       {
-        error: `Booking status transition failed: ${updateErr.message}. Handover ${handover.id} was recorded; ops will reconcile.`,
+        error: `Handover insert failed: ${handoverErr?.message ?? "unknown"}. Booking status was rolled back.`,
       },
       { status: 500 },
     );
