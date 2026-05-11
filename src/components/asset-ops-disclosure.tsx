@@ -12,6 +12,7 @@
 // Per-marque service partner is auto-derived from the brand.
 
 import type { Vehicle } from "@/lib/market-data";
+import { resolveAcquisitionStatus } from "@/components/acquisition-badge";
 
 // Service-partner mapping by brand. Audit T1.5 fix: copy is
 // aspirational ("factory-authorized network") rather than naming a
@@ -36,6 +37,13 @@ const SERVICE_PARTNER_BY_BRAND: Record<string, string> = {
 const DEFAULT_DISCLOSURE = {
   storage:
     "Climate-controlled garage in Miami, 24/7 video monitoring, on-site security, segregated bays. Specific facility named to seated members through the document vault.",
+  // Pre-launch variant — same operating model, framed as planned
+  // rather than present-tense. Audit Finding #6 (codex round-2):
+  // the present-tense Storage copy implied vehicles were already in
+  // a named facility. For default 'sourced' assets we use this copy
+  // until the LLC actually takes possession.
+  storagePending:
+    "Once secured, the vehicle is housed in a climate-controlled Miami garage with 24/7 video monitoring, on-site security, and segregated bays. Specific facility named to seated members through the document vault at closing.",
   insurance:
     "Agreed-value comprehensive + $1M third-party liability per vehicle, written by a high-value-auto specialty carrier. Every co-owner named as an insured. Carrier and policy number disclosed to seated members through the document vault.",
   telematics:
@@ -56,6 +64,8 @@ const DEFAULT_DISCLOSURE = {
 
 export function AssetOpsDisclosure({ vehicle }: { vehicle: Vehicle }) {
   const servicePartner = SERVICE_PARTNER_BY_BRAND[vehicle.brand];
+  const isSecured =
+    resolveAcquisitionStatus(vehicle.acquisitionStatus) === "secured";
 
   return (
     <section className="border-b border-rule bg-cream-2">
@@ -81,7 +91,10 @@ export function AssetOpsDisclosure({ vehicle }: { vehicle: Vehicle }) {
         </p>
 
         <ul className="mt-10 grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <Disclosure label="Storage" body={DEFAULT_DISCLOSURE.storage} />
+          <Disclosure
+            label="Storage"
+            body={isSecured ? DEFAULT_DISCLOSURE.storage : DEFAULT_DISCLOSURE.storagePending}
+          />
           {servicePartner && (
             <Disclosure
               label={`${vehicle.brand} service`}

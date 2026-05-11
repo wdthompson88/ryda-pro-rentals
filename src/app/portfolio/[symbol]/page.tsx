@@ -16,6 +16,10 @@ import { AssetAnatomySections } from "@/components/asset-anatomy";
 import { AssetOpsDisclosure } from "@/components/asset-ops-disclosure";
 import { RecentComparableSales } from "@/components/recent-comparables";
 import { LiveMarketEmbed } from "@/components/live-market-embed";
+import {
+  AcquisitionBadge,
+  resolveAcquisitionStatus,
+} from "@/components/acquisition-badge";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import type { VehicleComparable } from "@/lib/vehicle-enrichment";
 import { SITE_URL } from "@/lib/site-url";
@@ -306,8 +310,27 @@ export default async function VehicleMarketPage({
                 {v.name}
               </h1>
               <p className="mt-1 text-xs text-mute">
-                {v.year} · {v.brand} · Stored in {v.market}
+                {v.year} · {v.brand} ·{" "}
+                {/* Codex round-1 catch: "Stored in" implied the
+                    vehicle was already in our possession, but the
+                    default acquisition status is 'sourced' (not
+                    secured). Switch to "Target market" until the
+                    LLC actually holds title. */}
+                {resolveAcquisitionStatus(v.acquisitionStatus) === "secured"
+                  ? `Stored in ${v.market}`
+                  : `Target market: ${v.market}`}
               </p>
+              {/* Acquisition status — pre-launch transparency. Shown
+                  at the top of the description column so a member who
+                  scrolls in from social or search sees it before the
+                  order panel. See AcquisitionBadge component for the
+                  per-state copy. */}
+              <div className="mt-6 max-w-2xl">
+                <AcquisitionBadge
+                  status={v.acquisitionStatus}
+                  note={v.acquisitionStatusNote}
+                />
+              </div>
               <p className="mt-6 max-w-2xl text-base leading-relaxed text-ink-soft">
                 {v.description}
               </p>

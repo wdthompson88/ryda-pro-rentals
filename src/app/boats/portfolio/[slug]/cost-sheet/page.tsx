@@ -6,6 +6,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { PrintButton } from "@/components/print-button";
+import { resolveAcquisitionStatus } from "@/components/acquisition-badge";
 import {
   BOATS,
   getBoatBySlug,
@@ -104,8 +105,11 @@ export default async function CostSheetPage({
             {v.name} · 1 Share
           </h1>
           <p className="mt-2 text-sm text-ink-soft">
-            {v.year} · {v.brand} · Hailing port {v.market} · {BOATS_HOLDING_YEARS}-year
-            planned exit doctrine ({BOATS_HOLDING_YEARS} yrs OR{" "}
+            {v.year} · {v.brand} ·{" "}
+            {resolveAcquisitionStatus(v.acquisitionStatus) === "secured"
+              ? `Hailing port ${v.market}`
+              : `Target market: ${v.market}`}{" "}
+            · {BOATS_HOLDING_YEARS}-year planned exit doctrine ({BOATS_HOLDING_YEARS} yrs OR{" "}
             {BOATS_HOLDING_HOURS_CAP.toLocaleString()} engine hours, whichever first).
             Asset-backed LLC co-ownership.
           </p>

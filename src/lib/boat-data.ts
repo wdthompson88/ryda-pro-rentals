@@ -76,6 +76,12 @@ export type Boat = {
   rentalDailyRate: number;
   rentalAvailable: boolean;
   captainIncluded: boolean;  // true = crewed only, false = bareboat option
+
+  // Acquisition lifecycle status, mirrors Vehicle. See market-data.ts
+  // AcquisitionStatus comment for the full lifecycle. Optional —
+  // undefined defaults to 'sourced' in the badge helper.
+  acquisitionStatus?: import("./market-data").AcquisitionStatus;
+  acquisitionStatusNote?: string;
 };
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -172,7 +178,7 @@ export const BOATS: Boat[] = [
     imagePosition: "center 50%",
     currentEngineHours: 410,
     description:
-      "The Pershing 6X is the marquee sport yacht in our Miami fleet, surface drives for blistering bay-to-Bimini runs, three-cabin layout, and a beach-club aft platform that converts the swim step into a full lounge.",
+      "The Pershing 6X is the marquee sport yacht in our Miami launch fleet — surface drives for blistering bay-to-Bimini runs, three-cabin layout, and a beach-club aft platform that converts the swim step into a full lounge.",
     specs: {
       engine: "Twin MAN V12 1550",
       power: "3,100 hp combined",

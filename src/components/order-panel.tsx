@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Vehicle, formatUSD } from "@/lib/market-data";
+import { resolveAcquisitionStatus } from "@/components/acquisition-badge";
 
 type Props = { vehicle: Vehicle };
 
@@ -154,7 +155,9 @@ export function OrderPanel({ vehicle }: Props) {
       </div>
 
       <div className="mt-5 border-t border-rule pt-4 text-center text-xs text-mute">
-        Vehicle stored in {vehicle.market}
+        {resolveAcquisitionStatus(vehicle.acquisitionStatus) === "secured"
+          ? `Vehicle stored in ${vehicle.market}`
+          : `Target storage market: ${vehicle.market}`}
       </div>
     </div>
   );

@@ -53,7 +53,32 @@ export type Vehicle = {
   // (Hagerty, BaT, etc.) without renaming. Section gracefully
   // collapses if not set.
   liveMarketEmbed?: string;
+  // Acquisition lifecycle status. Audit Finding #5: "Live · Miami"
+  // had implied the fleet was already operating. We're pre-launch
+  // (Q3 2026 Miami), so being explicit about where each vehicle is
+  // in the acquisition pipeline is a trust signal AND a legal/
+  // marketing-safety guard (we're not selling shares in vehicles we
+  // don't own yet — we're pre-collecting commitments toward
+  // acquisition). Default when undefined: 'sourced' (most accurate
+  // pre-launch state). See AcquisitionBadge component for copy.
+  acquisitionStatus?: AcquisitionStatus;
+  acquisitionStatusNote?: string; // optional free-text amplifier, e.g. "ETA Aug 2026" or "Under deposit since Apr"
 };
+
+// Where the vehicle is in the acquisition pipeline. Lifecycle:
+//   pending  → not yet curated; placeholder for the marketing view
+//   sourced  → unit identified, condition verified, photographed;
+//              no deposit placed; LLC not yet engaged
+//   optioned → refundable deposit placed with the seller; we're
+//              holding the unit while LLC formation completes
+//   secured  → title transferred to the LLC; vehicle in our storage
+//
+// The two states the buyer needs to understand at glance are
+// 'sourced' (we're confident in the asset but it's not under
+// contract yet) and 'secured' (we own it). 'optioned' is a useful
+// in-between for transparency. 'pending' is mostly for boats whose
+// hulls are still in build.
+export type AcquisitionStatus = "pending" | "sourced" | "optioned" | "secured";
 
 // One date-stamped event in the vehicle's history. Order from oldest
 // to newest. Use ISO month precision (YYYY-MM) — not day — since

@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import BuyFlow from "@/components/shared/buy-flow";
 import { BOATS, getBoatBySlug, formatUSD } from "@/lib/boat-data";
+import { resolveAcquisitionStatus } from "@/components/acquisition-badge";
 
 export async function generateStaticParams() {
   return BOATS.map((v) => ({ slug: v.slug }));
@@ -49,7 +50,13 @@ export default async function BuyPage({
     labels: {
       asset: "Boat",
       assetLower: "boat",
-      storageLabel: "Hailing port",
+      // Codex round-3 catch: pre-secured hulls shouldn't claim a
+      // hailing port — switch label to "Target market" until LLC
+      // takes title.
+      storageLabel:
+        resolveAcquisitionStatus(v.acquisitionStatus) === "secured"
+          ? "Hailing port"
+          : "Target market",
       storageValue: v.market,
       usageDays: "Cruising days",
       distanceLabel: "Nautical miles",

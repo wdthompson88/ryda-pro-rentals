@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import BuyFlow from "@/components/shared/buy-flow";
 import { VEHICLES, getVehicleBySymbol, formatUSD } from "@/lib/market-data";
+import { resolveAcquisitionStatus } from "@/components/acquisition-badge";
 
 export async function generateStaticParams() {
   return VEHICLES.map((v) => ({ symbol: v.symbol.toLowerCase() }));
@@ -50,7 +51,13 @@ export default async function BuyPage({
     labels: {
       asset: "Vehicle",
       assetLower: "vehicle",
-      storageLabel: "Stored in",
+      // Codex round-3 catch: pre-secured assets shouldn't claim
+      // "stored in" — switch label to "Target market" until LLC
+      // takes title.
+      storageLabel:
+        resolveAcquisitionStatus(v.acquisitionStatus) === "secured"
+          ? "Stored in"
+          : "Target market",
       storageValue: v.market,
       usageDays: "Driving days",
       distanceLabel: "Mileage",

@@ -12,6 +12,10 @@ import ShareValueChart, {
 import { OwnershipPrimitives } from "@/components/ownership-primitives";
 import CompareCalculator from "@/components/shared/lazy-compare-calculator";
 import {
+  AcquisitionBadge,
+  resolveAcquisitionStatus,
+} from "@/components/acquisition-badge";
+import {
   BOATS,
   getBoatBySlug,
   formatUSD,
@@ -139,10 +143,22 @@ export default async function BoatDetailPage({
           : "https://schema.org/OutOfStock",
       url: pageUrl,
     },
+    // Codex round-2: only assert hailing port in structured data when
+    // the LLC actually has the hull. For 'sourced' / pre-secured
+    // assets, omit the property — Google indexing the unverified
+    // claim could surface in SERP snippets.
     additionalProperty: [
       { "@type": "PropertyValue", name: "Length", value: `${b.lengthFt} ft` },
       { "@type": "PropertyValue", name: "Year", value: String(b.year) },
-      { "@type": "PropertyValue", name: "Hailing port", value: b.hailingPort },
+      ...(resolveAcquisitionStatus(b.acquisitionStatus) === "secured"
+        ? [
+            {
+              "@type": "PropertyValue",
+              name: "Hailing port",
+              value: b.hailingPort,
+            },
+          ]
+        : []),
       { "@type": "PropertyValue", name: "Shares available", value: String(b.sharesAvailable) },
     ],
   };
@@ -206,11 +222,26 @@ export default async function BoatDetailPage({
 
               <div className="mt-8">
                 <p className="text-xs text-mute">
-                  {b.brand} · {b.year} · {b.market} · {b.hailingPort}
+                  {b.brand} · {b.year} · {b.market} ·{" "}
+                  {/* Codex round-1 catch: hailingPort implied the
+                      hull was already at that marina. For the default
+                      'sourced' status that's not yet true; show as
+                      "Target marina" until secured. */}
+                  {resolveAcquisitionStatus(b.acquisitionStatus) === "secured"
+                    ? b.hailingPort
+                    : `Target marina: ${b.hailingPort}`}
                 </p>
                 <h1 className="mt-1 font-display text-4xl font-light text-ink sm:text-5xl">
                   {b.name}
                 </h1>
+                {/* Acquisition status — pre-launch transparency. See
+                    AcquisitionBadge for the per-state copy. */}
+                <div className="mt-5 max-w-2xl">
+                  <AcquisitionBadge
+                    status={b.acquisitionStatus}
+                    note={b.acquisitionStatusNote}
+                  />
+                </div>
                 <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-soft">
                   {b.description}
                 </p>
@@ -450,7 +481,11 @@ export default async function BoatDetailPage({
           <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
             <Pillar
               title="Slip + dockage"
-              body={`Year-round slip at ${b.hailingPort}. Dec–Mar haul-out and bottom service included in Miami.`}
+              body={
+                resolveAcquisitionStatus(b.acquisitionStatus) === "secured"
+                  ? `Year-round slip at ${b.hailingPort}. Dec–Mar haul-out and bottom service included in Miami.`
+                  : `Year-round slip planned at ${b.hailingPort} (or comparable marina) once secured. Dec–Mar haul-out and bottom service included in Miami.`
+              }
             />
             <Pillar
               title="Captain hours"
