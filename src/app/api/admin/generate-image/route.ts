@@ -17,7 +17,11 @@
 //     quality?: "low" | "medium" | "high",             default "medium"
 //     filename?: string,                               default <timestamp>-<rand>.png
 //     subdir?: string,                                 default "marketing/generated"
-//     vendor?: "openai-images" | "mock",               default first configured
+//     vendor?: "muapi-image" | "muapi-i2i" | "openai-images" | "mock",
+//                                                        default first configured
+//     model?: string,                                  optional MuAPI endpoint/model
+//     imageUrl?: string,                               optional reference image URL
+//     imagesList?: string[],                           optional multi-reference URLs
 //     queueId?: string,                                if set, also patches that
 //                                                      queue row's image_path so
 //                                                      the cron picks it up
@@ -37,6 +41,7 @@ import {
   type GenerateImageInput,
   type ImageQuality,
   type ImageSize,
+  type ImageVendor,
 } from "@/lib/image-gen";
 
 export const runtime = "nodejs";
@@ -55,7 +60,12 @@ const ALLOWED_SIZES: ImageSize[] = [
   "auto",
 ];
 const ALLOWED_QUALITY: ImageQuality[] = ["low", "medium", "high"];
-const ALLOWED_VENDORS = new Set(["openai-images", "mock"]);
+const ALLOWED_VENDORS = new Set([
+  "muapi-image",
+  "muapi-i2i",
+  "openai-images",
+  "mock",
+]);
 
 // Sanitize the subdir + filename so a malicious admin (or compromised
 // admin token) can't traverse outside public/. Reject anything with
@@ -84,6 +94,9 @@ export async function POST(req: NextRequest) {
     filename?: string;
     subdir?: string;
     vendor?: string;
+    model?: string;
+    imageUrl?: string;
+    imagesList?: string[];
     queueId?: string;
   };
   try {
@@ -167,10 +180,16 @@ export async function POST(req: NextRequest) {
     styleNote,
     size,
     quality,
+    model: typeof body.model === "string" ? body.model.trim() : undefined,
+    imageUrl:
+      typeof body.imageUrl === "string" ? body.imageUrl.trim() : undefined,
+    imagesList: Array.isArray(body.imagesList)
+      ? body.imagesList.filter((v): v is string => typeof v === "string" && v.trim().length > 0)
+      : undefined,
   };
 
   const result = await generateImage(input, outDir, filename, {
-    vendor: vendor as "openai-images" | "mock" | undefined,
+    vendor: vendor as ImageVendor | undefined,
   });
 
   if (result.kind === "not_configured") {
@@ -178,7 +197,7 @@ export async function POST(req: NextRequest) {
       {
         error: "Image generation not configured.",
         missingEnv: result.missingEnv,
-        hint: "Set OPENAI_API_KEY in Vercel env, or pass vendor:'mock' for local dev.",
+        hint: "Set MUAPI_API_KEY for Open Generative AI / MuAPI, OPENAI_API_KEY for legacy OpenAI Images, or pass vendor:'mock' for local dev.",
       },
       { status: 503 },
     );
@@ -200,7 +219,26 @@ export async function POST(req: NextRequest) {
     if (db) {
       const upd = await db
         .from("content_queue")
-        .update({ image_path: urlPath })
+        .update({
+          image_path: urlPath,
+          generation_vendor: result.vendor,
+          generation_type: result.vendor === "muapi-i2i" ? "image-to-image" : "image",
+          generation_model: input.model ?? null,
+          generation_request_id: result.requestId ?? null,
+          generation_status: "completed",
+          generation_output_url: result.vendorUrl,
+          generation_error: null,
+          generated_asset_path: urlPath,
+          generation_metadata: {
+            prompt,
+            styleNote,
+            size,
+            quality,
+            vendor: result.vendor,
+            requestId: result.requestId ?? null,
+            costCents: result.costCents,
+          },
+        })
         .eq("id", body.queueId)
         .select("id");
       queuePatched = {
@@ -222,6 +260,7 @@ export async function POST(req: NextRequest) {
     path: result.path,
     url: urlPath,
     vendor: result.vendor,
+    requestId: result.requestId ?? null,
     costCents: result.costCents,
     quality,
     size,

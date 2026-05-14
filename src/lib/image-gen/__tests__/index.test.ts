@@ -28,6 +28,11 @@ afterEach(async () => {
 });
 
 describe("getAdapter", () => {
+  it("returns the Open Generative AI / MuAPI adapters by name", () => {
+    expect(getAdapter("muapi-image")?.vendor).toBe("muapi-image");
+    expect(getAdapter("muapi-i2i")?.vendor).toBe("muapi-i2i");
+  });
+
   it("returns the openai-images adapter by name", () => {
     const adapter = getAdapter("openai-images");
     expect(adapter?.vendor).toBe("openai-images");
@@ -45,23 +50,45 @@ describe("getAdapter", () => {
 });
 
 describe("getDefaultAdapter", () => {
-  it("returns null when OPENAI_API_KEY is unset (does NOT fall through to mock)", () => {
+  it("returns null when MUAPI_API_KEY and OPENAI_API_KEY are unset (does NOT fall through to mock)", () => {
+    const prevMuapi = process.env.MUAPI_API_KEY;
     const prev = process.env.OPENAI_API_KEY;
+    delete process.env.MUAPI_API_KEY;
     delete process.env.OPENAI_API_KEY;
     try {
       expect(getDefaultAdapter()).toBeNull();
     } finally {
+      if (prevMuapi !== undefined) process.env.MUAPI_API_KEY = prevMuapi;
       if (prev !== undefined) process.env.OPENAI_API_KEY = prev;
     }
   });
 
-  it("returns openai-images adapter when OPENAI_API_KEY is set", () => {
+  it("prefers muapi-image when MUAPI_API_KEY is set", () => {
+    const prevMuapi = process.env.MUAPI_API_KEY;
     const prev = process.env.OPENAI_API_KEY;
+    process.env.MUAPI_API_KEY = "muapi-test-fake";
+    process.env.OPENAI_API_KEY = "sk-test-fake";
+    try {
+      const adapter = getDefaultAdapter();
+      expect(adapter?.vendor).toBe("muapi-image");
+    } finally {
+      if (prevMuapi === undefined) delete process.env.MUAPI_API_KEY;
+      else process.env.MUAPI_API_KEY = prevMuapi;
+      if (prev === undefined) delete process.env.OPENAI_API_KEY;
+      else process.env.OPENAI_API_KEY = prev;
+    }
+  });
+
+  it("falls back to openai-images adapter when only OPENAI_API_KEY is set", () => {
+    const prevMuapi = process.env.MUAPI_API_KEY;
+    const prev = process.env.OPENAI_API_KEY;
+    delete process.env.MUAPI_API_KEY;
     process.env.OPENAI_API_KEY = "sk-test-fake";
     try {
       const adapter = getDefaultAdapter();
       expect(adapter?.vendor).toBe("openai-images");
     } finally {
+      if (prevMuapi !== undefined) process.env.MUAPI_API_KEY = prevMuapi;
       if (prev === undefined) {
         delete process.env.OPENAI_API_KEY;
       } else {
@@ -134,6 +161,45 @@ describe("generateImage with openai-images vendor (no key)", () => {
   });
 });
 
+describe("generateImage with muapi vendors (no key)", () => {
+  it("returns not_configured when MUAPI_API_KEY is unset", async () => {
+    const prev = process.env.MUAPI_API_KEY;
+    delete process.env.MUAPI_API_KEY;
+    try {
+      const result = await generateImage(
+        { prompt: "anything" },
+        tmpDir,
+        "x.png",
+        { vendor: "muapi-image" },
+      );
+      expect(result.kind).toBe("not_configured");
+      if (result.kind !== "not_configured") return;
+      expect(result.missingEnv).toContain("MUAPI_API_KEY");
+    } finally {
+      if (prev !== undefined) process.env.MUAPI_API_KEY = prev;
+    }
+  });
+
+  it("requires reference images for muapi-i2i", async () => {
+    const prev = process.env.MUAPI_API_KEY;
+    process.env.MUAPI_API_KEY = "muapi-test-fake";
+    try {
+      const result = await generateImage(
+        { prompt: "edit this" },
+        tmpDir,
+        "x.png",
+        { vendor: "muapi-i2i" },
+      );
+      expect(result.kind).toBe("error");
+      if (result.kind !== "error") return;
+      expect(result.error).toContain("requires imageUrl");
+    } finally {
+      if (prev === undefined) delete process.env.MUAPI_API_KEY;
+      else process.env.MUAPI_API_KEY = prev;
+    }
+  });
+});
+
 describe("imageVendorStatus", () => {
   it("reports openai-images as configured iff OPENAI_API_KEY is set", () => {
     const prev = process.env.OPENAI_API_KEY;
@@ -153,6 +219,23 @@ describe("imageVendorStatus", () => {
     } else {
       process.env.OPENAI_API_KEY = prev;
     }
+  });
+
+  it("reports muapi adapters as configured iff MUAPI_API_KEY is set", () => {
+    const prev = process.env.MUAPI_API_KEY;
+
+    delete process.env.MUAPI_API_KEY;
+    let status = imageVendorStatus();
+    expect(status.find((s) => s.vendor === "muapi-image")?.configured).toBe(false);
+    expect(status.find((s) => s.vendor === "muapi-i2i")?.configured).toBe(false);
+
+    process.env.MUAPI_API_KEY = "muapi-test-fake";
+    status = imageVendorStatus();
+    expect(status.find((s) => s.vendor === "muapi-image")?.configured).toBe(true);
+    expect(status.find((s) => s.vendor === "muapi-i2i")?.configured).toBe(true);
+
+    if (prev === undefined) delete process.env.MUAPI_API_KEY;
+    else process.env.MUAPI_API_KEY = prev;
   });
 
   it("always reports mock as configured", () => {

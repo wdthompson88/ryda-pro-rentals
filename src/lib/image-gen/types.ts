@@ -24,6 +24,12 @@ export type GenerateImageInput = {
   quality?: ImageQuality;
   /** Optional seed-style identifier for caching/dedup. */
   brandHash?: string;
+  /** Optional Open Generative AI / MuAPI model endpoint override. */
+  model?: string;
+  /** Optional reference image URL for image-to-image/edit models. */
+  imageUrl?: string;
+  /** Optional multi-reference image URLs for omni/style/reference models. */
+  imagesList?: string[];
 };
 
 export type GenerateImageResult =
@@ -33,17 +39,19 @@ export type GenerateImageResult =
       path: string;
       /** Vendor's response url (often expiring) for reference. */
       vendorUrl: string | null;
+      /** Vendor request/prediction id for audit and polling traceability. */
+      requestId?: string | null;
       /** Cents charged by the vendor (best-effort; some vendors
        *  don't surface per-call cost). */
       costCents: number | null;
       /** The vendor whose adapter served this. */
-      vendor: "openai-images" | "recraft" | "stability" | "mock";
+      vendor: ImageVendor;
     }
   | { kind: "not_configured"; missingEnv: string[] }
   | { kind: "error"; error: string };
 
 export type ImageGenAdapter = {
-  vendor: "openai-images" | "recraft" | "stability" | "mock";
+  vendor: ImageVendor;
   isConfigured(): boolean;
   /** Generate one image + persist to disk under outDir. Returns
    *  the local path on success. */
@@ -53,3 +61,11 @@ export type ImageGenAdapter = {
     filename: string,
   ): Promise<GenerateImageResult>;
 };
+
+export type ImageVendor =
+  | "muapi-image"
+  | "muapi-i2i"
+  | "openai-images"
+  | "recraft"
+  | "stability"
+  | "mock";

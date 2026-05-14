@@ -18,7 +18,15 @@
 //                                                ("high" = sora-2-pro, 3x cost)
 //     filename?: string,                         default <timestamp>-<rand>.mp4
 //     subdir?: string,                           default "marketing/videos/clips"
-//     vendor?: "openai-sora"|"mock",             default first configured
+//     vendor?: "muapi-video"|"muapi-i2v"|"muapi-lipsync"|"muapi-workflow"|
+//              "seedance"|"openai-sora"|"mock", default first configured
+//     model?: string,                            optional MuAPI endpoint/model
+//     imageUrl?: string,                         optional reference image URL
+//     videoUrl?: string,                         optional source video URL
+//     audioUrl?: string,                         optional lip-sync audio URL
+//     workflowId?: string,                       optional MuAPI workflow id
+//     workflowInputs?: object,                   optional MuAPI workflow inputs
+//     queueId?: string,                          if set, patches content_queue metadata
 //   }
 //
 // Files land at public/<subdir>/<filename>.mp4 → served at
@@ -29,11 +37,13 @@
 import { NextResponse, type NextRequest } from "next/server";
 import path from "node:path";
 import { requireAdmin } from "@/lib/admin-auth";
+import { supabaseAdmin } from "@/lib/supabase-admin";
 import {
   generateClip,
   type GenerateClipInput,
   type VideoOrientation,
   type VideoQuality,
+  type VideoVendor,
 } from "@/lib/video-gen";
 
 export const runtime = "nodejs";
@@ -49,14 +59,22 @@ export const maxDuration = 300;
 const MAX_PROMPT_LEN = 4000;
 const MAX_STYLE_NOTE_LEN = 2000;
 
-const ALLOWED_DURATIONS = [5, 10] as const;
+const ALLOWED_DURATIONS = [5, 10, 15] as const;
 const ALLOWED_ORIENTATIONS: VideoOrientation[] = [
   "vertical",
   "landscape",
   "square",
 ];
 const ALLOWED_QUALITY: VideoQuality[] = ["standard", "high"];
-const ALLOWED_VENDORS = new Set(["openai-sora", "mock"]);
+const ALLOWED_VENDORS = new Set([
+  "muapi-video",
+  "muapi-i2v",
+  "muapi-lipsync",
+  "muapi-workflow",
+  "seedance",
+  "openai-sora",
+  "mock",
+]);
 
 // Same path-traversal guards as the image route. Allow only
 // safe characters in subdir + filename so a compromised admin
@@ -84,6 +102,13 @@ export async function POST(req: NextRequest) {
     filename?: string;
     subdir?: string;
     vendor?: string;
+    model?: string;
+    imageUrl?: string;
+    videoUrl?: string;
+    audioUrl?: string;
+    workflowId?: string;
+    workflowInputs?: Record<string, unknown>;
+    queueId?: string;
   };
   try {
     body = await req.json();
@@ -111,7 +136,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const durationSec = (body.durationSec ?? 5) as 5 | 10;
+  const durationSec = (body.durationSec ?? 5) as 5 | 10 | 15;
   if (!ALLOWED_DURATIONS.includes(durationSec)) {
     return NextResponse.json(
       { error: `durationSec must be one of ${ALLOWED_DURATIONS.join(", ")}.` },
@@ -170,10 +195,23 @@ export async function POST(req: NextRequest) {
     durationSec,
     orientation,
     quality,
+    model: typeof body.model === "string" ? body.model.trim() : undefined,
+    imageUrl:
+      typeof body.imageUrl === "string" ? body.imageUrl.trim() : undefined,
+    videoUrl:
+      typeof body.videoUrl === "string" ? body.videoUrl.trim() : undefined,
+    audioUrl:
+      typeof body.audioUrl === "string" ? body.audioUrl.trim() : undefined,
+    workflowId:
+      typeof body.workflowId === "string" ? body.workflowId.trim() : undefined,
+    workflowInputs:
+      body.workflowInputs && typeof body.workflowInputs === "object"
+        ? body.workflowInputs
+        : undefined,
   };
 
   const result = await generateClip(input, outDir, filename, {
-    vendor: vendor as "openai-sora" | "mock" | undefined,
+    vendor: vendor as VideoVendor | undefined,
   });
 
   if (result.kind === "not_configured") {
@@ -181,7 +219,7 @@ export async function POST(req: NextRequest) {
       {
         error: "Video generation not configured.",
         missingEnv: result.missingEnv,
-        hint: "Set OPENAI_API_KEY in Vercel env. Sora API uses the same key as gpt-image-1; ChatGPT Pro does NOT include API access.",
+        hint: "Set MUAPI_API_KEY for Open Generative AI / MuAPI, FAL_KEY for Seedance fallback, or OPENAI_API_KEY for legacy Sora.",
       },
       { status: 503 },
     );
@@ -201,14 +239,65 @@ export async function POST(req: NextRequest) {
 
   const urlPath = `/${subdir}/${filename}`.replace(/\/+/g, "/");
 
+  let queuePatched: { id: string; ok: boolean; error?: string } | null = null;
+  if (body.queueId) {
+    const db = supabaseAdmin();
+    if (db) {
+      const upd = await db
+        .from("content_queue")
+        .update({
+          generation_vendor: result.vendor,
+          generation_type:
+            result.vendor === "muapi-i2v"
+              ? "image-to-video"
+              : result.vendor === "muapi-lipsync"
+                ? "lip-sync"
+                : result.vendor === "muapi-workflow"
+                  ? "workflow"
+                  : "video",
+          generation_model: input.model ?? input.workflowId ?? null,
+          generation_request_id: result.requestId ?? null,
+          generation_status: "completed",
+          generation_output_url: result.vendorUrl,
+          generation_error: null,
+          generated_asset_path: urlPath,
+          generation_metadata: {
+            prompt,
+            styleNote,
+            durationSec,
+            orientation,
+            quality,
+            vendor: result.vendor,
+            requestId: result.requestId ?? null,
+            costCents: result.costCents,
+          },
+        })
+        .eq("id", body.queueId)
+        .select("id");
+      queuePatched = {
+        id: body.queueId,
+        ok: !upd.error && (upd.data?.length ?? 0) > 0,
+        error: upd.error?.message,
+      };
+    } else {
+      queuePatched = {
+        id: body.queueId,
+        ok: false,
+        error: "Database not configured.",
+      };
+    }
+  }
+
   return NextResponse.json({
     ok: true,
     path: result.path,
     url: urlPath,
     vendor: result.vendor,
+    requestId: result.requestId ?? null,
     costCents: result.costCents,
     durationSec: result.durationSec,
     quality,
     orientation,
+    queuePatched,
   });
 }

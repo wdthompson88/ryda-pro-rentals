@@ -1,5 +1,5 @@
 // queue-poller.ts — drain "needs image" rows from content_queue,
-// generate the image via ChatGPT, save to public/marketing/generated,
+// generate the image via Open Generative AI / MuAPI first, save to public/marketing/generated,
 // patch the row's image_path so the social cron picks it up.
 //
 // Why: every Instagram row needs an image (the IG Graph API rejects
@@ -7,8 +7,8 @@
 // each row's image_path resolves to a real file under
 // PUBLIC_ASSET_BASE_URL, the social-publisher cron logs them as
 // blocked. This poller closes that gap by generating images
-// continuously in the background using the user's ChatGPT Pro
-// subscription.
+// continuously in the background. MuAPI is preferred; legacy OpenAI
+// Images remains a fallback through src/lib/image-gen.
 //
 // Flow per pass:
 //   1. SELECT * FROM content_queue
@@ -19,9 +19,9 @@
 //   2. For each row, build a prompt:
 //        - row.metadata.image_prompt if present
 //        - else compose from row.title + body + brand-style preamble
-//   3. Call generateImageViaChatGPT(prompt, outPath)
+//   3. Call generateImage(prompt, outPath) through the vendor registry
 //   4. UPDATE content_queue SET image_path = '/marketing/generated/<file>.png'
-//   5. Sleep PAUSE_BETWEEN_MS to be polite to ChatGPT's rate limits
+//   5. Sleep PAUSE_BETWEEN_MS to be polite to vendor rate limits
 //
 // Modes:
 //   --once   single pass then exit
@@ -38,21 +38,29 @@
 //   QUEUE_POLLER_INTERVAL_MS=600000      ms between passes (default 10m)
 //   QUEUE_POLLER_HEADLESS=false          launch Playwright headless
 //   QUEUE_POLLER_OUT_DIR=...             override output dir
-//   CHATGPT_PROFILE_DIR=...              persistent profile dir
+//   MUAPI_API_KEY=...                    preferred Open Generative AI provider
+//   OPENAI_API_KEY=...                   legacy OpenAI Images fallback
 
 import { createClient } from "@supabase/supabase-js";
 import path from "node:path";
 import { promises as fs } from "node:fs";
 import { loadDotEnvLocal } from "./env-loader";
 
-// tsx doesn't auto-load .env files. Load Supabase + OpenAI env
+// tsx doesn't auto-load .env files. Load Supabase + generation env
 // before reading process.env below.
 loadDotEnvLocal();
 
 // Lazy-imported in pollOnce() so this script can `tsx`-load
 // without server-only failing if it's run from a non-Next env.
 type ImageApiResult =
-  | { kind: "ok"; path: string }
+  | {
+      kind: "ok";
+      path: string;
+      vendor: string;
+      vendorUrl: string | null;
+      requestId?: string | null;
+      costCents: number | null;
+    }
   | { kind: "not_configured"; missingEnv: string[] }
   | { kind: "error"; error: string };
 type ImageApiFn = (
@@ -78,7 +86,7 @@ const OUT_DIR =
 const PUBLIC_URL_PREFIX = "/marketing/generated";
 
 // RYDA brand-style preamble. Prepended to every prompt to bias
-// ChatGPT toward editorial photo realism rather than illustration
+// generation toward editorial photo realism rather than illustration
 // or 3D render. Tuned to the "quiet luxury" brand voice the
 // content-marketer agent established.
 const BRAND_PREAMBLE = `
@@ -245,7 +253,14 @@ async function pollOnce(): Promise<{
           filename,
         );
         if (r.kind === "ok") {
-          return { kind: "ok", path: r.path };
+          return {
+            kind: "ok",
+            path: r.path,
+            vendor: r.vendor,
+            vendorUrl: r.vendorUrl,
+            requestId: r.requestId ?? null,
+            costCents: r.costCents,
+          };
         }
         if (r.kind === "not_configured") {
           return { kind: "not_configured", missingEnv: r.missingEnv };
@@ -271,7 +286,23 @@ async function pollOnce(): Promise<{
     if (result.kind === "ok") {
       const upd = await supabase
         .from("content_queue")
-        .update({ image_path: publicUrl })
+        .update({
+          image_path: publicUrl,
+          generation_vendor: result.vendor,
+          generation_type: "image",
+          generation_request_id: result.requestId ?? null,
+          generation_status: "completed",
+          generation_output_url: result.vendorUrl,
+          generation_error: null,
+          generated_asset_path: publicUrl,
+          generation_metadata: {
+            prompt,
+            vendor: result.vendor,
+            requestId: result.requestId ?? null,
+            costCents: result.costCents,
+            source: "marketing:gen-images",
+          },
+        })
         .eq("id", row.id)
         .select("id");
       if (upd.error) {
@@ -290,7 +321,7 @@ async function pollOnce(): Promise<{
       }
     } else if (result.kind === "not_configured") {
       console.error(
-        `[queue-poller]   NOT CONFIGURED. Missing env: ${(result.missingEnv ?? []).join(", ")}. Set OPENAI_API_KEY in .env.local and re-run.`,
+        `[queue-poller]   NOT CONFIGURED. Missing env: ${(result.missingEnv ?? []).join(", ")}. Set MUAPI_API_KEY in .env.local for Open Generative AI / MuAPI, or OPENAI_API_KEY for fallback.`,
       );
       notLoggedIn = true;
       break;
@@ -299,9 +330,9 @@ async function pollOnce(): Promise<{
       errors += 1;
     }
 
-    // Polite pause between rows. ChatGPT throttles aggressively if
-    // you hammer it; 30s feels comfortable and matches typical
-    // human image-gen cadence.
+    // Polite pause between rows. Creative generation vendors throttle
+    // aggressively if you hammer them; 30s keeps background spend and
+    // rate limits under control.
     if (i < needs.length - 1) {
       await new Promise((r) => setTimeout(r, PAUSE_BETWEEN_MS));
     }
@@ -316,7 +347,7 @@ async function main() {
 
   console.log("[queue-poller] starting");
   console.log(
-    `[queue-poller] config: batch=${BATCH_SIZE} pause=${PAUSE_BETWEEN_MS}ms interval=${POLL_INTERVAL_MS}ms vendor=openai-images-api`,
+    `[queue-poller] config: batch=${BATCH_SIZE} pause=${PAUSE_BETWEEN_MS}ms interval=${POLL_INTERVAL_MS}ms vendor=muapi-preferred`,
   );
 
   do {
@@ -326,7 +357,7 @@ async function main() {
       // Wait a longer interval after a login failure so the user
       // has time to log in before the next attempt.
       console.log(
-        `[queue-poller] sleeping 5min after login failure; log into ChatGPT in '${process.env.CHATGPT_PROFILE_DIR || "default profile dir"}' before next pass`,
+        "[queue-poller] sleeping 5min after provider configuration failure",
       );
       await new Promise((r) => setTimeout(r, 5 * 60_000));
       continue;

@@ -16,12 +16,12 @@ ryda-marketing/content/<channel>/<slug>.md   (markdown drafts on disk)
         X / LinkedIn / IG / email             (live posts)
 ```
 
-Image generation is API-first via `gpt-image-1` (the same model
-behind chatgpt.com's image gen). An earlier iteration tried browser
-automation against chatgpt.com to use a ChatGPT Pro subscription at
-$0 marginal cost — that path was deleted because Cloudflare's bot
-detection blocked Playwright reliably. ChatGPT Pro is for personal
-browsing; this pipeline needs `OPENAI_API_KEY`.
+Image generation is API-first through Open Generative AI / MuAPI when
+`MUAPI_API_KEY` is configured. The legacy `gpt-image-1` path remains
+as a fallback when only `OPENAI_API_KEY` is present. An earlier
+iteration tried browser automation against chatgpt.com to use a
+ChatGPT Pro subscription at $0 marginal cost — that path was deleted
+because Cloudflare's bot detection blocked Playwright reliably.
 
 Video generation has its own subdirectory at `video/`. See
 `video/README.md` for the daily-spot pipeline + the daily-brief
@@ -91,8 +91,13 @@ scheduled posts, image tasks, queue status, and an action checklist.
 1. **Set up env**: in `.env.local` (loaded by every script):
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `SUPABASE_SERVICE_ROLE_KEY`
-   - `OPENAI_API_KEY` (for image gen via gpt-image-1)
-   - Optional: `OPENAI_ORG_ID`, `FAL_KEY` (for autonomous video via Seedance)
+   - `MUAPI_API_KEY` (preferred Open Generative AI creative engine)
+   - Optional: `OPENAI_API_KEY` (legacy image fallback), `OPENAI_ORG_ID`,
+     `FAL_KEY` (legacy autonomous video fallback via Seedance)
+   - Optional MuAPI defaults:
+     `RYDA_MUAPI_IMAGE_MODEL`, `RYDA_MUAPI_VIDEO_MODEL`,
+     `RYDA_MUAPI_I2V_MODEL`, `RYDA_MUAPI_LIPSYNC_MODEL`,
+     `RYDA_MUAPI_WORKFLOW_ID`
 
 2. **Apply the migration**: `supabase/migrations/0030_content_queue.sql`
    creates the queue table. Apply via the Supabase dashboard or
@@ -113,7 +118,11 @@ Use `com.ryda.marketing-loop.plist.template` in this directory.
 Replace placeholders, save to `~/Library/LaunchAgents/`, run
 `launchctl load`. See the template's header comment for the recipe.
 
-## Image gen pricing (gpt-image-1, May 2026)
+## Image gen pricing
+
+MuAPI/Open Generative AI costs vary by selected model. The queue stores
+best-effort vendor/model metadata on `content_queue` so operator review
+can compare quality and spend. Legacy OpenAI Images pricing:
 
 | Quality | 1024×1024 | 1024×1536 / 1536×1024 |
 |---------|-----------|-----------------------|

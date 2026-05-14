@@ -163,6 +163,7 @@ export default function AdminPage() {
           <nav className="mt-6 flex flex-wrap gap-2 text-xs">
             {[
               { href: "/admin", label: "Triage", note: "this page" },
+              { href: "/admin/creative", label: "Creative", note: "marketing generation queue" },
               { href: "/admin/prospects", label: "Prospects", note: "founding cohort CRM" },
               { href: "/admin/disputes", label: "Disputes", note: "Stripe chargebacks" },
               { href: "/admin/llc", label: "LLCs", note: "formation + members" },

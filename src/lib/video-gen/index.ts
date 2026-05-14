@@ -22,6 +22,12 @@ import type {
 import { seedanceAdapter } from "./seedance";
 import { openAiSoraAdapter } from "./openai-sora";
 import { mockVideoAdapter } from "./mock";
+import {
+  muapiImageToVideoAdapter,
+  muapiLipSyncAdapter,
+  muapiVideoAdapter,
+  muapiWorkflowAdapter,
+} from "./muapi";
 
 export type {
   GenerateClipInput,
@@ -33,6 +39,10 @@ export type {
 } from "./types";
 
 const REGISTRY: Record<VideoVendor, VideoGenAdapter | null> = {
+  "muapi-video": muapiVideoAdapter,
+  "muapi-i2v": muapiImageToVideoAdapter,
+  "muapi-lipsync": muapiLipSyncAdapter,
+  "muapi-workflow": muapiWorkflowAdapter,
   // Default. ByteDance Seedance 2.0 via fal.ai. ~10x cheaper than
   // Sora at equivalent quality, no API death clock, strong physics
   // on reflective surfaces (cars, boats, glass).
@@ -55,6 +65,7 @@ const REGISTRY: Record<VideoVendor, VideoGenAdapter | null> = {
  *  loudly when no real vendor is wired.
  *  Order: Seedance (FAL_KEY) > Sora (OPENAI_API_KEY, legacy). */
 export function getDefaultAdapter(): VideoGenAdapter | null {
+  if (muapiVideoAdapter.isConfigured()) return muapiVideoAdapter;
   if (seedanceAdapter.isConfigured()) return seedanceAdapter;
   if (openAiSoraAdapter.isConfigured()) return openAiSoraAdapter;
   return null;
@@ -78,17 +89,19 @@ export async function generateClip(
     (options?.vendor ? getAdapter(options.vendor) : null) ??
     getDefaultAdapter();
   if (!adapter) {
-    // Seedance is the default vendor (fal.ai), so the most useful
-    // env hint when nothing's wired is FAL_KEY. We list both since
-    // either unblocks the pipeline; FAL_KEY first since it's the
-    // path we recommend.
+    // MuAPI is the preferred Open Generative AI path. FAL/OpenAI
+    // remain supported fallbacks for existing setups.
     return {
       kind: "not_configured",
-      missingEnv: ["FAL_KEY", "OPENAI_API_KEY"],
+      missingEnv: ["MUAPI_API_KEY", "FAL_KEY", "OPENAI_API_KEY"],
     };
   }
   if (!adapter.isConfigured()) {
     const envByVendor: Record<string, string> = {
+      "muapi-video": "MUAPI_API_KEY",
+      "muapi-i2v": "MUAPI_API_KEY",
+      "muapi-lipsync": "MUAPI_API_KEY",
+      "muapi-workflow": "MUAPI_API_KEY",
       seedance: "FAL_KEY",
       "openai-sora": "OPENAI_API_KEY",
       runway: "RUNWAY_API_KEY",

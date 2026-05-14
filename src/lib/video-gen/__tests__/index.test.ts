@@ -18,7 +18,7 @@ import {
 } from "../index";
 
 let tmpDir: string;
-const ENV_KEYS_TO_PRESERVE = ["FAL_KEY", "OPENAI_API_KEY"];
+const ENV_KEYS_TO_PRESERVE = ["MUAPI_API_KEY", "FAL_KEY", "OPENAI_API_KEY"];
 const savedEnv: Record<string, string | undefined> = {};
 
 beforeEach(async () => {
@@ -36,6 +36,13 @@ afterEach(async () => {
 });
 
 describe("getAdapter", () => {
+  it("returns the Open Generative AI / MuAPI adapters by name", () => {
+    expect(getAdapter("muapi-video")?.vendor).toBe("muapi-video");
+    expect(getAdapter("muapi-i2v")?.vendor).toBe("muapi-i2v");
+    expect(getAdapter("muapi-lipsync")?.vendor).toBe("muapi-lipsync");
+    expect(getAdapter("muapi-workflow")?.vendor).toBe("muapi-workflow");
+  });
+
   it("returns the seedance adapter by name", () => {
     expect(getAdapter("seedance")?.vendor).toBe("seedance");
   });
@@ -57,27 +64,79 @@ describe("getAdapter", () => {
 
 describe("getDefaultAdapter (vendor preference)", () => {
   it("returns null when no API keys are set (no auto-fallback to mock)", () => {
+    delete process.env.MUAPI_API_KEY;
     delete process.env.FAL_KEY;
     delete process.env.OPENAI_API_KEY;
     expect(getDefaultAdapter()).toBeNull();
   });
 
+  it("prefers muapi-video when MUAPI_API_KEY is present", () => {
+    process.env.MUAPI_API_KEY = "muapi-test-fake";
+    process.env.FAL_KEY = "fal-test-fake";
+    process.env.OPENAI_API_KEY = "sk-test-fake";
+    expect(getDefaultAdapter()?.vendor).toBe("muapi-video");
+  });
+
   it("prefers seedance when FAL_KEY is present", () => {
+    delete process.env.MUAPI_API_KEY;
     process.env.FAL_KEY = "fal-test-fake";
     delete process.env.OPENAI_API_KEY;
     expect(getDefaultAdapter()?.vendor).toBe("seedance");
   });
 
   it("falls back to openai-sora when only OPENAI_API_KEY is set", () => {
+    delete process.env.MUAPI_API_KEY;
     delete process.env.FAL_KEY;
     process.env.OPENAI_API_KEY = "sk-test-fake";
     expect(getDefaultAdapter()?.vendor).toBe("openai-sora");
   });
 
   it("prefers seedance over sora when BOTH keys are present", () => {
+    delete process.env.MUAPI_API_KEY;
     process.env.FAL_KEY = "fal-test-fake";
     process.env.OPENAI_API_KEY = "sk-test-fake";
     expect(getDefaultAdapter()?.vendor).toBe("seedance");
+  });
+});
+
+describe("generateClip with muapi vendors", () => {
+  it("returns not_configured when MUAPI_API_KEY is unset", async () => {
+    delete process.env.MUAPI_API_KEY;
+    const result = await generateClip(
+      { prompt: "anything", durationSec: 5 },
+      tmpDir,
+      "x.mp4",
+      { vendor: "muapi-video" },
+    );
+    expect(result.kind).toBe("not_configured");
+    if (result.kind !== "not_configured") return;
+    expect(result.missingEnv).toContain("MUAPI_API_KEY");
+  });
+
+  it("requires imageUrl for muapi-i2v", async () => {
+    process.env.MUAPI_API_KEY = "muapi-test-fake";
+    const result = await generateClip(
+      { prompt: "anything", durationSec: 5 },
+      tmpDir,
+      "x.mp4",
+      { vendor: "muapi-i2v" },
+    );
+    expect(result.kind).toBe("error");
+    if (result.kind !== "error") return;
+    expect(result.error).toContain("requires imageUrl");
+  });
+
+  it("requires audio and visual source for muapi-lipsync", async () => {
+    process.env.MUAPI_API_KEY = "muapi-test-fake";
+    const result = await generateClip(
+      { prompt: "anything", durationSec: 5 },
+      tmpDir,
+      "x.mp4",
+      { vendor: "muapi-lipsync" },
+    );
+    expect(result.kind).toBe("error");
+    if (result.kind !== "error") return;
+    expect(result.error).toContain("requires audioUrl");
   });
 });
 
@@ -142,6 +201,20 @@ describe("generateClip with openai-sora vendor (no key)", () => {
 });
 
 describe("videoVendorStatus", () => {
+  it("reports muapi adapters as configured iff MUAPI_API_KEY is set", () => {
+    delete process.env.MUAPI_API_KEY;
+    let status = videoVendorStatus();
+    expect(status.find((x) => x.vendor === "muapi-video")?.configured).toBe(false);
+    expect(status.find((x) => x.vendor === "muapi-i2v")?.configured).toBe(false);
+
+    process.env.MUAPI_API_KEY = "muapi-test-fake";
+    status = videoVendorStatus();
+    expect(status.find((x) => x.vendor === "muapi-video")?.configured).toBe(true);
+    expect(status.find((x) => x.vendor === "muapi-i2v")?.configured).toBe(true);
+    expect(status.find((x) => x.vendor === "muapi-lipsync")?.configured).toBe(true);
+    expect(status.find((x) => x.vendor === "muapi-workflow")?.configured).toBe(true);
+  });
+
   it("reports seedance as configured iff FAL_KEY is set", () => {
     delete process.env.FAL_KEY;
     let status = videoVendorStatus();

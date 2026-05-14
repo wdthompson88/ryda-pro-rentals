@@ -18,9 +18,11 @@ import type {
   GenerateImageInput,
   GenerateImageResult,
   ImageGenAdapter,
+  ImageVendor,
 } from "./types";
 import { openAiImagesAdapter } from "./openai-images";
 import { mockImageAdapter } from "./mock";
+import { muapiImageAdapter, muapiImageToImageAdapter } from "./muapi";
 
 export type {
   GenerateImageInput,
@@ -28,11 +30,12 @@ export type {
   ImageGenAdapter,
   ImageQuality,
   ImageSize,
+  ImageVendor,
 } from "./types";
 
-type Vendor = ImageGenAdapter["vendor"];
-
-const REGISTRY: Record<Vendor, ImageGenAdapter | null> = {
+const REGISTRY: Record<ImageVendor, ImageGenAdapter | null> = {
+  "muapi-image": muapiImageAdapter,
+  "muapi-i2i": muapiImageToImageAdapter,
   "openai-images": openAiImagesAdapter,
   // Not wired yet; placeholder so callers can opt into a future
   // adapter by name without TS complaining.
@@ -45,12 +48,13 @@ const REGISTRY: Record<Vendor, ImageGenAdapter | null> = {
  *  preference order. Mock is excluded so production doesn't
  *  silently fall through to a 1x1 PNG. */
 export function getDefaultAdapter(): ImageGenAdapter | null {
+  if (muapiImageAdapter.isConfigured()) return muapiImageAdapter;
   if (openAiImagesAdapter.isConfigured()) return openAiImagesAdapter;
   return null;
 }
 
 /** Look up a specific adapter by name. */
-export function getAdapter(vendor: Vendor): ImageGenAdapter | null {
+export function getAdapter(vendor: ImageVendor): ImageGenAdapter | null {
   return REGISTRY[vendor] ?? null;
 }
 
@@ -63,7 +67,7 @@ export async function generateImage(
   input: GenerateImageInput,
   outDir: string,
   filename: string,
-  options?: { vendor?: Vendor },
+  options?: { vendor?: ImageVendor },
 ): Promise<GenerateImageResult> {
   const adapter =
     (options?.vendor ? getAdapter(options.vendor) : null) ??
@@ -71,7 +75,7 @@ export async function generateImage(
   if (!adapter) {
     return {
       kind: "not_configured",
-      missingEnv: ["OPENAI_API_KEY"],
+      missingEnv: ["MUAPI_API_KEY", "OPENAI_API_KEY"],
     };
   }
   if (!adapter.isConfigured()) {
@@ -80,7 +84,9 @@ export async function generateImage(
     return {
       kind: "not_configured",
       missingEnv:
-        adapter.vendor === "openai-images"
+        adapter.vendor === "muapi-image" || adapter.vendor === "muapi-i2i"
+          ? ["MUAPI_API_KEY"]
+          : adapter.vendor === "openai-images"
           ? ["OPENAI_API_KEY"]
           : [`${adapter.vendor.toUpperCase()}_API_KEY`],
     };
@@ -92,10 +98,10 @@ export async function generateImage(
  *  configured? Returned alongside the social connector status so
  *  ops sees at a glance whether image-generating routes will work. */
 export function imageVendorStatus(): {
-  vendor: Vendor;
+  vendor: ImageVendor;
   configured: boolean;
 }[] {
-  return (Object.keys(REGISTRY) as Vendor[]).map((vendor) => {
+  return (Object.keys(REGISTRY) as ImageVendor[]).map((vendor) => {
     const adapter = REGISTRY[vendor];
     return {
       vendor,

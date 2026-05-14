@@ -34,6 +34,18 @@ export type GenerateClipInput = {
   quality?: VideoQuality;
   /** Optional brand-style preamble prepended to the prompt. */
   styleNote?: string;
+  /** Optional Open Generative AI / MuAPI model endpoint override. */
+  model?: string;
+  /** Optional reference image URL for image-to-video/lip-sync jobs. */
+  imageUrl?: string;
+  /** Optional source video URL for video-to-video/lip-sync jobs. */
+  videoUrl?: string;
+  /** Optional audio URL for lip-sync jobs. */
+  audioUrl?: string;
+  /** Optional MuAPI workflow id when vendor is muapi-workflow. */
+  workflowId?: string;
+  /** Optional MuAPI workflow inputs. */
+  workflowInputs?: Record<string, unknown>;
 };
 
 export type GenerateClipResult =
@@ -43,6 +55,8 @@ export type GenerateClipResult =
       path: string;
       /** Vendor's signed download URL (often expiring). */
       vendorUrl: string | null;
+      /** Vendor request/prediction/run id for audit and polling traceability. */
+      requestId?: string | null;
       /** Cents charged. Estimated from quality+duration since most
        *  vendors don't return per-call cost in the API response. */
       costCents: number | null;
@@ -57,6 +71,10 @@ export type GenerateClipResult =
   | { kind: "error"; error: string };
 
 export type VideoVendor =
+  | "muapi-video"
+  | "muapi-i2v"
+  | "muapi-lipsync"
+  | "muapi-workflow"
   | "seedance" // ByteDance Seedance 2.0 via fal.ai (DEFAULT)
   | "openai-sora" // legacy — API discontinues 2026-09-24
   | "runway" // not wired
