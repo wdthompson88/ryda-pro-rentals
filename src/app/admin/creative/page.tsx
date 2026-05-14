@@ -186,7 +186,7 @@ export default function AdminCreativePage() {
   return (
     <>
       <SiteHeader />
-      <main className="mx-auto max-w-7xl px-6 py-12 sm:px-10 sm:py-16">
+      <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10 sm:py-16">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
@@ -379,7 +379,7 @@ export default function AdminCreativePage() {
             )}
           </aside>
         </section>
-      </main>
+      </div>
     </>
   );
 }
