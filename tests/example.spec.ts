@@ -17,9 +17,9 @@ test.describe('home page', () => {
     await page.goto('/');
     // The splitter shows three columns: Cars, Boats, Planes.
     // Each renders inside a Link to its vertical landing page.
-    await expect(page.getByRole('link', { name: /cars/i })).toBeVisible();
-    await expect(page.getByRole('link', { name: /boats/i })).toBeVisible();
-    await expect(page.getByRole('link', { name: /planes/i })).toBeVisible();
+    await expect(page.locator('a[href="/cars"]').first()).toBeVisible();
+    await expect(page.locator('a[href="/boats"]').first()).toBeVisible();
+    await expect(page.locator('a[href="/planes"]').first()).toBeVisible();
   });
 });
 
