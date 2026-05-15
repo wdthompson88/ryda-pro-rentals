@@ -42,11 +42,6 @@ export const SPLITTER_MEDIA: Record<"cars" | "boats" | "planes", MediaSlot> = {
     // Dropped Aventador-Lisbon (17051328), the "trails off to
     // skyline" clip the CEO called out in the screenshot.
     videos: [
-      // RYDA-branded 15s hero spot — full fleet match-cut + cockpit
-      // reveal + Overseas Highway crane shot. Listed first so SSR
-      // gets it on initial paint; client-side rotation cycles it
-      // back into the deck along with the others.
-      "/videos/ryda-hero-spot-15s.mp4",
       // Owned-asset, brand-approved
       "/videos/cars-koenigsegg-jesko.mp4",
       "/videos/cars-ferrari.mp4",

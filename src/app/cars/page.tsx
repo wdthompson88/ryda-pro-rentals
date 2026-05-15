@@ -70,7 +70,7 @@ export default function CarsHome() {
                   the click target; the video itself is decorative.
                   Audit T1-3 + T1-4. */}
               <video
-                src="/videos/ryda-hero-spot-15s.mp4"
+                src="/videos/cars-ferrari.mp4"
                 poster={heroVehicle.hero}
                 autoPlay
                 loop
@@ -291,4 +291,3 @@ function Step({ n, title, body }: { n: string; title: string; body: string }) {
     </div>
   );
 }
-
