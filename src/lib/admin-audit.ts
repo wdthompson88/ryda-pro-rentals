@@ -17,7 +17,10 @@ export type AdminAction =
   | "transfer_reject"
   | "resend_amendment"
   | "booking_canceled"
-  | "purchase_marked_paid";
+  | "purchase_marked_paid"
+  | "role_granted"
+  | "role_revoked"
+  | "email_sent";
 
 /** Record one admin action. Returns true on durable persistence. */
 export async function recordAdminAction(

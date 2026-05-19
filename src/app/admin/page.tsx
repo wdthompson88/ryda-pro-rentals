@@ -32,6 +32,13 @@ import { RefreshBar } from "@/components/admin/refresh-bar";
 import { AuditSummary } from "@/components/admin/audit-summary";
 import { UserLookup } from "@/components/admin/user-lookup";
 import { downloadCsv } from "@/components/admin/csv";
+import {
+  BulkProgress,
+  BulkToolbar,
+  runBulk,
+  useBulkSelection,
+} from "@/components/admin/bulk-actions";
+import { useNewPendingNotifier } from "@/components/admin/use-desktop-notifications";
 
 type Counts = {
   purchases_pending: number;
@@ -100,6 +107,7 @@ type Overview = {
 
 const SUB_ROUTES = [
   { href: "/admin", label: "Triage", note: "this page" },
+  { href: "/admin/calendar", label: "Calendar", note: "booking calendar" },
   { href: "/admin/creative", label: "Creative", note: "marketing generation queue" },
   { href: "/admin/prospects", label: "Prospects", note: "founding cohort CRM" },
   { href: "/admin/disputes", label: "Disputes", note: "Stripe chargebacks" },
@@ -119,6 +127,35 @@ export default function AdminPage() {
   const initialLoad = useRef(true);
 
   const { open: openModal, modal } = useActionModal();
+
+  const purchaseSel = useBulkSelection();
+  const bookingSel = useBulkSelection();
+  const transferSel = useBulkSelection();
+  const [bulkProgress, setBulkProgress] = useState<{
+    section: "purchases" | "bookings" | "transfers" | null;
+    done: number;
+    total: number;
+    failed: number;
+  }>({ section: null, done: 0, total: 0, failed: 0 });
+
+  // Desktop notifications. We pass in the current pending id sets;
+  // the hook diffs them across refreshes and fires when new ids appear.
+  const notifier = useNewPendingNotifier({
+    pendingPurchaseIds:
+      data?.recent.purchases
+        .filter((p) => p.status === "pending")
+        .map((p) => p.id) ?? [],
+    pendingTransferIds:
+      data?.recent.transfers
+        .filter(
+          (t) =>
+            t.status === "requested" ||
+            t.status === "pending_ryda_review" ||
+            t.status === "accepted",
+        )
+        .map((t) => t.id) ?? [],
+    armed: !initialLoad.current,
+  });
 
   const reload = useCallback(async () => {
     setRefreshing(true);
@@ -156,6 +193,70 @@ export default function AdminPage() {
   useEffect(() => {
     void reload();
   }, [reload]);
+
+  // Bulk-action runner closure factory. Each call returns an async fn
+  // that prompts for a single ops note (applied to every row in the
+  // batch), POSTs each selected id, and surfaces progress + errors.
+  const runBulkAction = useCallback(
+    async (cfg: {
+      section: "purchases" | "bookings" | "transfers";
+      ids: string[];
+      modalTitle: string;
+      modalMessage: string;
+      confirmLabel: string;
+      tone?: "default" | "danger";
+      runOne: (id: string, note: string) => Promise<void>;
+      onDone: () => void;
+    }) => {
+      if (cfg.ids.length === 0) return;
+      const res = await openModal({
+        title: cfg.modalTitle,
+        message: cfg.modalMessage,
+        confirmLabel: `${cfg.confirmLabel} (${cfg.ids.length})`,
+        tone: cfg.tone,
+        noteRequired: true,
+      });
+      if (!res.confirmed) return;
+      setBulkProgress({
+        section: cfg.section,
+        done: 0,
+        total: cfg.ids.length,
+        failed: 0,
+      });
+      const summary = await runBulk(
+        cfg.ids,
+        (id) => cfg.runOne(id, res.note),
+        {
+          concurrency: 3,
+          onProgress: (done, total, failed) =>
+            setBulkProgress({ section: cfg.section, done, total, failed }),
+        },
+      );
+      setBulkProgress({ section: null, done: 0, total: 0, failed: 0 });
+      cfg.onDone();
+      if (summary.failed > 0) {
+        window.alert(
+          `${summary.ok} succeeded · ${summary.failed} failed.\n\n${summary.errors.slice(0, 5).join("\n")}${summary.errors.length > 5 ? `\n… +${summary.errors.length - 5} more` : ""}`,
+        );
+      }
+      await reload();
+    },
+    [openModal, reload],
+  );
+
+  // Per-row endpoint dispatchers used by bulk actions. These mirror
+  // the single-row handler components below.
+  const postOne = useCallback(async (path: string, note: string) => {
+    const r = await authedFetch(path, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ note }),
+    });
+    if (!r.ok) {
+      const j = await r.json().catch(() => ({}));
+      throw new Error(j.error || `${r.status}`);
+    }
+  }, []);
 
   return (
     <>
@@ -224,6 +325,29 @@ export default function AdminPage() {
                 onRefresh={reload}
                 loading={refreshing}
                 lastRefreshedAt={lastRefreshedAt}
+                extra={
+                  notifier.permission === "unsupported" ? null : notifier.permission === "granted" ? (
+                    <label className="inline-flex cursor-pointer items-center gap-2 text-mute">
+                      <input
+                        type="checkbox"
+                        checked={notifier.enabled}
+                        onChange={(e) => notifier.setEnabled(e.target.checked)}
+                        className="h-3.5 w-3.5 rounded border-rule accent-marine"
+                      />
+                      Desktop alerts on new pending
+                    </label>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => void notifier.request()}
+                      className="inline-flex h-7 items-center rounded-full border border-rule bg-surface px-3 text-[11px] font-medium text-marine hover:border-marine"
+                    >
+                      {notifier.permission === "denied"
+                        ? "Notifications blocked — enable in browser"
+                        : "Enable desktop alerts"}
+                    </button>
+                  )
+                }
               />
             </div>
 
@@ -282,8 +406,68 @@ export default function AdminPage() {
                 })
               }
             >
+              <BulkToolbar
+                rows={data.recent.purchases}
+                selection={purchaseSel}
+                actions={[
+                  {
+                    label: "Mark paid selected",
+                    canRun: (rows) => rows.some((p) => p.status === "pending"),
+                    onClick: async (ids) => {
+                      const eligible = data.recent.purchases.filter(
+                        (p) => ids.includes(p.id) && p.status === "pending",
+                      );
+                      await runBulkAction({
+                        section: "purchases",
+                        ids: eligible.map((p) => p.id),
+                        modalTitle: "Bulk mark paid",
+                        modalMessage: `Flip ${eligible.length} pending purchase${eligible.length === 1 ? "" : "s"} to paid. Amendments generate downstream for each.`,
+                        confirmLabel: "Mark paid",
+                        runOne: (id, note) =>
+                          postOne(`/api/admin/purchase/${id}/mark-paid`, note),
+                        onDone: () => purchaseSel.clear(),
+                      });
+                    },
+                  },
+                  {
+                    label: "Refund selected",
+                    tone: "danger",
+                    canRun: (rows) =>
+                      rows.some(
+                        (p) => p.status === "paid" || p.status === "pending",
+                      ),
+                    onClick: async (ids) => {
+                      const eligible = data.recent.purchases.filter(
+                        (p) =>
+                          ids.includes(p.id) &&
+                          (p.status === "paid" || p.status === "pending"),
+                      );
+                      await runBulkAction({
+                        section: "purchases",
+                        ids: eligible.map((p) => p.id),
+                        modalTitle: "Bulk refund",
+                        modalMessage: `Refund ${eligible.length} purchase${eligible.length === 1 ? "" : "s"} and cancel their LLC seats. Total $${(eligible.reduce((a, p) => a + p.total_cents, 0) / 100).toLocaleString()}. Irreversible.`,
+                        confirmLabel: "Refund",
+                        tone: "danger",
+                        runOne: (id, note) =>
+                          postOne(`/api/share-purchase/${id}/refund`, note),
+                        onDone: () => purchaseSel.clear(),
+                      });
+                    },
+                  },
+                ]}
+              />
+              {bulkProgress.section === "purchases" && (
+                <BulkProgress
+                  done={bulkProgress.done}
+                  total={bulkProgress.total}
+                  failed={bulkProgress.failed}
+                />
+              )}
               <Table
                 columns={["Status", "Asset", "Shares", "Total", "Buyer", "Updated", ""]}
+                rowIds={data.recent.purchases.map((p) => p.id)}
+                selection={purchaseSel}
                 rows={data.recent.purchases.map((p) => [
                   pill(p.status),
                   String(p.vehicle_symbol ?? p.boat_slug ?? "—"),
@@ -329,8 +513,50 @@ export default function AdminPage() {
                 })
               }
             >
+              <BulkToolbar
+                rows={data.recent.bookings}
+                selection={bookingSel}
+                actions={[
+                  {
+                    label: "Cancel selected",
+                    tone: "danger",
+                    canRun: (rows) =>
+                      rows.some(
+                        (b) =>
+                          b.status === "pending" || b.status === "confirmed",
+                      ),
+                    onClick: async (ids) => {
+                      const eligible = data.recent.bookings.filter(
+                        (b) =>
+                          ids.includes(b.id) &&
+                          (b.status === "pending" || b.status === "confirmed"),
+                      );
+                      await runBulkAction({
+                        section: "bookings",
+                        ids: eligible.map((b) => b.id),
+                        modalTitle: "Bulk cancel bookings",
+                        modalMessage: `Cancel ${eligible.length} booking${eligible.length === 1 ? "" : "s"}. Members are notified and slots return to the calendar.`,
+                        confirmLabel: "Cancel",
+                        tone: "danger",
+                        runOne: (id, note) =>
+                          postOne(`/api/admin/booking/${id}/cancel`, note),
+                        onDone: () => bookingSel.clear(),
+                      });
+                    },
+                  },
+                ]}
+              />
+              {bulkProgress.section === "bookings" && (
+                <BulkProgress
+                  done={bulkProgress.done}
+                  total={bulkProgress.total}
+                  failed={bulkProgress.failed}
+                />
+              )}
               <Table
                 columns={["Status", "Asset", "Mode", "Dates", "Created", ""]}
+                rowIds={data.recent.bookings.map((b) => b.id)}
+                selection={bookingSel}
                 rows={data.recent.bookings.map((b) => [
                   pill(b.status),
                   String(b.vehicle_symbol ?? b.boat_slug ?? "—"),
@@ -416,6 +642,97 @@ export default function AdminPage() {
                 })
               }
             >
+              <BulkToolbar
+                rows={data.recent.transfers}
+                selection={transferSel}
+                actions={[
+                  {
+                    label: "Approve selected",
+                    canRun: (rows) =>
+                      rows.some((t) => t.status === "pending_ryda_review"),
+                    onClick: async (ids) => {
+                      const eligible = data.recent.transfers.filter(
+                        (t) =>
+                          ids.includes(t.id) &&
+                          t.status === "pending_ryda_review",
+                      );
+                      await runBulkAction({
+                        section: "transfers",
+                        ids: eligible.map((t) => t.id),
+                        modalTitle: "Bulk approve transfers",
+                        modalMessage: `Approve ${eligible.length} pending share transfer${eligible.length === 1 ? "" : "s"}. Cap tables update; all parties notified.`,
+                        confirmLabel: "Approve",
+                        runOne: async (id, note) => {
+                          const r = await authedFetch(
+                            "/api/admin/transfer/ack",
+                            {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({
+                                transferId: id,
+                                action: "approve",
+                                note,
+                              }),
+                            },
+                          );
+                          if (!r.ok) {
+                            const j = await r.json().catch(() => ({}));
+                            throw new Error(j.error || `${r.status}`);
+                          }
+                        },
+                        onDone: () => transferSel.clear(),
+                      });
+                    },
+                  },
+                  {
+                    label: "Reject selected",
+                    tone: "danger",
+                    canRun: (rows) =>
+                      rows.some((t) => t.status === "pending_ryda_review"),
+                    onClick: async (ids) => {
+                      const eligible = data.recent.transfers.filter(
+                        (t) =>
+                          ids.includes(t.id) &&
+                          t.status === "pending_ryda_review",
+                      );
+                      await runBulkAction({
+                        section: "transfers",
+                        ids: eligible.map((t) => t.id),
+                        modalTitle: "Bulk reject transfers",
+                        modalMessage: `Reject ${eligible.length} pending share transfer${eligible.length === 1 ? "" : "s"}. Originating members retain their shares; all parties notified.`,
+                        confirmLabel: "Reject",
+                        tone: "danger",
+                        runOne: async (id, note) => {
+                          const r = await authedFetch(
+                            "/api/admin/transfer/ack",
+                            {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({
+                                transferId: id,
+                                action: "reject",
+                                note,
+                              }),
+                            },
+                          );
+                          if (!r.ok) {
+                            const j = await r.json().catch(() => ({}));
+                            throw new Error(j.error || `${r.status}`);
+                          }
+                        },
+                        onDone: () => transferSel.clear(),
+                      });
+                    },
+                  },
+                ]}
+              />
+              {bulkProgress.section === "transfers" && (
+                <BulkProgress
+                  done={bulkProgress.done}
+                  total={bulkProgress.total}
+                  failed={bulkProgress.failed}
+                />
+              )}
               <Table
                 columns={[
                   "Status",
@@ -426,6 +743,8 @@ export default function AdminPage() {
                   "Updated",
                   "",
                 ]}
+                rowIds={data.recent.transfers.map((t) => t.id)}
+                selection={transferSel}
                 rows={data.recent.transfers.map((t) => [
                   pill(t.status),
                   String(t.vehicle_symbol ?? t.boat_slug ?? "—"),
@@ -511,17 +830,41 @@ function Stat({
 function Table({
   columns,
   rows,
+  selection,
+  rowIds,
 }: {
   columns: string[];
   rows: React.ReactNode[][];
+  /** When provided, prepends a checkbox column wired to the selection
+   *  state. rowIds must be parallel-aligned with rows. */
+  selection?: {
+    has: (id: string) => boolean;
+    toggle: (id: string) => void;
+    all: (ids: { id: string }[]) => boolean;
+    toggleAll: (ids: { id: string }[]) => void;
+  };
+  rowIds?: string[];
 }) {
   if (rows.length === 0) {
     return <p className="px-5 py-8 text-center text-sm text-mute">No rows.</p>;
   }
+  const showCheck = selection && rowIds && rowIds.length === rows.length;
+  const idObjs = showCheck ? rowIds!.map((id) => ({ id })) : [];
   return (
     <table className="w-full text-sm">
       <thead className="border-b border-rule bg-cream-2/40">
         <tr>
+          {showCheck && (
+            <th className="w-10 px-4 py-3">
+              <input
+                type="checkbox"
+                aria-label="Select all"
+                checked={selection!.all(idObjs)}
+                onChange={() => selection!.toggleAll(idObjs)}
+                className="h-3.5 w-3.5 rounded border-rule accent-marine"
+              />
+            </th>
+          )}
           {columns.map((c) => (
             <th
               key={c}
@@ -533,15 +876,29 @@ function Table({
         </tr>
       </thead>
       <tbody className="divide-y divide-rule">
-        {rows.map((r, i) => (
-          <tr key={i} className="hover:bg-cream-2/40">
-            {r.map((cell, j) => (
-              <td key={j} className="px-4 py-3 text-ink">
-                {cell}
-              </td>
-            ))}
-          </tr>
-        ))}
+        {rows.map((r, i) => {
+          const id = showCheck ? rowIds![i] : null;
+          return (
+            <tr key={id ?? i} className="hover:bg-cream-2/40">
+              {showCheck && id && (
+                <td className="w-10 px-4 py-3">
+                  <input
+                    type="checkbox"
+                    aria-label={`Select row ${i + 1}`}
+                    checked={selection!.has(id)}
+                    onChange={() => selection!.toggle(id)}
+                    className="h-3.5 w-3.5 rounded border-rule accent-marine"
+                  />
+                </td>
+              )}
+              {r.map((cell, j) => (
+                <td key={j} className="px-4 py-3 text-ink">
+                  {cell}
+                </td>
+              ))}
+            </tr>
+          );
+        })}
       </tbody>
     </table>
   );

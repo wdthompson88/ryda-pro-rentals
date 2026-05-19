@@ -16,10 +16,13 @@ export function RefreshBar({
   onRefresh,
   loading,
   lastRefreshedAt,
+  extra,
 }: {
   onRefresh: () => Promise<void> | void;
   loading: boolean;
   lastRefreshedAt: Date | null;
+  /** Optional toolbar slot rendered after the auto-refresh toggle. */
+  extra?: React.ReactNode;
 }) {
   const [auto, setAuto] = useState(false);
   const [tick, setTick] = useState(0); // forces "x seconds ago" rerender
@@ -74,6 +77,12 @@ export function RefreshBar({
         />
         Auto-refresh ({AUTO_REFRESH_MS / 1000}s)
       </label>
+      {extra && (
+        <>
+          <span className="text-mute/40">·</span>
+          {extra}
+        </>
+      )}
     </div>
   );
 }

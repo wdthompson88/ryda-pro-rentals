@@ -10,6 +10,7 @@
 
 import { useState } from "react";
 import { authedFetch } from "@/lib/api-fetch";
+import { useActionModal } from "@/components/admin/action-modal";
 
 type Hit = {
   id: string;
@@ -63,6 +64,22 @@ export function UserLookup() {
   const [hits, setHits] = useState<Hit[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { open: openModal, modal } = useActionModal();
+
+  async function rerun() {
+    const q = query.trim();
+    if (q.length < 3) return;
+    try {
+      const res = await authedFetch(
+        `/api/admin/users/search?q=${encodeURIComponent(q)}`,
+      );
+      if (!res.ok) return;
+      const j = (await res.json()) as { hits: Hit[] };
+      setHits(j.hits ?? []);
+    } catch {
+      /* swallow — the user can re-submit */
+    }
+  }
 
   async function search(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -130,16 +147,66 @@ export function UserLookup() {
       {hits && hits.length > 0 && (
         <div className="mt-5 space-y-5">
           {hits.map((h) => (
-            <UserCard key={h.id} hit={h} />
+            <UserCard
+              key={h.id}
+              hit={h}
+              openModal={openModal}
+              onChanged={rerun}
+            />
           ))}
         </div>
       )}
+      {modal}
     </section>
   );
 }
 
-function UserCard({ hit }: { hit: Hit }) {
+function UserCard({
+  hit,
+  openModal,
+  onChanged,
+}: {
+  hit: Hit;
+  openModal: ReturnType<typeof useActionModal>["open"];
+  onChanged: () => Promise<void>;
+}) {
   const role = (hit.app_metadata?.role as string | undefined) ?? "member";
+  const isAdmin = role === "admin";
+  const [busy, setBusy] = useState<string | null>(null);
+  const [composeOpen, setComposeOpen] = useState(false);
+
+  async function toggleRole() {
+    if (busy) return;
+    const action = isAdmin ? "revoke" : "grant";
+    const res = await openModal({
+      title: isAdmin ? "Revoke admin" : "Grant admin",
+      message: isAdmin
+        ? `Remove admin from ${hit.email}? They keep their account and any shares; they just lose /admin access.`
+        : `Grant admin to ${hit.email}? They'll see the /admin console on next sign-in or session refresh.`,
+      confirmLabel: isAdmin ? "Revoke admin" : "Grant admin",
+      tone: isAdmin ? "danger" : "default",
+      noteRequired: true,
+    });
+    if (!res.confirmed) return;
+    setBusy("role");
+    try {
+      const r = await authedFetch("/api/admin/users/role", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: hit.id, action, note: res.note }),
+      });
+      if (!r.ok) {
+        const j = await r.json().catch(() => ({}));
+        throw new Error(j.error || `Failed (${r.status}).`);
+      }
+      await onChanged();
+    } catch (e) {
+      window.alert(e instanceof Error ? e.message : "Role update failed.");
+    } finally {
+      setBusy(null);
+    }
+  }
+
   return (
     <article className="rounded-xl border border-rule bg-cream-2/40 p-4">
       <header className="flex flex-wrap items-baseline justify-between gap-2">
@@ -150,7 +217,7 @@ function UserCard({ hit }: { hit: Hit }) {
         <div className="flex flex-wrap items-center gap-2 text-[11px]">
           <span
             className={`rounded-full px-2.5 py-0.5 font-medium ${
-              role === "admin"
+              isAdmin
                 ? "bg-marine/15 text-marine-deep"
                 : "bg-mute/15 text-ink-soft"
             }`}
@@ -174,6 +241,37 @@ function UserCard({ hit }: { hit: Hit }) {
           </span>
         </div>
       </header>
+
+      <div className="mt-3 flex flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={toggleRole}
+          disabled={busy === "role"}
+          className={`inline-flex h-7 items-center rounded-full border px-3 text-[11px] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+            isAdmin
+              ? "border-red/40 text-red hover:bg-red hover:text-cream"
+              : "border-rule text-ink-soft hover:border-marine hover:text-marine"
+          }`}
+        >
+          {busy === "role" ? "…" : isAdmin ? "Revoke admin" : "Grant admin"}
+        </button>
+        <button
+          type="button"
+          onClick={() => setComposeOpen((s) => !s)}
+          disabled={!hit.email}
+          className="inline-flex h-7 items-center rounded-full border border-rule px-3 text-[11px] font-medium text-ink-soft transition-colors hover:border-ink hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {composeOpen ? "Close email" : "Send email"}
+        </button>
+      </div>
+
+      {composeOpen && hit.email && (
+        <EmailComposer
+          to={hit.email}
+          userId={hit.id}
+          onClose={() => setComposeOpen(false)}
+        />
+      )}
 
       <dl className="mt-4 grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
         <Stat
@@ -254,6 +352,99 @@ function UserCard({ hit }: { hit: Hit }) {
         ])}
       />
     </article>
+  );
+}
+
+function EmailComposer({
+  to,
+  userId,
+  onClose,
+}: {
+  to: string;
+  userId: string;
+  onClose: () => void;
+}) {
+  const [subject, setSubject] = useState("");
+  const [body, setBody] = useState("");
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [ok, setOk] = useState(false);
+
+  async function send(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (sending) return;
+    setError(null);
+    setSending(true);
+    try {
+      const r = await authedFetch("/api/admin/users/email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, subject, body }),
+      });
+      if (!r.ok) {
+        const j = await r.json().catch(() => ({}));
+        throw new Error(j.error || `Failed (${r.status}).`);
+      }
+      setOk(true);
+      setSubject("");
+      setBody("");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Send failed.");
+    } finally {
+      setSending(false);
+    }
+  }
+
+  return (
+    <form
+      onSubmit={send}
+      className="mt-3 space-y-2 rounded-lg border border-rule bg-surface p-3"
+    >
+      <p className="text-[11px] text-mute">
+        To <span className="font-mono">{to}</span> · reply-to is your admin
+        address
+      </p>
+      <input
+        type="text"
+        value={subject}
+        onChange={(e) => setSubject(e.target.value)}
+        placeholder="Subject"
+        maxLength={200}
+        required
+        className="w-full rounded-lg border border-rule bg-cream-2 px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none focus:ring-2 focus:ring-ink/10"
+      />
+      <textarea
+        value={body}
+        onChange={(e) => setBody(e.target.value)}
+        placeholder="Message body — plain text, line breaks preserved"
+        rows={5}
+        maxLength={20_000}
+        required
+        className="w-full rounded-lg border border-rule bg-cream-2 px-3 py-2 text-sm text-ink focus:border-ink focus:outline-none focus:ring-2 focus:ring-ink/10"
+      />
+      {error && <p className="text-xs text-red">{error}</p>}
+      {ok && (
+        <p className="text-xs text-success-deep">
+          Sent. Audit logged.
+        </p>
+      )}
+      <div className="flex justify-end gap-2">
+        <button
+          type="button"
+          onClick={onClose}
+          className="inline-flex h-8 items-center rounded-full border border-rule bg-cream-2 px-3 text-xs font-medium text-ink-soft hover:border-ink hover:text-ink"
+        >
+          Close
+        </button>
+        <button
+          type="submit"
+          disabled={sending || subject.length < 2 || body.length < 4}
+          className="inline-flex h-8 items-center rounded-full border border-ink bg-ink px-4 text-xs font-medium text-cream hover:bg-red hover:border-red disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {sending ? "Sending…" : "Send"}
+        </button>
+      </div>
+    </form>
   );
 }
 
