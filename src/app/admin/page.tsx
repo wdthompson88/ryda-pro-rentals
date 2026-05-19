@@ -1,6 +1,6 @@
 "use client";
 
-// /admin — read-only operational triage dashboard.
+// /admin — operational console.
 //
 // Gating: client-side this page just checks supabase.auth.getUser()
 // and bounces to /signin if anon. The TRUE gate is the
@@ -10,14 +10,28 @@
 // "no permission" empty state; no data leaks because the API call
 // 403s before returning anything.
 //
-// Intentionally minimal: counts + 20 most-recent rows per category.
-// Action buttons (resend, refund, mark KYC verified, ack transfer)
-// land in subsequent passes.
+// Capabilities (all wired to admin-gated API routes):
+//   - Counts strip + 20 most-recent rows per category (purchases,
+//     bookings, KYC, share transfers)
+//   - Per-row actions: mark purchase paid, resend amendment, refund,
+//     cancel booking, force-verify KYC, cancel KYC, approve/reject
+//     pending share transfer
+//   - Find-a-member lookup (email substring or UUID) with full picture
+//   - Recent-admin-actions panel (last 10 audit-log entries)
+//   - Manual refresh + auto-refresh toggle (30s cadence)
+//   - CSV export per table
+//   - Sub-route nav (prospects, disputes, LLC formation, comparables,
+//     vehicle enrichment, creative queue, audit log)
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { authedFetch } from "@/lib/api-fetch";
+import { useActionModal } from "@/components/admin/action-modal";
+import { RefreshBar } from "@/components/admin/refresh-bar";
+import { AuditSummary } from "@/components/admin/audit-summary";
+import { UserLookup } from "@/components/admin/user-lookup";
+import { downloadCsv } from "@/components/admin/csv";
 
 type Counts = {
   purchases_pending: number;
@@ -84,58 +98,64 @@ type Overview = {
   };
 };
 
+const SUB_ROUTES = [
+  { href: "/admin", label: "Triage", note: "this page" },
+  { href: "/admin/creative", label: "Creative", note: "marketing generation queue" },
+  { href: "/admin/prospects", label: "Prospects", note: "founding cohort CRM" },
+  { href: "/admin/disputes", label: "Disputes", note: "Stripe chargebacks" },
+  { href: "/admin/llc", label: "LLCs", note: "formation + members" },
+  { href: "/admin/comparables", label: "Comparables", note: "vehicle market data" },
+  { href: "/admin/vehicle-enrichment", label: "Enrichment", note: "VIN decoder" },
+  { href: "/admin/audit", label: "Audit", note: "admin actions log" },
+];
+
 export default function AdminPage() {
   const [data, setData] = useState<Overview | null>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lastRefreshedAt, setLastRefreshedAt] = useState<Date | null>(null);
+  const [refreshNonce, setRefreshNonce] = useState(0);
+  const initialLoad = useRef(true);
 
-  // Re-fetch the overview after every admin action so the UI
-  // reflects the new state. Action components call reload() after
-  // a successful mutation.
-  async function reload() {
+  const { open: openModal, modal } = useActionModal();
+
+  const reload = useCallback(async () => {
+    setRefreshing(true);
     try {
       const res = await authedFetch("/api/admin/overview");
-      if (res.status === 401 || res.status === 403) return;
-      if (!res.ok) throw new Error(`Lookup failed (${res.status}).`);
+      if (res.status === 401) {
+        setError("Sign in required.");
+        return;
+      }
+      if (res.status === 403) {
+        setError(
+          "Your account doesn't have admin access. Ask another admin to flip your role.",
+        );
+        return;
+      }
+      if (!res.ok) {
+        throw new Error(`Lookup failed (${res.status}).`);
+      }
       const j = (await res.json()) as Overview;
       setData(j);
+      setError(null);
+      setLastRefreshedAt(new Date());
+      setRefreshNonce((n) => n + 1);
     } catch (e) {
-      console.error("[admin · reload]", e);
+      setError(e instanceof Error ? e.message : "Could not load.");
+    } finally {
+      setRefreshing(false);
+      if (initialLoad.current) {
+        setLoading(false);
+        initialLoad.current = false;
+      }
     }
-  }
+  }, []);
 
   useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await authedFetch("/api/admin/overview");
-        if (cancelled) return;
-        if (res.status === 401) {
-          setError("Sign in required.");
-          return;
-        }
-        if (res.status === 403) {
-          setError(
-            "Your account doesn't have admin access. Ask another admin to flip your role.",
-          );
-          return;
-        }
-        if (!res.ok) {
-          throw new Error(`Lookup failed (${res.status}).`);
-        }
-        const j = (await res.json()) as Overview;
-        setData(j);
-      } catch (e) {
-        if (!cancelled)
-          setError(e instanceof Error ? e.message : "Could not load.");
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    void reload();
+  }, [reload]);
 
   return (
     <>
@@ -146,42 +166,44 @@ export default function AdminPage() {
             Admin
           </p>
           <h1 className="mt-3 font-display text-3xl font-light text-ink sm:text-4xl">
-            Operational triage.
+            Operational console.
           </h1>
-          <p className="mt-2 max-w-2xl text-sm text-ink-soft">
-            Read-only view of recent purchases, bookings, KYC checks, and
-            share transfers. Action buttons land in subsequent passes — for
-            now use the Supabase dashboard for state changes.
+          <p className="mt-2 max-w-3xl text-sm text-ink-soft">
+            Cross-user view of purchases, bookings, KYC, and share transfers
+            with inline actions. Per-row buttons hit the same admin-gated API
+            routes as the deeper sub-pages — every action is logged to{" "}
+            <Link
+              href="/admin/audit"
+              className="text-marine hover:text-marine-deep"
+            >
+              audit
+            </Link>
+            .
           </p>
 
-          {/* Sub-route nav. Without this, the admin sub-routes
-              (/admin/prospects, /admin/disputes, etc.) are invisible
-              from the dashboard. Each is a separate workstream with
-              its own state. Ordering: pre-customer (prospects) → live
-              ops (disputes, LLC, audit, comparables, vehicle data)
-              roughly mirrors the customer lifecycle. */}
           <nav className="mt-6 flex flex-wrap gap-2 text-xs">
-            {[
-              { href: "/admin", label: "Triage", note: "this page" },
-              { href: "/admin/creative", label: "Creative", note: "marketing generation queue" },
-              { href: "/admin/prospects", label: "Prospects", note: "founding cohort CRM" },
-              { href: "/admin/disputes", label: "Disputes", note: "Stripe chargebacks" },
-              { href: "/admin/llc", label: "LLCs", note: "formation + members" },
-              { href: "/admin/comparables", label: "Comparables", note: "vehicle market data" },
-              { href: "/admin/vehicle-enrichment", label: "Enrichment", note: "VIN decoder" },
-              { href: "/admin/audit", label: "Audit", note: "admin actions log" },
-            ].map((link) => (
+            {SUB_ROUTES.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 title={link.note}
-                className="rounded-full border border-rule bg-cream-2 px-3 py-1 font-medium text-ink-soft transition-colors hover:border-ink hover:text-ink"
+                aria-current={link.href === "/admin" ? "page" : undefined}
+                className={`rounded-full border px-3 py-1 font-medium transition-colors ${
+                  link.href === "/admin"
+                    ? "border-ink bg-ink text-cream"
+                    : "border-rule bg-cream-2 text-ink-soft hover:border-ink hover:text-ink"
+                }`}
               >
                 {link.label}
               </Link>
             ))}
           </nav>
         </header>
+
+        {/* User lookup is at the top because admins land here knowing
+            who they need to look up far more often than scrolling the
+            recent-20 list. */}
+        <UserLookup />
 
         {loading ? (
           <p className="text-sm text-mute">Loading…</p>
@@ -197,16 +219,69 @@ export default function AdminPage() {
           </div>
         ) : !data ? null : (
           <>
+            <div className="mb-4">
+              <RefreshBar
+                onRefresh={reload}
+                loading={refreshing}
+                lastRefreshedAt={lastRefreshedAt}
+              />
+            </div>
+
             {/* Counts strip */}
             <section className="grid grid-cols-2 gap-3 sm:grid-cols-5 sm:gap-4">
-              <Stat label="Pending purchases" value={data.counts.purchases_pending} tone={data.counts.purchases_pending > 0 ? "warn" : "off"} />
-              <Stat label="Failed purchases" value={data.counts.purchases_failed} tone={data.counts.purchases_failed > 0 ? "warn" : "off"} />
-              <Stat label="Paid purchases" value={data.counts.purchases_paid} tone="ok" />
-              <Stat label="Pending bookings" value={data.counts.bookings_pending} tone={data.counts.bookings_pending > 0 ? "warn" : "off"} />
-              <Stat label="Open transfers" value={data.counts.transfers_open} tone={data.counts.transfers_open > 0 ? "warn" : "off"} />
+              <Stat
+                label="Pending purchases"
+                value={data.counts.purchases_pending}
+                tone={data.counts.purchases_pending > 0 ? "warn" : "off"}
+              />
+              <Stat
+                label="Failed purchases"
+                value={data.counts.purchases_failed}
+                tone={data.counts.purchases_failed > 0 ? "warn" : "off"}
+              />
+              <Stat
+                label="Paid purchases"
+                value={data.counts.purchases_paid}
+                tone="ok"
+              />
+              <Stat
+                label="Pending bookings"
+                value={data.counts.bookings_pending}
+                tone={data.counts.bookings_pending > 0 ? "warn" : "off"}
+              />
+              <Stat
+                label="Open transfers"
+                value={data.counts.transfers_open}
+                tone={data.counts.transfers_open > 0 ? "warn" : "off"}
+              />
             </section>
 
-            <Section title="Recent share purchases">
+            <Section
+              title="Recent share purchases"
+              onExport={() =>
+                downloadCsv({
+                  filename: "ryda-admin-purchases.csv",
+                  columns: [
+                    "id",
+                    "status",
+                    "asset",
+                    "shares",
+                    "total_usd",
+                    "buyer_email",
+                    "updated_at",
+                  ],
+                  rows: data.recent.purchases.map((p) => [
+                    p.id,
+                    p.status,
+                    p.vehicle_symbol ?? p.boat_slug ?? "",
+                    p.shares,
+                    (p.total_cents / 100).toFixed(2),
+                    p.email,
+                    p.updated_at,
+                  ]),
+                })
+              }
+            >
               <Table
                 columns={["Status", "Asset", "Shares", "Total", "Buyer", "Updated", ""]}
                 rows={data.recent.purchases.map((p) => [
@@ -216,12 +291,44 @@ export default function AdminPage() {
                   `$${(p.total_cents / 100).toLocaleString()}`,
                   p.email,
                   fmt(p.updated_at),
-                  <PurchaseActions key={`act-${p.id}`} purchase={p} reload={reload} />,
+                  <PurchaseActions
+                    key={`act-${p.id}`}
+                    purchase={p}
+                    openModal={openModal}
+                    reload={reload}
+                  />,
                 ])}
               />
             </Section>
 
-            <Section title="Recent bookings">
+            <Section
+              title="Recent bookings"
+              onExport={() =>
+                downloadCsv({
+                  filename: "ryda-admin-bookings.csv",
+                  columns: [
+                    "id",
+                    "status",
+                    "asset",
+                    "mode",
+                    "start_date",
+                    "end_date",
+                    "user_id",
+                    "created_at",
+                  ],
+                  rows: data.recent.bookings.map((b) => [
+                    b.id,
+                    b.status,
+                    b.vehicle_symbol ?? b.boat_slug ?? "",
+                    b.mode,
+                    b.start_date,
+                    b.end_date,
+                    b.user_id,
+                    b.created_at,
+                  ]),
+                })
+              }
+            >
               <Table
                 columns={["Status", "Asset", "Mode", "Dates", "Created", ""]}
                 rows={data.recent.bookings.map((b) => [
@@ -230,12 +337,38 @@ export default function AdminPage() {
                   b.mode,
                   `${b.start_date} → ${b.end_date}`,
                   fmt(b.created_at),
-                  <BookingActions key={`bact-${b.id}`} booking={b} reload={reload} />,
+                  <BookingActions
+                    key={`bact-${b.id}`}
+                    booking={b}
+                    openModal={openModal}
+                    reload={reload}
+                  />,
                 ])}
               />
             </Section>
 
-            <Section title="Recent KYC">
+            <Section
+              title="Recent KYC"
+              onExport={() =>
+                downloadCsv({
+                  filename: "ryda-admin-kyc.csv",
+                  columns: [
+                    "user_id",
+                    "status",
+                    "failure_code",
+                    "failure_reason",
+                    "updated_at",
+                  ],
+                  rows: data.recent.kyc.map((k) => [
+                    k.user_id,
+                    k.status,
+                    k.failure_code ?? "",
+                    k.failure_reason ?? "",
+                    k.updated_at,
+                  ]),
+                })
+              }
+            >
               <Table
                 columns={["Status", "Failure", "User", "Updated", ""]}
                 rows={data.recent.kyc.map((k) => [
@@ -245,14 +378,54 @@ export default function AdminPage() {
                     : "—",
                   k.user_id.slice(0, 8),
                   fmt(k.updated_at),
-                  <KycActions key={`kact-${k.id}`} kyc={k} reload={reload} />,
+                  <KycActions
+                    key={`kact-${k.id}`}
+                    kyc={k}
+                    openModal={openModal}
+                    reload={reload}
+                  />,
                 ])}
               />
             </Section>
 
-            <Section title="Recent share transfers">
+            <Section
+              title="Recent share transfers"
+              onExport={() =>
+                downloadCsv({
+                  filename: "ryda-admin-transfers.csv",
+                  columns: [
+                    "id",
+                    "status",
+                    "asset",
+                    "shares",
+                    "from_user_id",
+                    "to_user_email",
+                    "expires_at",
+                    "updated_at",
+                  ],
+                  rows: data.recent.transfers.map((t) => [
+                    t.id,
+                    t.status,
+                    t.vehicle_symbol ?? t.boat_slug ?? "",
+                    t.shares,
+                    t.from_user_id,
+                    t.to_user_email,
+                    t.expires_at,
+                    t.updated_at,
+                  ]),
+                })
+              }
+            >
               <Table
-                columns={["Status", "Asset", "Shares", "From → To", "Expires", "Updated", ""]}
+                columns={[
+                  "Status",
+                  "Asset",
+                  "Shares",
+                  "From → To",
+                  "Expires",
+                  "Updated",
+                  "",
+                ]}
                 rows={data.recent.transfers.map((t) => [
                   pill(t.status),
                   String(t.vehicle_symbol ?? t.boat_slug ?? "—"),
@@ -260,23 +433,51 @@ export default function AdminPage() {
                   `${t.from_user_id.slice(0, 8)} → ${t.to_user_email}`,
                   fmt(t.expires_at),
                   fmt(t.updated_at),
-                  <TransferActions key={`tact-${t.id}`} transfer={t} reload={reload} />,
+                  <TransferActions
+                    key={`tact-${t.id}`}
+                    transfer={t}
+                    openModal={openModal}
+                    reload={reload}
+                  />,
                 ])}
               />
             </Section>
+
+            <AuditSummary refreshNonce={refreshNonce} />
           </>
         )}
       </section>
+
+      {modal}
     </>
   );
 }
 
 // ── view primitives ────────────────────────────────────────────
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({
+  title,
+  children,
+  onExport,
+}: {
+  title: string;
+  children: React.ReactNode;
+  onExport?: () => void;
+}) {
   return (
     <section className="mt-10">
-      <h2 className="font-display text-xl text-ink">{title}</h2>
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h2 className="font-display text-xl text-ink">{title}</h2>
+        {onExport && (
+          <button
+            type="button"
+            onClick={onExport}
+            className="text-xs font-medium text-marine hover:text-marine-deep"
+          >
+            Export CSV ↓
+          </button>
+        )}
+      </div>
       <div className="mt-4 overflow-x-auto rounded-xl border border-rule bg-surface">
         {children}
       </div>
@@ -390,35 +591,47 @@ function fmt(iso: string) {
 
 // ── Admin action buttons ───────────────────────────────────────
 //
-// Each component prompts the admin for a confirmation note (via a
-// browser prompt() — minimal but functional; richer modal can
-// land later) and POSTs to the corresponding admin route. After
-// success, reload() re-fetches the overview so the row reflects
-// the new status without a manual refresh.
+// Each component drives the row's action surface. The modal opener
+// is plumbed in from the page so confirmations are styled + multi-line
+// rather than the legacy window.prompt() / window.confirm() flow.
+
+type ModalOpener = ReturnType<typeof useActionModal>["open"];
 
 function PurchaseActions({
   purchase,
+  openModal,
   reload,
 }: {
   purchase: Purchase;
+  openModal: ModalOpener;
   reload: () => Promise<void>;
 }) {
   const [busy, setBusy] = useState<string | null>(null);
 
-  async function call(path: string, label: string) {
+  async function run(
+    label: string,
+    path: string,
+    cfg: {
+      title: string;
+      message: string;
+      confirmLabel: string;
+      tone?: "default" | "danger";
+      noteRequired?: boolean;
+    },
+  ) {
     if (busy) return;
-    const note = window.prompt(`${label}\n\nOptional ops note:`);
-    if (note === null) return; // cancel
+    const res = await openModal({ ...cfg });
+    if (!res.confirmed) return;
     setBusy(label);
     try {
-      const res = await authedFetch(path, {
+      const r = await authedFetch(path, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ note }),
+        body: JSON.stringify({ note: res.note }),
       });
-      if (!res.ok) {
-        const j = await res.json().catch(() => ({}));
-        throw new Error(j.error || `Failed (${res.status}).`);
+      if (!r.ok) {
+        const j = await r.json().catch(() => ({}));
+        throw new Error(j.error || `Failed (${r.status}).`);
       }
       await reload();
     } catch (e) {
@@ -428,14 +641,20 @@ function PurchaseActions({
     }
   }
 
+  const asset = purchase.vehicle_symbol ?? purchase.boat_slug ?? "asset";
+
   return (
     <div className="flex flex-wrap gap-1">
       {purchase.status === "pending" && (
         <ActionBtn
           onClick={() =>
-            call(`/api/admin/purchase/${purchase.id}/mark-paid`, "Mark paid")
+            run("mark-paid", `/api/admin/purchase/${purchase.id}/mark-paid`, {
+              title: "Mark purchase paid",
+              message: `Flip ${purchase.shares} ${asset} share${purchase.shares === 1 ? "" : "s"} for ${purchase.email} to paid? Amendment generation triggers downstream.`,
+              confirmLabel: "Mark paid",
+            })
           }
-          busy={busy === "Mark paid"}
+          busy={busy === "mark-paid"}
         >
           Mark paid
         </ActionBtn>
@@ -443,12 +662,13 @@ function PurchaseActions({
       {purchase.status === "paid" && (
         <ActionBtn
           onClick={() =>
-            call(
-              `/api/share-purchase/${purchase.id}/resend-amendment`,
-              "Resend amendment",
-            )
+            run("resend", `/api/share-purchase/${purchase.id}/resend-amendment`, {
+              title: "Resend amendment",
+              message: `Re-deliver the LLC amendment to ${purchase.email}.`,
+              confirmLabel: "Resend",
+            })
           }
-          busy={busy === "Resend amendment"}
+          busy={busy === "resend"}
         >
           Resend
         </ActionBtn>
@@ -457,9 +677,15 @@ function PurchaseActions({
         <ActionBtn
           tone="danger"
           onClick={() =>
-            call(`/api/share-purchase/${purchase.id}/refund`, "Refund / cancel")
+            run("refund", `/api/share-purchase/${purchase.id}/refund`, {
+              title: "Refund / cancel",
+              message: `Refund $${(purchase.total_cents / 100).toLocaleString()} for ${purchase.shares} ${asset} share${purchase.shares === 1 ? "" : "s"} and cancel the LLC seat. This is irreversible.`,
+              confirmLabel: "Refund",
+              tone: "danger",
+              noteRequired: true,
+            })
           }
-          busy={busy === "Refund / cancel"}
+          busy={busy === "refund"}
         >
           Refund
         </ActionBtn>
@@ -470,32 +696,35 @@ function PurchaseActions({
 
 function BookingActions({
   booking,
+  openModal,
   reload,
 }: {
   booking: Booking;
+  openModal: ModalOpener;
   reload: () => Promise<void>;
 }) {
   const [busy, setBusy] = useState(false);
 
   async function cancel() {
     if (busy) return;
-    if (
-      !window.confirm(
-        `Cancel booking on ${booking.vehicle_symbol ?? booking.boat_slug ?? "asset"} (${booking.start_date} → ${booking.end_date})?`,
-      )
-    )
-      return;
-    const note = window.prompt("Optional ops note:") ?? "";
+    const asset = booking.vehicle_symbol ?? booking.boat_slug ?? "asset";
+    const res = await openModal({
+      title: "Cancel booking",
+      message: `Cancel ${asset} booking ${booking.start_date} → ${booking.end_date}? Member is notified; slot returns to the calendar.`,
+      confirmLabel: "Cancel booking",
+      tone: "danger",
+    });
+    if (!res.confirmed) return;
     setBusy(true);
     try {
-      const res = await authedFetch(`/api/admin/booking/${booking.id}/cancel`, {
+      const r = await authedFetch(`/api/admin/booking/${booking.id}/cancel`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ note }),
+        body: JSON.stringify({ note: res.note }),
       });
-      if (!res.ok) {
-        const j = await res.json().catch(() => ({}));
-        throw new Error(j.error || `Failed (${res.status}).`);
+      if (!r.ok) {
+        const j = await r.json().catch(() => ({}));
+        throw new Error(j.error || `Failed (${r.status}).`);
       }
       await reload();
     } catch (e) {
@@ -517,32 +746,35 @@ function BookingActions({
 
 function KycActions({
   kyc,
+  openModal,
   reload,
 }: {
   kyc: Kyc;
+  openModal: ModalOpener;
   reload: () => Promise<void>;
 }) {
   const [busy, setBusy] = useState<string | null>(null);
 
   async function override(status: string, label: string) {
     if (busy) return;
-    if (
-      !window.confirm(
-        `Manually flip KYC for user ${kyc.user_id.slice(0, 8)} → ${status}?`,
-      )
-    )
-      return;
-    const note = window.prompt("Optional ops note:") ?? "";
+    const res = await openModal({
+      title: status === "verified" ? "Force-verify KYC" : "Cancel KYC",
+      message: `Manually flip KYC for user ${kyc.user_id.slice(0, 8)} → ${status}. Bypasses the verification provider.`,
+      confirmLabel: status === "verified" ? "Force verify" : "Cancel KYC",
+      tone: status === "verified" ? "default" : "danger",
+      noteRequired: true,
+    });
+    if (!res.confirmed) return;
     setBusy(label);
     try {
-      const res = await authedFetch("/api/admin/kyc/override", {
+      const r = await authedFetch("/api/admin/kyc/override", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: kyc.user_id, status, note }),
+        body: JSON.stringify({ userId: kyc.user_id, status, note: res.note }),
       });
-      if (!res.ok) {
-        const j = await res.json().catch(() => ({}));
-        throw new Error(j.error || `Failed (${res.status}).`);
+      if (!r.ok) {
+        const j = await r.json().catch(() => ({}));
+        throw new Error(j.error || `Failed (${r.status}).`);
       }
       await reload();
     } catch (e) {
@@ -577,36 +809,44 @@ function KycActions({
 
 function TransferActions({
   transfer,
+  openModal,
   reload,
 }: {
   transfer: Transfer;
+  openModal: ModalOpener;
   reload: () => Promise<void>;
 }) {
   const [busy, setBusy] = useState<string | null>(null);
 
   async function ack(action: "approve" | "reject") {
     if (busy) return;
-    if (
-      !window.confirm(
-        `${action === "approve" ? "APPROVE" : "REJECT"} transfer ${transfer.id.slice(0, 8)}?\n\nApproval moves the share to ${transfer.to_user_email}.`,
-      )
-    )
-      return;
-    const note = window.prompt("Required ops note:") ?? "";
-    if (!note) {
-      window.alert("Note required for transfer ack.");
-      return;
-    }
+    const asset = transfer.vehicle_symbol ?? transfer.boat_slug ?? "asset";
+    const res = await openModal({
+      title:
+        action === "approve" ? "Approve share transfer" : "Reject share transfer",
+      message:
+        action === "approve"
+          ? `Move ${transfer.shares} ${asset} share${transfer.shares === 1 ? "" : "s"} to ${transfer.to_user_email}. Originating member is notified; cap table updates.`
+          : `Reject the transfer to ${transfer.to_user_email}. Originating member retains the shares; both parties are notified.`,
+      confirmLabel: action === "approve" ? "Approve" : "Reject",
+      tone: action === "approve" ? "default" : "danger",
+      noteRequired: true,
+    });
+    if (!res.confirmed) return;
     setBusy(action);
     try {
-      const res = await authedFetch("/api/admin/transfer/ack", {
+      const r = await authedFetch("/api/admin/transfer/ack", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ transferId: transfer.id, action, note }),
+        body: JSON.stringify({
+          transferId: transfer.id,
+          action,
+          note: res.note,
+        }),
       });
-      if (!res.ok) {
-        const j = await res.json().catch(() => ({}));
-        throw new Error(j.error || `Failed (${res.status}).`);
+      if (!r.ok) {
+        const j = await r.json().catch(() => ({}));
+        throw new Error(j.error || `Failed (${r.status}).`);
       }
       await reload();
     } catch (e) {
