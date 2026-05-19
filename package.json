@@ -23,6 +23,7 @@
     "marketing:daily-spot": "tsx scripts/marketing/video/daily-spot.ts",
     "marketing:smoke-video": "tsx scripts/marketing/video/__smoke__/composer-smoke.ts",
     "marketing:brief": "tsx scripts/marketing/daily-brief.ts",
+    "sample-docs:pdf": "node scripts/generate-sample-document-pdfs.mjs",
     "check:dropbox-sign": "tsx scripts/check-dropbox-sign.ts"
   },
   "dependencies": {

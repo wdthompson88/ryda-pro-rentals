@@ -15,10 +15,10 @@ const DOCS: SampleDocumentGroup[] = getSampleDocumentGroups().map((group) => ({
   category: group.category,
   items: group.items.map((doc) => ({
     title: doc.title,
-    meta: "Redacted sample · Markdown",
+    meta: "Redacted sample · PDF",
     purpose: doc.summary,
     href: `/api/sample-documents/${doc.slug}`,
-    actionLabel: "Download sample",
+    actionLabel: "Download PDF",
   })),
 }));
 

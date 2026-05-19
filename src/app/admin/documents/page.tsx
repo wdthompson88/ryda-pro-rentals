@@ -98,11 +98,12 @@ export default function AdminDocumentsPage() {
             </h1>
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-soft">
               Canonical redacted sample packet for the public sample-document
-              page. These are local Markdown source files in
+              page. Public and admin downloads are generated PDF files in
               <code className="mx-1 rounded bg-cream-2 px-1 py-0.5 text-[12px]">
-                docs/sample-documents
+                docs/sample-documents/pdf
               </code>
-              and are separate from member-specific Dropbox Sign PDFs.
+              . Markdown files remain the editable source and are separate from
+              member-specific Dropbox Sign PDFs.
             </p>
           </div>
           <Link
@@ -127,7 +128,7 @@ export default function AdminDocumentsPage() {
               <p className="font-medium text-ink">Current status</p>
               <p className="mt-2">
                 Public users can download these redacted samples. Admins can
-                download the same canonical local files here. Final OA/MSA/
+                download the same canonical PDF files here. Final OA/MSA/
                 Subscription templates still need Dropbox Sign configuration
                 before member-specific e-signature PDFs are live.
               </p>
@@ -142,7 +143,7 @@ export default function AdminDocumentsPage() {
                       <tr>
                         <th className="px-5 py-3 text-left">Document</th>
                         <th className="px-5 py-3 text-left">Status</th>
-                        <th className="px-5 py-3 text-left">Local source</th>
+                        <th className="px-5 py-3 text-left">PDF file</th>
                         <th className="px-5 py-3 text-right">Actions</th>
                       </tr>
                     </thead>
@@ -162,7 +163,7 @@ export default function AdminDocumentsPage() {
                           </td>
                           <td className="px-5 py-4 align-top">
                             <code className="text-[11px] text-ink-soft">
-                              docs/sample-documents/{doc.filename}
+                              docs/sample-documents/pdf/{doc.pdfFilename}
                             </code>
                           </td>
                           <td className="px-5 py-4 align-top">
@@ -171,7 +172,7 @@ export default function AdminDocumentsPage() {
                                 href={doc.publicHref}
                                 className="rounded-full border border-rule bg-cream-2 px-3 py-1.5 text-xs font-medium text-ink hover:border-ink"
                               >
-                                Public
+                                Public PDF
                               </a>
                               <button
                                 type="button"
@@ -179,7 +180,7 @@ export default function AdminDocumentsPage() {
                                 disabled={busySlug === doc.slug}
                                 className="rounded-full bg-ink px-3 py-1.5 text-xs font-medium text-cream hover:bg-red disabled:opacity-50"
                               >
-                                {busySlug === doc.slug ? "Downloading..." : "Admin download"}
+                                {busySlug === doc.slug ? "Downloading..." : "Admin PDF"}
                               </button>
                             </div>
                           </td>
@@ -196,4 +197,3 @@ export default function AdminDocumentsPage() {
     </>
   );
 }
-

@@ -1,7 +1,8 @@
 # RYDA Sample Document Library
 
 These are local, redacted sample documents for the public `/sample-documents`
-page and the admin `/admin/documents` surface.
+page and the admin `/admin/documents` surface. The Markdown files are editable
+source. The downloadable user-facing files are generated PDFs in `pdf/`.
 
 Status: pre-counsel sample drafts. Do not treat these as final legal documents.
 
@@ -16,3 +17,8 @@ Production signed documents remain a separate workflow:
 This folder exists so the marketing site and admin dashboard have a canonical
 local source for the sample packet listed on the public page.
 
+Regenerate PDFs after editing source copy:
+
+```bash
+npm run sample-docs:pdf
+```
