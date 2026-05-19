@@ -16,7 +16,22 @@ import { supabase } from "@/lib/supabase";
 
 export type AuthStatus = "loading" | "anon" | "authed";
 
-export function useAuthStatus(): { status: AuthStatus; user: User | null } {
+// isAdmin reads app_metadata.role from the cached JWT — that's
+// service-role-only writable, so users can't self-promote. The cached
+// value can lag a server-side role change until the next session
+// refresh; that's OK for UI affordances (showing a link to /admin).
+// Anything load-bearing still re-checks server-side in requireAdmin.
+function readIsAdmin(user: User | null): boolean {
+  if (!user) return false;
+  const meta = user.app_metadata as { role?: unknown } | undefined;
+  return meta?.role === "admin";
+}
+
+export function useAuthStatus(): {
+  status: AuthStatus;
+  user: User | null;
+  isAdmin: boolean;
+} {
   const [status, setStatus] = useState<AuthStatus>("loading");
   const [user, setUser] = useState<User | null>(null);
 
@@ -70,5 +85,5 @@ export function useAuthStatus(): { status: AuthStatus; user: User | null } {
     };
   }, []);
 
-  return { status, user };
+  return { status, user, isAdmin: readIsAdmin(user) };
 }

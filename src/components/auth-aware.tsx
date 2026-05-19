@@ -21,6 +21,15 @@ export function HiddenWhenAuthed({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
+// Render children only for admin users (app_metadata.role === "admin").
+// Used to surface admin-only header affordances (the /admin link)
+// without leaking them to anon visitors or non-admin members.
+export function VisibleWhenAdmin({ children }: { children: ReactNode }) {
+  const { isAdmin } = useAuthStatus();
+  if (!isAdmin) return null;
+  return <>{children}</>;
+}
+
 // VisibleWhenAuthed (the symmetric inverse of HiddenWhenAuthed)
 // removed in the dead-code sweep (May 2026). Anyone needing the
 // inverse can re-add or use AuthSwap below — that's the more

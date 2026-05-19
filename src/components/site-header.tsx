@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { AuthSwap } from "@/components/auth-aware";
+import { AuthSwap, VisibleWhenAdmin } from "@/components/auth-aware";
 
 // RYDA spans three verticals: Cars, Boats, Planes. The header detects
 // which vertical the visitor is in via the pathname and swaps the nav
@@ -72,6 +72,12 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
   // its own — same shape as Sign up so the layout doesn't reflow on
   // hydration.
   const accountBtn = signUpBtn;
+  // Admin pill (admin-only, sits to the left of Account). Soft pill in
+  // the same family as Log in, accented marine to read as "tool, not
+  // CTA" — admins glance at it, members never see it.
+  const adminBtn = inverted
+    ? "border-cream/30 bg-cream/10 text-cream hover:border-cream hover:bg-cream/15"
+    : "border-rule bg-cream-2 text-marine hover:border-marine hover:text-marine-deep";
   // Search input theming, tracks the inverted state.
   const searchInput = inverted
     ? "border-cream/30 bg-cream/10 text-cream placeholder:text-cream/50 focus:border-cream focus:ring-cream/20"
@@ -197,12 +203,22 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
               </>
             }
             authed={
-              <Link
-                href="/account"
-                className={`hidden rounded-full border px-5 py-2 text-sm font-medium transition-colors sm:inline-flex ${accountBtn}`}
-              >
-                Account
-              </Link>
+              <>
+                <VisibleWhenAdmin>
+                  <Link
+                    href="/admin"
+                    className={`hidden rounded-full border px-5 py-2 text-sm font-medium transition-colors sm:inline-flex ${adminBtn}`}
+                  >
+                    Admin
+                  </Link>
+                </VisibleWhenAdmin>
+                <Link
+                  href="/account"
+                  className={`hidden rounded-full border px-5 py-2 text-sm font-medium transition-colors sm:inline-flex ${accountBtn}`}
+                >
+                  Account
+                </Link>
+              </>
             }
           />
 
@@ -328,13 +344,24 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
                 </>
               }
               authed={
-                <Link
-                  href="/account"
-                  onClick={() => setOpen(false)}
-                  className={`mt-3 inline-flex h-12 items-center justify-center rounded-full border px-5 text-sm font-medium transition-colors ${accountBtn}`}
-                >
-                  Account
-                </Link>
+                <>
+                  <VisibleWhenAdmin>
+                    <Link
+                      href="/admin"
+                      onClick={() => setOpen(false)}
+                      className={`mt-3 inline-flex h-12 items-center justify-center rounded-full border px-5 text-sm font-medium transition-colors ${adminBtn}`}
+                    >
+                      Admin
+                    </Link>
+                  </VisibleWhenAdmin>
+                  <Link
+                    href="/account"
+                    onClick={() => setOpen(false)}
+                    className={`mt-3 inline-flex h-12 items-center justify-center rounded-full border px-5 text-sm font-medium transition-colors ${accountBtn}`}
+                  >
+                    Account
+                  </Link>
+                </>
               }
             />
             <div className="mt-2 flex items-center justify-between rounded-lg px-3 py-2">
