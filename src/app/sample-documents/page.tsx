@@ -3,6 +3,7 @@ import {
   SampleDocumentsPageTemplate,
   type SampleDocumentGroup,
 } from "@/components/shared/sample-documents-page";
+import { getSampleDocumentGroups } from "@/lib/sample-documents";
 
 export const metadata = {
   title: "Sample documents",
@@ -10,20 +11,16 @@ export const metadata = {
     "The legal and operational documents RYDA uses. Request the redacted packet to review with your counsel.",
 };
 
-const DOCS: SampleDocumentGroup[] = [
-  {
-    category: "Legal · LLC structure",
-    items: ["Operating Agreement", "Management Services Agreement", "Subscription Agreement"],
-  },
-  {
-    category: "Vehicle · acquisition & condition",
-    items: ["Pre-Purchase Inspection Report", "Certificate of Insurance", "Title Evidence", "Quarterly Condition Report"],
-  },
-  {
-    category: "Operational · use & service",
-    items: ["Booking Rules & Fair-Use Policy", "Damage Reserve Policy"],
-  },
-];
+const DOCS: SampleDocumentGroup[] = getSampleDocumentGroups().map((group) => ({
+  category: group.category,
+  items: group.items.map((doc) => ({
+    title: doc.title,
+    meta: "Redacted sample · Markdown",
+    purpose: doc.summary,
+    href: `/api/sample-documents/${doc.slug}`,
+    actionLabel: "Download sample",
+  })),
+}));
 
 export default function SampleDocumentsPage() {
   return (
@@ -36,11 +33,11 @@ export default function SampleDocumentsPage() {
             eyebrow: "Sample documents",
             title: <>Read the paperwork <span className="italic">before you wire.</span></>,
             body:
-              "We'll send a redacted packet you can hand to your counsel and tax advisor before any commitment is made.",
+              "Download redacted samples immediately, then request a tailored packet for the specific LLC you're considering.",
             links: [
               {
                 href: "/contact?type=Membership&note=Sample%20documents%20packet#form",
-                label: "Request the full packet →",
+                label: "Request tailored packet →",
               },
             ],
           },
@@ -49,7 +46,7 @@ export default function SampleDocumentsPage() {
           cta: {
             title: "Want the packet for a specific car?",
             body:
-              "Pick the vehicle you're considering and we'll tailor the redacted packet to that LLC.",
+              "Pick the vehicle you're considering and we'll tailor the documents to that LLC, asset, and member register.",
             links: [{ href: "/portfolio", label: "Pick a car →" }],
           },
         }}

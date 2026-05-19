@@ -5,9 +5,11 @@ export type SampleDocumentItem =
   | string
   | {
       title: string;
-      meta: string;
-      purpose: string;
-      signedBy: string;
+      meta?: string;
+      purpose?: string;
+      signedBy?: string;
+      href?: string;
+      actionLabel?: string;
     };
 
 export type SampleDocumentGroup = {
@@ -76,7 +78,10 @@ export function SampleDocumentsPageTemplate({ data }: { data: SampleDocumentsPag
             {data.detailed ? (
               <div className="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-2">
                 {group.items.map((item, index) => {
-                  const doc = typeof item === "string" ? { title: item, meta: "", purpose: "", signedBy: "" } : item;
+                  const doc =
+                    typeof item === "string"
+                      ? { title: item, meta: "", purpose: "", signedBy: "" }
+                      : item;
                   return (
                     <Reveal key={doc.title} delayMs={index * 60}>
                       <div className="h-full rounded-2xl border border-rule bg-surface p-6">
@@ -86,18 +91,31 @@ export function SampleDocumentsPageTemplate({ data }: { data: SampleDocumentsPag
                           </div>
                           <div className="min-w-0 flex-1">
                             <p className="font-display text-lg text-ink">{doc.title}</p>
-                            <p className="mt-1 text-[11px] uppercase tracking-[0.14em] text-mute">
-                              {doc.meta}
-                            </p>
+                            {doc.meta && (
+                              <p className="mt-1 text-[11px] uppercase tracking-[0.14em] text-mute">
+                                {doc.meta}
+                              </p>
+                            )}
                           </div>
                         </div>
-                        <p className="mt-5 text-sm leading-relaxed text-ink-soft">{doc.purpose}</p>
-                        <div className="mt-5 flex items-baseline justify-between border-t border-rule pt-4">
-                          <p className="text-[11px] text-mute">
-                            Signed by · <span className="text-ink-soft">{doc.signedBy}</span>
+                        {doc.purpose && (
+                          <p className="mt-5 text-sm leading-relaxed text-ink-soft">
+                            {doc.purpose}
                           </p>
-                          <Link href={data.requestHref} className={`text-xs font-medium ${accentText}`}>
-                            Request →
+                        )}
+                        <div className="mt-5 flex items-baseline justify-between border-t border-rule pt-4">
+                          {doc.signedBy ? (
+                            <p className="text-[11px] text-mute">
+                              Signed by · <span className="text-ink-soft">{doc.signedBy}</span>
+                            </p>
+                          ) : (
+                            <span aria-hidden="true" />
+                          )}
+                          <Link
+                            href={doc.href ?? data.requestHref}
+                            className={`text-xs font-medium ${accentText}`}
+                          >
+                            {doc.actionLabel ?? "Request"} →
                           </Link>
                         </div>
                       </div>
@@ -108,12 +126,25 @@ export function SampleDocumentsPageTemplate({ data }: { data: SampleDocumentsPag
             ) : (
               <ul className="mt-6 divide-y divide-rule">
                 {group.items.map((item) => {
-                  const title = typeof item === "string" ? item : item.title;
+                  const doc =
+                    typeof item === "string"
+                      ? { title: item, href: data.requestHref, actionLabel: "Request sample" }
+                      : item;
                   return (
-                    <li key={title} className="flex items-center justify-between gap-4 py-4">
-                      <p className="font-display text-base text-ink">{title}</p>
-                      <Link href={data.requestHref} className={`text-xs font-medium ${accentText}`}>
-                        Request sample &rarr;
+                    <li key={doc.title} className="flex items-start justify-between gap-4 py-4">
+                      <div className="min-w-0">
+                        <p className="font-display text-base text-ink">{doc.title}</p>
+                        {doc.purpose && (
+                          <p className="mt-1 max-w-xl text-xs leading-relaxed text-mute">
+                            {doc.purpose}
+                          </p>
+                        )}
+                      </div>
+                      <Link
+                        href={doc.href ?? data.requestHref}
+                        className={`shrink-0 text-xs font-medium ${accentText}`}
+                      >
+                        {doc.actionLabel ?? "Request sample"} &rarr;
                       </Link>
                     </li>
                   );

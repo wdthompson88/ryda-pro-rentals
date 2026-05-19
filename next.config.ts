@@ -6,6 +6,10 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.join(__dirname),
   },
+  outputFileTracingIncludes: {
+    "/api/sample-documents/[slug]": ["./docs/sample-documents/**/*"],
+    "/api/admin/sample-documents/[slug]": ["./docs/sample-documents/**/*"],
+  },
   // 301 redirects from the legacy /markets/* paths to /portfolio/*.
   // Per user feedback May 2026: "still labeled as 'markets' in the
   // URL." We renamed the listing index + detail pages to /portfolio
