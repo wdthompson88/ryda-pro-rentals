@@ -66,11 +66,13 @@ const VALID_STATUSES = [
 ] as const;
 type Status = (typeof VALID_STATUSES)[number];
 
+// Content lives inside ryda-web now (the standalone ryda-marketing sibling
+// dir was deprecated 2026-05-19; marketing tooling consolidated into this
+// repo). Override via MARKETING_CONTENT_ROOT env if the operator hosts the
+// drafts elsewhere (e.g. Supabase bucket or a workspace-level mount).
 const CONTENT_ROOT = path.resolve(
   process.cwd(),
-  "..",
-  "ryda-marketing",
-  "content",
+  process.env.MARKETING_CONTENT_ROOT ?? "marketing-content",
 );
 
 type ParsedDraft = {

@@ -1,8 +1,12 @@
 # RYDA — Production Setup Runbook
 
-End-to-end checklist for getting the site from "marketing demo" to
-"actually transacts." Order matters. Each section ends with a
-verification step so you know it landed before moving on.
+End-to-end checklist for a fresh `ryda-web` clone, from cold install to
+production-ready. Order matters. Each section ends with a verification step
+so you know it landed before moving on.
+
+> This repo split from `ryangalli-app` on 2026-05-19. Production is live at
+> `https://ryda.pro`. The marketing-demo phase is historical — the app
+> transacts real share purchases via Stripe + Supabase.
 
 ---
 
@@ -19,36 +23,43 @@ You need accounts on:
 
 ## 1. Run database migrations (Supabase)
 
-Seven migrations live in `supabase/migrations/`. Run them in order.
+The full migration chain currently runs `0007_share_purchases.sql` through
+`0037_content_queue_creative_generation.sql` (37 files as of 2026-05-19 —
+`ls supabase/migrations/` for current state). Apply them in numeric order
+against a fresh project.
 
-**Easiest: paste each into the Supabase SQL Editor**
-
-1. Open https://supabase.com/dashboard → your project → SQL Editor → New query.
-2. For each file in this exact order, paste contents and click Run:
-   - `0007_share_purchases.sql`
-   - `0008_share_holdings.sql`
-   - `0009_bookings.sql`
-   - `0010_kyc_verifications.sql`
-   - `0011_llc_amendments.sql`
-   - `0012_document_signatures.sql`
-   - `0013_purchase_fulfillment_idempotency.sql`
-3. Verify: SQL Editor → run
-   ```sql
-   select table_name from information_schema.tables
-   where table_schema='public' order by table_name;
-   ```
-   You should see: `bookings`, `contact_messages`, `document_signatures`,
-   `help_escalations`, `investor_inquiries`, `kyc_verifications`,
-   `llc_amendments`, `share_holdings`, `share_purchases`, `waitlist`.
-
-**Alternative: psql one-liner.** If you have psql installed and a
-direct connection string, you can run them all at once:
+**Recommended: Supabase CLI** (handles ordering + applies idempotently)
 
 ```bash
-for f in supabase/migrations/00{07,08,09,10,11,12,13}_*.sql; do
-  psql "$DATABASE_URL" -f "$f"
+brew install supabase/tap/supabase   # if not already installed
+supabase login
+supabase link --project-ref <YOUR_PROJECT_REF>
+supabase db push                      # applies every migration in supabase/migrations/
+```
+
+**Alternative: psql one-liner**
+
+```bash
+for f in supabase/migrations/*.sql; do
+  psql "$DATABASE_URL" -f "$f" || break
 done
 ```
+
+**Last resort: paste into Supabase SQL Editor**, one migration at a time,
+in numeric order. Slow but works without any CLI installs.
+
+**Verification** — after applying, run in SQL Editor:
+
+```sql
+select table_name from information_schema.tables
+where table_schema='public' order by table_name;
+```
+
+You should see ~30 tables including: `bookings`, `boats`, `cars`,
+`content_queue`, `dispute_cases`, `document_signatures`, `kyc_verifications`,
+`llc_amendments`, `llc_insurance`, `llc_messages`, `llc_votes`,
+`prospects`, `reservation_agreements`, `share_holdings`, `share_purchases`,
+`vehicle_handovers`, `waitlist`, etc.
 
 ---
 

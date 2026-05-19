@@ -1,9 +1,8 @@
 # RYDA — Production Smoke-Test Runbook
 
 A short, repeatable checklist for verifying production end-to-end after a
-deploy. Run this on the live origin (currently
-`https://ryda-web-teal.vercel.app` — swap to `ryda.com` once DNS is
-cut over) using a real test card.
+deploy. Run this on the live origin `https://ryda.pro` using a real test
+card.
 
 Time: 8–10 minutes. Run after any release that touches auth, Stripe,
 Supabase, or webhooks.

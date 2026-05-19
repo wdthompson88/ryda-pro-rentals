@@ -13,7 +13,7 @@
   Install:
     1. Replace /Users/odinpartners/Desktop/APp/ryda-web with absolute path to ryda-web checkout,
        e.g. /Users/yourname/Desktop/APp/ryda-web
-    2. Replace /usr/local/bin/npm with the absolute path to npm
+    2. Replace /opt/homebrew/bin/npm with the absolute path to npm
        (run `which npm` to find it)
     3. Save as ~/Library/LaunchAgents/com.ryda.video-spot.plist
     4. Load: launchctl load ~/Library/LaunchAgents/com.ryda.video-spot.plist
@@ -35,7 +35,7 @@
 
     <key>ProgramArguments</key>
     <array>
-        <string>/usr/local/bin/npm</string>
+        <string>/opt/homebrew/bin/npm</string>
         <string>run</string>
         <string>marketing:daily-spot</string>
     </array>
