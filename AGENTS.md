@@ -58,7 +58,7 @@ npm run marketing:brief
 
 ## Context Hygiene
 
-- Do not treat root `/Users/odinpartners/Desktop/APp/CLAUDE.md` as detailed RYDA product context.
+- Do not treat root `/Users/odinpartners/Desktop/dev/CLAUDE.md` as detailed RYDA product context.
 - Prefer this file plus current source files.
 - Use `/Users/odinpartners/Desktop/dev/agent-ops/docs/HANDOFF_STATUS_2026-05-15.md` for current setup state.
 - Use `/Users/odinpartners/Desktop/dev/agent-ops/docs/MODEL_COUNCIL_WORKFLOW.md` when multiple AI outputs need prompt judgment.

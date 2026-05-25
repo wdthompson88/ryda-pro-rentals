@@ -4,7 +4,7 @@ Production app for asset-backed luxury vehicle co-ownership and booking.
 
 - Production: **https://ryda.pro**
 - Stack: Next.js (App Router) + TypeScript + Supabase + Stripe + Vercel + Resend + Playwright/Vitest
-- Repo split from `ryangalli-app` monorepo 2026-05-19 — sibling repos are `agent-ops` and `trading-suite` under `~/Desktop/APp/`
+- Repo split from `ryangalli-app` monorepo 2026-05-19 — sibling repos are `agent-ops` and `trading-suite` under `~/Desktop/dev/`
 
 ## Quickstart
 
