@@ -10,7 +10,7 @@ Keep this context lean. Read files that match the task instead of loading broad 
 
 ## Project
 
-- Path: `/Users/odinpartners/Desktop/APp/ryda-web`
+- Path: `/Users/odinpartners/Desktop/dev/ryda-web`
 - Stack: Next.js App Router, TypeScript, Supabase, Stripe, Vercel, Resend, Playwright/Vitest.
 - Production domain: `https://ryda.pro`
 - Product: asset-backed luxury vehicle co-ownership and booking platform with admin gates.
@@ -60,5 +60,5 @@ npm run marketing:brief
 
 - Do not treat root `/Users/odinpartners/Desktop/APp/CLAUDE.md` as detailed RYDA product context.
 - Prefer this file plus current source files.
-- Use `/Users/odinpartners/Desktop/APp/agent-ops/docs/HANDOFF_STATUS_2026-05-15.md` for current setup state.
-- Use `/Users/odinpartners/Desktop/APp/agent-ops/docs/MODEL_COUNCIL_WORKFLOW.md` when multiple AI outputs need prompt judgment.
+- Use `/Users/odinpartners/Desktop/dev/agent-ops/docs/HANDOFF_STATUS_2026-05-15.md` for current setup state.
+- Use `/Users/odinpartners/Desktop/dev/agent-ops/docs/MODEL_COUNCIL_WORKFLOW.md` when multiple AI outputs need prompt judgment.

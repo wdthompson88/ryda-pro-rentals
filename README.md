@@ -62,7 +62,7 @@ npm run marketing:brief    # daily marketing brief
 
 ## Cross-repo
 
-- Operations / dashboard / auto-commit steward: `~/Desktop/APp/agent-ops/`
-- Trading desk (unrelated to this app): `~/Desktop/APp/trading-suite/`
+- Operations / dashboard / auto-commit steward: `~/Desktop/dev/agent-ops/`
+- Trading desk (unrelated to this app): `~/Desktop/dev/trading-suite/`
 
 Each is its own git repo; you push to them independently.

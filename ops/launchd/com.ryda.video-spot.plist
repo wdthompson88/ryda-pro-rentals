@@ -11,8 +11,8 @@
   catches the next time your Mac is awake without creating duplicates.
 
   Install:
-    1. Replace /Users/odinpartners/Desktop/APp/ryda-web with absolute path to ryda-web checkout,
-       e.g. /Users/yourname/Desktop/APp/ryda-web
+    1. Replace /Users/odinpartners/Desktop/dev/ryda-web with absolute path to ryda-web checkout,
+       e.g. /Users/yourname/Desktop/dev/ryda-web
     2. Replace /opt/homebrew/bin/npm with the absolute path to npm
        (run `which npm` to find it)
     3. Save as ~/Library/LaunchAgents/com.ryda.video-spot.plist
@@ -25,7 +25,7 @@
     rm ~/Library/LaunchAgents/com.ryda.video-spot.plist
 
   Manual one-off:
-    cd /Users/odinpartners/Desktop/APp/ryda-web && npm run marketing:daily-spot -- --force
+    cd /Users/odinpartners/Desktop/dev/ryda-web && npm run marketing:daily-spot -- --force
 -->
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -41,14 +41,14 @@
     </array>
 
     <key>WorkingDirectory</key>
-    <string>/Users/odinpartners/Desktop/APp/ryda-web</string>
+    <string>/Users/odinpartners/Desktop/dev/ryda-web</string>
 
     <key>EnvironmentVariables</key>
     <dict>
         <key>PATH</key>
         <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
         <!--
-          Supabase env should come from /Users/odinpartners/Desktop/APp/ryda-web/.env (loaded
+          Supabase env should come from /Users/odinpartners/Desktop/dev/ryda-web/.env (loaded
           by your shell or the script). Don't hardcode here.
         -->
     </dict>

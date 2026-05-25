@@ -240,7 +240,7 @@ function buildBrief(opts: {
     lines.push("");
     lines.push("```bash");
     lines.push(
-      `cd /Users/odinpartners/Desktop/APp/ryda-web && npm run marketing:daily-spot -- --vendor=manual --spot-type=conversion_vo --vehicle ${vehicleIdx ?? 0} --resume`,
+      `cd /Users/odinpartners/Desktop/dev/ryda-web && npm run marketing:daily-spot -- --vendor=manual --spot-type=conversion_vo --vehicle ${vehicleIdx ?? 0} --resume`,
     );
     lines.push("```");
     lines.push("");
@@ -271,7 +271,7 @@ function buildBrief(opts: {
     lines.push("");
     lines.push("```bash");
     lines.push(
-      `cd /Users/odinpartners/Desktop/APp/ryda-web && npm run marketing:daily-spot -- --vendor=manual --vehicle ${vehicleIdx ?? 0} --resume`,
+      `cd /Users/odinpartners/Desktop/dev/ryda-web && npm run marketing:daily-spot -- --vendor=manual --vehicle ${vehicleIdx ?? 0} --resume`,
     );
     lines.push("```");
     lines.push("");

@@ -12,7 +12,7 @@
 
   Install:
     1. Replace {{REPO_PATH}} with absolute path to ryda-web checkout,
-       e.g. /Users/yourname/Desktop/APp/ryda-web
+       e.g. /Users/yourname/Desktop/dev/ryda-web
     2. Replace {{NPM_BIN}} with the absolute path to npm
        (run `which npm` to find it)
     3. Save as ~/Library/LaunchAgents/com.ryda.video-spot.plist

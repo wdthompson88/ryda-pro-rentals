@@ -7,8 +7,8 @@
   crashes.
 
   Install:
-    1. Replace /Users/odinpartners/Desktop/APp/ryda-web with absolute path to ryda-web checkout,
-       e.g. /Users/yourname/Desktop/APp/ryda-web
+    1. Replace /Users/odinpartners/Desktop/dev/ryda-web with absolute path to ryda-web checkout,
+       e.g. /Users/yourname/Desktop/dev/ryda-web
     2. Replace /usr/local/bin/node with the absolute path to node, e.g.
        /opt/homebrew/bin/node (run `which node` to find it)
     3. Replace /opt/homebrew/bin/npm with the absolute path to npm
@@ -49,7 +49,7 @@
     </array>
 
     <key>WorkingDirectory</key>
-    <string>/Users/odinpartners/Desktop/APp/ryda-web</string>
+    <string>/Users/odinpartners/Desktop/dev/ryda-web</string>
 
     <key>EnvironmentVariables</key>
     <dict>
@@ -57,7 +57,7 @@
         <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
         <!--
           Supabase + ChatGPT vars are read from the .env file in
-          /Users/odinpartners/Desktop/APp/ryda-web via the script's own dotenv loading.
+          /Users/odinpartners/Desktop/dev/ryda-web via the script's own dotenv loading.
           Don't hardcode secrets here (plist is plaintext on disk).
         -->
         <key>QUEUE_POLLER_HEADLESS</key>
