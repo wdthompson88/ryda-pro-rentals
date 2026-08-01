@@ -9,7 +9,7 @@
 // integration test against the eviction edge using a higher-cadence
 // load shape, or migrate to Upstash Redis (architecture finding).
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 // Tests target the in-memory adapter directly so they don't need
 // Upstash env vars set. The public `isAllowed` (resolver) is a
 // thin async wrapper over this — separately tested for adapter
@@ -56,18 +56,23 @@ describe("isAllowed — basic token bucket", () => {
     // never recovers and would permanently block legit users after
     // the first burst. The reset path lives in the bucket-creation
     // branch (b.resetAt <= now triggers fresh bucket).
-    const key = `t5-${Math.random()}`;
-    // Use a 1ms window so we can wait past it deterministically.
-    expect(isAllowed(key, 1, 1)).toBe(true);
-    expect(isAllowed(key, 1, 1)).toBe(false);
-    // Wait past the window. setTimeout(0) doesn't advance Date.now;
-    // a small sleep is reliable for this assertion.
-    return new Promise<void>((resolve) =>
-      setTimeout(() => {
-        expect(isAllowed(key, 1, 1)).toBe(true);
-        resolve();
-      }, 5),
-    );
+    //
+    // Fake timers, not a real sleep. The previous version used a 1ms
+    // window and a 5ms setTimeout, which raced the wall clock: if a
+    // millisecond ticked between the first two calls the bucket had
+    // already expired and the "blocked" assertion saw true. That
+    // flaked ~1 run in 8. isAllowedInMemory reads Date.now(), which
+    // vi.useFakeTimers() controls, so window expiry is now exact.
+    vi.useFakeTimers();
+    try {
+      const key = `t5-${Math.random()}`;
+      expect(isAllowed(key, 1, 60_000)).toBe(true);
+      expect(isAllowed(key, 1, 60_000)).toBe(false);
+      vi.advanceTimersByTime(60_001);
+      expect(isAllowed(key, 1, 60_000)).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
 
