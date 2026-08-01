@@ -35,7 +35,7 @@ npm run marketing:brief    # daily marketing brief
 
 | Doc | What it covers |
 |---|---|
-| [AGENTS.md](AGENTS.md) | Agent context — safety rules, source-of-truth dirs, verification commands |
+| [AGENTS.md](AGENTS.md) | Agent context — safety rules, source-of-truth dirs, verification commands, **team collaboration rules (branching, migrations, secrets)** |
 | [SETUP.md](SETUP.md) | First-time setup, Supabase migrations, env vars |
 | [SMOKE.md](SMOKE.md) | Post-deploy smoke checks against `https://ryda.pro` |
 | [CLAUDE.md](CLAUDE.md) | Defers to AGENTS.md — used when invoked from Claude Code CLI |
