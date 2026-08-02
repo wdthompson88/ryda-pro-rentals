@@ -1,0 +1,41 @@
+name: verify
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: verify-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: typecheck
+        run: npm run typecheck
+
+      - name: test
+        run: npm run test
+
+      # No secrets are exposed to CI. The app is designed to fall back
+      # cleanly when Supabase/Stripe/Resend vars are unset (see
+      # .env.local.example), so a build with placeholder public vars still
+      # proves the bundle compiles. Real values live in Vercel.
+      - name: build
+        env:
+          NEXT_PUBLIC_SITE_URL: https://ryda.pro
+        run: npm run build
