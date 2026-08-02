@@ -75,6 +75,41 @@ that never turns into a lost commit or a clobbered migration.
 - `git pull --rebase origin main` before you start and before you push.
 - Small PRs. A branch older than a day is a merge conflict waiting to happen.
 
+### Why `main` is not actually locked
+
+This repo is private on the GitHub free plan, and that plan cannot block a
+push to `main` by any means:
+
+| Mechanism | Status |
+|---|---|
+| Classic branch protection | Pro required |
+| Repository rulesets | Pro required |
+| Pre-receive hooks | Enterprise only |
+| GitHub Actions | Runs *after* the push has landed |
+
+So the model here is **prevent the accident, detect the bypass**:
+
+1. `.githooks/pre-push` refuses a `main` push. Beats forgetting which branch
+   you were on. Loses to `git push --no-verify`.
+2. The `direct-push-guard` job fails on any commit that reaches `main` with no
+   pull request behind it. That puts a red X on the default branch and emails
+   the repo owner — a bypass is loud and permanently recorded, even though it
+   could not be stopped.
+
+Treat the rule as binding. Nothing will physically stop you; the other person
+will simply see it.
+
+### If something does land on `main` directly
+
+Do not force-push `main` to "clean it up" — that rewrites history under
+whoever else has it checked out, which is worse than the original mistake.
+
+```sh
+git revert <sha>     # new commit undoing it, via a PR like anything else
+```
+
+Then say so, so the other person can rebase rather than discover it.
+
 ### Migrations are the collision risk
 
 `supabase/migrations/` uses sequential numbering (`0037_*` is current HEAD).
