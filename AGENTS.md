@@ -66,6 +66,11 @@ that never turns into a lost commit or a clobbered migration.
 
 - **Never commit or push to `main`.** Always branch: `feat/<initials>-<slug>`,
   `fix/<initials>-<slug>`, `chore/<initials>-<slug>`.
+- A `pre-push` hook enforces this locally. `npm install` wires it up (the
+  `prepare` script points `core.hooksPath` at `.githooks/`). It is client-side
+  only — GitHub gates real branch protection behind Pro for private repos —
+  so it stops the accident, not the intent. Emergency override:
+  `RYDA_ALLOW_MAIN_PUSH=1 git push`.
 - Open a PR. Merge only when the `verify` check is green.
 - `git pull --rebase origin main` before you start and before you push.
 - Small PRs. A branch older than a day is a merge conflict waiting to happen.

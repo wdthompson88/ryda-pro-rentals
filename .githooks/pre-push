@@ -1,0 +1,48 @@
+#!/bin/sh
+# Refuse direct pushes to main.
+#
+# This repo has NO server-side branch protection: GitHub gates both classic
+# branch protection and rulesets behind Pro for private repos, and this repo
+# is private on the free plan. More than one person has write access, so the
+# "never push main" rule in AGENTS.md is otherwise honour-system only.
+#
+# This hook is the enforcement. It is client-side, so it is a guard against
+# the accident (pushing while you forgot which branch you were on), not
+# against intent. Installed automatically by `npm install` via the `prepare`
+# script, which sets core.hooksPath to this directory.
+#
+# Genuine emergency override:
+#   RYDA_ALLOW_MAIN_PUSH=1 git push
+
+PROTECTED_BRANCH="main"
+
+while read -r _local_ref _local_sha remote_ref _remote_sha; do
+	case "$remote_ref" in
+	"refs/heads/$PROTECTED_BRANCH")
+		if [ "$RYDA_ALLOW_MAIN_PUSH" = "1" ]; then
+			echo "pre-push: RYDA_ALLOW_MAIN_PUSH=1 set — allowing push to $PROTECTED_BRANCH." >&2
+			exit 0
+		fi
+		echo "" >&2
+		echo "  pre-push: refusing to push directly to '$PROTECTED_BRANCH'." >&2
+		echo "" >&2
+		echo "  Branch, push, open a PR instead:" >&2
+		echo "" >&2
+		echo "    git switch -c feat/<initials>-<slug>" >&2
+		echo "    git push -u origin HEAD" >&2
+		echo "    gh pr create" >&2
+		echo "" >&2
+		echo "  If you already committed on $PROTECTED_BRANCH, move the commits:" >&2
+		echo "" >&2
+		echo "    git switch -c feat/<initials>-<slug>" >&2
+		echo "    git switch $PROTECTED_BRANCH && git reset --hard origin/$PROTECTED_BRANCH" >&2
+		echo "    git switch feat/<initials>-<slug>" >&2
+		echo "" >&2
+		echo "  Emergency override: RYDA_ALLOW_MAIN_PUSH=1 git push" >&2
+		echo "" >&2
+		exit 1
+		;;
+	esac
+done
+
+exit 0
