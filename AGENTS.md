@@ -121,6 +121,22 @@ migrations with the same number and a broken chain.
 - Never renumber a migration that has already been applied anywhere.
 - Applying migrations still requires explicit operator approval (see Safety Rules).
 
+### Node version
+
+Node **24** everywhere, because that is what Vercel runs in production for
+this project (`vercel project inspect ryda-web`). CI, both operator machines,
+and any new clone all match it. Not "the newest" — the one production uses.
+
+`.nvmrc` pins it, `engines.node` declares it, and `.npmrc` sets
+`engine-strict=true` so `npm install` on the wrong major **fails** rather than
+warning. That is deliberate: without it npm installs anyway and silently
+rewrites `package-lock.json` in the older npm's format, which then ping-pongs
+between machines. A refused install that names the required version is better
+than lockfile churn nobody can source.
+
+If an install fails with `EBADENGINE`, you are on the wrong Node. Switch to
+24 rather than working around it.
+
 ### Secrets
 
 - `.env.local` is git-ignored and **never** leaves the machine — not over chat,
