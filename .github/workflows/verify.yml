@@ -52,7 +52,9 @@ jobs:
 
       - uses: actions/setup-node@v7
         with:
-          node-version: 22
+          # 24.x is what Vercel runs in production for this project. CI must
+          # match the production runtime, not merely be "recent".
+          node-version: 24
           cache: npm
 
       - run: npm ci
