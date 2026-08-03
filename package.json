@@ -2,7 +2,7 @@
   "name": "ryda-web",
   "version": "0.1.0",
   "engines": {
-    "node": ">=22 <23"
+    "node": ">=24 <25"
   },
   "private": true,
   "scripts": {
