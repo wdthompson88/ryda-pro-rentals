@@ -218,15 +218,15 @@ export default function TransferPage({
 
       {/* KYC gate notice */}
       {kycStatus !== "verified" && (
-        <section className="rounded-2xl border border-amber-500/40 bg-amber-500/5 p-5">
-          <p className="text-sm font-medium text-amber-700">
+        <section className="rounded-2xl border border-warn/40 bg-warn/5 p-5">
+          <p className="text-sm font-medium text-warn-deep">
             Identity verification required.
           </p>
-          <p className="mt-2 text-sm text-amber-700">
+          <p className="mt-2 text-sm text-warn-deep">
             We can't accept a share transfer until your identity is on file.{" "}
             <Link
               href="/account/verification"
-              className="font-medium underline hover:text-amber-900"
+              className="font-medium underline hover:text-ink"
             >
               Verify now →
             </Link>

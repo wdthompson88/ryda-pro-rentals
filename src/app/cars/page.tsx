@@ -91,9 +91,9 @@ export default function CarsHome() {
                 className="absolute inset-0 hidden h-full w-full object-cover motion-reduce:block"
                 aria-hidden="true"
               />
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 bg-gradient-to-t from-[#0E0E10]/90 via-[#0E0E10]/40 to-transparent p-5 sm:p-6">
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 bg-gradient-to-t from-ink/90 via-ink/40 to-transparent p-5 sm:p-6">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-red">
+                  <p className="text-xs uppercase tracking-[0.2em] text-red-bright">
                     Watch the spot
                   </p>
                   <p className="mt-1 font-display text-xl text-cream sm:text-2xl">
@@ -246,7 +246,7 @@ export default function CarsHome() {
       {/* Sign up */}
       <section id="signup" className="border-b border-rule bg-ink text-cream">
         <div className="mx-auto max-w-3xl px-6 py-20 text-center sm:px-10 sm:py-28">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">Members</p>
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red-bright">Members</p>
           <h2 className="mt-4 font-display text-4xl font-light leading-tight sm:text-5xl">
             Become a member.
           </h2>
@@ -264,13 +264,13 @@ export default function CarsHome() {
               </Link>
               <Link
                 href="/signin"
-                className="inline-flex h-12 items-center justify-center rounded-full border border-cream/30 px-7 text-sm font-medium text-cream transition-colors hover:border-red hover:text-red"
+                className="inline-flex h-12 items-center justify-center rounded-full border border-cream/30 px-7 text-sm font-medium text-cream transition-colors hover:border-red hover:text-red-bright"
               >
                 Sign in
               </Link>
             </div>
           </HiddenWhenAuthed>
-          <p className="mt-6 text-xs text-cream/50">
+          <p className="mt-6 text-xs text-cream/70">
             Membership is limited to verified individuals 28 years or older.
             RYDA is a luxury access platform, co-ownership stakes are not
             investments and are not offered for investment purposes.

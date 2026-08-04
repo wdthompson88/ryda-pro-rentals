@@ -30,7 +30,7 @@ const TYPE_LABEL: Record<string, string> = {
 const VERTICAL_TONE: Record<string, string> = {
   cars: "text-red",
   boats: "text-marine",
-  planes: "text-cream/80",
+  planes: "text-ink-soft",
   general: "text-ink-soft",
 };
 

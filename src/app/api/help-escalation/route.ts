@@ -83,13 +83,13 @@ function renderEscalationHtml({
   const conversationHtml =
     conversation && conversation.length > 0
       ? `<div style="margin-top:18px;">
-          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#9A9590;margin-bottom:8px;">Conversation context</div>
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#514C47;margin-bottom:8px;">Conversation context</div>
           <div style="border:1px solid #e5e1d8;border-radius:8px;padding:12px;background:#faf7f2;">
             ${conversation
               .map(
                 (t) =>
                   `<div style="margin:6px 0;"><span style="font-weight:600;color:${
-                    t.role === "user" ? "#DC4747" : "#1c1c1c"
+                    t.role === "user" ? "#C03030" : "#1c1c1c"
                   };">${t.role === "user" ? "User" : "Bot"}:</span> <span style="color:#3c3c3c;">${escapeHtml(
                     t.text,
                   )}</span></div>`,
@@ -101,14 +101,14 @@ function renderEscalationHtml({
 
   return `
     <div>
-      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#9A9590;">From</div>
-      <div style="font-size:16px;font-weight:500;margin-top:2px;"><a href="mailto:${escapeHtml(email)}" style="color:#DC4747;text-decoration:none;">${escapeHtml(email)}</a></div>
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#514C47;">From</div>
+      <div style="font-size:16px;font-weight:500;margin-top:2px;"><a href="mailto:${escapeHtml(email)}" style="color:#C03030;text-decoration:none;">${escapeHtml(email)}</a></div>
     </div>
 
     ${
       note
         ? `<div style="margin-top:18px;">
-            <div style="font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#9A9590;margin-bottom:6px;">Their note</div>
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#514C47;margin-bottom:6px;">Their note</div>
             <div style="white-space:pre-wrap;color:#1c1c1c;">${escapeHtml(note)}</div>
           </div>`
         : ""
@@ -117,7 +117,7 @@ function renderEscalationHtml({
     ${
       trigger_message
         ? `<div style="margin-top:18px;">
-            <div style="font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#9A9590;margin-bottom:6px;">Trigger phrase</div>
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#514C47;margin-bottom:6px;">Trigger phrase</div>
             <div style="font-style:italic;color:#3c3c3c;">"${escapeHtml(trigger_message)}"</div>
           </div>`
         : ""

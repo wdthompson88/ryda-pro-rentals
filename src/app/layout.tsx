@@ -49,7 +49,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#fef9f3", // matches bg-cream so the URL bar tints right on iOS
+  themeColor: "#F4F1EC", // bg-cream literal (viewport meta can't read CSS vars)
 };
 
 export const metadata: Metadata = {
@@ -198,25 +198,6 @@ const organizationJsonLd = {
   ],
 };
 
-// No-flash theme bootstrap. Reads localStorage before React hydrates
-// so the page renders in the saved theme on first paint. Default is
-// dark (matches the original site palette).
-const themeBootstrap = `
-(function(){
-  try {
-    var t = localStorage.getItem('ryda-theme');
-    if (t === 'light' || t === 'dark') {
-      document.documentElement.setAttribute('data-theme', t);
-    }
-    // Add a class after the first frame so the smooth transition
-    // doesn't fire on initial load (only on user toggles).
-    requestAnimationFrame(function(){
-      document.documentElement.classList.add('theme-ready');
-    });
-  } catch (e) {}
-})();
-`;
-
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -224,10 +205,8 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${inter.variable} ${fraunces.variable} h-full antialiased`}
-      suppressHydrationWarning
     >
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
         {/* Site-wide Organization + WebSite + Service Schema.org graph.
             This is what Google reads to populate the brand knowledge
             panel + sitelinks search box. Without this, the search

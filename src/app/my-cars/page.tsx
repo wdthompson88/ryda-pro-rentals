@@ -105,7 +105,7 @@ export default function MyCarsPage() {
         </div>
       </section>
 
-      <section className="bg-ink py-12 text-center text-cream/60">
+      <section className="bg-ink py-12 text-center text-cream/75">
         <p className="text-xs">
           Sample owned-vehicle dashboard. Live operational data ships at
           Miami launch.

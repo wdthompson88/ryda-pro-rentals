@@ -266,7 +266,7 @@ function pillFor(status: string) {
       : tone === "warn"
         ? "bg-red/10 text-red"
         : tone === "info"
-          ? "bg-amber-500/15 text-amber-700"
+          ? "bg-warn/15 text-warn-deep"
           : "bg-mute/15 text-mute";
   return (
     <span

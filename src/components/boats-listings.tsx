@@ -401,7 +401,7 @@ function BoatCard({ boat: b }: { boat: Boat }) {
           role="status"
           aria-label={isSold ? "Status: Sold out" : "Status: Available"}
           className={`absolute right-3 top-3 rounded-full px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] backdrop-blur ${
-            isSold ? "bg-mute/90 text-cream" : "bg-marine/95 text-cream"
+            isSold ? "bg-ink/80 text-cream" : "bg-marine/95 text-cream"
           }`}
         >
           {isSold ? "Sold out" : "Available"}

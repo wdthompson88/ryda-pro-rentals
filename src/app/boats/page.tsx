@@ -170,7 +170,7 @@ export default function BoatsHome() {
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
           <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
             <div className="max-w-2xl">
-              <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine-bright">
                 Charter · Featured
               </p>
               <h2 className="mt-3 font-display text-3xl sm:text-4xl">
@@ -218,7 +218,7 @@ export default function BoatsHome() {
                         </span>
                         <span className="text-xs text-cream/60">/day</span>
                       </p>
-                      <span className="text-xs font-medium text-marine">
+                      <span className="text-xs font-medium text-marine-bright">
                         Charter →
                       </span>
                     </div>
@@ -277,7 +277,7 @@ export default function BoatsHome() {
       {/* Sign up */}
       <section id="signup" className="border-b border-rule bg-ink text-cream">
         <div className="mx-auto max-w-3xl px-6 py-20 text-center sm:px-10 sm:py-28">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine-bright">
             Members · Boats
           </p>
           <h2 className="mt-4 font-display text-4xl font-light leading-tight sm:text-5xl">
@@ -303,7 +303,7 @@ export default function BoatsHome() {
               </Link>
             </div>
           </HiddenWhenAuthed>
-          <p className="mt-6 text-xs text-cream/50">
+          <p className="mt-6 text-xs text-cream/70">
             Membership is limited to verified individuals 28 years or
             older. RYDA is a luxury access platform, co-ownership
             stakes are not investments and are not offered for

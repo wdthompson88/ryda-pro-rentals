@@ -91,7 +91,7 @@ export default function SplitterPage() {
     <h1 className="sr-only">
       RYDA — fractional luxury vehicle co-ownership in Miami. Cars, boats, and planes.
     </h1>
-    <div className="relative min-h-screen overflow-hidden bg-[#0E0E10] text-[#F4F1EC]">
+    <div className="relative min-h-screen overflow-hidden bg-ink text-cream">
       <SplitterIntro />
 
       {/* Floating top bar, minimal, hovers over the columns. 3-column
@@ -100,17 +100,17 @@ export default function SplitterPage() {
       <div className="absolute inset-x-0 top-0 z-30 grid grid-cols-3 items-center px-6 py-6 sm:px-10 sm:py-8">
         <Link
           href="/"
-          className="justify-self-start font-display text-2xl tracking-tight text-[#F4F1EC]"
+          className="justify-self-start font-display text-2xl tracking-tight text-cream"
         >
           RYDA
         </Link>
-        <p className="hidden justify-self-center text-sm font-medium uppercase tracking-[0.32em] text-[#F4F1EC]/75 sm:block">
+        <p className="hidden justify-self-center text-sm font-medium uppercase tracking-[0.32em] text-cream/75 sm:block">
           Luxury vehicle access
         </p>
         <div className="flex items-center justify-self-end gap-3 sm:gap-4">
           <Link
             href="/investors"
-            className="hidden text-sm font-medium uppercase tracking-[0.18em] text-[#F4F1EC]/75 transition-colors hover:text-[#F4F1EC] lg:inline-block"
+            className="hidden text-sm font-medium uppercase tracking-[0.18em] text-cream/75 transition-colors hover:text-cream lg:inline-block"
           >
             Investors
           </Link>
@@ -123,13 +123,13 @@ export default function SplitterPage() {
               <>
                 <Link
                   href="/signin"
-                  className="hidden rounded-full border border-[#F4F1EC]/30 bg-[#F4F1EC]/10 px-5 py-2 text-sm font-medium text-[#F4F1EC] transition-colors hover:bg-[#F4F1EC] hover:text-[#0E0E10] sm:inline-flex"
+                  className="hidden rounded-full border border-cream/30 bg-cream/10 px-5 py-2 text-sm font-medium text-cream transition-colors hover:bg-cream hover:text-ink sm:inline-flex"
                 >
                   Log in
                 </Link>
                 <Link
                   href="/signup"
-                  className="inline-flex rounded-full border border-[#F4F1EC] bg-[#F4F1EC] px-5 py-2 text-sm font-medium text-[#0E0E10] transition-colors hover:bg-red hover:text-[#F4F1EC] hover:border-red"
+                  className="inline-flex rounded-full border border-cream bg-cream px-5 py-2 text-sm font-medium text-ink transition-colors hover:bg-red hover:text-cream hover:border-red"
                 >
                   Sign up
                 </Link>
@@ -138,7 +138,7 @@ export default function SplitterPage() {
             authed={
               <Link
                 href="/account"
-                className="inline-flex rounded-full border border-[#F4F1EC] bg-[#F4F1EC] px-5 py-2 text-sm font-medium text-[#0E0E10] transition-colors hover:bg-red hover:text-[#F4F1EC] hover:border-red"
+                className="inline-flex rounded-full border border-cream bg-cream px-5 py-2 text-sm font-medium text-ink transition-colors hover:bg-red hover:text-cream hover:border-red"
               >
                 Account
               </Link>
@@ -256,24 +256,24 @@ function VerticalColumn({ v, index }: { v: Vertical; index: number }) {
     red: {
       glow: "from-red/35",
       eyebrowHover: "group-hover:text-red",
-      pill: "bg-red/95 text-[#F4F1EC]",
+      pill: "bg-red/95 text-cream",
     },
     marine: {
       glow: "from-marine/40",
       eyebrowHover: "group-hover:text-marine",
-      pill: "bg-marine/95 text-[#F4F1EC]",
+      pill: "bg-marine/95 text-cream",
     },
     neutral: {
-      glow: "from-[#F4F1EC]/15",
-      eyebrowHover: "group-hover:text-[#F4F1EC]",
-      pill: "border border-[#F4F1EC]/40 text-[#F4F1EC]/85 group-hover:border-[#F4F1EC] group-hover:text-[#F4F1EC]",
+      glow: "from-cream/15",
+      eyebrowHover: "group-hover:text-cream",
+      pill: "border border-cream/40 bg-black/45 text-cream/90 group-hover:border-cream group-hover:text-cream",
     },
   }[v.accent];
 
   return (
     <Link
       href={v.href}
-      className="group relative flex min-h-[60vh] flex-1 items-end overflow-hidden border-[#F4F1EC]/10 lg:min-h-screen lg:border-r last:lg:border-r-0"
+      className="group relative flex min-h-[60vh] flex-1 items-end overflow-hidden border-cream/10 lg:min-h-screen lg:border-r last:lg:border-r-0"
     >
       {/* Media layer, random Pexels b-roll loop on top of poster.
           MediaBackground picks one clip from the videos array on
@@ -310,7 +310,7 @@ function VerticalColumn({ v, index }: { v: Vertical; index: number }) {
       <span
         className={`absolute right-5 top-24 rounded-full px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] backdrop-blur transition-colors duration-300 sm:top-28 ${
           v.status === "coming-soon"
-            ? "border border-[#F4F1EC]/40 text-[#F4F1EC]/85 group-hover:border-[#F4F1EC] group-hover:text-[#F4F1EC]"
+            ? "border border-cream/40 bg-black/45 text-cream/90 group-hover:border-cream group-hover:text-cream"
             : accentClasses.pill
         }`}
       >
@@ -318,18 +318,18 @@ function VerticalColumn({ v, index }: { v: Vertical; index: number }) {
       </span>
 
       {/* Caption */}
-      <div className="relative z-10 w-full p-7 text-[#F4F1EC] sm:p-10 lg:p-12">
-        <p className={`font-display text-5xl font-light italic leading-[0.95] text-[#F4F1EC] transition-transform duration-700 group-hover:-translate-y-1 sm:text-6xl lg:text-7xl ${accentClasses.eyebrowHover}`}>
+      <div className="relative z-10 w-full p-7 text-cream sm:p-10 lg:p-12">
+        <p className={`font-display text-5xl font-light italic leading-[0.95] text-cream transition-transform duration-700 group-hover:-translate-y-1 sm:text-6xl lg:text-7xl ${accentClasses.eyebrowHover}`}>
           {v.label}
         </p>
-        <p className="mt-5 max-w-sm text-sm leading-relaxed text-[#F4F1EC]/85 sm:text-base">
+        <p className="mt-5 max-w-sm text-sm leading-relaxed text-cream/85 sm:text-base">
           {v.tagline}
         </p>
-        <div className="mt-7 flex items-center justify-between border-t border-[#F4F1EC]/20 pt-5">
-          <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-[#F4F1EC]/55">
+        <div className="mt-7 flex items-center justify-between border-t border-cream/20 pt-5">
+          <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-cream/75">
             {v.bullet}
           </span>
-          <span className="inline-flex items-center gap-1.5 text-sm font-medium text-[#F4F1EC] transition-transform duration-300 group-hover:translate-x-1.5">
+          <span className="inline-flex items-center gap-1.5 text-sm font-medium text-cream transition-transform duration-300 group-hover:translate-x-1.5">
             Enter →
           </span>
         </div>

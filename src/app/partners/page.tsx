@@ -161,7 +161,7 @@ export default function PartnersPage() {
       {/* CTA */}
       <section className="border-b border-rule bg-ink text-cream">
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red-bright">
             Let&apos;s talk
           </p>
           <h2 className="mt-3 font-display text-3xl sm:text-4xl">

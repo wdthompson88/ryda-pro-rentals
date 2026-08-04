@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
   h2: {
     fontSize: 12,
     letterSpacing: 1.2,
-    color: "#7a7670",
+    color: "#514C47",
     textTransform: "uppercase",
     marginTop: 24,
     marginBottom: 8,
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   kvKey: {
     width: 200,
     fontSize: 10,
-    color: "#7a7670",
+    color: "#514C47",
     textTransform: "uppercase",
     letterSpacing: 1,
   },
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
   },
   kvValPending: {
     fontSize: 11,
-    color: "#9a9590",
+    color: "#514C47",
     flex: 1,
     fontStyle: "italic",
   },
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
   fineprint: {
     marginTop: 32,
     fontSize: 8,
-    color: "#7a7670",
+    color: "#514C47",
     lineHeight: 1.5,
   },
 });

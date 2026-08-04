@@ -145,7 +145,7 @@ export default function PlanesComingSoon() {
       {/* Cross-vertical CTA */}
       <section className="bg-ink py-20 text-cream">
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red-bright">
             Meanwhile
           </p>
           <h2 className="mt-4 font-display text-3xl sm:text-4xl">

@@ -926,8 +926,8 @@ function pill(status: string) {
       : tone === "warn"
         ? "bg-red/10 text-red"
         : tone === "info"
-          ? "bg-amber-500/15 text-amber-700"
-          : "bg-mute/15 text-mute";
+          ? "bg-warn/15 text-warn-deep"
+          : "bg-mute/15 text-ink-soft";
   return (
     <span
       className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${cls}`}

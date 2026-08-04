@@ -46,7 +46,7 @@ contracts, vehicle acquisition — is at zero.
 | # | Task | Where it lives |
 |---|---|---|
 | 79 | Domain + DNS | ryda.pro · Cloudflare DNS · Vercel deploy. `docs/dns-records-namecheap.md` |
-| 80 | Brand identity | Wordmark logo + Fraunces+Inter + brand red `#DC4747` + `src/app/globals.css` color tokens. Logo at `/profile-image` |
+| 80 | Brand identity | Wordmark logo + Fraunces+Inter + brand red `#C03030` (`#DC4747` lives on only as the red-bright on-dark-band accent) + `src/app/globals.css` color tokens. Logo at `/profile-image` |
 | 82 | MVP platform scope | `src/app/{rent,bookings,signup,markets}/` — full vertical |
 | 83 | Member signup + KYC | Stripe Identity at `src/app/api/kyc/{start,status,webhook}/` |
 | 85 | Co-ownership marketplace | `src/app/markets/[symbol]` with full anatomy (provenance + originality + ops disclosure + classic.com live widget + curated comparables) |

@@ -1,67 +1,47 @@
 @import "tailwindcss";
 
 :root {
-  /* RYDA dark palette (default) — luxury black with warm cream text.
-   * Contrast targets (WCAG AA, normal text 4.5:1):
-   *  - red    on cream  (#0E0E10): ~4.6:1
-   *  - mute   on cream  (#0E0E10): ~5.4:1
-   *  - ink-soft on cream:          ~12:1
-   * Note: token names are theme-relative — `cream` always means "page
-   * background"; `ink` always means "primary text". The HEX values
-   * swap between light/dark themes; component classes don't change.
+  /* RYDA light palette — warm cream page, white cards, near-black ink.
+   * This is the ONLY theme (dark mode removed 2026-08 for readability).
+   * Contrast on cream #F4F1EC (WCAG 2.1, normal text needs 4.5:1 AA / 7:1 AAA):
+   *  - ink      #0E0E10: 17.1:1
+   *  - ink-soft #3A3A3D: 10.1:1 (AAA)
+   *  - mute     #514C47:  7.5:1 (AAA — darkened from #6A655F which was 5.1:1)
+   *  - red      #C03030:  5.0:1 (AA)
+   *  - marine   #1E5DAB:  5.8:1 (AA)
+   *  - gold     #7D6029:  5.2:1 (AA — darkened from #A88340 which failed at 3.1:1)
+   *  - success  #256B48:  5.7:1 (AA — darkened from #2E8459 which failed at 4.1:1)
+   *  - warn-deep #6E4708: 7.3:1 (AAA)
+   * The *-bright accents are for use ON bg-ink bands only (never on cream):
+   *  - red-bright    #DC4747 on ink: 4.6:1
+   *  - marine-bright #4A90D9 on ink: 5.8:1
    */
-  --ryda-cream:     #0E0E10;   /* page background */
-  --ryda-cream-2:   #161618;   /* section variant — slightly lighter than page */
-  --ryda-surface:   #1B1B1F;   /* cards */
-  --ryda-surface-2: #232328;   /* card hover / elevated */
-  --ryda-ink:       #F4F1EC;   /* primary text (the warm cream) */
-  --ryda-ink-soft:  #B8B2A8;   /* secondary text */
-  --ryda-mute:      #9A9590;   /* tertiary text / borders — bumped from #7A7570 for AA */
-  --ryda-rule:      #2A2A2E;   /* hairline borders */
-  --ryda-red:       #DC4747;   /* brand red — bumped from #C03030 to clear AA on dark */
-  --ryda-red-deep:  #ED5C5C;   /* hover red */
-  --ryda-gold:      #C9A66B;   /* premium accent for Black tier */
-  /* Boats accent — marine blue. Contrast on cream (#0E0E10) ≈ 5.7:1. */
-  --ryda-marine:      #4A90D9;
-  --ryda-marine-deep: #6FA8E5;
-  /* Designed-success green — replaces Tailwind's default emerald-* on
-   * cost sheets and "good number" affordances. Tuned to live in the
-   * same temperature family as marine (slightly cool, slightly muted)
-   * so it doesn't read as a Tailwind preset. AA on dark: ~6.1:1. */
-  --ryda-success:      #5FB58A;
-  --ryda-success-deep: #7CCBA1;
-}
+  color-scheme: light;
 
-/* Light theme — explicit opt-in via data-theme="light" on <html>.
- * Toggled by ThemeToggle, persisted to localStorage. Same token
- * NAMES, different HEX values. */
-:root[data-theme="light"] {
   --ryda-cream:     #F4F1EC;   /* page background — warm off-white */
   --ryda-cream-2:   #E9E4D8;   /* section variant */
   --ryda-surface:   #FFFFFF;   /* cards */
-  --ryda-surface-2: #F0EBDF;   /* card hover */
+  --ryda-surface-2: #F0EBDF;   /* card hover / elevated */
   --ryda-ink:       #0E0E10;   /* primary text — near black */
   --ryda-ink-soft:  #3A3A3D;   /* secondary text */
-  --ryda-mute:      #6A655F;   /* tertiary text / borders */
+  --ryda-mute:      #514C47;   /* tertiary text / borders */
   --ryda-rule:      #D8D3C8;   /* hairline borders */
-  --ryda-red:       #C03030;   /* brand red — slightly deeper for AA on light */
+  --ryda-red:       #C03030;   /* brand action */
   --ryda-red-deep:  #9C2424;   /* hover red */
-  --ryda-gold:      #A88340;   /* premium accent */
-  /* Boats accent — marine blue, deeper for AA on light. */
-  --ryda-marine:      #1E5DAB;
+  --ryda-gold:      #7D6029;   /* premium accent for Black tier */
+  --ryda-marine:      #1E5DAB; /* boats vertical accent */
   --ryda-marine-deep: #143C75;
-  /* Designed-success green, deeper for AA on light cream (~5.0:1). */
-  --ryda-success:      #2E8459;
+  /* Designed-success green for cost sheets and "good number" affordances. */
+  --ryda-success:      #256B48;
   --ryda-success-deep: #1F5C3D;
-}
-
-/* Smooth color transitions when toggling themes (but not on load) */
-html.theme-ready,
-html.theme-ready * {
-  transition:
-    background-color 220ms ease,
-    border-color 220ms ease,
-    color 220ms ease;
+  /* Designed-warning amber-brown for pending/attention states — replaces
+   * Tailwind's default amber-*. warn for washes/dots, warn-deep for text. */
+  --ryda-warn:      #8A5710;
+  --ryda-warn-deep: #6E4708;
+  /* Bright accents for the persistent dark (bg-ink) CTA bands. The standard
+   * red/marine are tuned for cream and fail AA on ink — these don't. */
+  --ryda-red-bright:    #DC4747;
+  --ryda-marine-bright: #4A90D9;
 }
 
 @theme inline {
@@ -80,6 +60,10 @@ html.theme-ready * {
   --color-marine-deep: var(--ryda-marine-deep);
   --color-success:      var(--ryda-success);
   --color-success-deep: var(--ryda-success-deep);
+  --color-warn:      var(--ryda-warn);
+  --color-warn-deep: var(--ryda-warn-deep);
+  --color-red-bright:    var(--ryda-red-bright);
+  --color-marine-bright: var(--ryda-marine-bright);
 
   --font-display: var(--font-fraunces);
   --font-sans:    var(--font-inter);

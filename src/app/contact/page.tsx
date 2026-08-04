@@ -88,7 +88,7 @@ export default function ContactPage() {
       {/* Consultation */}
       <section id="consultation" className="border-b border-rule bg-ink py-20 text-cream">
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red-bright">
             Membership consultation
           </p>
           <h2 className="mt-4 font-display text-4xl font-light sm:text-5xl">

@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { AuthSwap, VisibleWhenAdmin } from "@/components/auth-aware";
 
 // RYDA spans three verticals: Cars, Boats, Planes. The header detects
@@ -50,39 +49,29 @@ function navForVertical(v: Vertical): { href: string; label: string }[] {
   return CARS_NAV;
 }
 
-export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
+// Sign in (Log In), soft cream with ink text. Hover lifts to red.
+const signInBtn = "border-rule bg-cream-2 text-ink hover:border-red hover:text-red";
+// Sign up, dark ink with strong CTA presence.
+const signUpBtn = "border-ink bg-ink text-cream hover:bg-red hover:border-red";
+// Account button (signed-in state), takes the strong-CTA slot on
+// its own — same shape as Sign up so the layout doesn't reflow on
+// hydration.
+const accountBtn = signUpBtn;
+// Admin pill (admin-only, sits to the left of Account). Soft pill in
+// the same family as Log in, accented marine to read as "tool, not
+// CTA" — admins glance at it, members never see it.
+const adminBtn = "border-rule bg-cream-2 text-marine hover:border-marine hover:text-marine-deep";
+// Search input theming.
+const searchInput =
+  "border-rule bg-cream-2 text-ink placeholder:text-mute focus:border-ink focus:ring-ink/10";
+
+export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const pathname = usePathname();
   const router = useRouter();
   const vertical = detectVertical(pathname);
   const nav = navForVertical(vertical);
-
-  const tone = inverted ? "text-cream/70 hover:text-cream" : "text-ink-soft hover:text-ink";
-  const brand = inverted ? "text-cream" : "text-ink";
-  // Sign in (Log In), soft cream with ink text. Hover lifts to red.
-  const signInBtn = inverted
-    ? "border-cream/30 bg-cream/10 text-cream hover:bg-cream hover:text-ink"
-    : "border-rule bg-cream-2 text-ink hover:border-red hover:text-red";
-  // Sign up, dark ink (or cream on inverted) with strong CTA presence.
-  const signUpBtn = inverted
-    ? "border-cream bg-cream text-ink hover:bg-red hover:text-cream hover:border-red"
-    : "border-ink bg-ink text-cream hover:bg-red hover:border-red";
-  // Account button (signed-in state), takes the strong-CTA slot on
-  // its own — same shape as Sign up so the layout doesn't reflow on
-  // hydration.
-  const accountBtn = signUpBtn;
-  // Admin pill (admin-only, sits to the left of Account). Soft pill in
-  // the same family as Log in, accented marine to read as "tool, not
-  // CTA" — admins glance at it, members never see it.
-  const adminBtn = inverted
-    ? "border-cream/30 bg-cream/10 text-cream hover:border-cream hover:bg-cream/15"
-    : "border-rule bg-cream-2 text-marine hover:border-marine hover:text-marine-deep";
-  // Search input theming, tracks the inverted state.
-  const searchInput = inverted
-    ? "border-cream/30 bg-cream/10 text-cream placeholder:text-cream/50 focus:border-cream focus:ring-cream/20"
-    : "border-rule bg-cream-2 text-ink placeholder:text-mute focus:border-ink focus:ring-ink/10";
-  const burger = inverted ? "text-cream/80 hover:text-cream" : "text-ink-soft hover:text-ink";
 
   function onSearchSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -92,52 +81,36 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
   }
 
   return (
-    <header className={`w-full border-b ${inverted ? "border-cream/20" : "border-rule"}`}>
-      {/* Single-row marketing header. Vertical switcher / theme toggle /
-          search-icon were demoted to footer per luxury polish, header
-          now reads as minimal brand mark + nav + one CTA, not as
-          a control panel. */}
+    <header className="w-full border-b border-rule">
+      {/* Single-row marketing header. Vertical switcher / search-icon
+          were demoted to footer per luxury polish, header now reads as
+          minimal brand mark + nav + one CTA, not as a control panel. */}
 
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-5 sm:px-10">
         <div className="flex items-baseline gap-4 sm:gap-5">
-          <Link href="/" className={`font-display text-2xl tracking-tight ${brand}`}>
+          <Link href="/" className="font-display text-2xl tracking-tight text-ink">
             RYDA
           </Link>
           {/* Inline vertical switcher, Cars · Boats · Planes. The
-              currently-active vertical is bolded ink/cream; the others
+              currently-active vertical is bolded ink; the others
               are mute and clickable so members can jump between
               verticals without bouncing back to the splitter. */}
           {vertical !== "neutral" && (
             <div className="hidden items-baseline gap-2 text-[10px] font-medium uppercase tracking-[0.18em] sm:flex">
-              <VerticalSwitch
-                href="/cars"
-                label="Cars"
-                active={vertical === "cars"}
-                inverted={inverted}
-              />
-              <span aria-hidden className={inverted ? "text-cream/30" : "text-mute/50"}>
+              <VerticalSwitch href="/cars" label="Cars" active={vertical === "cars"} />
+              <span aria-hidden className="text-mute/50">
                 ·
               </span>
-              <VerticalSwitch
-                href="/boats"
-                label="Boats"
-                active={vertical === "boats"}
-                inverted={inverted}
-              />
-              <span aria-hidden className={inverted ? "text-cream/30" : "text-mute/50"}>
+              <VerticalSwitch href="/boats" label="Boats" active={vertical === "boats"} />
+              <span aria-hidden className="text-mute/50">
                 ·
               </span>
-              <VerticalSwitch
-                href="/planes"
-                label="Planes"
-                active={vertical === "planes"}
-                inverted={inverted}
-              />
+              <VerticalSwitch href="/planes" label="Planes" active={vertical === "planes"} />
             </div>
           )}
         </div>
 
-        <nav className={`hidden gap-7 text-sm font-medium md:flex ${tone}`}>
+        <nav className="hidden gap-7 text-sm font-medium md:flex text-ink-soft hover:text-ink">
           {nav.map((n) => (
             <Link key={n.href} href={n.href}>
               {n.label}
@@ -166,7 +139,7 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
                 stroke="currentColor"
                 strokeWidth="1.6"
                 strokeLinecap="round"
-                className={`pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 ${inverted ? "text-cream/55" : "text-mute"}`}
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-mute"
               >
                 <circle cx="6" cy="6" r="4" />
                 <line x1="9.2" y1="9.2" x2="12.5" y2="12.5" />
@@ -228,7 +201,7 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
             aria-controls="mobile-menu"
-            className={`inline-flex h-9 w-9 items-center justify-center rounded-full sm:hidden ${burger}`}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full sm:hidden text-ink-soft hover:text-ink"
           >
             <svg
               width="22"
@@ -258,40 +231,20 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
       </div>
 
       {open && (
-        <div
-          id="mobile-menu"
-          className={`border-t sm:hidden ${
-            inverted ? "border-cream/20 bg-ink" : "border-rule bg-cream"
-          }`}
-        >
-          <nav className={`mx-auto flex max-w-7xl flex-col gap-1 px-6 py-4 text-base ${tone}`}>
+        <div id="mobile-menu" className="border-t sm:hidden border-rule bg-cream">
+          <nav className="mx-auto flex max-w-7xl flex-col gap-1 px-6 py-4 text-base text-ink-soft">
             {/* Mobile vertical switcher, same Cars / Boats / Planes
                 jump as the desktop header. Active vertical bolded. */}
             <div className="mb-2 flex items-baseline gap-3 px-3 py-2 text-[11px] font-medium uppercase tracking-[0.2em]">
-              <VerticalSwitch
-                href="/cars"
-                label="Cars"
-                active={vertical === "cars"}
-                inverted={inverted}
-              />
-              <span aria-hidden className={inverted ? "text-cream/30" : "text-mute/50"}>
+              <VerticalSwitch href="/cars" label="Cars" active={vertical === "cars"} />
+              <span aria-hidden className="text-mute/50">
                 ·
               </span>
-              <VerticalSwitch
-                href="/boats"
-                label="Boats"
-                active={vertical === "boats"}
-                inverted={inverted}
-              />
-              <span aria-hidden className={inverted ? "text-cream/30" : "text-mute/50"}>
+              <VerticalSwitch href="/boats" label="Boats" active={vertical === "boats"} />
+              <span aria-hidden className="text-mute/50">
                 ·
               </span>
-              <VerticalSwitch
-                href="/planes"
-                label="Planes"
-                active={vertical === "planes"}
-                inverted={inverted}
-              />
+              <VerticalSwitch href="/planes" label="Planes" active={vertical === "planes"} />
             </div>
             {nav.map((n) => (
               <Link
@@ -364,12 +317,6 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
                 </>
               }
             />
-            <div className="mt-2 flex items-center justify-between rounded-lg px-3 py-2">
-              <span className="text-xs uppercase tracking-wider text-mute">
-                Theme
-              </span>
-              <ThemeToggle />
-            </div>
           </nav>
         </div>
       )}
@@ -378,31 +325,26 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
 }
 
 // Inline vertical-switch link used next to the RYDA wordmark.
-// Active vertical: bolded ink (or cream on inverted headers).
-// Inactive verticals: mute, clickable, hover transition to ink.
+// Active vertical: bolded ink. Inactive verticals: mute, clickable,
+// hover transition to ink.
 function VerticalSwitch({
   href,
   label,
   active,
-  inverted,
 }: {
   href: string;
   label: string;
   active: boolean;
-  inverted?: boolean;
 }) {
-  const activeTone = inverted ? "text-cream font-semibold" : "text-ink font-semibold";
-  const inactiveTone = inverted
-    ? "text-cream/55 font-medium hover:text-cream"
-    : "text-mute font-medium hover:text-ink";
   return (
     <Link
       href={href}
       aria-current={active ? "page" : undefined}
-      className={`transition-colors ${active ? activeTone : inactiveTone}`}
+      className={`transition-colors ${
+        active ? "text-ink font-semibold" : "text-mute font-medium hover:text-ink"
+      }`}
     >
       {label}
     </Link>
   );
 }
-

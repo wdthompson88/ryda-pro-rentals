@@ -660,7 +660,7 @@ export default async function VehicleMarketPage({
       </section>
 
       {/* Disclaimer footer */}
-      <section className="bg-ink py-12 pb-28 text-cream/60 lg:pb-12">
+      <section className="bg-ink py-12 pb-28 text-cream/75 lg:pb-12">
         <div className="mx-auto max-w-3xl px-6 text-center text-xs sm:px-10">
           RYDA is a luxury access platform. Co-ownership stakes are LLC
           membership interests in member-managed LLCs and are
