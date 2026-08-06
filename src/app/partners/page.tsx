@@ -90,7 +90,7 @@ export default function PartnersPage() {
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
             <Link
-              href="/contact?type=Partner&note=Fleet%20Partner%20Program%20application"
+              href="/contact?type=Partnership&note=Fleet%20Partner%20Program%20application"
               className="inline-flex h-12 items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream transition-colors hover:bg-red"
             >
               Apply to list your fleet →
@@ -174,7 +174,7 @@ export default function PartnersPage() {
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
-              href="/contact?type=Partner&note=Fleet%20Partner%20Program%20application"
+              href="/contact?type=Partnership&note=Fleet%20Partner%20Program%20application"
               className="inline-flex h-12 items-center justify-center rounded-full bg-red px-7 text-sm font-medium text-cream hover:bg-red-deep"
             >
               Get in touch →
