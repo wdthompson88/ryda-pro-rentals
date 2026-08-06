@@ -285,15 +285,17 @@ export function RentalListings() {
   return (
     <section>
       {/* Filter bar, sticky so filters stay accessible while browsing.
-          top-18 stacks it just below the sticky 71px site header. */}
+          top-18 stacks it just below the sticky 71px site header.
+          Tight h-9 controls — Cars & Bids density. Below lg the row
+          scrolls horizontally; at lg+ it wraps instead (the full control
+          set is ~1.4k px wide, wider than the max-w-7xl content box, so a
+          single non-scrolling row would bleed off-screen) and ml-auto
+          right-aligns the Reset/Sort group on its line. */}
       <div className="sticky top-18 z-30 border-b border-rule bg-cream-2/95 backdrop-blur">
-        <div className="mx-auto max-w-7xl px-6 py-5 sm:px-10">
-          {/* Search */}
-          <label className="block">
-            <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-mute">
-              Search
-            </span>
-            <div className="mt-1.5 flex h-11 items-center rounded-full border border-rule bg-surface px-4 transition-colors focus-within:border-ink">
+        <div className="mx-auto max-w-7xl px-6 py-2.5 sm:px-10">
+          <div className="flex items-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:flex-wrap lg:overflow-visible">
+            {/* Search */}
+            <div className="flex h-9 w-48 flex-none items-center rounded-full border border-rule bg-surface px-3 transition-colors focus-within:border-ink lg:w-52">
               <svg
                 width="14"
                 height="14"
@@ -314,25 +316,24 @@ export function RentalListings() {
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Try Ferrari, Miami, Convertible, 2024…"
+                placeholder="Search the fleet"
+                aria-label="Search the fleet"
                 className="h-full min-w-0 flex-1 bg-transparent text-sm text-ink placeholder:text-mute focus:outline-none"
               />
               {query ? (
                 <button
                   type="button"
                   onClick={() => setQuery("")}
-                  className="ml-2 shrink-0 rounded-full px-2 text-xs text-mute hover:text-ink"
+                  className="ml-1 shrink-0 rounded-full px-1 text-xs text-mute hover:text-ink"
                   aria-label="Clear search"
                 >
                   ×
                 </button>
               ) : null}
             </div>
-          </label>
 
-          {/* Filter row, Location is first because it's the most
-              consequential decision (Miami today, LA + NY soon). */}
-          <div className="mt-4 flex flex-wrap items-end gap-3">
+            {/* Selects — the neutral first option ("All locations", …) is
+                the visible label; aria-label carries the name for AT. */}
             <FilterSelect
               label="Location"
               value={location}
@@ -376,8 +377,7 @@ export function RentalListings() {
               }))}
             />
 
-            {/* Toggles for boolean attributes, distinct visual treatment
-                from selects so members can tell them apart. */}
+            {/* Boolean chip toggles — filled red reads as pressed. */}
             <FilterToggle
               label="Co-ownership"
               active={coOwnableOnly}
@@ -389,12 +389,12 @@ export function RentalListings() {
               onClick={() => setTrackOnly((v) => !v)}
             />
 
-            <div className="ml-auto flex items-end gap-3">
+            <div className="ml-auto flex flex-none items-center gap-2">
               {anyFilterActive ? (
                 <button
                   type="button"
                   onClick={clearAll}
-                  className="h-10 rounded-full border border-rule bg-surface px-4 text-xs font-medium text-ink-soft transition-colors hover:border-ink hover:text-ink"
+                  className="h-9 flex-none rounded-full border border-rule bg-surface px-3 text-xs font-medium text-ink-soft transition-colors hover:border-ink hover:text-ink"
                 >
                   Reset
                 </button>
@@ -411,7 +411,7 @@ export function RentalListings() {
           {/* Active filter chips, appear only when filters are applied.
               Each chip clears its filter on click. */}
           {chips.length > 0 ? (
-            <div className="mt-4 flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-1.5 py-1.5">
               <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-mute">
                 Filtering by
               </span>
@@ -421,7 +421,7 @@ export function RentalListings() {
                   type="button"
                   onClick={c.onClear}
                   aria-label={`Remove filter: ${c.label}`}
-                  className="group inline-flex items-center gap-1.5 rounded-full border border-rule bg-surface px-3 py-1 text-xs text-ink-soft transition-colors hover:border-ink hover:text-ink"
+                  className="group inline-flex items-center gap-1.5 rounded-full border border-rule bg-surface px-2.5 py-0.5 text-xs text-ink-soft transition-colors hover:border-ink hover:text-ink"
                 >
                   <span>{c.label}</span>
                   <span className="text-mute group-hover:text-ink" aria-hidden>
@@ -434,30 +434,31 @@ export function RentalListings() {
         </div>
       </div>
 
-      {/* Counter strip */}
+      {/* Counter strip — deliberately OUTSIDE the sticky wrapper so it
+          scrolls away with the page instead of eating pinned height. */}
       <div className="border-b border-rule">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-baseline justify-between gap-4 px-6 py-5 sm:px-10">
-          <p className="text-sm text-ink-soft">
-            <span className="font-display text-xl text-ink tabular-nums">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-baseline justify-between gap-3 px-6 py-2 sm:px-10">
+          <p className="text-xs text-ink-soft">
+            <span className="font-display text-base text-ink tabular-nums">
               {totalListed}
             </span>
-            <span className="ml-2">
+            <span className="ml-1.5">
               {totalListed === 1 ? "vehicle" : "vehicles"} available
             </span>
             {location !== ANY ? (
-              <span className="ml-2 text-mute">in {location}</span>
+              <span className="ml-1.5 text-mute">in {location}</span>
             ) : (
-              <span className="ml-2 text-mute">· Miami · LA · NYC</span>
+              <span className="ml-1.5 text-mute">· Miami · LA · NYC</span>
             )}
           </p>
           {totalListed > 0 ? (
-            <p className="text-sm text-ink-soft tabular-nums">
+            <p className="text-xs text-ink-soft tabular-nums">
               From{" "}
-              <span className="font-display text-xl text-ink">
+              <span className="font-display text-base text-ink">
                 {formatUSD(minRate)}
               </span>{" "}
               to{" "}
-              <span className="font-display text-xl text-ink">
+              <span className="font-display text-base text-ink">
                 {formatUSD(maxRate)}
               </span>
               <span className="ml-1 text-mute">/ day</span>
@@ -559,15 +560,16 @@ function FilterSelect({
   onChange: (v: string) => void;
   options: { value: string; label: string }[];
 }) {
+  // No caption above the control — the neutral first option ("All makes",
+  // "Any price", …) is the visible label; aria-label names it for AT.
+  // Chevron is an inline SVG on text-mute (token-driven — no raw hex).
   return (
-    <label className="flex flex-col gap-1.5">
-      <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-mute">
-        {label}
-      </span>
+    <span className="relative flex-none">
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="h-10 min-w-[140px] cursor-pointer appearance-none rounded-full border border-rule bg-surface bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 12 12%22><path fill=%22none%22 stroke=%22%239A9590%22 stroke-width=%221.5%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 d=%22M3 5l3 3 3-3%22/></svg>')] bg-[right_0.85rem_center] bg-no-repeat px-4 pr-9 text-sm text-ink transition-colors hover:border-ink focus:border-ink focus:outline-none"
+        aria-label={label}
+        className="h-9 w-full cursor-pointer appearance-none rounded-full border border-rule bg-surface px-3 pr-8 text-sm text-ink transition-colors hover:border-ink focus:border-ink focus:outline-none"
       >
         {options.map((o) => (
           <option key={o.value} value={o.value}>
@@ -575,7 +577,23 @@ function FilterSelect({
           </option>
         ))}
       </select>
-    </label>
+      <svg
+        width="12"
+        height="12"
+        viewBox="0 0 12 12"
+        aria-hidden
+        className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-mute"
+      >
+        <path
+          d="M3 5l3 3 3-3"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </span>
   );
 }
 
@@ -588,44 +606,20 @@ function FilterToggle({
   active: boolean;
   onClick: () => void;
 }) {
+  // Compact chip button — filled red when pressed, hairline pill when not.
   return (
-    <label className="flex flex-col gap-1.5">
-      <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-mute">
-        Toggle
-      </span>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={active}
-        aria-label={label}
-        onClick={onClick}
-        className={`flex h-10 items-center gap-2 rounded-full border px-4 text-xs font-medium transition-colors ${
-          active
-            ? "border-red bg-red text-cream hover:bg-red-deep"
-            : "border-rule bg-surface text-ink-soft hover:border-ink hover:text-ink"
-        }`}
-      >
-        <span
-          aria-hidden
-          className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border text-red ${
-            active ? "border-cream bg-cream" : "border-rule bg-surface"
-          }`}
-        >
-          {active && (
-            <svg width="9" height="9" viewBox="0 0 9 9" fill="none" aria-hidden>
-              <path
-                d="M2 4.5L4 6.5L7.5 2.5"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          )}
-        </span>
-        {label}
-      </button>
-    </label>
+    <button
+      type="button"
+      aria-pressed={active}
+      onClick={onClick}
+      className={`h-9 flex-none rounded-full border px-3.5 text-sm font-medium transition-colors ${
+        active
+          ? "border-red bg-red text-cream hover:bg-red-deep"
+          : "border-rule bg-surface text-ink-soft hover:border-ink hover:text-ink"
+      }`}
+    >
+      {label}
+    </button>
   );
 }
 
