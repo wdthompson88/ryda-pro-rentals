@@ -48,13 +48,15 @@ function SignUpPageInner() {
   );
 
   // Sanitize `?next=` against open-redirect / javascript: scheme tricks.
-  // Anything not a same-origin path falls back to the type's home:
-  // members continue to onboarding, partners land on their dashboard
-  // (which tracks the pending application) after the email round-trip.
-  const next = safeNext(
-    searchParams.get("next"),
-    accountType === "partner" ? "/partner" : "/onboarding",
-  );
+  // Anything not a same-origin path falls back to /onboarding.
+  const next = safeNext(searchParams.get("next"), "/onboarding");
+  // Partners ALWAYS land on /partner, even when a member-gated CTA's
+  // `?next=` is in the URL and the visitor toggled to partner after
+  // arriving: the pending application only materializes on the
+  // dashboard's first authenticated fetch, so carrying a member
+  // destination through the email round-trip would silently skip
+  // provisioning (and make the success CTA's label a lie).
+  const dest = accountType === "partner" ? "/partner" : next;
 
   // If a signed-in member lands on /signup (clicked an old marketing
   // link, etc.), bounce them to the gated destination — they don't
@@ -64,12 +66,12 @@ function SignUpPageInner() {
     let cancelled = false;
     supabase.auth.getSession().then(({ data }) => {
       if (cancelled) return;
-      if (data.session) router.replace(next);
+      if (data.session) router.replace(dest);
     });
     return () => {
       cancelled = true;
     };
-  }, [router, next]);
+  }, [router, dest]);
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -154,7 +156,7 @@ function SignUpPageInner() {
       if (supabase) {
         const origin =
           typeof window !== "undefined" ? window.location.origin : "";
-        const redirectTo = `${origin}/auth/callback?next=${encodeURIComponent(next)}`;
+        const redirectTo = `${origin}/auth/callback?next=${encodeURIComponent(dest)}`;
         const { error: err } = await supabase.auth.signUp({
           email,
           password,
@@ -234,7 +236,7 @@ function SignUpPageInner() {
 
             <div className="mt-7 flex flex-col gap-3">
               <Link
-                href={next}
+                href={dest}
                 className="inline-flex h-12 w-full items-center justify-center rounded-full bg-red px-7 text-sm font-medium text-cream hover:bg-red-deep"
               >
                 {accountType === "partner"
@@ -271,9 +273,13 @@ function SignUpPageInner() {
 
           <form className="mt-7 space-y-4" onSubmit={onSubmit}>
             {/* Account type. Member is the default; the /partners
-                marketing page deep-links here with ?as=partner. */}
+                marketing page deep-links here with ?as=partner.
+                Toggle buttons (aria-pressed), NOT ARIA radios: each
+                option is its own Tab stop and there's no roving
+                tabindex/arrow-key handling, so radio semantics would
+                promise keyboard behavior this control doesn't have. */}
             <div
-              role="radiogroup"
+              role="group"
               aria-label="Account type"
               className="grid grid-cols-2 gap-1.5 rounded-xl border border-rule bg-cream-2/40 p-1.5"
             >
@@ -451,7 +457,7 @@ function SignUpPageInner() {
           <div className="mt-10 border-t border-rule pt-6 text-center text-sm text-ink-soft">
             Already a member?{" "}
             <Link
-              href={`/signin${next !== "/onboarding" ? `?next=${encodeURIComponent(next)}` : ""}`}
+              href={`/signin${dest !== "/onboarding" ? `?next=${encodeURIComponent(dest)}` : ""}`}
               className="font-medium text-red hover:text-red-deep"
             >
               Sign in →
@@ -479,8 +485,7 @@ function TypeOption({
   return (
     <button
       type="button"
-      role="radio"
-      aria-checked={active}
+      aria-pressed={active}
       onClick={onSelect}
       className={`flex flex-col items-start rounded-lg px-3.5 py-2.5 text-left transition-colors ${
         active

@@ -81,12 +81,31 @@ export function validatePartnerApplication(
 
   let website = str(r.website, 200);
   if (website) {
-    // Accept bare domains; store a browsable URL. Reject anything with
-    // an explicit non-http scheme (javascript:, data:, …).
-    if (/^[a-z][a-z0-9+.-]*:/i.test(website) && !/^https?:\/\//i.test(website)) {
-      return { ok: false, error: "Website must be an http(s) URL." };
+    // Accept bare domains (with or without a port); store a browsable
+    // URL. Reject explicit non-http schemes (javascript:, data:,
+    // mailto:, …). A colon followed by digits is a port, not a scheme
+    // ("gmluxe.net:8080"), so it must not trip the scheme check.
+    if (!/^https?:\/\//i.test(website)) {
+      if (/^[a-z][a-z0-9+.-]*:(?!\d)/i.test(website)) {
+        return { ok: false, error: "Website must be an http(s) URL." };
+      }
+      website = `https://${website}`;
     }
-    if (!/^https?:\/\//i.test(website)) website = `https://${website}`;
+    // Must actually parse as a URL with a dotted host — catches junk
+    // like a bare "https://" and smuggled credentials/ports that the
+    // URL parser rejects.
+    let host = "";
+    try {
+      host = new URL(website).hostname;
+    } catch {
+      host = "";
+    }
+    if (!host.includes(".")) {
+      return {
+        ok: false,
+        error: "Enter a valid website address (e.g. gmluxe.net).",
+      };
+    }
   }
 
   const fleetRaw = str(r.fleet_size, 20);

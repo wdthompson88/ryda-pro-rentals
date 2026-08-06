@@ -118,21 +118,36 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // status_note is partner-visible (returned by /api/partner/me and
+  // readable under the row's own-select RLS policy), so it only holds
+  // the suspension notice. Approve notes stay in the audit log below —
+  // never on a row the subject of the review can read.
   const update: Record<string, unknown> = {
     status: to,
-    status_note: note || null,
+    status_note: to === "suspended" ? note || null : null,
   };
   if (to === "approved") update.approved_at = new Date().toISOString();
 
-  const { error: updErr } = await db
+  // Compare-and-swap on the status we validated against: if another
+  // admin's change landed between our read and this write, zero rows
+  // match and we 409 instead of silently overwriting their decision.
+  const { data: updated, error: updErr } = await db
     .from("partner_accounts")
     .update(update)
-    .eq("user_id", userId);
+    .eq("user_id", userId)
+    .eq("status", from)
+    .select("user_id");
   if (updErr) {
     console.error("[admin/partners · update]", updErr);
     return NextResponse.json(
       { error: "Failed to update partner status." },
       { status: 500 },
+    );
+  }
+  if (!updated || updated.length === 0) {
+    return NextResponse.json(
+      { error: "Status changed concurrently — reload and retry." },
+      { status: 409 },
     );
   }
 

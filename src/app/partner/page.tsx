@@ -9,6 +9,7 @@
 // 401s before any data moves, same posture as /account.
 //
 // States:
+//   unconfigured — no Supabase env (preview deploy): explainer card
 //   anon      — sign-in prompt (deep-links back here)
 //   none      — no application yet: inline apply form (any signed-in
 //               member can apply without re-registering)
@@ -24,6 +25,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { SiteHeader } from "@/components/site-header";
+import { supabase } from "@/lib/supabase";
 import { authedFetch } from "@/lib/api-fetch";
 import {
   PARTNER_FLEET_SIZES,
@@ -32,6 +34,7 @@ import {
 
 type ViewState =
   | { status: "loading" }
+  | { status: "unconfigured" }
   | { status: "anon" }
   | { status: "none"; intent: boolean }
   | { status: "ready"; partner: PartnerAccount }
@@ -41,6 +44,14 @@ export default function PartnerDashboardPage() {
   const [state, setState] = useState<ViewState>({ status: "loading" });
 
   const load = useCallback(async () => {
+    // Preview deploys without Supabase env: /signup simulates success,
+    // /signin simulates success, and this API would 401 — sending the
+    // visitor into a signup → sign-in → dashboard loop. Branch on the
+    // missing client up front instead, same posture as /account.
+    if (!supabase) {
+      setState({ status: "unconfigured" });
+      return;
+    }
     try {
       const res = await authedFetch("/api/partner/me");
       if (res.status === 401) {
@@ -90,6 +101,19 @@ export default function PartnerDashboardPage() {
           <p className="mt-12 text-sm text-mute">Loading…</p>
         )}
 
+        {state.status === "unconfigured" && (
+          <div className="mt-10 rounded-2xl border border-rule bg-cream-2/50 p-10 text-center">
+            <p className="font-display text-xl text-ink">
+              Preview environment.
+            </p>
+            <p className="mx-auto mt-3 max-w-md text-sm text-ink-soft">
+              This deploy has no backend configured, so partner accounts
+              are disabled. Everything works in production and in a
+              locally configured dev environment.
+            </p>
+          </div>
+        )}
+
         {state.status === "anon" && <SignInPrompt />}
 
         {state.status === "error" && (
@@ -110,7 +134,18 @@ export default function PartnerDashboardPage() {
 
         {state.status === "none" && (
           <ApplySection
-            onApplied={(partner) => setState({ status: "ready", partner })}
+            intent={state.intent}
+            onApplied={(partner) => {
+              // Stamp the (user-editable, affordance-only) flag the
+              // header Partner pill reads, so inline applicants get
+              // the same nav back to this page that signup-path
+              // partners do. Best-effort — the dashboard itself is
+              // API-gated either way.
+              void supabase?.auth
+                .updateUser({ data: { partner_intent: true } })
+                .catch(() => {});
+              setState({ status: "ready", partner });
+            }}
           />
         )}
 
@@ -153,20 +188,26 @@ function SignInPrompt() {
 // ── apply (signed-in member, no application yet) ────────────────
 
 function ApplySection({
+  intent,
   onApplied,
 }: {
+  /** True when signup metadata carried partner intent but the details
+   *  were unusable — the server saw them try to apply already. */
+  intent: boolean;
   onApplied: (p: PartnerAccount) => void;
 }) {
   return (
     <div className="mt-10">
       <div className="rounded-2xl border border-rule bg-surface p-8 sm:p-10">
         <h2 className="font-display text-xl text-ink">
-          List your fleet with RYDA.
+          {intent
+            ? "Almost there — confirm your company details."
+            : "List your fleet with RYDA."}
         </h2>
         <p className="mt-2 max-w-xl text-sm text-ink-soft">
-          Tell us about your company. We respond to every application
-          personally within 3 business days, and this page tracks the
-          review from the moment you submit.
+          {intent
+            ? "We saw your partner signup but couldn't read the company details. Re-enter them below and your application goes straight into review."
+            : "Tell us about your company. We respond to every application personally within 3 business days, and this page tracks the review from the moment you submit."}
         </p>
         <PartnerForm
           submitLabel="Submit application →"

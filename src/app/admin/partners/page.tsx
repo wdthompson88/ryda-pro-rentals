@@ -72,12 +72,12 @@ export default function AdminPartnersPage() {
       {
         approved: {
           title: p.status === "suspended" ? "Reinstate partner" : "Approve partner",
-          message: `${p.company_name} unlocks the partner dashboard and moves to listing setup. They see the change immediately.`,
+          message: `${p.company_name} unlocks the partner dashboard and moves to listing setup. They see the change immediately. Your note goes to the audit log only — the partner never sees it.`,
           confirm: p.status === "suspended" ? "Reinstate" : "Approve",
         },
         suspended: {
           title: p.status === "pending" ? "Decline application" : "Suspend partner",
-          message: `${p.company_name}'s dashboard shows a paused notice with your note. They keep account access.`,
+          message: `${p.company_name}'s dashboard shows a paused notice with your note — write it for the partner to read. They keep account access.`,
           confirm: p.status === "pending" ? "Decline" : "Suspend",
           tone: "danger",
         },

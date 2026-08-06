@@ -19,6 +19,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { requireSupabaseAdmin } from "@/lib/supabase-admin";
 import { getUserFromRequest } from "@/lib/api-auth";
+import { isAllowed, clientIp } from "@/lib/rate-limit";
 import {
   validatePartnerApplication,
   type PartnerAccount,
@@ -26,6 +27,13 @@ import {
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 export const runtime = "nodejs";
+
+// Same backstop every user-facing route carries. GET costs up to two
+// backend round-trips (select + auth admin lookup), POST writes — keep
+// both behind a per-IP window so one account can't hammer Supabase.
+const READ_LIMIT = 30;
+const WRITE_LIMIT = 10;
+const RATE_WINDOW_MS = 60_000;
 
 const COLS =
   "user_id, company_name, contact_name, contact_email, phone, website, fleet_size, market, status, status_note, approved_at, created_at, updated_at";
@@ -44,6 +52,12 @@ async function fetchPartner(
 }
 
 export async function GET(req: NextRequest) {
+  if (!(await isAllowed(`partner-me:read:${clientIp(req)}`, READ_LIMIT, RATE_WINDOW_MS))) {
+    return NextResponse.json(
+      { error: "Too many requests. Try again in a minute." },
+      { status: 429 },
+    );
+  }
   const user = await getUserFromRequest(req);
   if (!user) {
     return NextResponse.json({ error: "Sign in required." }, { status: 401 });
@@ -115,6 +129,12 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  if (!(await isAllowed(`partner-me:write:${clientIp(req)}`, WRITE_LIMIT, RATE_WINDOW_MS))) {
+    return NextResponse.json(
+      { error: "Too many requests. Try again in a minute." },
+      { status: 429 },
+    );
+  }
   const user = await getUserFromRequest(req);
   if (!user) {
     return NextResponse.json({ error: "Sign in required." }, { status: 401 });
@@ -164,12 +184,20 @@ export async function POST(req: NextRequest) {
       );
     }
   } else {
-    const { error: insErr } = await db.from("partner_accounts").insert({
-      user_id: user.id,
-      ...parsed.value,
-      contact_email: user.email,
-      status: "pending",
-    });
+    // Same double-fire tolerance as the GET provisioning path: if a
+    // concurrent request (second tab, racing GET) created the row
+    // between our check and this write, ignoreDuplicates turns the PK
+    // conflict into a no-op instead of a bogus 500 — the re-fetch
+    // below returns the row that won.
+    const { error: insErr } = await db.from("partner_accounts").upsert(
+      {
+        user_id: user.id,
+        ...parsed.value,
+        contact_email: user.email,
+        status: "pending",
+      },
+      { onConflict: "user_id", ignoreDuplicates: true },
+    );
     if (insErr) {
       console.error("[partner/me · insert]", insErr);
       return NextResponse.json(
