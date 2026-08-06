@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { PhotoGallery } from "@/components/photo-gallery";
-import { AuthSwap } from "@/components/auth-aware";
+import { RentalInquiryForm } from "@/components/rental-inquiry-form";
 import {
   VEHICLES,
   getVehicleBySymbol,
@@ -30,8 +30,9 @@ export async function generateStaticParams() {
   ];
 }
 
-// Revalidate hourly so the booking-card default dates ("2 weeks out") stay
-// fresh, never shows past dates after a few days in the wild.
+// Revalidate hourly so statically-prerendered listing content stays fresh.
+// (Booking dates are now computed client-side inside RentalInquiryForm,
+// so there's no build-time date to go stale.)
 export const revalidate = 3600;
 
 type ResolvedListing =
@@ -68,7 +69,12 @@ export async function generateMetadata({
   const rate = listingDailyRate(r);
   return {
     title: `Rent the ${title} · ${formatUSD(rate)}/day`,
-    description: `Hand-prepared, fully insured, white-glove delivered. ${title} in ${r.vehicle.market}.`,
+    // Partner cars are fulfilled by the operator on their own contract
+    // and insurance — the metadata must not promise RYDA fulfillment.
+    description:
+      r.kind === "ryda"
+        ? `Hand-prepared, fully insured, white-glove delivered. ${title} in ${r.vehicle.market}.`
+        : `Request your dates and a vetted Miami operator confirms availability and price directly with you. ${title} in ${r.vehicle.market}.`,
   };
 }
 
@@ -92,21 +98,6 @@ export default async function RentDetailPage({
     { days: 30, total: dailyRate * 30 * 0.88, save: 12 },
   ];
 
-  // Default dates: 2 weeks out, 3-day window. Dynamic so the page never
-  // shows past dates.
-  const fmt = (d: Date) =>
-    d.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    }) + " · 10:00 AM";
-  const start = new Date();
-  start.setDate(start.getDate() + 14);
-  const end = new Date(start);
-  end.setDate(end.getDate() + 3);
-  const startLabel = fmt(start);
-  const endLabel = fmt(end);
-
   const tint = r.kind === "partner" ? brandTint(r.vehicle.make) : undefined;
   const partnerGallery =
     r.kind === "partner" ? getPartnerGallery(r.vehicle) : [];
@@ -118,8 +109,10 @@ export default async function RentDetailPage({
       {/* Top split: hero image + booking panel */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-10 sm:px-10 sm:py-14">
+          {/* / is the canonical rental grid — /rent only 308s there,
+              so internal links point home directly. */}
           <Link
-            href="/rent"
+            href="/"
             className="text-xs font-medium uppercase tracking-[0.2em] text-red hover:text-red-deep"
           >
             ← Rentals
@@ -179,7 +172,7 @@ export default async function RentDetailPage({
                 <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-soft">
                   {r.kind === "ryda"
                     ? r.vehicle.description
-                    : `Hand-prepared, fully insured, and white-glove delivered. The ${title} is part of the RYDA Miami fleet, book a day or a week, we handle the logistics. 100 mi/day included with overage at $4/mi; full insurance bundled.`}
+                    : `The ${title} is run by a vetted Miami operator on RYDA's rental grid. Send your dates and the operator confirms availability and price directly with you — then closes the rental on their own contract and insurance, at their price. Inquiring through RYDA never costs more than going direct.`}
                 </p>
               </div>
 
@@ -203,7 +196,9 @@ export default async function RentDetailPage({
                   />
                   <Spec
                     label="Mileage included"
-                    value={r.vehicle.milesIncluded ?? "100 mi/day"}
+                    // No fabricated default — mileage terms are the
+                    // operator's when the listing doesn't state them.
+                    value={r.vehicle.milesIncluded ?? "Confirmed by operator"}
                   />
                 </div>
               )}
@@ -229,45 +224,14 @@ export default async function RentDetailPage({
                   </p>
                 ) : null}
                 <p className="mt-1 text-xs text-ink-soft">
-                  Includes 100 mi/day, full insurance, white-glove handover
+                  {r.kind === "ryda"
+                    ? "Includes 100 mi/day, full insurance, white-glove handover"
+                    : "Fulfilled by a vetted Miami operator on their contract and insurance"}
                 </p>
 
-                <div className="mt-5 space-y-3">
-                  <Field label="Start" value={startLabel} />
-                  <Field label="End" value={endLabel} />
-                  <Field label="Duration" value="3 days" />
-                  <Field label="Handover" value="White-glove delivery" />
-                </div>
-
-                <div className="mt-5 border-t border-rule pt-4 text-sm">
-                  <Row label="3 days × $/day" value={formatUSD(dailyRate * 3)} />
-                  <Row
-                    label="Service fee (10%)"
-                    value={formatUSD(dailyRate * 3 * 0.1)}
-                  />
-                  <Row label="Insurance" value="Included" />
-                  <Row label="Delivery" value={formatUSD(450)} />
-                  <Row
-                    label="Estimated tax"
-                    value={formatUSD(dailyRate * 3 * 0.07)}
-                  />
-                  <div className="mt-3 flex items-baseline justify-between border-t border-rule pt-3 font-display text-lg text-ink">
-                    <span>Total</span>
-                    <span className="tabular-nums">
-                      {formatUSD(dailyRate * 3 * 1.17 + 450)}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Deposit + driver requirements */}
+                {/* Driver requirements — kept from the old estimate card;
+                    operators impose these, so they qualify the lead. */}
                 <div className="mt-4 space-y-2 rounded-xl border border-rule bg-cream-2/40 p-3 text-[11px] text-ink-soft">
-                  <div className="flex items-baseline justify-between">
-                    <span className="text-mute">Cash deposit (refundable)</span>
-                    <span className="font-medium text-ink tabular-nums">
-                      {formatUSD(Math.max(5_000, Math.round(dailyRate * 2)))}
-                      <span className="ml-1 text-mute">· half for members</span>
-                    </span>
-                  </div>
                   <div className="flex items-baseline justify-between">
                     <span className="text-mute">Min. driver age</span>
                     <span className="font-medium text-ink">28+</span>
@@ -278,50 +242,20 @@ export default async function RentDetailPage({
                   </div>
                 </div>
 
-                {/* Renting requires an account (driver-record verification,
-                    insurance binding, deposit hold). Anon visitors hit
-                    the signup gate first; signed-in members go straight
-                    to the rental request form, no auth-link clutter. */}
-                <AuthSwap
-                  anon={
-                    <>
-                      <Link
-                        href={`/signup?next=${encodeURIComponent(
-                          `/contact?type=Rental&note=${encodeURIComponent(
-                            `Rental request: ${title} · ${market}`,
-                          )}#form`,
-                        )}&reason=rent`}
-                        className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-red px-7 py-3 text-sm font-semibold text-cream transition-colors hover:bg-red-deep"
-                      >
-                        Request rental
-                      </Link>
-                      <Link
-                        href={`/signin?next=${encodeURIComponent(
-                          `/contact?type=Rental&note=${encodeURIComponent(
-                            `Rental request: ${title} · ${market}`,
-                          )}#form`,
-                        )}&reason=rent`}
-                        className="mt-2 inline-flex w-full items-center justify-center text-xs text-ink-soft hover:text-ink"
-                      >
-                        Already a member? Sign in →
-                      </Link>
-                    </>
-                  }
-                  authed={
-                    <Link
-                      href={`/contact?type=Rental&note=${encodeURIComponent(
-                        `Rental request: ${title} · ${market}`,
-                      )}#form`}
-                      className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-red px-7 py-3 text-sm font-semibold text-cream transition-colors hover:bg-red-deep"
-                    >
-                      Request rental
-                    </Link>
-                  }
-                />
-                <p className="mt-3 text-center text-xs text-mute">
-                  We'll confirm availability within one business day. Free
-                  cancellation up to 7 days before pickup.
-                </p>
+                {/* Rentals-first pivot: the static fee-estimate mock +
+                    signup-gated contact CTA are replaced by the real
+                    inquiry form. One request → a named operator → the
+                    keys. Anon visitors get an account created alongside
+                    the inquiry; the lead itself is never gated. */}
+                <div className="mt-5 border-t border-rule pt-5">
+                  <RentalInquiryForm
+                    vehicleSlug={
+                      r.kind === "ryda" ? r.vehicle.symbol : r.vehicle.slug
+                    }
+                    vehicleName={title}
+                    market={market}
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -350,15 +284,29 @@ export default async function RentDetailPage({
               </div>
             </div>
 
-            {/* Trust badges grid */}
+            {/* Trust badges grid. RYDA-fleet cars carry RYDA's own
+                fulfillment promises; partner cars must only promise
+                what the lead-gen model delivers — insurance, mileage,
+                and availability are the operator's to confirm. */}
             <div className="lg:col-span-8">
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                 <TrustBadge label="Min driver age" value="28+" />
                 <TrustBadge label="Experience" value="5+ years" />
-                <TrustBadge label="Booking" value="Secured" />
-                <TrustBadge label="Insurance" value="$1M liability" />
-                <TrustBadge label="Mileage" value="100 mi/day incl." />
-                <TrustBadge label="Availability" value="Live calendar" />
+                {r.kind === "ryda" ? (
+                  <>
+                    <TrustBadge label="Booking" value="Secured" />
+                    <TrustBadge label="Insurance" value="$1M liability" />
+                    <TrustBadge label="Mileage" value="100 mi/day incl." />
+                    <TrustBadge label="Availability" value="Live calendar" />
+                  </>
+                ) : (
+                  <>
+                    <TrustBadge label="Operator" value="Vetted by RYDA" />
+                    <TrustBadge label="Insurance" value="Operator's policy" />
+                    <TrustBadge label="Your price" value="The operator's price" />
+                    <TrustBadge label="Availability" value="Operator confirms" />
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -374,12 +322,14 @@ export default async function RentDetailPage({
                 Deliverable to
               </p>
               <p className="mt-2 font-display text-2xl text-ink">
-                White-glove delivery across the region.
+                {r.kind === "ryda"
+                  ? "White-glove delivery across the region."
+                  : "Delivery across the region."}
               </p>
               <p className="mt-2 text-sm text-ink-soft">
-                We deliver and collect the vehicle to any address. Min 3-day
-                rental for in-market delivery; 7-day minimum for cross-state.
-                Delivery and pick-up rates from $450.
+                {r.kind === "ryda"
+                  ? "We deliver and collect the vehicle to any address. Min 3-day rental for in-market delivery; 7-day minimum for cross-state. Delivery and pick-up rates from $450."
+                  : "Most operators deliver and collect across the region. Delivery windows, minimums, and rates are the operator's — they confirm the details directly with you when they reply."}
               </p>
               <ul className="mt-4 grid grid-cols-2 gap-y-2 text-sm text-ink-soft sm:grid-cols-3">
                 {(market === "Miami"
@@ -417,135 +367,137 @@ export default async function RentDetailPage({
               </ul>
             </div>
 
+            {/* Payment: RYDA-fleet cars settle with RYDA; partner cars
+                settle with the operator on their contract — money never
+                moves through RYDA on a partner rental, and this page
+                must not imply it does. (No membership upsell here —
+                co-ownership/membership copy stays off rental surfaces.) */}
             <div className="lg:col-span-5">
               <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-red">
-                Payment options
+                Payment
               </p>
-              <p className="mt-2 font-display text-2xl text-ink">
-                Multiple ways to settle.
-              </p>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {["Wire", "ACH", "Credit card", "Debit card"].map((p) => (
-                  <span
-                    key={p}
-                    className="rounded-full border border-rule bg-surface px-3 py-1 text-xs font-medium text-ink"
-                  >
-                    {p}
-                  </span>
-                ))}
-              </div>
-              <p className="mt-4 text-[11px] text-mute">
-                Members on RYDA Blue or Black get reduced deposits and
-                priority booking on peak weekends.
-              </p>
+              {r.kind === "ryda" ? (
+                <>
+                  <p className="mt-2 font-display text-2xl text-ink">
+                    Multiple ways to settle.
+                  </p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {["Wire", "ACH", "Credit card", "Debit card"].map((p) => (
+                      <span
+                        key={p}
+                        className="rounded-full border border-rule bg-surface px-3 py-1 text-xs font-medium text-ink"
+                      >
+                        {p}
+                      </span>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="mt-2 font-display text-2xl text-ink">
+                    Never through RYDA.
+                  </p>
+                  <p className="mt-2 text-sm text-ink-soft">
+                    No card at request, no payment through RYDA. You pay the
+                    operator on their contract, exactly as you would going
+                    direct — your price is the operator&apos;s price.
+                  </p>
+                </>
+              )}
             </div>
           </div>
         </div>
       </section>
 
-      {/* Duration discounts */}
-      <section className="border-b border-rule bg-cream-2">
-        <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
-          <h2 className="font-display text-3xl text-ink">Longer trips, better rates</h2>
-          <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
-            {ratesByDuration.map((rate) => (
-              <div key={rate.days} className="rounded-xl border border-rule bg-surface p-5">
-                <p className="text-xs text-mute">{rate.days} days</p>
-                <p className="mt-2 font-display text-xl text-ink tabular-nums">
-                  {formatUSD(rate.total)}
-                </p>
-                {rate.save > 0 && (
-                  <p className="mt-1 text-xs font-medium text-red">
-                    Save {rate.save}%
+      {/* Duration discounts — RYDA fleet only. Partner pricing is the
+          operator's; quoting duration discounts RYDA can't honor would
+          contradict "your price is the operator's price". */}
+      {r.kind === "ryda" && (
+        <section className="border-b border-rule bg-cream-2">
+          <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
+            <h2 className="font-display text-3xl text-ink">Longer trips, better rates</h2>
+            <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
+              {ratesByDuration.map((rate) => (
+                <div key={rate.days} className="rounded-xl border border-rule bg-surface p-5">
+                  <p className="text-xs text-mute">{rate.days} days</p>
+                  <p className="mt-2 font-display text-xl text-ink tabular-nums">
+                    {formatUSD(rate.total)}
                   </p>
-                )}
-              </div>
-            ))}
+                  {rate.save > 0 && (
+                    <p className="mt-1 text-xs font-medium text-red">
+                      Save {rate.save}%
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* What's included */}
+      {/* What's included (RYDA fleet) / How the rental works (partner).
+          The RYDA pillars are fulfillment promises — insurance, mileage,
+          roadside, handover — that only hold for RYDA's own cars. On
+          partner listings the honest pillars are the lead-gen model. */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-14 sm:px-10">
-          <h2 className="font-display text-3xl text-ink">What's included</h2>
+          <h2 className="font-display text-3xl text-ink">
+            {r.kind === "ryda" ? "What's included" : "How the rental works"}
+          </h2>
           <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-            <Pillar
-              title="Full insurance"
-              body="$1M third-party liability. Agreed-value physical damage with low deductible."
-            />
-            <Pillar
-              title="100 miles / day"
-              body="Industry-standard included mileage. Extra miles at $4/mi at the time of booking."
-            />
-            <Pillar
-              title="24/7 roadside"
-              body="Single number, replacement vehicle if anything goes wrong."
-            />
-            <Pillar
-              title="White-glove handover"
-              body="Vehicle delivered washed, fueled, photo-documented."
-            />
-            {r.kind === "ryda" && r.vehicle.trackEligible && (
-              <Pillar
-                title="Track-day eligible"
-                body="Optional unlimited-miles track package + helmet drop-off."
-              />
+            {r.kind === "ryda" ? (
+              <>
+                <Pillar
+                  title="Full insurance"
+                  body="$1M third-party liability. Agreed-value physical damage with low deductible."
+                />
+                <Pillar
+                  title="100 miles / day"
+                  body="Industry-standard included mileage. Extra miles at $4/mi at the time of booking."
+                />
+                <Pillar
+                  title="24/7 roadside"
+                  body="Single number, replacement vehicle if anything goes wrong."
+                />
+                <Pillar
+                  title="White-glove handover"
+                  body="Vehicle delivered washed, fueled, photo-documented."
+                />
+                {r.vehicle.trackEligible && (
+                  <Pillar
+                    title="Track-day eligible"
+                    body="Optional unlimited-miles track package + helmet drop-off."
+                  />
+                )}
+              </>
+            ) : (
+              <>
+                <Pillar
+                  title="A vetted operator"
+                  body="Your request goes straight to the Miami operator who runs this car. They reply by name and confirm availability directly with you."
+                />
+                <Pillar
+                  title="Their contract & insurance"
+                  body="The rental closes on the operator's own agreement and coverage — the same terms you'd get going direct. Delivery, deposit, and mileage are theirs to confirm."
+                />
+                <Pillar
+                  title="The operator's price"
+                  body="Inquiring through RYDA never costs more than going direct. Operators pay RYDA a referral commission on bookings we send them — that's the whole model."
+                />
+                <Pillar
+                  title="No payment through RYDA"
+                  body="No card at request. Nothing is charged until you and the operator confirm the booking together."
+                />
+              </>
             )}
           </div>
         </div>
       </section>
 
-      {/* Or claim a co-ownership share, only for RYDA fleet with shares left */}
-      {r.kind === "ryda" && r.vehicle.sharesAvailable > 0 && (
-        <section className="border-b border-rule bg-ink py-14 text-cream">
-          <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-              Drive once. Own a piece forever.
-            </p>
-            <h2 className="mt-3 font-display text-3xl sm:text-4xl">
-              Or claim a co-ownership share for ~{formatUSD(r.vehicle.pricePerShare)}.
-            </h2>
-            <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
-              Effective {formatUSD(r.vehicle.effectiveDailyCost)}/day in
-              steady-state ops vs. {formatUSD(r.vehicle.rentalDailyRate)}/day
-              to rent. {r.vehicle.sharesAvailable} of {r.vehicle.shares}{" "}
-              shares left.
-            </p>
-            <Link
-              href={`/portfolio/${r.vehicle.symbol}`}
-              className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-red hover:text-cream"
-            >
-              See in the fleet →
-            </Link>
-          </div>
-        </section>
-      )}
-
-      {/* Partner-only: pitch the co-ownership story without offering a share on this car */}
-      {r.kind === "partner" && (
-        <section className="border-b border-rule bg-ink py-14 text-cream">
-          <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-              Beyond the rental
-            </p>
-            <h2 className="mt-3 font-display text-3xl sm:text-4xl">
-              Renting is your test drive. Co-ownership is the relationship.
-            </h2>
-            <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
-              The RYDA co-ownership fleet runs ~$221/day in steady-state
-              ops on a Ferrari versus $1,500–3,000/day to rent the same car (Miami market floor).
-              See if a curated certified pre owned share fits before your next trip.
-            </p>
-            <Link
-              href="/portfolio"
-              className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-red hover:text-cream"
-            >
-              See the co-ownership fleet →
-            </Link>
-          </div>
-        </section>
-      )}
+      {/* No co-ownership pitch here. The program is parked (2027
+          waitlist) and the pivot's rule is co-ownership stays out of
+          rental-surface copy — the quiet pointer on / and
+          /how-it-works is the only sanctioned reference. */}
     </>
   );
 }
@@ -555,24 +507,6 @@ function Spec({ label, value }: { label: string; value: string }) {
     <div>
       <dt className="text-xs uppercase tracking-wider text-mute">{label}</dt>
       <dd className="mt-1 text-sm text-ink">{value}</dd>
-    </div>
-  );
-}
-
-function Field({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-center justify-between border-b border-rule pb-3">
-      <span className="text-sm text-mute">{label}</span>
-      <span className="text-sm font-medium text-ink">{value}</span>
-    </div>
-  );
-}
-
-function Row({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-baseline justify-between py-1.5">
-      <span className="text-ink-soft">{label}</span>
-      <span className="font-medium text-ink tabular-nums">{value}</span>
     </div>
   );
 }

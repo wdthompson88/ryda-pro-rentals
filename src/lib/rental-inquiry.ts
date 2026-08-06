@@ -1,0 +1,163 @@
+// Pure validation + vehicle resolution for the rental-inquiry API.
+// Lives in lib (not the route file) so unit tests can pin the exact
+// predicate the route uses without mocking Supabase or Resend — same
+// pattern as content-length.ts + the csp-report route.
+//
+// No imports with side effects here: partner-fleet and market-data are
+// plain data modules, so this file stays testable in plain node.
+
+import { PARTNER_VEHICLES, type PartnerVehicle } from "./partner-fleet";
+import { VEHICLES, type Vehicle } from "./market-data";
+
+export type RentalInquiryFleet = "ryda" | "partner";
+
+export type RentalInquiry = {
+  name: string;
+  email: string;
+  phone: string | null;
+  vehicleSlug: string;        // canonical id: partner slug or RYDA symbol
+  vehicleLabel: string;       // display name for emails + admin triage
+  fleet: RentalInquiryFleet;
+  // Ops attribution ONLY. Customers never see the operator's name —
+  // listings and emails say "a vetted Miami operator".
+  partnerName: string | null;
+  startDate: string;          // YYYY-MM-DD
+  endDate: string;            // YYYY-MM-DD
+  message: string | null;
+  marketingOptIn: boolean;
+  clientToken: string | null; // idempotency token; null = fallback row
+};
+
+export type RentalInquiryResult =
+  | { ok: true; value: RentalInquiry }
+  | { ok: false; error: string };
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+// Longest span the funnel accepts. Longer stays a conversation with the
+// operator, not a form submission.
+const MAX_SPAN_DAYS = 30;
+
+// Strict YYYY-MM-DD parse to UTC-midnight ms. new Date("2026-02-31")
+// silently rolls over to March; round-tripping through toISOString
+// catches that as well as non-ISO shapes ("8/1/2026", "2026-8-1").
+function parseIsoDate(s: string): number | null {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return null;
+  const d = new Date(`${s}T00:00:00.000Z`);
+  if (Number.isNaN(d.getTime())) return null;
+  if (d.toISOString().slice(0, 10) !== s) return null;
+  return d.getTime();
+}
+
+/**
+ * Resolve a vehicle reference from either fleet:
+ *   1. partner fleet by slug (partner-fleet.ts `.slug`)
+ *   2. RYDA fleet by symbol (market-data.ts `.symbol`), rentals only
+ * Case-insensitive because the slug travels through URLs and client
+ * state. Lists are injectable for tests; production callers use the
+ * defaults.
+ */
+export function resolveRentalVehicle(
+  slug: string,
+  partnerList: PartnerVehicle[] = PARTNER_VEHICLES,
+  rydaList: Vehicle[] = VEHICLES,
+): Pick<RentalInquiry, "vehicleSlug" | "vehicleLabel" | "fleet" | "partnerName"> | null {
+  const needle = slug.trim().toLowerCase();
+  if (!needle) return null;
+
+  const partner = partnerList.find((v) => v.slug.toLowerCase() === needle);
+  if (partner) {
+    return {
+      fleet: "partner",
+      vehicleSlug: partner.slug,
+      vehicleLabel: `${partner.make} ${partner.model}`,
+      partnerName: partner.partner,
+    };
+  }
+
+  const ryda = rydaList.find((v) => v.symbol.toLowerCase() === needle);
+  if (ryda && ryda.rentalAvailable) {
+    return {
+      fleet: "ryda",
+      vehicleSlug: ryda.symbol,
+      vehicleLabel: ryda.name,
+      partnerName: null,
+    };
+  }
+
+  return null;
+}
+
+/**
+ * Validate + normalize a rental-inquiry POST body. Returns either the
+ * canonical row-ready value or a customer-facing error string (the
+ * route maps every failure to a 400).
+ *
+ * `now` is injectable so date-boundary tests don't race the wall clock
+ * (same reason rate-limit tests use fake timers).
+ */
+export function validateRentalInquiry(
+  body: unknown,
+  now: Date = new Date(),
+): RentalInquiryResult {
+  if (typeof body !== "object" || body === null) {
+    return { ok: false, error: "Bad request." };
+  }
+  const b = body as Record<string, unknown>;
+
+  const name = String(b.name || "").trim().slice(0, 200);
+  const email = String(b.email || "").trim().toLowerCase().slice(0, 320);
+  // Cap free-text fields like the contact route: bodyParser limits stop a
+  // literal DoS, consistency keeps the schema and email templates sane.
+  const phone = String(b.phone || "").trim().slice(0, 32);
+  const message = String(b.message || "").trim().slice(0, 5000);
+  const clientToken = String(b.clientToken || "").trim().slice(0, 128);
+  // Strict boolean — an accidental "true" string or 1 is not consent.
+  const marketingOptIn = b.marketingOptIn === true;
+
+  if (!name) return { ok: false, error: "Name required." };
+  if (!email || !email.includes("@")) {
+    return { ok: false, error: "Valid email required." };
+  }
+
+  const startMs = parseIsoDate(String(b.startDate || ""));
+  const endMs = parseIsoDate(String(b.endDate || ""));
+  if (startMs === null || endMs === null) {
+    return { ok: false, error: "Invalid dates. Use YYYY-MM-DD." };
+  }
+  // UTC-tolerant "today": the server's UTC date can be one day ahead of
+  // the customer's local date (Miami evenings are already tomorrow in
+  // UTC), so allow one day of slack rather than reject a legitimate
+  // same-day request. A stale-by-one lead is still a lead.
+  const todayUtcMs = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  if (startMs < todayUtcMs - DAY_MS) {
+    return { ok: false, error: "Start date can't be in the past." };
+  }
+  if (endMs < startMs) {
+    return { ok: false, error: "End date must be on or after the start date." };
+  }
+  if ((endMs - startMs) / DAY_MS > MAX_SPAN_DAYS) {
+    return { ok: false, error: "Rentals are capped at 30 days per request." };
+  }
+
+  const vehicle = resolveRentalVehicle(String(b.vehicleSlug || ""));
+  if (!vehicle) {
+    return { ok: false, error: "Vehicle not found." };
+  }
+
+  return {
+    ok: true,
+    value: {
+      name,
+      email,
+      phone: phone || null,
+      ...vehicle,
+      startDate: new Date(startMs).toISOString().slice(0, 10),
+      endDate: new Date(endMs).toISOString().slice(0, 10),
+      message: message || null,
+      marketingOptIn,
+      // Missing token = no dedupe, but the lead still lands (never lose
+      // a lead beats strict idempotency for a lead-gen funnel).
+      clientToken: clientToken || null,
+    },
+  };
+}

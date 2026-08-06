@@ -30,6 +30,18 @@
    * so it doesn't read as a Tailwind preset. AA on dark: ~6.1:1. */
   --ryda-success:      #5FB58A;
   --ryda-success-deep: #7CCBA1;
+  /* Designed-warn amber — pending/attention washes (`bg-warn/15`,
+   * status chips) so we never reach for Tailwind's amber-*. Same
+   * muted family as success/marine. On dark: warn ≈ 7.8:1,
+   * warn-deep ≈ 9.8:1. */
+  --ryda-warn:      #D19A3D;
+  --ryda-warn-deep: #E0B25C;
+  /* Accent for use ON `bg-ink` bands only (never on the page bg).
+   * `ink` flips with the theme, so the red that clears AA on an ink
+   * band is the OPPOSITE theme's red: here (dark theme) bg-ink is the
+   * light #F4F1EC, where #C03030 hits ~5.0:1. Name matches the
+   * light-only palette branch so `text-red-bright` survives the merge. */
+  --ryda-red-bright: #C03030;
 }
 
 /* Light theme — explicit opt-in via data-theme="light" on <html>.
@@ -53,6 +65,14 @@
   /* Designed-success green, deeper for AA on light cream (~5.0:1). */
   --ryda-success:      #2E8459;
   --ryda-success-deep: #1F5C3D;
+  /* Designed-warn amber, deeper for AA on light cream — warn ≈ 5.4:1,
+   * warn-deep ≈ 7.3:1 (AAA for small warning text). */
+  --ryda-warn:      #8A5710;
+  --ryda-warn-deep: #6E4708;
+  /* On the light theme bg-ink bands are near-black (#0E0E10); standard
+   * red (#C03030) is ~2.9:1 there, so ink bands take the bright red
+   * (~4.6:1 on ink). Never use on cream surfaces. */
+  --ryda-red-bright: #DC4747;
 }
 
 /* Smooth color transitions when toggling themes (but not on load) */
@@ -80,6 +100,9 @@ html.theme-ready * {
   --color-marine-deep: var(--ryda-marine-deep);
   --color-success:      var(--ryda-success);
   --color-success-deep: var(--ryda-success-deep);
+  --color-warn:      var(--ryda-warn);
+  --color-warn-deep: var(--ryda-warn-deep);
+  --color-red-bright: var(--ryda-red-bright);
 
   --font-display: var(--font-fraunces);
   --font-sans:    var(--font-inter);

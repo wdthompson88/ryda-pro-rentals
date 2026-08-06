@@ -1,62 +1,31 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { AuthSwap, VisibleWhenAdmin } from "@/components/auth-aware";
 
-// RYDA spans three verticals: Cars, Boats, Planes. The header detects
-// which vertical the visitor is in via the pathname and swaps the nav
-// accordingly. Plus a small site-search bar so members can find a car,
-// boat, or doc from any page. Sign-in / Sign-up are paired buttons —
-// soft cream "Log in" next to a dark "Sign up" CTA, in RYDA's palette.
+// Rental-first header (Aug 2026 pivot). Rentals are THE product, so the
+// nav is one flat list on every page: Rent (the homepage grid) · How it
+// works · For partners. The old vertical-aware nav (Cars / Boats /
+// Planes switcher, portfolio + membership links) is retired from the
+// top bar — co-ownership now lives at /co-ownership via footer links
+// only. Site search + the auth-aware Log in / Sign up / Account slots
+// are unchanged.
 
-type Vertical = "cars" | "boats" | "planes" | "neutral";
-
-const CARS_NAV = [
-  { href: "/portfolio", label: "Portfolio" },
-  { href: "/rent", label: "Rent" },
+const NAV = [
+  // "/" is the canonical marketplace grid (/rent 308s to it).
+  { href: "/", label: "Rent" },
   { href: "/how-it-works", label: "How it works" },
-  { href: "/membership", label: "Membership" },
+  { href: "/partners", label: "For partners" },
 ];
-
-const BOATS_NAV = [
-  { href: "/boats/portfolio", label: "Portfolio" },
-  { href: "/boats/rent", label: "Charter" },
-  { href: "/boats/how-it-works", label: "How it works" },
-  { href: "/boats/membership", label: "Membership" },
-];
-
-const PLANES_NAV: { href: string; label: string }[] = [
-  // Planes is just a coming-soon surface today, no sub-nav.
-];
-
-function detectVertical(pathname: string | null): Vertical {
-  if (!pathname) return "neutral";
-  if (pathname.startsWith("/boats")) return "boats";
-  if (pathname.startsWith("/planes")) return "planes";
-  if (pathname === "/") return "neutral";
-  // Everything else (the existing car-era routes) is the cars vertical:
-  // /portfolio, /rent, /membership, /how-it-works, /faq, /inside, /journal,
-  // /vs, /sample-documents, etc. plus /cars itself.
-  return "cars";
-}
-
-function navForVertical(v: Vertical): { href: string; label: string }[] {
-  if (v === "boats") return BOATS_NAV;
-  if (v === "planes") return PLANES_NAV;
-  if (v === "neutral") return [];
-  return CARS_NAV;
-}
 
 export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const pathname = usePathname();
   const router = useRouter();
-  const vertical = detectVertical(pathname);
-  const nav = navForVertical(vertical);
+  const nav = NAV;
 
   const tone = inverted ? "text-cream/70 hover:text-cream" : "text-ink-soft hover:text-ink";
   const brand = inverted ? "text-cream" : "text-ink";
@@ -103,38 +72,6 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
           <Link href="/" className={`font-display text-2xl tracking-tight ${brand}`}>
             RYDA
           </Link>
-          {/* Inline vertical switcher, Cars · Boats · Planes. The
-              currently-active vertical is bolded ink/cream; the others
-              are mute and clickable so members can jump between
-              verticals without bouncing back to the splitter. */}
-          {vertical !== "neutral" && (
-            <div className="hidden items-baseline gap-2 text-[10px] font-medium uppercase tracking-[0.18em] sm:flex">
-              <VerticalSwitch
-                href="/cars"
-                label="Cars"
-                active={vertical === "cars"}
-                inverted={inverted}
-              />
-              <span aria-hidden className={inverted ? "text-cream/30" : "text-mute/50"}>
-                ·
-              </span>
-              <VerticalSwitch
-                href="/boats"
-                label="Boats"
-                active={vertical === "boats"}
-                inverted={inverted}
-              />
-              <span aria-hidden className={inverted ? "text-cream/30" : "text-mute/50"}>
-                ·
-              </span>
-              <VerticalSwitch
-                href="/planes"
-                label="Planes"
-                active={vertical === "planes"}
-                inverted={inverted}
-              />
-            </div>
-          )}
         </div>
 
         <nav className={`hidden gap-7 text-sm font-medium md:flex ${tone}`}>
@@ -265,34 +202,6 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
           }`}
         >
           <nav className={`mx-auto flex max-w-7xl flex-col gap-1 px-6 py-4 text-base ${tone}`}>
-            {/* Mobile vertical switcher, same Cars / Boats / Planes
-                jump as the desktop header. Active vertical bolded. */}
-            <div className="mb-2 flex items-baseline gap-3 px-3 py-2 text-[11px] font-medium uppercase tracking-[0.2em]">
-              <VerticalSwitch
-                href="/cars"
-                label="Cars"
-                active={vertical === "cars"}
-                inverted={inverted}
-              />
-              <span aria-hidden className={inverted ? "text-cream/30" : "text-mute/50"}>
-                ·
-              </span>
-              <VerticalSwitch
-                href="/boats"
-                label="Boats"
-                active={vertical === "boats"}
-                inverted={inverted}
-              />
-              <span aria-hidden className={inverted ? "text-cream/30" : "text-mute/50"}>
-                ·
-              </span>
-              <VerticalSwitch
-                href="/planes"
-                label="Planes"
-                active={vertical === "planes"}
-                inverted={inverted}
-              />
-            </div>
             {nav.map((n) => (
               <Link
                 key={n.href}
@@ -374,35 +283,6 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
         </div>
       )}
     </header>
-  );
-}
-
-// Inline vertical-switch link used next to the RYDA wordmark.
-// Active vertical: bolded ink (or cream on inverted headers).
-// Inactive verticals: mute, clickable, hover transition to ink.
-function VerticalSwitch({
-  href,
-  label,
-  active,
-  inverted,
-}: {
-  href: string;
-  label: string;
-  active: boolean;
-  inverted?: boolean;
-}) {
-  const activeTone = inverted ? "text-cream font-semibold" : "text-ink font-semibold";
-  const inactiveTone = inverted
-    ? "text-cream/55 font-medium hover:text-cream"
-    : "text-mute font-medium hover:text-ink";
-  return (
-    <Link
-      href={href}
-      aria-current={active ? "page" : undefined}
-      className={`transition-colors ${active ? activeTone : inactiveTone}`}
-    >
-      {label}
-    </Link>
   );
 }
 

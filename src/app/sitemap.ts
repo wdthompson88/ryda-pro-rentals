@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { VEHICLES } from "@/lib/market-data";
+import { PARTNER_VEHICLES } from "@/lib/partner-fleet";
 import { BOATS } from "@/lib/boat-data";
 import { POSTS as JOURNAL_POSTS } from "@/lib/journal-content";
 import { HELP as HELP_CATEGORIES } from "@/lib/help-content";
@@ -15,14 +16,20 @@ import { LEARN_ARTICLES } from "@/lib/learn-content";
 // /onboarding, /bookings/*, /admin/*) are intentionally NOT listed.
 
 const PUBLIC_ROUTES = [
+  // "" is the rental marketplace grid (rental-first pivot, Aug 2026).
+  // NOTE: /rent is intentionally NOT listed — it 308s to /, which is
+  // the single canonical URL for the grid. /rent/[slug] detail pages
+  // remain live and are emitted below.
   "",
+  // Rental-first surfaces.
+  "/partners",
+  "/co-ownership",
   // Verticals, splash for each line of business.
   "/cars",
   "/boats",
   "/planes",
   // Cars marketing surfaces.
   "/portfolio",
-  "/rent",
   "/membership",
   "/how-it-works",
   "/about",
@@ -115,6 +122,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
       : []),
   ]);
 
+  // Partner-fleet rental detail pages. These are the marketplace's
+  // primary SEO surface post-pivot: one indexable page per partner car
+  // at /rent/[slug]. Priority sits above the co-own marketing pages
+  // and equal to the RYDA-fleet rental pages emitted above.
+  const partnerEntries: MetadataRoute.Sitemap = PARTNER_VEHICLES.map(
+    (p) => ({
+      url: `${siteUrl}/rent/${p.slug}`,
+      lastModified,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    }),
+  );
+
   const boatEntries: MetadataRoute.Sitemap = BOATS.flatMap((b) => [
     {
       url: `${siteUrl}/boats/portfolio/${b.slug}`,
@@ -177,6 +197,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     ...staticEntries,
     ...vehicleEntries,
+    ...partnerEntries,
     ...boatEntries,
     ...journalEntries,
     ...helpEntries,
