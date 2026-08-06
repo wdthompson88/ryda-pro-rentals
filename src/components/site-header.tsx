@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { AuthSwap, VisibleWhenAdmin } from "@/components/auth-aware";
 
 // Rental-first header (Aug 2026 pivot). Rentals are THE product, so the
@@ -273,12 +272,6 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
                 </>
               }
             />
-            <div className="mt-2 flex items-center justify-between rounded-lg px-3 py-2">
-              <span className="text-xs uppercase tracking-wider text-mute">
-                Theme
-              </span>
-              <ThemeToggle />
-            </div>
           </nav>
         </div>
       )}
