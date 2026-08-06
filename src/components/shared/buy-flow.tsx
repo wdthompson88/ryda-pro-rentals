@@ -208,7 +208,7 @@ export default function BuyFlow({ asset, initialShares, config }: Props) {
   return (
     <div className="bg-cream">
       {/* Progress header */}
-      <div className="border-b border-rule bg-cream/90 backdrop-blur sticky top-20 z-10">
+      <div className="border-b border-rule bg-cream/90 backdrop-blur sticky top-18 z-10">
         <div className="mx-auto max-w-5xl px-6 py-5 sm:px-10">
           <Link
             href={config.returnHref}

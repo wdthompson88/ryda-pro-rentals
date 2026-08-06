@@ -266,7 +266,7 @@ export default async function BoatDetailPage({
 
             {/* Order panel */}
             <div className="lg:col-span-4">
-              <div className="sticky top-24 rounded-2xl border border-rule bg-surface p-6 shadow-sm">
+              <div className="sticky top-22 rounded-2xl border border-rule bg-surface p-6 shadow-sm">
                 <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
                   Claim a share
                 </p>

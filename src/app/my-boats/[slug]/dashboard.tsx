@@ -169,7 +169,7 @@ function Loaded({ boat, data }: { boat: Boat; data: MyAssetData }) {
       </section>
 
       {/* Sub-tab navigation */}
-      <section className="sticky top-20 z-10 border-b border-rule bg-cream/95 backdrop-blur">
+      <section className="sticky top-18 z-10 border-b border-rule bg-cream/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-6 sm:px-10">
           {[
             ["Overview", "#overview"],

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AuthSwap, VisibleWhenAdmin } from "@/components/auth-aware";
 
 // Rental-first header (Aug 2026 pivot). Rentals are THE product, so the
@@ -16,7 +16,7 @@ import { AuthSwap, VisibleWhenAdmin } from "@/components/auth-aware";
 
 const NAV = [
   // /rent is the canonical browse grid; "/" is the landing page.
-  { href: "/rent", label: "Rent" },
+  { href: "/rent", label: "Browse" },
   { href: "/how-it-works", label: "How it works" },
   { href: "/partners", label: "For partners" },
 ];
@@ -26,6 +26,69 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
   const nav = NAV;
+
+  // Priority navigation: links stay inline for as long as they fit the
+  // space between the brand and the auth cluster; whatever would
+  // overflow folds into a trailing "More" dropdown instead of hiding.
+  // SSR renders all links (visibleCount = nav.length) so hydration
+  // matches; the layout effect corrects on mount and on every resize.
+  const [visibleCount, setVisibleCount] = useState(nav.length);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const navRef = useRef<HTMLElement | null>(null);
+  const measureRef = useRef<HTMLDivElement | null>(null);
+  const moreMeasureRef = useRef<HTMLSpanElement | null>(null);
+  const moreRef = useRef<HTMLDivElement | null>(null);
+
+  useLayoutEffect(() => {
+    const navEl = navRef.current;
+    const measureEl = measureRef.current;
+    if (!navEl || !measureEl) return;
+    const GAP = 28; // matches the nav's gap-7
+    const compute = () => {
+      const available = navEl.clientWidth;
+      const widths = Array.from(measureEl.children).map(
+        (el) => (el as HTMLElement).offsetWidth,
+      );
+      const moreW = (moreMeasureRef.current?.offsetWidth ?? 56) + 14; // + chevron
+      const total =
+        widths.reduce((a, b) => a + b, 0) + GAP * Math.max(0, widths.length - 1);
+      if (total <= available) {
+        setVisibleCount(widths.length);
+        return;
+      }
+      let used = moreW;
+      let count = 0;
+      for (const w of widths) {
+        if (used + GAP + w > available) break;
+        used += GAP + w;
+        count += 1;
+      }
+      setVisibleCount(count);
+    };
+    compute();
+    const ro = new ResizeObserver(compute);
+    ro.observe(navEl);
+    return () => ro.disconnect();
+  }, []);
+
+  // The More menu closes on outside click or Escape, standard menu manners.
+  useEffect(() => {
+    if (!moreOpen) return;
+    const onDown = (e: MouseEvent) => {
+      if (moreRef.current && !moreRef.current.contains(e.target as Node)) {
+        setMoreOpen(false);
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMoreOpen(false);
+    };
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [moreOpen]);
 
   const tone = inverted ? "text-cream/70 hover:text-cream" : "text-ink-soft hover:text-ink";
   const brand = inverted ? "text-cream" : "text-ink";
@@ -74,19 +137,88 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
           now reads as minimal brand mark + nav + one CTA, not as
           a control panel. */}
 
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-5 sm:px-10">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-4 sm:px-10">
         <div className="flex items-baseline gap-4 sm:gap-5">
           <Link href="/" className={`font-display text-2xl tracking-tight ${brand}`}>
             RYDA
           </Link>
         </div>
 
-        <nav className={`hidden gap-7 text-sm font-medium md:flex ${tone}`}>
-          {nav.map((n) => (
-            <Link key={n.href} href={n.href}>
+        <nav
+          ref={navRef}
+          aria-label="Primary"
+          className={`relative hidden min-w-0 flex-1 items-center justify-center gap-7 text-sm font-medium sm:flex ${tone}`}
+        >
+          {/* Invisible twin of the full link list at natural width — the
+              fit calculation reads these, never the visible subset. */}
+          <div
+            ref={measureRef}
+            aria-hidden="true"
+            className="pointer-events-none invisible absolute left-0 top-0 flex gap-7"
+          >
+            {nav.map((n) => (
+              <span key={n.href} className="whitespace-nowrap">
+                {n.label}
+              </span>
+            ))}
+          </div>
+          <span
+            ref={moreMeasureRef}
+            aria-hidden="true"
+            className="pointer-events-none invisible absolute left-0 top-0 whitespace-nowrap"
+          >
+            More
+          </span>
+
+          {nav.slice(0, visibleCount).map((n) => (
+            <Link key={n.href} href={n.href} className="whitespace-nowrap">
               {n.label}
             </Link>
           ))}
+          {visibleCount < nav.length && (
+            <div ref={moreRef} className="relative">
+              <button
+                type="button"
+                onClick={() => setMoreOpen((s) => !s)}
+                aria-expanded={moreOpen}
+                aria-haspopup="menu"
+                className={`flex items-center gap-1 whitespace-nowrap ${tone}`}
+              >
+                More
+                <svg
+                  width="10"
+                  height="10"
+                  viewBox="0 0 10 10"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  aria-hidden="true"
+                  className={moreOpen ? "rotate-180" : ""}
+                >
+                  <polyline points="2,3.5 5,6.5 8,3.5" />
+                </svg>
+              </button>
+              {moreOpen && (
+                <div
+                  role="menu"
+                  className="absolute right-0 top-full z-50 mt-3 min-w-44 rounded-xl border border-rule bg-surface p-1.5 shadow-lg"
+                >
+                  {nav.slice(visibleCount).map((n) => (
+                    <Link
+                      key={n.href}
+                      role="menuitem"
+                      href={n.href}
+                      onClick={() => setMoreOpen(false)}
+                      className="block whitespace-nowrap rounded-lg px-3 py-2 text-sm text-ink-soft hover:bg-cream-2 hover:text-ink"
+                    >
+                      {n.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </nav>
 
         <div className="flex items-center gap-3 sm:gap-3">
