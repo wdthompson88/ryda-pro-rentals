@@ -7,11 +7,13 @@ import { SiteHeader } from "@/components/site-header";
 import { supabase } from "@/lib/supabase";
 import { safeNext } from "@/lib/safe-next";
 
-// /signup, front-end member account creation. Drives the user to the
-// guided onboarding (KYC, preferences, age verification) once an account
-// is created. Preserves `?next=` so post-onboarding the member is
-// returned to the gated action they tried to take (e.g. claim a share,
-// request a rental). Real auth ships at Miami launch.
+// /signup, traditional account creation (modeled on the mainstable
+// signup: minimal fields, neutral copy, passive consent line — NOT an
+// application funnel). Name + email + password; identity, age (28+),
+// and preferences live in the guided onboarding AFTER the account
+// exists. Preserves `?next=` so post-onboarding the member is returned
+// to the gated action they tried to take (e.g. claim a share, request
+// a rental). Real auth ships at Miami launch.
 
 export default function SignUpPage() {
   // The form lives inside a Suspense boundary because it depends on
@@ -26,7 +28,7 @@ export default function SignUpPage() {
   //     which renders its own visible H1 (line 168 / 210). One H1
   //     visible at any moment, never two.
   return (
-    <Suspense fallback={<h1 className="sr-only">Apply for RYDA membership</h1>}>
+    <Suspense fallback={<h1 className="sr-only">Create your RYDA account</h1>}>
       <SignUpPageInner />
     </Suspense>
   );
@@ -55,12 +57,10 @@ function SignUpPageInner() {
     };
   }, [router, next]);
 
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [agedConfirmed, setAgedConfirmed] = useState(false);
-  const [tosAccepted, setTosAccepted] = useState(false);
-  const [marketingOptIn, setMarketingOptIn] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -71,19 +71,27 @@ function SignUpPageInner() {
         ? "One quick step before you claim your share."
         : reason === "checkout"
           ? "One quick step before you reserve."
-          : "Start your application.";
+          : "Create your account.";
 
   const reasonSub =
     reason === "rent" || reason === "buy" || reason === "checkout"
       ? "Browsing is open to everyone, we just need an account before you can transact. 60 seconds."
-      : "We review every applicant before Miami launch. The full onboarding takes ~8 minutes (identity check + preferences) and you can save and return.";
+      : "Free to join. An account unlocks rentals, bookings, and co-ownership — browsing stays open to everyone.";
 
+  // Composed display/legal name for surfaces that want one string
+  // (waitlist, emails). The split parts are what downstream identity
+  // flows use — KYC verified outputs and the onboarding form are
+  // already first/last shaped.
+  const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
+
+  // Traditional setup: no attestation checkboxes here. Identity, age
+  // (28+), and preferences all live in onboarding/booking; ToS/privacy
+  // consent is the passive line under the submit button.
   const ready =
-    name.trim().length >= 2 &&
+    firstName.trim().length >= 1 &&
+    lastName.trim().length >= 1 &&
     email.includes("@") &&
-    password.length >= 8 &&
-    agedConfirmed &&
-    tosAccepted;
+    password.length >= 8;
 
   const [error, setError] = useState<string | null>(null);
 
@@ -95,13 +103,15 @@ function SignUpPageInner() {
 
     // Always persist to the waitlist regardless of auth path, it's
     // the lead-attribution surface (market, source) and works even if
-    // auth isn't configured yet.
+    // auth isn't configured yet. Attribution ONLY — this is not
+    // marketing consent (there is no opt-in at signup), so any send
+    // pipeline must check marketing_opt_in, not this table.
     void fetch("/api/waitlist", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         email,
-        name,
+        name: fullName,
         market: "Miami",
         source: reason ? `signup:${reason}` : "signup",
       }),
@@ -122,17 +132,25 @@ function SignUpPageInner() {
           password,
           options: {
             emailRedirectTo: redirectTo,
-            // Persist self-attested age confirmation + marketing opt-in
-            // to user_metadata. NOTE: user_metadata is user-editable, so
-            // this is an audit-trail signature, NOT a security primitive.
-            // Real age/identity verification happens in /onboarding KYC,
-            // which writes to a server-owned `members` table that the
-            // rental API checks before any booking can be created.
+            // NOTE: user_metadata is user-editable, so nothing here is
+            // a security primitive. Age/identity verification happens
+            // in /onboarding KYC, which writes to a server-owned
+            // `members` table that the rental API checks before any
+            // booking can be created.
             data: {
-              name,
-              marketing_opt_in: marketingOptIn,
-              aged_confirmed: true,
-              aged_confirmed_at: new Date().toISOString(),
+              // Split parts are canonical (matches KYC verified-output
+              // and onboarding field shape); `name` stays as the
+              // composed string so existing consumers keep working.
+              first_name: firstName.trim(),
+              last_name: lastName.trim(),
+              name: fullName,
+              // No marketing opt-in exists at signup (traditional
+              // setup). Explicit false matters on this branch: the
+              // account profile and rental-inquiry form treat an
+              // ABSENT flag as opted-in (`!== false`), so omitting it
+              // would silently auto-enroll every new account. Users
+              // opt in from /account/profile or the inquiry form.
+              marketing_opt_in: false,
             },
           },
         });
@@ -200,22 +218,34 @@ function SignUpPageInner() {
       <section className="flex min-h-[80vh] items-center justify-center px-6 py-20">
         <div className="w-full max-w-md rounded-2xl border border-rule bg-surface p-8 sm:p-10 shadow-sm">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            Create account
+            Sign up
           </p>
           <h1 className="mt-3 font-display text-3xl text-ink">{reasonCopy}</h1>
           <p className="mt-2 text-sm text-ink-soft">{reasonSub}</p>
 
           <form className="mt-7 space-y-4" onSubmit={onSubmit}>
-            <Field
-              label="Full name"
-              id="signup-name"
-              type="text"
-              placeholder="Jane Doe"
-              value={name}
-              onChange={setName}
-              autoComplete="name"
-              required
-            />
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <Field
+                label="First name"
+                id="signup-first-name"
+                type="text"
+                placeholder="Jane"
+                value={firstName}
+                onChange={setFirstName}
+                autoComplete="given-name"
+                required
+              />
+              <Field
+                label="Last name"
+                id="signup-last-name"
+                type="text"
+                placeholder="Doe"
+                value={lastName}
+                onChange={setLastName}
+                autoComplete="family-name"
+                required
+              />
+            </div>
             <Field
               label="Email"
               id="signup-email"
@@ -238,63 +268,6 @@ function SignUpPageInner() {
               hint="8+ characters. We recommend a passphrase."
             />
 
-            {/* Age verification, required for both renters (driver age 28+
-                everywhere, partner-imposed) and co-owners (LLC member
-                eligibility). Surface here so it's not a surprise later. */}
-            <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-rule bg-cream-2/40 p-3 text-xs">
-              <input
-                type="checkbox"
-                checked={agedConfirmed}
-                onChange={(e) => setAgedConfirmed(e.target.checked)}
-                className="mt-0.5 h-4 w-4 accent-red"
-              />
-              <span className="text-ink-soft">
-                I confirm I'm <strong className="text-ink">28 or older</strong>
-                , required to drive any vehicle in the RYDA fleet.
-              </span>
-            </label>
-
-            <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-rule bg-cream-2/40 p-3 text-xs">
-              <input
-                type="checkbox"
-                checked={tosAccepted}
-                onChange={(e) => setTosAccepted(e.target.checked)}
-                className="mt-0.5 h-4 w-4 accent-red"
-              />
-              <span className="text-ink-soft">
-                I agree to RYDA's{" "}
-                <Link
-                  href="/legal/terms"
-                  className="underline hover:text-ink"
-                  target="_blank"
-                >
-                  Terms of Service
-                </Link>{" "}
-                and{" "}
-                <Link
-                  href="/legal/privacy"
-                  className="underline hover:text-ink"
-                  target="_blank"
-                >
-                  Privacy Policy
-                </Link>
-                .
-              </span>
-            </label>
-
-            <label className="flex cursor-pointer items-start gap-3 px-1 text-xs">
-              <input
-                type="checkbox"
-                checked={marketingOptIn}
-                onChange={(e) => setMarketingOptIn(e.target.checked)}
-                className="mt-0.5 h-4 w-4 accent-red"
-              />
-              <span className="text-mute">
-                Send me launch updates and new vehicle drops. Unsubscribe any
-                time.
-              </span>
-            </label>
-
             {error ? (
               <p
                 role="alert"
@@ -311,15 +284,37 @@ function SignUpPageInner() {
             >
               {submitting ? "Creating account…" : "Create account →"}
             </button>
+
+            {/* Passive consent, the traditional pattern — no checkbox
+                gauntlet before a person can hold an account. */}
+            <p className="text-center text-xs text-mute">
+              By creating an account you agree to RYDA's{" "}
+              <Link
+                href="/legal/terms"
+                className="underline hover:text-ink"
+                target="_blank"
+              >
+                Terms of Service
+              </Link>{" "}
+              and{" "}
+              <Link
+                href="/legal/privacy"
+                className="underline hover:text-ink"
+                target="_blank"
+              >
+                Privacy Policy
+              </Link>
+              .
+            </p>
           </form>
 
           <p className="mt-5 text-center text-xs text-mute">
-            Browsing the fleet doesn't require an account, we ask only when
-            you're ready to rent or claim a share.
+            RYDA membership is 28+ — identity and eligibility are verified
+            during onboarding, not here.
           </p>
 
           <div className="mt-10 border-t border-rule pt-6 text-center text-sm text-ink-soft">
-            Already a member?{" "}
+            Already have an account?{" "}
             <Link
               href={`/signin${next !== "/onboarding" ? `?next=${encodeURIComponent(next)}` : ""}`}
               className="font-medium text-red hover:text-red-deep"

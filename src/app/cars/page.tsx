@@ -226,7 +226,7 @@ export default function CarsHome() {
             ~$40–80K a year before you turn the key. RYDA is the third option.
           </p>
           <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-3 lg:grid-cols-5">
-            <Step n="01" title="Verify" body="Apply and complete identity verification." />
+            <Step n="01" title="Verify" body="Sign up and complete identity verification." />
             <Step n="02" title="Choose" body="Browse the curated, certified pre owned fleet. Every car passes a multi-point Pre-Purchase Inspection by the dealer before a single share is sold." />
             <Step n="03" title="Co-own" body="RYDA forms a LLC for up to 5 members to hold the vehicle. You sign the operating agreement and fund your share (2 shares minimum per person)." />
             <Step n="04" title="Drive" body="Book your time on the RYDA smart calendar. Each share unlocks ~32 days and ~3,200 miles a year (100 mi/day)." />
