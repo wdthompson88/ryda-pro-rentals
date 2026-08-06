@@ -20,6 +20,7 @@ export type AdminAction =
   | "purchase_marked_paid"
   | "role_granted"
   | "role_revoked"
+  | "partner_status_changed"
   | "email_sent";
 
 /** Record one admin action. Returns true on durable persistence. */

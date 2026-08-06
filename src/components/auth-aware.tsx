@@ -30,6 +30,16 @@ export function VisibleWhenAdmin({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
+// Render children only for users who signed up as fleet partners
+// (user_metadata.partner_intent). Affordance only — the flag is
+// user-editable, so this gates nothing but the visibility of the
+// /partner header link; the dashboard's data is API-gated.
+export function VisibleWhenPartner({ children }: { children: ReactNode }) {
+  const { isPartner } = useAuthStatus();
+  if (!isPartner) return null;
+  return <>{children}</>;
+}
+
 // VisibleWhenAuthed (the symmetric inverse of HiddenWhenAuthed)
 // removed in the dead-code sweep (May 2026). Anyone needing the
 // inverse can re-add or use AuthSwap below — that's the more

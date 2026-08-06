@@ -7,11 +7,15 @@ import { SiteHeader } from "@/components/site-header";
 import { supabase } from "@/lib/supabase";
 import { safeNext } from "@/lib/safe-next";
 
-// /signup, front-end member account creation. Drives the user to the
-// guided onboarding (KYC, preferences, age verification) once an account
-// is created. Preserves `?next=` so post-onboarding the member is
-// returned to the gated action they tried to take (e.g. claim a share,
-// request a rental). Real auth ships at Miami launch.
+// /signup, front-end account creation for both account types:
+//   - Member (default): drives to the guided onboarding (KYC,
+//     preferences, age verification) once an account is created.
+//   - Fleet partner (?as=partner, linked from /partners): collects
+//     company details and drives to the /partner dashboard, where the
+//     application shows as pending until an admin approves it.
+// Preserves `?next=` so post-onboarding the member is returned to the
+// gated action they tried to take (e.g. claim a share, request a
+// rental). Real auth ships at Miami launch.
 
 export default function SignUpPage() {
   // The form lives inside a Suspense boundary because it depends on
@@ -35,10 +39,22 @@ export default function SignUpPage() {
 function SignUpPageInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  // Sanitize `?next=` against open-redirect / javascript: scheme tricks.
-  // Anything not a same-origin path falls back to /onboarding.
-  const next = safeNext(searchParams.get("next"), "/onboarding");
   const reason = searchParams.get("reason"); // "rent" | "buy" | "checkout"
+
+  // /signup?as=partner preselects the Fleet Partner path (the CTA on
+  // /partners deep-links here). The toggle in the form switches freely.
+  const [accountType, setAccountType] = useState<"member" | "partner">(
+    searchParams.get("as") === "partner" ? "partner" : "member",
+  );
+
+  // Sanitize `?next=` against open-redirect / javascript: scheme tricks.
+  // Anything not a same-origin path falls back to the type's home:
+  // members continue to onboarding, partners land on their dashboard
+  // (which tracks the pending application) after the email round-trip.
+  const next = safeNext(
+    searchParams.get("next"),
+    accountType === "partner" ? "/partner" : "/onboarding",
+  );
 
   // If a signed-in member lands on /signup (clicked an old marketing
   // link, etc.), bounce them to the gated destination — they don't
@@ -58,6 +74,9 @@ function SignUpPageInner() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  // Partner-only fields.
+  const [company, setCompany] = useState("");
+  const [phone, setPhone] = useState("");
   const [agedConfirmed, setAgedConfirmed] = useState(false);
   const [tosAccepted, setTosAccepted] = useState(false);
   const [marketingOptIn, setMarketingOptIn] = useState(true);
@@ -65,25 +84,31 @@ function SignUpPageInner() {
   const [submitted, setSubmitted] = useState(false);
 
   const reasonCopy =
-    reason === "rent"
-      ? "One quick step before you book."
-      : reason === "buy"
-        ? "One quick step before you claim your share."
-        : reason === "checkout"
-          ? "One quick step before you reserve."
-          : "Start your application.";
+    accountType === "partner"
+      ? "Partner with RYDA."
+      : reason === "rent"
+        ? "One quick step before you book."
+        : reason === "buy"
+          ? "One quick step before you claim your share."
+          : reason === "checkout"
+            ? "One quick step before you reserve."
+            : "Start your application.";
 
   const reasonSub =
-    reason === "rent" || reason === "buy" || reason === "checkout"
-      ? "Browsing is open to everyone, we just need an account before you can transact. 60 seconds."
-      : "We review every applicant before Miami launch. The full onboarding takes ~8 minutes (identity check + preferences) and you can save and return.";
+    accountType === "partner"
+      ? "Tell us about your company and fleet. We respond to every partner application personally within 3 business days — your dashboard tracks the review."
+      : reason === "rent" || reason === "buy" || reason === "checkout"
+        ? "Browsing is open to everyone, we just need an account before you can transact. 60 seconds."
+        : "We review every applicant before Miami launch. The full onboarding takes ~8 minutes (identity check + preferences) and you can save and return.";
 
+  // Partners attest company details instead of the 28+ driver check
+  // (they operate the cars, members drive them).
   const ready =
     name.trim().length >= 2 &&
     email.includes("@") &&
     password.length >= 8 &&
-    agedConfirmed &&
-    tosAccepted;
+    tosAccepted &&
+    (accountType === "partner" ? company.trim().length >= 2 : agedConfirmed);
 
   const [error, setError] = useState<string | null>(null);
 
@@ -103,7 +128,12 @@ function SignUpPageInner() {
         email,
         name,
         market: "Miami",
-        source: reason ? `signup:${reason}` : "signup",
+        source:
+          accountType === "partner"
+            ? "signup:partner"
+            : reason
+              ? `signup:${reason}`
+              : "signup",
       }),
     }).catch(() => {
       /* Soft-fail, don't block the user. */
@@ -128,11 +158,26 @@ function SignUpPageInner() {
             // Real age/identity verification happens in /onboarding KYC,
             // which writes to a server-owned `members` table that the
             // rental API checks before any booking can be created.
+            //
+            // Partner signup follows the same trust model: the
+            // partner_* keys are a REQUEST that /api/partner/me turns
+            // into a partner_accounts row with status 'pending' on
+            // first authenticated visit. Only the admin-gated
+            // /api/admin/partners route can approve.
             data: {
               name,
               marketing_opt_in: marketingOptIn,
-              aged_confirmed: true,
-              aged_confirmed_at: new Date().toISOString(),
+              ...(accountType === "partner"
+                ? {
+                    account_type: "partner",
+                    partner_intent: true,
+                    partner_company: company.trim(),
+                    partner_phone: phone.trim() || null,
+                  }
+                : {
+                    aged_confirmed: true,
+                    aged_confirmed_at: new Date().toISOString(),
+                  }),
             },
           },
         });
@@ -161,13 +206,17 @@ function SignUpPageInner() {
               ✓
             </div>
             <h1 className="mt-5 font-display text-3xl text-ink">
-              Account created.
+              {accountType === "partner"
+                ? "Application received."
+                : "Account created."}
             </h1>
             <p className="mt-3 text-sm text-ink-soft">
               We've emailed{" "}
               <span className="font-medium text-ink">{email}</span> to confirm
-              your account. Continue to onboarding to verify your identity and
-              complete your member profile, or pick up where you left off.
+              your account.{" "}
+              {accountType === "partner"
+                ? "Once you're in, your partner dashboard tracks the fleet review — we respond to every application within 3 business days."
+                : "Continue to onboarding to verify your identity and complete your member profile, or pick up where you left off."}
             </p>
 
             <div className="mt-7 flex flex-col gap-3">
@@ -175,11 +224,13 @@ function SignUpPageInner() {
                 href={next}
                 className="inline-flex h-12 w-full items-center justify-center rounded-full bg-red px-7 text-sm font-medium text-cream hover:bg-red-deep"
               >
-                {next === "/onboarding"
-                  ? "Continue to onboarding →"
-                  : "Continue where I left off →"}
+                {accountType === "partner"
+                  ? "Go to your partner dashboard →"
+                  : next === "/onboarding"
+                    ? "Continue to onboarding →"
+                    : "Continue where I left off →"}
               </Link>
-              {next !== "/onboarding" && (
+              {accountType !== "partner" && next !== "/onboarding" && (
                 <Link
                   href="/onboarding"
                   className="inline-flex h-12 w-full items-center justify-center rounded-full border border-rule px-7 text-sm font-medium text-ink-soft hover:border-ink hover:text-ink"
@@ -206,6 +257,27 @@ function SignUpPageInner() {
           <p className="mt-2 text-sm text-ink-soft">{reasonSub}</p>
 
           <form className="mt-7 space-y-4" onSubmit={onSubmit}>
+            {/* Account type. Member is the default; the /partners
+                marketing page deep-links here with ?as=partner. */}
+            <div
+              role="radiogroup"
+              aria-label="Account type"
+              className="grid grid-cols-2 gap-1.5 rounded-xl border border-rule bg-cream-2/40 p-1.5"
+            >
+              <TypeOption
+                label="Member"
+                hint="Rent + co-own"
+                active={accountType === "member"}
+                onSelect={() => setAccountType("member")}
+              />
+              <TypeOption
+                label="Fleet partner"
+                hint="List your cars"
+                active={accountType === "partner"}
+                onSelect={() => setAccountType("partner")}
+              />
+            </div>
+
             <Field
               label="Full name"
               id="signup-name"
@@ -216,6 +288,29 @@ function SignUpPageInner() {
               autoComplete="name"
               required
             />
+            {accountType === "partner" && (
+              <>
+                <Field
+                  label="Company"
+                  id="signup-company"
+                  type="text"
+                  placeholder="Your rental company"
+                  value={company}
+                  onChange={setCompany}
+                  autoComplete="organization"
+                  required
+                />
+                <Field
+                  label="Phone (optional)"
+                  id="signup-phone"
+                  type="tel"
+                  placeholder="+1 (305) 555-0100"
+                  value={phone}
+                  onChange={setPhone}
+                  autoComplete="tel"
+                />
+              </>
+            )}
             <Field
               label="Email"
               id="signup-email"
@@ -240,19 +335,24 @@ function SignUpPageInner() {
 
             {/* Age verification, required for both renters (driver age 28+
                 everywhere, partner-imposed) and co-owners (LLC member
-                eligibility). Surface here so it's not a surprise later. */}
-            <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-rule bg-cream-2/40 p-3 text-xs">
-              <input
-                type="checkbox"
-                checked={agedConfirmed}
-                onChange={(e) => setAgedConfirmed(e.target.checked)}
-                className="mt-0.5 h-4 w-4 accent-red"
-              />
-              <span className="text-ink-soft">
-                I confirm I'm <strong className="text-ink">28 or older</strong>
-                , required to drive any vehicle in the RYDA fleet.
-              </span>
-            </label>
+                eligibility). Surface here so it's not a surprise later.
+                Fleet partners operate cars rather than drive ours, so
+                they skip this attestation. */}
+            {accountType !== "partner" && (
+              <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-rule bg-cream-2/40 p-3 text-xs">
+                <input
+                  type="checkbox"
+                  checked={agedConfirmed}
+                  onChange={(e) => setAgedConfirmed(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 accent-red"
+                />
+                <span className="text-ink-soft">
+                  I confirm I'm{" "}
+                  <strong className="text-ink">28 or older</strong>, required
+                  to drive any vehicle in the RYDA fleet.
+                </span>
+              </label>
+            )}
 
             <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-rule bg-cream-2/40 p-3 text-xs">
               <input
@@ -309,13 +409,18 @@ function SignUpPageInner() {
               disabled={!ready || submitting}
               className="inline-flex h-12 w-full items-center justify-center rounded-full bg-red px-7 text-sm font-medium text-cream transition-colors hover:bg-red-deep disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {submitting ? "Creating account…" : "Create account →"}
+              {submitting
+                ? "Creating account…"
+                : accountType === "partner"
+                  ? "Apply to partner →"
+                  : "Create account →"}
             </button>
           </form>
 
           <p className="mt-5 text-center text-xs text-mute">
-            Browsing the fleet doesn't require an account, we ask only when
-            you're ready to rent or claim a share.
+            {accountType === "partner"
+              ? "No commitment — applying starts a conversation about whether RYDA is the right channel for your fleet."
+              : "Browsing the fleet doesn't require an account, we ask only when you're ready to rent or claim a share."}
           </p>
 
           <div className="mt-10 border-t border-rule pt-6 text-center text-sm text-ink-soft">
@@ -330,6 +435,41 @@ function SignUpPageInner() {
         </div>
       </section>
     </>
+  );
+}
+
+// Segmented account-type option. Active option reads as a raised card
+// on the cream-2 track; inactive stays quiet.
+function TypeOption({
+  label,
+  hint,
+  active,
+  onSelect,
+}: {
+  label: string;
+  hint: string;
+  active: boolean;
+  onSelect: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      role="radio"
+      aria-checked={active}
+      onClick={onSelect}
+      className={`flex flex-col items-start rounded-lg px-3.5 py-2.5 text-left transition-colors ${
+        active
+          ? "border border-rule bg-surface shadow-sm"
+          : "border border-transparent hover:bg-cream-2/60"
+      }`}
+    >
+      <span
+        className={`text-sm font-medium ${active ? "text-ink" : "text-ink-soft"}`}
+      >
+        {label}
+      </span>
+      <span className="mt-0.5 text-[11px] text-mute">{hint}</span>
+    </button>
   );
 }
 
