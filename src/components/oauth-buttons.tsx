@@ -69,10 +69,13 @@ export function OAuthButtons({
           </button>
         ))}
       </div>
+      {/* "or continue with email", not a bare "or" — /signin already
+          has an "Or" separator before its magic-link action, and two
+          identical "or"s on one card read as a glitch. */}
       <div className="my-5 flex items-center gap-4" aria-hidden>
         <span className="h-px flex-1 bg-rule" />
-        <span className="text-xs uppercase tracking-[0.16em] text-mute">
-          or
+        <span className="whitespace-nowrap text-xs uppercase tracking-[0.16em] text-mute">
+          or continue with email
         </span>
         <span className="h-px flex-1 bg-rule" />
       </div>
