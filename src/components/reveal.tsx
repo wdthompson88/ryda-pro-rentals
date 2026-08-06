@@ -167,11 +167,16 @@ export function RevealStagger({
         <motion.div
           key={(child as { key?: string | number })?.key ?? i}
           variants={itemVariants}
-          // Inherit display so the wrapper doesn't break grid/flex
-          // layouts. The consumer's className on RevealStagger sets
-          // display: grid (or whatever) and we want children to be
-          // direct grid items, not block-wrapped.
-          style={{ display: "contents" }}
+          // The wrapper must generate a real box: `display: contents`
+          // would keep the child a direct grid item but a contents
+          // element paints nothing, so the animated opacity/transform
+          // silently never render (the stagger becomes a no-op).
+          // Instead the wrapper itself becomes the grid/flex item of
+          // the consumer's container, and making it a single-cell grid
+          // stretches the child to fill it in both axes — preserving
+          // the equal-height card behavior children had when they were
+          // direct grid items.
+          style={{ display: "grid" }}
         >
           {child}
         </motion.div>

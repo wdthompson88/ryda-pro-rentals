@@ -100,9 +100,9 @@ export default function RequestsPage() {
             Miami&apos;s most-wanted exotics are one request away — no card, no
             payment, an operator replies directly.
           </p>
-          {/* / is the canonical rental grid — /rent only 308s there. */}
+          {/* /rent is the canonical browse grid ("/" is the landing page). */}
           <Link
-            href="/"
+            href="/rent"
             className="mt-6 inline-flex h-11 items-center justify-center rounded-full bg-red px-6 text-sm font-medium text-cream transition-colors hover:bg-red-deep"
           >
             Browse the fleet →

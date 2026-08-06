@@ -109,10 +109,10 @@ export default async function RentDetailPage({
       {/* Top split: hero image + booking panel */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-10 sm:px-10 sm:py-14">
-          {/* / is the canonical rental grid — /rent only 308s there,
-              so internal links point home directly. */}
+          {/* /rent is the canonical browse grid ("/" is the landing
+              page), so the breadcrumb points there. */}
           <Link
-            href="/"
+            href="/rent"
             className="text-xs font-medium uppercase tracking-[0.2em] text-red hover:text-red-deep"
           >
             ← Rentals
@@ -496,8 +496,9 @@ export default async function RentDetailPage({
 
       {/* No co-ownership pitch here. The program is parked (2027
           waitlist) and the pivot's rule is co-ownership stays out of
-          rental-surface copy — the quiet pointer on / and
-          /how-it-works is the only sanctioned reference. */}
+          rental-surface copy — the footer link (Cars column in
+          site-footer) and the quiet pointer at the end of
+          /how-it-works are the only sanctioned references. */}
     </>
   );
 }

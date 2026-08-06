@@ -156,7 +156,7 @@ export default function HowItWorksPage() {
                     Create the account →
                   </Link>
                   <Link
-                    href="/"
+                    href="/rent"
                     className="inline-flex h-12 items-center justify-center rounded-full border border-rule bg-surface px-7 text-sm font-medium text-ink hover:border-ink"
                   >
                     Browse the fleet first
@@ -184,7 +184,7 @@ export default function HowItWorksPage() {
             operator take it from there.
           </p>
           <Link
-            href="/"
+            href="/rent"
             className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink transition-colors hover:bg-red hover:text-cream"
           >
             See the cars →

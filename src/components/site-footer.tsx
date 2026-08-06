@@ -73,6 +73,10 @@ export function SiteFooter() {
               ["Portfolio", "/portfolio"],
               ["Rent", "/rent"],
               ["Membership", "/membership"],
+              // The parked ownership program's single quiet home. This
+              // footer link is what the "reachable from the footer"
+              // comments on / and in site-header promise — keep it.
+              ["Co-ownership", "/co-ownership"],
               ["How it works", "/how-it-works"],
               ["Insurance", "/insurance"],
               ["Storage", "/storage"],

@@ -9,13 +9,14 @@ import { AuthSwap, VisibleWhenAdmin } from "@/components/auth-aware";
 // nav is one flat list on every page: Rent (the homepage grid) · How it
 // works · For partners. The old vertical-aware nav (Cars / Boats /
 // Planes switcher, portfolio + membership links) is retired from the
-// top bar — co-ownership now lives at /co-ownership via footer links
-// only. Site search + the auth-aware Log in / Sign up / Account slots
-// are unchanged.
+// top bar — co-ownership now lives at /co-ownership, reachable via the
+// footer's Cars column and a quiet pointer at the end of /how-it-works.
+// Site search + the auth-aware Log in / Sign up / Account slots are
+// unchanged.
 
 const NAV = [
-  // "/" is the canonical marketplace grid (/rent 308s to it).
-  { href: "/", label: "Rent" },
+  // /rent is the canonical browse grid; "/" is the landing page.
+  { href: "/rent", label: "Rent" },
   { href: "/how-it-works", label: "How it works" },
   { href: "/partners", label: "For partners" },
 ];

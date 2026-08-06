@@ -16,11 +16,12 @@ import { LEARN_ARTICLES } from "@/lib/learn-content";
 // /onboarding, /bookings/*, /admin/*) are intentionally NOT listed.
 
 const PUBLIC_ROUTES = [
-  // "" is the rental marketplace grid (rental-first pivot, Aug 2026).
-  // NOTE: /rent is intentionally NOT listed — it 308s to /, which is
-  // the single canonical URL for the grid. /rent/[slug] detail pages
-  // remain live and are emitted below.
+  // "" is the rentals-first landing page; /rent is the canonical
+  // browse grid users click through to. Both are listed — they are
+  // distinct pages, not duplicates. /rent/[slug] detail pages are
+  // emitted below.
   "",
+  "/rent",
   // Rental-first surfaces.
   "/partners",
   "/co-ownership",
@@ -94,7 +95,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${siteUrl}${path}`,
     lastModified,
     changeFrequency: "weekly" as const,
-    priority: path === "" ? 1.0 : path === "/cars" || path === "/boats" || path === "/planes" ? 0.9 : 0.7,
+    // Priorities: the landing page leads, the browse grid sits just
+    // under it (and above every secondary marketing page).
+    priority:
+      path === ""
+        ? 1.0
+        : path === "/rent"
+          ? 0.9
+          : path === "/cars" || path === "/boats" || path === "/planes"
+            ? 0.8
+            : 0.7,
   }));
 
   const vehicleEntries: MetadataRoute.Sitemap = VEHICLES.flatMap((v) => [
