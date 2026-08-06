@@ -71,7 +71,8 @@ function SignUpPageInner() {
     };
   }, [router, next]);
 
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   // Partner-only fields.
@@ -101,10 +102,17 @@ function SignUpPageInner() {
         ? "Browsing is open to everyone, we just need an account before you can transact. 60 seconds."
         : "We review every applicant before Miami launch. The full onboarding takes ~8 minutes (identity check + preferences) and you can save and return.";
 
+  // Composed display/legal name for surfaces that want one string
+  // (waitlist, emails, the partner contact). The split parts are what
+  // downstream identity flows use — KYC verified outputs and the
+  // onboarding form are already first/last shaped.
+  const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
+
   // Partners attest company details instead of the 28+ driver check
   // (they operate the cars, members drive them).
   const ready =
-    name.trim().length >= 2 &&
+    firstName.trim().length >= 1 &&
+    lastName.trim().length >= 1 &&
     email.includes("@") &&
     password.length >= 8 &&
     tosAccepted &&
@@ -126,7 +134,7 @@ function SignUpPageInner() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         email,
-        name,
+        name: fullName,
         market: "Miami",
         source:
           accountType === "partner"
@@ -165,7 +173,12 @@ function SignUpPageInner() {
             // first authenticated visit. Only the admin-gated
             // /api/admin/partners route can approve.
             data: {
-              name,
+              // Split parts are canonical (matches KYC verified-output
+              // and onboarding field shape); `name` stays as the
+              // composed string so existing consumers keep working.
+              first_name: firstName.trim(),
+              last_name: lastName.trim(),
+              name: fullName,
               marketing_opt_in: marketingOptIn,
               ...(accountType === "partner"
                 ? {
@@ -278,16 +291,28 @@ function SignUpPageInner() {
               />
             </div>
 
-            <Field
-              label="Full name"
-              id="signup-name"
-              type="text"
-              placeholder="Jane Doe"
-              value={name}
-              onChange={setName}
-              autoComplete="name"
-              required
-            />
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <Field
+                label="First name"
+                id="signup-first-name"
+                type="text"
+                placeholder="Jane"
+                value={firstName}
+                onChange={setFirstName}
+                autoComplete="given-name"
+                required
+              />
+              <Field
+                label="Last name"
+                id="signup-last-name"
+                type="text"
+                placeholder="Doe"
+                value={lastName}
+                onChange={setLastName}
+                autoComplete="family-name"
+                required
+              />
+            </div>
             {accountType === "partner" && (
               <>
                 <Field
