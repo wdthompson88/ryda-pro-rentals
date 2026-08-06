@@ -108,6 +108,7 @@ type Overview = {
 const SUB_ROUTES = [
   { href: "/admin", label: "Triage", note: "this page" },
   { href: "/admin/inquiries", label: "Inquiries", note: "rental lead pipeline" },
+  { href: "/admin/partners", label: "Partners", note: "operators + Stripe onboarding" },
   { href: "/admin/calendar", label: "Calendar", note: "booking calendar" },
   { href: "/admin/creative", label: "Creative", note: "marketing generation queue" },
   { href: "/admin/documents", label: "Documents", note: "sample packet + legal templates" },

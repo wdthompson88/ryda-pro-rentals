@@ -40,8 +40,9 @@ export function requireStripe() {
 // purchase events (see SETUP.md §3.2), each has its own `whsec_…` and
 // reusing the wrong one will 400 every event ("invalid signature"). The
 // canonical setup:
-//   - STRIPE_WEBHOOK_SECRET      → /api/share-purchase/webhook
-//   - STRIPE_KYC_WEBHOOK_SECRET  → /api/kyc/webhook
+//   - STRIPE_WEBHOOK_SECRET          → /api/share-purchase/webhook
+//   - STRIPE_KYC_WEBHOOK_SECRET      → /api/kyc/webhook
+//   - STRIPE_CONNECT_WEBHOOK_SECRET  → /api/stripe/connect-webhook
 // If you mount BOTH event groups on the same Stripe endpoint pointing at
 // a single internal handler, you'd only need one secret. The per-route
 // constant `KYC_WEBHOOK_SECRET` falls back to STRIPE_WEBHOOK_SECRET so
@@ -49,3 +50,13 @@ export function requireStripe() {
 export const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET ?? "";
 export const STRIPE_KYC_WEBHOOK_SECRET =
   process.env.STRIPE_KYC_WEBHOOK_SECRET ?? process.env.STRIPE_WEBHOOK_SECRET ?? "";
+// The Connect endpoint is created in the dashboard with "Listen to
+// events on connected accounts" — that toggle makes it a DIFFERENT
+// endpoint type from the two above (rental checkouts are direct
+// charges on the operators' Express accounts, so their events only
+// ever arrive there). It can never share an endpoint with the
+// platform-account handlers, so unlike KYC there is deliberately NO
+// fallback to STRIPE_WEBHOOK_SECRET — a fallback would just turn a
+// missing env var into a silent "invalid signature" 400 loop.
+export const STRIPE_CONNECT_WEBHOOK_SECRET =
+  process.env.STRIPE_CONNECT_WEBHOOK_SECRET ?? "";

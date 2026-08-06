@@ -16,6 +16,16 @@
 //   new → sent | lost
 //   sent → booked | lost
 //
+// Payments: for a `sent` row, once the operator confirms availability
+// and price off-platform, the admin issues a Stripe payment link here
+// (POST /api/admin/inquiries/[id]/payment-link). Checkout is a DIRECT
+// charge on the operator's Connect account — the rental price settles
+// straight to the operator, RYDA's commission rides along as an
+// application fee, and the Connect webhook flips the inquiry to
+// `booked` when the customer pays. The Payment column renders only
+// when the API includes a payment status for the row (see
+// paymentStatus below).
+//
 // Distinct from /admin/prospects (outbound co-ownership CRM — parked
 // with the founding-member waitlist) and from /admin bookings triage
 // (paid RYDA-fleet customers). This is inbound rental demand.
@@ -48,6 +58,16 @@ const STATUS_TONE: Record<Status, string> = {
   lost: "bg-mute/10 text-mute border-rule",
 };
 
+// Payment chip tones — pending warn, paid success, expired mute
+// (mirrors STATUS_TONE). A status the API grows later that isn't in
+// this map falls back to the neutral in-flight chip.
+const PAYMENT_TONE: Record<string, string> = {
+  pending: "bg-warn/15 text-warn-deep border-warn/40",
+  paid: "bg-success/15 text-success-deep border-success/40",
+  expired: "bg-mute/10 text-mute border-rule",
+  canceled: "bg-mute/10 text-mute border-rule",
+};
+
 // Mirrors the server-side ALLOWED_TRANSITIONS map — the buttons only
 // offer moves the API will accept.
 const NEXT_MOVES: Record<Status, readonly Status[]> = {
@@ -73,6 +93,11 @@ type Inquiry = {
   marketing_opt_in: boolean;
   status: Status;
   created_at: string;
+  // Latest rental_payments status for the row, joined in by
+  // GET /api/admin/inquiries (pending|paid|expired|canceled; null when
+  // no link was ever minted, or pre-migration-0041). The UI tolerates
+  // the field being absent/null and simply renders no chip.
+  payment_status?: string | null;
 };
 
 type Counts = Record<Status, number>;
@@ -109,9 +134,16 @@ export default function AdminInquiriesPage() {
   const [statusFilter, setStatusFilter] = useState<Status | "all">("all");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
+  // Which row's send-payment-link panel is open. Separate from
+  // expandedId so an admin can read the message while filling in the
+  // confirmed price.
+  const [payPanelId, setPayPanelId] = useState<string | null>(null);
 
-  const load = useCallback(async () => {
-    setLoading(true);
+  // `quiet` refreshes rows without unmounting the table — used after
+  // creating a payment link so the success panel (with the link the
+  // admin may still need to copy) survives the reload.
+  const load = useCallback(async (opts?: { quiet?: boolean }) => {
+    if (!opts?.quiet) setLoading(true);
     setError(null);
     const params = new URLSearchParams();
     if (statusFilter !== "all") params.set("status", statusFilter);
@@ -148,7 +180,11 @@ export default function AdminInquiriesPage() {
       next === "booked"
         ? `Mark ${inquiry.name}'s ${inquiry.vehicle_label} inquiry as booked? This records the referral-commission event and is terminal.`
         : next === "lost"
-          ? `Mark ${inquiry.name}'s ${inquiry.vehicle_label} inquiry as lost? This is terminal — the row stays for conversion analysis but leaves the active pipeline.`
+          ? `Mark ${inquiry.name}'s ${inquiry.vehicle_label} inquiry as lost? This is terminal — the row stays for conversion analysis but leaves the active pipeline.${
+              inquiry.payment_status === "pending"
+                ? " A live payment link is outstanding — it will be voided so the customer can no longer pay."
+                : ""
+            }`
           : null;
     if (confirmMsg && !window.confirm(confirmMsg)) return;
 
@@ -190,6 +226,7 @@ export default function AdminInquiriesPage() {
         "end_date",
         "days",
         "marketing_opt_in",
+        "payment_status",
         "message",
       ],
       rows: inquiries.map((i) => [
@@ -207,6 +244,7 @@ export default function AdminInquiriesPage() {
         i.end_date,
         spanDays(i.start_date, i.end_date),
         i.marketing_opt_in ? "yes" : "no",
+        i.payment_status ?? "",
         i.message ?? "",
       ]),
     });
@@ -327,6 +365,7 @@ export default function AdminInquiriesPage() {
                     "Dates",
                     "Opt-in",
                     "Status",
+                    "Payment",
                     "",
                   ].map((c, i) => (
                     <th
@@ -349,6 +388,11 @@ export default function AdminInquiriesPage() {
                     }
                     busy={busyId === i.id}
                     onTransition={(next) => void transition(i, next)}
+                    payOpen={payPanelId === i.id}
+                    onTogglePay={() =>
+                      setPayPanelId((cur) => (cur === i.id ? null : i.id))
+                    }
+                    onPaymentCreated={() => void load({ quiet: true })}
                   />
                 ))}
               </tbody>
@@ -423,18 +467,35 @@ const MOVE_LABEL: Record<Status, string> = {
   lost: "Lost",
 };
 
+function PaymentPill({ status }: { status: string }) {
+  const tone = PAYMENT_TONE[status] ?? "bg-cream-2 text-ink-soft border-rule";
+  return (
+    <span
+      className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${tone}`}
+    >
+      {status}
+    </span>
+  );
+}
+
 function InquiryRow({
   inquiry: i,
   expanded,
   onToggle,
   busy,
   onTransition,
+  payOpen,
+  onTogglePay,
+  onPaymentCreated,
 }: {
   inquiry: Inquiry;
   expanded: boolean;
   onToggle: () => void;
   busy: boolean;
   onTransition: (next: Status) => void;
+  payOpen: boolean;
+  onTogglePay: () => void;
+  onPaymentCreated: () => void;
 }) {
   const moves = NEXT_MOVES[i.status];
   return (
@@ -489,10 +550,33 @@ function InquiryRow({
           <StatusPill status={i.status} />
         </td>
         <td className="whitespace-nowrap px-4 py-3 align-top">
-          {moves.length === 0 ? (
+          {/* Rendered only when the API includes the joined payment
+              status — absent field means no chip, not an error. */}
+          {i.payment_status ? <PaymentPill status={i.payment_status} /> : null}
+        </td>
+        <td className="whitespace-nowrap px-4 py-3 align-top">
+          {moves.length === 0 && i.status !== "sent" ? (
             <span className="text-xs text-mute">—</span>
           ) : (
             <div className="flex flex-wrap gap-1">
+              {/* Payment links only exist on the partner direct-charge
+                  rail — the API hard-409s inquiries without partner
+                  attribution (RYDA fleet), so don't offer the button
+                  where it can only fail. */}
+              {i.status === "sent" && i.fleet === "partner" && i.partner_name && (
+                <button
+                  type="button"
+                  onClick={onTogglePay}
+                  disabled={busy}
+                  className={`inline-flex h-7 items-center justify-center rounded-full border px-3 text-[11px] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+                    payOpen
+                      ? "border-red bg-red text-cream"
+                      : "border-red/40 text-red hover:bg-red hover:text-cream"
+                  }`}
+                >
+                  {payOpen ? "Close payment" : "Send payment link"}
+                </button>
+              )}
               {moves.map((next) => (
                 <button
                   key={next}
@@ -515,9 +599,17 @@ function InquiryRow({
         </td>
       </tr>
 
+      {payOpen && (
+        <tr>
+          <td colSpan={10} className="bg-cream-2/40 px-6 py-4">
+            <PaymentLinkPanel inquiry={i} onCreated={onPaymentCreated} />
+          </td>
+        </tr>
+      )}
+
       {expanded && (
         <tr>
-          <td colSpan={9} className="bg-cream-2/40 px-6 py-4">
+          <td colSpan={10} className="bg-cream-2/40 px-6 py-4">
             <div className="grid gap-4 text-xs sm:grid-cols-2">
               <div className="space-y-2">
                 <KV label="Market" value={i.market} />
@@ -552,6 +644,217 @@ function KV({ label, value }: { label: string; value: string }) {
     <div className="grid grid-cols-3 gap-3">
       <span className="text-mute">{label}</span>
       <span className="col-span-2 text-ink">{value}</span>
+    </div>
+  );
+}
+
+// Inline send-payment-link panel for a `sent` row. The admin enters
+// the price the operator confirmed off-platform; the API creates a
+// Checkout Session as a DIRECT charge on the operator's Connect
+// account (RYDA commission = application fee) and emails the link to
+// the customer. The link is also shown here for manual follow-up.
+function PaymentLinkPanel({
+  inquiry: i,
+  onCreated,
+}: {
+  inquiry: Inquiry;
+  onCreated: () => void;
+}) {
+  const [amount, setAmount] = useState("");
+  const [note, setNote] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [result, setResult] = useState<{
+    url: string;
+    emailed: boolean;
+    deduped: boolean;
+  } | null>(null);
+  const [copied, setCopied] = useState(false);
+  const url = result?.url ?? null;
+
+  // Dollars in the UI, integer cents on the wire — matches the
+  // *_cents convention everywhere else. Fee math stays server-side
+  // in fees.ts; the panel never computes the commission. The
+  // [$50, $100,000] bound mirrors the API's MIN/MAX_AMOUNT_CENTS
+  // rails so the panel never submits a value the server is
+  // guaranteed to refuse.
+  const MIN_USD = 50;
+  const MAX_USD = 100_000;
+  const cents = Math.round(Number(amount) * 100);
+  const valid =
+    amount.trim() !== "" &&
+    Number.isFinite(cents) &&
+    cents >= MIN_USD * 100 &&
+    cents <= MAX_USD * 100;
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!valid || busy) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await authedFetch(
+        `/api/admin/inquiries/${i.id}/payment-link`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            amount_cents: cents,
+            ...(note.trim() ? { note: note.trim() } : {}),
+          }),
+        },
+      );
+      const body = (await res.json().catch(() => ({}))) as {
+        url?: string;
+        emailed?: boolean;
+        deduped?: boolean;
+        error?: string;
+      };
+      if (!res.ok) {
+        // Surface the API's message verbatim — the onboarding-missing
+        // and paused cases get a Partners link appended below.
+        throw new Error(
+          body.error ||
+            (res.status === 503
+              ? "Stripe not configured."
+              : `HTTP ${res.status}`),
+        );
+      }
+      if (typeof body.url !== "string" || !body.url) {
+        throw new Error("Link created but the API returned no URL.");
+      }
+      setResult({
+        url: body.url,
+        emailed: body.emailed === true,
+        deduped: body.deduped === true,
+      });
+      onCreated(); // quiet refresh — Payment chip flips to pending
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="max-w-2xl">
+      <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-mute">
+        Send payment link
+      </p>
+      <p className="mt-1.5 text-xs leading-relaxed text-ink-soft">
+        Checkout is created on the operator&apos;s Stripe account — the
+        rental price settles straight to them and RYDA&apos;s commission is
+        taken automatically. Enter the price the operator confirmed for{" "}
+        {i.vehicle_label}, {i.start_date} → {i.end_date}.
+      </p>
+
+      <form
+        onSubmit={submit}
+        className="mt-3 flex flex-wrap items-end gap-3"
+      >
+        <label className="flex flex-col gap-1 text-xs text-mute">
+          Amount (USD, $50 – $100,000)
+          <input
+            type="number"
+            min="50"
+            max="100000"
+            step="0.01"
+            inputMode="decimal"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            placeholder="2500.00"
+            className="w-36 rounded-lg border border-rule bg-surface px-3 py-2 text-sm tabular-nums text-ink placeholder:text-mute focus:border-ink focus:outline-none"
+          />
+        </label>
+        <label className="flex flex-col gap-1 text-xs text-mute">
+          Note (optional, shown on the Checkout line item)
+          <input
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder="Incl. delivery to Miami Beach"
+            className="w-72 rounded-lg border border-rule bg-surface px-3 py-2 text-sm text-ink placeholder:text-mute focus:border-ink focus:outline-none"
+          />
+        </label>
+        <button
+          type="submit"
+          disabled={!valid || busy}
+          className="rounded-full bg-red px-5 py-2.5 text-sm font-medium text-cream hover:bg-red-deep disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {busy ? "Creating…" : "Create link + email customer"}
+        </button>
+      </form>
+
+      {error && (
+        <p className="mt-3 text-xs text-red">
+          {error}
+          {/onboard|paused/i.test(error) && (
+            <>
+              {" "}
+              —{" "}
+              <Link
+                href="/admin/partners"
+                className="underline underline-offset-2 hover:text-red-deep"
+              >
+                manage the operator in Partners
+              </Link>
+              .
+            </>
+          )}
+        </p>
+      )}
+
+      {url && result && (
+        <div
+          className={`mt-3 rounded-xl border p-3 ${
+            result.emailed
+              ? "border-success/40 bg-success/10"
+              : "border-warn/40 bg-warn/10"
+          }`}
+        >
+          {/* The API reports exactly what happened — never claim an
+              email went out when it didn't (emailed:false) or when an
+              existing link was reused without sending one (deduped). */}
+          {result.deduped ? (
+            <p className="text-xs font-medium text-warn-deep">
+              A live payment link already existed for this inquiry — reusing
+              it. No new email was sent; copy the link below if the customer
+              needs it again.
+            </p>
+          ) : result.emailed ? (
+            <p className="text-xs font-medium text-success-deep">
+              Payment link created and emailed to {i.email}.
+            </p>
+          ) : (
+            <p className="text-xs font-medium text-warn-deep">
+              Payment link created, but the email to {i.email} could NOT be
+              sent — copy the link below and send it manually.
+            </p>
+          )}
+          <div className="mt-2 flex items-center gap-2">
+            <input
+              readOnly
+              value={url}
+              onFocus={(e) => e.currentTarget.select()}
+              className="w-full rounded-lg border border-rule bg-surface px-3 py-1.5 text-xs text-ink"
+            />
+            <button
+              type="button"
+              onClick={() => {
+                navigator.clipboard
+                  .writeText(url)
+                  .then(() => {
+                    setCopied(true);
+                    window.setTimeout(() => setCopied(false), 2000);
+                  })
+                  .catch(() => {});
+              }}
+              className="inline-flex h-8 shrink-0 items-center rounded-full border border-rule bg-surface px-3 text-[11px] font-medium text-ink-soft hover:border-ink hover:text-ink"
+            >
+              {copied ? "Copied" : "Copy"}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

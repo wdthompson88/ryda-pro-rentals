@@ -23,6 +23,68 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { requireSupabaseAdmin } from "@/lib/supabase-admin";
 import { requireAdmin } from "@/lib/admin-auth";
+import { stripe } from "@/lib/stripe";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
+// Marking a lead lost must also kill any live payment link — a
+// pending Checkout session would otherwise stay payable for up to
+// 24h, letting a customer pay for a car nobody intends to hand over.
+// Best-effort: the Stripe session is expired FIRST, and the row only
+// flips pending→canceled after the expire succeeds — if the expire
+// fails the row stays pending so the Connect webhook can still
+// process a payment correctly (it alerts the team when money lands
+// on a lost lead).
+async function voidLivePaymentLinks(db: SupabaseClient, inquiryId: string) {
+  try {
+    const pend = await db
+      .from("rental_payments")
+      .select("id, stripe_checkout_session_id, partner_id")
+      .eq("inquiry_id", inquiryId)
+      .eq("status", "pending");
+    if (pend.error) {
+      // Pre-0041 window (table missing) is expected; anything else is
+      // worth a log line, but never fails the transition.
+      const msg = pend.error.message.toLowerCase();
+      const tableMissing =
+        msg.includes("rental_payments") &&
+        (msg.includes("schema cache") || msg.includes("does not exist"));
+      if (!tableMissing) {
+        console.warn("[inquiry transition · payment lookup]", pend.error);
+      }
+      return;
+    }
+    for (const row of pend.data ?? []) {
+      if (!stripe || !row.stripe_checkout_session_id) continue;
+      const partner = await db
+        .from("partners")
+        .select("stripe_account_id")
+        .eq("id", row.partner_id)
+        .maybeSingle();
+      const acct = partner.data?.stripe_account_id as string | null;
+      if (!acct) continue;
+      try {
+        await stripe.checkout.sessions.expire(
+          row.stripe_checkout_session_id,
+          {},
+          { stripeAccount: acct },
+        );
+      } catch (err) {
+        console.warn("[inquiry transition · session expire]", row.id, err);
+        continue; // leave the row pending — see note above
+      }
+      const cancel = await db
+        .from("rental_payments")
+        .update({ status: "canceled" })
+        .eq("id", row.id)
+        .eq("status", "pending");
+      if (cancel.error) {
+        console.warn("[inquiry transition · payment cancel]", cancel.error);
+      }
+    }
+  } catch (err) {
+    console.warn("[inquiry transition · void links]", err);
+  }
+}
 
 const STATUSES = ["new", "sent", "booked", "lost"] as const;
 type Status = (typeof STATUSES)[number];
@@ -134,6 +196,11 @@ export async function PATCH(
       },
       { status: 409 },
     );
+  }
+
+  // A lead that just went lost must not leave a payable link behind.
+  if (nextStatus === "lost") {
+    await voidLivePaymentLinks(db, id);
   }
 
   return NextResponse.json({ inquiry: data });
