@@ -274,7 +274,7 @@ function Pill({
     tone === "ok"
       ? "bg-success/10 text-success-deep"
       : tone === "wait"
-        ? "bg-amber-500/15 text-amber-700"
+        ? "bg-warn/15 text-warn-deep"
         : tone === "warn"
           ? "bg-red/10 text-red"
           : "bg-mute/15 text-mute";

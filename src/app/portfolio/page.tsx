@@ -293,7 +293,7 @@ function MarketSection({
                     !isLive
                       ? "border border-cream/40 bg-black/40 text-cream"
                       : v.sharesAvailable === 0
-                        ? "bg-mute/90 text-cream"
+                        ? "bg-ink/80 text-cream"
                         : "bg-red/95 text-cream"
                   }`}
                 >
@@ -408,7 +408,7 @@ function FeaturedCard({ vehicle: v }: { vehicle: Vehicle }) {
         <p className="mt-1 font-display text-base text-cream/95">{v.name}</p>
         <div className="mt-4 flex items-baseline justify-between border-t border-cream/20 pt-3">
           <div>
-            <p className="text-[10px] uppercase tracking-[0.14em] text-cream/55">
+            <p className="text-[10px] uppercase tracking-[0.14em] text-cream/75">
               Per share
             </p>
             <p className="font-display text-xl tabular-nums">

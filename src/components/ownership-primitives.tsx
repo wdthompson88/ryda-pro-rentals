@@ -22,7 +22,7 @@ import {
   BOATS_TARGET_DEPRECIATION_PCT,
 } from "@/lib/boat-data";
 
-type Variant = "default" | "dark" | "compact";
+type Variant = "default" | "compact";
 type Vertical = "cars" | "boats";
 
 export function OwnershipPrimitives({
@@ -34,21 +34,15 @@ export function OwnershipPrimitives({
   title?: string;
   vertical?: Vertical;
 }) {
-  const isDark = variant === "dark";
-  const wrapperBg = isDark
-    ? "bg-ink"
-    : variant === "compact"
-      ? "bg-cream-2/40"
-      : "bg-surface";
-  const wrapperBorder = isDark ? "border-cream/10" : "border-rule";
+  const wrapperBg = variant === "compact" ? "bg-cream-2/40" : "bg-surface";
+  const wrapperBorder = "border-rule";
   // Cars use red, boats use marine, same accent system as the rest
   // of the vertical's pages.
-  const accentClass = vertical === "boats" ? "text-marine" : "text-red";
-  const eyebrowTone = isDark ? accentClass : accentClass;
-  const headlineTone = isDark ? "text-cream" : "text-ink";
-  const labelTone = isDark ? "text-cream/60" : "text-mute";
-  const valueTone = isDark ? "text-cream" : "text-ink";
-  const subTone = isDark ? "text-cream/70" : "text-ink-soft";
+  const eyebrowTone = vertical === "boats" ? "text-marine" : "text-red";
+  const headlineTone = "text-ink";
+  const labelTone = "text-mute";
+  const valueTone = "text-ink";
+  const subTone = "text-ink-soft";
 
   const items =
     vertical === "boats"
@@ -131,9 +125,7 @@ export function OwnershipPrimitives({
 
   return (
     <section
-      className={`border ${wrapperBorder} ${wrapperBg} ${
-        isDark ? "py-16 sm:py-20" : "py-14 sm:py-18"
-      }`}
+      className={`border ${wrapperBorder} ${wrapperBg} py-14 sm:py-18`}
     >
       <div className="mx-auto max-w-7xl px-6 sm:px-10">
         <div className="flex items-baseline justify-between gap-6">
@@ -151,11 +143,7 @@ export function OwnershipPrimitives({
           {items.map((it) => (
             <div
               key={it.label}
-              className={`rounded-2xl border p-5 ${
-                isDark
-                  ? "border-cream/10 bg-cream/5"
-                  : "border-rule bg-cream-2/40"
-              }`}
+              className="rounded-2xl border p-5 border-rule bg-cream-2/40"
             >
               <p className={`text-[10px] uppercase tracking-[0.16em] ${labelTone}`}>
                 {it.label}

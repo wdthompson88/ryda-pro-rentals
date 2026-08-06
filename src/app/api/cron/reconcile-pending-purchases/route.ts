@@ -217,7 +217,7 @@ export async function GET(req: NextRequest) {
           idempotent and will mint holdings + send the amendment.</p>
           ${
             suppressedDup > 0
-              ? `<p style="color:#666;font-size:13px;">
+              ? `<p style="color:#514C47;font-size:13px;">
                   (${suppressedDup} additional row${
                     suppressedDup === 1 ? "" : "s"
                   } suppressed: already notified within

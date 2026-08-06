@@ -188,7 +188,7 @@ export default function BoatsRentPage() {
       {/* Co-own teaser */}
       <section className="bg-ink py-20 text-cream">
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine-bright">
             Beyond the charter
           </p>
           <h2 className="mt-4 font-display text-3xl sm:text-4xl">

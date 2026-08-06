@@ -65,12 +65,12 @@ export async function POST(req: Request) {
       subject: `New investor inquiry: ${name}${check_size ? ` · ${check_size}` : ""}`,
       replyTo: email,
       html: emailLayout("New investor inquiry", `
-        <div style="font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#9A9590;">From</div>
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#514C47;">From</div>
         <div style="font-size:16px;font-weight:500;margin-top:2px;">${escapeHtml(name)}</div>
-        <div style="margin-top:2px;"><a href="mailto:${escapeHtml(email)}" style="color:#DC4747;text-decoration:none;">${escapeHtml(email)}</a></div>
-        ${firm ? `<div style="margin-top:14px;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#9A9590;">Firm</div><div style="margin-top:2px;">${escapeHtml(firm)}</div>` : ""}
-        ${check_size ? `<div style="margin-top:14px;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#9A9590;">Anticipated check size</div><div style="margin-top:2px;font-weight:500;">${escapeHtml(check_size)}</div>` : ""}
-        ${notes ? `<div style="margin-top:18px;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#9A9590;margin-bottom:6px;">Notes</div><div style="white-space:pre-wrap;color:#1c1c1c;">${escapeHtml(notes)}</div>` : ""}
+        <div style="margin-top:2px;"><a href="mailto:${escapeHtml(email)}" style="color:#C03030;text-decoration:none;">${escapeHtml(email)}</a></div>
+        ${firm ? `<div style="margin-top:14px;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#514C47;">Firm</div><div style="margin-top:2px;">${escapeHtml(firm)}</div>` : ""}
+        ${check_size ? `<div style="margin-top:14px;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#514C47;">Anticipated check size</div><div style="margin-top:2px;font-weight:500;">${escapeHtml(check_size)}</div>` : ""}
+        ${notes ? `<div style="margin-top:18px;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#514C47;margin-bottom:6px;">Notes</div><div style="white-space:pre-wrap;color:#1c1c1c;">${escapeHtml(notes)}</div>` : ""}
         <div style="margin-top:24px;padding-top:18px;border-top:1px solid #e5e1d8;font-size:13px;color:#3c3c3c;">
           <strong>Hit reply</strong> to respond, this email's reply-to is set to ${escapeHtml(email)}.
         </div>

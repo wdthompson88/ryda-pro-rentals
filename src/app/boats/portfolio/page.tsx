@@ -319,7 +319,7 @@ function FeaturedBoatCard({ boat: b }: { boat: Boat }) {
       />
       <span
         className={`absolute right-4 top-4 rounded-full px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] backdrop-blur ${
-          b.sharesAvailable === 0 ? "bg-mute/90 text-cream" : "bg-marine/95 text-cream"
+          b.sharesAvailable === 0 ? "bg-ink/80 text-cream" : "bg-marine/95 text-cream"
         }`}
       >
         {b.sharesAvailable === 0 ? "Sold out" : `${b.sharesAvailable} shares left`}
@@ -334,7 +334,7 @@ function FeaturedBoatCard({ boat: b }: { boat: Boat }) {
         <p className="mt-1 font-display text-base text-cream/95">{b.model}</p>
         <div className="mt-4 flex items-baseline justify-between border-t border-cream/20 pt-3">
           <div>
-            <p className="text-[10px] uppercase tracking-[0.14em] text-cream/55">
+            <p className="text-[10px] uppercase tracking-[0.14em] text-cream/75">
               Per share
             </p>
             <p className="font-display text-xl tabular-nums">

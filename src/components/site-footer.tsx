@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { HiddenWhenAuthed } from "@/components/auth-aware";
 // HealthBadge is dynamic-imported via HealthBadgeLazy so its ~64KB
 // chunk doesn't load on every marketing page where the user never
@@ -145,7 +144,6 @@ export function SiteFooter() {
             <Link href="/legal/accessibility" className="hover:text-ink">
               Accessibility
             </Link>
-            <ThemeToggle className="ml-2" />
           </div>
         </div>
       </div>

@@ -76,7 +76,7 @@ export function HealthBadge() {
     status === "ok"
       ? "bg-success"
       : status === "degraded"
-        ? "bg-amber-500"
+        ? "bg-warn"
         : "bg-red";
 
   const label =

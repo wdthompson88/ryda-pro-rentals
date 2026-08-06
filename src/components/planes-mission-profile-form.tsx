@@ -124,7 +124,7 @@ Reply when RYDA Planes opens the member cohort window for this profile.`;
           placeholder="Full name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="h-11 rounded-xl border border-cream/20 bg-cream/10 px-4 text-sm text-cream placeholder:text-cream/40 focus:border-cream/50 focus:outline-none"
+          className="h-11 rounded-xl border border-cream/20 bg-cream/10 px-4 text-sm text-cream placeholder:text-cream/70 focus:border-cream/50 focus:outline-none"
         />
         <input
           type="email"
@@ -133,7 +133,7 @@ Reply when RYDA Planes opens the member cohort window for this profile.`;
           placeholder="you@email.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="h-11 rounded-xl border border-cream/20 bg-cream/10 px-4 text-sm text-cream placeholder:text-cream/40 focus:border-cream/50 focus:outline-none"
+          className="h-11 rounded-xl border border-cream/20 bg-cream/10 px-4 text-sm text-cream placeholder:text-cream/70 focus:border-cream/50 focus:outline-none"
         />
       </div>
 
@@ -151,7 +151,7 @@ Reply when RYDA Planes opens the member cohort window for this profile.`;
               }`}
             >
               <div className="font-medium">{j.label}</div>
-              <div className="mt-0.5 text-cream/50">{j.example}</div>
+              <div className="mt-0.5 text-cream/70">{j.example}</div>
             </button>
           ))}
         </div>
@@ -205,7 +205,7 @@ Reply when RYDA Planes opens the member cohort window for this profile.`;
       >
         {submitting ? "Submitting…" : "Send mission profile →"}
       </button>
-      <p className="text-[11px] text-cream/50">
+      <p className="text-[11px] text-cream/70">
         We&apos;ll only contact you when the cohort window opens for your
         profile. No interim marketing.
       </p>

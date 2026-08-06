@@ -187,7 +187,7 @@ export default function InsidePage() {
                     <p className="font-display text-xl text-ink">May 2026</p>
                     <div className="flex flex-wrap gap-2 text-xs text-mute">
                       <Legend color="bg-red" label="Yours" />
-                      <Legend color="bg-mute/60" label="Other co-owner" />
+                      <Legend color="bg-mute" label="Other co-owner" />
                       <Legend color="border border-rule bg-cream-2" label="Open" />
                       <Legend color="bg-ink/30" label="Service" />
                     </div>
@@ -210,7 +210,7 @@ export default function InsidePage() {
                         day === 18 ||
                         day === 22
                       ) {
-                        bg = "bg-mute/60";
+                        bg = "bg-mute";
                         textColor = "text-cream";
                       } else if (day === 28) {
                         bg = "bg-ink/30";
@@ -374,7 +374,7 @@ export default function InsidePage() {
       {/* CTA */}
       <section className="bg-ink py-20 text-cream">
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red-bright">
             Ready to see your real portfolio?
           </p>
           <h2 className="mt-4 font-display text-3xl sm:text-4xl">

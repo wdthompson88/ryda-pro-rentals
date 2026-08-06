@@ -39,7 +39,7 @@ export function BrandMarquee({ items, eyebrow, tone = "muted" }: Props) {
   // restarts invisibly.
 
   const tonecls =
-    tone === "muted" ? "text-mute/80" : "text-ink";
+    tone === "muted" ? "text-mute" : "text-ink";
 
   if (reduce || items.length === 0) {
     return (

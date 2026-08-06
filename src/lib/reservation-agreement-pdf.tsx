@@ -71,7 +71,7 @@ const styles = StyleSheet.create({
   h2: {
     fontSize: 12,
     letterSpacing: 1.2,
-    color: "#7a7670",
+    color: "#514C47",
     textTransform: "uppercase",
     marginTop: 24,
     marginBottom: 8,
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
   kvKey: {
     width: 160,
     fontSize: 10,
-    color: "#7a7670",
+    color: "#514C47",
     textTransform: "uppercase",
     letterSpacing: 1,
   },
@@ -115,14 +115,14 @@ const styles = StyleSheet.create({
   },
   sigCaption: {
     fontSize: 9,
-    color: "#7a7670",
+    color: "#514C47",
     textTransform: "uppercase",
     letterSpacing: 1,
   },
   fineprint: {
     marginTop: 32,
     fontSize: 8,
-    color: "#7a7670",
+    color: "#514C47",
     lineHeight: 1.5,
   },
   // Numbered terms list — small index column + body column.

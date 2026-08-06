@@ -606,7 +606,7 @@ function FilterToggle({
       >
         <span
           aria-hidden
-          className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
+          className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border text-red ${
             active ? "border-cream bg-cream" : "border-rule bg-surface"
           }`}
         >
@@ -614,7 +614,7 @@ function FilterToggle({
             <svg width="9" height="9" viewBox="0 0 9 9" fill="none" aria-hidden>
               <path
                 d="M2 4.5L4 6.5L7.5 2.5"
-                stroke="#DC4747"
+                stroke="currentColor"
                 strokeWidth="1.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"

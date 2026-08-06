@@ -86,7 +86,14 @@ export function AssetCalendar({
 
   // Real cell data: for each day in the month, find any active booking.
   type CellState = { day: number; badge: BadgeState | null };
-  type BadgeState = { color: string; label: string };
+  type BadgeState = { tone: string; label: string };
+
+  // Badge tones are token classes so they track the palette (the old
+  // inline-hex version froze dark-theme values that fail contrast on
+  // light). "You" follows the vertical accent; others stay neutral.
+  const youTone = vertical === "boats" ? "bg-marine text-cream" : "bg-red text-cream";
+  const otherTone = "bg-ink-soft text-cream";
+  const serviceTone = "bg-ink text-cream";
   const cells: CellState[] = [];
   // Empty leading cells.
   for (let i = 0; i < startWeekday; i++) cells.push({ day: 0, badge: null });
@@ -107,25 +114,23 @@ export function AssetCalendar({
         // precedence when present.
         const isYou = hit.is_self === true;
         badge = isYou
-          ? { color: "#DC4747", label: "You" }
-          : { color: "#9A9590", label: "Other" };
+          ? { tone: youTone, label: "You" }
+          : { tone: otherTone, label: "Other" };
       }
     } else if (loaded) {
       // Demo fallback once the fetch has resolved (and didn't return
       // any rows). Mirrors the original sample-data pattern.
       if (monthOffset === 0) {
-        if (d === 12 || d === 13) badge = { color: "#DC4747", label: "You" };
+        if (d === 12 || d === 13) badge = { tone: youTone, label: "You" };
         else if (d === 23 || d === 24 || d === 25)
-          badge = { color: "#9A9590", label: "Other" };
-        else if (d === 1) badge = { color: "#3A3A3E", label: "Service" };
+          badge = { tone: otherTone, label: "Other" };
+        else if (d === 1) badge = { tone: serviceTone, label: "Service" };
       }
     }
     cells.push({ day: d, badge });
   }
   // Pad trailing cells to make the grid a clean rectangle.
   while (cells.length % 7 !== 0) cells.push({ day: 0, badge: null });
-
-  const accent = vertical === "boats" ? "marine" : "red";
 
   return (
     <div>
@@ -168,8 +173,7 @@ export function AssetCalendar({
               {c.badge && (
                 <div className="mt-1">
                   <span
-                    className="inline-block rounded px-1.5 py-0.5 text-[10px] font-medium text-cream"
-                    style={{ backgroundColor: c.badge.color }}
+                    className={`inline-block rounded px-1.5 py-0.5 text-[10px] font-medium ${c.badge.tone}`}
                   >
                     {c.badge.label}
                   </span>
@@ -185,7 +189,6 @@ export function AssetCalendar({
           : loaded
             ? "Sample calendar — sign in to see real bookings."
             : "Loading…"}
-        {accent === "marine" ? " " : null}
       </p>
     </div>
   );

@@ -236,7 +236,7 @@ export function HelpChat() {
               <p id="ryda-help-chat-title" className="font-display text-base">
                 Ask RYDA
               </p>
-              <p className="text-[11px] uppercase tracking-wider text-cream/50">
+              <p className="text-[11px] uppercase tracking-wider text-cream/70">
                 Answers from 61 help articles · Real human on request
               </p>
             </div>

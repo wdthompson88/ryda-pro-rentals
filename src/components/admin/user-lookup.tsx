@@ -228,7 +228,7 @@ function UserCard({
             className={`rounded-full px-2.5 py-0.5 font-medium ${
               hit.email_confirmed_at
                 ? "bg-success/10 text-success-deep"
-                : "bg-amber-500/15 text-amber-700"
+                : "bg-warn/15 text-warn-deep"
             }`}
           >
             {hit.email_confirmed_at ? "email verified" : "email unverified"}
@@ -492,7 +492,7 @@ function MiniTable({
         {title}
       </p>
       {rows.length === 0 ? (
-        <p className="mt-1.5 text-xs text-mute/70">{empty}</p>
+        <p className="mt-1.5 text-xs text-mute">{empty}</p>
       ) : (
         <div className="mt-2 overflow-x-auto rounded-lg border border-rule bg-surface">
           <table className="w-full text-xs">

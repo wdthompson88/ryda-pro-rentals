@@ -276,7 +276,7 @@ export default async function BoatCharterDetail({
       {/* Co-own teaser */}
       <section className="border-b border-rule bg-ink py-14 text-cream">
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine-bright">
             Charter once. Own a piece forever.
           </p>
           <h2 className="mt-3 font-display text-3xl sm:text-4xl">

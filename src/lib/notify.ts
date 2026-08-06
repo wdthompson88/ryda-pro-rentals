@@ -70,7 +70,7 @@ export function emailLayout(title: string, innerHtml: string): string {
       </td>
     </tr>
     <tr><td style="padding:24px;font-size:14px;line-height:1.55;">${innerHtml}</td></tr>
-    <tr><td style="background:#faf7f2;padding:14px 24px;color:#9A9590;font-size:11px;border-top:1px solid #e5e1d8;">Sent by RYDA system. Reply to this email to respond directly to the member.</td></tr>
+    <tr><td style="background:#faf7f2;padding:14px 24px;color:#514C47;font-size:11px;border-top:1px solid #e5e1d8;">Sent by RYDA system. Reply to this email to respond directly to the member.</td></tr>
   </table>
 </body>
 </html>`;
