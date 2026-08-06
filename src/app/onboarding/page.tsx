@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { StepProgress } from "@/components/step-progress";
+import { supabase } from "@/lib/supabase";
 
 const STEPS = ["Basic", "Phone", "Personal", "Identity", "Financial", "Tier", "Done"];
 
@@ -51,20 +52,120 @@ export default function OnboardingPage() {
 
 // ── Step components ─────────────────────────────────────────────
 
+// Basic — the ONE place name + phone are ever typed. Email autofills
+// from the auth session (typed once at signup, or supplied by the
+// OAuth provider) and is read-only when known. Name prefills from
+// whatever the sign-in method already told us: social providers put
+// name/full_name in user_metadata, so a Google/Facebook/Microsoft
+// signup usually just confirms and continues. On continue, the values
+// persist to user_metadata so no later step ever re-asks.
 function Basic({ onNext }: { onNext: () => void }) {
+  const [first, setFirst] = useState("");
+  const [last, setLast] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  // True once the session supplied the email — the field locks then,
+  // it's an account fact, not a preference. Without a session (or
+  // without Supabase configured) the field stays editable so the demo
+  // flow still works.
+  const [emailLocked, setEmailLocked] = useState(false);
+
+  useEffect(() => {
+    if (!supabase) return;
+    let cancelled = false;
+    supabase.auth.getUser().then(({ data }) => {
+      if (cancelled || !data.user) return;
+      if (data.user.email) {
+        setEmail(data.user.email);
+        setEmailLocked(true);
+      }
+      const meta = (data.user.user_metadata ?? {}) as Record<string, unknown>;
+      const metaFirst =
+        typeof meta.first_name === "string" ? meta.first_name : "";
+      const metaLast = typeof meta.last_name === "string" ? meta.last_name : "";
+      if (metaFirst || metaLast) {
+        setFirst(metaFirst);
+        setLast(metaLast);
+      } else {
+        // OAuth providers send a single display name — split it once
+        // here so the user can correct rather than re-type.
+        const full =
+          typeof meta.full_name === "string"
+            ? meta.full_name
+            : typeof meta.name === "string"
+              ? meta.name
+              : "";
+        const parts = full.trim().split(/\s+/).filter(Boolean);
+        if (parts.length > 0) {
+          setFirst(parts[0]);
+          setLast(parts.slice(1).join(" "));
+        }
+      }
+      if (typeof meta.phone === "string") setPhone(meta.phone);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  function saveAndContinue() {
+    // Best-effort persistence — the wizard must keep flowing even if
+    // the metadata write fails or Supabase isn't configured.
+    if (supabase) {
+      const name = `${first.trim()} ${last.trim()}`.trim();
+      void supabase.auth
+        .updateUser({
+          data: {
+            first_name: first.trim(),
+            last_name: last.trim(),
+            name,
+            phone: phone.trim() || null,
+          },
+        })
+        .catch(() => {});
+    }
+    onNext();
+  }
+
   return (
     <div>
       <h2 className="font-display text-2xl text-ink">Tell us about you.</h2>
       <p className="mt-2 text-sm text-ink-soft">
-        We'll start with the basics. Takes 30 seconds.
+        Your email carries over from sign-in — just add your name and
+        number. You'll never be asked for these again.
       </p>
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Field label="First name" autoComplete="given-name" />
-        <Field label="Last name" autoComplete="family-name" />
-        <Field label="Email" type="email" autoComplete="email" />
-        <Field label="Phone" type="tel" placeholder="+1" autoComplete="tel" />
+        <Field
+          label="First name"
+          autoComplete="given-name"
+          value={first}
+          onChange={setFirst}
+        />
+        <Field
+          label="Last name"
+          autoComplete="family-name"
+          value={last}
+          onChange={setLast}
+        />
+        <Field
+          label="Email"
+          type="email"
+          autoComplete="email"
+          value={email}
+          onChange={setEmail}
+          readOnly={emailLocked}
+          hint={emailLocked ? "From your sign-in." : undefined}
+        />
+        <Field
+          label="Phone"
+          type="tel"
+          placeholder="+1"
+          autoComplete="tel"
+          value={phone}
+          onChange={setPhone}
+        />
       </div>
-      <NextButton onClick={onNext} />
+      <NextButton onClick={saveAndContinue} />
     </div>
   );
 }
@@ -298,11 +399,21 @@ function Field({
   type = "text",
   placeholder,
   autoComplete,
+  value,
+  onChange,
+  readOnly,
+  hint,
 }: {
   label: string;
   type?: string;
   placeholder?: string;
   autoComplete?: string;
+  /** Controlled mode — pass with onChange. Omit for the mock steps
+   *  that don't persist yet. */
+  value?: string;
+  onChange?: (v: string) => void;
+  readOnly?: boolean;
+  hint?: string;
 }) {
   const id = fieldId(label);
   return (
@@ -319,8 +430,15 @@ function Field({
         type={type}
         placeholder={placeholder}
         autoComplete={autoComplete}
-        className="mt-2 h-12 w-full rounded-xl border border-rule bg-cream px-4 text-sm text-ink placeholder:text-mute focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
+        readOnly={readOnly}
+        {...(value !== undefined
+          ? { value, onChange: (e) => onChange?.(e.target.value) }
+          : {})}
+        className={`mt-2 h-12 w-full rounded-xl border border-rule px-4 text-sm text-ink placeholder:text-mute focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20 ${
+          readOnly ? "cursor-default bg-cream-2/60 text-ink-soft" : "bg-cream"
+        }`}
       />
+      {hint ? <p className="mt-1.5 text-[11px] text-mute">{hint}</p> : null}
     </div>
   );
 }

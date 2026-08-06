@@ -201,12 +201,12 @@ function ApplySection({
       <div className="rounded-2xl border border-rule bg-surface p-8 sm:p-10">
         <h2 className="font-display text-xl text-ink">
           {intent
-            ? "Almost there — confirm your company details."
+            ? "Almost there — tell us about your company."
             : "List your fleet with RYDA."}
         </h2>
         <p className="mt-2 max-w-xl text-sm text-ink-soft">
           {intent
-            ? "We saw your partner signup but couldn't read the company details. Re-enter them below and your application goes straight into review."
+            ? "You signed up as a fleet partner. Add your company details below and your application goes straight into review — we respond personally within 3 business days."
             : "Tell us about your company. We respond to every application personally within 3 business days, and this page tracks the review from the moment you submit."}
         </p>
         <PartnerForm

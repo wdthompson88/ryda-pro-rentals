@@ -101,8 +101,11 @@ export async function GET(req: NextRequest) {
     phone: meta.partner_phone,
   });
   if (!parsed.ok) {
-    // Intent without usable details (metadata is user-editable, so
-    // garbage is possible) — let the dashboard show the apply form.
+    // Intent without company details — the NORMAL path now that
+    // signup is email+password only. The dashboard's apply form
+    // collects the company once; this branch also covers garbled
+    // metadata (it's user-editable). Accounts created while signup
+    // still sent partner_company fall through to the upsert below.
     return NextResponse.json({ partner: null, intent: true });
   }
 

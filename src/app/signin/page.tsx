@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
+import { OAuthButtons } from "@/components/oauth-buttons";
 import { supabase } from "@/lib/supabase";
 import { safeNext } from "@/lib/safe-next";
 
@@ -145,6 +146,14 @@ function SignInPageInner() {
           <p className="mt-2 text-sm text-ink-soft">
             Member sign-in for RYDA, co-owners, renters, and partners.
           </p>
+
+          {/* Social sign-in (renders only for providers enabled via
+              NEXT_PUBLIC_AUTH_PROVIDERS). */}
+          {!magicSent && (
+            <div className="mt-7">
+              <OAuthButtons next={next} verb="Continue" />
+            </div>
+          )}
 
           {magicSent ? (
             <div className="mt-8 rounded-xl border border-rule bg-cream-2/40 p-5 text-sm">

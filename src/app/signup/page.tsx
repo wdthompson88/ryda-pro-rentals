@@ -4,20 +4,25 @@ import Link from "next/link";
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
+import { OAuthButtons } from "@/components/oauth-buttons";
 import { supabase } from "@/lib/supabase";
 import { safeNext } from "@/lib/safe-next";
 
 // /signup, traditional account creation (modeled on the mainstable
 // signup: minimal fields, neutral copy, passive consent line — NOT an
-// application funnel). Two account types:
-//   - Member (default): name + email + password, then the guided
-//     onboarding (KYC, preferences, age verification) AFTER the
-//     account exists. Eligibility checks like the 28+ driver rule
-//     live in onboarding/booking, not the signup form.
-//   - Fleet partner (?as=partner, linked from /partners): adds
-//     company details and drives to the /partner dashboard, where the
-//     application shows as pending until an admin approves it. (B2B
-//     partnering IS reviewed, so its copy keeps the apply framing.)
+// application funnel). Email + password ONLY — name and phone are
+// entered exactly once, in the onboarding Basic step, where email
+// autofills from the session. That keeps the flow identical across
+// auth methods: social sign-ins (OAuthButtons; Google/Facebook/
+// Microsoft as providers get configured) skip this form entirely and
+// land in the same onboarding with the provider's profile prefilled.
+// Two account types:
+//   - Member (default): account → guided onboarding (KYC, prefs, 28+).
+//   - Fleet partner (?as=partner, linked from /partners): same minimal
+//     account; company details are collected once on the /partner
+//     dashboard, where the application shows as pending until an
+//     admin approves it. (B2B partnering IS reviewed, so its copy
+//     keeps the apply framing.)
 // Preserves `?next=` so post-onboarding the member is returned to the
 // gated action they tried to take (e.g. claim a share, request a
 // rental). Real auth ships at Miami launch.
@@ -78,13 +83,8 @@ function SignUpPageInner() {
     };
   }, [router, dest]);
 
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // Partner-only fields.
-  const [company, setCompany] = useState("");
-  const [phone, setPhone] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -101,26 +101,18 @@ function SignUpPageInner() {
 
   const reasonSub =
     accountType === "partner"
-      ? "Tell us about your company and fleet. We respond to every partner application personally within 3 business days — your dashboard tracks the review."
+      ? "Create your account, then tell us about your fleet from your partner dashboard. We respond to every application personally within 3 business days."
       : reason === "rent" || reason === "buy" || reason === "checkout"
         ? "Browsing is open to everyone, we just need an account before you can transact. 60 seconds."
         : "Free to join. An account unlocks rentals, bookings, and co-ownership — browsing stays open to everyone.";
 
-  // Composed display/legal name for surfaces that want one string
-  // (waitlist, emails, the partner contact). The split parts are what
-  // downstream identity flows use — KYC verified outputs and the
-  // onboarding form are already first/last shaped.
-  const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
-
-  // Traditional setup: no attestation checkboxes here. Identity, age
-  // (28+ driver rule), and preferences all live in onboarding/booking;
-  // ToS/privacy consent is the passive line under the submit button.
-  const ready =
-    firstName.trim().length >= 1 &&
-    lastName.trim().length >= 1 &&
-    email.includes("@") &&
-    password.length >= 8 &&
-    (accountType !== "partner" || company.trim().length >= 2);
+  // Email + password is the whole form. Name and phone are collected
+  // once in onboarding (email autofills there from the session), so
+  // password and social signups converge on the same steps. No
+  // attestation checkboxes: identity, age (28+), and preferences live
+  // in onboarding/booking; ToS/privacy consent is the passive line
+  // under the submit button.
+  const ready = email.includes("@") && password.length >= 8;
 
   const [error, setError] = useState<string | null>(null);
 
@@ -141,7 +133,6 @@ function SignUpPageInner() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         email,
-        name: fullName,
         market: "Miami",
         source:
           accountType === "partner"
@@ -179,12 +170,12 @@ function SignUpPageInner() {
             // first authenticated visit. Only the admin-gated
             // /api/admin/partners route can approve.
             data: {
-              // Split parts are canonical (matches KYC verified-output
-              // and onboarding field shape); `name` stays as the
-              // composed string so existing consumers keep working.
-              first_name: firstName.trim(),
-              last_name: lastName.trim(),
-              name: fullName,
+              // Name/phone are NOT collected here — the onboarding
+              // Basic step writes first_name/last_name/name/phone to
+              // user_metadata exactly once, prefilled from whatever
+              // the auth method already knows (OAuth providers send
+              // name + email themselves).
+              //
               // No marketing opt-in exists at signup (traditional
               // setup — marketing is managed in /account/notifications
               // and is off by default per /account/privacy). Record
@@ -192,12 +183,7 @@ function SignUpPageInner() {
               // saying "never opted in here".
               marketing_opt_in: false,
               ...(accountType === "partner"
-                ? {
-                    account_type: "partner",
-                    partner_intent: true,
-                    partner_company: company.trim(),
-                    partner_phone: phone.trim() || null,
-                  }
+                ? { account_type: "partner", partner_intent: true }
                 : {}),
             },
           },
@@ -236,7 +222,7 @@ function SignUpPageInner() {
               <span className="font-medium text-ink">{email}</span> to confirm
               your account.{" "}
               {accountType === "partner"
-                ? "Once you're in, your partner dashboard tracks the fleet review — we respond to every application within 3 business days."
+                ? "Once you're in, tell us about your company from your partner dashboard — we respond to every application within 3 business days."
                 : "Continue to onboarding to verify your identity and complete your member profile, or pick up where you left off."}
             </p>
 
@@ -303,51 +289,12 @@ function SignUpPageInner() {
               />
             </div>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <Field
-                label="First name"
-                id="signup-first-name"
-                type="text"
-                placeholder="Jane"
-                value={firstName}
-                onChange={setFirstName}
-                autoComplete="given-name"
-                required
-              />
-              <Field
-                label="Last name"
-                id="signup-last-name"
-                type="text"
-                placeholder="Doe"
-                value={lastName}
-                onChange={setLastName}
-                autoComplete="family-name"
-                required
-              />
-            </div>
-            {accountType === "partner" && (
-              <>
-                <Field
-                  label="Company"
-                  id="signup-company"
-                  type="text"
-                  placeholder="Your rental company"
-                  value={company}
-                  onChange={setCompany}
-                  autoComplete="organization"
-                  required
-                />
-                <Field
-                  label="Phone (optional)"
-                  id="signup-phone"
-                  type="tel"
-                  placeholder="+1 (305) 555-0100"
-                  value={phone}
-                  onChange={setPhone}
-                  autoComplete="tel"
-                />
-              </>
-            )}
+            {/* Social sign-in (renders only for providers enabled via
+                NEXT_PUBLIC_AUTH_PROVIDERS). Same /auth/callback → dest
+                routing as email confirmation, so partner intent and
+                onboarding work identically for every method. */}
+            <OAuthButtons next={dest} verb="Sign up" />
+
             <Field
               label="Email"
               id="signup-email"
