@@ -194,7 +194,7 @@ export function MembershipPageTemplate({ data }: { data: MembershipPageData }) {
               href={data.cta.href}
               className={`mt-8 inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink ${ctaHover} hover:text-cream`}
             >
-              Apply now →
+              Sign up →
             </Link>
           </HiddenWhenAuthed>
         </div>

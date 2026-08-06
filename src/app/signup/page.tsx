@@ -132,7 +132,10 @@ function SignUpPageInner() {
 
     // Always persist to the waitlist regardless of auth path, it's
     // the lead-attribution surface (market, source) and works even if
-    // auth isn't configured yet.
+    // auth isn't configured yet. Attribution ONLY — this is not
+    // marketing consent (there is no opt-in at signup; see the
+    // marketing_opt_in note below), so any future send pipeline must
+    // check consent, not this table.
     void fetch("/api/waitlist", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -182,6 +185,12 @@ function SignUpPageInner() {
               first_name: firstName.trim(),
               last_name: lastName.trim(),
               name: fullName,
+              // No marketing opt-in exists at signup (traditional
+              // setup — marketing is managed in /account/notifications
+              // and is off by default per /account/privacy). Record
+              // the explicit false so there's a durable consent signal
+              // saying "never opted in here".
+              marketing_opt_in: false,
               ...(accountType === "partner"
                 ? {
                     account_type: "partner",
@@ -408,7 +417,7 @@ function SignUpPageInner() {
           <p className="mt-5 text-center text-xs text-mute">
             {accountType === "partner"
               ? "No commitment — applying starts a conversation about whether RYDA is the right channel for your fleet."
-              : "Drivers must be 28+ to rent — we verify identity and eligibility during onboarding, not here."}
+              : "RYDA membership is 28+ — identity and eligibility are verified during onboarding, not here."}
           </p>
 
           <div className="mt-10 border-t border-rule pt-6 text-center text-sm text-ink-soft">

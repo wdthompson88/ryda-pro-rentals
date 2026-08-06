@@ -17,7 +17,7 @@ export default function OnboardingPage() {
       <SiteHeader />
       <section className="mx-auto max-w-2xl px-6 py-12 sm:px-10 sm:py-16">
         <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-          Membership application
+          Member onboarding
         </p>
         <h1 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
           {STEPS[step] === "Done"
@@ -262,16 +262,17 @@ function Done() {
       </div>
       <h2 className="mt-6 font-display text-3xl text-ink">You're in.</h2>
       <p className="mt-3 text-base text-ink-soft">
-        Welcome to RYDA. Your application is under review, we'll send a
-        decision within 5 business days.
+        Welcome to RYDA. Your account is active — identity verification
+        usually clears within minutes, and we'll email you the moment
+        it does.
       </p>
       <div className="mt-8 rounded-xl border border-rule bg-cream-2/40 p-5 text-left text-sm">
-        <p className="font-medium text-ink">Member #00104, Pending review</p>
+        <p className="font-medium text-ink">Member #00104</p>
         <ul className="mt-3 space-y-2 text-ink-soft">
-          <li>· Identity verification: Submitted</li>
+          <li>· Identity verification: Processing</li>
           <li>· Financial qualification: Submitted</li>
           <li>· Membership tier: RYDA Core</li>
-          <li>· Status: Under review</li>
+          <li>· Status: Active</li>
         </ul>
       </div>
       <Link

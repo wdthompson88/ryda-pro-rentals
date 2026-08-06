@@ -143,7 +143,7 @@ function SignInPageInner() {
           </p>
           <h1 className="mt-3 font-display text-3xl text-ink">{reasonCopy}</h1>
           <p className="mt-2 text-sm text-ink-soft">
-            Member sign-in for RYDA, co-owners, renters, and applicants.
+            Member sign-in for RYDA, co-owners, renters, and partners.
           </p>
 
           {magicSent ? (

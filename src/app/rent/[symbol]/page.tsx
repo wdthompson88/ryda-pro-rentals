@@ -303,7 +303,7 @@ export default async function RentDetailPage({
                         )}&reason=rent`}
                         className="mt-2 inline-flex w-full items-center justify-center text-xs text-ink-soft hover:text-ink"
                       >
-                        Already a member? Sign in →
+                        Already have an account? Sign in →
                       </Link>
                     </>
                   }
