@@ -284,8 +284,9 @@ export function RentalListings() {
 
   return (
     <section>
-      {/* Filter bar, sticky so filters stay accessible while browsing */}
-      <div className="sticky top-0 z-30 border-b border-rule bg-cream-2/95 backdrop-blur">
+      {/* Filter bar, sticky so filters stay accessible while browsing.
+          top-20 stacks it just below the sticky 79px site header. */}
+      <div className="sticky top-20 z-30 border-b border-rule bg-cream-2/95 backdrop-blur">
         <div className="mx-auto max-w-7xl px-6 py-5 sm:px-10">
           {/* Search */}
           <label className="block">

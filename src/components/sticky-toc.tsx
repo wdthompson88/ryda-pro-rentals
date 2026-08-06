@@ -72,7 +72,7 @@ export function StickyToc({
   return (
     <nav
       aria-label="Page contents"
-      className="sticky top-0 z-30 border-b border-rule bg-cream/95 backdrop-blur-md"
+      className="sticky top-20 z-30 border-b border-rule bg-cream/95 backdrop-blur-md"
     >
       <div
         ref={containerRef}

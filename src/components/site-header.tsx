@@ -61,7 +61,14 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
   }
 
   return (
-    <header className={`w-full border-b ${inverted ? "border-cream/20" : "border-rule"}`}>
+    // Everlasting top bar (Cars & Bids pattern): sticky so the brand,
+    // nav, search, and auth CTAs stay reachable at any scroll depth.
+    // Solid background — content must never ghost through it.
+    <header
+      className={`sticky top-0 z-50 w-full border-b ${
+        inverted ? "border-cream/20 bg-ink" : "border-rule bg-cream"
+      }`}
+    >
       {/* Single-row marketing header. Vertical switcher / theme toggle /
           search-icon were demoted to footer per luxury polish, header
           now reads as minimal brand mark + nav + one CTA, not as
