@@ -66,7 +66,9 @@ function SignUpPageInner() {
   // dashboard's first authenticated fetch, so carrying a member
   // destination through the email round-trip would silently skip
   // provisioning (and make the success CTA's label a lie).
-  const dest = accountType === "partner" ? "/partner" : next;
+  // ?from=signup lets the dashboard stamp partner_intent for OAuth
+  // signups, which can't carry metadata through the provider redirect.
+  const dest = accountType === "partner" ? "/partner?from=signup" : next;
 
   // If a signed-in member lands on /signup (clicked an old marketing
   // link, etc.), bounce them to the gated destination — they don't
@@ -212,10 +214,10 @@ function SignUpPageInner() {
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-cream-2 text-2xl text-ink">
               ✓
             </div>
+            {/* One heading for both types: no application exists yet
+                for partners — that starts on their dashboard. */}
             <h1 className="mt-5 font-display text-3xl text-ink">
-              {accountType === "partner"
-                ? "Application received."
-                : "Account created."}
+              Account created.
             </h1>
             <p className="mt-3 text-sm text-ink-soft">
               We've emailed{" "}
@@ -291,8 +293,9 @@ function SignUpPageInner() {
 
             {/* Social sign-in (renders only for providers enabled via
                 NEXT_PUBLIC_AUTH_PROVIDERS). Same /auth/callback → dest
-                routing as email confirmation, so partner intent and
-                onboarding work identically for every method. */}
+                routing as email confirmation; the provider redirect
+                can't carry metadata, so partner intent travels as
+                dest's ?from=signup and /partner stamps it on landing. */}
             <OAuthButtons next={dest} verb="Sign up" />
 
             <Field

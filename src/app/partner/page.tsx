@@ -23,7 +23,8 @@
 // Status is admin-owned (/admin/partners). This page never writes it.
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { supabase } from "@/lib/supabase";
 import { authedFetch } from "@/lib/api-fetch";
@@ -41,7 +42,24 @@ type ViewState =
   | { status: "error"; message: string };
 
 export default function PartnerDashboardPage() {
+  // Suspense boundary because the inner page reads useSearchParams
+  // (Next 16 requires it).
+  return (
+    <Suspense fallback={null}>
+      <PartnerDashboardInner />
+    </Suspense>
+  );
+}
+
+function PartnerDashboardInner() {
   const [state, setState] = useState<ViewState>({ status: "loading" });
+  const searchParams = useSearchParams();
+  // /signup routes partners here with ?from=signup. Email+password
+  // signups already carry partner_intent in metadata; OAuth signups
+  // CAN'T (the provider redirect carries no metadata), so the query
+  // param is how their partner choice survives the round-trip.
+  const fromSignup = searchParams.get("from") === "signup";
+  const stamped = useRef(false);
 
   const load = useCallback(async () => {
     // Preview deploys without Supabase env: /signup simulates success,
@@ -73,12 +91,41 @@ export default function PartnerDashboardPage() {
       if (body.partner) {
         setState({ status: "ready", partner: body.partner });
       } else {
-        setState({ status: "none", intent: body.intent === true });
+        if (fromSignup && !stamped.current) {
+          stamped.current = true;
+          // Stamp the partner choice that the OAuth redirect couldn't
+          // carry (idempotent for email+password signups, which wrote
+          // it at signUp), and record the lead the signup form's
+          // waitlist POST never fired for OAuth users. Both
+          // best-effort — the apply form below is the real surface.
+          void supabase?.auth
+            .updateUser({
+              data: { account_type: "partner", partner_intent: true },
+            })
+            .catch(() => {});
+          void supabase?.auth.getSession().then(({ data }) => {
+            const em = data.session?.user.email;
+            if (!em) return;
+            void fetch("/api/waitlist", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                email: em,
+                market: "Miami",
+                source: "signup:partner",
+              }),
+            }).catch(() => {});
+          });
+        }
+        setState({
+          status: "none",
+          intent: body.intent === true || fromSignup,
+        });
       }
     } catch {
       setState({ status: "error", message: "Could not load. Check your connection." });
     }
-  }, []);
+  }, [fromSignup]);
 
   useEffect(() => {
     void load();

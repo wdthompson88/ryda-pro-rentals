@@ -69,60 +69,100 @@ function Basic({ onNext }: { onNext: () => void }) {
   // without Supabase configured) the field stays editable so the demo
   // flow still works.
   const [emailLocked, setEmailLocked] = useState(false);
+  // "unknown" until getUser resolves. Continue is gated on it so an
+  // early click can't persist empty strings over provider-supplied
+  // metadata (the prefill race), and copy/persistence can be honest
+  // about whether a session exists at all.
+  const [session, setSession] = useState<"unknown" | "authed" | "anon">(
+    supabase ? "unknown" : "anon",
+  );
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!supabase) return;
     let cancelled = false;
-    supabase.auth.getUser().then(({ data }) => {
-      if (cancelled || !data.user) return;
-      if (data.user.email) {
-        setEmail(data.user.email);
-        setEmailLocked(true);
-      }
-      const meta = (data.user.user_metadata ?? {}) as Record<string, unknown>;
-      const metaFirst =
-        typeof meta.first_name === "string" ? meta.first_name : "";
-      const metaLast = typeof meta.last_name === "string" ? meta.last_name : "";
-      if (metaFirst || metaLast) {
-        setFirst(metaFirst);
-        setLast(metaLast);
-      } else {
-        // OAuth providers send a single display name — split it once
-        // here so the user can correct rather than re-type.
-        const full =
-          typeof meta.full_name === "string"
-            ? meta.full_name
-            : typeof meta.name === "string"
-              ? meta.name
-              : "";
-        const parts = full.trim().split(/\s+/).filter(Boolean);
-        if (parts.length > 0) {
-          setFirst(parts[0]);
-          setLast(parts.slice(1).join(" "));
+    supabase.auth
+      .getUser()
+      .then(({ data }) => {
+        if (cancelled) return;
+        if (!data.user) {
+          setSession("anon");
+          return;
         }
-      }
-      if (typeof meta.phone === "string") setPhone(meta.phone);
-    });
+        setSession("authed");
+        if (data.user.email) {
+          setEmail(data.user.email);
+          setEmailLocked(true);
+        }
+        const meta = (data.user.user_metadata ?? {}) as Record<
+          string,
+          unknown
+        >;
+        let metaFirst =
+          typeof meta.first_name === "string" ? meta.first_name : "";
+        let metaLast =
+          typeof meta.last_name === "string" ? meta.last_name : "";
+        if (!metaFirst && !metaLast) {
+          // OAuth providers send a single display name — split it once
+          // here so the user can correct rather than re-type.
+          const full =
+            typeof meta.full_name === "string"
+              ? meta.full_name
+              : typeof meta.name === "string"
+                ? meta.name
+                : "";
+          const parts = full.trim().split(/\s+/).filter(Boolean);
+          metaFirst = parts[0] ?? "";
+          metaLast = parts.slice(1).join(" ");
+        }
+        // Functional merges: the prefill must never clobber anything
+        // the user already typed while getUser was in flight.
+        if (metaFirst) setFirst((prev) => prev || metaFirst);
+        if (metaLast) setLast((prev) => prev || metaLast);
+        const metaPhone = typeof meta.phone === "string" ? meta.phone : "";
+        if (metaPhone) setPhone((prev) => prev || metaPhone);
+      })
+      .catch(() => {
+        if (!cancelled) setSession("anon");
+      });
     return () => {
       cancelled = true;
     };
   }, []);
 
-  function saveAndContinue() {
-    // Best-effort persistence — the wizard must keep flowing even if
-    // the metadata write fails or Supabase isn't configured.
-    if (supabase) {
-      const name = `${first.trim()} ${last.trim()}`.trim();
-      void supabase.auth
-        .updateUser({
-          data: {
-            first_name: first.trim(),
-            last_name: last.trim(),
-            name,
-            phone: phone.trim() || null,
-          },
-        })
-        .catch(() => {});
+  // Basic is the sole place name + phone are collected, so blank is
+  // not an option here — this is the validation /signup used to do.
+  const complete =
+    first.trim().length > 0 &&
+    last.trim().length > 0 &&
+    phone.trim().length > 0;
+
+  async function saveAndContinue() {
+    if (saving) return;
+    if (supabase && session === "authed") {
+      setSaving(true);
+      // Persist only real values — never write an empty string or
+      // null over metadata (GoTrue shallow-merges, so a blank write
+      // would erase a provider-supplied name/phone).
+      const f = first.trim();
+      const l = last.trim();
+      const p = phone.trim();
+      const data: Record<string, unknown> = {};
+      if (f) data.first_name = f;
+      if (l) data.last_name = l;
+      if (f || l) data.name = `${f} ${l}`.trim();
+      if (p) data.phone = p;
+      try {
+        // supabase-js RESOLVES with { error } (it doesn't reject) —
+        // check it rather than relying on .catch.
+        const { error } = await supabase.auth.updateUser({ data });
+        if (error) {
+          console.warn("[onboarding] profile save failed:", error.message);
+        }
+      } catch {
+        // Network-level failure — the wizard must keep flowing.
+      }
+      setSaving(false);
     }
     onNext();
   }
@@ -131,9 +171,17 @@ function Basic({ onNext }: { onNext: () => void }) {
     <div>
       <h2 className="font-display text-2xl text-ink">Tell us about you.</h2>
       <p className="mt-2 text-sm text-ink-soft">
-        Your email carries over from sign-in — just add your name and
-        number. You'll never be asked for these again.
+        {emailLocked
+          ? "Your email carries over from sign-in — just add your name and number. You'll never be asked for these again."
+          : "We'll start with the basics. Takes 30 seconds."}
       </p>
+      {session === "anon" && supabase && (
+        <p className="mt-4 rounded-xl border border-rule bg-cream-2/40 p-3 text-xs text-ink-soft">
+          You're not signed in yet — confirm your email (check your
+          inbox) and sign in first so these details save to your
+          account. You can still preview the steps now.
+        </p>
+      )}
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Field
           label="First name"
@@ -165,7 +213,11 @@ function Basic({ onNext }: { onNext: () => void }) {
           onChange={setPhone}
         />
       </div>
-      <NextButton onClick={saveAndContinue} />
+      <NextButton
+        onClick={() => void saveAndContinue()}
+        disabled={session === "unknown" || !complete || saving}
+        label={saving ? "Saving" : "Continue"}
+      />
     </div>
   );
 }
@@ -431,6 +483,7 @@ function Field({
         placeholder={placeholder}
         autoComplete={autoComplete}
         readOnly={readOnly}
+        aria-describedby={hint ? `${id}-hint` : undefined}
         {...(value !== undefined
           ? { value, onChange: (e) => onChange?.(e.target.value) }
           : {})}
@@ -438,7 +491,11 @@ function Field({
           readOnly ? "cursor-default bg-cream-2/60 text-ink-soft" : "bg-cream"
         }`}
       />
-      {hint ? <p className="mt-1.5 text-[11px] text-mute">{hint}</p> : null}
+      {hint ? (
+        <p id={`${id}-hint`} className="mt-1.5 text-[11px] text-mute">
+          {hint}
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -477,11 +534,20 @@ function Bullet({ children, ok }: { children: React.ReactNode; ok?: boolean }) {
   );
 }
 
-function NextButton({ onClick, label = "Continue" }: { onClick: () => void; label?: string }) {
+function NextButton({
+  onClick,
+  label = "Continue",
+  disabled,
+}: {
+  onClick: () => void;
+  label?: string;
+  disabled?: boolean;
+}) {
   return (
     <button
       onClick={onClick}
-      className="mt-10 h-12 w-full rounded-full bg-red px-7 text-sm font-medium text-cream hover:bg-red-deep"
+      disabled={disabled}
+      className="mt-10 h-12 w-full rounded-full bg-red px-7 text-sm font-medium text-cream hover:bg-red-deep disabled:cursor-not-allowed disabled:opacity-50"
     >
       {label} →
     </button>
