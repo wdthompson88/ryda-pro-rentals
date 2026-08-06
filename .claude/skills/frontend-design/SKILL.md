@@ -56,7 +56,7 @@ Two fonts, loaded via `next/font` and mapped to CSS variables in globals.css:
 
 Sizes — use Tailwind's default scale, no custom tracking. Common patterns visible in the codebase:
 
-- **Card titles**: `font-display text-xl text-ink leading-tight`
+- **Card titles**: `font-display text-xl text-ink leading-tight` (dense listing cards only: `text-lg` — see Component patterns → Dense listing card)
 - **Prices**: `font-display text-2xl text-ink tabular-nums` (always tabular for numerals)
 - **Section headers**: `font-display text-3xl md:text-4xl text-ink`
 - **Body**: `text-sm text-ink-soft leading-relaxed`
@@ -70,7 +70,7 @@ Sizes — use Tailwind's default scale, no custom tracking. Common patterns visi
 Tailwind default spacing scale (4px base, so `p-4` = 16px, `gap-6` = 24px, etc.). The codebase consistently uses these intervals:
 
 - **Section vertical padding**: `py-16 md:py-24` (64–96px)
-- **Card padding**: `p-5` (20px)
+- **Card padding**: `p-5` (20px) (dense listing cards only: `p-4` — see Component patterns → Dense listing card)
 - **Grid gaps**: `gap-6` (24px) for card grids, `gap-3` (12px) for inline element groups
 - **Stack within cards**: `mt-3` between info clusters, `mt-4` for new sections within the card
 
@@ -96,6 +96,22 @@ Tailwind default spacing scale (4px base, so `p-4` = 16px, `gap-6` = 24px, etc.)
 </div>
 ```
 Hover variant adds `hover:border-ink/40 hover:shadow-lg` (or use framer-motion `whileHover` for spring physics — see `src/components/portfolio-listings.tsx` for the spring values).
+
+### Dense listing card (marketplace browse grids only)
+
+A sanctioned one-step-denser variant for high-inventory browse grids (4-up at `xl`, e.g. the `/rent` marketplace) where the **photo carries the price chip and badges**, so the body is only three short lines: `p-4` body padding and `font-display text-lg` title. Everything else keeps the standard card grammar — `rounded-2xl border border-rule bg-surface`, `rounded-full` chips, Fraunces + `tabular-nums` prices, `hover:border-ink/40 hover:shadow-lg`.
+
+```tsx
+<Link className="group flex flex-col overflow-hidden rounded-2xl border border-rule bg-surface transition-all hover:-translate-y-0.5 hover:border-ink/40 hover:shadow-lg">
+  {/* photo block carries brand/status badges + a bg-ink/85 price chip */}
+  <div className="flex flex-1 flex-col p-4">
+    <h3 className="font-display text-lg leading-tight text-ink">Model</h3>
+    ...
+  </div>
+</Link>
+```
+
+**Only** use this when the price lives on the photo (as a `bg-ink/85` chip with `text-cream` — ≈11.4:1). A card whose body shows the price stays `p-5`/`text-xl`; `src/components/portfolio-listings.tsx` remains the canonical standard card. Reference implementation: `src/components/rental-listings.tsx`. Don't mix the two densities within one grid.
 
 ### Pill / status badge
 ```tsx

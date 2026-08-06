@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { SiteHeader } from "@/components/site-header";
-import { RentalListings } from "@/components/rental-listings";
+import {
+  RentalListings,
+  RentalListingsFromUrl,
+} from "@/components/rental-listings";
 
 // /rent — the canonical browse page (founder decision, Aug 2026):
 // "/" is a full landing page that tells the story; the car-browsing
@@ -24,6 +28,14 @@ export const metadata: Metadata = {
 };
 
 export default function RentPage() {
+  // Deliberately NO searchParams prop here: searchParams is a
+  // request-time API and awaiting it would silently flip this page —
+  // the primary conversion surface, backed by fully static in-repo
+  // inventory — from a static prerender to per-request dynamic
+  // rendering. ?q= (landing-page hero search) is instead read
+  // client-side by RentalListingsFromUrl inside the Suspense boundary
+  // below, which keeps the route static.
+
   return (
     <>
       <SiteHeader />
@@ -55,9 +67,17 @@ export default function RentPage() {
 
       {/* Full marketplace grid — merged partner + rental-available RYDA
           inventory. RentalListings owns the search/filter bar, the
-          vehicle-count strip, and the card grid. */}
+          vehicle-count strip, and the card grid.
+
+          useSearchParams suspends during prerender, so the unfiltered
+          grid is the Suspense fallback: the static HTML ships the full
+          inventory (SEO + no layout hole), and on hydration the
+          URL-aware wrapper takes over, seeding ?q= and remounting the
+          grid whenever the query in the URL changes. */}
       <section id="available" aria-label="Available rentals">
-        <RentalListings />
+        <Suspense fallback={<RentalListings />}>
+          <RentalListingsFromUrl />
+        </Suspense>
       </section>
     </>
   );

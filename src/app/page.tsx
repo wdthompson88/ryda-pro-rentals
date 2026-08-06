@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
+import { HeroSearch } from "@/components/hero-search";
 import { Reveal, RevealStagger } from "@/components/reveal";
 import { VEHICLES, formatUSD } from "@/lib/market-data";
 import {
@@ -105,6 +106,13 @@ export default function HomePage() {
               >
                 How it works →
               </Link>
+            </div>
+
+            {/* Hero search — straight into /rent with ?q= applied. Sits
+                between the CTA row and the hero image; max-w-xl keeps
+                the composition balanced against the max-w-2xl copy. */}
+            <div className="mt-6 max-w-xl">
+              <HeroSearch />
             </div>
           </Reveal>
 
