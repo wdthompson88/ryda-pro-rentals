@@ -112,6 +112,7 @@ const SUB_ROUTES = [
   { href: "/admin/calendar", label: "Calendar", note: "booking calendar" },
   { href: "/admin/creative", label: "Creative", note: "marketing generation queue" },
   { href: "/admin/documents", label: "Documents", note: "sample packet + legal templates" },
+  { href: "/admin/partners", label: "Partners", note: "fleet partner applications" },
   { href: "/admin/prospects", label: "Prospects", note: "founding cohort CRM" },
   { href: "/admin/disputes", label: "Disputes", note: "Stripe chargebacks" },
   { href: "/admin/llc", label: "LLCs", note: "formation + members" },

@@ -27,10 +27,22 @@ function readIsAdmin(user: User | null): boolean {
   return meta?.role === "admin";
 }
 
+// isPartner reads partner_intent from user_metadata — which IS
+// user-editable, so unlike isAdmin this is purely a UI affordance
+// (showing the /partner header pill). The dashboard itself is gated
+// by /api/partner/me against the server-owned partner_accounts table,
+// so a self-set flag buys nothing but a link to a sign-in-walled page.
+function readIsPartner(user: User | null): boolean {
+  if (!user) return false;
+  const meta = user.user_metadata as { partner_intent?: unknown } | undefined;
+  return meta?.partner_intent === true;
+}
+
 export function useAuthStatus(): {
   status: AuthStatus;
   user: User | null;
   isAdmin: boolean;
+  isPartner: boolean;
 } {
   const [status, setStatus] = useState<AuthStatus>("loading");
   const [user, setUser] = useState<User | null>(null);
@@ -85,5 +97,10 @@ export function useAuthStatus(): {
     };
   }, []);
 
-  return { status, user, isAdmin: readIsAdmin(user) };
+  return {
+    status,
+    user,
+    isAdmin: readIsAdmin(user),
+    isPartner: readIsPartner(user),
+  };
 }

@@ -90,7 +90,7 @@ export default function PartnersPage() {
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
             <Link
-              href="/contact?type=Partnership&note=Fleet%20Partner%20Program%20application"
+              href="/signup?as=partner"
               className="inline-flex h-12 items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream transition-colors hover:bg-red"
             >
               Apply to list your fleet →
@@ -161,7 +161,7 @@ export default function PartnersPage() {
       {/* CTA */}
       <section className="border-b border-rule bg-ink text-cream">
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red-bright">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
             Let&apos;s talk
           </p>
           <h2 className="mt-3 font-display text-3xl sm:text-4xl">
@@ -174,10 +174,19 @@ export default function PartnersPage() {
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
-              href="/contact?type=Partnership&note=Fleet%20Partner%20Program%20application"
+              href="/signup?as=partner"
               className="inline-flex h-12 items-center justify-center rounded-full bg-red px-7 text-sm font-medium text-cream hover:bg-red-deep"
             >
-              Get in touch →
+              Apply as a partner →
+            </Link>
+            {/* type must be "Partnership" — the only partner-ish value
+                in the contact form's VALID_TYPES; anything else lands
+                as "Other" with no triage intent. */}
+            <Link
+              href="/contact?type=Partnership&note=Fleet%20Partner%20Program%20question"
+              className="inline-flex h-12 items-center justify-center rounded-full border border-cream/30 px-7 text-sm font-medium text-cream hover:border-cream"
+            >
+              Ask a question first
             </Link>
             <Link
               href="mailto:partners@ryda.pro"
