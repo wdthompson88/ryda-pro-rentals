@@ -4,16 +4,22 @@ import Link from "next/link";
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
+import { OAuthButtons } from "@/components/oauth-buttons";
 import { supabase } from "@/lib/supabase";
 import { safeNext } from "@/lib/safe-next";
 
 // /signup, traditional account creation (modeled on the mainstable
 // signup: minimal fields, neutral copy, passive consent line — NOT an
-// application funnel). Name + email + password; identity, age (28+),
-// and preferences live in the guided onboarding AFTER the account
-// exists. Preserves `?next=` so post-onboarding the member is returned
-// to the gated action they tried to take (e.g. claim a share, request
-// a rental). Real auth ships at Miami launch.
+// application funnel). Email + password ONLY — name and phone are
+// entered exactly once, in the onboarding Basic step, where email
+// autofills from the session. That keeps the flow identical across
+// auth methods: social sign-ins (OAuthButtons; Google/Facebook/
+// Microsoft as providers get configured) skip this form entirely and
+// land in the same onboarding with the provider's profile prefilled.
+// Identity, age (28+), and preferences live in onboarding/KYC.
+// Preserves `?next=` so post-onboarding the member is returned to the
+// gated action they tried to take (e.g. claim a share, request a
+// rental). Real auth ships at Miami launch.
 
 export default function SignUpPage() {
   // The form lives inside a Suspense boundary because it depends on
@@ -57,8 +63,6 @@ function SignUpPageInner() {
     };
   }, [router, next]);
 
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -78,20 +82,13 @@ function SignUpPageInner() {
       ? "Browsing is open to everyone, we just need an account before you can transact. 60 seconds."
       : "Free to join. An account unlocks rentals, bookings, and co-ownership — browsing stays open to everyone.";
 
-  // Composed display/legal name for surfaces that want one string
-  // (waitlist, emails). The split parts are what downstream identity
-  // flows use — KYC verified outputs and the onboarding form are
-  // already first/last shaped.
-  const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
-
-  // Traditional setup: no attestation checkboxes here. Identity, age
-  // (28+), and preferences all live in onboarding/booking; ToS/privacy
-  // consent is the passive line under the submit button.
-  const ready =
-    firstName.trim().length >= 1 &&
-    lastName.trim().length >= 1 &&
-    email.includes("@") &&
-    password.length >= 8;
+  // Email + password is the whole form. Name and phone are collected
+  // once in onboarding (email autofills there from the session), so
+  // password and social signups converge on the same steps. No
+  // attestation checkboxes: identity, age (28+), and preferences live
+  // in onboarding/booking; ToS/privacy consent is the passive line
+  // under the submit button.
+  const ready = email.includes("@") && password.length >= 8;
 
   const [error, setError] = useState<string | null>(null);
 
@@ -111,7 +108,6 @@ function SignUpPageInner() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         email,
-        name: fullName,
         market: "Miami",
         source: reason ? `signup:${reason}` : "signup",
       }),
@@ -138,12 +134,12 @@ function SignUpPageInner() {
             // `members` table that the rental API checks before any
             // booking can be created.
             data: {
-              // Split parts are canonical (matches KYC verified-output
-              // and onboarding field shape); `name` stays as the
-              // composed string so existing consumers keep working.
-              first_name: firstName.trim(),
-              last_name: lastName.trim(),
-              name: fullName,
+              // Name/phone are NOT collected here — the onboarding
+              // Basic step writes first_name/last_name/name/phone to
+              // user_metadata exactly once, prefilled from whatever
+              // the auth method already knows (OAuth providers send
+              // name + email themselves).
+              //
               // No marketing opt-in exists at signup (traditional
               // setup). Explicit false matters on this branch: the
               // account profile and rental-inquiry form treat an
@@ -224,28 +220,12 @@ function SignUpPageInner() {
           <p className="mt-2 text-sm text-ink-soft">{reasonSub}</p>
 
           <form className="mt-7 space-y-4" onSubmit={onSubmit}>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <Field
-                label="First name"
-                id="signup-first-name"
-                type="text"
-                placeholder="Jane"
-                value={firstName}
-                onChange={setFirstName}
-                autoComplete="given-name"
-                required
-              />
-              <Field
-                label="Last name"
-                id="signup-last-name"
-                type="text"
-                placeholder="Doe"
-                value={lastName}
-                onChange={setLastName}
-                autoComplete="family-name"
-                required
-              />
-            </div>
+            {/* Social sign-in (renders only for providers enabled via
+                NEXT_PUBLIC_AUTH_PROVIDERS). Same /auth/callback → next
+                routing as email confirmation, so onboarding works
+                identically for every method. */}
+            <OAuthButtons next={next} verb="Sign up" />
+
             <Field
               label="Email"
               id="signup-email"
