@@ -56,9 +56,9 @@ export function InvestorInquiryForm() {
 
   if (status === "success") {
     return (
-      <div className="mx-auto mt-10 max-w-xl rounded-2xl border border-cream/20 bg-cream/5 px-6 py-10 text-cream">
+      <div className="mx-auto mt-10 max-w-xl rounded-2xl border border-rule bg-surface px-6 py-10 text-ink">
         <p className="font-display text-2xl">Thanks, we'll be in touch.</p>
-        <p className="mt-3 text-sm text-cream/70">
+        <p className="mt-3 text-sm text-ink-soft">
           We send the deck to qualified investors within 24 hours, followed by a call to walk through diligence materials.
         </p>
       </div>
@@ -78,13 +78,13 @@ export function InvestorInquiryForm() {
           id="investor-check-size"
           name="check_size"
           defaultValue=""
-          className="h-12 w-full rounded-full border border-cream/20 bg-cream/5 px-5 text-sm text-cream focus:border-red focus:outline-none focus:ring-2 focus:ring-red/30"
+          className="h-12 w-full rounded-full border border-rule bg-surface px-5 text-sm text-ink focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
         >
           <option value="" disabled>
             Anticipated check size
           </option>
           {CHECK_SIZES.map((s) => (
-            <option key={s} value={s} className="bg-ink">
+            <option key={s} value={s}>
               {s}
             </option>
           ))}
@@ -99,7 +99,7 @@ export function InvestorInquiryForm() {
           name="notes"
           placeholder="Anything we should know? (optional)"
           rows={4}
-          className="w-full rounded-2xl border border-cream/20 bg-cream/5 px-5 py-3 text-sm text-cream placeholder:text-cream/50 focus:border-red focus:outline-none focus:ring-2 focus:ring-red/30"
+          className="w-full rounded-2xl border border-rule bg-surface px-5 py-3 text-sm text-ink placeholder:text-mute focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
         />
       </div>
       <button
@@ -135,7 +135,7 @@ function Input({
         id={id}
         placeholder={label}
         aria-required={props.required || undefined}
-        className="h-12 w-full rounded-full border border-cream/20 bg-cream/5 px-5 text-cream placeholder:text-cream/50 focus:border-red focus:outline-none focus:ring-2 focus:ring-red/30"
+        className="h-12 w-full rounded-full border border-rule bg-surface px-5 text-ink placeholder:text-mute focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
       />
     </div>
   );

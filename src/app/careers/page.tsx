@@ -105,7 +105,7 @@ export default function CareersPage() {
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
           <h2 className="font-display text-3xl sm:text-4xl">Don't see your role?</h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
-            <Link href="/contact?type=Other#form" className="text-red hover:text-red-deep">
+            <Link href="/contact?type=Other#form" className="text-red-bright hover:text-cream">
               Send us a message
             </Link>{" "}
             with what you'd build at RYDA. The best applications make a

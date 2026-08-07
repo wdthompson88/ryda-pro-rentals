@@ -285,7 +285,7 @@ function pillTone(status: string): string {
     return "bg-success/15 text-success-deep";
   if (status === "canceled" || status === "rejected" || status === "expired")
     return "bg-mute/15 text-mute line-through";
-  if (status === "pending") return "bg-amber-500/20 text-amber-800";
+  if (status === "pending") return "bg-warn/15 text-warn-deep";
   return "bg-marine/15 text-marine-deep";
 }
 

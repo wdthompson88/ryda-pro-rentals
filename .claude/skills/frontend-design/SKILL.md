@@ -11,29 +11,39 @@ The brand position is **quiet luxury** — Aman, Loro Piana, Tom Ford website-er
 
 ## Color tokens
 
-All colors are CSS custom properties defined in `src/app/globals.css` and surfaced as Tailwind utilities via `@theme inline`. **Never use hex values directly in components — always reference tokens.** Both light and dark modes have full token sets; the same token name resolves to mode-appropriate values automatically.
+All colors are CSS custom properties defined in `src/app/globals.css` and surfaced as Tailwind utilities via `@theme inline`. **Never use hex values directly in components — always reference tokens.**
 
-| Token | Tailwind | Light | Dark | Use for |
+**The site is light-only.** Dark mode was removed in 2026-08 for readability — one token set, no theme toggle, no `data-theme`. Deliberately dark surfaces still exist (the homepage splitter, `bg-ink` CTA bands, photo scrims, the intro veil) but they are token-driven islands on a light site, not a theme.
+
+| Token | Tailwind | Value | Contrast on cream | Use for |
 |---|---|---|---|---|
-| `cream` | `bg-cream` | `#F4F1EC` | `#0E0E10` | Page background |
-| `cream-2` | `bg-cream-2` | `#E9E4D8` | `#161618` | Section variant (subtle band separating areas) |
-| `surface` | `bg-surface` | `#FFFFFF` | `#1B1B1F` | Card backgrounds |
-| `surface-2` | `bg-surface-2` | `#F0EBDF` | `#232328` | Card hover / elevated surface |
-| `ink` | `text-ink` | `#0E0E10` | `#F4F1EC` | Primary text |
-| `ink-soft` | `text-ink-soft` | `#3A3A3D` | `#B8B2A8` | Secondary text |
-| `mute` | `text-mute` / `border-mute` | `#6A655F` | `#9A9590` | Tertiary text + hairline borders. Bumped to AA. |
-| `rule` | `border-rule` | `#D8D3C8` | `#2A2A2E` | Hairline dividers (1px) |
-| `red` | `text-red` / `bg-red` | `#C03030` | `#DC4747` | Brand action (CTAs, important indicators) |
-| `red-deep` | `bg-red-deep` | `#9C2424` | `#ED5C5C` | Hover state for `red` |
-| `gold` | `text-gold` | `#A88340` | `#C9A66B` | Premium tier accent (Black tier only — sparing use) |
-| `marine` | `text-marine` | `#1E5DAB` | `#4A90D9` | Boats vertical accent (vs cars=red) |
-| `success` | `bg-success` | `#2E8459` | `#5FB58A` | Positive economic indicators (rental net positive, etc.) |
+| `cream` | `bg-cream` | `#F4F1EC` | — | Page background (warm off-white) |
+| `cream-2` | `bg-cream-2` | `#E9E4D8` | — | Section variant (subtle band separating areas) |
+| `surface` | `bg-surface` | `#FFFFFF` | — | Card backgrounds |
+| `surface-2` | `bg-surface-2` | `#F0EBDF` | — | Card hover / elevated surface |
+| `ink` | `text-ink` | `#0E0E10` | 17.1:1 | Primary text |
+| `ink-soft` | `text-ink-soft` | `#3A3A3D` | 10.1:1 (AAA) | Secondary text |
+| `mute` | `text-mute` / `border-mute` | `#514C47` | 7.5:1 (AAA) | Tertiary text + hairline borders |
+| `rule` | `border-rule` | `#D8D3C8` | — | Hairline dividers (1px) |
+| `red` | `text-red` / `bg-red` | `#C03030` | 5.0:1 (AA) | Brand action (CTAs, important indicators) |
+| `red-deep` | `bg-red-deep` | `#9C2424` | 6.9:1 | Hover state for `red` |
+| `gold` | `text-gold` | `#7D6029` | 5.2:1 (AA) | Premium tier accent (Black tier only — sparing use) |
+| `marine` | `text-marine` | `#1E5DAB` | 5.8:1 (AA) | Boats vertical accent (vs cars=red) |
+| `marine-deep` | `text-marine-deep` | `#143C75` | 10.4:1 | Hover for `marine`; Blue-tier accent |
+| `success` | `bg-success` | `#256B48` | 5.7:1 (AA) | Positive economic indicators (rental net positive, etc.) |
+| `success-deep` | `text-success-deep` | `#1F5C3D` | 7.0:1 (AAA) | Success text at small sizes |
+| `warn` | `bg-warn` | `#8A5710` | 5.4:1 | Warning/pending washes (`bg-warn/15`), status dots |
+| `warn-deep` | `text-warn-deep` | `#6E4708` | 7.3:1 (AAA) | Warning/pending text — never Tailwind `amber-*` |
+| `red-bright` | `text-red-bright` | `#DC4747` | on ink 4.6:1 | Red accent **on `bg-ink` bands only** — never on cream |
+| `marine-bright` | `text-marine-bright` | `#4A90D9` | on ink 5.8:1 | Marine accent **on `bg-ink` bands only** — never on cream |
 
 **Rules:**
-- **No raw hex** anywhere in component code. If you need a color that's not in the table, raise it; don't invent.
+- **No raw hex** anywhere in component code. If you need a color that's not in the table, raise it; don't invent. (Standalone render contexts — OG images, PDFs, emails — structurally need literals; use the palette values above.)
 - **Don't mix vertical accents** — cars context uses `red`, boats context uses `marine`. They never appear in the same component cluster.
 - **Gold is rare** — only on Black-tier membership UI, premium document watermarks, Founder badge. Overusing it cheapens it.
-- **AA contrast minimum** — every color combo passes WCAG AA. Don't introduce a new combo without checking.
+- **Contrast: AA minimum, AAA for muted text.** Body/secondary/caption text targets 7:1 (`ink-soft`, `mute`, `warn-deep` all clear it). Accents used as text must clear 4.5:1. Don't introduce a new combo without checking.
+- **On `bg-ink` bands, use the `-bright` accents.** Standard `red`/`marine` are tuned for cream and fail AA on ink. Never use `red-bright`/`marine-bright` on light surfaces.
+- **Don't fade text with opacity modifiers** (`text-mute/70`, `text-ink/50`) — that's how faint-gray-text creep starts. On dark bands, cream text needs at least `/70` (`text-cream/70` ≈ 8.5:1 on ink).
 
 ## Typography
 
@@ -46,7 +56,7 @@ Two fonts, loaded via `next/font` and mapped to CSS variables in globals.css:
 
 Sizes — use Tailwind's default scale, no custom tracking. Common patterns visible in the codebase:
 
-- **Card titles**: `font-display text-xl text-ink leading-tight`
+- **Card titles**: `font-display text-xl text-ink leading-tight` (dense listing cards only: `text-lg` — see Component patterns → Dense listing card)
 - **Prices**: `font-display text-2xl text-ink tabular-nums` (always tabular for numerals)
 - **Section headers**: `font-display text-3xl md:text-4xl text-ink`
 - **Body**: `text-sm text-ink-soft leading-relaxed`
@@ -60,7 +70,7 @@ Sizes — use Tailwind's default scale, no custom tracking. Common patterns visi
 Tailwind default spacing scale (4px base, so `p-4` = 16px, `gap-6` = 24px, etc.). The codebase consistently uses these intervals:
 
 - **Section vertical padding**: `py-16 md:py-24` (64–96px)
-- **Card padding**: `p-5` (20px)
+- **Card padding**: `p-5` (20px) (dense listing cards only: `p-4` — see Component patterns → Dense listing card)
 - **Grid gaps**: `gap-6` (24px) for card grids, `gap-3` (12px) for inline element groups
 - **Stack within cards**: `mt-3` between info clusters, `mt-4` for new sections within the card
 
@@ -86,6 +96,22 @@ Tailwind default spacing scale (4px base, so `p-4` = 16px, `gap-6` = 24px, etc.)
 </div>
 ```
 Hover variant adds `hover:border-ink/40 hover:shadow-lg` (or use framer-motion `whileHover` for spring physics — see `src/components/portfolio-listings.tsx` for the spring values).
+
+### Dense listing card (marketplace browse grids only)
+
+A sanctioned one-step-denser variant for high-inventory browse grids (4-up at `xl`, e.g. the `/rent` marketplace) where the **photo carries the price chip and badges**, so the body is only three short lines: `p-4` body padding and `font-display text-lg` title. Everything else keeps the standard card grammar — `rounded-2xl border border-rule bg-surface`, `rounded-full` chips, Fraunces + `tabular-nums` prices, `hover:border-ink/40 hover:shadow-lg`.
+
+```tsx
+<Link className="group flex flex-col overflow-hidden rounded-2xl border border-rule bg-surface transition-all hover:-translate-y-0.5 hover:border-ink/40 hover:shadow-lg">
+  {/* photo block carries brand/status badges + a bg-ink/85 price chip */}
+  <div className="flex flex-1 flex-col p-4">
+    <h3 className="font-display text-lg leading-tight text-ink">Model</h3>
+    ...
+  </div>
+</Link>
+```
+
+**Only** use this when the price lives on the photo (as a `bg-ink/85` chip with `text-cream` — ≈11.4:1). A card whose body shows the price stays `p-5`/`text-xl`; `src/components/portfolio-listings.tsx` remains the canonical standard card. Reference implementation: `src/components/rental-listings.tsx`. Don't mix the two densities within one grid.
 
 ### Pill / status badge
 ```tsx

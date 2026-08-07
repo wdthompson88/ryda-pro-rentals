@@ -20,6 +20,13 @@ export type AdminAction =
   | "purchase_marked_paid"
   | "role_granted"
   | "role_revoked"
+  | "partner_status_changed"
+  // Operator roster (partners, 0041). Post-unification these are
+  // partner-program lifecycle events, not bookkeeping: commission_rate
+  // is RYDA's application fee on every live charge, and status
+  // active/paused is the switch that blocks or restores payment links.
+  | "partner_operator_created"
+  | "partner_operator_updated"
   | "email_sent";
 
 /** Record one admin action. Returns true on durable persistence. */

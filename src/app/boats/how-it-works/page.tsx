@@ -43,7 +43,7 @@ export default function BoatsHowItWorks() {
             Lifecycle
           </p>
           <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
-            From application to your first run.
+            From sign-up to your first run.
           </h2>
           <div className="mt-12 grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-5">
             {HOW_IT_WORKS_STEPS.map((s) => (

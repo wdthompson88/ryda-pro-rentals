@@ -1591,7 +1591,7 @@ export const HELP: HelpCategory[] = [
           },
           {
             type: "p",
-            text: "All 100 early shares are allocated by application order, with priority weighting for members in launch markets and members making early share commitments.",
+            text: "All 100 early shares are allocated by sign-up order, with priority weighting for members in launch markets and members making early share commitments.",
           },
         ],
       },

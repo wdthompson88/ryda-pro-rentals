@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { StepProgress } from "@/components/step-progress";
+import { supabase } from "@/lib/supabase";
 
 const STEPS = ["Basic", "Phone", "Personal", "Identity", "Financial", "Tier", "Done"];
 
@@ -17,7 +18,7 @@ export default function OnboardingPage() {
       <SiteHeader />
       <section className="mx-auto max-w-2xl px-6 py-12 sm:px-10 sm:py-16">
         <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-          Membership application
+          Member onboarding
         </p>
         <h1 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
           {STEPS[step] === "Done"
@@ -51,20 +52,172 @@ export default function OnboardingPage() {
 
 // ── Step components ─────────────────────────────────────────────
 
+// Basic — the ONE place name + phone are ever typed. Email autofills
+// from the auth session (typed once at signup, or supplied by the
+// OAuth provider) and is read-only when known. Name prefills from
+// whatever the sign-in method already told us: social providers put
+// name/full_name in user_metadata, so a Google/Facebook/Microsoft
+// signup usually just confirms and continues. On continue, the values
+// persist to user_metadata so no later step ever re-asks.
 function Basic({ onNext }: { onNext: () => void }) {
+  const [first, setFirst] = useState("");
+  const [last, setLast] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  // True once the session supplied the email — the field locks then,
+  // it's an account fact, not a preference. Without a session (or
+  // without Supabase configured) the field stays editable so the demo
+  // flow still works.
+  const [emailLocked, setEmailLocked] = useState(false);
+  // "unknown" until getUser resolves. Continue is gated on it so an
+  // early click can't persist empty strings over provider-supplied
+  // metadata (the prefill race), and copy/persistence can be honest
+  // about whether a session exists at all.
+  const [session, setSession] = useState<"unknown" | "authed" | "anon">(
+    supabase ? "unknown" : "anon",
+  );
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!supabase) return;
+    let cancelled = false;
+    supabase.auth
+      .getUser()
+      .then(({ data }) => {
+        if (cancelled) return;
+        if (!data.user) {
+          setSession("anon");
+          return;
+        }
+        setSession("authed");
+        if (data.user.email) {
+          setEmail(data.user.email);
+          setEmailLocked(true);
+        }
+        const meta = (data.user.user_metadata ?? {}) as Record<
+          string,
+          unknown
+        >;
+        let metaFirst =
+          typeof meta.first_name === "string" ? meta.first_name : "";
+        let metaLast =
+          typeof meta.last_name === "string" ? meta.last_name : "";
+        if (!metaFirst && !metaLast) {
+          // OAuth providers send a single display name — split it once
+          // here so the user can correct rather than re-type.
+          const full =
+            typeof meta.full_name === "string"
+              ? meta.full_name
+              : typeof meta.name === "string"
+                ? meta.name
+                : "";
+          const parts = full.trim().split(/\s+/).filter(Boolean);
+          metaFirst = parts[0] ?? "";
+          metaLast = parts.slice(1).join(" ");
+        }
+        // Functional merges: the prefill must never clobber anything
+        // the user already typed while getUser was in flight.
+        if (metaFirst) setFirst((prev) => prev || metaFirst);
+        if (metaLast) setLast((prev) => prev || metaLast);
+        const metaPhone = typeof meta.phone === "string" ? meta.phone : "";
+        if (metaPhone) setPhone((prev) => prev || metaPhone);
+      })
+      .catch(() => {
+        if (!cancelled) setSession("anon");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Basic is the sole place name + phone are collected, so blank is
+  // not an option here — this is the validation /signup used to do.
+  const complete =
+    first.trim().length > 0 &&
+    last.trim().length > 0 &&
+    phone.trim().length > 0;
+
+  async function saveAndContinue() {
+    if (saving) return;
+    if (supabase && session === "authed") {
+      setSaving(true);
+      // Persist only real values — never write an empty string or
+      // null over metadata (GoTrue shallow-merges, so a blank write
+      // would erase a provider-supplied name/phone).
+      const f = first.trim();
+      const l = last.trim();
+      const p = phone.trim();
+      const data: Record<string, unknown> = {};
+      if (f) data.first_name = f;
+      if (l) data.last_name = l;
+      if (f || l) data.name = `${f} ${l}`.trim();
+      if (p) data.phone = p;
+      try {
+        // supabase-js RESOLVES with { error } (it doesn't reject) —
+        // check it rather than relying on .catch.
+        const { error } = await supabase.auth.updateUser({ data });
+        if (error) {
+          console.warn("[onboarding] profile save failed:", error.message);
+        }
+      } catch {
+        // Network-level failure — the wizard must keep flowing.
+      }
+      setSaving(false);
+    }
+    onNext();
+  }
+
   return (
     <div>
       <h2 className="font-display text-2xl text-ink">Tell us about you.</h2>
       <p className="mt-2 text-sm text-ink-soft">
-        We'll start with the basics. Takes 30 seconds.
+        {emailLocked
+          ? "Your email carries over from sign-in — just add your name and number. You'll never be asked for these again."
+          : "We'll start with the basics. Takes 30 seconds."}
       </p>
+      {session === "anon" && supabase && (
+        <p className="mt-4 rounded-xl border border-rule bg-cream-2/40 p-3 text-xs text-ink-soft">
+          You're not signed in yet — confirm your email (check your
+          inbox) and sign in first so these details save to your
+          account. You can still preview the steps now.
+        </p>
+      )}
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Field label="First name" autoComplete="given-name" />
-        <Field label="Last name" autoComplete="family-name" />
-        <Field label="Email" type="email" autoComplete="email" />
-        <Field label="Phone" type="tel" placeholder="+1" autoComplete="tel" />
+        <Field
+          label="First name"
+          autoComplete="given-name"
+          value={first}
+          onChange={setFirst}
+        />
+        <Field
+          label="Last name"
+          autoComplete="family-name"
+          value={last}
+          onChange={setLast}
+        />
+        <Field
+          label="Email"
+          type="email"
+          autoComplete="email"
+          value={email}
+          onChange={setEmail}
+          readOnly={emailLocked}
+          hint={emailLocked ? "From your sign-in." : undefined}
+        />
+        <Field
+          label="Phone"
+          type="tel"
+          placeholder="+1"
+          autoComplete="tel"
+          value={phone}
+          onChange={setPhone}
+        />
       </div>
-      <NextButton onClick={onNext} />
+      <NextButton
+        onClick={() => void saveAndContinue()}
+        disabled={session === "unknown" || !complete || saving}
+        label={saving ? "Saving" : "Continue"}
+      />
     </div>
   );
 }
@@ -262,16 +415,17 @@ function Done() {
       </div>
       <h2 className="mt-6 font-display text-3xl text-ink">You're in.</h2>
       <p className="mt-3 text-base text-ink-soft">
-        Welcome to RYDA. Your application is under review, we'll send a
-        decision within 5 business days.
+        Welcome to RYDA. Your account is active — identity verification
+        usually clears within minutes, and we'll email you the moment
+        it does.
       </p>
       <div className="mt-8 rounded-xl border border-rule bg-cream-2/40 p-5 text-left text-sm">
-        <p className="font-medium text-ink">Member #00104, Pending review</p>
+        <p className="font-medium text-ink">Member #00104</p>
         <ul className="mt-3 space-y-2 text-ink-soft">
-          <li>· Identity verification: Submitted</li>
+          <li>· Identity verification: Processing</li>
           <li>· Financial qualification: Submitted</li>
           <li>· Membership tier: RYDA Core</li>
-          <li>· Status: Under review</li>
+          <li>· Status: Active</li>
         </ul>
       </div>
       <Link
@@ -297,11 +451,21 @@ function Field({
   type = "text",
   placeholder,
   autoComplete,
+  value,
+  onChange,
+  readOnly,
+  hint,
 }: {
   label: string;
   type?: string;
   placeholder?: string;
   autoComplete?: string;
+  /** Controlled mode — pass with onChange. Omit for the mock steps
+   *  that don't persist yet. */
+  value?: string;
+  onChange?: (v: string) => void;
+  readOnly?: boolean;
+  hint?: string;
 }) {
   const id = fieldId(label);
   return (
@@ -318,8 +482,20 @@ function Field({
         type={type}
         placeholder={placeholder}
         autoComplete={autoComplete}
-        className="mt-2 h-12 w-full rounded-xl border border-rule bg-cream px-4 text-sm text-ink placeholder:text-mute focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
+        readOnly={readOnly}
+        aria-describedby={hint ? `${id}-hint` : undefined}
+        {...(value !== undefined
+          ? { value, onChange: (e) => onChange?.(e.target.value) }
+          : {})}
+        className={`mt-2 h-12 w-full rounded-xl border border-rule px-4 text-sm text-ink placeholder:text-mute focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20 ${
+          readOnly ? "cursor-default bg-cream-2/60 text-ink-soft" : "bg-cream"
+        }`}
       />
+      {hint ? (
+        <p id={`${id}-hint`} className="mt-1.5 text-[11px] text-mute">
+          {hint}
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -350,19 +526,26 @@ function Select({ label, options }: { label: string; options: string[] }) {
 function Bullet({ children, ok }: { children: React.ReactNode; ok?: boolean }) {
   return (
     <li className="flex items-start gap-3 text-sm text-ink-soft">
-      <span className={`mt-0.5 ${ok ? "text-red" : "text-red"}`}>
-        {ok ? "✓" : "·"}
-      </span>
+      <span className="mt-0.5 text-red">{ok ? "✓" : "·"}</span>
       <span>{children}</span>
     </li>
   );
 }
 
-function NextButton({ onClick, label = "Continue" }: { onClick: () => void; label?: string }) {
+function NextButton({
+  onClick,
+  label = "Continue",
+  disabled,
+}: {
+  onClick: () => void;
+  label?: string;
+  disabled?: boolean;
+}) {
   return (
     <button
       onClick={onClick}
-      className="mt-10 h-12 w-full rounded-full bg-red px-7 text-sm font-medium text-cream hover:bg-red-deep"
+      disabled={disabled}
+      className="mt-10 h-12 w-full rounded-full bg-red px-7 text-sm font-medium text-cream hover:bg-red-deep disabled:cursor-not-allowed disabled:opacity-50"
     >
       {label} →
     </button>

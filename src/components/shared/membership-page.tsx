@@ -194,7 +194,7 @@ export function MembershipPageTemplate({ data }: { data: MembershipPageData }) {
               href={data.cta.href}
               className={`mt-8 inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink ${ctaHover} hover:text-cream`}
             >
-              Apply now →
+              Sign up →
             </Link>
           </HiddenWhenAuthed>
         </div>
@@ -230,18 +230,18 @@ export function MembershipPageTemplate({ data }: { data: MembershipPageData }) {
     const items = features.flatMap((group) => group.items.filter(isUpgrade)).slice(0, 7);
     const previousLabel = isBlack ? "Everything in Blue, plus" : isBlue ? "Everything in Core, plus" : null;
     const accentLine = isBlack
-      ? "before:bg-[#C9A66B]"
+      ? "before:bg-gold"
       : isBlue && accent === "marine"
-        ? "before:bg-[#1e40af]"
+        ? "before:bg-marine-deep"
         : accent === "marine"
           ? "before:bg-marine"
           : isBlue
             ? "before:bg-marine"
             : "before:bg-red";
     const eyebrowColor = isBlack
-      ? "text-[#C9A66B]"
+      ? "text-gold"
       : isBlue && accent === "marine"
-        ? "text-[#1e40af]"
+        ? "text-marine-deep"
         : accent === "marine"
           ? "text-marine"
           : isBlue

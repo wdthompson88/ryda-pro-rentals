@@ -7,6 +7,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 import {
   VEHICLES,
@@ -146,14 +147,38 @@ const YEAR_BUCKETS: {
 // Component
 // ─────────────────────────────────────────────────────────────────────────
 
-export function RentalListings() {
-  const [query, setQuery] = useState("");
+// URL-aware wrapper for /rent. Reads ?q= with useSearchParams — a
+// client-side read, so the page itself stays a static prerender (mount
+// this inside a <Suspense> boundary; the hook suspends during
+// prerender). .get() returns the FIRST value of a repeated ?q=a&q=b,
+// matching the old server-side normalization.
+//
+// The key remount is the point: initialQuery only seeds state, so
+// without it a same-route navigation (/rent?q=urus → header "Browse" →
+// /rent, or back/forward between two queries) would leave the grid,
+// search box, and count strip filtered by a stale query that
+// contradicts the URL. Keying by the query resets the grid to match
+// the URL on every query change.
+export function RentalListingsFromUrl() {
+  const q = useSearchParams().get("q") ?? undefined;
+  return <RentalListings key={q ?? ""} initialQuery={q} />;
+}
+
+export function RentalListings({
+  initialQuery,
+}: {
+  initialQuery?: string;
+} = {}) {
+  // initialQuery seeds the search box from /rent?q=… (landing-page hero
+  // search). State-seed only — after mount the input owns the value, so
+  // typing here never rewrites the URL. URL→state sync across
+  // navigations is RentalListingsFromUrl's job (key remount above).
+  const [query, setQuery] = useState(initialQuery ?? "");
   const [location, setLocation] = useState<string>(ANY);
   const [make, setMake] = useState<string>(ANY);
   const [category, setCategory] = useState<string>(ANY);
   const [priceBucket, setPriceBucket] = useState<string>(ANY);
   const [yearBucket, setYearBucket] = useState<string>(ANY);
-  const [coOwnableOnly, setCoOwnableOnly] = useState(false);
   const [trackOnly, setTrackOnly] = useState(false);
   const [sort, setSort] = useState<SortOption>("featured");
 
@@ -194,11 +219,10 @@ export function RentalListings() {
         const bucket = YEAR_BUCKETS.find((b) => b.value === yearBucket);
         if (bucket?.test && !bucket.test(v.year)) return false;
       }
-      if (coOwnableOnly && !v.isCoOwnable) return false;
       if (trackOnly && !v.trackEligible) return false;
       return true;
     });
-  }, [query, location, make, category, priceBucket, yearBucket, coOwnableOnly, trackOnly]);
+  }, [query, location, make, category, priceBucket, yearBucket, trackOnly]);
 
   const visible = useMemo(() => {
     const out = [...filtered];
@@ -246,7 +270,6 @@ export function RentalListings() {
     category !== ANY ||
     priceBucket !== ANY ||
     yearBucket !== ANY ||
-    coOwnableOnly ||
     trackOnly;
 
   function clearAll() {
@@ -256,7 +279,6 @@ export function RentalListings() {
     setCategory(ANY);
     setPriceBucket(ANY);
     setYearBucket(ANY);
-    setCoOwnableOnly(false);
     setTrackOnly(false);
     setSort("featured");
   }
@@ -277,22 +299,23 @@ export function RentalListings() {
     const lbl = YEAR_BUCKETS.find((b) => b.value === yearBucket)?.label;
     if (lbl) chips.push({ label: lbl, onClear: () => setYearBucket(ANY) });
   }
-  if (coOwnableOnly)
-    chips.push({ label: "Co-ownership", onClear: () => setCoOwnableOnly(false) });
   if (trackOnly)
     chips.push({ label: "Track-ready", onClear: () => setTrackOnly(false) });
 
   return (
     <section>
-      {/* Filter bar, sticky so filters stay accessible while browsing */}
-      <div className="sticky top-0 z-30 border-b border-rule bg-cream-2/95 backdrop-blur">
-        <div className="mx-auto max-w-7xl px-6 py-5 sm:px-10">
-          {/* Search */}
-          <label className="block">
-            <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-mute">
-              Search
-            </span>
-            <div className="mt-1.5 flex h-11 items-center rounded-full border border-rule bg-surface px-4 transition-colors focus-within:border-ink">
+      {/* Filter bar, sticky so filters stay accessible while browsing.
+          top-18 stacks it just below the sticky 71px site header.
+          Tight h-9 controls — Cars & Bids density. Below lg the row
+          scrolls horizontally; at lg+ it wraps instead (the full control
+          set is ~1.4k px wide, wider than the max-w-7xl content box, so a
+          single non-scrolling row would bleed off-screen) and ml-auto
+          right-aligns the Reset/Sort group on its line. */}
+      <div className="sticky top-18 z-30 border-b border-rule bg-cream-2/95 backdrop-blur">
+        <div className="mx-auto max-w-7xl px-6 py-2.5 sm:px-10">
+          <div className="flex items-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:flex-wrap lg:overflow-visible">
+            {/* Search */}
+            <div className="flex h-9 w-48 flex-none items-center rounded-full border border-rule bg-surface px-3 transition-colors focus-within:border-ink lg:w-52">
               <svg
                 width="14"
                 height="14"
@@ -313,25 +336,24 @@ export function RentalListings() {
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Try Ferrari, Miami, Convertible, 2024…"
+                placeholder="Search the fleet"
+                aria-label="Search the fleet"
                 className="h-full min-w-0 flex-1 bg-transparent text-sm text-ink placeholder:text-mute focus:outline-none"
               />
               {query ? (
                 <button
                   type="button"
                   onClick={() => setQuery("")}
-                  className="ml-2 shrink-0 rounded-full px-2 text-xs text-mute hover:text-ink"
+                  className="ml-1 shrink-0 rounded-full px-1 text-xs text-mute hover:text-ink"
                   aria-label="Clear search"
                 >
                   ×
                 </button>
               ) : null}
             </div>
-          </label>
 
-          {/* Filter row, Location is first because it's the most
-              consequential decision (Miami today, LA + NY soon). */}
-          <div className="mt-4 flex flex-wrap items-end gap-3">
+            {/* Selects — the neutral first option ("All locations", …) is
+                the visible label; aria-label carries the name for AT. */}
             <FilterSelect
               label="Location"
               value={location}
@@ -375,25 +397,19 @@ export function RentalListings() {
               }))}
             />
 
-            {/* Toggles for boolean attributes, distinct visual treatment
-                from selects so members can tell them apart. */}
-            <FilterToggle
-              label="Co-ownership"
-              active={coOwnableOnly}
-              onClick={() => setCoOwnableOnly((v) => !v)}
-            />
+            {/* Boolean chip toggle — filled red reads as pressed. */}
             <FilterToggle
               label="Track-ready"
               active={trackOnly}
               onClick={() => setTrackOnly((v) => !v)}
             />
 
-            <div className="ml-auto flex items-end gap-3">
+            <div className="ml-auto flex flex-none items-center gap-2">
               {anyFilterActive ? (
                 <button
                   type="button"
                   onClick={clearAll}
-                  className="h-10 rounded-full border border-rule bg-surface px-4 text-xs font-medium text-ink-soft transition-colors hover:border-ink hover:text-ink"
+                  className="h-9 flex-none rounded-full border border-rule bg-surface px-3 text-xs font-medium text-ink-soft transition-colors hover:border-ink hover:text-ink"
                 >
                   Reset
                 </button>
@@ -410,7 +426,7 @@ export function RentalListings() {
           {/* Active filter chips, appear only when filters are applied.
               Each chip clears its filter on click. */}
           {chips.length > 0 ? (
-            <div className="mt-4 flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-1.5 py-1.5">
               <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-mute">
                 Filtering by
               </span>
@@ -420,7 +436,7 @@ export function RentalListings() {
                   type="button"
                   onClick={c.onClear}
                   aria-label={`Remove filter: ${c.label}`}
-                  className="group inline-flex items-center gap-1.5 rounded-full border border-rule bg-surface px-3 py-1 text-xs text-ink-soft transition-colors hover:border-ink hover:text-ink"
+                  className="group inline-flex items-center gap-1.5 rounded-full border border-rule bg-surface px-2.5 py-0.5 text-xs text-ink-soft transition-colors hover:border-ink hover:text-ink"
                 >
                   <span>{c.label}</span>
                   <span className="text-mute group-hover:text-ink" aria-hidden>
@@ -433,30 +449,31 @@ export function RentalListings() {
         </div>
       </div>
 
-      {/* Counter strip */}
+      {/* Counter strip — deliberately OUTSIDE the sticky wrapper so it
+          scrolls away with the page instead of eating pinned height. */}
       <div className="border-b border-rule">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-baseline justify-between gap-4 px-6 py-5 sm:px-10">
-          <p className="text-sm text-ink-soft">
-            <span className="font-display text-xl text-ink tabular-nums">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-baseline justify-between gap-3 px-6 py-2 sm:px-10">
+          <p className="text-xs text-ink-soft">
+            <span className="font-display text-base text-ink tabular-nums">
               {totalListed}
             </span>
-            <span className="ml-2">
+            <span className="ml-1.5">
               {totalListed === 1 ? "vehicle" : "vehicles"} available
             </span>
             {location !== ANY ? (
-              <span className="ml-2 text-mute">in {location}</span>
+              <span className="ml-1.5 text-mute">in {location}</span>
             ) : (
-              <span className="ml-2 text-mute">· Miami · LA · NYC</span>
+              <span className="ml-1.5 text-mute">· Miami · LA · NYC</span>
             )}
           </p>
           {totalListed > 0 ? (
-            <p className="text-sm text-ink-soft tabular-nums">
+            <p className="text-xs text-ink-soft tabular-nums">
               From{" "}
-              <span className="font-display text-xl text-ink">
+              <span className="font-display text-base text-ink">
                 {formatUSD(minRate)}
               </span>{" "}
               to{" "}
-              <span className="font-display text-xl text-ink">
+              <span className="font-display text-base text-ink">
                 {formatUSD(maxRate)}
               </span>
               <span className="ml-1 text-mute">/ day</span>
@@ -473,7 +490,7 @@ export function RentalListings() {
             onReset={clearAll}
           />
         ) : (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {visible.map((v) => (
               <RentalCard key={`${v.kind}-${v.slug}`} listing={v} />
             ))}
@@ -558,15 +575,16 @@ function FilterSelect({
   onChange: (v: string) => void;
   options: { value: string; label: string }[];
 }) {
+  // No caption above the control — the neutral first option ("All makes",
+  // "Any price", …) is the visible label; aria-label names it for AT.
+  // Chevron is an inline SVG on text-mute (token-driven — no raw hex).
   return (
-    <label className="flex flex-col gap-1.5">
-      <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-mute">
-        {label}
-      </span>
+    <span className="relative flex-none">
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="h-10 min-w-[140px] cursor-pointer appearance-none rounded-full border border-rule bg-surface bg-[url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 12 12%22><path fill=%22none%22 stroke=%22%239A9590%22 stroke-width=%221.5%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 d=%22M3 5l3 3 3-3%22/></svg>')] bg-[right_0.85rem_center] bg-no-repeat px-4 pr-9 text-sm text-ink transition-colors hover:border-ink focus:border-ink focus:outline-none"
+        aria-label={label}
+        className="h-9 w-full cursor-pointer appearance-none rounded-full border border-rule bg-surface px-3 pr-8 text-sm text-ink transition-colors hover:border-ink focus:border-ink focus:outline-none"
       >
         {options.map((o) => (
           <option key={o.value} value={o.value}>
@@ -574,7 +592,23 @@ function FilterSelect({
           </option>
         ))}
       </select>
-    </label>
+      <svg
+        width="12"
+        height="12"
+        viewBox="0 0 12 12"
+        aria-hidden
+        className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-mute"
+      >
+        <path
+          d="M3 5l3 3 3-3"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </span>
   );
 }
 
@@ -587,44 +621,20 @@ function FilterToggle({
   active: boolean;
   onClick: () => void;
 }) {
+  // Compact chip button — filled red when pressed, hairline pill when not.
   return (
-    <label className="flex flex-col gap-1.5">
-      <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-mute">
-        Toggle
-      </span>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={active}
-        aria-label={label}
-        onClick={onClick}
-        className={`flex h-10 items-center gap-2 rounded-full border px-4 text-xs font-medium transition-colors ${
-          active
-            ? "border-red bg-red text-cream hover:bg-red-deep"
-            : "border-rule bg-surface text-ink-soft hover:border-ink hover:text-ink"
-        }`}
-      >
-        <span
-          aria-hidden
-          className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
-            active ? "border-cream bg-cream" : "border-rule bg-surface"
-          }`}
-        >
-          {active && (
-            <svg width="9" height="9" viewBox="0 0 9 9" fill="none" aria-hidden>
-              <path
-                d="M2 4.5L4 6.5L7.5 2.5"
-                stroke="#DC4747"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          )}
-        </span>
-        {label}
-      </button>
-    </label>
+    <button
+      type="button"
+      aria-pressed={active}
+      onClick={onClick}
+      className={`h-9 flex-none rounded-full border px-3.5 text-sm font-medium transition-colors ${
+        active
+          ? "border-red bg-red text-cream hover:bg-red-deep"
+          : "border-rule bg-surface text-ink-soft hover:border-ink hover:text-ink"
+      }`}
+    >
+      {label}
+    </button>
   );
 }
 
@@ -634,14 +644,17 @@ function RentalCard({ listing: v }: { listing: RentalListing }) {
     ? Math.round((savings / v.regularRate) * 100)
     : 0;
   const tint = brandTint(v.make);
-  const hasShare = v.isCoOwnable && (v.sharesAvailable ?? 0) > 0;
 
+  // Dense Mainstable-style card: the photo carries the badges AND the
+  // price chip, so the body stays three short lines and the 4-up grid
+  // shows far more inventory per screen. The whole card is the link.
   return (
     <Link
       href={`/rent/${v.slug}`}
       className="group flex flex-col overflow-hidden rounded-2xl border border-rule bg-surface transition-all hover:-translate-y-0.5 hover:border-ink/40 hover:shadow-lg"
     >
-      {/* Image with badges */}
+      {/* Photo — brand chip top-left, track/save badge top-right (never
+          stacked), price chip bottom-right. */}
       <div
         className="relative aspect-[16/10] w-full overflow-hidden"
         style={{ backgroundColor: v.kind === "partner" ? tint : undefined }}
@@ -651,7 +664,7 @@ function RentalCard({ listing: v }: { listing: RentalListing }) {
             src={v.hero}
             alt={`${v.make} ${v.model}`}
             fill
-            sizes="(min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+            sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
             className={`object-cover transition-transform duration-500 group-hover:scale-[1.02] ${
               v.flipImage ? "-scale-x-100" : ""
             }`}
@@ -692,97 +705,39 @@ function RentalCard({ listing: v }: { listing: RentalListing }) {
             Save {savingsPct}%
           </span>
         ) : null}
+
+        {/* Price chip bottom-right — dark so it reads on any photo. The
+            regular-rate strikethrough rides inside the chip so the partner
+            discount stays visible without a second price block. */}
+        <span className="absolute bottom-3 right-3 inline-flex items-baseline gap-1.5 rounded-full bg-ink/85 px-3 py-1 backdrop-blur">
+          {v.regularRate && savings > 0 ? (
+            <span className="text-[11px] text-cream/70 line-through tabular-nums">
+              {formatUSD(v.regularRate)}
+            </span>
+          ) : null}
+          <span className="font-display text-base text-cream tabular-nums">
+            {formatUSD(v.dailyRate)}
+          </span>
+          <span className="text-[11px] text-cream/70">/day</span>
+        </span>
       </div>
 
-      {/* Body */}
-      <div className="flex flex-1 flex-col p-5">
-        <div>
-          <p className="text-[11px] uppercase tracking-[0.14em] text-mute">
-            {v.make}
-            {v.year ? ` · ${v.year}` : ""}
-          </p>
-          <h3 className="mt-1 font-display text-xl text-ink leading-tight">
-            {v.model}
-          </h3>
-          <p className="mt-1 text-xs text-mute">{v.category}</p>
-        </div>
-
-        {/* Location + miles */}
-        <div className="mt-4 flex items-center gap-3 text-xs text-ink-soft">
-          <span className="inline-flex items-center gap-1.5">
-            <svg
-              width="11"
-              height="13"
-              viewBox="0 0 12 14"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-hidden
-            >
-              <path
-                d="M6 13C6 13 11 8.5 11 5.5C11 2.46243 8.76142 0 6 0C3.23858 0 1 2.46243 1 5.5C1 8.5 6 13 6 13Z"
-                stroke="currentColor"
-                strokeWidth="1.2"
-              />
-              <circle
-                cx="6"
-                cy="5.5"
-                r="1.6"
-                stroke="currentColor"
-                strokeWidth="1.2"
-              />
-            </svg>
-            {v.market}
-          </span>
-          <span className="text-mute">· 100 mi/day included</span>
-        </div>
-
-        {/* Price block */}
-        <div className="mt-5 border-t border-rule pt-4">
-          <div className="flex items-end justify-between gap-4">
-            <div>
-              <p className="text-[11px] uppercase tracking-[0.14em] text-mute">
-                Daily rate
-              </p>
-              <p className="font-display text-2xl text-ink tabular-nums">
-                {formatUSD(v.dailyRate)}
-                <span className="ml-1 text-sm text-mute">/day</span>
-              </p>
-            </div>
-            {v.regularRate && savings > 0 ? (
-              <div className="text-right">
-                <p className="text-[11px] uppercase tracking-[0.14em] text-mute">
-                  Regular
-                </p>
-                <p className="text-sm text-mute line-through tabular-nums">
-                  {formatUSD(v.regularRate)}
-                </p>
-              </div>
-            ) : hasShare ? (
-              <div className="text-right">
-                <p className="text-[11px] uppercase tracking-[0.14em] text-mute">
-                  Or own a share
-                </p>
-                <p className="text-sm text-red tabular-nums">
-                  {v.sharesAvailable} of 10 left
-                </p>
-              </div>
-            ) : null}
-          </div>
-        </div>
-
-        {/* CTA */}
-        <div className="mt-5 flex items-center justify-between">
-          <p className="text-xs text-ink-soft">
-            {hasShare ? "Co-ownership available" : "100 mi/day included"}
-          </p>
-          <span className="inline-flex items-center gap-1.5 text-sm font-medium text-red transition-colors group-hover:text-red-deep">
-            View details
-            <span
-              aria-hidden
-              className="transition-transform group-hover:translate-x-0.5"
-            >
-              →
-            </span>
+      {/* Body — three short lines; mt-auto pins the location line so card
+          bottoms align across a row even when a model name wraps. */}
+      <div className="flex flex-1 flex-col p-4">
+        <h3 className="font-display text-lg leading-tight text-ink">
+          {v.model}
+        </h3>
+        <p className="mt-1 text-xs text-mute">
+          {[v.make, v.year, v.category].filter(Boolean).join(" · ")}
+        </p>
+        <div className="mt-auto flex items-center justify-between pt-3 text-xs text-mute">
+          <span>{v.market} · 100 mi/day</span>
+          <span
+            aria-hidden
+            className="transition-all group-hover:translate-x-0.5 group-hover:text-red"
+          >
+            →
           </span>
         </div>
       </div>

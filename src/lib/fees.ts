@@ -23,3 +23,54 @@ export function computeFees(pricePerShare: number, shares: number) {
   const total = buyIn + acquisitionFee;
   return { buyIn, acquisitionFee, total };
 }
+
+// ── Rental payment rail (Stripe Connect direct charges) ──────────────
+//
+// Fee-only model: the customer pays the operator's connected account
+// directly; RYDA's commission rides along as application_fee_amount on
+// the direct charge. Same single-source discipline as computeFees —
+// the admin "send payment link" preview and the Checkout Session the
+// server creates must both call computeRentalFee so the fee the admin
+// sees and the fee Stripe takes are always identical.
+//
+// Works in CENTS (Stripe's unit), unlike computeFees' dollars — rental
+// amounts are operator-quoted arbitrary prices, not per-share sticker
+// dollars, so cents-in/cents-out avoids a *100 conversion step where a
+// rounding bug could hide.
+
+/** Platform commission when the partner row has no override.
+ *  Mirrors partners.commission_rate's default (0.150) in migration 0041. */
+export const RENTAL_COMMISSION_RATE_DEFAULT = 0.15;
+
+/**
+ * Split an operator-confirmed rental price into RYDA's application fee
+ * and the operator's net. `amountCents` must be a positive integer;
+ * `commissionRate` is a fraction bounded [0, 0.5] to match the DB
+ * check constraint on partners.commission_rate. Throws on invalid
+ * input rather than guessing — this feeds a live Stripe charge.
+ */
+export function computeRentalFee(
+  amountCents: number,
+  commissionRate: number = RENTAL_COMMISSION_RATE_DEFAULT
+) {
+  if (!Number.isInteger(amountCents) || amountCents <= 0) {
+    throw new Error(
+      `computeRentalFee: amountCents must be a positive integer, got ${amountCents}`
+    );
+  }
+  if (
+    !Number.isFinite(commissionRate) ||
+    commissionRate < 0 ||
+    commissionRate > 0.5
+  ) {
+    throw new Error(
+      `computeRentalFee: commissionRate must be within [0, 0.5], got ${commissionRate}`
+    );
+  }
+  const applicationFeeCents = Math.round(amountCents * commissionRate);
+  return {
+    amountCents,
+    applicationFeeCents,
+    operatorNetCents: amountCents - applicationFeeCents,
+  };
+}

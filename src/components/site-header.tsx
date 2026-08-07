@@ -1,62 +1,98 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
-import { ThemeToggle } from "@/components/theme-toggle";
-import { AuthSwap, VisibleWhenAdmin } from "@/components/auth-aware";
+import { useRouter } from "next/navigation";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  AuthSwap,
+  VisibleWhenAdmin,
+  VisibleWhenPartner,
+} from "@/components/auth-aware";
 
-// RYDA spans three verticals: Cars, Boats, Planes. The header detects
-// which vertical the visitor is in via the pathname and swaps the nav
-// accordingly. Plus a small site-search bar so members can find a car,
-// boat, or doc from any page. Sign-in / Sign-up are paired buttons —
-// soft cream "Log in" next to a dark "Sign up" CTA, in RYDA's palette.
+// Rental-first header (Aug 2026 pivot). Rentals are THE product, so the
+// nav is one flat list on every page: Rent (the homepage grid) · How it
+// works · For partners. The old vertical-aware nav (Cars / Boats /
+// Planes switcher, portfolio + membership links) is retired from the
+// top bar — co-ownership now lives at /co-ownership, reachable via the
+// footer's Cars column and a quiet pointer at the end of /how-it-works.
+// Site search + the auth-aware Log in / Sign up / Account slots are
+// unchanged.
 
-type Vertical = "cars" | "boats" | "planes" | "neutral";
-
-const CARS_NAV = [
-  { href: "/portfolio", label: "Portfolio" },
-  { href: "/rent", label: "Rent" },
+const NAV = [
+  // /rent is the canonical browse grid; "/" is the landing page.
+  { href: "/rent", label: "Browse" },
   { href: "/how-it-works", label: "How it works" },
-  { href: "/membership", label: "Membership" },
+  { href: "/partners", label: "For partners" },
 ];
-
-const BOATS_NAV = [
-  { href: "/boats/portfolio", label: "Portfolio" },
-  { href: "/boats/rent", label: "Charter" },
-  { href: "/boats/how-it-works", label: "How it works" },
-  { href: "/boats/membership", label: "Membership" },
-];
-
-const PLANES_NAV: { href: string; label: string }[] = [
-  // Planes is just a coming-soon surface today, no sub-nav.
-];
-
-function detectVertical(pathname: string | null): Vertical {
-  if (!pathname) return "neutral";
-  if (pathname.startsWith("/boats")) return "boats";
-  if (pathname.startsWith("/planes")) return "planes";
-  if (pathname === "/") return "neutral";
-  // Everything else (the existing car-era routes) is the cars vertical:
-  // /portfolio, /rent, /membership, /how-it-works, /faq, /inside, /journal,
-  // /vs, /sample-documents, etc. plus /cars itself.
-  return "cars";
-}
-
-function navForVertical(v: Vertical): { href: string; label: string }[] {
-  if (v === "boats") return BOATS_NAV;
-  if (v === "planes") return PLANES_NAV;
-  if (v === "neutral") return [];
-  return CARS_NAV;
-}
 
 export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const pathname = usePathname();
   const router = useRouter();
-  const vertical = detectVertical(pathname);
-  const nav = navForVertical(vertical);
+  const nav = NAV;
+
+  // Priority navigation: links stay inline for as long as they fit the
+  // space between the brand and the auth cluster; whatever would
+  // overflow folds into a trailing "More" dropdown instead of hiding.
+  // SSR renders all links (visibleCount = nav.length) so hydration
+  // matches; the layout effect corrects on mount and on every resize.
+  const [visibleCount, setVisibleCount] = useState(nav.length);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const navRef = useRef<HTMLElement | null>(null);
+  const measureRef = useRef<HTMLDivElement | null>(null);
+  const moreMeasureRef = useRef<HTMLSpanElement | null>(null);
+  const moreRef = useRef<HTMLDivElement | null>(null);
+
+  useLayoutEffect(() => {
+    const navEl = navRef.current;
+    const measureEl = measureRef.current;
+    if (!navEl || !measureEl) return;
+    const GAP = 28; // matches the nav's gap-7
+    const compute = () => {
+      const available = navEl.clientWidth;
+      const widths = Array.from(measureEl.children).map(
+        (el) => (el as HTMLElement).offsetWidth,
+      );
+      const moreW = (moreMeasureRef.current?.offsetWidth ?? 56) + 14; // + chevron
+      const total =
+        widths.reduce((a, b) => a + b, 0) + GAP * Math.max(0, widths.length - 1);
+      if (total <= available) {
+        setVisibleCount(widths.length);
+        return;
+      }
+      let used = moreW;
+      let count = 0;
+      for (const w of widths) {
+        if (used + GAP + w > available) break;
+        used += GAP + w;
+        count += 1;
+      }
+      setVisibleCount(count);
+    };
+    compute();
+    const ro = new ResizeObserver(compute);
+    ro.observe(navEl);
+    return () => ro.disconnect();
+  }, []);
+
+  // The More menu closes on outside click or Escape, standard menu manners.
+  useEffect(() => {
+    if (!moreOpen) return;
+    const onDown = (e: MouseEvent) => {
+      if (moreRef.current && !moreRef.current.contains(e.target as Node)) {
+        setMoreOpen(false);
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMoreOpen(false);
+    };
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [moreOpen]);
 
   const tone = inverted ? "text-cream/70 hover:text-cream" : "text-ink-soft hover:text-ink";
   const brand = inverted ? "text-cream" : "text-ink";
@@ -78,6 +114,12 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
   const adminBtn = inverted
     ? "border-cream/30 bg-cream/10 text-cream hover:border-cream hover:bg-cream/15"
     : "border-rule bg-cream-2 text-marine hover:border-marine hover:text-marine-deep";
+  // Partner pill (fleet partners only, sits where the admin pill does
+  // for admins). Same quiet-tool family as the admin pill but in ink —
+  // it's an account surface, not a CTA.
+  const partnerBtn = inverted
+    ? "border-cream/30 bg-cream/10 text-cream hover:border-cream hover:bg-cream/15"
+    : "border-rule bg-cream-2 text-ink-soft hover:border-ink hover:text-ink";
   // Search input theming, tracks the inverted state.
   const searchInput = inverted
     ? "border-cream/30 bg-cream/10 text-cream placeholder:text-cream/50 focus:border-cream focus:ring-cream/20"
@@ -92,57 +134,101 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
   }
 
   return (
-    <header className={`w-full border-b ${inverted ? "border-cream/20" : "border-rule"}`}>
+    // Everlasting top bar (Cars & Bids pattern): sticky so the brand,
+    // nav, search, and auth CTAs stay reachable at any scroll depth.
+    // Solid background — content must never ghost through it.
+    <header
+      className={`sticky top-0 z-50 w-full border-b ${
+        inverted ? "border-cream/20 bg-ink" : "border-rule bg-cream"
+      }`}
+    >
       {/* Single-row marketing header. Vertical switcher / theme toggle /
           search-icon were demoted to footer per luxury polish, header
           now reads as minimal brand mark + nav + one CTA, not as
           a control panel. */}
 
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-5 sm:px-10">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-4 sm:px-10">
         <div className="flex items-baseline gap-4 sm:gap-5">
           <Link href="/" className={`font-display text-2xl tracking-tight ${brand}`}>
             RYDA
           </Link>
-          {/* Inline vertical switcher, Cars · Boats · Planes. The
-              currently-active vertical is bolded ink/cream; the others
-              are mute and clickable so members can jump between
-              verticals without bouncing back to the splitter. */}
-          {vertical !== "neutral" && (
-            <div className="hidden items-baseline gap-2 text-[10px] font-medium uppercase tracking-[0.18em] sm:flex">
-              <VerticalSwitch
-                href="/cars"
-                label="Cars"
-                active={vertical === "cars"}
-                inverted={inverted}
-              />
-              <span aria-hidden className={inverted ? "text-cream/30" : "text-mute/50"}>
-                ·
-              </span>
-              <VerticalSwitch
-                href="/boats"
-                label="Boats"
-                active={vertical === "boats"}
-                inverted={inverted}
-              />
-              <span aria-hidden className={inverted ? "text-cream/30" : "text-mute/50"}>
-                ·
-              </span>
-              <VerticalSwitch
-                href="/planes"
-                label="Planes"
-                active={vertical === "planes"}
-                inverted={inverted}
-              />
-            </div>
-          )}
         </div>
 
-        <nav className={`hidden gap-7 text-sm font-medium md:flex ${tone}`}>
-          {nav.map((n) => (
-            <Link key={n.href} href={n.href}>
+        <nav
+          ref={navRef}
+          aria-label="Primary"
+          className={`relative hidden min-w-0 flex-1 items-center justify-center gap-7 text-sm font-medium sm:flex ${tone}`}
+        >
+          {/* Invisible twin of the full link list at natural width — the
+              fit calculation reads these, never the visible subset. */}
+          <div
+            ref={measureRef}
+            aria-hidden="true"
+            className="pointer-events-none invisible absolute left-0 top-0 flex gap-7"
+          >
+            {nav.map((n) => (
+              <span key={n.href} className="whitespace-nowrap">
+                {n.label}
+              </span>
+            ))}
+          </div>
+          <span
+            ref={moreMeasureRef}
+            aria-hidden="true"
+            className="pointer-events-none invisible absolute left-0 top-0 whitespace-nowrap"
+          >
+            More
+          </span>
+
+          {nav.slice(0, visibleCount).map((n) => (
+            <Link key={n.href} href={n.href} className="whitespace-nowrap">
               {n.label}
             </Link>
           ))}
+          {visibleCount < nav.length && (
+            <div ref={moreRef} className="relative">
+              <button
+                type="button"
+                onClick={() => setMoreOpen((s) => !s)}
+                aria-expanded={moreOpen}
+                aria-haspopup="menu"
+                className={`flex items-center gap-1 whitespace-nowrap ${tone}`}
+              >
+                More
+                <svg
+                  width="10"
+                  height="10"
+                  viewBox="0 0 10 10"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  aria-hidden="true"
+                  className={moreOpen ? "rotate-180" : ""}
+                >
+                  <polyline points="2,3.5 5,6.5 8,3.5" />
+                </svg>
+              </button>
+              {moreOpen && (
+                <div
+                  role="menu"
+                  className="absolute right-0 top-full z-50 mt-3 min-w-44 rounded-xl border border-rule bg-surface p-1.5 shadow-lg"
+                >
+                  {nav.slice(visibleCount).map((n) => (
+                    <Link
+                      key={n.href}
+                      role="menuitem"
+                      href={n.href}
+                      onClick={() => setMoreOpen(false)}
+                      className="block whitespace-nowrap rounded-lg px-3 py-2 text-sm text-ink-soft hover:bg-cream-2 hover:text-ink"
+                    >
+                      {n.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </nav>
 
         <div className="flex items-center gap-3 sm:gap-3">
@@ -212,6 +298,14 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
                     Admin
                   </Link>
                 </VisibleWhenAdmin>
+                <VisibleWhenPartner>
+                  <Link
+                    href="/partner"
+                    className={`hidden rounded-full border px-5 py-2 text-sm font-medium transition-colors sm:inline-flex ${partnerBtn}`}
+                  >
+                    Partner
+                  </Link>
+                </VisibleWhenPartner>
                 <Link
                   href="/account"
                   className={`hidden rounded-full border px-5 py-2 text-sm font-medium transition-colors sm:inline-flex ${accountBtn}`}
@@ -265,34 +359,6 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
           }`}
         >
           <nav className={`mx-auto flex max-w-7xl flex-col gap-1 px-6 py-4 text-base ${tone}`}>
-            {/* Mobile vertical switcher, same Cars / Boats / Planes
-                jump as the desktop header. Active vertical bolded. */}
-            <div className="mb-2 flex items-baseline gap-3 px-3 py-2 text-[11px] font-medium uppercase tracking-[0.2em]">
-              <VerticalSwitch
-                href="/cars"
-                label="Cars"
-                active={vertical === "cars"}
-                inverted={inverted}
-              />
-              <span aria-hidden className={inverted ? "text-cream/30" : "text-mute/50"}>
-                ·
-              </span>
-              <VerticalSwitch
-                href="/boats"
-                label="Boats"
-                active={vertical === "boats"}
-                inverted={inverted}
-              />
-              <span aria-hidden className={inverted ? "text-cream/30" : "text-mute/50"}>
-                ·
-              </span>
-              <VerticalSwitch
-                href="/planes"
-                label="Planes"
-                active={vertical === "planes"}
-                inverted={inverted}
-              />
-            </div>
             {nav.map((n) => (
               <Link
                 key={n.href}
@@ -354,6 +420,15 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
                       Admin
                     </Link>
                   </VisibleWhenAdmin>
+                  <VisibleWhenPartner>
+                    <Link
+                      href="/partner"
+                      onClick={() => setOpen(false)}
+                      className={`mt-3 inline-flex h-12 items-center justify-center rounded-full border px-5 text-sm font-medium transition-colors ${partnerBtn}`}
+                    >
+                      Partner
+                    </Link>
+                  </VisibleWhenPartner>
                   <Link
                     href="/account"
                     onClick={() => setOpen(false)}
@@ -364,45 +439,10 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
                 </>
               }
             />
-            <div className="mt-2 flex items-center justify-between rounded-lg px-3 py-2">
-              <span className="text-xs uppercase tracking-wider text-mute">
-                Theme
-              </span>
-              <ThemeToggle />
-            </div>
           </nav>
         </div>
       )}
     </header>
-  );
-}
-
-// Inline vertical-switch link used next to the RYDA wordmark.
-// Active vertical: bolded ink (or cream on inverted headers).
-// Inactive verticals: mute, clickable, hover transition to ink.
-function VerticalSwitch({
-  href,
-  label,
-  active,
-  inverted,
-}: {
-  href: string;
-  label: string;
-  active: boolean;
-  inverted?: boolean;
-}) {
-  const activeTone = inverted ? "text-cream font-semibold" : "text-ink font-semibold";
-  const inactiveTone = inverted
-    ? "text-cream/55 font-medium hover:text-cream"
-    : "text-mute font-medium hover:text-ink";
-  return (
-    <Link
-      href={href}
-      aria-current={active ? "page" : undefined}
-      className={`transition-colors ${active ? activeTone : inactiveTone}`}
-    >
-      {label}
-    </Link>
   );
 }
 

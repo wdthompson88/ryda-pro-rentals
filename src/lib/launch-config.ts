@@ -42,7 +42,7 @@ export function earlyPricingCTA(): {
   );
   return {
     headline: "Members start in Miami.",
-    body: `Apply by ${deadlineLabel} to lock early-member pricing on Blue or Black for life.`,
+    body: `Sign up by ${deadlineLabel} to lock early-member pricing on Blue or Black for life.`,
     expired: false,
   };
 }

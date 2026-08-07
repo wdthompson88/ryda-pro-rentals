@@ -266,7 +266,7 @@ export default async function BoatDetailPage({
 
             {/* Order panel */}
             <div className="lg:col-span-4">
-              <div className="sticky top-6 rounded-2xl border border-rule bg-surface p-6 shadow-sm">
+              <div className="sticky top-22 rounded-2xl border border-rule bg-surface p-6 shadow-sm">
                 <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
                   Claim a share
                 </p>
@@ -506,7 +506,7 @@ export default async function BoatDetailPage({
       {/* Or charter teaser */}
       <section className="border-b border-rule bg-ink py-14 text-cream">
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-marine-bright">
             Try it before you commit
           </p>
           <h2 className="mt-3 font-display text-3xl sm:text-4xl">

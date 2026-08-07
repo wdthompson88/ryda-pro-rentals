@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
   },
   brand: {
     fontSize: 9,
-    color: "#8f2d2d",
+    color: "#C03030",
     letterSpacing: 2,
     textTransform: "uppercase",
     marginBottom: 12,
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
   },
   bullet: {
     width: 12,
-    color: "#8f2d2d",
+    color: "#C03030",
   },
   bulletText: {
     flex: 1,
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
     borderColor: "#e2dbd2",
     paddingTop: 8,
     fontSize: 8,
-    color: "#7b726a",
+    color: "#5f5750",
   },
 });
 

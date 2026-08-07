@@ -81,12 +81,12 @@ export async function POST(req: Request) {
       subject: `New waitlist signup: ${name || email}`,
       replyTo: email,
       html: emailLayout("New waitlist signup", `
-        <div style="font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#9A9590;">From</div>
-        <div style="font-size:16px;font-weight:500;margin-top:2px;"><a href="mailto:${escapeHtml(email)}" style="color:#DC4747;text-decoration:none;">${escapeHtml(email)}</a></div>
-        ${name ? `<div style="margin-top:14px;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#9A9590;">Name</div><div style="margin-top:2px;">${escapeHtml(name)}</div>` : ""}
-        <div style="margin-top:14px;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#9A9590;">Market</div>
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#514C47;">From</div>
+        <div style="font-size:16px;font-weight:500;margin-top:2px;"><a href="mailto:${escapeHtml(email)}" style="color:#C03030;text-decoration:none;">${escapeHtml(email)}</a></div>
+        ${name ? `<div style="margin-top:14px;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#514C47;">Name</div><div style="margin-top:2px;">${escapeHtml(name)}</div>` : ""}
+        <div style="margin-top:14px;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#514C47;">Market</div>
         <div style="margin-top:2px;">${escapeHtml(market)}</div>
-        ${source ? `<div style="margin-top:14px;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#9A9590;">Source</div><div style="margin-top:2px;">${escapeHtml(source)}</div>` : ""}
+        ${source ? `<div style="margin-top:14px;font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#514C47;">Source</div><div style="margin-top:2px;">${escapeHtml(source)}</div>` : ""}
         <div style="margin-top:24px;padding-top:18px;border-top:1px solid #e5e1d8;font-size:13px;color:#3c3c3c;">
           <strong>Hit reply</strong> to respond, this email's reply-to is set to ${escapeHtml(email)}.
         </div>

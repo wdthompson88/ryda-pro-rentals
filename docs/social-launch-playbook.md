@@ -43,7 +43,7 @@ Asset-backed LLC. 2-share min. Launching Q3 2026.
 ryda.pro
 ```
 
-**Profile picture:** the orange/cream RYDA logo on dark. Use a 1080x1080 crop of `/opengraph-image` from your site, or the wordmark on a clean background.
+**Profile picture:** the red/cream RYDA brand mark. Use a 1080x1080 crop of `/opengraph-image` (the social cards remain dark inverted brand cards), or the wordmark on the site's light cream background.
 
 **Story highlights (set up after first 5 posts):**
 - "What is RYDA?" (3-slide explainer)
@@ -94,7 +94,7 @@ Member-managed LLC. Asset-backed. Launching Q3 2026.
 🌐 ryda.pro
 ```
 
-**Header image:** wide hero shot — the splash splitter from `/` on dark, or the 296 hero. 1500x500 px.
+**Header image:** wide hero shot — the splash splitter from `/` on the light cream site background, or the 296 hero. Need a dark asset? Use the `/opengraph-image` inverted brand card. 1500x500 px.
 
 **Profile picture:** same as Instagram (consistent branding).
 
@@ -267,7 +267,7 @@ A single "X-poster" account on Reddit won't help; an authentic personal account 
 
 ## Cross-platform brand kit
 
-**Profile picture:** 1080x1080 crop of the orange wordmark on dark cream-2 background. Source: take a screenshot of the splitter intro at `https://ryda.pro` or use a cropped version of your `/opengraph-image`.
+**Profile picture:** 1080x1080 crop of the red wordmark on the light cream-2 background. Source: take a screenshot of the splitter intro at `https://ryda.pro` (now light-only), or use a cropped version of your `/opengraph-image` for a dark inverted brand card.
 
 **Banner / header:**
 - Wide ratios: use the 296 hero with "RYDA · Miami Q3 2026" subtle wordmark in lower-third

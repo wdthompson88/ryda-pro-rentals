@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { HiddenWhenAuthed } from "@/components/auth-aware";
 // HealthBadge is dynamic-imported via HealthBadgeLazy so its ~64KB
 // chunk doesn't load on every marketing page where the user never
@@ -74,6 +73,10 @@ export function SiteFooter() {
               ["Portfolio", "/portfolio"],
               ["Rent", "/rent"],
               ["Membership", "/membership"],
+              // The parked ownership program's single quiet home. This
+              // footer link is what the "reachable from the footer"
+              // comments on / and in site-header promise — keep it.
+              ["Co-ownership", "/co-ownership"],
               ["How it works", "/how-it-works"],
               ["Insurance", "/insurance"],
               ["Storage", "/storage"],
@@ -145,7 +148,6 @@ export function SiteFooter() {
             <Link href="/legal/accessibility" className="hover:text-ink">
               Accessibility
             </Link>
-            <ThemeToggle className="ml-2" />
           </div>
         </div>
       </div>

@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Apply",
+  title: "Sign up",
   description:
-    "Create your RYDA account. Browsing is free; signup unlocks rentals and co-ownership.",
+    "Create your RYDA account. Browsing is free; an account unlocks rentals, bookings, and co-ownership.",
 };
 
 export default function SignUpLayout({ children }: { children: React.ReactNode }) {

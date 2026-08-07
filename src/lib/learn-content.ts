@@ -47,7 +47,7 @@ export const LEARN_STAGES: LearnStage[] = [
   {
     slug: "buy",
     label: "Buy",
-    intro: "From application to keys",
+    intro: "From sign-up to keys",
     description:
       "What the closing checklist actually looks like, what's in the operating agreement, what to expect in your first 30 days.",
   },

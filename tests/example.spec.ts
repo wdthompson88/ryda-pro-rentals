@@ -1,6 +1,7 @@
-// Smoke tests against the RYDA marketing surface. Validates that
-// the Round-2 research work (exit doctrine, Miami peak windows,
-// asset detail anatomy, learn hub) renders correctly post-deploy.
+// Smoke tests against the RYDA marketing surface. Validates that the
+// rental-first restructure (Aug 2026 pivot: landing story on /, browse
+// grid at /rent, lead-gen how-it-works) plus the surviving asset-detail
+// and learn-hub surfaces render correctly post-deploy.
 //
 // Run locally:    npm run test:e2e
 // Run UI mode:    npm run test:e2e:ui
@@ -13,45 +14,67 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('home page', () => {
-  test('renders the three-vertical splitter', async ({ page }) => {
+  test('renders the rental-first landing story', async ({ page }) => {
     await page.goto('/');
-    // The splitter shows three columns: Cars, Boats, Planes.
-    // Each renders inside a Link to its vertical landing page.
-    await expect(page.locator('a[href="/cars"]').first()).toBeVisible();
-    await expect(page.locator('a[href="/boats"]').first()).toBeVisible();
-    await expect(page.locator('a[href="/planes"]').first()).toBeVisible();
+    // Hero: rental-first headline + the one CTA into the browse grid.
+    await expect(
+      page.getByRole('heading', { name: /one request away/i }),
+    ).toBeVisible();
+    await expect(page.locator('a[href="/rent"]').first()).toBeVisible();
+    // Featured fleet section renders its heading.
+    await expect(
+      page.getByRole('heading', { name: /the cars miami asks for by name/i }),
+    ).toBeVisible();
+    // How-it-works teaser links through to the full page.
+    await expect(
+      page.locator('a[href="/how-it-works"]').first(),
+    ).toBeVisible();
+  });
+
+  test('hero car is not repeated in the featured grid', async ({ page }) => {
+    await page.goto('/');
+    // Hero image + three featured cards, each a distinct car with a
+    // distinct photo. Guards the FEATURED[0]-in-both-places regression.
+    const detailLinks = page.locator('a[href^="/rent/"]');
+    await expect(detailLinks).toHaveCount(4);
+    const hrefs = await detailLinks.evaluateAll((els) =>
+      els.map((el) => el.getAttribute('href')),
+    );
+    expect(new Set(hrefs).size).toBe(hrefs.length);
+    const photoSrcs = await page
+      .locator('a[href^="/rent/"] img')
+      .evaluateAll((imgs) => imgs.map((img) => img.getAttribute('src')));
+    expect(new Set(photoSrcs).size).toBe(photoSrcs.length);
   });
 });
 
 test.describe('how-it-works', () => {
-  test('exit doctrine deep-dive renders both paths', async ({ page }) => {
-    await page.goto('/how-it-works#exit');
-    // Hero of the new section
+  test('renders the three-step lead-gen model', async ({ page }) => {
+    await page.goto('/how-it-works');
+    // Hero of the rental-first page.
     await expect(
-      page.getByRole('heading', { name: /how you get out, in detail/i }),
+      page.getByRole('heading', { name: /one request\. a named operator/i }),
     ).toBeVisible();
-    // Both path badges
-    await expect(page.getByText(/default · planned exit/i)).toBeVisible();
-    await expect(page.getByText(/alternate · early transfer/i)).toBeVisible();
-    // Doctrine reaffirmation block — three pillars
-    await expect(page.getByText(/members vote/i).first()).toBeVisible();
-    await expect(page.getByText(/no public market/i)).toBeVisible();
-    await expect(page.getByText(/k-1, not 1099-b/i)).toBeVisible();
+    // The three steps.
+    await expect(page.getByText(/request with dates/i).first()).toBeVisible();
+    await expect(page.getByText(/operator confirms/i).first()).toBeVisible();
+    // Commission-transparency section — the whole business model.
+    await expect(
+      page.getByRole('heading', { name: /referral commission/i }),
+    ).toBeVisible();
+    await expect(page.getByText(/never through ryda/i).first()).toBeVisible();
   });
 
-  test('miami peak-window calendar renders concrete events', async ({
+  test('parked co-ownership program keeps its quiet pointer', async ({
     page,
   }) => {
-    await page.goto('/how-it-works#booking');
+    await page.goto('/how-it-works');
+    // The 2027 waitlist pointer at the end of the page — one of the
+    // two sanctioned co-ownership references (the other is the
+    // footer's Cars column link).
     await expect(
-      page.getByText(/peak protection · miami calendar/i),
+      page.getByRole('link', { name: /founding member waitlist/i }),
     ).toBeVisible();
-    // Key events that members would actually plan around. If any of
-    // these go missing the calendar lost specificity and we want to
-    // catch it.
-    await expect(page.getByText(/f1 miami grand prix/i)).toBeVisible();
-    await expect(page.getByText(/art basel miami beach/i)).toBeVisible();
-    await expect(page.getByText(/holiday week \+ nye/i)).toBeVisible();
   });
 });
 

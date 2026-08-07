@@ -277,7 +277,7 @@ export default function BookingsPage() {
                         b.status === "confirmed"
                           ? "bg-success/10 text-success-deep"
                           : b.status === "in-progress"
-                            ? "bg-amber-500/15 text-amber-700"
+                            ? "bg-warn/15 text-warn-deep"
                             : "bg-red/10 text-red"
                       }`}
                     >

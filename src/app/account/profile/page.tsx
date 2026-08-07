@@ -15,6 +15,11 @@
 // On the email row we link to /account/security since email is an
 // auth credential, not profile data — Supabase requires re-verification
 // when it changes.
+//
+// Rentals-first additions: a marketing opt-in toggle (canonical copy in
+// auth user_metadata, where /signup wrote it) plus a best-effort sync of
+// name/phone/consent into rental_profiles — the row the rental-inquiry
+// API also upserts — so operator-facing leads carry fresh contact info.
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -71,6 +76,10 @@ export default function ProfilePage() {
   const [email, setEmail] = useState<string>("");
   const [initial, setInitial] = useState<Profile>(EMPTY);
   const [form, setForm] = useState<Profile>(EMPTY);
+  // Marketing consent is tracked separately from the Profile shape —
+  // its canonical home is auth user_metadata, not user_profiles.
+  const [marketingOptIn, setMarketingOptIn] = useState(true);
+  const [initialMarketing, setInitialMarketing] = useState(true);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [savedFlash, setSavedFlash] = useState(false);
@@ -92,6 +101,29 @@ export default function ProfilePage() {
         return;
       }
       setEmail(userData.user.email ?? "");
+
+      // Marketing consent: signup wrote it to user_metadata; default
+      // true (opt-out model, matching the signup checkbox default).
+      const meta = userData.user.user_metadata as
+        | { marketing_opt_in?: unknown }
+        | undefined;
+      let marketing = meta?.marketing_opt_in !== false;
+
+      // Best-effort override from rental_profiles (the row the
+      // rental-inquiry API upserts). The table ships with that API's
+      // migration, so tolerate it not existing yet — the error is
+      // ignored and metadata stays authoritative.
+      const { data: rentalRow } = await supabase
+        .from("rental_profiles")
+        .select("marketing_opt_in")
+        .eq("user_id", userData.user.id)
+        .maybeSingle();
+      if (rentalRow && typeof rentalRow.marketing_opt_in === "boolean") {
+        marketing = rentalRow.marketing_opt_in;
+      }
+      if (cancelled) return;
+      setMarketingOptIn(marketing);
+      setInitialMarketing(marketing);
 
       // RLS lets the user read exactly their own row; .maybeSingle()
       // returns null when the row hasn't been created yet.
@@ -116,7 +148,9 @@ export default function ProfilePage() {
   // Dirty check — controls whether Save is enabled and whether the
   // discard banner shows.
   const dirty =
-    JSON.stringify(form) !== JSON.stringify(initial) && !loading;
+    (JSON.stringify(form) !== JSON.stringify(initial) ||
+      marketingOptIn !== initialMarketing) &&
+    !loading;
 
   async function onSave(e: React.FormEvent) {
     e.preventDefault();
@@ -154,9 +188,41 @@ export default function ProfilePage() {
         .single();
       if (err) throw err;
 
+      // Marketing consent → user_metadata (its canonical home; signup
+      // wrote it there). A failure here is a real save failure — the
+      // toggle would silently revert on reload — so it throws.
+      if (marketingOptIn !== initialMarketing) {
+        const { error: metaErr } = await supabase.auth.updateUser({
+          data: { marketing_opt_in: marketingOptIn },
+        });
+        if (metaErr) throw metaErr;
+      }
+
+      // Best-effort sync into rental_profiles so operator-facing leads
+      // pick up fresh contact info. The table (+ RLS) ships with the
+      // rental-inquiry API migration; if it isn't applied yet, or RLS
+      // is service-role-only, the upsert errors — ignored on purpose so
+      // the canonical saves above never fail on it.
+      void supabase
+        .from("rental_profiles")
+        .upsert(
+          {
+            user_id: userData.user.id,
+            full_name: form.full_name || null,
+            phone: form.phone || null,
+            marketing_opt_in: marketingOptIn,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: "user_id" },
+        )
+        .then(() => {
+          /* advisory sync — outcome intentionally ignored */
+        });
+
       const updated = fromRow(row);
       setInitial(updated);
       setForm(updated);
+      setInitialMarketing(marketingOptIn);
       setSavedFlash(true);
       setTimeout(() => setSavedFlash(false), 3000);
     } catch (err) {
@@ -323,6 +389,31 @@ export default function ProfilePage() {
                 </select>
               </Field>
             </Row>
+          </Section>
+
+          {/* Rentals ─────────────────────────────────── */}
+          <Section title="Rentals" hint="Requests + drop alerts">
+            <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-rule bg-cream-2/40 p-3 text-xs">
+              <input
+                type="checkbox"
+                checked={marketingOptIn}
+                onChange={(e) => setMarketingOptIn(e.target.checked)}
+                className="mt-0.5 h-4 w-4 accent-red"
+              />
+              <span className="text-ink-soft">
+                Send me Miami drops and member offers. Unsubscribe any time.
+              </span>
+            </label>
+            <p className="text-xs text-ink-soft">
+              Sent a rental request? Track every one under{" "}
+              <Link
+                href="/account/requests"
+                className="text-red hover:text-red-deep"
+              >
+                Rental requests
+              </Link>
+              .
+            </p>
           </Section>
 
           {/* Save bar ─────────────────────────────────── */}

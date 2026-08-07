@@ -17,6 +17,9 @@ type Item = {
 
 const ITEMS: Item[] = [
   { href: "/account", label: "Overview", icon: "◇", hint: "Stats + activity" },
+  // Rental-first ordering: requests sit directly under Overview,
+  // mirroring the admin pipeline's placement.
+  { href: "/account/requests", label: "Rental requests", icon: "◔", hint: "Where each request stands" },
   { href: "/account/portfolio", label: "Your shares", icon: "◑", hint: "Cars you co-own" },
   { href: "/account/profile", label: "Profile", icon: "◐", hint: "Name, contact, address" },
   { href: "/account/security", label: "Login & security", icon: "◆", hint: "Email, password, sessions" },

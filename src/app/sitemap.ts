@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { VEHICLES } from "@/lib/market-data";
+import { PARTNER_VEHICLES } from "@/lib/partner-fleet";
 import { BOATS } from "@/lib/boat-data";
 import { POSTS as JOURNAL_POSTS } from "@/lib/journal-content";
 import { HELP as HELP_CATEGORIES } from "@/lib/help-content";
@@ -15,14 +16,21 @@ import { LEARN_ARTICLES } from "@/lib/learn-content";
 // /onboarding, /bookings/*, /admin/*) are intentionally NOT listed.
 
 const PUBLIC_ROUTES = [
+  // "" is the rentals-first landing page; /rent is the canonical
+  // browse grid users click through to. Both are listed — they are
+  // distinct pages, not duplicates. /rent/[slug] detail pages are
+  // emitted below.
   "",
+  "/rent",
+  // Rental-first surfaces.
+  "/partners",
+  "/co-ownership",
   // Verticals, splash for each line of business.
   "/cars",
   "/boats",
   "/planes",
   // Cars marketing surfaces.
   "/portfolio",
-  "/rent",
   "/membership",
   "/how-it-works",
   "/about",
@@ -87,7 +95,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${siteUrl}${path}`,
     lastModified,
     changeFrequency: "weekly" as const,
-    priority: path === "" ? 1.0 : path === "/cars" || path === "/boats" || path === "/planes" ? 0.9 : 0.7,
+    // Priorities: the landing page leads, the browse grid sits just
+    // under it (and above every secondary marketing page).
+    priority:
+      path === ""
+        ? 1.0
+        : path === "/rent"
+          ? 0.9
+          : path === "/cars" || path === "/boats" || path === "/planes"
+            ? 0.8
+            : 0.7,
   }));
 
   const vehicleEntries: MetadataRoute.Sitemap = VEHICLES.flatMap((v) => [
@@ -114,6 +131,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
         ]
       : []),
   ]);
+
+  // Partner-fleet rental detail pages. These are the marketplace's
+  // primary SEO surface post-pivot: one indexable page per partner car
+  // at /rent/[slug]. Priority sits above the co-own marketing pages
+  // and equal to the RYDA-fleet rental pages emitted above.
+  const partnerEntries: MetadataRoute.Sitemap = PARTNER_VEHICLES.map(
+    (p) => ({
+      url: `${siteUrl}/rent/${p.slug}`,
+      lastModified,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    }),
+  );
 
   const boatEntries: MetadataRoute.Sitemap = BOATS.flatMap((b) => [
     {
@@ -177,6 +207,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     ...staticEntries,
     ...vehicleEntries,
+    ...partnerEntries,
     ...boatEntries,
     ...journalEntries,
     ...helpEntries,

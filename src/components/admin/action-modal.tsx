@@ -26,6 +26,9 @@ import { useCallback, useRef, useState } from "react";
 
 export type ActionModalConfig = {
   title: string;
+  /** Rendered with `whitespace-pre-line`, so "\n\n" makes paragraphs —
+   *  disclosure messages (what exactly is about to be linked/paused)
+   *  need more than one sentence. */
   message: string;
   /** Label above the note textarea. Set to false to hide the textarea entirely. */
   noteLabel?: string | false;
@@ -33,6 +36,13 @@ export type ActionModalConfig = {
   noteRequired?: boolean;
   /** Pre-fill the note textarea. */
   initialNote?: string;
+  /** Renders an opt-in checkbox above the buttons. Use it when the
+   *  action has a SECOND, separately destructive side effect that must
+   *  never happen implicitly (e.g. "also pause the linked operator").
+   *  Its state comes back as `checked`. */
+  checkboxLabel?: string;
+  /** Initial checkbox state. Defaults to false — an opt-in must start off. */
+  checkboxDefault?: boolean;
   confirmLabel?: string;
   cancelLabel?: string;
   /** "danger" gives the confirm button the red destructive treatment. */
@@ -42,6 +52,8 @@ export type ActionModalConfig = {
 export type ActionModalResult = {
   confirmed: boolean;
   note: string;
+  /** State of the opt-in checkbox; always false when none was configured. */
+  checked: boolean;
 };
 
 type Resolver = (r: ActionModalResult) => void;
@@ -52,12 +64,14 @@ export function useActionModal(): {
 } {
   const [config, setConfig] = useState<ActionModalConfig | null>(null);
   const [note, setNote] = useState("");
+  const [checked, setChecked] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const resolverRef = useRef<Resolver | null>(null);
 
   const open = useCallback((cfg: ActionModalConfig) => {
     setConfig(cfg);
     setNote(cfg.initialNote ?? "");
+    setChecked(cfg.checkboxDefault === true);
     setError(null);
     return new Promise<ActionModalResult>((resolve) => {
       resolverRef.current = resolve;
@@ -77,13 +91,18 @@ export function useActionModal(): {
         setError("Note required.");
         return;
       }
-      resolverRef.current?.({ confirmed, note: note.trim() });
+      resolverRef.current?.({
+        confirmed,
+        note: note.trim(),
+        checked: cfg.checkboxLabel ? checked : false,
+      });
       resolverRef.current = null;
       setConfig(null);
       setNote("");
+      setChecked(false);
       setError(null);
     },
-    [config, note],
+    [config, note, checked],
   );
 
   const modal = config ? (
@@ -103,7 +122,7 @@ export function useActionModal(): {
         >
           {config.title}
         </h3>
-        <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+        <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-ink-soft">
           {config.message}
         </p>
 
@@ -133,6 +152,20 @@ export function useActionModal(): {
             {error && (
               <span className="mt-1 block text-xs text-red">{error}</span>
             )}
+          </label>
+        )}
+
+        {config.checkboxLabel && (
+          <label className="mt-5 flex items-start gap-2.5 rounded-lg border border-rule bg-cream-2 px-3 py-2.5">
+            <input
+              type="checkbox"
+              checked={checked}
+              onChange={(e) => setChecked(e.target.checked)}
+              className="mt-0.5 h-4 w-4 shrink-0 accent-red"
+            />
+            <span className="text-xs leading-relaxed text-ink-soft">
+              {config.checkboxLabel}
+            </span>
           </label>
         )}
 

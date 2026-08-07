@@ -72,7 +72,7 @@ const compareAccentClasses = {
     bgSoft: "bg-red/5",
     focus: "focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20",
     hoverBgSoft: "hover:bg-red/5",
-    shadow: "shadow-lg shadow-red/30",
+    shadow: "shadow-lg shadow-ink/15",
     range: "accent-red",
   },
   marine: {
@@ -83,7 +83,7 @@ const compareAccentClasses = {
     bgSoft: "bg-marine/5",
     focus: "focus:border-marine focus:outline-none focus:ring-2 focus:ring-marine/20",
     hoverBgSoft: "hover:bg-marine/5",
-    shadow: "shadow-lg shadow-marine/30",
+    shadow: "shadow-lg shadow-ink/15",
     range: "accent-marine",
   },
 } as const;

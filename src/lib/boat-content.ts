@@ -25,7 +25,7 @@ export const HOW_IT_WORKS_STEPS: { n: string; title: string; body: string }[] = 
   {
     n: "01",
     title: "Verify",
-    body: "Apply and complete identity verification.",
+    body: "Sign up and complete identity verification.",
   },
   {
     n: "02",

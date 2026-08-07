@@ -51,3 +51,6 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+# Supabase CLI local link state (project ref) - machine-local, never committed
+supabase/.temp/

@@ -494,7 +494,7 @@ function VehicleCard({ vehicle: v }: { vehicle: Vehicle }) {
               : `Status: ${v.sharesAvailable} of ${v.shares} shares available`
           }
           className={`absolute right-3 top-3 rounded-full px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] backdrop-blur ${
-            isSold ? "bg-mute/90 text-cream" : "bg-red/95 text-cream"
+            isSold ? "bg-ink/80 text-cream" : "bg-red/95 text-cream"
           }`}
         >
           {isSold

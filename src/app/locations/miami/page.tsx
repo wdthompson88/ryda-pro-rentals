@@ -198,7 +198,7 @@ export default function MiamiPage() {
       {/* Sign up */}
       <section className="border-b border-rule bg-ink py-20 text-cream">
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red-bright">
             Members · Miami
           </p>
           <h2 className="mt-4 font-display text-4xl font-light sm:text-5xl">
@@ -219,7 +219,7 @@ export default function MiamiPage() {
               </Link>
               <Link
                 href="/signin"
-                className="inline-flex h-12 items-center justify-center rounded-full border border-cream/30 px-7 text-sm font-medium text-cream transition-colors hover:border-red hover:text-red"
+                className="inline-flex h-12 items-center justify-center rounded-full border border-cream/30 px-7 text-sm font-medium text-cream transition-colors hover:border-cream hover:bg-cream hover:text-ink"
               >
                 Sign in
               </Link>

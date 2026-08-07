@@ -58,7 +58,19 @@ export function escapeHtml(s: string): string {
     .replace(/'/g, "&#39;");
 }
 
-export function emailLayout(title: string, innerHtml: string): string {
+// Default footer suits internal team notifications (the original and
+// most common use). Customer- or operator-facing emails MUST pass
+// their own `footerText` — a rental customer is not "the member", and
+// a nonsensical system footer is exactly the wrong note to strike
+// under a live payment link.
+export const TEAM_EMAIL_FOOTER =
+  "Sent by RYDA system. Reply to this email to respond directly to the member.";
+
+export function emailLayout(
+  title: string,
+  innerHtml: string,
+  footerText: string = TEAM_EMAIL_FOOTER,
+): string {
   return `<!doctype html>
 <html>
 <body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f4f1ec;margin:0;padding:24px;color:#1c1c1c;">
@@ -70,7 +82,7 @@ export function emailLayout(title: string, innerHtml: string): string {
       </td>
     </tr>
     <tr><td style="padding:24px;font-size:14px;line-height:1.55;">${innerHtml}</td></tr>
-    <tr><td style="background:#faf7f2;padding:14px 24px;color:#9A9590;font-size:11px;border-top:1px solid #e5e1d8;">Sent by RYDA system. Reply to this email to respond directly to the member.</td></tr>
+    <tr><td style="background:#faf7f2;padding:14px 24px;color:#514C47;font-size:11px;border-top:1px solid #e5e1d8;">${escapeHtml(footerText)}</td></tr>
   </table>
 </body>
 </html>`;

@@ -39,9 +39,16 @@ const BENEFITS: { label: string; body: string }[] = [
   },
   {
     label: "You stay in control",
-    body: "Set your own availability, pricing, and blackout dates. RYDA is a channel — not a middleman that takes over your client relationships.",
+    body: "Set your own availability, pricing, and blackout dates. You keep the client relationship and the rental contract; RYDA is the channel that brings them to you and takes a commission when it does.",
   },
 ];
+
+// The commercial term, stated before anyone applies. It used to appear
+// for the first time on the post-approval dashboard — after Stripe KYC
+// was already signed — which is the worst possible moment to learn
+// there's a fee. DEFAULT_COMMISSION_PCT must track the 0041 default
+// (commission_rate 0.150); per-operator rates are set in admin.
+const DEFAULT_COMMISSION_PCT = 15;
 
 const STEPS: { n: string; title: string; body: string }[] = [
   {
@@ -61,8 +68,13 @@ const STEPS: { n: string; title: string; body: string }[] = [
   },
   {
     n: "04",
+    title: "Activate payments",
+    body: "We send you a Stripe onboarding link. Stripe verifies your business and bank details so bookings pay out directly to you — RYDA never holds your money.",
+  },
+  {
+    n: "05",
     title: "Live",
-    body: "Your fleet goes live on RYDA. Enquiries reach you directly. You handle it from there, exactly as you do today.",
+    body: "Your fleet goes live on RYDA. Enquiries reach you directly, you confirm the price, and the customer pays on your own Stripe account.",
   },
 ];
 
@@ -90,7 +102,7 @@ export default function PartnersPage() {
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
             <Link
-              href="/contact?type=Partner&note=Fleet%20Partner%20Program%20application"
+              href="/signup?as=partner"
               className="inline-flex h-12 items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream transition-colors hover:bg-red"
             >
               Apply to list your fleet →
@@ -144,7 +156,7 @@ export default function PartnersPage() {
             From application to live in days, not months.
           </h2>
 
-          <ol className="mt-12 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+          <ol className="mt-12 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-5 lg:gap-8">
             {STEPS.map((s) => (
               <li key={s.n}>
                 <p className="font-display text-2xl text-red">{s.n}</p>
@@ -158,10 +170,62 @@ export default function PartnersPage() {
         </div>
       </section>
 
+      {/* What it costs — stated up front, before the application and
+          well before Stripe onboarding. */}
+      <section className="border-b border-rule bg-cream-2">
+        <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+            What it costs
+          </p>
+          <h2 className="mt-3 max-w-3xl font-display text-3xl text-ink sm:text-4xl">
+            {DEFAULT_COMMISSION_PCT}% commission on bookings RYDA brings you.
+            Nothing else.
+          </h2>
+          <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-3">
+            <div className="rounded-2xl border border-rule bg-surface p-6">
+              <p className="font-display text-xl text-ink">
+                No listing or monthly fee
+              </p>
+              <p className="mt-3 text-sm leading-relaxed text-ink-soft">
+                No setup cost, no subscription, no minimum. If RYDA sends
+                you nothing, RYDA earns nothing.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-rule bg-surface p-6">
+              <p className="font-display text-xl text-ink">
+                Taken at the moment of payment
+              </p>
+              <p className="mt-3 text-sm leading-relaxed text-ink-soft">
+                You confirm the price with the client. The customer pays on
+                your own Stripe account and the {DEFAULT_COMMISSION_PCT}%
+                is deducted automatically — no invoices, no chasing. On a
+                $2,000 booking that&apos;s $
+                {(2000 * (1 - DEFAULT_COMMISSION_PCT / 100)).toLocaleString(
+                  "en-US",
+                )}{" "}
+                to you.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-rule bg-surface p-6">
+              <p className="font-display text-xl text-ink">
+                Your rates stay yours
+              </p>
+              <p className="mt-3 text-sm leading-relaxed text-ink-soft">
+                RYDA never marks up your price to the client, and the rate
+                is agreed with you before you go live — the standard is{" "}
+                {DEFAULT_COMMISSION_PCT}%.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="border-b border-rule bg-ink text-cream">
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+          {/* On the bg-ink band the eyebrow must be red-bright — standard
+              red is tuned for cream and fails AA on ink. */}
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red-bright">
             Let&apos;s talk
           </p>
           <h2 className="mt-3 font-display text-3xl sm:text-4xl">
@@ -174,10 +238,19 @@ export default function PartnersPage() {
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
-              href="/contact?type=Partner&note=Fleet%20Partner%20Program%20application"
+              href="/signup?as=partner"
               className="inline-flex h-12 items-center justify-center rounded-full bg-red px-7 text-sm font-medium text-cream hover:bg-red-deep"
             >
-              Get in touch →
+              Apply as a partner →
+            </Link>
+            {/* type must be "Partnership" — the only partner-ish value
+                in the contact form's VALID_TYPES; anything else lands
+                as "Other" with no triage intent. */}
+            <Link
+              href="/contact?type=Partnership&note=Fleet%20Partner%20Program%20question"
+              className="inline-flex h-12 items-center justify-center rounded-full border border-cream/30 px-7 text-sm font-medium text-cream hover:border-cream"
+            >
+              Ask a question first
             </Link>
             <Link
               href="mailto:partners@ryda.pro"

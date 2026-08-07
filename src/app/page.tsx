@@ -1,336 +1,342 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
-import { SplitterIntro } from "@/components/splitter-intro";
-import { MediaBackground } from "@/components/media-background";
-import { SPLITTER_MEDIA, type MediaSlot } from "@/lib/media";
-import { AuthSwap } from "@/components/auth-aware";
-import { RevealStagger, Reveal } from "@/components/reveal";
-import { BrandMarquee } from "@/components/brand-marquee";
+import { SiteHeader } from "@/components/site-header";
+import { HeroSearch } from "@/components/hero-search";
+import { Reveal, RevealStagger } from "@/components/reveal";
+import { VEHICLES, formatUSD } from "@/lib/market-data";
+import {
+  PARTNER_VEHICLES,
+  getPartnerHero,
+  type PartnerVehicle,
+} from "@/lib/partner-fleet";
 
-// Splitter, three full-height columns. One ambient b-roll loop per
-// vertical (Lambo / overhead yacht / private jet). Hover lights the
-// column up via brightness/saturation lift + scale + red glow. On
-// reduced-motion preference the videos are skipped and the poster
-// images get a subtle Ken-Burns zoom instead.
+// Rental-first landing page (founder decision, Aug 2026): the homepage
+// does NOT land straight in inventory. "/" tells the whole story —
+// hero, featured fleet, how it works, straight answers, closing CTA —
+// and the car-browsing grid lives at /rent, one click away.
 //
-// Columns stagger-in via framer-motion as the splitter veil dismisses.
-// Below the splitter sits a single editorial band — founder voice,
-// member criteria, soft cross-links to /about and /inside. This is the
-// only scroll content on /; the splitter remains the page's signature.
+// The model in one breath: browse → request with dates → a vetted
+// Miami operator confirms and closes the rental on their own contract
+// and insurance. Operators pay RYDA a referral commission on bookings
+// we send them. Operators are never named publicly; they introduce
+// themselves when they confirm.
+//
+// Ownership-program content stays OFF this page entirely — that
+// program's single quiet home is its own page, reachable from the
+// footer (Cars column in site-footer) and a quiet pointer at the
+// end of /how-it-works.
+
+// og/twitter are declared here in full because Next merges metadata
+// shallowly per top-level key: without them the home page inherits
+// the root layout's co-ownership-led social card ("Supercar
+// co-ownership and rentals"), which contradicts the rental-first
+// rule above the moment the URL is pasted into iMessage/Slack/X.
+const HOME_SOCIAL_DESCRIPTION =
+  "Miami's most-wanted exotics. One request away. Pick a car, send your dates, and a vetted Miami operator confirms directly with you — no card, no payment through RYDA.";
 
 export const metadata: Metadata = {
-  title: "Luxury vehicle access",
-  description:
-    "Co-own or rent the world's most coveted luxury vehicles in the US. Cars · Boats · Planes. Member-managed LLCs, professionally operated.",
+  title: "Rent Miami's most-wanted exotics",
+  description: HOME_SOCIAL_DESCRIPTION,
+  openGraph: {
+    title: "RYDA — Rent Miami's most-wanted exotics",
+    description: HOME_SOCIAL_DESCRIPTION,
+    siteName: "RYDA",
+    type: "website",
+    locale: "en_US",
+    url: "/",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "RYDA — Rent Miami's most-wanted exotics",
+    description: HOME_SOCIAL_DESCRIPTION,
+  },
 };
 
-type Accent = "red" | "marine" | "neutral";
+// ─────────────────────────────────────────────────────────────────────────
+// Data — assembled at module scope (build time). The four highest daily
+// rates in the Miami partner fleet that have a real hero photo: the top
+// car takes the full-bleed hero, the next three fill the Featured-fleet
+// grid. The hero car is deliberately EXCLUDED from the grid so the same
+// photo never appears twice on the landing page.
+// ─────────────────────────────────────────────────────────────────────────
 
-type Vertical = {
-  href: string;
-  label: string;
-  tagline: string;
-  bullet: string;
-  /** Status pill copy. "live" = operational; "early" = site live but ops
-   *  start at a future date (members can join the member cohort now);
-   *  "coming-soon" = in design, not capturing serious leads. */
-  status: "live" | "early" | "coming-soon";
-  pillLabel: string;
-  media: MediaSlot;
-  /** Per-vertical accent, cars use red, boats use marine, planes
-   *  stay neutral until they ship. */
-  accent: Accent;
-};
+const FEATURED: PartnerVehicle[] = [...PARTNER_VEHICLES]
+  .filter((v) => v.market === "Miami" && Boolean(getPartnerHero(v)))
+  .sort((a, b) => b.dailyRate - a.dailyRate)
+  .slice(0, 4);
 
-const VERTICALS: Vertical[] = [
-  {
-    href: "/cars",
-    label: "Cars",
-    tagline: "The road, without limits.",
-    // Per dual-audit Finding 3 (May 2026): "Live · Miami today"
-    // contradicted "Q3 2026 launch" copy elsewhere. A buyer who
-    // catches that on first read downgrades trust. Now matches the
-    // honest pre-launch state every other surface uses.
-    bullet: "Founding cohort · Miami launch Q3 2026",
-    status: "live",
-    pillLabel: "Founding cohort",
-    media: SPLITTER_MEDIA.cars,
-    accent: "red",
-  },
-  {
-    href: "/boats",
-    label: "Boats",
-    tagline: "The sea, where the horizon opens.",
-    bullet: "Founding cohort · Miami launch Q3 2026",
-    status: "live",
-    pillLabel: "Founding cohort",
-    media: SPLITTER_MEDIA.boats,
-    accent: "marine",
-  },
-  {
-    href: "/planes",
-    label: "Planes",
-    tagline: "The sky, within reach.",
-    bullet: "Coming soon",
-    status: "coming-soon",
-    pillLabel: "Coming soon",
-    media: SPLITTER_MEDIA.planes,
-    accent: "neutral",
-  },
-];
+const HERO_CAR = FEATURED[0];
+const HERO_PHOTO = HERO_CAR ? getPartnerHero(HERO_CAR) : undefined;
 
-export default function SplitterPage() {
+// Total browsable inventory: partner fleet + RYDA cars flagged
+// rentalAvailable — the same merge /rent renders.
+const FLEET_COUNT =
+  PARTNER_VEHICLES.length + VEHICLES.filter((v) => v.rentalAvailable).length;
+
+export default function HomePage() {
   return (
     <>
-    {/* Semantic H1 for SEO + a11y. The splitter's "RYDA" wordmark
-        and the Cars/Boats/Planes labels are visually heading-sized
-        but render as <p> tags, so search engines + screen readers
-        previously had no anchor for the page's topic (audit Finding
-        4, May 2026). The visually-hidden H1 below covers both
-        without disrupting the splitter visual. */}
-    <h1 className="sr-only">
-      RYDA — fractional luxury vehicle co-ownership in Miami. Cars, boats, and planes.
-    </h1>
-    <div className="relative min-h-screen overflow-hidden bg-[#0E0E10] text-[#F4F1EC]">
-      <SplitterIntro />
+      <SiteHeader />
 
-      {/* Floating top bar, minimal, hovers over the columns. 3-column
-          grid so "Luxury vehicle access" is truly centered on the page,
-          not just floated between unequal-width left/right groups. */}
-      <div className="absolute inset-x-0 top-0 z-30 grid grid-cols-3 items-center px-6 py-6 sm:px-10 sm:py-8">
-        <Link
-          href="/"
-          className="justify-self-start font-display text-2xl tracking-tight text-[#F4F1EC]"
-        >
-          RYDA
-        </Link>
-        <p className="hidden justify-self-center text-sm font-medium uppercase tracking-[0.32em] text-[#F4F1EC]/75 sm:block">
-          Luxury vehicle access
-        </p>
-        <div className="flex items-center justify-self-end gap-3 sm:gap-4">
-          <Link
-            href="/investors"
-            className="hidden text-sm font-medium uppercase tracking-[0.18em] text-[#F4F1EC]/75 transition-colors hover:text-[#F4F1EC] lg:inline-block"
-          >
-            Investors
-          </Link>
-          {/* Paired auth CTAs in the splitter top bar. Anon members see
-              Log in (soft cream-on-ink outline) next to Sign up (solid
-              cream). Signed-in members see a single "Account" button
-              that takes the Sign-up slot's styling. */}
-          <AuthSwap
-            anon={
-              <>
-                <Link
-                  href="/signin"
-                  className="hidden rounded-full border border-[#F4F1EC]/30 bg-[#F4F1EC]/10 px-5 py-2 text-sm font-medium text-[#F4F1EC] transition-colors hover:bg-[#F4F1EC] hover:text-[#0E0E10] sm:inline-flex"
-                >
-                  Log in
-                </Link>
-                <Link
-                  href="/signup"
-                  className="inline-flex rounded-full border border-[#F4F1EC] bg-[#F4F1EC] px-5 py-2 text-sm font-medium text-[#0E0E10] transition-colors hover:bg-red hover:text-[#F4F1EC] hover:border-red"
-                >
-                  Sign up
-                </Link>
-              </>
-            }
-            authed={
+      {/* ── Hero ─────────────────────────────────────────────────── */}
+      <section className="border-b border-rule bg-cream py-16 md:py-24">
+        <div className="mx-auto max-w-7xl px-6 sm:px-10">
+          <Reveal>
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+              Exotic rentals · Miami
+            </p>
+            <h1 className="mt-4 max-w-3xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
+              Miami&apos;s most-wanted exotics. One request away.
+            </h1>
+            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink-soft">
+              Pick a car, send your dates, and a vetted Miami operator
+              confirms directly with you.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center gap-5">
               <Link
-                href="/account"
-                className="inline-flex rounded-full border border-[#F4F1EC] bg-[#F4F1EC] px-5 py-2 text-sm font-medium text-[#0E0E10] transition-colors hover:bg-red hover:text-[#F4F1EC] hover:border-red"
+                href="/rent"
+                className="inline-flex h-12 items-center justify-center rounded-full bg-red px-7 text-sm font-medium text-cream transition-colors hover:bg-red-deep"
               >
-                Account
+                Browse the fleet
               </Link>
-            }
-          />
+              <Link
+                href="/how-it-works"
+                className="text-sm font-medium text-ink underline-offset-4 hover:text-red hover:underline"
+              >
+                How it works →
+              </Link>
+            </div>
+
+            {/* Hero search — straight into /rent with ?q= applied. Sits
+                between the CTA row and the hero image; max-w-xl keeps
+                the composition balanced against the max-w-2xl copy. */}
+            <div className="mt-6 max-w-xl">
+              <HeroSearch />
+            </div>
+          </Reveal>
+
+          {/* One strong image — the top car in the fleet, no video, no
+              carousel. Links through to its detail page. */}
+          {HERO_CAR && HERO_PHOTO ? (
+            <Reveal delayMs={120}>
+              <Link
+                href={`/rent/${HERO_CAR.slug}`}
+                className="group mt-12 block"
+              >
+                <div className="relative aspect-[16/9] w-full max-w-7xl overflow-hidden rounded-2xl border border-rule md:aspect-[21/9]">
+                  <Image
+                    src={HERO_PHOTO}
+                    alt={`${HERO_CAR.make} ${HERO_CAR.model} — available to rent in ${HERO_CAR.market}`}
+                    fill
+                    priority
+                    sizes="(min-width: 1280px) 1216px, 100vw"
+                    className="object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+                    unoptimized
+                  />
+                  <span className="absolute left-4 top-4 rounded-full bg-cream/95 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] text-ink backdrop-blur">
+                    {HERO_CAR.make} {HERO_CAR.model}
+                  </span>
+                </div>
+                <p className="mt-3 text-xs text-mute">
+                  {HERO_CAR.make} {HERO_CAR.model} ·{" "}
+                  <span className="tabular-nums">
+                    {formatUSD(HERO_CAR.dailyRate)}
+                  </span>
+                  /day in {HERO_CAR.market} —{" "}
+                  <span className="font-medium text-red group-hover:text-red-deep">
+                    view the car →
+                  </span>
+                </p>
+              </Link>
+            </Reveal>
+          ) : null}
         </div>
-      </div>
+      </section>
 
-      {/* Columns stagger-in as the splitter veil dismisses. RevealStagger
-          fires immediately on mount because the columns are already in
-          the viewport — `whileInView` resolves true on first paint. The
-          ~80ms cascade gives Cars → Boats → Planes a left-to-right
-          reveal that mirrors how the eye scans the page. */}
-      <RevealStagger
-        as="div"
-        className="flex min-h-screen flex-col lg:flex-row"
-        staggerMs={80}
-        initialDelayMs={150}
-        distance={20}
-        durationMs={750}
-      >
-        {VERTICALS.map((v, i) => (
-          <VerticalColumn key={v.href} v={v} index={i} />
-        ))}
-      </RevealStagger>
-    </div>
+      {/* ── Featured fleet ───────────────────────────────────────── */}
+      <section className="border-b border-rule bg-cream py-16 md:py-24">
+        <div className="mx-auto max-w-7xl px-6 sm:px-10">
+          <Reveal>
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+              Featured fleet
+            </p>
+            <h2 className="mt-3 max-w-2xl font-display text-3xl text-ink md:text-4xl">
+              The cars Miami asks for by name.
+            </h2>
+          </Reveal>
+          <RevealStagger
+            className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3"
+            staggerMs={80}
+          >
+            {/* Grid takes the three cars AFTER the hero — FEATURED[0]
+                already fills the hero image above. */}
+            {FEATURED.slice(1, 4).map((v) => (
+              <FeaturedCard key={v.slug} vehicle={v} />
+            ))}
+          </RevealStagger>
+          <Reveal delayMs={80}>
+            <p className="mt-10">
+              <Link
+                href="/rent"
+                className="text-sm font-medium text-red hover:text-red-deep"
+              >
+                View all {FLEET_COUNT} cars →
+              </Link>
+            </p>
+          </Reveal>
+        </div>
+      </section>
 
-    {/* Flagship offer band. Sits between the splitter (which sells the
-        brand) and the editorial second screen (which sells the founder
-        voice). Per the dual-audit (Claude + Codex, May 2026): the
-        homepage previously communicated category, not value prop. A
-        $5-15M Miami HNW buyer should know in 5 seconds what the actual
-        offer is. This band is that 5-second answer. Three numbers, one
-        sentence, one CTA. */}
-    <FlagshipOfferBand />
+      {/* ── How it works ─────────────────────────────────────────── */}
+      <section className="border-b border-rule bg-cream-2 py-16 md:py-24">
+        <div className="mx-auto max-w-7xl px-6 sm:px-10">
+          <Reveal>
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+              How it works
+            </p>
+            <h2 className="mt-3 max-w-2xl font-display text-3xl text-ink md:text-4xl">
+              Three steps between you and the keys.
+            </h2>
+          </Reveal>
+          <RevealStagger
+            className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3"
+            staggerMs={80}
+          >
+            <StepCard
+              n="01"
+              title="Browse the fleet"
+              body="One curated grid — Lamborghini, Ferrari, Rolls-Royce and the rest of Miami's most-wanted inventory. Every listing is real, bookable stock."
+            />
+            <StepCard
+              n="02"
+              title="Request your dates"
+              body="A 30-second account saves your details for next time; no card, no payment through RYDA."
+            />
+            <StepCard
+              n="03"
+              title="The operator confirms"
+              body="Availability, final price, and keys, directly with you — on their contract and insurance."
+            />
+          </RevealStagger>
+          <Reveal delayMs={80}>
+            <p className="mt-10">
+              <Link
+                href="/how-it-works"
+                className="text-sm font-medium text-red hover:text-red-deep"
+              >
+                The full picture →
+              </Link>
+            </p>
+          </Reveal>
+        </div>
+      </section>
 
-    <BelowFoldEditorial />
+      {/* ── Straight answers — deliberate dark island on bg-ink.
+             Bright accents only here; standard `red` is tuned for
+             cream and fails AA on ink. ─────────────────────────────── */}
+      <section className="bg-ink py-16 text-cream md:py-24">
+        <div className="mx-auto max-w-7xl px-6 sm:px-10">
+          <Reveal>
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-red-bright">
+              Straight answers
+            </p>
+            <h2 className="mt-3 max-w-2xl font-display text-3xl md:text-4xl">
+              What RYDA is — and what it isn&apos;t.
+            </h2>
+          </Reveal>
+          <RevealStagger
+            className="mt-10 grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4"
+            staggerMs={80}
+          >
+            <InkPillar
+              title="Vetted operators"
+              body="Every car is run by a Miami operator we've vetted — real fleet, real garage. They introduce themselves when they confirm."
+            />
+            <InkPillar
+              title="Their contract & insurance"
+              body="The rental closes on the operator's own agreement and coverage — the same terms you'd get going direct."
+            />
+            <InkPillar
+              title="The operator's price"
+              body="No markup, no booking fee. Requesting through RYDA never costs more than going direct."
+            />
+            <InkPillar
+              title="No payment through RYDA"
+              body="No card at request. Nothing is charged until you and the operator confirm the booking together."
+            />
+          </RevealStagger>
+        </div>
+      </section>
+
+      {/* ── Closing CTA ──────────────────────────────────────────── */}
+      <section className="bg-cream py-16 md:py-24">
+        <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
+          <Reveal>
+            <h2 className="font-display text-3xl font-light text-ink md:text-4xl">
+              {FLEET_COUNT} cars. One request between you and the keys.
+            </h2>
+            <Link
+              href="/rent"
+              className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-red px-7 text-sm font-medium text-cream transition-colors hover:bg-red-deep"
+            >
+              Browse the fleet
+            </Link>
+          </Reveal>
+        </div>
+      </section>
     </>
   );
 }
 
-// Single-flow band that answers the "what is this actually" question
-// for a first-time buyer. The splitter shows the brand; this band
-// shows the offer.
-function FlagshipOfferBand() {
-  return (
-    <section className="border-b border-rule bg-cream py-16 sm:py-20">
-      <div className="mx-auto max-w-6xl px-6 sm:px-10">
-        <Reveal>
-          <p className="text-xs font-medium uppercase tracking-[0.22em] text-red">
-            Founding cohort · Miami launch Q3 2026
-          </p>
-          <h2 className="mt-4 max-w-4xl font-display text-4xl font-light leading-[1.1] text-ink sm:text-5xl">
-            Co-own a <span className="italic">Ferrari 296 GTB</span> in
-            Miami. One of ten shares.
-          </h2>
-        </Reveal>
+// ─────────────────────────────────────────────────────────────────────────
+// Local components — the featured cards are deliberately NOT the
+// marketplace RentalCard: no savings badges, no ownership-program chrome,
+// just photo · name · category · rate.
+// ─────────────────────────────────────────────────────────────────────────
 
-        <Reveal delayMs={120}>
-          <div className="mt-10 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-rule bg-rule sm:grid-cols-3">
-            {[
-              { label: "Buy-in", value: "$34K", note: "per share, 2-share minimum" },
-              { label: "Annual ops", value: "$7,080", note: "all-in, fixed" },
-              { label: "Driving days", value: "~32 / yr", note: "year-2 planned exit" },
-            ].map((stat) => (
-              <div key={stat.label} className="bg-surface p-6 sm:p-7">
-                <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-mute">
-                  {stat.label}
-                </p>
-                <p className="mt-3 font-display text-3xl tabular-nums text-ink sm:text-4xl">
-                  {stat.value}
-                </p>
-                <p className="mt-2 text-xs leading-relaxed text-ink-soft">
-                  {stat.note}
-                </p>
-              </div>
-            ))}
-          </div>
-        </Reveal>
-
-        <Reveal delayMs={200}>
-          <div className="mt-10 flex flex-wrap items-center gap-4">
-            {/* Primary CTA per the dual-audit's Finding 2: "Sign up" is
-                the wrong first-action verb for a $68K minimum. The
-                founding-cohort buyer is one phone call away, not one
-                form submission. */}
-            <Link
-              href="/contact?type=Membership#form"
-              className="inline-flex h-12 items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream hover:bg-red"
-            >
-              Talk to a founder
-            </Link>
-            <Link
-              href="/portfolio/f458"
-              className="inline-flex h-12 items-center justify-center rounded-full border border-rule bg-surface px-7 text-sm font-medium text-ink hover:border-ink"
-            >
-              See the Ferrari →
-            </Link>
-            <p className="text-xs text-mute">
-              30-minute discovery call. No commitment. The deck and the
-              operating-agreement template come after.
-            </p>
-          </div>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
-function VerticalColumn({ v, index }: { v: Vertical; index: number }) {
-
-  // Per-vertical accent classes. Tailwind needs these spelled out
-  // explicitly (no string interpolation) so the JIT can pick them up.
-  const accentClasses = {
-    red: {
-      glow: "from-red/35",
-      eyebrowHover: "group-hover:text-red",
-      pill: "bg-red/95 text-[#F4F1EC]",
-    },
-    marine: {
-      glow: "from-marine/40",
-      eyebrowHover: "group-hover:text-marine",
-      pill: "bg-marine/95 text-[#F4F1EC]",
-    },
-    neutral: {
-      glow: "from-[#F4F1EC]/15",
-      eyebrowHover: "group-hover:text-[#F4F1EC]",
-      pill: "border border-[#F4F1EC]/40 text-[#F4F1EC]/85 group-hover:border-[#F4F1EC] group-hover:text-[#F4F1EC]",
-    },
-  }[v.accent];
-
+function FeaturedCard({ vehicle: v }: { vehicle: PartnerVehicle }) {
+  const hero = getPartnerHero(v);
   return (
     <Link
-      href={v.href}
-      className="group relative flex min-h-[60vh] flex-1 items-end overflow-hidden border-[#F4F1EC]/10 lg:min-h-screen lg:border-r last:lg:border-r-0"
+      href={`/rent/${v.slug}`}
+      className="group flex flex-col overflow-hidden rounded-2xl border border-rule bg-surface transition-all hover:-translate-y-0.5 hover:border-ink/40 hover:shadow-lg"
     >
-      {/* Media layer, random Pexels b-roll loop on top of poster.
-          MediaBackground picks one clip from the videos array on
-          mount, so each visit shows different footage. Default state
-          is dimmed; hover brightens the whole column. */}
-      <div className="absolute inset-0 transition-all duration-700 ease-out [filter:brightness(0.7)_saturate(0.92)] group-hover:scale-[1.02] group-hover:[filter:brightness(0.92)_saturate(1.08)]">
-        <MediaBackground
-          videos={v.media.videos}
-          poster={v.media.poster}
-          alt={v.media.alt}
-          position={v.media.position}
-          priority={index === 0}
-          sizes="(min-width: 1024px) 33vw, 100vw"
-          kenBurns={true}
-        />
+      <div className="relative aspect-[16/10] w-full overflow-hidden">
+        {hero ? (
+          <Image
+            src={hero}
+            alt={`${v.make} ${v.model}`}
+            fill
+            sizes="(min-width: 768px) 33vw, 100vw"
+            className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+            unoptimized
+          />
+        ) : null}
       </div>
-
-      {/* Dark gradient, heavier at bottom for caption legibility */}
-      <div
-        aria-hidden
-        className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/15 transition-opacity duration-700 group-hover:from-black/55 group-hover:via-black/15 group-hover:to-transparent"
-      />
-
-      {/* Per-vertical accent glow at the bottom on hover */}
-      <div
-        aria-hidden
-        className={`pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t ${accentClasses.glow} to-transparent opacity-0 transition-opacity duration-700 group-hover:opacity-100`}
-      />
-
-      {/* Status pill, "Live" uses the vertical accent (red for cars).
-          "Coming soon" verticals (boats + planes) use the same neutral
-          outlined style so they read consistently as "not open yet"
-          rather than a solid blue button that suggests an action. */}
-      <span
-        className={`absolute right-5 top-24 rounded-full px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] backdrop-blur transition-colors duration-300 sm:top-28 ${
-          v.status === "coming-soon"
-            ? "border border-[#F4F1EC]/40 text-[#F4F1EC]/85 group-hover:border-[#F4F1EC] group-hover:text-[#F4F1EC]"
-            : accentClasses.pill
-        }`}
-      >
-        {v.pillLabel}
-      </span>
-
-      {/* Caption */}
-      <div className="relative z-10 w-full p-7 text-[#F4F1EC] sm:p-10 lg:p-12">
-        <p className={`font-display text-5xl font-light italic leading-[0.95] text-[#F4F1EC] transition-transform duration-700 group-hover:-translate-y-1 sm:text-6xl lg:text-7xl ${accentClasses.eyebrowHover}`}>
-          {v.label}
+      <div className="flex flex-1 flex-col p-5">
+        <p className="text-[11px] uppercase tracking-[0.14em] text-mute">
+          {v.make}
         </p>
-        <p className="mt-5 max-w-sm text-sm leading-relaxed text-[#F4F1EC]/85 sm:text-base">
-          {v.tagline}
+        <h3 className="mt-1 font-display text-xl leading-tight text-ink">
+          {v.model}
+        </h3>
+        <p className="mt-1 text-xs text-mute">
+          {v.category} · {v.market}
         </p>
-        <div className="mt-7 flex items-center justify-between border-t border-[#F4F1EC]/20 pt-5">
-          <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-[#F4F1EC]/55">
-            {v.bullet}
-          </span>
-          <span className="inline-flex items-center gap-1.5 text-sm font-medium text-[#F4F1EC] transition-transform duration-300 group-hover:translate-x-1.5">
-            Enter →
+        <div className="mt-4 flex items-end justify-between gap-4 border-t border-rule pt-4">
+          <p className="font-display text-2xl text-ink tabular-nums">
+            {formatUSD(v.dailyRate)}
+            <span className="ml-1 text-sm text-mute">/day</span>
+          </p>
+          <span className="inline-flex items-center gap-1.5 text-sm font-medium text-red transition-colors group-hover:text-red-deep">
+            View
+            <span
+              aria-hidden
+              className="transition-transform group-hover:translate-x-0.5"
+            >
+              →
+            </span>
           </span>
         </div>
       </div>
@@ -338,129 +344,29 @@ function VerticalColumn({ v, index }: { v: Vertical; index: number }) {
   );
 }
 
-// One editorial band below the splitter. Three jobs:
-//   1. Anchor the brand voice — pull-quote from Ryan's founder note
-//      (same paragraph that opens /about's founder letter, lightly
-//      compressed) so the very first words a scroller reads are the
-//      same words the about page speaks in.
-//   2. Telegraph member criteria — four short specs so a serious
-//      visitor can self-qualify without clicking through. We don't sell
-//      from this band; it's a filter, not a funnel.
-//   3. Hand off — soft links into /about (full founder letter) and
-//      /inside (sample member view). No "Sign up" CTA on the homepage;
-//      that lives in the splitter top bar already.
-//
-// Single section, ~70vh on desktop. Cream surface so it visually breaks
-// from the dark splitter. RevealStagger on the criteria grid so each
-// spec arrives in sequence as the visitor scrolls into it.
-function BelowFoldEditorial() {
-  const criteria: { label: string; value: string }[] = [
-    { label: "Age", value: "28 or older" },
-    { label: "License", value: "Valid US driver's license, clean recent record" },
-    { label: "Minimum stake", value: "2 shares per member" },
-    { label: "Verification", value: "Identity check before any wire" },
-  ];
-
+function StepCard({
+  n,
+  title,
+  body,
+}: {
+  n: string;
+  title: string;
+  body: string;
+}) {
   return (
-    <section className="border-t border-rule bg-cream py-20 sm:py-28">
-      <div className="mx-auto max-w-7xl px-6 sm:px-10">
-        <div className="grid gap-12 lg:grid-cols-12 lg:gap-16">
-          {/* Left column: pull-quote in the founder's voice. */}
-          <Reveal as="div" className="lg:col-span-7">
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-              From the founders
-            </p>
-            <p className="mt-6 font-display text-3xl font-light leading-[1.15] text-ink sm:text-4xl">
-              <span className="italic">&ldquo;Buying outright sits idle.</span>{" "}
-              <span className="italic">Renting is hollow.</span>{" "}
-              Co-ownership is the third option — a real stake in a real
-              car, professionally operated, with a clean LLC underneath.&rdquo;
-            </p>
-            <p className="mt-6 text-sm font-medium uppercase tracking-[0.18em] text-mute">
-              Ryan Galli · Co-founder, RYDA
-            </p>
-            <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm">
-              <Link
-                href="/about"
-                className="inline-flex items-center gap-2 font-medium text-ink underline-offset-4 hover:text-red hover:underline"
-              >
-                Read the founder&apos;s notes
-                <span aria-hidden>→</span>
-              </Link>
-              <Link
-                href="/inside"
-                className="inline-flex items-center gap-2 font-medium text-ink-soft underline-offset-4 hover:text-ink hover:underline"
-              >
-                See what members see
-                <span aria-hidden>→</span>
-              </Link>
-            </div>
-          </Reveal>
+    <div className="rounded-2xl border border-rule bg-surface p-6">
+      <p className="font-display text-2xl text-red">{n}</p>
+      <p className="mt-3 font-display text-xl text-ink">{title}</p>
+      <p className="mt-3 text-sm leading-relaxed text-ink-soft">{body}</p>
+    </div>
+  );
+}
 
-          {/* Right column: member criteria as a small spec grid. Not a
-              feature list — a filter. Anyone who can't tick all four
-              shouldn't apply, and we'd rather they self-select out
-              here than waste a sales cycle. */}
-          <div className="lg:col-span-5">
-            <Reveal>
-              <p className="text-xs font-medium uppercase tracking-[0.2em] text-mute">
-                Membership criteria
-              </p>
-              <p className="mt-3 max-w-md text-sm leading-relaxed text-ink-soft">
-                A short filter so you can self-qualify before you reach
-                out. RYDA is a 100-member founding cohort, not an
-                open-signup platform.
-              </p>
-            </Reveal>
-            <RevealStagger
-              as="div"
-              className="mt-8 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-rule bg-rule sm:grid-cols-2"
-              staggerMs={80}
-              distance={12}
-            >
-              {criteria.map((c) => (
-                <div
-                  key={c.label}
-                  className="bg-surface p-5"
-                >
-                  <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-mute">
-                    {c.label}
-                  </p>
-                  <p className="mt-2 text-sm leading-snug text-ink">
-                    {c.value}
-                  </p>
-                </div>
-              ))}
-            </RevealStagger>
-          </div>
-        </div>
-
-        {/* Quiet curation strip beneath the editorial. Wordmarks, not
-            logos — luxury houses signal taste through letterforms,
-            not third-party marks. The marquee is incidental, almost
-            decorative; it sits behind the editorial weight above and
-            answers an unstated question ("which marques?") without
-            shouting it. */}
-        <div className="mt-16 border-t border-rule pt-12 sm:mt-20 sm:pt-14">
-          <Reveal>
-            <BrandMarquee
-              eyebrow="Curated from"
-              items={[
-                "Ferrari",
-                "Lamborghini",
-                "Porsche",
-                "McLaren",
-                "Aston Martin",
-                "Bugatti",
-                "Koenigsegg",
-                "Lotus",
-                "Mercedes-Benz",
-                "BMW",
-              ]}
-            />
-          </Reveal>
-        </div>
-      </div>
-    </section>
+function InkPillar({ title, body }: { title: string; body: string }) {
+  return (
+    <div className="border-t border-cream/20 pt-5">
+      <p className="font-display text-lg text-cream">{title}</p>
+      <p className="mt-2 text-sm leading-relaxed text-cream/70">{body}</p>
+    </div>
   );
 }

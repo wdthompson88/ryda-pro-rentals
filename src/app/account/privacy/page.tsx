@@ -259,7 +259,7 @@ function DeleteAccountCard() {
         </div>
       )}
       {requested && (
-        <p className="rounded-xl border border-amber-500/40 bg-amber-500/5 px-4 py-3 text-sm text-amber-700">
+        <p className="rounded-xl border border-warn/40 bg-warn/5 px-4 py-3 text-sm text-warn-deep">
           Deletion request received. Legal will email you within one business
           day to walk through share-buyback. You stay signed in until they
           confirm with you — there's a 24-hour cooling-off window before

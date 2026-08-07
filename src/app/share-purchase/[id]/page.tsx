@@ -406,7 +406,7 @@ export default function PurchasePage({
         </>
       ) : null}
 
-      <section className="bg-ink py-10 text-center text-cream/60">
+      <section className="bg-ink py-10 text-center text-cream/75">
         <p className="text-xs">
           Live tracker. Stripe-driven payment confirmations land here within
           a minute of clearing.
@@ -617,7 +617,7 @@ function WelcomeView({ purchase }: { purchase: Purchase }) {
         </div>
       </section>
 
-      <section className="bg-ink py-10 text-center text-cream/60">
+      <section className="bg-ink py-10 text-center text-cream/75">
         <p className="text-xs">
           Live tracker. Stripe-driven payment confirmations land here within
           a minute of clearing.

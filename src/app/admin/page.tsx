@@ -107,6 +107,16 @@ type Overview = {
 
 const SUB_ROUTES = [
   { href: "/admin", label: "Triage", note: "this page" },
+  { href: "/admin/inquiries", label: "Inquiries", note: "rental lead pipeline" },
+  // ONE Partners entry. /admin/partners unified the two pre-merge pages
+  // (applications + operator roster) behind a tab bar; two rows for the
+  // same href collided on the nav's React key and implied two
+  // destinations four chips apart.
+  {
+    href: "/admin/partners",
+    label: "Partners",
+    note: "applications + operators + Stripe onboarding",
+  },
   { href: "/admin/calendar", label: "Calendar", note: "booking calendar" },
   { href: "/admin/creative", label: "Creative", note: "marketing generation queue" },
   { href: "/admin/documents", label: "Documents", note: "sample packet + legal templates" },
@@ -926,8 +936,8 @@ function pill(status: string) {
       : tone === "warn"
         ? "bg-red/10 text-red"
         : tone === "info"
-          ? "bg-amber-500/15 text-amber-700"
-          : "bg-mute/15 text-mute";
+          ? "bg-warn/15 text-warn-deep"
+          : "bg-mute/15 text-ink-soft";
   return (
     <span
       className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${cls}`}
