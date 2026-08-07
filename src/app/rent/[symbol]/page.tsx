@@ -368,10 +368,14 @@ export default async function RentDetailPage({
             </div>
 
             {/* Payment: RYDA-fleet cars settle with RYDA; partner cars
-                settle with the operator on their contract — money never
-                moves through RYDA on a partner rental, and this page
-                must not imply it does. (No membership upsell here —
-                co-ownership/membership copy stays off rental surfaces.) */}
+                settle on the OPERATOR's own Stripe account (fee-only
+                direct charges, 0041) — rental money never enters a RYDA
+                balance, and this page must not imply it does. It must
+                not claim the opposite either: the Checkout link is
+                created and emailed BY RYDA, so "no payment through RYDA"
+                sets up a bait-and-switch when that email arrives. (No
+                membership upsell here — co-ownership/membership copy
+                stays off rental surfaces.) */}
             <div className="lg:col-span-5">
               <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-red">
                 Payment
@@ -395,12 +399,13 @@ export default async function RentDetailPage({
               ) : (
                 <>
                   <p className="mt-2 font-display text-2xl text-ink">
-                    Never through RYDA.
+                    Straight to the operator.
                   </p>
                   <p className="mt-2 text-sm text-ink-soft">
-                    No card at request, no payment through RYDA. You pay the
-                    operator on their contract, exactly as you would going
-                    direct — your price is the operator&apos;s price.
+                    No card at request. Once the operator confirms your
+                    dates we send a secure Stripe link — the charge settles
+                    on the operator&apos;s own account and RYDA never holds
+                    your money. Your price is the operator&apos;s price.
                   </p>
                 </>
               )}

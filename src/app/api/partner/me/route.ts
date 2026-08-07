@@ -1,6 +1,8 @@
 // /api/partner/me — the /partner dashboard's data + application surface.
 //
-// GET  → { partner: PartnerAccount | null }
+// GET  → { partner: PartnerAccount | null,
+//          operator: null | { linked: true, stripeOnboarded: boolean,
+//                             paused: boolean } }
 //   Returns the caller's partner account. First authenticated call
 //   also converts signup intent into a real row: /signup?as=partner
 //   can only write user-editable user_metadata (partner_intent +
@@ -9,9 +11,18 @@
 //   status 'pending'. Metadata is a REQUEST only — the row always
 //   starts 'pending' and only /api/admin/partners can change status.
 //
-// POST → { partner: PartnerAccount }
+//   `operator` is the partner-facing summary of the bridged operators
+//   row (partners, 0041) that admin approval links via partner_id:
+//   null unless the account is APPROVED and bridged, then exactly the
+//   three fields above. Deliberately narrow — commission_rate,
+//   stripe_account_id, and every other commercial term stay
+//   server-side; a suspended/declined account gets null even though it
+//   keeps its partner_id (see fetchOperator).
+//
+// POST → { partner: PartnerAccount, operator: … as above }
 //   Apply (signed-in member without a row) or update company details.
-//   Detail fields only — status/approved_at are never written here.
+//   Detail fields only — status/approved_at/partner_id are never
+//   written here.
 //
 // Auth: getUserFromRequest (bearer/cookie) → 401. All queries scope by
 // user_id; the service-role client bypasses RLS so nothing else leaks.
@@ -35,8 +46,10 @@ const READ_LIMIT = 30;
 const WRITE_LIMIT = 10;
 const RATE_WINDOW_MS = 60_000;
 
+// partner_id (the approval bridge, 0042) rides along: it's an opaque
+// uuid, and the operator summary below is derived from it anyway.
 const COLS =
-  "user_id, company_name, contact_name, contact_email, phone, website, fleet_size, market, status, status_note, approved_at, created_at, updated_at";
+  "user_id, company_name, contact_name, contact_email, phone, website, fleet_size, market, status, status_note, approved_at, partner_id, created_at, updated_at";
 
 async function fetchPartner(
   db: SupabaseClient,
@@ -49,6 +62,52 @@ async function fetchPartner(
     .maybeSingle();
   if (error) return { partner: null, error: error.message };
   return { partner: (data as PartnerAccount | null) ?? null, error: null };
+}
+
+/** The exact partner-facing operator payload — field names are a
+ *  contract with the /partner dashboard. */
+type OperatorSummary = {
+  linked: true;
+  stripeOnboarded: boolean;
+  paused: boolean;
+};
+
+// Derive the operator summary from the bridged partners (0041) row.
+// Deliberately narrow: linked / stripeOnboarded / paused only —
+// commission_rate and stripe_account_id are ops-sensitive commercial
+// terms and NEVER reach this payload (0041 keeps the table
+// service-role-only for the same reason). Best-effort: any error
+// (including a pre-0041 environment) reads as "no operator yet"
+// rather than failing the dashboard.
+//
+// Gated on APPROVED. Suspension deliberately preserves partner_id (the
+// operator may carry payment history and is paused, never deleted), and
+// the bridged operator can be a third party's row that another approved
+// application still serves — so a declined or suspended account must not
+// keep polling this route for that company's live Stripe-onboarding and
+// pause state. Two booleans are still two booleans about someone else's
+// payment status, and they confirm to a bad-faith applicant that a
+// name-collision bridge landed on the operator they were aiming at.
+async function fetchOperator(
+  db: SupabaseClient,
+  partner: Pick<PartnerAccount, "status" | "partner_id"> | null | undefined,
+): Promise<OperatorSummary | null> {
+  const partnerId = partner?.partner_id;
+  if (!partnerId || partner?.status !== "approved") return null;
+  const { data, error } = await db
+    .from("partners")
+    .select("stripe_onboarded_at, status")
+    .eq("id", partnerId)
+    .maybeSingle();
+  if (error || !data) {
+    if (error) console.warn("[partner/me · operator]", error.message);
+    return null;
+  }
+  return {
+    linked: true,
+    stripeOnboarded: Boolean(data.stripe_onboarded_at),
+    paused: data.status === "paused",
+  };
 }
 
 export async function GET(req: NextRequest) {
@@ -80,7 +139,12 @@ export async function GET(req: NextRequest) {
       { status: 500 },
     );
   }
-  if (partner) return NextResponse.json({ partner });
+  if (partner) {
+    return NextResponse.json({
+      partner,
+      operator: await fetchOperator(db, partner),
+    });
+  }
 
   // No row yet — check signup intent. user_metadata comes from the
   // service-role lookup (authoritative store), not from anything the
@@ -88,11 +152,13 @@ export async function GET(req: NextRequest) {
   const { data: authUser, error: authErr } = await db.auth.admin.getUserById(
     user.id,
   );
-  if (authErr || !authUser?.user) return NextResponse.json({ partner: null });
+  if (authErr || !authUser?.user) {
+    return NextResponse.json({ partner: null, operator: null });
+  }
   const meta =
     (authUser.user.user_metadata as Record<string, unknown> | undefined) ?? {};
   if (meta.partner_intent !== true) {
-    return NextResponse.json({ partner: null });
+    return NextResponse.json({ partner: null, operator: null });
   }
 
   const parsed = validatePartnerApplication({
@@ -106,7 +172,7 @@ export async function GET(req: NextRequest) {
     // collects the company once; this branch also covers garbled
     // metadata (it's user-editable). Accounts created while signup
     // still sent partner_company fall through to the upsert below.
-    return NextResponse.json({ partner: null, intent: true });
+    return NextResponse.json({ partner: null, operator: null, intent: true });
   }
 
   // Provision the pending application. ignoreDuplicates makes a
@@ -128,7 +194,12 @@ export async function GET(req: NextRequest) {
     );
   }
   const provisioned = await fetchPartner(db, user.id);
-  return NextResponse.json({ partner: provisioned.partner });
+  // A freshly provisioned application is always pre-bridge
+  // (partner_id null), but derive uniformly for shape consistency.
+  return NextResponse.json({
+    partner: provisioned.partner,
+    operator: await fetchOperator(db, provisioned.partner),
+  });
 }
 
 export async function POST(req: NextRequest) {
@@ -211,5 +282,11 @@ export async function POST(req: NextRequest) {
   }
 
   const after = await fetchPartner(db, user.id);
-  return NextResponse.json({ partner: after.partner });
+  // Same shape as GET so the dashboard can treat both responses
+  // uniformly (a detail edit never changes the bridge, but an already
+  // -approved partner editing their profile keeps their operator).
+  return NextResponse.json({
+    partner: after.partner,
+    operator: await fetchOperator(db, after.partner),
+  });
 }

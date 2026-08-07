@@ -33,12 +33,23 @@ import {
   type PartnerAccount,
 } from "@/lib/partner";
 
+// Admin approval bridges an application (partner_accounts) to a Stripe
+// operator (partners row). /api/partner/me surfaces that link as an
+// `operator` field: null until the bridge exists, then linked with the
+// Stripe onboarding + pause state. Older API deploys omit the field
+// entirely — `undefined` here — and the Payments card hides itself.
+type OperatorLink = {
+  linked: true;
+  stripeOnboarded: boolean;
+  paused: boolean;
+};
+
 type ViewState =
   | { status: "loading" }
   | { status: "unconfigured" }
   | { status: "anon" }
   | { status: "none"; intent: boolean }
-  | { status: "ready"; partner: PartnerAccount }
+  | { status: "ready"; partner: PartnerAccount; operator?: OperatorLink | null }
   | { status: "error"; message: string };
 
 export default function PartnerDashboardPage() {
@@ -79,6 +90,7 @@ function PartnerDashboardInner() {
       const body = (await res.json().catch(() => ({}))) as {
         partner?: PartnerAccount | null;
         intent?: boolean;
+        operator?: OperatorLink | null;
         error?: string;
       };
       if (!res.ok) {
@@ -89,7 +101,11 @@ function PartnerDashboardInner() {
         return;
       }
       if (body.partner) {
-        setState({ status: "ready", partner: body.partner });
+        setState({
+          status: "ready",
+          partner: body.partner,
+          operator: body.operator,
+        });
       } else {
         if (fromSignup && !stamped.current) {
           stamped.current = true;
@@ -182,7 +198,7 @@ function PartnerDashboardInner() {
         {state.status === "none" && (
           <ApplySection
             intent={state.intent}
-            onApplied={(partner) => {
+            onApplied={(partner, operator) => {
               // Stamp the (user-editable, affordance-only) flag the
               // header Partner pill reads, so inline applicants get
               // the same nav back to this page that signup-path
@@ -191,13 +207,20 @@ function PartnerDashboardInner() {
               void supabase?.auth
                 .updateUser({ data: { partner_intent: true } })
                 .catch(() => {});
-              setState({ status: "ready", partner });
+              // operator rides along from the POST response (null for
+              // a fresh pending application) so the Payments card
+              // renders immediately, matching what a GET would show.
+              setState({ status: "ready", partner, operator });
             }}
           />
         )}
 
         {state.status === "ready" && (
-          <Dashboard partner={state.partner} onSaved={load} />
+          <Dashboard
+            partner={state.partner}
+            operator={state.operator}
+            onSaved={load}
+          />
         )}
       </main>
     </>
@@ -241,7 +264,7 @@ function ApplySection({
   /** True when signup metadata carried partner intent but the details
    *  were unusable — the server saw them try to apply already. */
   intent: boolean;
-  onApplied: (p: PartnerAccount) => void;
+  onApplied: (p: PartnerAccount, operator?: OperatorLink | null) => void;
 }) {
   return (
     <div className="mt-10">
@@ -276,14 +299,20 @@ function ApplySection({
 
 function Dashboard({
   partner,
+  operator,
   onSaved,
 }: {
   partner: PartnerAccount;
+  /** undefined = API predates the operator bridge — hide the card. */
+  operator?: OperatorLink | null;
   onSaved: () => void;
 }) {
   return (
     <div className="mt-8 space-y-6">
       <StatusCard partner={partner} />
+      {operator !== undefined && (
+        <PaymentsCard operator={operator} status={partner.status} />
+      )}
       {partner.status === "approved" && <FleetPanel />}
       <ProfileCard partner={partner} onSaved={onSaved} />
       <p className="text-xs text-mute">
@@ -300,6 +329,11 @@ function Dashboard({
   );
 }
 
+// Mirrors the four steps on /partners plus the one that page used to
+// omit: before any money can move the operator must finish Stripe
+// Express onboarding (identity, business details, bank account). Landing
+// an approved operator on a KYC gate the journey never mentioned is how
+// a "days not months" promise turns into a complaint.
 const REVIEW_STEPS = [
   { title: "Apply", body: "Application received." },
   {
@@ -309,6 +343,10 @@ const REVIEW_STEPS = [
   {
     title: "Listing setup",
     body: "Photos, specs, pricing, and availability — together.",
+  },
+  {
+    title: "Activate payments",
+    body: "We send a Stripe link; Stripe verifies your business and bank details so payouts reach you directly.",
   },
   { title: "Live", body: "Your fleet goes live. Enquiries reach you directly." },
 ];
@@ -335,7 +373,7 @@ function StatusCard({ partner }: { partner: PartnerAccount }) {
       </div>
 
       {partner.status === "pending" && (
-        <ol className="mt-6 grid grid-cols-1 gap-5 border-t border-rule pt-6 sm:grid-cols-4">
+        <ol className="mt-6 grid grid-cols-1 gap-5 border-t border-rule pt-6 sm:grid-cols-3 lg:grid-cols-5">
           {REVIEW_STEPS.map((s, i) => {
             // Step 0 is done the moment a row exists; review (step 1)
             // is where a pending application sits.
@@ -403,12 +441,15 @@ function StatusCard({ partner }: { partner: PartnerAccount }) {
 }
 
 function StatusPill({ status }: { status: PartnerAccount["status"] }) {
+  // -deep text on every tinted wash: `text-red` on `bg-red/10` measures
+  // ~4.3:1, under the 4.5:1 AA floor, and this is the pill that tells a
+  // partner their account is paused.
   const cls =
     status === "approved"
       ? "bg-success/10 text-success-deep"
       : status === "suspended"
-        ? "bg-red/10 text-red"
-        : "bg-amber-500/15 text-amber-700";
+        ? "bg-red/10 text-red-deep"
+        : "bg-warn/15 text-warn-deep";
   const label =
     status === "approved"
       ? "Approved"
@@ -421,6 +462,71 @@ function StatusPill({ status }: { status: PartnerAccount["status"] }) {
     >
       {label}
     </span>
+  );
+}
+
+// ── payments (Stripe operator bridge, admin-owned) ──────────────
+//
+// Status only — nothing here is partner-actionable. Admin approval
+// creates-or-links the Stripe operator row; onboarding links are sent
+// by RYDA, not self-served.
+//
+// The ACCOUNT's status leads. `operator` alone can't tell the story:
+// a declined application never gets bridged, so operator is null —
+// which used to print "your application is under review" directly under
+// StatusCard's red Paused banner and the decline note. And a suspended
+// partner whose operator stayed active (another approved application
+// shares it) would read "Payments active" under the same banner. Both
+// are contradictions the partner has no way to resolve, so the card
+// answers for the account first and the operator second.
+//
+// Within an approved account, precedence is paused → onboarded →
+// pending (a paused operator that finished Stripe is still paused).
+function PaymentsCard({
+  operator,
+  status,
+}: {
+  operator: OperatorLink | null;
+  status: PartnerAccount["status"];
+}) {
+  return (
+    <section className="rounded-2xl border border-rule bg-surface p-6 sm:p-8">
+      <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+        Payments
+      </p>
+      {status === "suspended" ? (
+        <div className="mt-4 rounded-xl bg-warn/15 px-4 py-3 text-sm text-warn-deep">
+          Payments are off while your account is paused. Nothing new can be
+          booked or charged through RYDA — see the note above.
+        </div>
+      ) : status === "pending" ? (
+        <p className="mt-4 text-sm text-ink-soft">
+          Your application is under review. On approval you&apos;ll complete
+          Stripe onboarding, and payments unlock from there.
+        </p>
+      ) : operator === null ? (
+        // Approved but not yet bridged — a transient window between the
+        // approval and its operator row.
+        <p className="mt-4 text-sm text-ink-soft">
+          You&apos;re approved — we&apos;re setting up your operator entry.
+          Your Stripe onboarding link follows shortly.
+        </p>
+      ) : operator.paused ? (
+        <div className="mt-4 rounded-xl bg-warn/15 px-4 py-3 text-sm text-warn-deep">
+          Payments paused — contact RYDA.
+        </div>
+      ) : operator.stripeOnboarded ? (
+        <div className="mt-4 rounded-xl bg-success/10 px-4 py-3 text-sm text-success-deep">
+          Payments active — you receive bookings directly; RYDA&apos;s
+          commission is deducted automatically.
+        </div>
+      ) : (
+        <p className="mt-4 text-sm text-ink-soft">
+          RYDA will send your Stripe onboarding link — payouts go
+          directly to your account.
+        </p>
+      )}
+    </section>
   );
 }
 
@@ -530,7 +636,10 @@ function PartnerForm({
 }: {
   initial?: PartnerAccount;
   submitLabel: string;
-  onSaved: (p: PartnerAccount) => void;
+  /** operator passes the POST response's bridge summary through
+   *  (undefined when an older API omits the field) — the apply path
+   *  needs it so the Payments card matches a fresh GET. */
+  onSaved: (p: PartnerAccount, operator?: OperatorLink | null) => void;
   onCancel?: () => void;
 }) {
   const [company, setCompany] = useState(initial?.company_name ?? "");
@@ -564,12 +673,13 @@ function PartnerForm({
       });
       const body = (await res.json().catch(() => ({}))) as {
         partner?: PartnerAccount;
+        operator?: OperatorLink | null;
         error?: string;
       };
       if (!res.ok || !body.partner) {
         throw new Error(body.error || `Save failed (${res.status}).`);
       }
-      onSaved(body.partner);
+      onSaved(body.partner, body.operator);
     } catch (e2) {
       setErr(e2 instanceof Error ? e2.message : "Something went wrong.");
     } finally {

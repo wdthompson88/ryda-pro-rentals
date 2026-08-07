@@ -334,10 +334,16 @@ function SignUpPageInner() {
               disabled={!ready || submitting}
               className="inline-flex h-12 w-full items-center justify-center rounded-full bg-red px-7 text-sm font-medium text-cream transition-colors hover:bg-red-deep disabled:cursor-not-allowed disabled:opacity-50"
             >
+              {/* Not "Apply …": this submit creates an ACCOUNT and
+                  nothing else (see the file header — deliberately not an
+                  application funnel). The application starts on the
+                  /partner dashboard, where company details are
+                  collected. Promising "apply" here made three separate
+                  screens claim to be the application. */}
               {submitting
                 ? "Creating account…"
                 : accountType === "partner"
-                  ? "Apply to partner →"
+                  ? "Create partner account →"
                   : "Create account →"}
             </button>
 
@@ -366,7 +372,7 @@ function SignUpPageInner() {
 
           <p className="mt-5 text-center text-xs text-mute">
             {accountType === "partner"
-              ? "No commitment — applying starts a conversation about whether RYDA is the right channel for your fleet."
+              ? "No commitment — your account is the first step; you tell us about your fleet from the dashboard, and that's what starts the review."
               : "RYDA membership is 28+ — identity and eligibility are verified during onboarding, not here."}
           </p>
 

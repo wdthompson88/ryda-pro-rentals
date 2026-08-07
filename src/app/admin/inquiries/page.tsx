@@ -792,7 +792,10 @@ function PaymentLinkPanel({
               {" "}
               —{" "}
               <Link
-                href="/admin/partners"
+                // Straight to the roster tab — Applications (the
+                // default) is not where an onboarding/paused problem
+                // gets fixed.
+                href="/admin/partners?tab=operators"
                 className="underline underline-offset-2 hover:text-red-deep"
               >
                 manage the operator in Partners

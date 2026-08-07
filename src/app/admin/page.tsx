@@ -108,11 +108,18 @@ type Overview = {
 const SUB_ROUTES = [
   { href: "/admin", label: "Triage", note: "this page" },
   { href: "/admin/inquiries", label: "Inquiries", note: "rental lead pipeline" },
-  { href: "/admin/partners", label: "Partners", note: "operators + Stripe onboarding" },
+  // ONE Partners entry. /admin/partners unified the two pre-merge pages
+  // (applications + operator roster) behind a tab bar; two rows for the
+  // same href collided on the nav's React key and implied two
+  // destinations four chips apart.
+  {
+    href: "/admin/partners",
+    label: "Partners",
+    note: "applications + operators + Stripe onboarding",
+  },
   { href: "/admin/calendar", label: "Calendar", note: "booking calendar" },
   { href: "/admin/creative", label: "Creative", note: "marketing generation queue" },
   { href: "/admin/documents", label: "Documents", note: "sample packet + legal templates" },
-  { href: "/admin/partners", label: "Partners", note: "fleet partner applications" },
   { href: "/admin/prospects", label: "Prospects", note: "founding cohort CRM" },
   { href: "/admin/disputes", label: "Disputes", note: "Stripe chargebacks" },
   { href: "/admin/llc", label: "LLCs", note: "formation + members" },

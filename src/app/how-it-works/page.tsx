@@ -106,8 +106,16 @@ export default function HowItWorksPage() {
               },
               {
                 label: "Where money moves",
-                value: "Never through RYDA",
-                note: "No card at request, no payment through RYDA — ever. You pay the operator on their contract, exactly as you would going direct.",
+                value: "Straight to the operator",
+                // Must match what actually ships: no card at request,
+                // but once the operator confirms, RYDA emails a Stripe
+                // Checkout link created on the OPERATOR's own connected
+                // account (fee-only direct charges — see 0041). Money
+                // never enters a RYDA balance, but it IS a RYDA-sent
+                // payment request, so "no payment through RYDA — ever"
+                // reads as bait-and-switch when that email lands, and as
+                // a phishing signal to everyone who believed it.
+                note: "No card at request. Once the operator confirms your dates we send a secure Stripe link — the charge settles on the operator's own account and RYDA never holds your money.",
               },
             ].map((c) => (
               <div key={c.label} className="bg-surface p-6 sm:p-7">

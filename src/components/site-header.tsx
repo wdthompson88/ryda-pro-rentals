@@ -3,7 +3,11 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { AuthSwap, VisibleWhenAdmin } from "@/components/auth-aware";
+import {
+  AuthSwap,
+  VisibleWhenAdmin,
+  VisibleWhenPartner,
+} from "@/components/auth-aware";
 
 // Rental-first header (Aug 2026 pivot). Rentals are THE product, so the
 // nav is one flat list on every page: Rent (the homepage grid) · How it
@@ -110,6 +114,12 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
   const adminBtn = inverted
     ? "border-cream/30 bg-cream/10 text-cream hover:border-cream hover:bg-cream/15"
     : "border-rule bg-cream-2 text-marine hover:border-marine hover:text-marine-deep";
+  // Partner pill (fleet partners only, sits where the admin pill does
+  // for admins). Same quiet-tool family as the admin pill but in ink —
+  // it's an account surface, not a CTA.
+  const partnerBtn = inverted
+    ? "border-cream/30 bg-cream/10 text-cream hover:border-cream hover:bg-cream/15"
+    : "border-rule bg-cream-2 text-ink-soft hover:border-ink hover:text-ink";
   // Search input theming, tracks the inverted state.
   const searchInput = inverted
     ? "border-cream/30 bg-cream/10 text-cream placeholder:text-cream/50 focus:border-cream focus:ring-cream/20"
@@ -288,6 +298,14 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
                     Admin
                   </Link>
                 </VisibleWhenAdmin>
+                <VisibleWhenPartner>
+                  <Link
+                    href="/partner"
+                    className={`hidden rounded-full border px-5 py-2 text-sm font-medium transition-colors sm:inline-flex ${partnerBtn}`}
+                  >
+                    Partner
+                  </Link>
+                </VisibleWhenPartner>
                 <Link
                   href="/account"
                   className={`hidden rounded-full border px-5 py-2 text-sm font-medium transition-colors sm:inline-flex ${accountBtn}`}
@@ -402,6 +420,15 @@ export function SiteHeader({ inverted }: { inverted?: boolean } = {}) {
                       Admin
                     </Link>
                   </VisibleWhenAdmin>
+                  <VisibleWhenPartner>
+                    <Link
+                      href="/partner"
+                      onClick={() => setOpen(false)}
+                      className={`mt-3 inline-flex h-12 items-center justify-center rounded-full border px-5 text-sm font-medium transition-colors ${partnerBtn}`}
+                    >
+                      Partner
+                    </Link>
+                  </VisibleWhenPartner>
                   <Link
                     href="/account"
                     onClick={() => setOpen(false)}

@@ -2,12 +2,16 @@
 //
 // A "partner" is a rental operator (the B2B side pitched on /partners)
 // with a RYDA account. The account layer is one row in partner_accounts
-// (migration 0038) keyed by auth user id, with an admin-approved status
+// (migration 0042) keyed by auth user id, with an admin-approved status
 // lifecycle:
 //
 //   pending   — applied (via /signup?as=partner or from /partner);
 //               visible to admins on /admin/partners
-//   approved  — admin approved; the /partner dashboard unlocks
+//   approved  — admin approved; the /partner dashboard unlocks, and
+//               the admin route bridges the application to a
+//               company-keyed operators row (partners, 0041) via
+//               partner_id — that row is where Stripe onboarding and
+//               payment links live
 //   suspended — declined or paused by an admin
 //
 // Trust model (mirrors admin-auth.ts): the signup form writes a
@@ -40,6 +44,12 @@ export type PartnerAccount = {
   status: PartnerStatus;
   status_note: string | null;
   approved_at: string | null;
+  /** Approval bridge to the company-keyed operators row (partners,
+   *  0041). Set by the admin route on approval; null before that. An
+   *  opaque uuid — safe in the partner-facing payload, unlike the
+   *  operator row itself (commission_rate / stripe_account_id stay
+   *  server-side). */
+  partner_id: string | null;
   created_at: string;
   updated_at: string;
 };
