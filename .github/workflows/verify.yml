@@ -4,11 +4,20 @@ name: verify
 # otherwise fire both a `push` and a `pull_request` run for the same commit,
 # billing two runs for one answer against the free tier's monthly minutes.
 # Branch work is covered by the pull_request trigger.
+#
+# The pull_request list is the BASE branch, not the branch being merged.
+# feat/dt-rental-first-site is a long-lived integration branch: the whole
+# rental build loop (docs/RYDA_RENTAL_BUILD_LOOP.md) opens its task PRs
+# against it, never against main. With main alone in this list those PRs
+# got zero checks and merged clean and unverified — which is the opposite
+# of what AGENTS.md promises ("merge only when the verify check is green").
+# Cost is one ~1m30s run per task PR; the alternative is an integration
+# branch nothing ever tested.
 on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+    branches: [main, feat/dt-rental-first-site]
 
 concurrency:
   group: verify-${{ github.ref }}
