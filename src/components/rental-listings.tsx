@@ -25,7 +25,11 @@ import {
 // Normalized listing shape
 // ─────────────────────────────────────────────────────────────────────────
 
-type RentalListing = {
+// Exported so the DB-backed read path (src/lib/rental-listings-db.ts)
+// is type-checked against the exact shape this grid renders. When
+// rental inventory finishes moving into the database (build loop 0A →
+// 2C) this type and its adapters should move to src/lib/.
+export type RentalListing = {
   slug: string;             // route param: vehicle.symbol.toLowerCase() OR partner.slug
   kind: "ryda" | "partner";
   make: string;
