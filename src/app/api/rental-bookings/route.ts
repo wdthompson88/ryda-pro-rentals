@@ -67,6 +67,7 @@ import {
   rentalBookingSubject,
   type RentalBookingCaller,
   type RentalBookingInsert,
+  type RentalBookingListingSummary,
   type RentalBookingRow,
   type RentalOperatorIdentity,
 } from "@/lib/rental-booking-access";
@@ -88,6 +89,33 @@ const REQUEST_EXPIRY_HOURS = 24;
 /** Bookings returned by one GET. A renter's history is small; this is a
  *  backstop against an operator inbox growing unbounded. */
 const LIST_LIMIT = 200;
+
+/**
+ * WHICH 200, and why the two roles do not agree on it.
+ *
+ * A renter reads a HISTORY, so latest pickup first is the right order
+ * and the cap is theoretical — nobody has 200 bookings.
+ *
+ * An operator reads an INBOX, and ordering that by start_date descending
+ * makes the cap actively harmful: a partner whose fleet has accumulated
+ * more than 200 rows, weighted toward confirmed bookings months out,
+ * loses the rows with the NEAREST pickup dates first. A renter's fresh
+ * request for next week sorts below a stack of far-future confirmations
+ * and is dropped server-side — so BookingRequestList groups a list it
+ * never received, countOperatorRequests() badges /partner with a count
+ * that does not include it, and the request auto-expires at 24h having
+ * been shown to nobody. The payload is a bare `{bookings: […]}` with no
+ * total, so neither surface could even warn.
+ *
+ * created_at descending is what makes the truncation harmless: the rows
+ * that fall off the end are the OLDEST, which are the decided ones, and
+ * a request that has just arrived is always in the window it needs to be
+ * in — the one where somebody can still answer it.
+ */
+const LIST_ORDER = {
+  renter: "start_date",
+  operator: "created_at",
+} as const;
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -133,7 +161,15 @@ const LISTING_BASE_COLS =
 const LISTING_WINDOW_COLS =
   "available_from, available_until, booking_horizon_days";
 
-/** The car, as the payload may describe it. No partner_id — see D6. */
+/**
+ * The car, as the payload may describe it. No partner_id — see D6.
+ *
+ * The return type is ANNOTATED, not inferred: RentalBookingListingSummary
+ * is the declaration the three client surfaces read this block through,
+ * so a field added here that they do not know about — or dropped here
+ * while they still render it — is a compile error rather than an
+ * `undefined` on a screen.
+ */
 function listingSummary(listing: {
   id: string;
   slug: string;
@@ -141,7 +177,7 @@ function listingSummary(listing: {
   model: string;
   year: number | null;
   market: string;
-}) {
+}): RentalBookingListingSummary {
   return {
     id: listing.id,
     slug: listing.slug,
@@ -762,7 +798,8 @@ export async function GET(req: NextRequest) {
   let query = db
     .from("rental_bookings")
     .select(RENTAL_BOOKING_COLS)
-    .order("start_date", { ascending: false })
+    // See LIST_ORDER: an inbox and a history want different 200 rows.
+    .order(LIST_ORDER[role], { ascending: false })
     .limit(LIST_LIMIT);
 
   if (role === "operator") {
