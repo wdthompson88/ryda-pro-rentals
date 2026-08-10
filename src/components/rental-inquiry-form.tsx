@@ -19,15 +19,100 @@
 // clientToken is generated once per mount so a double-tap / retry
 // dedupes server-side (unique partial index on rental_inquiries)
 // instead of creating duplicate leads.
+//
+// DATES (build loop 2C). The two raw <input type="date"> fields are now
+// the FALLBACK, not the default: when the car has a live calendar the
+// form renders RentalDatePicker against the open days the availability
+// route returns, and asks that same route for the price. Two rules hold
+// this together:
+//
+//   · The price is never computed here. The browser sends two dates and
+//     is told a number of cents; nothing on this side multiplies a rate.
+//     A client-computed total is a total the server did not agree to.
+//   · The client-side range check is the SERVER's check. validate() calls
+//     checkOpenRange(), whose test asserts it rejects exactly what the
+//     route's checkRange() rejects — so a range this form accepts is one
+//     the API accepts, and the renter never gets a refusal after the
+//     click.
+//
+// DEGRADATION IS THE NORMAL PATH TODAY. 0046/0047 are written but not
+// applied, and RYDA-fleet cars have no listing row at all, so
+// `available: false` is expected: the picker disappears, the plain date
+// inputs come back, and the lead still lands. The submit contract is
+// identical on both paths.
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { authedFetch } from "@/lib/api-fetch";
 import { useAuthStatus } from "@/lib/use-auth-status";
 import { useRentalProfile } from "@/lib/use-rental-profile";
+import { formatUSD } from "@/lib/market-data";
+import { RentalDatePicker } from "@/components/rental-date-picker";
+import {
+  MAX_INQUIRY_SPAN_NIGHTS,
+  nightsBetween,
+} from "@/lib/rental-availability";
+import {
+  checkOpenRange,
+  firstBookableRange,
+  rentalQuoteMessage,
+  type OpenDayRangeInput,
+  type PublicRentalQuote,
+  type RentalAvailabilityResponse,
+  type RentalAvailabilityUnavailableReason,
+} from "@/lib/rental-quote";
 
 type Status = "idle" | "submitting" | "success" | "error";
+
+/** The live calendar, or the reason there isn't one. */
+type Availability =
+  | { kind: "loading" }
+  /**
+   * No live calendar: pre-migration, a RYDA-fleet symbol, a closed car,
+   * or a failure — and WHICH of those it is now travels with it. The
+   * route writes renter-ready copy for each state and this used to throw
+   * both fields away, so a car whose operating window had lapsed
+   * ("This car isn't taking dates right now.") rendered identically to a
+   * working one.
+   */
+  | {
+      kind: "off";
+      reason: RentalAvailabilityUnavailableReason | null;
+      message: string | null;
+    }
+  | { kind: "on"; data: Extract<RentalAvailabilityResponse, { available: true }> };
+
+/**
+ * Which degraded states are worth putting on screen.
+ *
+ * `not_listed` and `not_configured` are RYDA-side facts about a car that
+ * was never on the live calendar — a fleet symbol, or a database that
+ * has not taken 0046 yet. The plain date inputs ARE the designed path
+ * there, and "live availability isn't set up for this car yet" would tell
+ * a renter about our migration state. `closed` and `unavailable` are
+ * different: the first is the operator saying no dates, the second is a
+ * calendar we could not read, and a renter who is about to type dates
+ * into a box needs to know both.
+ */
+function shouldShowDegradedNote(
+  reason: RentalAvailabilityUnavailableReason | null,
+): boolean {
+  return reason === "closed" || reason === "unavailable";
+}
+
+/**
+ * Cents as dollars, showing cents only when the amount is not whole.
+ *
+ * formatUSD rounds to whole dollars, and 0044 constrains daily_rate_cents
+ * only to `> 0` — so a $1,450.50 rate rendered "$1,451 × 3 nights"
+ * beside a "$4,352" total that does not multiply out. Formatting each
+ * figure from its own exact cents keeps the arithmetic checkable, which
+ * is the entire reason the two sit on one tabular-nums row.
+ */
+function formatCents(cents: number): string {
+  return formatUSD(cents / 100, { decimals: cents % 100 === 0 ? 0 : 2 });
+}
 
 // What happened to the parallel account-creation attempt (anon path
 // only). Rendered as a sub-note in the success state — never blocks
@@ -55,10 +140,20 @@ export function RentalInquiryForm({
   vehicleSlug,
   vehicleName,
   market,
+  onListingRateCents,
 }: {
   vehicleSlug: string;
   vehicleName: string;
   market: string;
+  /**
+   * The listing's daily rate as the DATABASE holds it, reported upward
+   * once the availability route answers (null when there is no live
+   * listing). The booking card's headline rate comes from the static
+   * partner-fleet file, and the quote below comes from
+   * rental_listings.daily_rate_cents — two independently-sourced prices
+   * in one card. This is how the card stops showing the stale one.
+   */
+  onListingRateCents?: (cents: number | null) => void;
 }) {
   const { status: authStatus, user } = useAuthStatus();
   // Prefill source for signed-in members. Enabled only once authed so
@@ -88,6 +183,14 @@ export function RentalInquiryForm({
   // the statically-prerendered page never hydrates against a stale
   // build-time date. Same pattern as contact-form's URL-param read.
   const [todayStr, setTodayStr] = useState("");
+
+  const [availability, setAvailability] = useState<Availability>({ kind: "loading" });
+  const [quote, setQuote] = useState<PublicRentalQuote | null>(null);
+  // The server's reason a chosen range did not price. Normally
+  // unreachable — the picker greys those days out — but a stale calendar
+  // (an operator approving somebody else's request while this page sat
+  // open) is exactly the case worth surfacing rather than swallowing.
+  const [quoteNote, setQuoteNote] = useState<string | null>(null);
 
   // One idempotency token per mount. Never rendered, so the SSR/client
   // value mismatch is harmless.
@@ -139,21 +242,155 @@ export function RentalInquiryForm({
 
   const showAccountFields = authStatus !== "authed";
 
+  // ── The live calendar ─────────────────────────────────────────────
+  //
+  // Public route, so a plain fetch: no bearer, and no 401 for a visitor
+  // who has not signed up yet — browsing open days pre-auth is the RLS
+  // posture 0046 was written for.
+  // Held in a ref so a caller passing an inline arrow does not re-run the
+  // fetch on every render of the parent.
+  const rateCallbackRef = useRef(onListingRateCents);
+  useEffect(() => {
+    rateCallbackRef.current = onListingRateCents;
+  });
+
+  useEffect(() => {
+    let cancelled = false;
+    setAvailability({ kind: "loading" });
+    (async () => {
+      try {
+        const res = await fetch(
+          `/api/rental-availability/${encodeURIComponent(vehicleSlug)}`,
+        );
+        const body = (await res.json()) as RentalAvailabilityResponse;
+        if (cancelled) return;
+        if (res.ok && body?.available === true) {
+          setAvailability({ kind: "on", data: body });
+          rateCallbackRef.current?.(body.listing.dailyRateCents);
+        } else {
+          setAvailability({
+            kind: "off",
+            reason: body?.available === false ? body.reason : null,
+            message: body?.available === false ? body.message : null,
+          });
+          rateCallbackRef.current?.(null);
+        }
+      } catch {
+        // A calendar we cannot load is a calendar we do not show. The
+        // lead is what matters; the inputs below still capture it — but
+        // the renter is told, rather than handed a form that looks live.
+        if (!cancelled) {
+          setAvailability({
+            kind: "off",
+            reason: "unavailable",
+            message: "We couldn't load this car's calendar. Try again shortly.",
+          });
+          rateCallbackRef.current?.(null);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [vehicleSlug]);
+
+  // The rules the picker enforces and validate() re-checks — one object,
+  // built from the server's own answer.
+  const rules: OpenDayRangeInput | null = useMemo(() => {
+    if (availability.kind !== "on") return null;
+    const { openDays, listing, window } = availability.data;
+    return {
+      openDays,
+      minNights: listing.minNights,
+      maxNights: listing.maxNights,
+      window: { start_date: window.startDate, end_date: window.endDate },
+    };
+  }, [availability]);
+
+  // Snap the "two weeks out, three nights" default onto days the car is
+  // actually open. Runs once per calendar payload: without the guard the
+  // effect would fight the renter's own clicks, since it depends on the
+  // dates it sets.
+  const seededFor = useRef<string | null>(null);
+  useEffect(() => {
+    if (availability.kind !== "on" || !rules) return;
+    const key = `${availability.data.listing.listingId}:${availability.data.openDays.length}`;
+    if (seededFor.current === key) return;
+    seededFor.current = key;
+
+    if (startDate && endDate && checkOpenRange(startDate, endDate, rules).ok) return;
+    const seed = firstBookableRange(rules, startDate || undefined);
+    setStartDate(seed?.startDate ?? "");
+    setEndDate(seed?.endDate ?? "");
+  }, [availability, rules, startDate, endDate]);
+
+  // ── The server quote ──────────────────────────────────────────────
+  //
+  // Fires only on a complete range, and the response is displayed
+  // verbatim: this component never multiplies a rate by a night count.
+  useEffect(() => {
+    if (availability.kind !== "on" || !startDate || !endDate) {
+      setQuote(null);
+      setQuoteNote(null);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const params = new URLSearchParams({ start: startDate, end: endDate });
+        const res = await fetch(
+          `/api/rental-availability/${encodeURIComponent(vehicleSlug)}?${params.toString()}`,
+        );
+        const body = (await res.json()) as RentalAvailabilityResponse;
+        if (cancelled) return;
+        if (res.ok && body?.available === true) {
+          setQuote(body.quote);
+          setQuoteNote(body.quote ? null : (body.quoteError?.message ?? null));
+        } else {
+          setQuote(null);
+          setQuoteNote(null);
+        }
+      } catch {
+        if (!cancelled) {
+          setQuote(null);
+          setQuoteNote(null);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [availability.kind, vehicleSlug, startDate, endDate]);
+
   function validate(): string | null {
     if (!startDate || !endDate) return "Pick your dates first.";
     // ISO date strings compare correctly as strings.
     if (todayStr && startDate < todayStr)
       return "Start date can't be in the past.";
     if (endDate < startDate) return "Return date must be on or after the start.";
-    // UTC-anchored, matching the server's validateRentalInquiry math.
-    // Local-time parsing would count a DST fall-back hour into the
-    // span and wrongly reject an exactly-30-day rental.
-    const span =
-      (Date.parse(`${endDate}T00:00:00Z`) -
-        Date.parse(`${startDate}T00:00:00Z`)) /
-      86_400_000;
-    if (span > 30)
-      return "For rentals over 30 days, contact us directly — we'll arrange it.";
+    // nightsBetween(), not a subtraction written out here. It is the one
+    // expression of "the 5th to the 8th is three nights" and it is
+    // UTC-anchored, which is the whole reason this line stopped being
+    // local-time arithmetic: a DST fall-back hour inside the span
+    // wrongly rejected an exactly-30-night rental. The cap comes from
+    // the same module the server's validateRentalInquiry() reads it
+    // from, so this check cannot come to be looser than that one.
+    const nights = nightsBetween(startDate, endDate);
+    if (nights === null) return "Pick your dates first.";
+    if (nights > MAX_INQUIRY_SPAN_NIGHTS)
+      return `For rentals over ${MAX_INQUIRY_SPAN_NIGHTS} days, contact us directly — we'll arrange it.`;
+    // The calendar's own rules, when the car has one. Same function the
+    // picker greys days out with and the same rejection vocabulary the
+    // route answers in, so this cannot accept a range the API refuses.
+    if (rules) {
+      const check = checkOpenRange(startDate, endDate, rules);
+      if (!check.ok) {
+        return rentalQuoteMessage(check.reason, {
+          minNights: rules.minNights,
+          maxNights: rules.maxNights,
+        });
+      }
+    }
     if (name.trim().length < 2) return "Your name, so the operator knows who's asking.";
     if (showAccountFields && !email.includes("@"))
       return "A valid email — it's where the operator's reply lands.";
@@ -305,35 +542,152 @@ export function RentalInquiryForm({
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
-      {/* Dates */}
-      <div className="grid grid-cols-2 gap-3">
-        <label className="block">
+      {/* Dates — live calendar when the car has one, plain inputs when
+          it doesn't (pre-migration, RYDA fleet, or a failed load), and an
+          explicit placeholder while we still don't know which.
+          `loading` used to fall through to the inputs, so every visit
+          painted two date fields and then swapped in a ~340px calendar —
+          and a renter who typed into them on a slow connection had their
+          dates silently overwritten by the seeding effect. */}
+      {availability.kind === "loading" ? (
+        <div>
           <span className="block text-xs font-medium uppercase tracking-wider text-mute">
-            Start
+            Your dates
           </span>
-          <input
-            type="date"
-            required
-            value={startDate}
-            min={todayStr || undefined}
-            onChange={(e) => setStartDate(e.target.value)}
-            className={inputCls}
+          <div
+            aria-hidden
+            className="mt-2 h-80 rounded-2xl border border-rule bg-cream-2/40 motion-safe:animate-pulse"
           />
-        </label>
-        <label className="block">
+          <p className="sr-only" role="status">
+            Loading this car&apos;s calendar.
+          </p>
+        </div>
+      ) : availability.kind === "on" ? (
+        <div>
           <span className="block text-xs font-medium uppercase tracking-wider text-mute">
-            Return
+            Your dates
           </span>
-          <input
-            type="date"
-            required
-            value={endDate}
-            min={startDate || todayStr || undefined}
-            onChange={(e) => setEndDate(e.target.value)}
-            className={inputCls}
-          />
-        </label>
-      </div>
+          <div className="mt-2">
+            <RentalDatePicker
+              openDays={availability.data.openDays}
+              windowStart={availability.data.window.startDate}
+              windowEnd={availability.data.window.endDate}
+              minNights={availability.data.listing.minNights}
+              maxNights={availability.data.listing.maxNights}
+              startDate={startDate}
+              endDate={endDate}
+              today={availability.data.today}
+              disabled={status === "submitting"}
+              onSelect={(range) => {
+                setStartDate(range.startDate);
+                setEndDate(range.endDate);
+                if (status === "error") setStatus("idle");
+              }}
+            />
+          </div>
+
+          {/* The price, as the server computed it. Nothing on this side
+              multiplies a rate by a night count.
+
+              aria-live, because the number arrives a round trip AFTER the
+              picker's live region has already announced the range: a
+              screen-reader renter heard "Aug 5 to Aug 8, 3 nights" and
+              was then never told the total — the one figure this whole
+              surface exists to communicate. */}
+          {quote && (
+            <div
+              aria-live="polite"
+              className="mt-3 rounded-xl border border-rule bg-cream-2/40 p-3"
+            >
+              <div className="flex items-baseline justify-between gap-3">
+                {/* Tabular across the whole caption, not just the night
+                    count: the rate and the count sit on one line and a
+                    proportional "$1,450" next to a tabular "3" is the
+                    kind of drift the price pattern exists to stop. */}
+                <span className="text-xs tabular-nums text-ink-soft">
+                  {formatCents(quote.dailyRateCents)} × {quote.nights} night
+                  {quote.nights === 1 ? "" : "s"}
+                </span>
+                <span className="font-display text-2xl tabular-nums text-ink">
+                  {formatCents(quote.renterTotalCents)}
+                </span>
+              </div>
+              {quote.depositAmountCents > 0 && (
+                // NAMES NO MECHANISM (guardrail 3.9). This said "a
+                // refundable hold on your card at pickup", which is wrong
+                // twice over: D5 places the authorization at APPROVAL,
+                // not at pickup, and phase 3C — the code that would place
+                // it — is unbuilt, so there is no PaymentIntent and no
+                // card on file anywhere in this flow.
+                <p className="mt-1 text-[11px] text-mute">
+                  This car carries a refundable{" "}
+                  {formatCents(quote.depositAmountCents)} security deposit.
+                  Nothing is placed on your card now — the operator confirms
+                  the deposit terms with you.
+                </p>
+              )}
+              {/* What the submit ACTUALLY carries. The request sends the
+                  dates and the car; the price is RYDA's calculation from
+                  the operator's listed rate, and the operator confirms
+                  the final number when they reply — which is the same
+                  promise the rest of this page makes. */}
+              <p className="mt-1.5 text-[11px] text-mute">
+                Calculated from this car&apos;s listed daily rate. Nothing is
+                charged now — the operator confirms the dates and the final
+                price with you.
+              </p>
+            </div>
+          )}
+          {/* role="alert": a stale calendar rejecting a range is the one
+              case worth interrupting for, and it was landing in a bare
+              <p> that assistive tech never announced. */}
+          {!quote && quoteNote && (
+            <p role="alert" className="mt-2 text-xs text-warn-deep">
+              {quoteNote}
+            </p>
+          )}
+        </div>
+      ) : (
+        <div>
+          {shouldShowDegradedNote(availability.reason) && availability.message && (
+            <p
+              role="status"
+              className="mb-3 rounded-xl border border-rule bg-cream-2/40 px-4 py-3 text-xs text-ink-soft"
+            >
+              {availability.message} Send your dates anyway and the operator
+              will come back to you.
+            </p>
+          )}
+          <div className="grid grid-cols-2 gap-3">
+            <label className="block">
+              <span className="block text-xs font-medium uppercase tracking-wider text-mute">
+                Start
+              </span>
+              <input
+                type="date"
+                required
+                value={startDate}
+                min={todayStr || undefined}
+                onChange={(e) => setStartDate(e.target.value)}
+                className={inputCls}
+              />
+            </label>
+            <label className="block">
+              <span className="block text-xs font-medium uppercase tracking-wider text-mute">
+                Return
+              </span>
+              <input
+                type="date"
+                required
+                value={endDate}
+                min={startDate || todayStr || undefined}
+                onChange={(e) => setEndDate(e.target.value)}
+                className={inputCls}
+              />
+            </label>
+          </div>
+        </div>
+      )}
 
       <label className="block">
         <span className="block text-xs font-medium uppercase tracking-wider text-mute">

@@ -89,6 +89,18 @@ export const MAX_BOOKING_HORIZON_DAYS = 730;
 export const SAME_DAY_SLACK_DAYS = 1;
 
 /**
+ * Longest stay the inquiry funnel accepts, in BILLABLE NIGHTS. Longer is
+ * a conversation with the operator, not a form submission.
+ *
+ * It lives here for the same reason SAME_DAY_SLACK_DAYS does: it is a
+ * bound both sides of the wire enforce. validateRentalInquiry() rejects
+ * past it on the server and rental-inquiry-form.tsx rejects past it in
+ * the browser, and a form that is looser than the validator turns a
+ * submitted lead into an error the renter cannot act on.
+ */
+export const MAX_INQUIRY_SPAN_NIGHTS = 30;
+
+/**
  * Hard ceiling on day-by-day expansion. Sized just over the widest legal
  * window (730-day horizon + slack), so it is a guard against a
  * hand-built object, never a real calendar.

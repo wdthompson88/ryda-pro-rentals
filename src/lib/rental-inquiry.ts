@@ -8,6 +8,7 @@
 
 import { PARTNER_VEHICLES, type PartnerVehicle } from "./partner-fleet";
 import { VEHICLES, type Vehicle } from "./market-data";
+import { MAX_INQUIRY_SPAN_NIGHTS } from "./rental-availability";
 
 export type RentalInquiryFleet = "ryda" | "partner";
 
@@ -33,9 +34,6 @@ export type RentalInquiryResult =
   | { ok: false; error: string };
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-// Longest span the funnel accepts. Longer stays a conversation with the
-// operator, not a form submission.
-const MAX_SPAN_DAYS = 30;
 
 // Strict YYYY-MM-DD parse to UTC-midnight ms. new Date("2026-02-31")
 // silently rolls over to March; round-tripping through toISOString
@@ -135,8 +133,11 @@ export function validateRentalInquiry(
   if (endMs < startMs) {
     return { ok: false, error: "End date must be on or after the start date." };
   }
-  if ((endMs - startMs) / DAY_MS > MAX_SPAN_DAYS) {
-    return { ok: false, error: "Rentals are capped at 30 days per request." };
+  if ((endMs - startMs) / DAY_MS > MAX_INQUIRY_SPAN_NIGHTS) {
+    return {
+      ok: false,
+      error: `Rentals are capped at ${MAX_INQUIRY_SPAN_NIGHTS} days per request.`,
+    };
   }
 
   const vehicle = resolveRentalVehicle(String(b.vehicleSlug || ""));
