@@ -17,8 +17,15 @@ type Item = {
 
 const ITEMS: Item[] = [
   { href: "/account", label: "Overview", icon: "◇", hint: "Stats + activity" },
-  // Rental-first ordering: requests sit directly under Overview,
-  // mirroring the admin pipeline's placement.
+  // Rental-first ordering: the rental surfaces sit directly under
+  // Overview, mirroring the admin pipeline's placement.
+  //
+  // TWO ENTRIES, TWO TABLES. "My rentals" is the booking history
+  // (rental_bookings, 0047 — dated, priced, with an operator decision on
+  // it); "Rental requests" is the older lead-gen inquiry history
+  // (rental_inquiries, 0039/0040 — a message to an operator). Bookings
+  // come first because they are the ones with dates to keep.
+  { href: "/account/rentals", label: "My rentals", icon: "◈", hint: "Upcoming, active, past bookings" },
   { href: "/account/requests", label: "Rental requests", icon: "◔", hint: "Where each request stands" },
   { href: "/account/portfolio", label: "Your shares", icon: "◑", hint: "Cars you co-own" },
   { href: "/account/profile", label: "Profile", icon: "◐", hint: "Name, contact, address" },

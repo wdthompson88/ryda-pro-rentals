@@ -34,6 +34,7 @@ import {
   rentalBookingAccess,
   rentalBookingSubject,
   type RentalBookingCaller,
+  type RentalBookingListingSummary,
   type RentalBookingRow,
   type RentalOperatorIdentity,
 } from "@/lib/rental-booking-access";
@@ -163,18 +164,24 @@ export async function GET(
     }
   }
 
+  // ANNOTATED, not inferred, and dropping partner_id is the whole job —
+  // see listingSummary() in the list route. Both routes project the car
+  // through RentalBookingListingSummary so the three client surfaces read
+  // one declaration rather than three that happen to agree today.
+  const listingBlock: RentalBookingListingSummary | null = listing
+    ? {
+        id: listing.id,
+        slug: listing.slug,
+        make: listing.make,
+        model: listing.model,
+        year: listing.year,
+        market: listing.market,
+      }
+    : null;
+
   return NextResponse.json({
     booking: projectRentalBooking(row, access),
-    listing: listing
-      ? {
-          id: listing.id,
-          slug: listing.slug,
-          make: listing.make,
-          model: listing.model,
-          year: listing.year,
-          market: listing.market,
-        }
-      : null,
+    listing: listingBlock,
     operator: discloseOperator(access, operator, listing?.market),
     viewer: { party: access.party, canDecide: access.canDecide },
   });

@@ -436,6 +436,51 @@ export type RentalBookingView = {
   operatorNetCents?: number;
 };
 
+/**
+ * The car, as every booking payload describes it.
+ *
+ * partner_id is NOT here and its absence is D6 in the type system: this
+ * is the block that travels to a renter's browser, and the operator's
+ * identity reaches it only through discloseOperator() below. Both booking
+ * routes build their listing block by annotating against this type, so a
+ * column added to one of those select lists cannot reach a payload
+ * without passing through here first.
+ */
+export type RentalBookingListingSummary = {
+  id: string;
+  slug: string;
+  make: string;
+  model: string;
+  year: number | null;
+  market: string;
+};
+
+/**
+ * ONE BOOKING, AS THE API SENDS IT — the shape every surface consumes.
+ *
+ * This is what GET /api/rental-bookings returns per row, and what
+ * GET /api/rental-bookings/[id] returns spread across its `booking`,
+ * `listing` and `operator` keys. It is declared here, beside the
+ * projection and the disclosure that produce it, because three client
+ * surfaces read it (the renter's /account/rentals, the operator's
+ * /partner/requests, the post-submit /rent/booking-requested) and each of
+ * them had hand-typed its own version. Three hand-typed copies of a
+ * payload are three chances for one of them to describe a field the
+ * server does not send — or, worse, to keep describing one it stopped
+ * sending.
+ *
+ * `operator` is REQUIRED, and that is the point of putting it in the row
+ * type rather than leaving each surface to remember it: the disclosure is
+ * how an operator's identity reaches a screen at all, so a surface that
+ * wants to name one has to go through discloseOperator()'s verdict to get
+ * a name to render.
+ */
+export type RentalBookingItem = RentalBookingView & {
+  /** null when the listing row could not be loaded — never a partial. */
+  listing: RentalBookingListingSummary | null;
+  operator: RentalOperatorDisclosure;
+};
+
 export function projectRentalBooking(
   row: RentalBookingRow,
   access: RentalBookingAccessGranted,
