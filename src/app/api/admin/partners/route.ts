@@ -5,6 +5,14 @@
 //         plus the application queue (partner_accounts, 0042).
 // POST  → create-or-update an operator (upsert by name) — roster only.
 //         Audit-logged (create / commercial-term edit / pause-resume).
+//         FEE TERMS (0048 / decision D2): commission_rate, fee_mode
+//         ('percent' | 'flat'), fee_flat_cents, fee_payer ('operator' |
+//         'renter'), fee_floor_cents, fee_cap_cents. Only the keys a
+//         caller sends are written, and coherence is judged against the
+//         row AS IT WILL BE by resolveRentalFeeConfig — the same code
+//         path computeRentalFee runs and the same rules 0048's CHECK
+//         constraints enforce, so the admin preview, this validation,
+//         the stored row and the eventual charge cannot disagree.
 //         RENAMING is possible since 0045 but never silent: the two
 //         remaining name couplings each answer with a 409 that writes
 //         nothing, and a follow-up request confirms them —
@@ -92,6 +100,19 @@ import {
   type PartnerAccount,
   type PartnerStatus,
 } from "@/lib/partner";
+import {
+  RENTAL_FEE_EXAMPLE_BASE_CENTS,
+  computeRentalFee,
+  rentalFeeConfigFromPartner,
+  type PartnerFeeColumns,
+  type RentalFeeMode,
+  type RentalFeePayer,
+} from "@/lib/fees";
+import {
+  readCentsField,
+  readCommissionRate,
+  readEnumField,
+} from "@/lib/partner-fee-body";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 const UUID_RE =
@@ -119,8 +140,46 @@ type PartnerRow = {
   stripe_onboarded_at: string | null;
   status: "active" | "paused";
   created_at: string;
+  // Fee terms (0048). Optional on the type because a database that has
+  // not had 0048 applied returns rows without them — the fee engine
+  // resolves that absence to today's percent / operator-pays behavior
+  // rather than throwing, and the POST below only writes these keys
+  // when a caller actually sends one.
+  fee_mode?: RentalFeeMode | null;
+  fee_flat_cents?: number | null;
+  fee_payer?: RentalFeePayer | null;
+  fee_floor_cents?: number | null;
+  fee_cap_cents?: number | null;
   [key: string]: unknown;
 };
+
+// Postgres/PostgREST text when the fee columns are missing — i.e. 0048
+// has not been applied here. Distinguished from a real failure so the
+// admin is told which migration to run instead of reading a raw error.
+const FEE_COLUMN_RE = /fee_mode|fee_payer|fee_flat_cents|fee_floor_cents|fee_cap_cents/i;
+
+function feeSchemaHint(message: string | undefined): string {
+  const raw = message?.trim() || "unknown";
+  return FEE_COLUMN_RE.test(raw) && /column|schema cache|does not exist/i.test(raw)
+    ? `${raw}. The operator fee-terms columns are missing — apply migration 0048 (operator approval required).`
+    : raw;
+}
+
+/** The worked example, flattened for the audit log. Cents on purpose —
+ *  the audit trail should never carry a rounded dollar figure that
+ *  cannot be reconciled back to the charge. */
+function describeFeeExample(example: ReturnType<typeof computeRentalFee>) {
+  return {
+    base_amount_cents: example.baseAmountCents,
+    fee_cents: example.feeCents,
+    fee_payer: example.feePayer,
+    renter_total_cents: example.renterTotalCents,
+    operator_net_cents: example.operatorNetCents,
+    ...(example.clampedBy
+      ? { clamped_by: example.clampedBy, raw_fee_cents: example.rawFeeCents }
+      : {}),
+  };
+}
 
 /** Everything an admin needs to decide whether linking an application
  *  to a PRE-EXISTING operator is legitimate. Admin-only route, so the
@@ -259,6 +318,20 @@ export async function GET(req: NextRequest) {
     );
   }
 
+  // Has 0048 been applied here? Migrations are proposed by code and
+  // applied by a human (AGENTS.md), so there is a real window in which
+  // this route ships before the columns exist — and during it the
+  // editor must not POST fee_mode and break the commission edit that
+  // worked yesterday. `select("*")` above already answers the question
+  // whenever a row exists; the probe is only for an empty roster.
+  let feeConfigReady = partners.length > 0
+    ? Object.prototype.hasOwnProperty.call(partners[0], "fee_mode")
+    : false;
+  if (partners.length === 0) {
+    const probe = await db.from("partners").select("fee_mode").limit(1);
+    feeConfigReady = !probe.error;
+  }
+
   return NextResponse.json({
     partners: partners.map((p) => ({
       ...p,
@@ -273,6 +346,11 @@ export async function GET(req: NextRequest) {
     applications,
     applicationsError,
     stripeConfigured: !!stripe,
+    // Drives the Operators tab: with 0048 applied the full fee-terms
+    // editor renders; without it, only the commission-% control, so the
+    // page keeps working against an un-migrated database instead of
+    // 500-ing on an unknown column.
+    feeConfigReady,
   });
 }
 
@@ -324,21 +402,56 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const rawRate = body.commission_rate ?? body.commissionRate;
-  const commissionRate =
-    rawRate === undefined || rawRate === null ? null : Number(rawRate);
-  // [0, 0.5] mirrors both the 0041 check constraint and
-  // computeRentalFee's contract — reject here with words instead of
-  // letting Postgres throw a constraint name at the admin.
-  if (
-    commissionRate !== null &&
-    (!Number.isFinite(commissionRate) || commissionRate < 0 || commissionRate > 0.5)
-  ) {
+  // The rate, read by src/lib/partner-fee-body.ts: bounded by the
+  // imported ceiling (which the 0048 CHECK, computeRentalFee and the
+  // admin form all share), refused rather than coerced when it is not a
+  // number — Number('') is 0, and a 0% commission written from an empty
+  // field earns RYDA nothing on every future booking — and refused when
+  // it is finer than numeric(4,3) can store, because a rate that gets
+  // re-rounded on write makes every later charge differ from the preview
+  // and the audit entry that approved it.
+  const commissionRateField = readCommissionRate(body);
+  if (!commissionRateField.ok) {
     return NextResponse.json(
-      { error: "commission_rate: decimal fraction between 0 and 0.5 (0.15 = 15%)." },
+      { error: commissionRateField.error },
       { status: 400 },
     );
   }
+  const commissionRate = commissionRateField.provided
+    ? commissionRateField.value
+    : null;
+
+  // ── fee terms (0048 / D2) ───────────────────────────────────────────
+  // Parsed for SHAPE here; validated for COHERENCE after the lookup,
+  // because "is this a legal set of terms" is a question about the row
+  // as it will exist, not about this request in isolation — flipping an
+  // operator to flat mode is legal only if a flat amount is already on
+  // the row or arrives in the same call.
+  const feeModeField = readEnumField<RentalFeeMode>(body, "fee_mode", "feeMode", [
+    "percent",
+    "flat",
+  ]);
+  const feePayerField = readEnumField<RentalFeePayer>(
+    body,
+    "fee_payer",
+    "feePayer",
+    ["operator", "renter"],
+  );
+  const feeFlatField = readCentsField(body, "fee_flat_cents", "feeFlatCents");
+  const feeFloorField = readCentsField(body, "fee_floor_cents", "feeFloorCents");
+  const feeCapField = readCentsField(body, "fee_cap_cents", "feeCapCents");
+  // Checked one at a time rather than in a loop so TypeScript narrows
+  // each variable to its ok branch for the rest of the handler.
+  if (!feeModeField.ok)
+    return NextResponse.json({ error: feeModeField.error }, { status: 400 });
+  if (!feePayerField.ok)
+    return NextResponse.json({ error: feePayerField.error }, { status: 400 });
+  if (!feeFlatField.ok)
+    return NextResponse.json({ error: feeFlatField.error }, { status: 400 });
+  if (!feeFloorField.ok)
+    return NextResponse.json({ error: feeFloorField.error }, { status: 400 });
+  if (!feeCapField.ok)
+    return NextResponse.json({ error: feeCapField.error }, { status: 400 });
 
   // Pause/resume — mirrors the 0041 status check constraint. Paused
   // partners keep their roster row but the payment-link route refuses
@@ -371,9 +484,93 @@ export async function POST(req: NextRequest) {
       { status: 500 },
     );
   }
+  const existingRow = (lookup.data as PartnerRow | null) ?? null;
+
+  // ── the fee-terms patch, validated as the row WILL be ───────────────
+  //
+  // Only the keys a caller actually sent are written, for the same
+  // reason the rest of this handler patches narrowly: a pause toggle
+  // and an inline commission edit both POST the whole row identity, and
+  // neither may reset an operator's fee terms as a side effect. It also
+  // keeps every pre-0048 flow working against a database that has not
+  // had the migration applied — no fee_* key in the patch, no unknown
+  // column in the write.
+  const feePatch: Record<string, unknown> = {};
+  if (feeModeField.provided) feePatch.fee_mode = feeModeField.value;
+  if (feePayerField.provided) feePatch.fee_payer = feePayerField.value;
+  if (feeFlatField.provided) feePatch.fee_flat_cents = feeFlatField.value;
+  if (feeFloorField.provided) feePatch.fee_floor_cents = feeFloorField.value;
+  if (feeCapField.provided) feePatch.fee_cap_cents = feeCapField.value;
+
+  const effectiveMode = (feePatch.fee_mode ??
+    existingRow?.fee_mode ??
+    "percent") as RentalFeeMode;
+
+  // Switching back to a percent rate RETIRES the flat amount rather than
+  // 400-ing on it. 0048's coherence CHECK forbids a percent row from
+  // carrying a flat fee — precisely so the row always answers "which
+  // number is live?" — and the alternative here is an error the admin
+  // cannot act on ("clear a field you can no longer see"). The discard
+  // is not silent: it lands in the audit entry's before/after like any
+  // other changed column.
+  if (
+    effectiveMode === "percent" &&
+    !feeFlatField.provided &&
+    existingRow?.fee_flat_cents != null
+  ) {
+    feePatch.fee_flat_cents = null;
+  }
+
+  const pick = <T,>(key: string, fallback: T | null | undefined): T | null =>
+    key in feePatch ? (feePatch[key] as T | null) : ((fallback ?? null) as T | null);
+
+  // The row as it will exist after this write. Coherence is a property
+  // of THAT, not of this request: flipping an operator to flat mode is
+  // legal only if a flat amount is already on the row or arrives in the
+  // same call, and only the merged view can tell.
+  const effectiveFee: PartnerFeeColumns = {
+    commission_rate: commissionRate ?? existingRow?.commission_rate ?? null,
+    fee_mode: effectiveMode,
+    fee_flat_cents: pick<number>("fee_flat_cents", existingRow?.fee_flat_cents),
+    fee_payer: pick<RentalFeePayer>("fee_payer", existingRow?.fee_payer) ?? "operator",
+    fee_floor_cents: pick<number>("fee_floor_cents", existingRow?.fee_floor_cents),
+    fee_cap_cents: pick<number>("fee_cap_cents", existingRow?.fee_cap_cents),
+  };
+
+  // Validated by the FEE ENGINE, not by a second copy of its rules.
+  // resolveRentalFeeConfig is the same code path computeRentalFee runs
+  // internally and it enforces exactly what 0048's CHECK constraints
+  // enforce, so a config this route accepts is one the row accepts and
+  // one the admin preview renders identically. Per-BOOKING conditions
+  // (a flat operator-paid fee larger than some particular base) are
+  // deliberately not asserted here — they depend on a rental this route
+  // has never seen. computeRentalFee refuses those at quote time, and
+  // the admin form's worked example shows them before the save.
+  let feeExample: ReturnType<typeof computeRentalFee> | null = null;
+  try {
+    feeExample = computeRentalFee(
+      RENTAL_FEE_EXAMPLE_BASE_CENTS,
+      rentalFeeConfigFromPartner(effectiveFee),
+    );
+  } catch (err) {
+    const detail = err instanceof Error ? err.message : String(err);
+    // The engine's messages already name the offending field
+    // ("flatCents is required when mode is 'flat'"), so pass them
+    // through rather than flattening every cause into one sentence.
+    const clean = detail.replace(/^computeRentalFee:\s*/, "");
+    // A config that is coherent but simply cannot survive the $2,000
+    // reference booking (an operator-paid flat fee bigger than the
+    // rental) is a real, saveable term for an expensive fleet — it is
+    // not a validation failure, so it must not 400 here.
+    if (/exceeds the .* base/.test(clean)) {
+      feeExample = null;
+    } else {
+      return NextResponse.json({ error: `Fee terms — ${clean}` }, { status: 400 });
+    }
+  }
 
   if (lookup.data) {
-    const patch: Record<string, unknown> = {};
+    const patch: Record<string, unknown> = { ...feePatch };
     // Set by the rename guard below so the audit entry records what the
     // rename actually did, not just that it happened.
     let relinkedInquiries = 0;
@@ -511,7 +708,7 @@ export async function POST(req: NextRequest) {
     if (updated.error || !updated.data) {
       console.error("[admin partners · update]", updated.error);
       return NextResponse.json(
-        { error: `Update failed: ${updated.error?.message ?? "unknown"}` },
+        { error: `Update failed: ${feeSchemaHint(updated.error?.message)}` },
         { status: 500 },
       );
     }
@@ -539,6 +736,15 @@ export async function POST(req: NextRequest) {
           ? { relinked_inquiries: relinkedInquiries }
           : {}),
         ...(fleetCodeConfirmed ? { fleet_code_rename_confirmed: true } : {}),
+        // The terms, worked through one concrete booking. A row of
+        // columns ("fee_mode: flat, fee_flat_cents: 25000") does not
+        // answer "what did this change cost the operator" a year later;
+        // "on a $2,000 booking the renter paid $2,000 and the operator
+        // received $1,750" does. Same function, same example, and the
+        // same number the admin saw in the preview before clicking save.
+        ...(feeExample && Object.keys(feePatch).length > 0
+          ? { fee_example: describeFeeExample(feeExample) }
+          : {}),
         note: note || undefined,
       },
     });
@@ -549,11 +755,14 @@ export async function POST(req: NextRequest) {
     .from("partners")
     .insert({
       name,
-      // Omitted fields take the 0041 defaults (commission 0.150,
-      // status 'active', market 'Miami').
+      // Omitted fields take the 0041/0048 defaults (commission 0.150,
+      // status 'active', market 'Miami', fee_mode 'percent', fee_payer
+      // 'operator', no clamps) — i.e. a new operator created without
+      // fee terms gets exactly the terms every operator had before D2.
       ...(contactEmail !== null ? { contact_email: contactEmail } : {}),
       ...(commissionRate !== null ? { commission_rate: commissionRate } : {}),
       ...(status !== null ? { status } : {}),
+      ...feePatch,
     })
     .select("*")
     .single();
@@ -574,7 +783,7 @@ export async function POST(req: NextRequest) {
     console.error("[admin partners · insert]", inserted.error);
     return NextResponse.json(
       {
-        error: `Create failed: ${inserted.error?.message ?? "unknown"}. If the partners table does not exist, apply migration 0041 (operator approval required).`,
+        error: `Create failed: ${feeSchemaHint(inserted.error?.message)}. If the partners table does not exist, apply migration 0041 (operator approval required).`,
       },
       { status: 500 },
     );
@@ -589,6 +798,12 @@ export async function POST(req: NextRequest) {
       name: createdRow.name,
       contact_email: createdRow.contact_email,
       commission_rate: createdRow.commission_rate,
+      fee_mode: createdRow.fee_mode ?? null,
+      fee_flat_cents: createdRow.fee_flat_cents ?? null,
+      fee_payer: createdRow.fee_payer ?? null,
+      fee_floor_cents: createdRow.fee_floor_cents ?? null,
+      fee_cap_cents: createdRow.fee_cap_cents ?? null,
+      ...(feeExample ? { fee_example: describeFeeExample(feeExample) } : {}),
       source: "operators_tab",
       note: note || undefined,
     },
