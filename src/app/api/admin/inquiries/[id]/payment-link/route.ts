@@ -40,6 +40,11 @@ import { computeRentalFee } from "@/lib/fees";
 import { emailLayout, escapeHtml } from "@/lib/notify";
 import { partnerInquiryEmail } from "@/lib/partner-contacts";
 import { SITE_URL } from "@/lib/site-url";
+import {
+  partnerFetchers,
+  resolveInquiryOperator,
+  isColumnMissing,
+} from "@/lib/partner-resolution";
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -113,6 +118,28 @@ function fmtUsd(cents: number): string {
     currency: "USD",
   });
 }
+
+// The lead's own columns, then its operator attribution. partner_id
+// arrives with 0045; until that is applied the select errors and must
+// degrade to the pre-0045 shape rather than 500 every payment link —
+// same schema-cache fallback as /api/rental-inquiry's insert.
+const INQUIRY_COLS =
+  "id, status, name, email, vehicle_label, start_date, end_date, fleet, partner_name";
+
+// Everything the charge needs from the operator, read identically
+// whether the lead resolved by id or by legacy name.
+const PARTNER_COLS =
+  "id, name, status, contact_email, commission_rate, stripe_account_id, stripe_onboarded_at";
+
+type OperatorRow = {
+  id: string;
+  name: string;
+  status: string;
+  contact_email: string | null;
+  commission_rate: number;
+  stripe_account_id: string | null;
+  stripe_onboarded_at: string | null;
+};
 
 // Customer-facing pay-link email. NEVER name the operator here — the
 // public promise is "a vetted Miami operator" (see rental-inquiry
@@ -218,13 +245,20 @@ export async function POST(
   const note =
     typeof body.note === "string" ? body.note.trim().slice(0, 500) || null : null;
 
-  const inquiryRes = await db
+  let inquiryRes = await db
     .from("rental_inquiries")
-    .select(
-      "id, status, name, email, vehicle_label, start_date, end_date, fleet, partner_name",
-    )
+    .select(`${INQUIRY_COLS}, partner_id`)
     .eq("id", id)
     .maybeSingle();
+  if (inquiryRes.error && isColumnMissing(inquiryRes.error, "partner_id")) {
+    // Pre-0045 window: the FK does not exist yet, so every lead is a
+    // legacy lead and the resolver falls back to partner_name below.
+    inquiryRes = await db
+      .from("rental_inquiries")
+      .select(INQUIRY_COLS)
+      .eq("id", id)
+      .maybeSingle();
+  }
   if (inquiryRes.error) {
     return NextResponse.json(
       { error: `Database error: ${inquiryRes.error.message}` },
@@ -252,49 +286,57 @@ export async function POST(
     );
   }
 
-  // Direct charges need an operator account to land on. RYDA-fleet
-  // inquiries carry no partner attribution by design.
-  if (!inquiry.partner_name) {
-    return NextResponse.json(
-      {
-        error:
-          "This inquiry has no operator attribution (RYDA fleet) — the direct-charge payment rail applies to partner vehicles only.",
-      },
-      { status: 409 },
-    );
-  }
-
-  const partnerRes = await db
-    .from("partners")
-    .select(
-      "id, name, status, contact_email, commission_rate, stripe_account_id, stripe_onboarded_at",
-    )
-    .eq("name", inquiry.partner_name)
-    .maybeSingle();
-  if (partnerRes.error) {
-    if (isTableMissing(partnerRes.error, "partners")) {
+  // Which operator owns this lead. ONE decider for that question
+  // (src/lib/partner-resolution.ts): partner_id when the lead carries
+  // one, the snapshotted name only for legacy rows. A renamed operator
+  // still resolves — that is the whole point of 0045. Direct charges
+  // need an account to land on, so a lead with neither (RYDA fleet, by
+  // design) stops here.
+  const resolved = await resolveInquiryOperator<OperatorRow>(
+    inquiry,
+    partnerFetchers<OperatorRow>(db, PARTNER_COLS),
+  );
+  if (!resolved.ok) {
+    if (resolved.reason === "no_attribution") {
       return NextResponse.json(
         {
           error:
-            "Partner payments schema not ready — apply migration 0041 (operator approval required) before sending payment links.",
+            "This inquiry has no operator attribution (RYDA fleet) — the direct-charge payment rail applies to partner vehicles only.",
         },
-        { status: 503 },
+        { status: 409 },
       );
     }
-    return NextResponse.json(
-      { error: `Database error: ${partnerRes.error.message}` },
-      { status: 500 },
-    );
-  }
-  const partner = partnerRes.data;
-  if (!partner) {
+    if (resolved.reason === "lookup_failed") {
+      if (isTableMissing(resolved.error, "partners")) {
+        return NextResponse.json(
+          {
+            error:
+              "Partner payments schema not ready — apply migration 0041 (operator approval required) before sending payment links.",
+          },
+          { status: 503 },
+        );
+      }
+      return NextResponse.json(
+        { error: `Database error: ${resolved.error?.message ?? "unknown"}` },
+        { status: 500 },
+      );
+    }
+    // not_found. Say which key missed: an id that resolves to nothing
+    // should be impossible (0045's FK restricts the delete, so an
+    // operator holding leads cannot be removed) and is worth naming
+    // loudly; a name that misses is the legacy path, and the fix is to
+    // onboard them so future leads carry the id.
     return NextResponse.json(
       {
-        error: `Partner "${inquiry.partner_name}" is not onboarded yet — add them in Admin → Partners and complete Stripe onboarding first.`,
+        error:
+          resolved.via === "partner_id"
+            ? `This inquiry is linked to operator ${resolved.value}, which is no longer on the roster — re-attribute the lead before sending a payment link.`
+            : `Partner "${resolved.value}" is not onboarded yet — add them in Admin → Partners and complete Stripe onboarding first.`,
       },
       { status: 404 },
     );
   }
+  const partner = resolved.partner;
   if (partner.status === "paused") {
     return NextResponse.json(
       { error: `Partner "${partner.name}" is paused — no new bookings until they're resumed.` },
@@ -309,6 +351,10 @@ export async function POST(
       { status: 409 },
     );
   }
+  // Pinned once, after the guard: every Stripe call below (create, and
+  // the two expire paths) must land on this one account, and a const
+  // keeps that narrowing alive inside the closures.
+  const stripeAccount = partner.stripe_account_id;
 
   // The ONLY fee math. Throws if a partners row was edited out-of-band
   // to a rate outside the [0, 0.5] contract — better a loud 500 than a
@@ -433,7 +479,7 @@ export async function POST(
       // operator's connected account. This request option is what
       // routes it; remove it and the charge silently lands on the
       // platform balance, which the founder decision forbids.
-      { stripeAccount: partner.stripe_account_id },
+      { stripeAccount },
     );
   } catch (err) {
     console.error("[payment-link · session create]", err);
@@ -452,7 +498,7 @@ export async function POST(
     // untrackable link can't be paid, then surface the failure.
     try {
       await stripeClient.checkout.sessions.expire(session.id, {}, {
-        stripeAccount: partner.stripe_account_id,
+        stripeAccount,
       });
     } catch (expireErr) {
       console.error("[payment-link · session expire]", expireErr);
@@ -492,7 +538,7 @@ export async function POST(
     if (code === "23505") {
       try {
         await stripeClient.checkout.sessions.expire(session.id, {}, {
-          stripeAccount: partner.stripe_account_id,
+          stripeAccount,
         });
       } catch (expireErr) {
         console.error("[payment-link · duplicate session expire]", expireErr);

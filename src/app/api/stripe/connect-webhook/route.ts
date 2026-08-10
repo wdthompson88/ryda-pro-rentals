@@ -41,6 +41,11 @@ import { stripe, STRIPE_CONNECT_WEBHOOK_SECRET } from "@/lib/stripe";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { notifyTeam, emailLayout, escapeHtml } from "@/lib/notify";
 import { partnerInquiryEmail } from "@/lib/partner-contacts";
+import {
+  partnerFetchers,
+  resolveInquiryOperator,
+  type InquiryOperatorRef,
+} from "@/lib/partner-resolution";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 // Stripe needs the raw body for signature verification. Next.js App
@@ -111,22 +116,25 @@ function fmtUsd(cents: number): string {
 // contact_email when set, else the code-level partner-contacts map
 // (which itself falls back to the team inbox — a booking notification
 // landing on our own desk beats one sent to an unconfirmed address).
+//
+// Which operator to read that from is NOT decided here: it goes through
+// the one resolver (src/lib/partner-resolution.ts), so a renamed
+// operator still gets their own booking notification. The name is only
+// consulted for the code-level map, which is still keyed by brand string
+// (partner-contacts.ts) — the last name coupling left, and a routing
+// fallback rather than an identity lookup.
 async function partnerContactEmail(
   admin: SupabaseClient,
-  partnerId: string | null,
-  partnerName: string | null,
+  ref: InquiryOperatorRef,
 ): Promise<string> {
-  if (partnerId) {
-    const res = await admin
-      .from("partners")
-      .select("contact_email")
-      .eq("id", partnerId)
-      .maybeSingle();
-    if (!res.error && res.data?.contact_email) {
-      return res.data.contact_email as string;
-    }
+  const resolved = await resolveInquiryOperator<{ contact_email: string | null }>(
+    ref,
+    partnerFetchers(admin, "contact_email"),
+  );
+  if (resolved.ok && resolved.partner.contact_email) {
+    return resolved.partner.contact_email;
   }
-  return partnerInquiryEmail(partnerName);
+  return partnerInquiryEmail(ref.partner_name ?? null);
 }
 
 export async function POST(req: NextRequest) {
@@ -432,11 +440,14 @@ export async function POST(req: NextRequest) {
             `, "Sent by RYDA. Reply to this email to reach the RYDA team."),
           });
 
-          const operatorInbox = await partnerContactEmail(
-            admin,
-            payment.partner_id ?? null,
-            inquiry.partner_name ?? null,
-          );
+          // The payment row's partner_id is the authoritative link (it is
+          // the account the charge actually settled on, cross-checked
+          // against event.account above); the inquiry's snapshotted name
+          // is the legacy fallback.
+          const operatorInbox = await partnerContactEmail(admin, {
+            partner_id: payment.partner_id ?? null,
+            partner_name: inquiry.partner_name ?? null,
+          });
           await sendEmail({
             to: operatorInbox,
             subject: `Booking paid · ${inquiry.vehicle_label} · ${inquiry.start_date} → ${inquiry.end_date}`,
