@@ -7,7 +7,14 @@ import { StepProgress } from "@/components/step-progress";
 import { authedFetch } from "@/lib/api-fetch";
 import { supabase } from "@/lib/supabase";
 
-const STEPS = ["Basic", "Phone", "Personal", "Identity", "Financial", "Tier", "Done"];
+// Basic → Phone → Personal → Identity → Done. The wizard used to carry
+// two more steps between Identity and Done — "Financial" (interest +
+// co-ownership disclaimer acknowledgment) and "Tier" (Core/Blue/Black
+// share-buy-in credits) — both of which described the retired
+// co-ownership product and were removed in the rentals-first strip.
+// The Identity step stays: it is the Stripe Identity entry point and is
+// wanted for renter verification.
+const STEPS = ["Basic", "Phone", "Personal", "Identity", "Done"];
 const IDENTITY_STEP = STEPS.indexOf("Identity");
 
 export default function OnboardingPage() {
@@ -57,9 +64,7 @@ export default function OnboardingPage() {
           {step === 3 && (
             <Identity onNext={next} onBack={back} returned={kycReturned} />
           )}
-          {step === 4 && <Financial onNext={next} onBack={back} />}
-          {step === 5 && <Tier onNext={next} onBack={back} />}
-          {step === 6 && <Done />}
+          {step === 4 && <Done />}
         </div>
 
         <p className="mt-6 text-center text-xs text-mute">
@@ -462,102 +467,6 @@ function Identity({
   );
 }
 
-function Financial({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
-  return (
-    <div>
-      <h2 className="font-display text-2xl text-ink">A bit about you.</h2>
-      <p className="mt-2 text-sm text-ink-soft">
-        Helps us match you to the right vehicles, markets, and member events.
-        No accredited-investor status or financial qualification required —
-        RYDA is a luxury access platform, not an investment platform.
-      </p>
-      <div className="mt-8 space-y-5">
-        <Select
-          label="Why are you interested in RYDA?"
-          options={[
-            "I love these cars and want to drive more of them",
-            "I want a Ferrari without buying one outright",
-            "I rent exotics now and the math no longer works",
-            "I'm exploring, not sure yet",
-          ]}
-        />
-        <Select
-          label="How often do you drive a supercar today?"
-          options={[
-            "Never, but I want to",
-            "A few days a year (rentals, friends' cars)",
-            "I own one already and want a second flavor",
-            "Regularly via a club or my own collection",
-          ]}
-        />
-        <Select
-          label="Primary market"
-          options={["Miami", "Los Angeles", "New York", "I travel between these cities", "Somewhere else"]}
-        />
-        <div>
-          <label className="block text-xs font-medium uppercase tracking-wider text-mute">
-            Anything we should know? (optional)
-          </label>
-          <textarea
-            rows={3}
-            className="mt-2 w-full rounded-xl border border-rule bg-cream px-4 py-3 text-sm text-ink placeholder:text-mute focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
-            placeholder="Track-day enthusiast, prefer naturally aspirated V8s, occasional Aspen trips..."
-          />
-        </div>
-        <label className="flex items-start gap-3 text-xs text-ink-soft">
-          <input type="checkbox" className="mt-0.5 accent-red" />
-          <span>
-            I acknowledge the{" "}
-            <Link href="/legal/disclaimer" className="underline hover:text-ink">
-              Co-Ownership Disclaimer
-            </Link>
-            . I understand co-ownership stakes are not investments and the
-            cars I co-own will depreciate over time.
-          </span>
-        </label>
-      </div>
-      <BackNext onBack={onBack} onNext={onNext} />
-    </div>
-  );
-}
-
-function Tier({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
-  const [tier, setTier] = useState<"core" | "blue" | "black">("blue");
-  return (
-    <div>
-      <h2 className="font-display text-2xl text-ink">Pick a tier.</h2>
-      <p className="mt-2 text-sm text-ink-soft">
-        Most active members start on Blue. Upgrade or downgrade anytime.
-      </p>
-      <div className="mt-8 grid grid-cols-1 gap-3">
-        <TierOption
-          name="RYDA Core"
-          price="Free"
-          tagline="Browse, rent, and claim co-ownership shares. Standard handover."
-          selected={tier === "core"}
-          onClick={() => setTier("core")}
-        />
-        <TierOption
-          name="RYDA Blue"
-          price="$500 / yr"
-          tagline="$200 buy-in credit · 1 free delivery · monthly meetups · member-to-member transfers."
-          selected={tier === "blue"}
-          onClick={() => setTier("blue")}
-          badge="Most chosen"
-        />
-        <TierOption
-          name="RYDA Black"
-          price="$1,500 / yr"
-          tagline="$500 share credit · 3 deliveries · 3 service hrs · flagship events · dedicated contact."
-          selected={tier === "black"}
-          onClick={() => setTier("black")}
-        />
-      </div>
-      <BackNext onBack={onBack} onNext={onNext} />
-    </div>
-  );
-}
-
 function Done() {
   return (
     <div className="text-center">
@@ -571,19 +480,16 @@ function Done() {
         it does.
       </p>
       <div className="mt-8 rounded-xl border border-rule bg-cream-2/40 p-5 text-left text-sm">
-        <p className="font-medium text-ink">Member #00104</p>
-        <ul className="mt-3 space-y-2 text-ink-soft">
+        <ul className="space-y-2 text-ink-soft">
           <li>· Identity verification: Processing</li>
-          <li>· Financial qualification: Submitted</li>
-          <li>· Membership tier: RYDA Core</li>
-          <li>· Status: Active</li>
+          <li>· Account: Active</li>
         </ul>
       </div>
       <Link
-        href="/portfolio"
+        href="/rent"
         className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream hover:bg-red"
       >
-        Browse vehicles →
+        Browse the fleet →
       </Link>
     </div>
   );
@@ -651,29 +557,6 @@ function Field({
   );
 }
 
-function Select({ label, options }: { label: string; options: string[] }) {
-  const id = fieldId(label);
-  return (
-    <div>
-      <label
-        htmlFor={id}
-        className="block text-xs font-medium uppercase tracking-wider text-mute"
-      >
-        {label}
-      </label>
-      <select
-        id={id}
-        name={id}
-        className="mt-2 h-12 w-full rounded-xl border border-rule bg-cream px-4 text-sm text-ink focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
-      >
-        {options.map((o) => (
-          <option key={o}>{o}</option>
-        ))}
-      </select>
-    </div>
-  );
-}
-
 function Bullet({ children, ok }: { children: React.ReactNode; ok?: boolean }) {
   return (
     <li className="flex items-start gap-3 text-sm text-ink-soft">
@@ -730,40 +613,4 @@ function BackNext({
       )}
     </div>
   );
-}
-
-function TierOption({
-  name,
-  price,
-  tagline,
-  selected,
-  onClick,
-  badge,
-}: {
-  name: string;
-  price: string;
-  tagline: string;
-  selected: boolean;
-  onClick: () => void;
-  badge?: string;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={`relative w-full rounded-2xl border p-6 text-left transition-colors ${
-        selected ? "border-red bg-red/5" : "border-rule bg-cream hover:border-ink-soft"
-      }`}
-    >
-      {badge && (
-        <span className="absolute -top-3 right-6 rounded-full bg-red px-3 py-1 text-xs font-medium text-cream">
-          {badge}
-        </span>
-      )}
-      <div className="flex items-baseline justify-between">
-        <p className="font-display text-lg text-ink">{name}</p>
-        <p className="font-display text-xl text-ink tabular-nums">{price}</p>
-      </div>
-      <p className="mt-2 text-sm text-ink-soft">{tagline}</p>
-    </button>
-  );
-}
+}

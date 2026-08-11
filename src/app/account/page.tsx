@@ -2,67 +2,73 @@
 
 // /account — Overview tab. The dashboard hub: a welcome line, the
 // quick stats strip, and a recent-activity feed. Other sections live
-// at /account/profile, /account/security, etc. (sidebar in layout).
+// at /account/requests, /account/profile, etc. (sidebar in layout).
 //
 // Real data:
 //   - Display name + member-since from auth.users + user_profiles
-//   - Stats from share_holdings + bookings (RLS scopes to caller)
-//   - Activity feed = union of recent share_purchases + bookings
-//     + llc_amendments, sorted by date
+//   - Stats + activity from the caller's rental_inquiries rows, read
+//     through useRentalProfile (GET /api/rental-inquiry, session-gated,
+//     own rows only, newest first) — the same source /account/requests
+//     renders, so the two tabs can never disagree.
+//
+// This page used to aggregate share_holdings, bookings, share_purchases
+// and llc_amendments. Those are co-ownership tables and no longer have
+// application code behind them.
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useAuthStatus } from "@/lib/use-auth-status";
+import {
+  useRentalProfile,
+  type RentalInquiry,
+} from "@/lib/use-rental-profile";
 
-type Stats = {
-  assetsCount: number;
-  totalShares: number;
-  upcomingBookings: number;
-  nextBookingDate: string | null;
+// Pipeline states that still have a future in them. `booked` is a
+// confirmed trip; `lost` is closed and counts toward neither.
+const OPEN_STATUSES = new Set(["new", "sent"]);
+
+// Member-honest labels for the activity feed. Kept in step with the
+// status chips on /account/requests.
+const ACTIVITY_LABEL: Record<string, string> = {
+  new: "Request sent",
+  sent: "Routed to an operator",
+  booked: "Booking confirmed",
+  lost: "Request closed",
 };
 
-type ActivityItem = {
-  key: string;
-  label: string;
-  detail: string;
-  date: string;
-};
+function todayIso(): string {
+  return new Date().toISOString().slice(0, 10);
+}
 
 export default function AccountOverviewPage() {
+  const { status: authStatus } = useAuthStatus();
+  const { loading: inquiriesLoading, inquiries } = useRentalProfile(
+    authStatus === "authed",
+  );
+
   const [displayName, setDisplayName] = useState<string | null>(null);
   const [memberSince, setMemberSince] = useState<string | null>(null);
-  const [stats, setStats] = useState<Stats | null>(null);
-  const [activity, setActivity] = useState<ActivityItem[]>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!supabase) {
-      setLoading(false);
-      return;
-    }
+    if (!supabase) return;
     let cancelled = false;
     (async () => {
       const { data: userData } = await supabase.auth.getUser();
-      if (cancelled || !userData.user) {
-        setLoading(false);
-        return;
-      }
-      const userId = userData.user.id;
+      if (cancelled || !userData.user) return;
 
       // Display name from user_profiles (preferred → full → email
       // prefix → null). If no profile row yet, falls through.
       const { data: profile } = await supabase
         .from("user_profiles")
         .select("preferred_name, full_name")
-        .eq("user_id", userId)
+        .eq("user_id", userData.user.id)
         .maybeSingle();
       if (cancelled) return;
       setDisplayName(
         profile?.preferred_name ||
           profile?.full_name ||
-          (userData.user.email
-            ? userData.user.email.split("@")[0]
-            : null),
+          (userData.user.email ? userData.user.email.split("@")[0] : null),
       );
       if (userData.user.created_at) {
         const d = new Date(userData.user.created_at);
@@ -70,113 +76,19 @@ export default function AccountOverviewPage() {
           d.toLocaleDateString("en-US", { month: "long", year: "numeric" }),
         );
       }
-
-      // Holdings (active only) — distinct asset count + total shares.
-      const { data: holdings } = await supabase
-        .from("share_holdings")
-        .select("vehicle_symbol, boat_slug, shares")
-        .eq("user_id", userId)
-        .is("transferred_at", null);
-      if (cancelled) return;
-      const assetKeys = new Set<string>();
-      let totalShares = 0;
-      for (const h of holdings ?? []) {
-        if (h.vehicle_symbol) assetKeys.add("v:" + h.vehicle_symbol);
-        if (h.boat_slug) assetKeys.add("b:" + h.boat_slug);
-        totalShares += h.shares ?? 0;
-      }
-
-      // Upcoming bookings — active statuses, end_date >= today.
-      const today = new Date().toISOString().slice(0, 10);
-      const { data: bookings } = await supabase
-        .from("bookings")
-        .select("id, start_date, end_date, status, vehicle_symbol, boat_slug")
-        .eq("user_id", userId)
-        .in("status", ["pending", "confirmed", "in-progress"])
-        .gte("end_date", today)
-        .order("start_date", { ascending: true });
-      if (cancelled) return;
-
-      const nextDate =
-        bookings && bookings.length > 0 ? bookings[0].start_date : null;
-      setStats({
-        assetsCount: assetKeys.size,
-        totalShares,
-        upcomingBookings: bookings?.length ?? 0,
-        nextBookingDate: nextDate,
-      });
-
-      // Activity feed: combine recent share_purchases + bookings +
-      // llc_amendments. Cap at 5 most-recent across the union.
-      const [purchasesRes, amendmentsRes] = await Promise.all([
-        supabase
-          .from("share_purchases")
-          .select(
-            "id, status, shares, vehicle_symbol, boat_slug, updated_at",
-          )
-          .eq("user_id", userId)
-          .order("updated_at", { ascending: false })
-          .limit(5),
-        supabase
-          .from("llc_amendments")
-          .select(
-            "id, document_type, vehicle_symbol, boat_slug, created_at",
-          )
-          .eq("user_id", userId)
-          .order("created_at", { ascending: false })
-          .limit(5),
-      ]);
-      if (cancelled) return;
-
-      const items: ActivityItem[] = [];
-      for (const b of bookings ?? []) {
-        const asset = b.vehicle_symbol || b.boat_slug || "asset";
-        items.push({
-          key: "b:" + b.id,
-          label:
-            b.status === "confirmed"
-              ? "Booking confirmed"
-              : b.status === "in-progress"
-                ? "Booking active"
-                : "Booking pending",
-          detail: `${String(asset).toUpperCase()} · ${b.start_date} – ${b.end_date}`,
-          date: b.start_date,
-        });
-      }
-      for (const p of purchasesRes.data ?? []) {
-        const asset = p.vehicle_symbol || p.boat_slug || "asset";
-        const verb =
-          p.status === "paid"
-            ? "Share confirmed"
-            : p.status === "pending"
-              ? "Share pending"
-              : p.status === "failed"
-                ? "Share payment failed"
-                : "Share " + p.status;
-        items.push({
-          key: "p:" + p.id,
-          label: verb,
-          detail: `${String(asset).toUpperCase()} · ${p.shares} share${p.shares > 1 ? "s" : ""}`,
-          date: p.updated_at,
-        });
-      }
-      for (const a of amendmentsRes.data ?? []) {
-        const asset = a.vehicle_symbol || a.boat_slug || "asset";
-        items.push({
-          key: "a:" + a.id,
-          label: "LLC amendment generated",
-          detail: `${String(asset).toUpperCase()} · ${a.document_type.replace(/_/g, " ")}`,
-          date: a.created_at,
-        });
-      }
-      items.sort((x, y) => (y.date > x.date ? 1 : -1));
-      setActivity(items.slice(0, 5));
-      setLoading(false);
     })();
     return () => {
       cancelled = true;
     };
   }, []);
+
+  const loading = authStatus === "loading" || inquiriesLoading;
+
+  // Derived stats. All three read off the same rows the requests tab
+  // shows, so a member never sees a count that its own list contradicts.
+  const openCount = inquiries.filter((i) => OPEN_STATUSES.has(i.status)).length;
+  const bookedCount = inquiries.filter((i) => i.status === "booked").length;
+  const upcoming = nextUpcoming(inquiries);
 
   return (
     <div className="space-y-10">
@@ -192,93 +104,87 @@ export default function AccountOverviewPage() {
         </p>
       </header>
 
-      {/* Quick stats — pulled live from share_holdings + bookings.
-          assetsCount = distinct vehicle/boat the member holds at
-          least one active share in. Empty state when zero. */}
+      {/* Quick stats — the member's own rental pipeline. Empty state
+          when they haven't sent a request yet. */}
       <section>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
           <Stat
-            label="Assets co-owned"
-            value={loading ? "…" : String(stats?.assetsCount ?? 0)}
+            label="Open requests"
+            value={loading ? "…" : String(openCount)}
             sub={
-              !loading && (stats?.totalShares ?? 0) > 0
-                ? `${stats?.totalShares} share${stats?.totalShares === 1 ? "" : "s"}`
-                : "Browse the fleet"
+              loading
+                ? undefined
+                : openCount > 0
+                  ? "With a vetted operator"
+                  : "Browse the fleet"
             }
           />
           <Stat
-            label="Upcoming bookings"
-            value={loading ? "…" : String(stats?.upcomingBookings ?? 0)}
-            sub={
-              !loading && stats?.nextBookingDate
-                ? `Next: ${new Date(stats.nextBookingDate).toLocaleDateString(
-                    "en-US",
-                    { month: "short", day: "numeric" },
-                  )}`
-                : "None scheduled"
-            }
+            label="Trips booked"
+            value={loading ? "…" : String(bookedCount)}
+            sub={loading ? undefined : bookedCount > 0 ? "All time" : "None yet"}
           />
-          <Stat label="Member status" value="Active" sub="See Membership" />
+          <Stat
+            label="Next pickup"
+            value={
+              loading ? "…" : upcoming ? prettyShortDate(upcoming.start_date) : "—"
+            }
+            sub={loading ? undefined : (upcoming?.vehicle_label ?? "Nothing scheduled")}
+          />
         </div>
       </section>
 
-      {/* Quick-jump cards into member-area routes. Cards without a
-          backing route show "Available at launch" and are
-          non-clickable. */}
+      {/* Quick-jump cards into the surviving member-area routes. */}
       <section>
         <h2 className="font-display text-xl text-ink">Jump to</h2>
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <Card
-            title="My assets"
+            title="Rental requests"
             desc={
               loading
                 ? "Loading…"
-                : (stats?.assetsCount ?? 0) > 0
-                  ? `${stats?.assetsCount} co-owned · ${stats?.totalShares} shares`
-                  : "Browse the fleet"
+                : inquiries.length > 0
+                  ? `${inquiries.length} request${inquiries.length === 1 ? "" : "s"} · ${openCount} open`
+                  : "Where each request stands"
             }
-            href="/account/membership"
+            href="/account/requests"
           />
-          <Card
-            title="Bookings"
-            desc={
-              loading
-                ? "Loading…"
-                : (stats?.upcomingBookings ?? 0) > 0
-                  ? `${stats?.upcomingBookings} upcoming`
-                  : "Book a session"
-            }
-            href="/bookings"
-          />
+          <Card title="Browse the fleet" desc="Cars available in Miami" href="/rent" />
           <Card title="Profile" desc="Name, contact, address" href="/account/profile" />
-          <Card title="Login & security" desc="Email, password, sessions" href="/account/security" />
+          <Card
+            title="Login & security"
+            desc="Email, password, sessions"
+            href="/account/security"
+          />
           <Card title="Verification" desc="KYC, driving record" href="/account/verification" />
-          <Card title="Documents" desc="Agreements, insurance certs" href="/account/documents" />
+          <Card title="Payments" desc="Cards, bank ACH" href="/account/payments" />
         </div>
       </section>
 
-      {/* Recent activity — live union of bookings + share_purchases
-          + llc_amendments, capped at 5 most-recent. Empty state
-          when nothing has happened yet. */}
+      {/* Recent activity — the five most recent rental requests, newest
+          first (the API already sorts, so no re-sort here). */}
       <section>
         <h2 className="font-display text-xl text-ink">Recent activity</h2>
         {loading ? (
           <p className="mt-4 text-sm text-mute">Loading activity…</p>
-        ) : activity.length === 0 ? (
+        ) : inquiries.length === 0 ? (
           <div className="mt-4 rounded-xl border border-dashed border-rule bg-cream-2/40 p-6 text-center">
             <p className="text-sm text-ink-soft">
-              No activity yet. Buy a share or book time on a co-owned asset to
-              see things land here.
+              No activity yet.{" "}
+              <Link href="/rent" className="text-red hover:text-red-deep">
+                Request a car
+              </Link>{" "}
+              and it&apos;ll land here.
             </p>
           </div>
         ) : (
           <ul className="mt-4 divide-y divide-rule rounded-xl border border-rule bg-surface">
-            {activity.map((a) => (
+            {inquiries.slice(0, 5).map((i) => (
               <Activity
-                key={a.key}
-                label={a.label}
-                detail={a.detail}
-                date={formatRelativeDate(a.date)}
+                key={i.id}
+                label={ACTIVITY_LABEL[i.status] ?? i.status}
+                detail={`${i.vehicle_label} · ${prettyShortDate(i.start_date)} – ${prettyShortDate(i.end_date)}`}
+                date={formatRelativeDate(i.created_at)}
               />
             ))}
           </ul>
@@ -286,20 +192,39 @@ export default function AccountOverviewPage() {
       </section>
 
       <p className="text-xs text-mute">
-        Co-ownership and bookings ship live with the Miami launch. See{" "}
-        <Link href="/membership" className="text-red hover:text-red-deep">
-          /membership
-        </Link>{" "}
-        for what's included.
+        Your price is always the operator&apos;s price. See{" "}
+        <Link href="/how-it-works" className="text-red hover:text-red-deep">
+          how it works
+        </Link>
+        .
       </p>
     </div>
   );
+}
+
+// Soonest not-yet-finished trip among requests that are still live.
+// A `lost` request is never upcoming no matter what its dates say.
+function nextUpcoming(inquiries: RentalInquiry[]): RentalInquiry | null {
+  const today = todayIso();
+  const live = inquiries
+    .filter((i) => i.status !== "lost" && i.end_date >= today)
+    .sort((a, b) => (a.start_date < b.start_date ? -1 : 1));
+  return live[0] ?? null;
+}
+
+// "Mar 4" — date-only strings are rendered at noon so a UTC parse
+// can't roll them back a day in a western timezone.
+function prettyShortDate(iso: string): string {
+  const d = new Date(`${iso}T12:00:00`);
+  if (isNaN(d.getTime())) return iso;
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
 // "2 hours ago" style timestamp — caps at "Yesterday" / "N days ago"
 // for the recent-activity feed; full date past 30 days.
 function formatRelativeDate(iso: string): string {
   const ms = Date.now() - new Date(iso).getTime();
+  if (isNaN(ms)) return "";
   if (ms < 60_000) return "Just now";
   if (ms < 60 * 60_000) return `${Math.floor(ms / 60_000)} min ago`;
   if (ms < 24 * 60 * 60_000) return `${Math.floor(ms / (60 * 60_000))} h ago`;
@@ -368,7 +293,3 @@ function Activity({
     </li>
   );
 }
-
-// Charge component removed — upcoming-charges section was sample
-// data; will return when the Stripe billing-portal route lands
-// real receipts.

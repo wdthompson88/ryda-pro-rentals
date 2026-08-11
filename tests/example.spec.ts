@@ -1,7 +1,7 @@
 // Smoke tests against the RYDA marketing surface. Validates that the
 // rental-first restructure (Aug 2026 pivot: landing story on /, browse
-// grid at /rent, lead-gen how-it-works) plus the surviving asset-detail
-// and learn-hub surfaces render correctly post-deploy.
+// grid at /rent, lead-gen how-it-works) plus the surviving learn hub
+// render correctly post-deploy.
 //
 // Run locally:    npm run test:e2e
 // Run UI mode:    npm run test:e2e:ui
@@ -66,22 +66,11 @@ test.describe('how-it-works', () => {
   });
 });
 
-test.describe('asset detail page', () => {
-  test('Ferrari 458 listing page renders title + ops disclosure', async ({
-    page,
-  }) => {
-    await page.goto('/portfolio/f458');
-    // Listing title (year prefix from callsite, name from Vehicle.name).
-    await expect(
-      page.getByRole('heading', { name: /ferrari 458/i }).first(),
-    ).toBeVisible();
-    // Ops disclosure block — shipped on every listing.
-    await expect(page.getByText(/care & custody/i).first()).toBeVisible();
-    // Live market embed section heading (classic.com widget).
-    await expect(page.getByText(/live market data/i).first()).toBeVisible();
-  });
-});
-
+// NOTE: /learn survives the co-ownership strip by operator decision, but
+// its *copy* is still the old co-ownership curriculum and is queued for a
+// content audit. This test asserts what the page says today on purpose —
+// when the audit rewrites the hub, this spec should fail loudly rather
+// than let a half-rewritten page ship unnoticed.
 test.describe('learn hub', () => {
   test('renders the 5 stages', async ({ page }) => {
     await page.goto('/learn');
