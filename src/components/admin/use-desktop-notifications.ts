@@ -18,10 +18,19 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 export type NotifyPermission = "default" | "granted" | "denied" | "unsupported";
 
+/** One watched queue: the ids currently in it, and how to announce a
+ *  new arrival. `noun` is pluralized with a bare "s". */
+export type NotifyChannel = {
+  ids: string[];
+  noun: string;
+  body: string;
+};
+
 export function useNewPendingNotifier(opts: {
-  /** Current ids in the pending sets (purchases + transfers). */
-  pendingPurchaseIds: string[];
-  pendingTransferIds: string[];
+  /** Queues to diff across refreshes. Two today (inquiries + bookings),
+   *  but the shape is open — the hook was previously hardcoded to
+   *  co-ownership purchases and share transfers. */
+  channels: NotifyChannel[];
   /** Only fire after this becomes true. Use to skip the first load. */
   armed: boolean;
 }): {
@@ -35,8 +44,9 @@ export function useNewPendingNotifier(opts: {
     detectPermission(),
   );
 
-  const prevPurchaseIds = useRef<Set<string>>(new Set());
-  const prevTransferIds = useRef<Set<string>>(new Set());
+  // Previous id set per channel, keyed by noun so adding or reordering
+  // a channel can't misattribute one queue's ids to another.
+  const prevIds = useRef<Map<string, Set<string>>>(new Map());
   const armedRef = useRef(false);
 
   // Resync permission state on focus (catches revokes from browser settings).
@@ -66,38 +76,22 @@ export function useNewPendingNotifier(opts: {
   useEffect(() => {
     if (!opts.armed) return;
 
-    const newPurchases = opts.pendingPurchaseIds.filter(
-      (id) => !prevPurchaseIds.current.has(id),
-    );
-    const newTransfers = opts.pendingTransferIds.filter(
-      (id) => !prevTransferIds.current.has(id),
-    );
+    const canFire = armedRef.current && enabled && permission === "granted";
 
-    if (armedRef.current && enabled && permission === "granted") {
-      if (newPurchases.length > 0) {
+    for (const ch of opts.channels) {
+      const seen = prevIds.current.get(ch.noun) ?? new Set<string>();
+      const fresh = ch.ids.filter((id) => !seen.has(id));
+      if (canFire && fresh.length > 0) {
         fire(
-          `${newPurchases.length} new pending purchase${newPurchases.length === 1 ? "" : "s"}`,
-          "Pending purchases need admin review.",
+          `${fresh.length} new ${ch.noun}${fresh.length === 1 ? "" : "s"}`,
+          ch.body,
         );
       }
-      if (newTransfers.length > 0) {
-        fire(
-          `${newTransfers.length} new pending transfer${newTransfers.length === 1 ? "" : "s"}`,
-          "Share transfer awaiting RYDA review.",
-        );
-      }
+      prevIds.current.set(ch.noun, new Set(ch.ids));
     }
 
-    prevPurchaseIds.current = new Set(opts.pendingPurchaseIds);
-    prevTransferIds.current = new Set(opts.pendingTransferIds);
     armedRef.current = true;
-  }, [
-    opts.armed,
-    opts.pendingPurchaseIds,
-    opts.pendingTransferIds,
-    enabled,
-    permission,
-  ]);
+  }, [opts.armed, opts.channels, enabled, permission]);
 
   return {
     permission,

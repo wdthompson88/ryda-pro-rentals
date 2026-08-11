@@ -1,6 +1,6 @@
 "use client";
 
-// /admin — operational console.
+// /admin — operational console, rental triage.
 //
 // Gating: client-side this page just checks supabase.auth.getUser()
 // and bounces to /signin if anon. The TRUE gate is the
@@ -10,98 +10,105 @@
 // "no permission" empty state; no data leaks because the API call
 // 403s before returning anything.
 //
-// Capabilities (all wired to admin-gated API routes):
-//   - Counts strip + 20 most-recent rows per category (purchases,
-//     bookings, KYC, share transfers)
-//   - Per-row actions: mark purchase paid, resend amendment, refund,
-//     cancel booking, force-verify KYC, cancel KYC, approve/reject
-//     pending share transfer
-//   - Find-a-member lookup (email substring or UUID) with full picture
+// WHAT CHANGED IN THE RENTALS-FIRST STRIP
+// This page used to be a co-ownership triage desk: counts and 20-row
+// tables for share_purchases, bookings, kyc_verifications and
+// share_transfers, each with per-row actions (mark paid, resend
+// amendment, refund, force-verify KYC, approve/reject transfer) and
+// bulk runners over the same. Every one of those endpoints belonged to
+// the retired product and is gone, so the actions went with them rather
+// than being left as buttons that 404.
+//
+// What replaced them is deliberately read-only. The rental funnel's
+// write surface already exists and is better than anything this page
+// had: /admin/inquiries owns lead triage and payment links,
+// /admin/partners owns the operator roster and Stripe onboarding. This
+// page is the thing neither of those can be — one screen that shows the
+// whole funnel at once: a lead arrives (rental_inquiries), an operator
+// answers it (rental_bookings), money moves (rental_payments).
+//
+// Capabilities:
+//   - Counts strip across all three rental stages
+//   - 20 most-recent rows per stage, each CSV-exportable
+//   - Find-a-member lookup (email substring or UUID)
 //   - Recent-admin-actions panel (last 10 audit-log entries)
 //   - Manual refresh + auto-refresh toggle (30s cadence)
-//   - CSV export per table
-//   - Sub-route nav (prospects, disputes, LLC formation, comparables,
-//     vehicle enrichment, creative queue, audit log)
+//   - Desktop notification when a new lead or booking request lands
+//   - Sub-route nav
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { authedFetch } from "@/lib/api-fetch";
-import { useActionModal } from "@/components/admin/action-modal";
 import { RefreshBar } from "@/components/admin/refresh-bar";
 import { AuditSummary } from "@/components/admin/audit-summary";
 import { UserLookup } from "@/components/admin/user-lookup";
 import { downloadCsv } from "@/components/admin/csv";
 import {
-  BulkProgress,
-  BulkToolbar,
-  runBulk,
-  useBulkSelection,
-} from "@/components/admin/bulk-actions";
-import { useNewPendingNotifier } from "@/components/admin/use-desktop-notifications";
+  useNewPendingNotifier,
+  type NotifyChannel,
+} from "@/components/admin/use-desktop-notifications";
 
 type Counts = {
-  purchases_pending: number;
-  purchases_failed: number;
-  purchases_paid: number;
-  bookings_pending: number;
-  transfers_open: number;
+  inquiries_new: number;
+  inquiries_sent: number;
+  inquiries_booked: number;
+  bookings_requested: number;
+  bookings_open: number;
+  payments_pending: number;
 };
 
-type Purchase = {
+type Inquiry = {
   id: string;
-  user_id: string;
+  name: string;
   email: string;
+  vehicle_slug: string;
+  vehicle_label: string;
+  fleet: string;
+  market: string | null;
+  start_date: string;
+  end_date: string;
   status: string;
-  shares: number;
-  vehicle_symbol: string | null;
-  boat_slug: string | null;
-  total_cents: number;
-  fulfilled_at: string | null;
-  updated_at: string;
+  partner_id: string | null;
+  created_at: string;
 };
 
 type Booking = {
   id: string;
-  user_id: string;
-  vehicle_symbol: string | null;
-  boat_slug: string | null;
-  mode: string;
+  listing_id: string;
+  listing_label: string | null;
+  renter_user_id: string;
   start_date: string;
   end_date: string;
   status: string;
+  initiated_by: string;
+  renter_total_cents: number;
+  fee_cents: number;
+  currency: string;
+  expires_at: string | null;
+  confirmed_at: string | null;
   created_at: string;
 };
 
-type Kyc = {
+type Payment = {
   id: string;
-  user_id: string;
+  inquiry_id: string;
+  partner_id: string;
+  amount_cents: number;
+  application_fee_cents: number;
+  currency: string;
   status: string;
-  failure_code: string | null;
-  failure_reason: string | null;
-  updated_at: string;
-};
-
-type Transfer = {
-  id: string;
-  from_user_id: string;
-  to_user_email: string;
-  to_user_id: string | null;
-  vehicle_symbol: string | null;
-  boat_slug: string | null;
-  shares: number;
-  status: string;
-  expires_at: string;
-  updated_at: string;
+  pay_link_sent_at: string | null;
+  paid_at: string | null;
+  created_at: string;
 };
 
 type Overview = {
   counts: Counts;
   recent: {
-    purchases: Purchase[];
+    inquiries: Inquiry[];
     bookings: Booking[];
-    kyc: Kyc[];
-    transfers: Transfer[];
+    payments: Payment[];
   };
 };
 
@@ -117,13 +124,7 @@ const SUB_ROUTES = [
     label: "Partners",
     note: "applications + operators + Stripe onboarding",
   },
-  { href: "/admin/calendar", label: "Calendar", note: "booking calendar" },
   { href: "/admin/creative", label: "Creative", note: "marketing generation queue" },
-  { href: "/admin/documents", label: "Documents", note: "sample packet + legal templates" },
-  { href: "/admin/prospects", label: "Prospects", note: "founding cohort CRM" },
-  { href: "/admin/disputes", label: "Disputes", note: "Stripe chargebacks" },
-  { href: "/admin/llc", label: "LLCs", note: "formation + members" },
-  { href: "/admin/comparables", label: "Comparables", note: "vehicle market data" },
   { href: "/admin/vehicle-enrichment", label: "Enrichment", note: "VIN decoder" },
   { href: "/admin/audit", label: "Audit", note: "admin actions log" },
 ];
@@ -137,34 +138,33 @@ export default function AdminPage() {
   const [refreshNonce, setRefreshNonce] = useState(0);
   const initialLoad = useRef(true);
 
-  const { open: openModal, modal } = useActionModal();
-
-  const purchaseSel = useBulkSelection();
-  const bookingSel = useBulkSelection();
-  const transferSel = useBulkSelection();
-  const [bulkProgress, setBulkProgress] = useState<{
-    section: "purchases" | "bookings" | "transfers" | null;
-    done: number;
-    total: number;
-    failed: number;
-  }>({ section: null, done: 0, total: 0, failed: 0 });
-
-  // Desktop notifications. We pass in the current pending id sets;
-  // the hook diffs them across refreshes and fires when new ids appear.
+  // Desktop notifications. We pass the ids currently sitting in each
+  // "needs a human" queue; the hook diffs them across refreshes and
+  // fires only when an id it has never seen appears. Memoized because
+  // the hook's effect depends on the array identity.
+  const channels = useMemo<NotifyChannel[]>(
+    () => [
+      {
+        ids:
+          data?.recent.inquiries
+            .filter((i) => i.status === "new")
+            .map((i) => i.id) ?? [],
+        noun: "rental lead",
+        body: "An unrouted inquiry is waiting for an operator.",
+      },
+      {
+        ids:
+          data?.recent.bookings
+            .filter((b) => b.status === "requested")
+            .map((b) => b.id) ?? [],
+        noun: "booking request",
+        body: "An operator has not answered yet — these expire in 24h.",
+      },
+    ],
+    [data],
+  );
   const notifier = useNewPendingNotifier({
-    pendingPurchaseIds:
-      data?.recent.purchases
-        .filter((p) => p.status === "pending")
-        .map((p) => p.id) ?? [],
-    pendingTransferIds:
-      data?.recent.transfers
-        .filter(
-          (t) =>
-            t.status === "requested" ||
-            t.status === "pending_ryda_review" ||
-            t.status === "accepted",
-        )
-        .map((t) => t.id) ?? [],
+    channels,
     armed: !initialLoad.current,
   });
 
@@ -205,751 +205,320 @@ export default function AdminPage() {
     void reload();
   }, [reload]);
 
-  // Bulk-action runner closure factory. Each call returns an async fn
-  // that prompts for a single ops note (applied to every row in the
-  // batch), POSTs each selected id, and surfaces progress + errors.
-  const runBulkAction = useCallback(
-    async (cfg: {
-      section: "purchases" | "bookings" | "transfers";
-      ids: string[];
-      modalTitle: string;
-      modalMessage: string;
-      confirmLabel: string;
-      tone?: "default" | "danger";
-      runOne: (id: string, note: string) => Promise<void>;
-      onDone: () => void;
-    }) => {
-      if (cfg.ids.length === 0) return;
-      const res = await openModal({
-        title: cfg.modalTitle,
-        message: cfg.modalMessage,
-        confirmLabel: `${cfg.confirmLabel} (${cfg.ids.length})`,
-        tone: cfg.tone,
-        noteRequired: true,
-      });
-      if (!res.confirmed) return;
-      setBulkProgress({
-        section: cfg.section,
-        done: 0,
-        total: cfg.ids.length,
-        failed: 0,
-      });
-      const summary = await runBulk(
-        cfg.ids,
-        (id) => cfg.runOne(id, res.note),
-        {
-          concurrency: 3,
-          onProgress: (done, total, failed) =>
-            setBulkProgress({ section: cfg.section, done, total, failed }),
-        },
-      );
-      setBulkProgress({ section: null, done: 0, total: 0, failed: 0 });
-      cfg.onDone();
-      if (summary.failed > 0) {
-        window.alert(
-          `${summary.ok} succeeded · ${summary.failed} failed.\n\n${summary.errors.slice(0, 5).join("\n")}${summary.errors.length > 5 ? `\n… +${summary.errors.length - 5} more` : ""}`,
-        );
-      }
-      await reload();
-    },
-    [openModal, reload],
-  );
-
-  // Per-row endpoint dispatchers used by bulk actions. These mirror
-  // the single-row handler components below.
-  const postOne = useCallback(async (path: string, note: string) => {
-    const r = await authedFetch(path, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ note }),
-    });
-    if (!r.ok) {
-      const j = await r.json().catch(() => ({}));
-      throw new Error(j.error || `${r.status}`);
-    }
-  }, []);
+  const counts = data?.counts;
 
   return (
     <>
       <SiteHeader />
-      <section className="mx-auto max-w-7xl px-6 py-10 sm:px-10 sm:py-14">
-        <header className="mb-8">
+      <section className="mx-auto max-w-7xl px-6 py-12 sm:px-10 sm:py-16">
+        <header>
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
             Admin
           </p>
           <h1 className="mt-3 font-display text-3xl font-light text-ink sm:text-4xl">
-            Operational console.
+            Rental triage.
           </h1>
-          <p className="mt-2 max-w-3xl text-sm text-ink-soft">
-            Cross-user view of purchases, bookings, KYC, and share transfers
-            with inline actions. Per-row buttons hit the same admin-gated API
-            routes as the deeper sub-pages — every action is logged to{" "}
-            <Link
-              href="/admin/audit"
-              className="text-marine hover:text-marine-deep"
-            >
-              audit
+          <p className="mt-2 max-w-2xl text-sm text-ink-soft">
+            The whole funnel on one screen — leads in, operator answers,
+            money on the Connect rail. Act on a lead from{" "}
+            <Link href="/admin/inquiries" className="text-red hover:text-red-deep">
+              Inquiries
             </Link>
             .
           </p>
-
-          <nav className="mt-6 flex flex-wrap gap-2 text-xs">
-            {SUB_ROUTES.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                title={link.note}
-                aria-current={link.href === "/admin" ? "page" : undefined}
-                className={`rounded-full border px-3 py-1 font-medium transition-colors ${
-                  link.href === "/admin"
-                    ? "border-ink bg-ink text-cream"
-                    : "border-rule bg-cream-2 text-ink-soft hover:border-ink hover:text-ink"
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
         </header>
 
-        {/* User lookup is at the top because admins land here knowing
-            who they need to look up far more often than scrolling the
-            recent-20 list. */}
-        <UserLookup />
+        {/* Sub-route nav. */}
+        <nav className="mt-8 flex flex-wrap gap-2">
+          {SUB_ROUTES.map((r) => (
+            <Link
+              key={r.href}
+              href={r.href}
+              title={r.note}
+              className="inline-flex h-8 items-center rounded-full border border-rule px-4 text-xs font-medium text-ink-soft transition-colors hover:border-ink hover:text-ink"
+            >
+              {r.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="mt-8">
+          <RefreshBar
+            onRefresh={reload}
+            loading={refreshing}
+            lastRefreshedAt={lastRefreshedAt}
+            extra={
+              notifier.permission === "unsupported" ? null : notifier.permission ===
+                "granted" ? (
+                <label className="inline-flex items-center gap-2 text-xs text-ink-soft">
+                  <input
+                    type="checkbox"
+                    className="accent-red"
+                    checked={notifier.enabled}
+                    onChange={(e) => notifier.setEnabled(e.target.checked)}
+                  />
+                  Desktop alerts
+                </label>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => void notifier.request()}
+                  className="text-xs text-ink-soft underline hover:text-ink"
+                >
+                  Enable desktop alerts
+                </button>
+              )
+            }
+          />
+        </div>
 
         {loading ? (
-          <p className="text-sm text-mute">Loading…</p>
+          <p className="mt-10 text-sm text-mute">Loading…</p>
         ) : error ? (
-          <div className="rounded-2xl border border-red/40 bg-red/5 p-6">
-            <p className="text-sm text-red">{error}</p>
-            <Link
-              href="/account"
-              className="mt-3 inline-flex text-xs text-ink-soft hover:text-ink"
-            >
-              ← Back to my account
-            </Link>
+          <div className="mt-10 rounded-2xl border border-rule bg-surface p-6">
+            <p className="text-sm text-ink-soft">{error}</p>
           </div>
-        ) : !data ? null : (
+        ) : (
           <>
-            <div className="mb-4">
-              <RefreshBar
-                onRefresh={reload}
-                loading={refreshing}
-                lastRefreshedAt={lastRefreshedAt}
-                extra={
-                  notifier.permission === "unsupported" ? null : notifier.permission === "granted" ? (
-                    <label className="inline-flex cursor-pointer items-center gap-2 text-mute">
-                      <input
-                        type="checkbox"
-                        checked={notifier.enabled}
-                        onChange={(e) => notifier.setEnabled(e.target.checked)}
-                        className="h-3.5 w-3.5 rounded border-rule accent-marine"
-                      />
-                      Desktop alerts on new pending
-                    </label>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => void notifier.request()}
-                      className="inline-flex h-7 items-center rounded-full border border-rule bg-surface px-3 text-[11px] font-medium text-marine hover:border-marine"
-                    >
-                      {notifier.permission === "denied"
-                        ? "Notifications blocked — enable in browser"
-                        : "Enable desktop alerts"}
-                    </button>
-                  )
-                }
+            {/* Counts strip. */}
+            <section className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+              <Count
+                label="Unrouted leads"
+                value={counts?.inquiries_new ?? 0}
+                tone={(counts?.inquiries_new ?? 0) > 0 ? "warn" : "default"}
               />
-            </div>
-
-            {/* Counts strip */}
-            <section className="grid grid-cols-2 gap-3 sm:grid-cols-5 sm:gap-4">
-              <Stat
-                label="Pending purchases"
-                value={data.counts.purchases_pending}
-                tone={data.counts.purchases_pending > 0 ? "warn" : "off"}
+              <Count label="With operator" value={counts?.inquiries_sent ?? 0} />
+              <Count label="Leads booked" value={counts?.inquiries_booked ?? 0} />
+              <Count
+                label="Awaiting answer"
+                value={counts?.bookings_requested ?? 0}
+                tone={(counts?.bookings_requested ?? 0) > 0 ? "warn" : "default"}
               />
-              <Stat
-                label="Failed purchases"
-                value={data.counts.purchases_failed}
-                tone={data.counts.purchases_failed > 0 ? "warn" : "off"}
-              />
-              <Stat
-                label="Paid purchases"
-                value={data.counts.purchases_paid}
-                tone="ok"
-              />
-              <Stat
-                label="Pending bookings"
-                value={data.counts.bookings_pending}
-                tone={data.counts.bookings_pending > 0 ? "warn" : "off"}
-              />
-              <Stat
-                label="Open transfers"
-                value={data.counts.transfers_open}
-                tone={data.counts.transfers_open > 0 ? "warn" : "off"}
+              <Count label="Live bookings" value={counts?.bookings_open ?? 0} />
+              <Count
+                label="Unpaid links"
+                value={counts?.payments_pending ?? 0}
+                tone={(counts?.payments_pending ?? 0) > 0 ? "warn" : "default"}
               />
             </section>
 
-            <Section
-              title="Recent share purchases"
+            {/* Recent inquiries. */}
+            <Panel
+              title="Recent inquiries"
+              subtitle="20 most recent · rental_inquiries"
               onExport={() =>
                 downloadCsv({
-                  filename: "ryda-admin-purchases.csv",
+                  filename: "rental-inquiries.csv",
                   columns: [
                     "id",
-                    "status",
-                    "asset",
-                    "shares",
-                    "total_usd",
-                    "buyer_email",
-                    "updated_at",
-                  ],
-                  rows: data.recent.purchases.map((p) => [
-                    p.id,
-                    p.status,
-                    p.vehicle_symbol ?? p.boat_slug ?? "",
-                    p.shares,
-                    (p.total_cents / 100).toFixed(2),
-                    p.email,
-                    p.updated_at,
-                  ]),
-                })
-              }
-            >
-              <BulkToolbar
-                rows={data.recent.purchases}
-                selection={purchaseSel}
-                actions={[
-                  {
-                    label: "Mark paid selected",
-                    canRun: (rows) => rows.some((p) => p.status === "pending"),
-                    onClick: async (ids) => {
-                      const eligible = data.recent.purchases.filter(
-                        (p) => ids.includes(p.id) && p.status === "pending",
-                      );
-                      await runBulkAction({
-                        section: "purchases",
-                        ids: eligible.map((p) => p.id),
-                        modalTitle: "Bulk mark paid",
-                        modalMessage: `Flip ${eligible.length} pending purchase${eligible.length === 1 ? "" : "s"} to paid. Amendments generate downstream for each.`,
-                        confirmLabel: "Mark paid",
-                        runOne: (id, note) =>
-                          postOne(`/api/admin/purchase/${id}/mark-paid`, note),
-                        onDone: () => purchaseSel.clear(),
-                      });
-                    },
-                  },
-                  {
-                    label: "Refund selected",
-                    tone: "danger",
-                    canRun: (rows) =>
-                      rows.some(
-                        (p) => p.status === "paid" || p.status === "pending",
-                      ),
-                    onClick: async (ids) => {
-                      const eligible = data.recent.purchases.filter(
-                        (p) =>
-                          ids.includes(p.id) &&
-                          (p.status === "paid" || p.status === "pending"),
-                      );
-                      await runBulkAction({
-                        section: "purchases",
-                        ids: eligible.map((p) => p.id),
-                        modalTitle: "Bulk refund",
-                        modalMessage: `Refund ${eligible.length} purchase${eligible.length === 1 ? "" : "s"} and cancel their LLC seats. Total $${(eligible.reduce((a, p) => a + p.total_cents, 0) / 100).toLocaleString()}. Irreversible.`,
-                        confirmLabel: "Refund",
-                        tone: "danger",
-                        runOne: (id, note) =>
-                          postOne(`/api/share-purchase/${id}/refund`, note),
-                        onDone: () => purchaseSel.clear(),
-                      });
-                    },
-                  },
-                ]}
-              />
-              {bulkProgress.section === "purchases" && (
-                <BulkProgress
-                  done={bulkProgress.done}
-                  total={bulkProgress.total}
-                  failed={bulkProgress.failed}
-                />
-              )}
-              <Table
-                columns={["Status", "Asset", "Shares", "Total", "Buyer", "Updated", ""]}
-                rowIds={data.recent.purchases.map((p) => p.id)}
-                selection={purchaseSel}
-                rows={data.recent.purchases.map((p) => [
-                  pill(p.status),
-                  String(p.vehicle_symbol ?? p.boat_slug ?? "—"),
-                  String(p.shares),
-                  `$${(p.total_cents / 100).toLocaleString()}`,
-                  p.email,
-                  fmt(p.updated_at),
-                  <PurchaseActions
-                    key={`act-${p.id}`}
-                    purchase={p}
-                    openModal={openModal}
-                    reload={reload}
-                  />,
-                ])}
-              />
-            </Section>
-
-            <Section
-              title="Recent bookings"
-              onExport={() =>
-                downloadCsv({
-                  filename: "ryda-admin-bookings.csv",
-                  columns: [
-                    "id",
-                    "status",
-                    "asset",
-                    "mode",
+                    "created_at",
+                    "name",
+                    "email",
+                    "vehicle_label",
+                    "fleet",
+                    "market",
                     "start_date",
                     "end_date",
-                    "user_id",
-                    "created_at",
-                  ],
-                  rows: data.recent.bookings.map((b) => [
-                    b.id,
-                    b.status,
-                    b.vehicle_symbol ?? b.boat_slug ?? "",
-                    b.mode,
-                    b.start_date,
-                    b.end_date,
-                    b.user_id,
-                    b.created_at,
-                  ]),
-                })
-              }
-            >
-              <BulkToolbar
-                rows={data.recent.bookings}
-                selection={bookingSel}
-                actions={[
-                  {
-                    label: "Cancel selected",
-                    tone: "danger",
-                    canRun: (rows) =>
-                      rows.some(
-                        (b) =>
-                          b.status === "pending" || b.status === "confirmed",
-                      ),
-                    onClick: async (ids) => {
-                      const eligible = data.recent.bookings.filter(
-                        (b) =>
-                          ids.includes(b.id) &&
-                          (b.status === "pending" || b.status === "confirmed"),
-                      );
-                      await runBulkAction({
-                        section: "bookings",
-                        ids: eligible.map((b) => b.id),
-                        modalTitle: "Bulk cancel bookings",
-                        modalMessage: `Cancel ${eligible.length} booking${eligible.length === 1 ? "" : "s"}. Members are notified and slots return to the calendar.`,
-                        confirmLabel: "Cancel",
-                        tone: "danger",
-                        runOne: (id, note) =>
-                          postOne(`/api/admin/booking/${id}/cancel`, note),
-                        onDone: () => bookingSel.clear(),
-                      });
-                    },
-                  },
-                ]}
-              />
-              {bulkProgress.section === "bookings" && (
-                <BulkProgress
-                  done={bulkProgress.done}
-                  total={bulkProgress.total}
-                  failed={bulkProgress.failed}
-                />
-              )}
-              <Table
-                columns={["Status", "Asset", "Mode", "Dates", "Created", ""]}
-                rowIds={data.recent.bookings.map((b) => b.id)}
-                selection={bookingSel}
-                rows={data.recent.bookings.map((b) => [
-                  pill(b.status),
-                  String(b.vehicle_symbol ?? b.boat_slug ?? "—"),
-                  b.mode,
-                  `${b.start_date} → ${b.end_date}`,
-                  fmt(b.created_at),
-                  <BookingActions
-                    key={`bact-${b.id}`}
-                    booking={b}
-                    openModal={openModal}
-                    reload={reload}
-                  />,
-                ])}
-              />
-            </Section>
-
-            <Section
-              title="Recent KYC"
-              onExport={() =>
-                downloadCsv({
-                  filename: "ryda-admin-kyc.csv",
-                  columns: [
-                    "user_id",
                     "status",
-                    "failure_code",
-                    "failure_reason",
-                    "updated_at",
                   ],
-                  rows: data.recent.kyc.map((k) => [
-                    k.user_id,
-                    k.status,
-                    k.failure_code ?? "",
-                    k.failure_reason ?? "",
-                    k.updated_at,
+                  rows: (data?.recent.inquiries ?? []).map((i) => [
+                    i.id,
+                    i.created_at,
+                    i.name,
+                    i.email,
+                    i.vehicle_label,
+                    i.fleet,
+                    i.market,
+                    i.start_date,
+                    i.end_date,
+                    i.status,
                   ]),
                 })
               }
+              empty={(data?.recent.inquiries.length ?? 0) === 0}
+              emptyText="No rental inquiries yet."
             >
-              <Table
-                columns={["Status", "Failure", "User", "Updated", ""]}
-                rows={data.recent.kyc.map((k) => [
-                  pill(k.status),
-                  k.failure_code
-                    ? `${k.failure_code}${k.failure_reason ? ` · ${k.failure_reason}` : ""}`
-                    : "—",
-                  k.user_id.slice(0, 8),
-                  fmt(k.updated_at),
-                  <KycActions
-                    key={`kact-${k.id}`}
-                    kyc={k}
-                    openModal={openModal}
-                    reload={reload}
-                  />,
-                ])}
-              />
-            </Section>
+              <Table head={["Received", "Renter", "Car", "Dates", "Status"]}>
+                {(data?.recent.inquiries ?? []).map((i) => (
+                  <tr key={i.id} className="border-t border-rule">
+                    <Td>{shortDateTime(i.created_at)}</Td>
+                    <Td>
+                      <span className="text-ink">{i.name}</span>
+                      <span className="block text-[11px] text-mute">{i.email}</span>
+                    </Td>
+                    <Td>
+                      <span className="text-ink">{i.vehicle_label}</span>
+                      <span className="block text-[11px] text-mute">
+                        {i.fleet === "ryda" ? "RYDA fleet" : "Partner"}
+                        {i.market ? ` · ${i.market}` : ""}
+                      </span>
+                    </Td>
+                    <Td>
+                      {shortDate(i.start_date)} – {shortDate(i.end_date)}
+                    </Td>
+                    <Td>
+                      <Chip status={i.status} />
+                    </Td>
+                  </tr>
+                ))}
+              </Table>
+            </Panel>
 
-            <Section
-              title="Recent share transfers"
+            {/* Recent bookings. */}
+            <Panel
+              title="Recent bookings"
+              subtitle="20 most recent · rental_bookings"
               onExport={() =>
                 downloadCsv({
-                  filename: "ryda-admin-transfers.csv",
+                  filename: "rental-bookings.csv",
                   columns: [
                     "id",
+                    "created_at",
+                    "listing_id",
+                    "listing_label",
+                    "renter_user_id",
+                    "start_date",
+                    "end_date",
                     "status",
-                    "asset",
-                    "shares",
-                    "from_user_id",
-                    "to_user_email",
-                    "expires_at",
-                    "updated_at",
+                    "initiated_by",
+                    "renter_total_cents",
+                    "fee_cents",
+                    "currency",
                   ],
-                  rows: data.recent.transfers.map((t) => [
-                    t.id,
-                    t.status,
-                    t.vehicle_symbol ?? t.boat_slug ?? "",
-                    t.shares,
-                    t.from_user_id,
-                    t.to_user_email,
-                    t.expires_at,
-                    t.updated_at,
+                  rows: (data?.recent.bookings ?? []).map((b) => [
+                    b.id,
+                    b.created_at,
+                    b.listing_id,
+                    b.listing_label,
+                    b.renter_user_id,
+                    b.start_date,
+                    b.end_date,
+                    b.status,
+                    b.initiated_by,
+                    b.renter_total_cents,
+                    b.fee_cents,
+                    b.currency,
                   ]),
                 })
               }
+              empty={(data?.recent.bookings.length ?? 0) === 0}
+              emptyText="No rental bookings yet."
             >
-              <BulkToolbar
-                rows={data.recent.transfers}
-                selection={transferSel}
-                actions={[
-                  {
-                    label: "Approve selected",
-                    canRun: (rows) =>
-                      rows.some((t) => t.status === "pending_ryda_review"),
-                    onClick: async (ids) => {
-                      const eligible = data.recent.transfers.filter(
-                        (t) =>
-                          ids.includes(t.id) &&
-                          t.status === "pending_ryda_review",
-                      );
-                      await runBulkAction({
-                        section: "transfers",
-                        ids: eligible.map((t) => t.id),
-                        modalTitle: "Bulk approve transfers",
-                        modalMessage: `Approve ${eligible.length} pending share transfer${eligible.length === 1 ? "" : "s"}. Cap tables update; all parties notified.`,
-                        confirmLabel: "Approve",
-                        runOne: async (id, note) => {
-                          const r = await authedFetch(
-                            "/api/admin/transfer/ack",
-                            {
-                              method: "POST",
-                              headers: { "Content-Type": "application/json" },
-                              body: JSON.stringify({
-                                transferId: id,
-                                action: "approve",
-                                note,
-                              }),
-                            },
-                          );
-                          if (!r.ok) {
-                            const j = await r.json().catch(() => ({}));
-                            throw new Error(j.error || `${r.status}`);
-                          }
-                        },
-                        onDone: () => transferSel.clear(),
-                      });
-                    },
-                  },
-                  {
-                    label: "Reject selected",
-                    tone: "danger",
-                    canRun: (rows) =>
-                      rows.some((t) => t.status === "pending_ryda_review"),
-                    onClick: async (ids) => {
-                      const eligible = data.recent.transfers.filter(
-                        (t) =>
-                          ids.includes(t.id) &&
-                          t.status === "pending_ryda_review",
-                      );
-                      await runBulkAction({
-                        section: "transfers",
-                        ids: eligible.map((t) => t.id),
-                        modalTitle: "Bulk reject transfers",
-                        modalMessage: `Reject ${eligible.length} pending share transfer${eligible.length === 1 ? "" : "s"}. Originating members retain their shares; all parties notified.`,
-                        confirmLabel: "Reject",
-                        tone: "danger",
-                        runOne: async (id, note) => {
-                          const r = await authedFetch(
-                            "/api/admin/transfer/ack",
-                            {
-                              method: "POST",
-                              headers: { "Content-Type": "application/json" },
-                              body: JSON.stringify({
-                                transferId: id,
-                                action: "reject",
-                                note,
-                              }),
-                            },
-                          );
-                          if (!r.ok) {
-                            const j = await r.json().catch(() => ({}));
-                            throw new Error(j.error || `${r.status}`);
-                          }
-                        },
-                        onDone: () => transferSel.clear(),
-                      });
-                    },
-                  },
-                ]}
-              />
-              {bulkProgress.section === "transfers" && (
-                <BulkProgress
-                  done={bulkProgress.done}
-                  total={bulkProgress.total}
-                  failed={bulkProgress.failed}
-                />
-              )}
               <Table
-                columns={[
-                  "Status",
-                  "Asset",
-                  "Shares",
-                  "From → To",
-                  "Expires",
-                  "Updated",
-                  "",
-                ]}
-                rowIds={data.recent.transfers.map((t) => t.id)}
-                selection={transferSel}
-                rows={data.recent.transfers.map((t) => [
-                  pill(t.status),
-                  String(t.vehicle_symbol ?? t.boat_slug ?? "—"),
-                  String(t.shares),
-                  `${t.from_user_id.slice(0, 8)} → ${t.to_user_email}`,
-                  fmt(t.expires_at),
-                  fmt(t.updated_at),
-                  <TransferActions
-                    key={`tact-${t.id}`}
-                    transfer={t}
-                    openModal={openModal}
-                    reload={reload}
-                  />,
-                ])}
-              />
-            </Section>
+                head={["Created", "Car", "Dates", "Renter total", "Status"]}
+              >
+                {(data?.recent.bookings ?? []).map((b) => (
+                  <tr key={b.id} className="border-t border-rule">
+                    <Td>{shortDateTime(b.created_at)}</Td>
+                    <Td>
+                      <span className="text-ink">
+                        {b.listing_label ?? b.listing_id.slice(0, 8)}
+                      </span>
+                      <span className="block text-[11px] text-mute">
+                        opened by {b.initiated_by}
+                      </span>
+                    </Td>
+                    <Td>
+                      {shortDate(b.start_date)} – {shortDate(b.end_date)}
+                    </Td>
+                    <Td className="tabular-nums">
+                      {money(b.renter_total_cents, b.currency)}
+                      <span className="block text-[11px] text-mute">
+                        fee {money(b.fee_cents, b.currency)}
+                      </span>
+                    </Td>
+                    <Td>
+                      <Chip status={b.status} />
+                    </Td>
+                  </tr>
+                ))}
+              </Table>
+            </Panel>
 
-            <AuditSummary refreshNonce={refreshNonce} />
+            {/* Recent payments. */}
+            <Panel
+              title="Recent payments"
+              subtitle="20 most recent · rental_payments (Connect direct charges)"
+              onExport={() =>
+                downloadCsv({
+                  filename: "rental-payments.csv",
+                  columns: [
+                    "id",
+                    "created_at",
+                    "inquiry_id",
+                    "partner_id",
+                    "amount_cents",
+                    "application_fee_cents",
+                    "currency",
+                    "status",
+                    "pay_link_sent_at",
+                    "paid_at",
+                  ],
+                  rows: (data?.recent.payments ?? []).map((p) => [
+                    p.id,
+                    p.created_at,
+                    p.inquiry_id,
+                    p.partner_id,
+                    p.amount_cents,
+                    p.application_fee_cents,
+                    p.currency,
+                    p.status,
+                    p.pay_link_sent_at,
+                    p.paid_at,
+                  ]),
+                })
+              }
+              empty={(data?.recent.payments.length ?? 0) === 0}
+              emptyText="No payment links sent yet."
+            >
+              <Table
+                head={["Created", "Inquiry", "Charge", "RYDA fee", "Status"]}
+              >
+                {(data?.recent.payments ?? []).map((p) => (
+                  <tr key={p.id} className="border-t border-rule">
+                    <Td>{shortDateTime(p.created_at)}</Td>
+                    <Td className="font-mono text-[11px]">
+                      {p.inquiry_id.slice(0, 8)}
+                    </Td>
+                    <Td className="tabular-nums">
+                      {money(p.amount_cents, p.currency)}
+                    </Td>
+                    <Td className="tabular-nums">
+                      {money(p.application_fee_cents, p.currency)}
+                    </Td>
+                    <Td>
+                      <Chip status={p.status} />
+                    </Td>
+                  </tr>
+                ))}
+              </Table>
+            </Panel>
+
+            <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-2">
+              <UserLookup />
+              <AuditSummary refreshNonce={refreshNonce} />
+            </div>
           </>
         )}
       </section>
-
-      {modal}
     </>
   );
 }
 
-// ── view primitives ────────────────────────────────────────────
+// ── Formatting ───────────────────────────────────────────────────
 
-function Section({
-  title,
-  children,
-  onExport,
-}: {
-  title: string;
-  children: React.ReactNode;
-  onExport?: () => void;
-}) {
-  return (
-    <section className="mt-10">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="font-display text-xl text-ink">{title}</h2>
-        {onExport && (
-          <button
-            type="button"
-            onClick={onExport}
-            className="text-xs font-medium text-marine hover:text-marine-deep"
-          >
-            Export CSV ↓
-          </button>
-        )}
-      </div>
-      <div className="mt-4 overflow-x-auto rounded-xl border border-rule bg-surface">
-        {children}
-      </div>
-    </section>
-  );
+// Date-only strings render at noon so a UTC parse can't roll them back
+// a day in a western timezone.
+function shortDate(iso: string): string {
+  const d = new Date(`${iso}T12:00:00`);
+  if (isNaN(d.getTime())) return iso;
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
-function Stat({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: number;
-  tone: "ok" | "warn" | "off";
-}) {
-  const cls =
-    tone === "ok"
-      ? "text-success-deep"
-      : tone === "warn"
-        ? "text-red"
-        : "text-mute";
-  return (
-    <div className="rounded-xl border border-rule bg-surface p-4">
-      <p className="text-xs uppercase tracking-wider text-mute">{label}</p>
-      <p className={`mt-2 font-display text-2xl tabular-nums ${cls}`}>{value}</p>
-    </div>
-  );
-}
-
-function Table({
-  columns,
-  rows,
-  selection,
-  rowIds,
-}: {
-  columns: string[];
-  rows: React.ReactNode[][];
-  /** When provided, prepends a checkbox column wired to the selection
-   *  state. rowIds must be parallel-aligned with rows. */
-  selection?: {
-    has: (id: string) => boolean;
-    toggle: (id: string) => void;
-    all: (ids: { id: string }[]) => boolean;
-    toggleAll: (ids: { id: string }[]) => void;
-  };
-  rowIds?: string[];
-}) {
-  if (rows.length === 0) {
-    return <p className="px-5 py-8 text-center text-sm text-mute">No rows.</p>;
-  }
-  const showCheck = selection && rowIds && rowIds.length === rows.length;
-  const idObjs = showCheck ? rowIds!.map((id) => ({ id })) : [];
-  return (
-    <table className="w-full text-sm">
-      <thead className="border-b border-rule bg-cream-2/40">
-        <tr>
-          {showCheck && (
-            <th className="w-10 px-4 py-3">
-              <input
-                type="checkbox"
-                aria-label="Select all"
-                checked={selection!.all(idObjs)}
-                onChange={() => selection!.toggleAll(idObjs)}
-                className="h-3.5 w-3.5 rounded border-rule accent-marine"
-              />
-            </th>
-          )}
-          {columns.map((c) => (
-            <th
-              key={c}
-              className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-mute"
-            >
-              {c}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody className="divide-y divide-rule">
-        {rows.map((r, i) => {
-          const id = showCheck ? rowIds![i] : null;
-          return (
-            <tr key={id ?? i} className="hover:bg-cream-2/40">
-              {showCheck && id && (
-                <td className="w-10 px-4 py-3">
-                  <input
-                    type="checkbox"
-                    aria-label={`Select row ${i + 1}`}
-                    checked={selection!.has(id)}
-                    onChange={() => selection!.toggle(id)}
-                    className="h-3.5 w-3.5 rounded border-rule accent-marine"
-                  />
-                </td>
-              )}
-              {r.map((cell, j) => (
-                <td key={j} className="px-4 py-3 text-ink">
-                  {cell}
-                </td>
-              ))}
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
-  );
-}
-
-function pill(status: string) {
-  const tone =
-    status === "paid" || status === "verified" || status === "completed"
-      ? "ok"
-      : status === "failed" ||
-          status === "rejected" ||
-          status === "expired" ||
-          status === "canceled"
-        ? "warn"
-        : status === "pending" ||
-            status === "requested" ||
-            status === "pending_ryda_review" ||
-            status === "processing"
-          ? "info"
-          : "off";
-  const cls =
-    tone === "ok"
-      ? "bg-success/10 text-success-deep"
-      : tone === "warn"
-        ? "bg-red/10 text-red"
-        : tone === "info"
-          ? "bg-warn/15 text-warn-deep"
-          : "bg-mute/15 text-ink-soft";
-  return (
-    <span
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${cls}`}
-    >
-      {status}
-    </span>
-  );
-}
-
-function fmt(iso: string) {
-  if (!iso) return "—";
-  return new Date(iso).toLocaleString("en-US", {
+function shortDateTime(iso: string): string {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return iso;
+  return d.toLocaleString("en-US", {
     month: "short",
     day: "numeric",
     hour: "numeric",
@@ -957,315 +526,152 @@ function fmt(iso: string) {
   });
 }
 
-// ── Admin action buttons ───────────────────────────────────────
-//
-// Each component drives the row's action surface. The modal opener
-// is plumbed in from the page so confirmations are styled + multi-line
-// rather than the legacy window.prompt() / window.confirm() flow.
-
-type ModalOpener = ReturnType<typeof useActionModal>["open"];
-
-function PurchaseActions({
-  purchase,
-  openModal,
-  reload,
-}: {
-  purchase: Purchase;
-  openModal: ModalOpener;
-  reload: () => Promise<void>;
-}) {
-  const [busy, setBusy] = useState<string | null>(null);
-
-  async function run(
-    label: string,
-    path: string,
-    cfg: {
-      title: string;
-      message: string;
-      confirmLabel: string;
-      tone?: "default" | "danger";
-      noteRequired?: boolean;
-    },
-  ) {
-    if (busy) return;
-    const res = await openModal({ ...cfg });
-    if (!res.confirmed) return;
-    setBusy(label);
-    try {
-      const r = await authedFetch(path, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ note: res.note }),
-      });
-      if (!r.ok) {
-        const j = await r.json().catch(() => ({}));
-        throw new Error(j.error || `Failed (${r.status}).`);
-      }
-      await reload();
-    } catch (e) {
-      window.alert(e instanceof Error ? e.message : "Action failed.");
-    } finally {
-      setBusy(null);
-    }
-  }
-
-  const asset = purchase.vehicle_symbol ?? purchase.boat_slug ?? "asset";
-
-  return (
-    <div className="flex flex-wrap gap-1">
-      {purchase.status === "pending" && (
-        <ActionBtn
-          onClick={() =>
-            run("mark-paid", `/api/admin/purchase/${purchase.id}/mark-paid`, {
-              title: "Mark purchase paid",
-              message: `Flip ${purchase.shares} ${asset} share${purchase.shares === 1 ? "" : "s"} for ${purchase.email} to paid? Amendment generation triggers downstream.`,
-              confirmLabel: "Mark paid",
-            })
-          }
-          busy={busy === "mark-paid"}
-        >
-          Mark paid
-        </ActionBtn>
-      )}
-      {purchase.status === "paid" && (
-        <ActionBtn
-          onClick={() =>
-            run("resend", `/api/share-purchase/${purchase.id}/resend-amendment`, {
-              title: "Resend amendment",
-              message: `Re-deliver the LLC amendment to ${purchase.email}.`,
-              confirmLabel: "Resend",
-            })
-          }
-          busy={busy === "resend"}
-        >
-          Resend
-        </ActionBtn>
-      )}
-      {(purchase.status === "paid" || purchase.status === "pending") && (
-        <ActionBtn
-          tone="danger"
-          onClick={() =>
-            run("refund", `/api/share-purchase/${purchase.id}/refund`, {
-              title: "Refund / cancel",
-              message: `Refund $${(purchase.total_cents / 100).toLocaleString()} for ${purchase.shares} ${asset} share${purchase.shares === 1 ? "" : "s"} and cancel the LLC seat. This is irreversible.`,
-              confirmLabel: "Refund",
-              tone: "danger",
-              noteRequired: true,
-            })
-          }
-          busy={busy === "refund"}
-        >
-          Refund
-        </ActionBtn>
-      )}
-    </div>
-  );
+function money(cents: number, currency: string): string {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: (currency || "usd").toUpperCase(),
+    maximumFractionDigits: 0,
+  }).format((cents ?? 0) / 100);
 }
 
-function BookingActions({
-  booking,
-  openModal,
-  reload,
-}: {
-  booking: Booking;
-  openModal: ModalOpener;
-  reload: () => Promise<void>;
-}) {
-  const [busy, setBusy] = useState(false);
+// ── Presentational ───────────────────────────────────────────────
 
-  async function cancel() {
-    if (busy) return;
-    const asset = booking.vehicle_symbol ?? booking.boat_slug ?? "asset";
-    const res = await openModal({
-      title: "Cancel booking",
-      message: `Cancel ${asset} booking ${booking.start_date} → ${booking.end_date}? Member is notified; slot returns to the calendar.`,
-      confirmLabel: "Cancel booking",
-      tone: "danger",
-    });
-    if (!res.confirmed) return;
-    setBusy(true);
-    try {
-      const r = await authedFetch(`/api/admin/booking/${booking.id}/cancel`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ note: res.note }),
-      });
-      if (!r.ok) {
-        const j = await r.json().catch(() => ({}));
-        throw new Error(j.error || `Failed (${r.status}).`);
-      }
-      await reload();
-    } catch (e) {
-      window.alert(e instanceof Error ? e.message : "Cancel failed.");
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  if (booking.status !== "pending" && booking.status !== "confirmed") {
-    return <span className="text-xs text-mute">—</span>;
-  }
-  return (
-    <ActionBtn tone="danger" onClick={cancel} busy={busy}>
-      Cancel
-    </ActionBtn>
-  );
-}
-
-function KycActions({
-  kyc,
-  openModal,
-  reload,
-}: {
-  kyc: Kyc;
-  openModal: ModalOpener;
-  reload: () => Promise<void>;
-}) {
-  const [busy, setBusy] = useState<string | null>(null);
-
-  async function override(status: string, label: string) {
-    if (busy) return;
-    const res = await openModal({
-      title: status === "verified" ? "Force-verify KYC" : "Cancel KYC",
-      message: `Manually flip KYC for user ${kyc.user_id.slice(0, 8)} → ${status}. Bypasses the verification provider.`,
-      confirmLabel: status === "verified" ? "Force verify" : "Cancel KYC",
-      tone: status === "verified" ? "default" : "danger",
-      noteRequired: true,
-    });
-    if (!res.confirmed) return;
-    setBusy(label);
-    try {
-      const r = await authedFetch("/api/admin/kyc/override", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: kyc.user_id, status, note: res.note }),
-      });
-      if (!r.ok) {
-        const j = await r.json().catch(() => ({}));
-        throw new Error(j.error || `Failed (${r.status}).`);
-      }
-      await reload();
-    } catch (e) {
-      window.alert(e instanceof Error ? e.message : "Override failed.");
-    } finally {
-      setBusy(null);
-    }
-  }
-
-  return (
-    <div className="flex flex-wrap gap-1">
-      {kyc.status !== "verified" && (
-        <ActionBtn
-          onClick={() => override("verified", "verify")}
-          busy={busy === "verify"}
-        >
-          Force verify
-        </ActionBtn>
-      )}
-      {kyc.status !== "canceled" && (
-        <ActionBtn
-          tone="danger"
-          onClick={() => override("canceled", "cancel")}
-          busy={busy === "cancel"}
-        >
-          Cancel
-        </ActionBtn>
-      )}
-    </div>
-  );
-}
-
-function TransferActions({
-  transfer,
-  openModal,
-  reload,
-}: {
-  transfer: Transfer;
-  openModal: ModalOpener;
-  reload: () => Promise<void>;
-}) {
-  const [busy, setBusy] = useState<string | null>(null);
-
-  async function ack(action: "approve" | "reject") {
-    if (busy) return;
-    const asset = transfer.vehicle_symbol ?? transfer.boat_slug ?? "asset";
-    const res = await openModal({
-      title:
-        action === "approve" ? "Approve share transfer" : "Reject share transfer",
-      message:
-        action === "approve"
-          ? `Move ${transfer.shares} ${asset} share${transfer.shares === 1 ? "" : "s"} to ${transfer.to_user_email}. Originating member is notified; cap table updates.`
-          : `Reject the transfer to ${transfer.to_user_email}. Originating member retains the shares; both parties are notified.`,
-      confirmLabel: action === "approve" ? "Approve" : "Reject",
-      tone: action === "approve" ? "default" : "danger",
-      noteRequired: true,
-    });
-    if (!res.confirmed) return;
-    setBusy(action);
-    try {
-      const r = await authedFetch("/api/admin/transfer/ack", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          transferId: transfer.id,
-          action,
-          note: res.note,
-        }),
-      });
-      if (!r.ok) {
-        const j = await r.json().catch(() => ({}));
-        throw new Error(j.error || `Failed (${r.status}).`);
-      }
-      await reload();
-    } catch (e) {
-      window.alert(e instanceof Error ? e.message : "Ack failed.");
-    } finally {
-      setBusy(null);
-    }
-  }
-
-  if (transfer.status !== "pending_ryda_review") {
-    return <span className="text-xs text-mute">—</span>;
-  }
-  return (
-    <div className="flex flex-wrap gap-1">
-      <ActionBtn onClick={() => ack("approve")} busy={busy === "approve"}>
-        Approve
-      </ActionBtn>
-      <ActionBtn
-        tone="danger"
-        onClick={() => ack("reject")}
-        busy={busy === "reject"}
-      >
-        Reject
-      </ActionBtn>
-    </div>
-  );
-}
-
-function ActionBtn({
-  children,
-  onClick,
-  busy,
+function Count({
+  label,
+  value,
   tone = "default",
 }: {
-  children: React.ReactNode;
-  onClick: () => void;
-  busy?: boolean;
-  tone?: "default" | "danger";
+  label: string;
+  value: number;
+  tone?: "default" | "warn";
 }) {
-  const cls =
-    tone === "danger"
-      ? "border-red/40 text-red hover:bg-red hover:text-cream"
-      : "border-rule text-ink-soft hover:border-ink hover:text-ink";
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={busy}
-      className={`inline-flex h-7 items-center justify-center rounded-full border px-3 text-[11px] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${cls}`}
+    <div
+      className={`rounded-xl border p-4 ${
+        tone === "warn" ? "border-warn/40 bg-warn/5" : "border-rule bg-surface"
+      }`}
     >
-      {busy ? "…" : children}
-    </button>
+      <p className="text-[11px] uppercase tracking-wider text-mute">{label}</p>
+      <p className="mt-2 font-display text-2xl text-ink tabular-nums">{value}</p>
+    </div>
+  );
+}
+
+function Panel({
+  title,
+  subtitle,
+  onExport,
+  empty,
+  emptyText,
+  children,
+}: {
+  title: string;
+  subtitle: string;
+  onExport: () => void;
+  empty: boolean;
+  emptyText: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="mt-10">
+      <div className="flex flex-wrap items-baseline justify-between gap-3">
+        <div>
+          <h2 className="font-display text-xl text-ink">{title}</h2>
+          <p className="mt-1 text-xs text-mute">{subtitle}</p>
+        </div>
+        {!empty && (
+          <button
+            type="button"
+            onClick={onExport}
+            className="inline-flex h-8 items-center rounded-full border border-rule px-4 text-xs font-medium text-ink-soft transition-colors hover:border-ink hover:text-ink"
+          >
+            Export CSV
+          </button>
+        )}
+      </div>
+      {empty ? (
+        <div className="mt-4 rounded-xl border border-dashed border-rule bg-cream-2/40 p-6 text-center">
+          <p className="text-sm text-ink-soft">{emptyText}</p>
+        </div>
+      ) : (
+        <div className="mt-4 overflow-x-auto rounded-xl border border-rule bg-surface">
+          {children}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function Table({
+  head,
+  children,
+}: {
+  head: string[];
+  children: React.ReactNode;
+}) {
+  return (
+    <table className="w-full min-w-[640px] text-left text-sm">
+      <thead>
+        <tr>
+          {head.map((h) => (
+            <th
+              key={h}
+              className="px-4 py-3 text-[11px] font-medium uppercase tracking-wider text-mute"
+            >
+              {h}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>{children}</tbody>
+    </table>
+  );
+}
+
+function Td({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <td className={`px-4 py-3 align-top text-ink-soft ${className}`}>
+      {children}
+    </td>
+  );
+}
+
+// Status chip. Covers all three vocabularies on this page — inquiry
+// (new/sent/booked/lost), booking (requested/confirmed/in_progress/
+// completed/declined/expired/cancelled — note the two-L rental
+// spelling) and payment (pending/paid/expired/canceled, one L). An
+// unrecognized state degrades to the neutral chip with its raw label
+// rather than being hidden.
+const CHIP_TONE: Record<string, string> = {
+  new: "bg-warn/15 text-warn-deep",
+  requested: "bg-warn/15 text-warn-deep",
+  pending: "bg-warn/15 text-warn-deep",
+  sent: "border border-rule bg-cream-2 text-ink-soft",
+  confirmed: "bg-success/15 text-success-deep",
+  in_progress: "bg-success/15 text-success-deep",
+  booked: "bg-success/15 text-success-deep",
+  completed: "bg-success/15 text-success-deep",
+  paid: "bg-success/15 text-success-deep",
+  lost: "bg-cream-2 text-mute",
+  declined: "bg-cream-2 text-mute",
+  expired: "bg-cream-2 text-mute",
+  cancelled: "bg-cream-2 text-mute",
+  canceled: "bg-cream-2 text-mute",
+};
+
+function Chip({ status }: { status: string }) {
+  const cls = CHIP_TONE[status] ?? "border border-rule bg-cream-2 text-ink-soft";
+  return (
+    <span
+      className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium ${cls}`}
+    >
+      {status.replace(/_/g, " ")}
+    </span>
   );
 }
