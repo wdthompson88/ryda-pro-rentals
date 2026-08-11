@@ -8,9 +8,7 @@
 //    └──→ lost ←──┘           (terminal)
 //
 // i.e. new → sent | lost, sent → booked | lost. Nothing leaves
-// booked or lost. Unlike /api/admin/prospects (where free-form stage
-// moves are allowed because human judgment beats rigidity at
-// cohort-1 volume), transitions here ARE constrained server-side:
+// booked or lost. Transitions here ARE constrained server-side:
 // `booked` is the referral-commission event, and a mis-click that
 // un-books a lead would silently drop revenue attribution. If a row
 // genuinely needs rewinding, that's a deliberate SQL-editor moment,

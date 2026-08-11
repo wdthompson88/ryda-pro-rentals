@@ -6,8 +6,8 @@
 // (STRIPE_CONNECT_WEBHOOK_SECRET — see src/lib/stripe.ts). Rental
 // checkouts are DIRECT charges on those accounts (fee-only model, see
 // /api/admin/inquiries/[id]/payment-link), so their events land HERE
-// with `event.account` set to the operator's acct_… id — never on the
-// platform endpoint at /api/share-purchase/webhook.
+// with `event.account` set to the operator's acct_… id — never on a
+// platform-account endpoint.
 //
 // Handles:
 //   - checkout.session.completed (+ async_payment_succeeded): verify

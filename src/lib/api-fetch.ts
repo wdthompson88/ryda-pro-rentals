@@ -3,9 +3,9 @@
 // header so the API routes' getUserFromRequest() can resolve auth.uid().
 //
 // Without this, the marketing-site browser client persists the session
-// in localStorage but doesn't auto-attach it to fetch — so /api/bookings,
-// /api/kyc/start, and /api/share-purchase/create-checkout would return
-// 401 even with a logged-in user.
+// in localStorage but doesn't auto-attach it to fetch — so
+// /api/rental-inquiry, /api/partner/me, the /api/admin/* routes and
+// /api/kyc/start would return 401 even with a logged-in user.
 //
 // Use everywhere a client component calls a server route that needs
 // authentication.

@@ -11,7 +11,7 @@
 // to the operator (`sent`), and the operator either closes it
 // (`booked` — the referral-commission event) or doesn't (`lost`).
 // Creation happens only through the public POST /api/rental-inquiry
-// route, so unlike /api/admin/prospects there is no POST here.
+// route, so there is deliberately no POST here.
 //
 // Filter params accepted on GET:
 //   ?status=new|sent|booked|lost   — default: all statuses

@@ -132,10 +132,10 @@ export default function EventsPage() {
                     </p>
                     <div className="mt-5 flex flex-wrap items-center gap-4 text-xs">
                       <Link
-                        href="/membership"
+                        href="/signup"
                         className="font-medium text-red hover:text-red-deep"
                       >
-                        Members RSVP →
+                        RSVP →
                       </Link>
                       <Link
                         href="/contact"

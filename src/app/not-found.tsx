@@ -3,12 +3,15 @@ import { SiteHeader } from "@/components/site-header";
 
 export const metadata = { title: "Not found" };
 
+// A 404 is the one page guaranteed to be reached by a stale link, so
+// every destination here has to resolve. Three of these used to point
+// at /portfolio, /sample-documents and /membership.
 const POPULAR = [
-  { label: "See the fleet", href: "/portfolio", note: "Co-ownership shares" },
-  { label: "Browse rentals", href: "/rent", note: "Daily rates from $1,200" },
-  { label: "How it works", href: "/how-it-works", note: "The 5-step explainer" },
-  { label: "Sample documents", href: "/sample-documents", note: "Operating Agreement, MSA, more" },
-  { label: "Membership tiers", href: "/membership", note: "Core · Blue · Black" },
+  { label: "Browse the fleet", href: "/rent", note: "Daily rates from $1,200" },
+  { label: "How it works", href: "/how-it-works", note: "One request, one operator" },
+  { label: "Where we operate", href: "/locations", note: "Miami now, more coming" },
+  { label: "For partners", href: "/partners", note: "List your fleet with RYDA" },
+  { label: "Help center", href: "/help", note: "Answers to the common ones" },
   { label: "Contact us", href: "/contact", note: "Real humans, fast replies" },
 ];
 
