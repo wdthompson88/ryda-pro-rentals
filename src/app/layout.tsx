@@ -54,11 +54,11 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: "RYDA — Supercar co-ownership and rentals",
+    default: "RYDA — Exotic and luxury car rental, Miami",
     template: "%s · RYDA",
   },
   description:
-    "Co-own or rent a curated certified pre owned Ferrari, Lamborghini, or McLaren in the US. Asset-backed LLC, professionally operated. Launching in Miami Q3 2026.",
+    "Browse Miami's exotic and luxury rental fleet — Ferrari, Lamborghini, McLaren, Rolls-Royce. Send one request with your dates and a vetted local operator confirms directly with you, on their contract and insurance.",
   metadataBase: new URL(siteUrl),
   // Canonical anchor for the home page. Per-page metadata can override
   // alternates.canonical for routes that should self-canonicalize
@@ -90,9 +90,9 @@ export const metadata: Metadata = {
       : undefined,
   },
   openGraph: {
-    title: "RYDA — Supercar co-ownership and rentals",
+    title: "RYDA — Exotic and luxury car rental, Miami",
     description:
-      "Co-own or rent a curated supercar with verified members. Asset-backed LLC, professionally operated. Launching in Miami Q3 2026.",
+      "One curated grid of Miami's exotic rental fleet. Send your dates; a vetted local operator confirms directly with you.",
     siteName: "RYDA",
     type: "website",
     locale: "en_US",
@@ -100,12 +100,12 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "RYDA — Supercar co-ownership and rentals",
+    title: "RYDA — Exotic and luxury car rental, Miami",
     description:
-      "Co-own or rent a curated supercar with verified members. Asset-backed LLC, professionally operated. Launching in Miami Q3 2026.",
+      "One curated grid of Miami's exotic rental fleet. Send your dates; a vetted local operator confirms directly with you.",
   },
   // Categorization helps some crawlers and embeds.
-  category: "Luxury vehicle co-ownership",
+  category: "Luxury car rental",
   applicationName: "RYDA",
 };
 
@@ -126,7 +126,7 @@ const organizationJsonLd = {
       url: siteUrl,
       logo: `${siteUrl}/opengraph-image`,
       description:
-        "Asset-backed co-ownership of certified pre-owned Ferraris, Lamborghinis, McLarens, and curated boats. Member-managed single-purpose LLCs. Professional operations. Launching Q3 2026 in Miami; LA + NY 2027.",
+        "RYDA is a marketplace for exotic and luxury car rental. We list vetted local operators' fleets in one grid, route each request to the operator who holds the car, and earn a referral commission on the bookings we send them. Miami now; LA + NY 2027.",
       foundingDate: "2026",
       areaServed: [
         { "@type": "City", name: "Miami" },
@@ -161,7 +161,7 @@ const organizationJsonLd = {
       url: siteUrl,
       name: "RYDA",
       description:
-        "Co-own or rent a Ferrari, Lamborghini, McLaren, or boat in the US. Asset-backed LLC, professionally operated.",
+        "Rent a Ferrari, Lamborghini, McLaren or Rolls-Royce in Miami. One request; a vetted local operator confirms directly with you.",
       publisher: { "@id": `${siteUrl}#organization` },
       inLanguage: "en-US",
       potentialAction: {
@@ -176,7 +176,7 @@ const organizationJsonLd = {
     {
       "@type": "Service",
       "@id": `${siteUrl}#service`,
-      serviceType: "Luxury vehicle co-ownership",
+      serviceType: "Exotic and luxury car rental",
       provider: { "@id": `${siteUrl}#organization` },
       areaServed: [
         { "@type": "City", name: "Miami" },
@@ -186,13 +186,9 @@ const organizationJsonLd = {
       offers: {
         "@type": "Offer",
         priceCurrency: "USD",
-        availability: "https://schema.org/PreOrder",
-        url: `${siteUrl}/cars`,
-        category: "Co-ownership share",
-      },
-      audience: {
-        "@type": "PeopleAudience",
-        suggestedMinAge: 28,
+        availability: "https://schema.org/InStock",
+        url: `${siteUrl}/rent`,
+        category: "Car rental",
       },
     },
   ],

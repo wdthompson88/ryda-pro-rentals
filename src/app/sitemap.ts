@@ -1,7 +1,6 @@
 import type { MetadataRoute } from "next";
 import { VEHICLES } from "@/lib/market-data";
 import { PARTNER_VEHICLES } from "@/lib/partner-fleet";
-import { BOATS } from "@/lib/boat-data";
 import { POSTS as JOURNAL_POSTS } from "@/lib/journal-content";
 import { HELP as HELP_CATEGORIES } from "@/lib/help-content";
 import { LEARN_ARTICLES } from "@/lib/learn-content";
@@ -9,11 +8,12 @@ import { LEARN_ARTICLES } from "@/lib/learn-content";
 // Sitemap of every crawlable, public RYDA route. Generated at build
 // time. Three categories:
 //   1. Static landing pages (hand-maintained list below).
-//   2. Per-vehicle dynamic routes derived from /lib/market-data.
-//   3. Per-boat + per-journal-post dynamic routes.
+//   2. Per-vehicle rental detail routes, RYDA fleet (/lib/market-data)
+//      and partner fleet (/lib/partner-fleet).
+//   3. Per-help-article, per-journal-post and per-learn-article routes.
 //
-// Routes that are gated, member-only, or stub previews (e.g. /portfolio,
-// /onboarding, /bookings/*, /admin/*) are intentionally NOT listed.
+// Routes that are gated, member-only, or stub previews (e.g. /account/*,
+// /onboarding, /admin/*) are intentionally NOT listed.
 
 const PUBLIC_ROUTES = [
   // "" is the rentals-first landing page; /rent is the canonical
@@ -24,47 +24,28 @@ const PUBLIC_ROUTES = [
   "/rent",
   // Rental-first surfaces.
   "/partners",
-  "/co-ownership",
-  // Verticals, splash for each line of business.
-  "/cars",
-  "/boats",
-  "/planes",
-  // Cars marketing surfaces.
-  "/portfolio",
-  "/membership",
   "/how-it-works",
-  "/about",
+  // Operations explainers. Retained post-pivot pending a rental-first
+  // content audit — indexable, but no longer linked from the footer.
   "/insurance",
   "/storage",
-  "/trust-and-safety",
-  "/sustainability",
-  "/host-your-car",
-  "/help",
-  "/faq",
+  "/events",
   "/learn",
   "/journal",
+  // Company + support.
+  "/about",
+  "/trust-and-safety",
+  "/sustainability",
+  "/help",
+  "/faq",
   "/press",
   "/investors",
-  "/inside",
-  "/member-protection",
   "/careers",
   "/contact",
-  "/events",
-  "/sample-documents",
   // Locations.
   "/locations/miami",
   "/locations/los-angeles",
   "/locations/new-york",
-  // Boats marketing surfaces (parity with cars).
-  // NOTE: /boats/journal does NOT exist as a route, boat-themed posts
-  // live in the main /journal listing tagged accordingly.
-  "/boats/about",
-  "/boats/faq",
-  "/boats/how-it-works",
-  "/boats/membership",
-  "/boats/portfolio",
-  "/boats/rent",
-  "/boats/sample-documents",
   // Search + auth.
   "/search",
   "/signin",
@@ -97,30 +78,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     changeFrequency: "weekly" as const,
     // Priorities: the landing page leads, the browse grid sits just
     // under it (and above every secondary marketing page).
-    priority:
-      path === ""
-        ? 1.0
-        : path === "/rent"
-          ? 0.9
-          : path === "/cars" || path === "/boats" || path === "/planes"
-            ? 0.8
-            : 0.7,
+    priority: path === "" ? 1.0 : path === "/rent" ? 0.9 : 0.7,
   }));
 
-  const vehicleEntries: MetadataRoute.Sitemap = VEHICLES.flatMap((v) => [
-    {
-      url: `${siteUrl}/portfolio/${v.symbol.toLowerCase()}`,
-      lastModified,
-      changeFrequency: "weekly" as const,
-      priority: 0.8,
-    },
-    {
-      url: `${siteUrl}/portfolio/${v.symbol.toLowerCase()}/cost-sheet`,
-      lastModified,
-      changeFrequency: "monthly" as const,
-      priority: 0.6,
-    },
-    ...(v.rentalAvailable
+  // RYDA-fleet rental detail pages. Only cars that are actually
+  // rentable get a URL — /rent/[symbol]'s generateStaticParams filters
+  // VEHICLES on the same flag, so anything else would 404 a crawler.
+  const vehicleEntries: MetadataRoute.Sitemap = VEHICLES.flatMap((v) =>
+    v.rentalAvailable
       ? [
           {
             url: `${siteUrl}/rent/${v.symbol.toLowerCase()}`,
@@ -129,13 +94,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
             priority: 0.7,
           },
         ]
-      : []),
-  ]);
+      : [],
+  );
 
   // Partner-fleet rental detail pages. These are the marketplace's
   // primary SEO surface post-pivot: one indexable page per partner car
-  // at /rent/[slug]. Priority sits above the co-own marketing pages
-  // and equal to the RYDA-fleet rental pages emitted above.
+  // at /rent/[slug]. Priority sits above the secondary marketing pages
+  // and above the RYDA-fleet rental pages emitted above.
   const partnerEntries: MetadataRoute.Sitemap = PARTNER_VEHICLES.map(
     (p) => ({
       url: `${siteUrl}/rent/${p.slug}`,
@@ -144,27 +109,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     }),
   );
-
-  const boatEntries: MetadataRoute.Sitemap = BOATS.flatMap((b) => [
-    {
-      url: `${siteUrl}/boats/portfolio/${b.slug}`,
-      lastModified,
-      changeFrequency: "weekly" as const,
-      priority: 0.8,
-    },
-    {
-      url: `${siteUrl}/boats/portfolio/${b.slug}/cost-sheet`,
-      lastModified,
-      changeFrequency: "monthly" as const,
-      priority: 0.6,
-    },
-    {
-      url: `${siteUrl}/boats/rent/${b.slug}`,
-      lastModified,
-      changeFrequency: "weekly" as const,
-      priority: 0.7,
-    },
-  ]);
 
   const journalEntries: MetadataRoute.Sitemap = JOURNAL_POSTS
     .filter((p) => p.status === "published")
@@ -208,7 +152,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...staticEntries,
     ...vehicleEntries,
     ...partnerEntries,
-    ...boatEntries,
     ...journalEntries,
     ...helpEntries,
     ...learnEntries,

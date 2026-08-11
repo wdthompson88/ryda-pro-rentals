@@ -11,19 +11,12 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        // Member-area + per-purchase tracker pages aren't real auth-gated
-        // surfaces yet, keep them out of search until they ship behind auth.
-        // /portfolio is the public catalog and stays indexable; only the
-        // mid-funnel /buy paths need to stay out of search results.
+        // Everything public is indexable — /rent and its detail pages
+        // are the whole SEO surface. What stays out is the signed-in
+        // member area, the identity-verification wizard, the admin
+        // console, the auth callback routes and the API.
         disallow: [
           "/account",
-          "/portfolio/*/buy",
-          "/boats/portfolio/*/buy",
-          "/my-cars",
-          "/my-boats",
-          "/bookings",
-          "/messages",
-          "/share-purchase",
           "/onboarding",
           "/admin",
           "/auth",

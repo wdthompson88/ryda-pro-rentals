@@ -176,7 +176,7 @@ export default function HowItWorksPage() {
         </div>
       </section>
 
-      {/* CTA + parked co-ownership pointer */}
+      {/* Closing CTA into the browse grid */}
       <section className="bg-ink py-20 text-cream">
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
           {/* Ink bands take the bright accent — standard `red` is tuned
@@ -197,15 +197,6 @@ export default function HowItWorksPage() {
           >
             See the cars →
           </Link>
-          <p className="mt-10 text-sm text-cream/70">
-            Here for co-ownership?{" "}
-            <Link
-              href="/co-ownership"
-              className="font-medium text-cream underline-offset-4 hover:underline"
-            >
-              Founding member waitlist — 2027
-            </Link>
-          </p>
         </div>
       </section>
     </>

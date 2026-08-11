@@ -5,7 +5,7 @@ import { HiddenWhenAuthed } from "@/components/auth-aware";
 // scrolls to the legal strip. Critical-path bundle saving.
 import { HealthBadgeLazy } from "@/components/health-badge-lazy";
 
-// Footer, brand row on top + 4 link columns below + legal strip.
+// Footer, brand row on top + 3 link columns below + legal strip.
 // Pacaso / Brunello pattern: full sitemap visible, but quiet eyebrows
 // and 15px body so the density doesn't shout. Theme toggle lives in
 // the bottom legal strip, power-user setting, not a top-level nav.
@@ -20,9 +20,9 @@ export function SiteFooter() {
             <div className="lg:col-span-7">
               <p className="font-display text-3xl text-ink">RYDA</p>
               <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-ink-soft">
-                Luxury vehicle access, Cars, Boats, and (soon) Planes.
-                Member-managed LLCs, professionally operated.
-                Miami launching Q3 2026.
+                Miami&apos;s exotic and luxury rental fleet, in one grid.
+                Send one request with your dates and a vetted local
+                operator confirms directly with you.
               </p>
             </div>
             <div className="lg:col-span-5 lg:flex lg:items-end lg:justify-end">
@@ -64,47 +64,22 @@ export function SiteFooter() {
         </div>
       </div>
 
-      {/* 4 link columns */}
+      {/* 3 link columns */}
       <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
-        <div className="grid grid-cols-2 gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-12">
+        <div className="grid grid-cols-2 gap-10 sm:grid-cols-2 lg:grid-cols-3 lg:gap-12">
           <FooterCol
             title="Cars"
             links={[
-              ["Portfolio", "/portfolio"],
               ["Rent", "/rent"],
-              ["Membership", "/membership"],
-              // The parked ownership program's single quiet home. This
-              // footer link is what the "reachable from the footer"
-              // comments on / and in site-header promise — keep it.
-              ["Co-ownership", "/co-ownership"],
               ["How it works", "/how-it-works"],
-              ["Insurance", "/insurance"],
-              ["Storage", "/storage"],
               ["FAQ", "/faq"],
-            ]}
-          />
-          <FooterCol
-            title="Boats"
-            links={[
-              ["Portfolio", "/boats/portfolio"],
-              ["Charter", "/boats/rent"],
-              ["Membership", "/boats/membership"],
-              ["How it works", "/boats/how-it-works"],
-              ["About boats", "/boats/about"],
-              ["FAQ", "/boats/faq"],
-              ["Sample documents", "/boats/sample-documents"],
             ]}
           />
           <FooterCol
             title="Resources"
             links={[
-              ["Journal", "/journal"],
-              ["Inside RYDA", "/inside"],
-              ["Sample documents", "/sample-documents"],
               ["Trust & safety", "/trust-and-safety"],
-              ["Member protection", "/member-protection"],
               ["Sustainability", "/sustainability"],
-              ["Host your vehicle", "/host-your-car"],
               ["Help center", "/help"],
             ]}
           />
@@ -140,7 +115,7 @@ export function SiteFooter() {
               Terms
             </Link>
             <Link href="/legal/disclaimer" className="hover:text-ink">
-              Co-ownership disclaimer
+              Disclaimer
             </Link>
             <Link href="/legal/cookies" className="hover:text-ink">
               Cookies

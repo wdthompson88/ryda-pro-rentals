@@ -1,14 +1,13 @@
-// Site-wide search index. Compiles all searchable surfaces (cars,
-// boats, journal posts, vs/* pages, FAQ topics, key marketing pages)
-// into a single flat list so the /search page can rank+filter cheaply
+// Site-wide search index. Compiles all searchable surfaces (rental
+// listings, journal posts, FAQ topics, key marketing pages) into a
+// single flat list so the /search page can rank+filter cheaply
 // without a backend.
 //
-// All sources pull from existing typed data, adding a new vehicle to
-// VEHICLES, a new boat to BOATS, or a new published journal post
-// surfaces in search automatically.
+// All sources pull from existing typed data: adding a rentable vehicle
+// to VEHICLES, or a new published journal post, surfaces in search
+// automatically.
 
 import { VEHICLES } from "@/lib/market-data";
-import { BOATS } from "@/lib/boat-data";
 import { POSTS as JOURNAL } from "@/lib/journal-content";
 
 export type SearchEntry = {
@@ -37,46 +36,22 @@ export type SearchEntry = {
 // ─────────────────────────────────────────────────────────────────────────
 
 const STATIC_PAGES: SearchEntry[] = [
-  // Cars
-  {
-    href: "/portfolio",
-    title: "RYDA Portfolio",
-    subtitle: "Cars · The full fleet, organized by market",
-    vertical: "cars",
-    type: "page",
-    haystack: "portfolio fleet cars supercars co-own ferrari lamborghini mclaren",
-  },
+  // Rentals
   {
     href: "/rent",
     title: "Rent",
     subtitle: "Cars · By the day · Miami fleet + partners",
     vertical: "cars",
     type: "page",
-    haystack: "rent rental daily charter try before you buy partners gm luxe",
+    haystack: "rent rental daily hire exotic supercar luxury miami partners fleet",
   },
   {
     href: "/how-it-works",
     title: "How it works",
-    subtitle: "Cars · The 5-step lifecycle + comparisons",
+    subtitle: "Cars · Browse, request your dates, the operator confirms",
     vertical: "cars",
     type: "page",
-    haystack: "how it works lifecycle 5 steps compare delaware llc",
-  },
-  {
-    href: "/membership",
-    title: "Membership tiers",
-    subtitle: "Cars · Core / Blue / Black",
-    vertical: "cars",
-    type: "page",
-    haystack: "membership tiers core blue black early",
-  },
-  {
-    href: "/sample-documents",
-    title: "Sample documents",
-    subtitle: "Cars · Operating Agreement, MSA, PPI, and more",
-    vertical: "cars",
-    type: "doc",
-    haystack: "sample documents operating agreement msa management services pre-purchase inspection ppi insurance",
+    haystack: "how it works request dates operator confirms referral commission",
   },
   {
     href: "/faq",
@@ -84,7 +59,7 @@ const STATIC_PAGES: SearchEntry[] = [
     subtitle: "Cars · Common questions",
     vertical: "cars",
     type: "faq",
-    haystack: "faq questions answers cars co-ownership",
+    haystack: "faq questions answers cars rental",
   },
   {
     href: "/about",
@@ -93,14 +68,6 @@ const STATIC_PAGES: SearchEntry[] = [
     vertical: "general",
     type: "page",
     haystack: "about founders ryan dave stefano team mission story",
-  },
-  {
-    href: "/inside",
-    title: "Inside RYDA",
-    subtitle: "Member app preview",
-    vertical: "general",
-    type: "page",
-    haystack: "inside member app preview portal dashboard",
   },
   {
     href: "/journal",
@@ -118,86 +85,10 @@ const STATIC_PAGES: SearchEntry[] = [
     type: "page",
     haystack: "contact email phone schedule call",
   },
-
-  // Boats
-  {
-    href: "/boats",
-    title: "RYDA Boats",
-    subtitle: "Boats · Co-own or charter the world's most beautiful boats",
-    vertical: "boats",
-    type: "page",
-    haystack: "boats yacht sailboat catamaran co-ownership",
-  },
-  {
-    href: "/boats/portfolio",
-    title: "Boats Portfolio",
-    subtitle: "Boats · The full fleet by market",
-    vertical: "boats",
-    type: "page",
-    haystack: "boats portfolio fleet wajer pershing riva lagoon",
-  },
-  {
-    href: "/boats/rent",
-    title: "Boat Charter",
-    subtitle: "Boats · Crewed yacht charter by the day",
-    vertical: "boats",
-    type: "page",
-    haystack: "boat charter rent yacht crewed daily",
-  },
-  {
-    href: "/boats/how-it-works",
-    title: "How RYDA Boats works",
-    subtitle: "Boats · 5-step lifecycle + FAQ",
-    vertical: "boats",
-    type: "page",
-    haystack: "boats how it works lifecycle delaware llc captain hurricane",
-  },
-  {
-    href: "/boats/membership",
-    title: "Boats Membership",
-    subtitle: "Boats · Tiers + perks",
-    vertical: "boats",
-    type: "page",
-    haystack: "boats membership tiers early",
-  },
-  {
-    href: "/boats/sample-documents",
-    title: "Boats Sample Documents",
-    subtitle: "Boats · Operating Agreement, MSA, marine survey, USCG documentation",
-    vertical: "boats",
-    type: "doc",
-    haystack: "boats sample documents operating agreement marine survey uscg coast guard captain",
-  },
-  {
-    href: "/boats/faq",
-    title: "Boats FAQ",
-    subtitle: "Boats · Common questions",
-    vertical: "boats",
-    type: "faq",
-    haystack: "boats faq questions slip captain hurricane charter",
-  },
-  {
-    href: "/boats/about",
-    title: "About RYDA Boats",
-    subtitle: "Boats · Story + founder's letter",
-    vertical: "boats",
-    type: "page",
-    haystack: "about boats founder letter ryan story",
-  },
-
-  // Planes
-  {
-    href: "/planes",
-    title: "RYDA Planes",
-    subtitle: "Planes · Coming soon · Member cohort outreach in 2027",
-    vertical: "planes",
-    type: "page",
-    haystack: "planes private jet aviation fractional coming soon",
-  },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────
-// Vehicle entries (cars portfolio + rental)
+// Vehicle entries (rental detail pages only)
 // ─────────────────────────────────────────────────────────────────────────
 
 const VEHICLE_ENTRIES: SearchEntry[] = VEHICLES.flatMap((v) => {
@@ -218,72 +109,21 @@ const VEHICLE_ENTRIES: SearchEntry[] = VEHICLES.flatMap((v) => {
     .join(" ")
     .toLowerCase();
 
-  const portfolio: SearchEntry = {
-    href: `/portfolio/${v.symbol.toLowerCase()}`,
-    title: v.name,
-    subtitle: `Cars · ${v.year} · ${v.market} · ${v.specs.power}`,
-    vertical: "cars",
-    type: "vehicle",
-    haystack: baseHaystack,
-  };
-
-  const rental: SearchEntry | null = v.rentalAvailable
-    ? {
-        href: `/rent/${v.symbol.toLowerCase()}`,
-        title: `${v.name}, rental`,
-        subtitle: `Cars · ${v.year} · From $${v.rentalDailyRate.toLocaleString()}/day`,
-        vertical: "cars",
-        type: "vehicle",
-        haystack: `${baseHaystack} rent rental charter daily`,
-      }
-    : null;
-
-  return rental ? [portfolio, rental] : [portfolio];
-});
-
-// ─────────────────────────────────────────────────────────────────────────
-// Boat entries (boats portfolio + charter)
-// ─────────────────────────────────────────────────────────────────────────
-
-const BOAT_ENTRIES: SearchEntry[] = BOATS.flatMap((b) => {
-  const baseHaystack = [
-    b.name,
-    b.brand,
-    b.model,
-    b.hullId,
-    b.year,
-    b.market,
-    b.hailingPort,
-    b.category,
-    b.engines,
-    b.specs.engine,
-    b.description,
-  ]
-    .filter(Boolean)
-    .join(" ")
-    .toLowerCase();
-
-  const portfolio: SearchEntry = {
-    href: `/boats/portfolio/${b.slug}`,
-    title: b.name,
-    subtitle: `Boats · ${b.year} · ${b.lengthFt}' · ${b.market}`,
-    vertical: "boats",
-    type: "boat",
-    haystack: baseHaystack,
-  };
-
-  const charter: SearchEntry | null = b.rentalAvailable
-    ? {
-        href: `/boats/rent/${b.slug}`,
-        title: `${b.name}, charter`,
-        subtitle: `Boats · ${b.year} · From $${b.rentalDailyRate.toLocaleString()}/day`,
-        vertical: "boats",
-        type: "boat",
-        haystack: `${baseHaystack} charter rent daily yacht`,
-      }
-    : null;
-
-  return charter ? [portfolio, charter] : [portfolio];
+  // Only rentable cars get an entry. A non-rentable VEHICLES row has
+  // no public page to link to post-pivot, so indexing it would put a
+  // dead result in the search box.
+  return v.rentalAvailable
+    ? [
+        {
+          href: `/rent/${v.symbol.toLowerCase()}`,
+          title: `${v.name}, rental`,
+          subtitle: `Cars · ${v.year} · From $${v.rentalDailyRate.toLocaleString()}/day`,
+          vertical: "cars" as const,
+          type: "vehicle" as const,
+          haystack: `${baseHaystack} rent rental daily`,
+        },
+      ]
+    : [];
 });
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -323,7 +163,6 @@ const JOURNAL_ENTRIES: SearchEntry[] = JOURNAL.filter(
 export const SEARCH_INDEX: SearchEntry[] = [
   ...STATIC_PAGES,
   ...VEHICLE_ENTRIES,
-  ...BOAT_ENTRIES,
   ...JOURNAL_ENTRIES,
 ];
 

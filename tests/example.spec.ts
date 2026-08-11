@@ -64,18 +64,6 @@ test.describe('how-it-works', () => {
     ).toBeVisible();
     await expect(page.getByText(/never through ryda/i).first()).toBeVisible();
   });
-
-  test('parked co-ownership program keeps its quiet pointer', async ({
-    page,
-  }) => {
-    await page.goto('/how-it-works');
-    // The 2027 waitlist pointer at the end of the page — one of the
-    // two sanctioned co-ownership references (the other is the
-    // footer's Cars column link).
-    await expect(
-      page.getByRole('link', { name: /founding member waitlist/i }),
-    ).toBeVisible();
-  });
 });
 
 test.describe('asset detail page', () => {

@@ -20,14 +20,14 @@ const ITEMS: Item[] = [
   // Rental-first ordering: requests sit directly under Overview,
   // mirroring the admin pipeline's placement.
   { href: "/account/requests", label: "Rental requests", icon: "◔", hint: "Where each request stands" },
-  { href: "/account/portfolio", label: "Your shares", icon: "◑", hint: "Cars you co-own" },
   { href: "/account/profile", label: "Profile", icon: "◐", hint: "Name, contact, address" },
   { href: "/account/security", label: "Login & security", icon: "◆", hint: "Email, password, sessions" },
+  // Stripe Identity. No rental surface gates on it yet, but the stack
+  // is deliberately retained for renter verification, so the member
+  // keeps a way to reach it.
   { href: "/account/verification", label: "Verification", icon: "✓", hint: "KYC, driving record" },
   { href: "/account/payments", label: "Payments", icon: "$", hint: "Cards, bank ACH" },
-  { href: "/account/membership", label: "Membership", icon: "◇", hint: "Tier, billing, renewal" },
   { href: "/account/notifications", label: "Notifications", icon: "✉", hint: "Email, SMS, push" },
-  { href: "/account/documents", label: "Documents", icon: "▤", hint: "Agreements, certificates" },
   { href: "/account/privacy", label: "Privacy & data", icon: "•", hint: "Export, delete account" },
 ];
 
