@@ -18,6 +18,13 @@ import { isAllowed, clientIp } from "@/lib/rate-limit";
 import { emailLayout, escapeHtml } from "@/lib/notify";
 import { partnerInquiryEmail } from "@/lib/partner-contacts";
 import { validateRentalInquiry, type RentalInquiry } from "@/lib/rental-inquiry";
+import {
+  partnerFetchers,
+  planOperatorLookup,
+  isColumnMissing,
+  droppableOptionalColumn,
+} from "@/lib/partner-resolution";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 const RATE_LIMIT = 5;            // 5 submissions per minute, contact-style
 const RATE_WINDOW_MS = 60_000;
@@ -116,6 +123,45 @@ function customerEmailHtml(inquiry: RentalInquiry): string {
   `);
 }
 
+// Columns the lead can land WITHOUT, in strip order. Each arrives with a
+// migration the operator has to approve (user_id with 0040, partner_id
+// with 0045), and partner_id additionally carries a foreign key that can
+// stop resolving between the lookup and the insert. The retry below drops
+// whichever one the insert blames.
+const OPTIONAL_INSERT_COLUMNS = ["partner_id", "user_id"] as const;
+
+// Resolve the operator row for a lead at CAPTURE time so the row carries
+// a stable id, not just the name partner-fleet.ts happened to stamp on
+// the vehicle. Best-effort by design: an unknown operator, a missing
+// partners table (pre-0041) or a DB blip must cost the lead its FK, never
+// the lead itself — partner_name still lands and the pay-link resolver
+// falls back to it.
+//
+// The name goes through planOperatorLookup rather than straight into the
+// fetcher so capture time and pay-link time normalize it identically. A
+// name that only differs by surrounding whitespace would otherwise
+// resolve at pay-link time (trimmed) but be invisible to both the 0045
+// backfill and the rename guard, which match exactly.
+async function resolvePartnerId(
+  db: SupabaseClient,
+  partnerName: string | null,
+): Promise<string | null> {
+  const key = planOperatorLookup({ partner_name: partnerName });
+  if (!key) return null;
+  const res = await partnerFetchers<{ id: string }>(db, "id").byName(key.value);
+  if (!res.ok) {
+    console.warn("[rental-inquiry · partner lookup]", res.error?.message);
+    return null;
+  }
+  if (!res.partner) {
+    // The operator is on the code-level fleet but not on the roster.
+    // Worth a line: it is also why their pay link would 404.
+    console.warn("[rental-inquiry · unknown operator]", key.value);
+    return null;
+  }
+  return res.partner.id;
+}
+
 export async function POST(req: NextRequest) {
   try {
     if (!(await isAllowed(`rental-inquiry:${clientIp(req)}`, RATE_LIMIT, RATE_WINDOW_MS))) {
@@ -155,6 +201,12 @@ export async function POST(req: NextRequest) {
     // first-time submitters have no session yet. Present → link the lead.
     const user = await getUserFromRequest(req);
 
+    // Attribution is written twice on purpose (0045): partner_id is the
+    // identity everything joins on, partner_name is the historical label —
+    // what this operator was called when the lead came in. Renaming the
+    // operator changes the former's target, never the latter.
+    const partnerId = await resolvePartnerId(admin, inquiry.partnerName);
+
     const row: Record<string, unknown> = {
       name: inquiry.name,
       email: inquiry.email,
@@ -171,6 +223,7 @@ export async function POST(req: NextRequest) {
       client_token: inquiry.clientToken,
     };
     if (user) row.user_id = user.id;
+    if (partnerId) row.partner_id = partnerId;
 
     let { data: inserted, error: insertError } = await admin
       .from("rental_inquiries")
@@ -178,12 +231,31 @@ export async function POST(req: NextRequest) {
       .select("id")
       .single();
 
-    // Schema-cache fallback: user_id arrives with migration 0040, which
-    // needs operator approval to apply. Detect "no such column" and retry
-    // without the linkage so leads keep landing during the transition —
-    // mirrors the contact route's `context` fallback.
-    if (insertError && user && isUserIdColumnMissing(insertError)) {
-      delete row.user_id;
+    // Optional-column fallback, two failure modes, one response: strip
+    // that key and retry, so the LEAD still lands.
+    //
+    //  · "no such column" — user_id arrives with migration 0040 and
+    //    partner_id with 0045, both operator-approved, so both have a
+    //    pre-migration window (mirrors the contact route's `context`
+    //    fallback).
+    //  · foreign key violation (23503) — partner_id resolved a moment
+    //    ago and the partners row went away before the insert (ops
+    //    merging duplicates, or the approval bridge rolling back a row
+    //    it had just created). The FK is attribution; losing it costs
+    //    the lead its id, and that is the trade this route promises.
+    //
+    // Bounded by the number of optional columns: each pass removes
+    // exactly one, so it cannot spin.
+    for (let attempt = 0; attempt < OPTIONAL_INSERT_COLUMNS.length; attempt++) {
+      if (!insertError) break;
+      const missing = droppableOptionalColumn(
+        insertError,
+        row,
+        OPTIONAL_INSERT_COLUMNS,
+      );
+      if (!missing) break;
+      console.warn("[rental-inquiry · dropping column]", missing, insertError.message);
+      delete row[missing];
       ({ data: inserted, error: insertError } = await admin
         .from("rental_inquiries")
         .insert(row)
@@ -252,15 +324,13 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// "No such column" detection shared by the GET path. user_id arrives
-// with migration 0040 (operator-approved); until it's applied, queries
+// "No such column" detection for the GET path. user_id arrives with
+// migration 0040 (operator-approved); until it's applied, queries
 // touching the column error and must degrade, not 500 the dashboard.
+// The predicate itself now lives in partner-resolution.ts so the
+// partner_id (0045) degradation uses the same one.
 function isUserIdColumnMissing(error: { message?: string } | null): boolean {
-  const msg = (error?.message ?? "").toLowerCase();
-  return (
-    msg.includes("user_id") &&
-    (msg.includes("column") || msg.includes("schema cache"))
-  );
+  return isColumnMissing(error, "user_id");
 }
 
 export async function GET(req: NextRequest) {

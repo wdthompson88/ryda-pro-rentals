@@ -4,14 +4,32 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { StepProgress } from "@/components/step-progress";
+import { authedFetch } from "@/lib/api-fetch";
 import { supabase } from "@/lib/supabase";
 
 const STEPS = ["Basic", "Phone", "Personal", "Identity", "Financial", "Tier", "Done"];
+const IDENTITY_STEP = STEPS.indexOf("Identity");
 
 export default function OnboardingPage() {
   const [step, setStep] = useState(0);
+  // True once Stripe has bounced the user back here from the hosted
+  // Identity flow. Threaded into the Identity step because the webhook
+  // that flips the row to 'verified' is out-of-band — see below.
+  const [kycReturned, setKycReturned] = useState(false);
   const next = () => setStep((s) => Math.min(s + 1, STEPS.length - 1));
   const back = () => setStep((s) => Math.max(s - 1, 0));
+
+  // Stripe Identity returns to `/onboarding?kyc=ok` (the return_url is
+  // built in api/kyc/start). The wizard's position is component state,
+  // so without this the user would land back on step 1 having just
+  // completed step 4. Read from window rather than useSearchParams to
+  // avoid forcing a Suspense boundary on an already-client page.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("kyc") !== "ok") return;
+    setKycReturned(true);
+    setStep(IDENTITY_STEP);
+  }, []);
 
   return (
     <>
@@ -36,7 +54,9 @@ export default function OnboardingPage() {
           {step === 0 && <Basic onNext={next} />}
           {step === 1 && <Phone onNext={next} onBack={back} />}
           {step === 2 && <Personal onNext={next} onBack={back} />}
-          {step === 3 && <Identity onNext={next} onBack={back} />}
+          {step === 3 && (
+            <Identity onNext={next} onBack={back} returned={kycReturned} />
+          )}
           {step === 4 && <Financial onNext={next} onBack={back} />}
           {step === 5 && <Tier onNext={next} onBack={back} />}
           {step === 6 && <Done />}
@@ -282,23 +302,154 @@ function Personal({ onNext, onBack }: { onNext: () => void; onBack: () => void }
   );
 }
 
-function Identity({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
+// Identity — the one step in this wizard wired to a real backend.
+// POSTs to /api/kyc/start, which mints a Stripe Identity session and
+// returns a hosted URL; we hand the browser over to Stripe and it
+// returns to /onboarding?kyc=ok.
+//
+// Phases: "unknown" until the status check resolves (the CTA stays
+// disabled so an early click can't mint a session for someone already
+// verified), then "none" (no attempt, or a terminal one worth retrying),
+// "pending" (submitted, Stripe still processing), or "verified".
+type KycPhase = "unknown" | "none" | "pending" | "verified";
+
+function Identity({
+  onNext,
+  onBack,
+  returned,
+}: {
+  onNext: () => void;
+  onBack: () => void;
+  returned: boolean;
+}) {
+  const [phase, setPhase] = useState<KycPhase>("unknown");
+  const [running, setRunning] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await authedFetch("/api/kyc/status");
+        if (cancelled) return;
+        if (!res.ok) {
+          setPhase("none");
+          return;
+        }
+        const j = await res.json();
+        // Only 'processing' and 'verified' mean the user has done their
+        // part. requires_input / requires_action / canceled / failed all
+        // want another trip through Stripe, so they read as "none" and
+        // the CTA offers a retry.
+        setPhase(
+          j.verified
+            ? "verified"
+            : j.status === "processing"
+              ? "pending"
+              : "none",
+        );
+      } catch {
+        // Offline, or the route isn't deployed in this preview. Let the
+        // user try the button rather than trapping them on a lookup.
+        if (!cancelled) setPhase("none");
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  async function startKyc() {
+    if (running) return;
+    setRunning(true);
+    setError(null);
+    try {
+      const res = await authedFetch("/api/kyc/start", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ returnUrl: "/onboarding" }),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(
+          j.error || `Could not start verification (${res.status}).`,
+        );
+      }
+      const j = await res.json();
+      // The route short-circuits without minting a session when a
+      // 'verified' row already exists.
+      if (j.kycVerified) {
+        setPhase("verified");
+        return;
+      }
+      if (typeof j.url === "string") {
+        window.location.href = j.url;
+        return;
+      }
+      throw new Error("No verification URL returned.");
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Could not start verification.",
+      );
+    } finally {
+      setRunning(false);
+    }
+  }
+
+  // The webhook that flips the row to 'verified' lands out-of-band, so
+  // someone who just finished at Stripe can still read as
+  // 'requires_input' here for a few seconds. Treat the return trip
+  // itself as enough to move on — this wizard is not the gate. The
+  // rental API re-checks verification server-side before any booking.
+  const canContinue = phase === "verified" || phase === "pending" || returned;
+
   return (
     <div>
       <h2 className="font-display text-2xl text-ink">Identity verification.</h2>
       <p className="mt-2 text-sm text-ink-soft">
-        We use Stripe Identity to verify your government ID and run a quick liveness
-        check. Takes 2–3 minutes.
+        We use Stripe Identity to verify your government ID and match it to a
+        live selfie. Takes 2–3 minutes.
       </p>
-      <div className="mt-8 space-y-4">
-        <Bullet ok>Government photo ID (front + back)</Bullet>
-        <Bullet ok>Selfie liveness check</Bullet>
-        <Bullet ok>SSN last-4 (US members)</Bullet>
-        <Bullet>Soft credit pull (no impact on your score)</Bullet>
-      </div>
-      <button className="mt-8 h-12 w-full rounded-full bg-red px-7 text-sm font-medium text-cream hover:bg-red-deep">
-        Continue with Stripe Identity →
-      </button>
+      <ul className="mt-8 space-y-4">
+        <Bullet ok>Government photo ID</Bullet>
+        <Bullet ok>Live selfie match</Bullet>
+        <Bullet>Stripe checks the document — RYDA gets a pass or fail</Bullet>
+      </ul>
+
+      {phase === "verified" && (
+        <p className="mt-8 rounded-xl border border-success/30 bg-success/10 px-4 py-3 text-sm text-success-deep">
+          Identity verified. You&rsquo;re all set for this step.
+        </p>
+      )}
+
+      {phase !== "verified" && (returned || phase === "pending") && (
+        <p className="mt-8 rounded-xl border border-warn/30 bg-warn/15 px-4 py-3 text-sm text-warn-deep">
+          Verification submitted. Stripe usually clears it within minutes —
+          we&rsquo;ll email you when it does. You can continue in the meantime.
+        </p>
+      )}
+
+      {phase !== "verified" && (
+        <button
+          type="button"
+          onClick={startKyc}
+          disabled={running || phase === "unknown"}
+          className="mt-8 h-12 w-full rounded-full bg-red px-7 text-sm font-medium text-cream hover:bg-red-deep disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {running
+            ? "Opening Stripe…"
+            : returned || phase === "pending"
+              ? "Restart identity check →"
+              : "Continue with Stripe Identity →"}
+        </button>
+      )}
+
+      {error && (
+        <p className="mt-4 rounded-xl border border-red/40 bg-red/5 px-4 py-3 text-sm text-red">
+          {error}
+        </p>
+      )}
+
       <p className="mt-4 text-center text-xs text-mute">
         Stripe Identity stores verification data, not RYDA. See our{" "}
         <Link href="/legal/privacy" className="underline hover:text-ink">
@@ -306,7 +457,7 @@ function Identity({ onNext, onBack }: { onNext: () => void; onBack: () => void }
         </Link>
         .
       </p>
-      <BackNext onBack={onBack} onNext={onNext} hideNext />
+      <BackNext onBack={onBack} onNext={onNext} hideNext={!canContinue} />
     </div>
   );
 }

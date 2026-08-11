@@ -1033,13 +1033,14 @@ function OperatorsTab({
         // operator can be paid, which is only true once their vehicles
         // carry their name.
         <p className="mt-4 max-w-3xl text-xs leading-relaxed text-mute">
-          Payment links resolve the operator by the{" "}
-          <code className="text-ink-soft">partner_name</code> snapshotted on
-          each inquiry, which comes from the code-level fleet
-          (src/lib/partner-fleet.ts). An operator can only be sent a payment
-          link once their vehicles are listed there under this exact name —
-          a green &ldquo;Ready&rdquo; chip means Stripe is done, not that
-          inquiries can reach them yet.
+          Inquiries link to an operator by{" "}
+          <code className="text-ink-soft">partner_id</code> (migration 0045),
+          stamped at capture from the name in the code-level fleet
+          (src/lib/partner-fleet.ts). Renaming an operator no longer breaks
+          leads already in flight — but one whose vehicles are not listed
+          there under this exact name receives no leads at all, so a green
+          &ldquo;Ready&rdquo; chip means Stripe is done, not that inquiries
+          can reach them yet.
         </p>
       )}
     </>

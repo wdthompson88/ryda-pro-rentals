@@ -5,6 +5,14 @@
 //         plus the application queue (partner_accounts, 0042).
 // POST  → create-or-update an operator (upsert by name) — roster only.
 //         Audit-logged (create / commercial-term edit / pause-resume).
+//         RENAMING is possible since 0045 but never silent: the two
+//         remaining name couplings each answer with a 409 that writes
+//         nothing, and a follow-up request confirms them —
+//         confirmFleetCodeRename (the name is hard-coded in
+//         partner-fleet.ts / partner-contacts.ts, so NEW leads break
+//         until the code ships) and relinkLegacyInquiries (name-only
+//         inquiries get linked to this operator first). See
+//         src/lib/partner-rename.ts.
 // PATCH → { userId, status: "approved" | "suspended", note?,
 //           expectedCompanyName, linkExistingOperatorId?, pauseOperator? }
 //         Review an application. APPROVAL IS THE BRIDGE: it
@@ -73,6 +81,12 @@ import { requireAdmin } from "@/lib/admin-auth";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { PARTNER_VEHICLES } from "@/lib/partner-fleet";
 import { recordAdminAction } from "@/lib/admin-audit";
+import {
+  classifyLegacyCount,
+  countInquiriesByName,
+  countLegacyInquiries,
+  relinkLegacyInquiries,
+} from "@/lib/partner-rename";
 import {
   canTransitionPartnerStatus,
   type PartnerAccount,
@@ -360,45 +374,124 @@ export async function POST(req: NextRequest) {
 
   if (lookup.data) {
     const patch: Record<string, unknown> = {};
+    // Set by the rename guard below so the audit entry records what the
+    // rename actually did, not just that it happened.
+    let relinkedInquiries = 0;
+    let fleetCodeConfirmed = false;
     if (id && name !== lookup.data.name) {
-      // Rename guard: rental_inquiries snapshot partner_name at
-      // inquiry time and the payment-link route resolves the partner
-      // by that exact string; the code-level fleet (partner-fleet.ts)
-      // stamps the same string on every NEW inquiry. Renaming a
-      // referenced partner would orphan every in-flight lead ("not
-      // onboarded yet" 404s) and break new-inquiry attribution — so a
-      // referenced name is immutable until inquiries link by id.
+      // Rename guard, NARROWED by migration 0045.
+      //
+      // Existing leads no longer break on a rename: rental_inquiries now
+      // carry partner_id and the pay-link route resolves through it
+      // (src/lib/partner-resolution.ts), so the snapshotted partner_name
+      // is a historical label, not a lookup key. What is still coupled
+      // to the string is code, not data — so the guard now blocks only
+      // that, and only the rows the FK genuinely cannot cover.
       const oldName = String(lookup.data.name);
+      const operatorId = String(lookup.data.id);
+
+      // (1) The code-level fleet. partner-fleet.ts hard-codes the
+      // operator name on every partner vehicle, so it is the name each
+      // NEW inquiry gets stamped with and resolved by at capture time;
+      // partner-contacts.ts keys its lead-routing inbox map on the same
+      // string. Rename the roster row without editing both and new leads
+      // land with a null partner_id and an unresolvable name.
+      //
+      // A CONFIRMATION, not a wall. Every name that can reach
+      // rental_inquiries.partner_name comes from PARTNER_VEHICLES
+      // (resolveRentalVehicle copies `.partner`; the anon POST body
+      // cannot supply it), so a hard block here made every operator that
+      // can own a lead permanently un-renameable — i.e. it re-imposed
+      // exactly the coupling 0045 removed, one layer up. Same idiom as
+      // the approval bridge's linkExistingOperatorId: disclose the
+      // consequence, write nothing, and let a second request that
+      // carries confirmFleetCodeRename proceed.
       const fleetNames = new Set<string>(
         PARTNER_VEHICLES.map((v) => v.partner),
       );
       if (fleetNames.has(oldName)) {
-        return NextResponse.json(
-          {
-            error: `Cannot rename "${oldName}" — the partner fleet (partner-fleet.ts) attributes vehicles to that exact name, so a rename would break every new inquiry. Update the code first, then rename.`,
-          },
-          { status: 409 },
-        );
+        if (body.confirmFleetCodeRename !== true) {
+          return NextResponse.json(
+            {
+              error: `"${oldName}" is hard-coded in src/lib/partner-fleet.ts (on every one of its vehicles) and in src/lib/partner-contacts.ts (lead routing). Existing inquiries are safe — they link by partner_id since migration 0045 — but every NEW lead is stamped with the code's string, so until both files are updated and deployed new leads will land with no partner_id and an unresolvable name. Re-send with confirmFleetCodeRename to rename anyway.`,
+              requiresFleetCodeConfirmation: true,
+              codeReferences: [
+                "src/lib/partner-fleet.ts",
+                "src/lib/partner-contacts.ts",
+              ],
+            },
+            { status: 409 },
+          );
+        }
+        fleetCodeConfirmed = true;
       }
-      const refs = await db
-        .from("rental_inquiries")
-        .select("id", { count: "exact", head: true })
-        .eq("partner_name", oldName);
-      if (refs.error) {
+
+      // (2) Legacy leads only: rows still carrying this name with NO
+      // partner_id. Those are the ones that would genuinely orphan —
+      // they predate 0045 or its backfill could not prove them. Rows
+      // that carry the FK are deliberately not counted; blocking on them
+      // is the coupling this migration removed.
+      const verdict = classifyLegacyCount(
+        await countLegacyInquiries(db, oldName),
+      );
+      if (verdict.kind === "lookup_failed") {
         // Can't verify → refuse the rename rather than risk orphaning
         // in-flight leads.
         return NextResponse.json(
-          { error: `Cannot verify the rename is safe: ${refs.error.message}` },
+          { error: `Cannot verify the rename is safe: ${verdict.message}` },
           { status: 500 },
         );
       }
-      if ((refs.count ?? 0) > 0) {
-        return NextResponse.json(
-          {
-            error: `Cannot rename "${oldName}" — ${refs.count} inquiry(ies) reference that name and would lose their operator link (payment links would 404 as "not onboarded"). Renames are blocked while the name is referenced.`,
-          },
-          { status: 409 },
-        );
+      if (verdict.kind === "pre_fk") {
+        // Pre-0045 environment: no FK exists, so EVERY referencing row
+        // is still name-coupled — the original guard, unchanged, until
+        // the migration is applied. Not relinkable here: there is no
+        // column to write.
+        const all = await countInquiriesByName(db, oldName);
+        if (all.error) {
+          return NextResponse.json(
+            {
+              error: `Cannot verify the rename is safe: ${all.error.message?.trim() || "the database returned no diagnostic"}`,
+            },
+            { status: 500 },
+          );
+        }
+        if ((all.count ?? 0) > 0) {
+          return NextResponse.json(
+            {
+              error: `Cannot rename "${oldName}" — ${all.count} inquiry(ies) reference that name and migration 0045 (rental_inquiries.partner_id) has not been applied here, so they have no other link to this operator. Apply 0045 (operator approval required), then rename.`,
+            },
+            { status: 409 },
+          );
+        }
+      } else if (verdict.count > 0) {
+        // Relinkable, and this route is the only place with both halves
+        // of the join in hand — so offer the fix instead of naming a
+        // backfill the admin has no way to re-run (it lives in the body
+        // of an applied migration; there is no route, script or npm
+        // task for it). Confirmed explicitly because it writes rows
+        // outside the one the admin thinks they are editing.
+        if (body.relinkLegacyInquiries !== true) {
+          return NextResponse.json(
+            {
+              error: `${verdict.count} inquiry(ies) still reference "${oldName}" by name alone (no partner_id) — most likely captured while the operator lookup was failing. Renaming now would orphan them and their payment links would 404 as "not onboarded". Re-send with relinkLegacyInquiries to link them to this operator first (the same exact-name join migration 0045 backfills with), then the rename proceeds.`,
+              requiresLegacyRelink: true,
+              legacyCount: verdict.count,
+            },
+            { status: 409 },
+          );
+        }
+        // Runs BEFORE the name changes, so the join still matches.
+        const relink = await relinkLegacyInquiries(db, oldName, operatorId);
+        if (relink.error) {
+          return NextResponse.json(
+            {
+              error: `Could not link the ${verdict.count} name-only inquiry(ies) to this operator, so the rename was not applied: ${relink.error.message?.trim() || "the database returned no diagnostic"}`,
+            },
+            { status: 500 },
+          );
+        }
+        relinkedInquiries = verdict.count;
       }
       patch.name = name;
     }
@@ -438,6 +531,14 @@ export async function POST(req: NextRequest) {
             { from: before[k] ?? null, to: patch[k] ?? null },
           ]),
         ),
+        // A rename can take two side effects with it, both explicitly
+        // confirmed by the caller and neither visible on the row: rows
+        // in another table were re-pointed, and/or the admin accepted
+        // that the code still says the old name.
+        ...(relinkedInquiries > 0
+          ? { relinked_inquiries: relinkedInquiries }
+          : {}),
+        ...(fleetCodeConfirmed ? { fleet_code_rename_confirmed: true } : {}),
         note: note || undefined,
       },
     });

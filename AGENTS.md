@@ -13,11 +13,32 @@ Keep this context lean. Read files that match the task instead of loading broad 
 - Repo: `moocow4844/ryda-web` (private). Clone anywhere; all paths in this file are repo-relative.
 - Stack: Next.js App Router, TypeScript, Supabase, Stripe, Vercel, Resend, Playwright/Vitest.
 - Production domain: `https://ryda.pro`
-- Product: asset-backed luxury vehicle co-ownership and booking platform with admin gates.
+- Product: **rentals-first marketplace.** RYDA lists local operators' luxury/exotic cars,
+  captures inquiries against real accounts, routes each lead to the operator, and earns a
+  referral commission. Co-ownership is the 2027 chapter — its pages, member dashboards, and
+  share-purchase flow all still exist and still work, but they are no longer the front door.
+
+## The pivot, in one paragraph (read before changing product surfaces)
+
+August 2026: rentals became the product. `/` is a landing page, `/rent` is the browse grid,
+`/how-it-works` explains the referral model. Co-ownership content lives on at its own URLs
+(`/portfolio`, `/membership`, `/co-ownership`, the boats tree) and is reachable from the
+footer — **do not delete it**, and do not re-introduce it into the top nav or onto rental
+surfaces. Payments are **fee-only Stripe Connect direct charges**: the customer pays a link
+that charges the operator's connected account, the rental price never enters RYDA's balance,
+and RYDA's commission rides along as `application_fee_amount`. Never write copy — anywhere —
+promising that RYDA holds, guarantees, or never touches payment; state what the code does.
+Operators are never named on customer-facing surfaces ("a vetted Miami operator").
 
 ## Source-Of-Truth Areas
 
 - App routes: `src/app`
+- Rental funnel: `src/app/api/rental-inquiry`, `src/components/rental-inquiry-form.tsx`
+- Browse + listings data: `src/components/rental-listings.tsx`, `src/lib/partner-fleet.ts`
+- Partner program: `src/app/partner`, `src/app/admin/partners`, `src/app/api/admin/partners`
+- Rental payments: `src/app/api/admin/inquiries/[id]/payment-link`,
+  `src/app/api/stripe/connect-webhook`, `src/lib/fees.ts` (the only home for money math)
+- Design system: `.claude/skills/frontend-design/SKILL.md` — light-only palette, tokens only
 - Admin flows: `src/app/admin`, `src/app/api/admin`
 - Share purchase and Stripe: `src/app/api/share-purchase`, `src/lib/stripe.ts`
 - Supabase admin client: `src/lib/supabase-admin.ts`
@@ -74,6 +95,13 @@ that never turns into a lost commit or a clobbered migration.
 - Open a PR. Merge only when the `verify` check is green.
 - `git pull --rebase origin main` before you start and before you push.
 - Small PRs. A branch older than a day is a merge conflict waiting to happen.
+- **Claim your surface out loud.** The August 2026 pivot cost a day of reconciliation
+  because two agents independently built a partner system — one an application funnel,
+  one a Stripe operator roster — that then had to be merged into one. Before starting
+  anything that touches a shared surface (`site-header`, `/admin/*`, auth/signup, the
+  design tokens, or a new DB table), check the open branches (`git fetch && git branch -r`)
+  and say in the PR title what you are claiming. Two agents shipping the same concept is
+  more expensive than one waiting.
 
 ### Why `main` is not actually locked
 
