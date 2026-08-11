@@ -3,9 +3,9 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { Reveal, RevealStagger } from "@/components/reveal";
 
-// Rental-first "How it works" (Aug 2026 pivot). The old co-ownership
-// doctrine page (5-step lifecycle, exit doctrine, 4-way comparison)
-// lives in git history; co-ownership itself is parked at /co-ownership.
+// Rental "How it works". The old co-ownership doctrine page (5-step
+// lifecycle, exit doctrine, 4-way comparison) lives only in git history
+// — that product is not part of this repo.
 //
 // This page has one job: explain the lead-gen model honestly in under
 // a minute — browse, request with dates, a vetted operator confirms and

@@ -22,16 +22,14 @@ import {
 // we send them. Operators are never named publicly; they introduce
 // themselves when they confirm.
 //
-// Ownership-program content stays OFF this page entirely — that
-// program's single quiet home is its own page, reachable from the
-// footer (Cars column in site-footer) and a quiet pointer at the
-// end of /how-it-works.
+// Ownership-program content does not belong here, or anywhere in this
+// repo — that product was removed in the rentals-first strip.
 
 // og/twitter are declared here in full because Next merges metadata
-// shallowly per top-level key: without them the home page inherits
-// the root layout's co-ownership-led social card ("Supercar
-// co-ownership and rentals"), which contradicts the rental-first
-// rule above the moment the URL is pasted into iMessage/Slack/X.
+// shallowly per top-level key. The root layout's card is rental-first
+// too, but declaring these locally keeps the home page's social card
+// pinned to the home page's own copy rather than inheriting whatever
+// the layout says later.
 const HOME_SOCIAL_DESCRIPTION =
   "Miami's most-wanted exotics. One request away. Pick a car, send your dates, and a vetted Miami operator confirms directly with you — no card, no payment through RYDA.";
 

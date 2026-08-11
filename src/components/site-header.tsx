@@ -12,11 +12,10 @@ import {
 // Rental-first header (Aug 2026 pivot). Rentals are THE product, so the
 // nav is one flat list on every page: Rent (the homepage grid) · How it
 // works · For partners. The old vertical-aware nav (Cars / Boats /
-// Planes switcher, portfolio + membership links) is retired from the
-// top bar — co-ownership now lives at /co-ownership, reachable via the
-// footer's Cars column and a quiet pointer at the end of /how-it-works.
-// Site search + the auth-aware Log in / Sign up / Account slots are
-// unchanged.
+// Planes switcher, portfolio + membership links) is gone along with the
+// co-ownership product itself — this is a rentals-only repo and those
+// destinations no longer exist. Site search + the auth-aware Log in /
+// Sign up / Account slots are unchanged.
 
 const NAV = [
   // /rent is the canonical browse grid; "/" is the landing page.

@@ -105,8 +105,11 @@ Read these first (they are the RYDA conventions every task must obey):
   (the `btree_gist` EXCLUDE constraint). The co-ownership handover flow to rewire:
   **`0034_vehicle_handovers.sql`** + `src/app/bookings/[id]/checkin` + `/return` +
   `src/app/api/bookings/[id]/handover/route.ts`.
-- **`docs/DROPBOX_SIGN_SETUP.md`** — Dropbox Sign is already installed (`@dropbox/sign`) and
-  configured; it is the tool for the reservation agreement (Phase 4).
+- **E-signature is NOT installed.** An earlier draft of this doc said Dropbox Sign was
+  already wired; that was true of the co-ownership product and is no longer true here. The
+  `@dropbox/sign` dependency, `src/lib/dropbox-sign.ts`, the document routes and
+  `docs/DROPBOX_SIGN_SETUP.md` were all removed in the rentals-first strip. Phase 4B starts
+  from a vendor choice, not from configuration.
 
 **Runtime facts:** Node **24** is mandatory (`.npmrc` `engine-strict=true`; wrong major
 fails `npm install`). Migration **head present = `0043`; the next number is almost certainly
@@ -432,9 +435,9 @@ pattern** to borrow (if any), a **Definition of Done (DoD)**, and an **Acceptanc
   operator's price" style claims — none remain that contradict the on-platform rail.
 
 - [ ] **4B. Reservation agreement / e-sign.**
-  Use **Dropbox Sign** (already installed; see `docs/DROPBOX_SIGN_SETUP.md`) for a renter+
-  operator rental agreement issued at confirmation; or Mainstable's lighter **click-accept**
-  (`/trial-agreement`) pattern if a full e-sign is overkill for v1.
+  Pick a vendor first — nothing is installed (see the note in §1). Dropbox Sign is the
+  known-good option since the team has used it before, or take the lighter **click-accept**
+  pattern if a full e-sign is overkill for v1.
   **Acceptance:** a confirmed booking produces a signed/accepted agreement stored against it.
 
 - [ ] **4C. Rewire check-in / return to the rental booking.**

@@ -1,20 +1,45 @@
-# RYDA Web
+# RYDA Rentals
 
-Production app for asset-backed luxury vehicle co-ownership and booking.
+Production app for the RYDA luxury and exotic car rental marketplace.
+
+RYDA lists local operators' cars, captures rental inquiries, routes each lead to the
+operator, and earns a referral commission. Payment is a Stripe Connect **direct charge** on
+the operator's connected account — the rental price never lands in RYDA's balance, and
+RYDA's commission rides along as `application_fee_amount`.
 
 - Production: **https://ryda.pro**
 - Stack: Next.js (App Router) + TypeScript + Supabase + Stripe + Vercel + Resend + Playwright/Vitest
-- Repo split from `ryangalli-app` monorepo 2026-05-19 — sibling repos are `agent-ops` and `trading-suite` under `~/Desktop/dev/`
+- Repo: `wdthompson88/ryda-pro-rentals`
+
+> **This repo is rentals only.** It was seeded from the history of `moocow4844/ryda-web` and
+> then stripped of the fractional co-ownership product (share purchase, LLC formation, member
+> voting, the boats tree). That product continues in the original repo. Commits before the
+> strip still reference routes and tables that no longer exist here — see the "no
+> co-ownership" section of [AGENTS.md](AGENTS.md) before acting on anything you find in
+> history.
 
 ## Quickstart
 
 ```bash
+nvm use                                    # Node 24 — a wrong major hard-fails npm install
 npm install
 cp .env.local.example .env.local           # fill in Supabase + Stripe + Resend keys
-npm run dev                                  # http://localhost:3000
+npm run dev                                # http://localhost:3000
 ```
 
-For local Stripe webhook handling: `stripe listen --forward-to localhost:3000/api/webhooks/stripe` and put the printed `whsec_*` into `STRIPE_WEBHOOK_SECRET`. Production webhook secrets live in Vercel env.
+The app degrades gracefully without keys: unset Supabase falls back to a simulated auth path,
+unset Resend makes `notifyTeam()` log instead of email, and an unset Stripe key makes the
+admin payment-link action return 503. You can browse and develop the marketing surface with
+an empty `.env.local`.
+
+For local Stripe webhooks:
+
+```bash
+stripe listen --forward-to localhost:3000/api/stripe/connect-webhook
+```
+
+Put the printed `whsec_*` into `STRIPE_CONNECT_WEBHOOK_SECRET`. Production webhook secrets
+live in Vercel env, never in the repo.
 
 ## Common commands
 
@@ -24,7 +49,7 @@ npm run typecheck          # tsc --noEmit
 npm run test               # vitest
 npm run test:e2e           # playwright (browser-facing flows)
 npm run build              # production build
-npm run lint               # eslint
+npm run verify             # typecheck + test + build — run before opening a PR
 
 # Marketing automation
 npm run marketing:sync:dry # preview draft → queue diff
@@ -35,20 +60,29 @@ npm run marketing:brief    # daily marketing brief
 
 | Doc | What it covers |
 |---|---|
-| [AGENTS.md](AGENTS.md) | Agent context — safety rules, source-of-truth dirs, verification commands, **team collaboration rules (branching, migrations, secrets)** |
-| [SETUP.md](SETUP.md) | First-time setup, Supabase migrations, env vars |
+| [AGENTS.md](AGENTS.md) | Agent context — safety rules, source-of-truth dirs, verification, migrations, branching |
+| [SETUP.md](SETUP.md) | First-time setup: migrations, env vars, Stripe Connect + Identity webhooks |
 | [SMOKE.md](SMOKE.md) | Post-deploy smoke checks against `https://ryda.pro` |
 | [CLAUDE.md](CLAUDE.md) | Defers to AGENTS.md — used when invoked from Claude Code CLI |
-| [docs/](docs/) | Per-feature deep-dives (admin v3, sample documents, Vercel crons, etc.) |
+| [docs/](docs/) | Per-feature deep-dives. Inherited and uneven; some predates the strip |
 
 ## Architecture in 30 seconds
 
 - **App routes** at `src/app/` (App Router conventions)
-- **Admin flows** at `src/app/admin/` + `src/app/api/admin/`
-- **Share-purchase flow** at `src/app/api/share-purchase/` + `src/lib/stripe.ts`
+- **Rental funnel**: `/rent` browse → `/rent/[symbol]` → `POST /api/rental-inquiry`
+- **Admin triage** at `src/app/admin/` + `src/app/api/admin/` — `/admin` is the funnel
+  overview, `/admin/inquiries` owns lead triage and payment links, `/admin/partners` owns the
+  operator roster and Stripe Connect onboarding
+- **Money math** lives only in `src/lib/fees.ts` (`computeRentalFee`)
+- **Payment rail** at `src/app/api/admin/inquiries/[id]/payment-link` +
+  `src/app/api/stripe/connect-webhook`
+- **Identity/KYC** at `src/app/api/kyc/` — built, wired, and not yet used by the rental flow;
+  kept for renter verification later
 - **Supabase admin** at `src/lib/supabase-admin.ts`
-- **Marketing automation** at `scripts/marketing/` (TypeScript content sync + queue poller + daily-brief + video composer)
-- **Database migrations** at `supabase/migrations/` (chain through `0037_*` as of 2026-05-19)
+- **Marketing automation** at `scripts/marketing/`
+- **Database migrations** at `supabase/migrations/` — 46 files, `0001`–`0047`, gap at `0026`,
+  next number is `0048`. Roughly half create co-ownership tables that no code reads; they are
+  inherited and intentionally left alone
 - **Tests** at `tests/`, `src/**/*.test.ts`, `playwright.config.ts`
 
 ## Hard safety rules (do NOT override without explicit operator approval)
@@ -59,10 +93,3 @@ npm run marketing:brief    # daily marketing brief
 - Paid MuAPI / OpenAI / FAL generation
 - Social publishing (Instagram, LinkedIn, X, email send)
 - Auto-publishing of generated assets (queue stays in operator approval state)
-
-## Cross-repo
-
-- Operations / dashboard / auto-commit steward: `~/Desktop/dev/agent-ops/`
-- Trading desk (unrelated to this app): `~/Desktop/dev/trading-suite/`
-
-Each is its own git repo; you push to them independently.

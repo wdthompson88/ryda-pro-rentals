@@ -373,9 +373,7 @@ export default async function RentDetailPage({
                 balance, and this page must not imply it does. It must
                 not claim the opposite either: the Checkout link is
                 created and emailed BY RYDA, so "no payment through RYDA"
-                sets up a bait-and-switch when that email arrives. (No
-                membership upsell here — co-ownership/membership copy
-                stays off rental surfaces.) */}
+                sets up a bait-and-switch when that email arrives. */}
             <div className="lg:col-span-5">
               <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-red">
                 Payment
@@ -499,11 +497,8 @@ export default async function RentDetailPage({
         </div>
       </section>
 
-      {/* No co-ownership pitch here. The program is parked (2027
-          waitlist) and the pivot's rule is co-ownership stays out of
-          rental-surface copy — the footer link (Cars column in
-          site-footer) and the quiet pointer at the end of
-          /how-it-works are the only sanctioned references. */}
+      {/* No ownership-program pitch here, and nowhere else either —
+          that product is not part of this repo. */}
     </>
   );
 }
