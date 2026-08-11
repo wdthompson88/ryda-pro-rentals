@@ -62,7 +62,19 @@ test.describe('how-it-works', () => {
     await expect(
       page.getByRole('heading', { name: /referral commission/i }),
     ).toBeVisible();
-    await expect(page.getByText(/never through ryda/i).first()).toBeVisible();
+    // Where the money goes. This used to assert /never through ryda/i,
+    // which was already failing before the co-ownership strip: the page
+    // deliberately dropped "no payment through RYDA — ever" (see the
+    // comment on that card) because RYDA does send a Stripe Checkout
+    // link once the operator confirms — the charge just settles on the
+    // operator's own connected account. The assertion was never updated
+    // to follow. It now checks the claim the page actually makes.
+    await expect(
+      page.getByText(/straight to the operator/i).first(),
+    ).toBeVisible();
+    await expect(
+      page.getByText(/ryda never holds your money/i).first(),
+    ).toBeVisible();
   });
 });
 
