@@ -12,7 +12,7 @@ import {
   resolveRentalVehicle,
   type RentalInquiry,
 } from "../rental-inquiry";
-import type { Vehicle } from "../market-data";
+import type { PartnerVehicle } from "../partner-fleet";
 
 const NOW = new Date("2026-08-06T15:00:00Z");
 
@@ -44,23 +44,14 @@ function expectError(input: Record<string, unknown>): string {
 }
 
 describe("validateRentalInquiry — happy paths", () => {
-  it("accepts a partner-fleet inquiry and resolves attribution", () => {
+  it("accepts an operator-listing inquiry and resolves attribution", () => {
     const v = expectOk(body());
-    expect(v.fleet).toBe("partner");
     expect(v.vehicleSlug).toBe("lamborghini-huracan-evo");
     expect(v.vehicleLabel).toBe("Lamborghini Huracán EVO");
     // Ops attribution present on the row — the route keeps it out of
     // every customer-facing surface.
     expect(v.partnerName).toBe("GM LUXE");
     expect(v.email).toBe("ava@example.com"); // normalized lowercase
-  });
-
-  it("accepts a RYDA-fleet symbol case-insensitively", () => {
-    const v = expectOk(body({ vehicleSlug: "gt3" }));
-    expect(v.fleet).toBe("ryda");
-    expect(v.vehicleSlug).toBe("GT3"); // canonical symbol, not raw input
-    expect(v.vehicleLabel).toBe("Porsche 911 GT3 RS");
-    expect(v.partnerName).toBeNull();
   });
 
   it("accepts a single-day rental (end == start)", () => {
@@ -153,21 +144,35 @@ describe("resolveRentalVehicle", () => {
     expect(expectError(body({ vehicleSlug: "bugatti-chiron" }))).toMatch(/vehicle/i);
   });
 
-  it("skips RYDA vehicles not flagged rentalAvailable", () => {
-    // Every current VEHICLES entry has rentalAvailable: true, so the
-    // gate is exercised through the injectable list — that keeps this
-    // pinned even after fleet data changes.
-    const noRental = {
-      symbol: "TEST",
-      name: "Test Car",
-      rentalAvailable: false,
-    } as unknown as Vehicle;
-    const forRental = { ...noRental, rentalAvailable: true } as Vehicle;
-    expect(resolveRentalVehicle("test", [], [noRental])).toBeNull();
-    expect(resolveRentalVehicle("test", [], [forRental])).toMatchObject({
-      fleet: "ryda",
-      vehicleSlug: "TEST",
-      partnerName: null,
+  it("has no second lookup path — a RYDA-fleet symbol resolves to nothing", () => {
+    // The RYDA-owned fleet was removed in Aug 2026 and the market-data
+    // symbol arm of this resolver went with it. "GT3" was a live symbol
+    // then; today it must be a rejected request, not a lead captured
+    // against a car RYDA does not have and no operator can deliver.
+    expect(resolveRentalVehicle("gt3")).toBeNull();
+    expect(resolveRentalVehicle("GT3")).toBeNull();
+    expect(expectError(body({ vehicleSlug: "gt3" }))).toMatch(/vehicle/i);
+  });
+
+  it("matches an operator slug case-insensitively and canonicalizes it", () => {
+    // Exercised through the injectable list so it stays pinned even
+    // after the real inventory changes.
+    const injected: PartnerVehicle = {
+      slug: "test-car",
+      partner: "GM LUXE",
+      partnerUrl: "https://example.test/test-car",
+      make: "Test",
+      model: "Car",
+      category: "Exotic",
+      dailyRate: 100,
+      regularRate: 120,
+      market: "Miami",
+    };
+    expect(resolveRentalVehicle("TEST-CAR", [injected])).toEqual({
+      vehicleSlug: "test-car", // canonical slug, not the raw input
+      vehicleLabel: "Test Car",
+      partnerName: "GM LUXE",
     });
+    expect(resolveRentalVehicle("test-car", [])).toBeNull();
   });
 });

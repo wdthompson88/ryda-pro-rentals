@@ -290,8 +290,10 @@ export async function POST(
   // (src/lib/partner-resolution.ts): partner_id when the lead carries
   // one, the snapshotted name only for legacy rows. A renamed operator
   // still resolves — that is the whole point of 0045. Direct charges
-  // need an account to land on, so a lead with neither (RYDA fleet, by
-  // design) stops here.
+  // need an account to land on, so a lead with neither stops here.
+  // Every lead captured today names an operator, so that is now a
+  // legacy row from before the RYDA-owned rail was removed, or one
+  // whose operator was never added to the roster.
   const resolved = await resolveInquiryOperator<OperatorRow>(
     inquiry,
     partnerFetchers<OperatorRow>(db, PARTNER_COLS),
@@ -301,7 +303,7 @@ export async function POST(
       return NextResponse.json(
         {
           error:
-            "This inquiry has no operator attribution (RYDA fleet) — the direct-charge payment rail applies to partner vehicles only.",
+            "This inquiry has no operator attribution, so there is no connected account for the charge to land on. Add the operator to the roster and re-capture the lead.",
         },
         { status: 409 },
       );

@@ -10,10 +10,9 @@ import {
 // /rent — the canonical browse page (founder decision, Aug 2026):
 // "/" is a full landing page that tells the story; the car-browsing
 // grid lives HERE and users click through to it. This page mounts the
-// same merged partner + RYDA rentalAvailable inventory the homepage
-// briefly hosted during the inventory-first experiment (the component
-// owns the data merge; we just mount it). /rent/[slug] detail pages
-// are unaffected.
+// operator inventory the homepage briefly hosted during the
+// inventory-first experiment (the component owns the data; we just
+// mount it). /rent/[slug] detail pages are unaffected.
 //
 // Lead-gen model in one breath: browse → request with dates → a vetted
 // Miami operator confirms and closes the rental on their own contract
@@ -65,9 +64,9 @@ export default function RentPage() {
         </div>
       </section>
 
-      {/* Full marketplace grid — merged partner + rental-available RYDA
-          inventory. RentalListings owns the search/filter bar, the
-          vehicle-count strip, and the card grid.
+      {/* Full marketplace grid — every operator listing. RentalListings
+          owns the search/filter bar, the vehicle-count strip, and the
+          card grid.
 
           useSearchParams suspends during prerender, so the unfiltered
           grid is the Suspense fallback: the static HTML ships the full

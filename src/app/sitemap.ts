@@ -1,5 +1,4 @@
 import type { MetadataRoute } from "next";
-import { VEHICLES } from "@/lib/market-data";
 import { PARTNER_VEHICLES } from "@/lib/partner-fleet";
 import { POSTS as JOURNAL_POSTS } from "@/lib/journal-content";
 import { HELP as HELP_CATEGORIES } from "@/lib/help-content";
@@ -8,8 +7,8 @@ import { LEARN_ARTICLES } from "@/lib/learn-content";
 // Sitemap of every crawlable, public RYDA route. Generated at build
 // time. Three categories:
 //   1. Static landing pages (hand-maintained list below).
-//   2. Per-vehicle rental detail routes, RYDA fleet (/lib/market-data)
-//      and partner fleet (/lib/partner-fleet).
+//   2. Per-vehicle rental detail routes, partner fleet
+//      (/lib/partner-fleet) — the only fleet there is.
 //   3. Per-help-article, per-journal-post and per-learn-article routes.
 //
 // Routes that are gated, member-only, or stub previews (e.g. /account/*,
@@ -81,26 +80,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: path === "" ? 1.0 : path === "/rent" ? 0.9 : 0.7,
   }));
 
-  // RYDA-fleet rental detail pages. Only cars that are actually
-  // rentable get a URL — /rent/[symbol]'s generateStaticParams filters
-  // VEHICLES on the same flag, so anything else would 404 a crawler.
-  const vehicleEntries: MetadataRoute.Sitemap = VEHICLES.flatMap((v) =>
-    v.rentalAvailable
-      ? [
-          {
-            url: `${siteUrl}/rent/${v.symbol.toLowerCase()}`,
-            lastModified,
-            changeFrequency: "weekly" as const,
-            priority: 0.7,
-          },
-        ]
-      : [],
-  );
-
   // Partner-fleet rental detail pages. These are the marketplace's
-  // primary SEO surface post-pivot: one indexable page per partner car
-  // at /rent/[slug]. Priority sits above the secondary marketing pages
-  // and above the RYDA-fleet rental pages emitted above.
+  // primary SEO surface: one indexable page per operator car at
+  // /rent/[slug], and they are exactly what /rent/[symbol]'s
+  // generateStaticParams prerenders, so no URL here can 404 a crawler.
+  // Priority sits above the secondary marketing pages.
   const partnerEntries: MetadataRoute.Sitemap = PARTNER_VEHICLES.map(
     (p) => ({
       url: `${siteUrl}/rent/${p.slug}`,
@@ -150,7 +134,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     ...staticEntries,
-    ...vehicleEntries,
     ...partnerEntries,
     ...journalEntries,
     ...helpEntries,

@@ -15,15 +15,24 @@ export const metadata = {
 //     collects and promises (no card, 30-day cap, account-alongside).
 //   src/app/api/rental-inquiry/route.ts     — where the lead goes, what
 //     the customer confirmation email says.
+//   src/lib/partner-contacts.ts             — who the routing email
+//     ACTUALLY reaches. partnerInquiryEmail() looks the operator up in
+//     PARTNER_INQUIRY_EMAILS and falls back to the team inbox; that map
+//     is currently empty, so today every lead lands at RYDA and a person
+//     forwards it. When a real operator address is added there, the
+//     first two answers below need revisiting.
 //   src/app/api/admin/inquiries/[id]/payment-link/route.ts — the pay
 //     link: created on the OPERATOR's connected account, RYDA's
 //     commission as an application fee, live for 24 hours.
 //
-// Two phrasings are banned outright. "RYDA never touches your payment"
+// Three phrasings are banned outright. "RYDA never touches your payment"
 // is false — the Checkout link is created and emailed by RYDA. "No
 // payment through RYDA" is the same lie in a nicer coat, and it reads
 // as bait-and-switch the moment that email lands. State the mechanism;
-// the honest promise is "no card at request".
+// the honest promise is "no card at request". And "your request goes
+// straight to the operator" is false while the map above is empty: a
+// customer told "instantly" who then waits on a manual forward trusts
+// us less than one who was told there is a person in the middle.
 //
 // Operators are not named here (D6). "A vetted Miami operator" until
 // they introduce themselves on reply.
@@ -34,7 +43,7 @@ const SECTIONS: FaqSection[] = [
     questions: [
       {
         q: "What happens when I send a request?",
-        a: "It goes straight to the vetted Miami operator who runs that car, and a copy lands in your inbox at the same time. The operator comes back to you directly to confirm whether your dates are open and what the final price is. No card is taken at that point and nothing is charged.",
+        a: "It comes to RYDA first, and a copy of it lands in your inbox straight away. From there a person here passes it to the vetted Miami operator who runs that car — that hand-off is done by hand rather than automatically, so it isn't instant. The operator then comes back to you directly to confirm whether your dates are open and what the final price is. No card is taken at any point in that, and nothing is charged.",
       },
       {
         q: "Is a request a booking?",
@@ -42,7 +51,7 @@ const SECTIONS: FaqSection[] = [
       },
       {
         q: "How quickly will an operator get back to me?",
-        a: "Your request reaches the operator the moment you send it, and RYDA emails you a copy at the same time. Response times are the operator's own, so we don't promise one on their behalf. If your dates are tight and it has gone quiet, reply to that confirmation email — the reply comes back to RYDA, and we'll chase it.",
+        a: "Your request reaches RYDA the moment you send it, and we email you a copy at the same time. Getting it in front of the operator is a manual step at our end, and the reply after that runs on the operator's own clock — so we don't put a number on either, and we won't promise you one on their behalf. If your dates are tight and it has gone quiet, reply to that confirmation email: the reply comes back to RYDA, and we'll chase it.",
       },
       {
         q: "Can I ask for delivery?",
@@ -113,7 +122,7 @@ const SECTIONS: FaqSection[] = [
       },
       {
         q: "What does the account actually do?",
-        a: "Two things. It saves your details so the next request fills itself in, and it keeps every request you've sent in one place at /account/requests, with where each one stands — sent, with the operator, booked. Requests you send before confirming your email still reach the operator; they appear in your dashboard once you've confirmed it.",
+        a: "Two things. It saves your details so the next request fills itself in, and it keeps every request you've sent in one place at /account/requests, with where each one stands — sent, with the operator, booked. Requests you send before confirming your email are still received and still passed to the operator; they appear in your dashboard once you've confirmed it.",
       },
       {
         q: "What do you do with my details?",

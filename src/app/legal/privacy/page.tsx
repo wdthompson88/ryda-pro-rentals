@@ -35,7 +35,7 @@ export default function PrivacyPage() {
         },
         {
           heading: "7. Security",
-          body: "We use industry-standard administrative, technical, and physical safeguards. No system is perfectly secure, but we treat your data with the same care we treat the cars in our fleet.",
+          body: "We use industry-standard administrative, technical, and physical safeguards. No system is perfectly secure, but your information is accessed only by the people who need it to route your request, and shared only as described in this policy.",
         },
         {
           heading: "8. Children's privacy",

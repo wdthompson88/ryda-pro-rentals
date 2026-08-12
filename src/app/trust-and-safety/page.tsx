@@ -353,7 +353,12 @@ export default function TrustAndSafetyPage() {
         </div>
       </section>
 
-      {/* CTA */}
+      {/* CTA. Do not point this at /help — that tree is still the
+          co-ownership help center (src/lib/help-content.ts: shares,
+          membership, the portfolio), and it contradicts every claim on
+          this page. The copy below splits questions into "for the
+          operator" and "for us", so the primary is the channel that
+          reaches us and the secondary is the rental FAQ. */}
       <section className="bg-ink py-20 text-cream">
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
           <h2 className="font-display text-3xl sm:text-4xl">
@@ -366,16 +371,16 @@ export default function TrustAndSafetyPage() {
           </p>
           <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Link
-              href="/help"
+              href="/contact#form"
               className="inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-red hover:text-cream"
             >
-              Help center →
+              Ask us a question →
             </Link>
             <Link
-              href="/contact"
+              href="/faq"
               className="inline-flex h-12 items-center justify-center rounded-full border border-cream/30 px-7 text-sm font-medium text-cream hover:border-cream hover:bg-cream/5"
             >
-              Contact us
+              Read the FAQ
             </Link>
           </div>
         </div>

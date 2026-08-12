@@ -3,24 +3,20 @@
 // predicate the route uses without mocking Supabase or Resend — same
 // pattern as content-length.ts + the csp-report route.
 //
-// No imports with side effects here: partner-fleet and market-data are
-// plain data modules, so this file stays testable in plain node.
+// No imports with side effects here: partner-fleet is a plain data
+// module, so this file stays testable in plain node.
 
 import { PARTNER_VEHICLES, type PartnerVehicle } from "./partner-fleet";
-import { VEHICLES, type Vehicle } from "./market-data";
-
-export type RentalInquiryFleet = "ryda" | "partner";
 
 export type RentalInquiry = {
   name: string;
   email: string;
   phone: string | null;
-  vehicleSlug: string;        // canonical id: partner slug or RYDA symbol
+  vehicleSlug: string;        // canonical id: the partner listing's slug
   vehicleLabel: string;       // display name for emails + admin triage
-  fleet: RentalInquiryFleet;
   // Ops attribution ONLY. Customers never see the operator's name —
   // listings and emails say "a vetted Miami operator".
-  partnerName: string | null;
+  partnerName: string;
   startDate: string;          // YYYY-MM-DD
   endDate: string;            // YYYY-MM-DD
   message: string | null;
@@ -49,42 +45,29 @@ function parseIsoDate(s: string): number | null {
 }
 
 /**
- * Resolve a vehicle reference from either fleet:
- *   1. partner fleet by slug (partner-fleet.ts `.slug`)
- *   2. RYDA fleet by symbol (market-data.ts `.symbol`), rentals only
+ * Resolve a vehicle reference to the partner listing it names, by slug
+ * (partner-fleet.ts `.slug`). There is one rail: RYDA owns no vehicle,
+ * so a lead that matches no operator listing is not a lead at all.
+ *
  * Case-insensitive because the slug travels through URLs and client
- * state. Lists are injectable for tests; production callers use the
- * defaults.
+ * state. The list is injectable for tests; production callers use the
+ * default.
  */
 export function resolveRentalVehicle(
   slug: string,
   partnerList: PartnerVehicle[] = PARTNER_VEHICLES,
-  rydaList: Vehicle[] = VEHICLES,
-): Pick<RentalInquiry, "vehicleSlug" | "vehicleLabel" | "fleet" | "partnerName"> | null {
+): Pick<RentalInquiry, "vehicleSlug" | "vehicleLabel" | "partnerName"> | null {
   const needle = slug.trim().toLowerCase();
   if (!needle) return null;
 
   const partner = partnerList.find((v) => v.slug.toLowerCase() === needle);
-  if (partner) {
-    return {
-      fleet: "partner",
-      vehicleSlug: partner.slug,
-      vehicleLabel: `${partner.make} ${partner.model}`,
-      partnerName: partner.partner,
-    };
-  }
+  if (!partner) return null;
 
-  const ryda = rydaList.find((v) => v.symbol.toLowerCase() === needle);
-  if (ryda && ryda.rentalAvailable) {
-    return {
-      fleet: "ryda",
-      vehicleSlug: ryda.symbol,
-      vehicleLabel: ryda.name,
-      partnerName: null,
-    };
-  }
-
-  return null;
+  return {
+    vehicleSlug: partner.slug,
+    vehicleLabel: `${partner.make} ${partner.model}`,
+    partnerName: partner.partner,
+  };
 }
 
 /**

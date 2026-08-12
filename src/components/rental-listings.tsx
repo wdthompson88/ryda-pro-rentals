@@ -1,19 +1,18 @@
 "use client";
 
-// Unified rental listings, RYDA co-ownership fleet + extended Miami
-// inventory in ONE filterable card grid. Each card links to a detail
-// page at /rent/[slug] regardless of which fleet it came from. The
-// route handler resolves slug → Vehicle (RYDA) or PartnerVehicle.
+// The rental listings grid: every car a partner operator lists with
+// RYDA, in ONE filterable card grid. Each card links to a detail page at
+// /rent/[slug], which resolves the slug back to a PartnerVehicle.
+//
+// There is exactly one rail. RYDA owns no vehicle and rents none of its
+// own — the RYDA-owned fleet (and with it `kind`, `isCoOwnable`, and the
+// co-ownable-first sort tier) was removed in Aug 2026.
 
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
-import {
-  VEHICLES,
-  formatUSD,
-  type Vehicle,
-} from "@/lib/market-data";
+import { formatUSD } from "@/lib/market-data";
 import {
   PARTNER_VEHICLES,
   brandTint,
@@ -30,46 +29,20 @@ import {
 // rental inventory finishes moving into the database (build loop 0A →
 // 2C) this type and its adapters should move to src/lib/.
 export type RentalListing = {
-  slug: string;             // route param: vehicle.symbol.toLowerCase() OR partner.slug
-  kind: "ryda" | "partner";
+  slug: string;             // route param: partner.slug
   make: string;
   model: string;
   year?: number;
   category: string;
   dailyRate: number;
-  regularRate?: number;     // discounted-vs-sticker price (partner cars only)
+  regularRate?: number;     // discounted-vs-sticker price
   market: string;
   hero?: string;
-  flipImage?: boolean;
-  imagePosition?: string;
-  trackEligible?: boolean;
-  isCoOwnable: boolean;     // RYDA fleet → can also claim a share
-  sharesAvailable?: number; // RYDA fleet only
 };
-
-function vehicleToListing(v: Vehicle): RentalListing {
-  return {
-    slug: v.symbol.toLowerCase(),
-    kind: "ryda",
-    make: v.brand,
-    model: v.name.replace(`${v.brand} `, "").trim() || v.name,
-    year: v.year,
-    category: v.category,
-    dailyRate: v.rentalDailyRate,
-    market: v.market,
-    hero: v.hero,
-    flipImage: v.flipImage,
-    imagePosition: v.imagePosition,
-    trackEligible: v.trackEligible,
-    isCoOwnable: true,
-    sharesAvailable: v.sharesAvailable,
-  };
-}
 
 function partnerToListing(p: PartnerVehicle): RentalListing {
   return {
     slug: p.slug,
-    kind: "partner",
     make: p.make,
     model: p.model,
     year: p.year,
@@ -78,14 +51,10 @@ function partnerToListing(p: PartnerVehicle): RentalListing {
     regularRate: p.regularRate,
     market: p.market,
     hero: getPartnerHero(p),
-    isCoOwnable: false,
   };
 }
 
-const ALL_LISTINGS: RentalListing[] = [
-  ...VEHICLES.filter((v) => v.rentalAvailable).map(vehicleToListing),
-  ...PARTNER_VEHICLES.map(partnerToListing),
-];
+const ALL_LISTINGS: RentalListing[] = PARTNER_VEHICLES.map(partnerToListing);
 
 // ─────────────────────────────────────────────────────────────────────────
 // Filters & sort
@@ -100,13 +69,15 @@ type SortOption =
 
 const ANY = "__any__";
 
+// Exactly the PartnerCategory union, nothing more. "Coupe", "GT" and
+// "Hypercar" used to live here because the RYDA-owned fleet was typed
+// on its own category union; with that fleet gone they matched zero
+// inventory, so picking one dropped the visitor on the empty state.
+// A filter that can only ever return nothing is worse than no filter.
 const CATEGORY_OPTIONS: { value: string; label: string }[] = [
   { value: ANY, label: "All types" },
-  { value: "Coupe", label: "Coupe" },
-  { value: "Convertible", label: "Convertible" },
-  { value: "GT", label: "GT" },
-  { value: "Hypercar", label: "Hypercar" },
   { value: "Exotic", label: "Exotic" },
+  { value: "Convertible", label: "Convertible" },
   { value: "SUV", label: "SUV" },
   { value: "Sedan", label: "Sedan" },
   { value: "7-Seater", label: "7-Seater" },
@@ -183,7 +154,6 @@ export function RentalListings({
   const [category, setCategory] = useState<string>(ANY);
   const [priceBucket, setPriceBucket] = useState<string>(ANY);
   const [yearBucket, setYearBucket] = useState<string>(ANY);
-  const [trackOnly, setTrackOnly] = useState(false);
   const [sort, setSort] = useState<SortOption>("featured");
 
   const makes = useMemo(
@@ -223,10 +193,9 @@ export function RentalListings({
         const bucket = YEAR_BUCKETS.find((b) => b.value === yearBucket);
         if (bucket?.test && !bucket.test(v.year)) return false;
       }
-      if (trackOnly && !v.trackEligible) return false;
       return true;
     });
-  }, [query, location, make, category, priceBucket, yearBucket, trackOnly]);
+  }, [query, location, make, category, priceBucket, yearBucket]);
 
   const visible = useMemo(() => {
     const out = [...filtered];
@@ -249,13 +218,9 @@ export function RentalListings({
         break;
       case "featured":
       default:
-        // RYDA fleet first (co-own option), then by price descending
-        out.sort((a, b) => {
-          const aTier = a.isCoOwnable ? 0 : 1;
-          const bTier = b.isCoOwnable ? 0 : 1;
-          if (aTier !== bTier) return aTier - bTier;
-          return b.dailyRate - a.dailyRate;
-        });
+        // One rail, so there is no tier to lead with: the headline cars
+        // are simply the most expensive ones.
+        out.sort((a, b) => b.dailyRate - a.dailyRate);
     }
     return out;
   }, [filtered, sort]);
@@ -273,8 +238,7 @@ export function RentalListings({
     make !== ANY ||
     category !== ANY ||
     priceBucket !== ANY ||
-    yearBucket !== ANY ||
-    trackOnly;
+    yearBucket !== ANY;
 
   function clearAll() {
     setQuery("");
@@ -283,7 +247,6 @@ export function RentalListings({
     setCategory(ANY);
     setPriceBucket(ANY);
     setYearBucket(ANY);
-    setTrackOnly(false);
     setSort("featured");
   }
 
@@ -303,8 +266,6 @@ export function RentalListings({
     const lbl = YEAR_BUCKETS.find((b) => b.value === yearBucket)?.label;
     if (lbl) chips.push({ label: lbl, onClear: () => setYearBucket(ANY) });
   }
-  if (trackOnly)
-    chips.push({ label: "Track-ready", onClear: () => setTrackOnly(false) });
 
   return (
     <section>
@@ -401,13 +362,6 @@ export function RentalListings({
               }))}
             />
 
-            {/* Boolean chip toggle — filled red reads as pressed. */}
-            <FilterToggle
-              label="Track-ready"
-              active={trackOnly}
-              onClick={() => setTrackOnly((v) => !v)}
-            />
-
             <div className="ml-auto flex flex-none items-center gap-2">
               {anyFilterActive ? (
                 <button
@@ -496,7 +450,7 @@ export function RentalListings({
         ) : (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {visible.map((v) => (
-              <RentalCard key={`${v.kind}-${v.slug}`} listing={v} />
+              <RentalCard key={v.slug} listing={v} />
             ))}
           </div>
         )}
@@ -616,32 +570,6 @@ function FilterSelect({
   );
 }
 
-function FilterToggle({
-  label,
-  active,
-  onClick,
-}: {
-  label: string;
-  active: boolean;
-  onClick: () => void;
-}) {
-  // Compact chip button — filled red when pressed, hairline pill when not.
-  return (
-    <button
-      type="button"
-      aria-pressed={active}
-      onClick={onClick}
-      className={`h-9 flex-none rounded-full border px-3.5 text-sm font-medium transition-colors ${
-        active
-          ? "border-red bg-red text-cream hover:bg-red-deep"
-          : "border-rule bg-surface text-ink-soft hover:border-ink hover:text-ink"
-      }`}
-    >
-      {label}
-    </button>
-  );
-}
-
 function RentalCard({ listing: v }: { listing: RentalListing }) {
   const savings = v.regularRate ? v.regularRate - v.dailyRate : 0;
   const savingsPct = v.regularRate
@@ -657,11 +585,11 @@ function RentalCard({ listing: v }: { listing: RentalListing }) {
       href={`/rent/${v.slug}`}
       className="group flex flex-col overflow-hidden rounded-2xl border border-rule bg-surface transition-all hover:-translate-y-0.5 hover:border-ink/40 hover:shadow-lg"
     >
-      {/* Photo — brand chip top-left, track/save badge top-right (never
-          stacked), price chip bottom-right. */}
+      {/* Photo — brand chip top-left, savings badge top-right, price chip
+          bottom-right. */}
       <div
         className="relative aspect-[16/10] w-full overflow-hidden"
-        style={{ backgroundColor: v.kind === "partner" ? tint : undefined }}
+        style={{ backgroundColor: tint }}
       >
         {v.hero ? (
           <Image
@@ -669,11 +597,10 @@ function RentalCard({ listing: v }: { listing: RentalListing }) {
             alt={`${v.make} ${v.model}`}
             fill
             sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-            className={`object-cover transition-transform duration-500 group-hover:scale-[1.02] ${
-              v.flipImage ? "-scale-x-100" : ""
-            }`}
-            style={{ objectPosition: v.imagePosition ?? "center" }}
-            unoptimized={v.kind === "partner"}
+            className="object-cover object-center transition-transform duration-500 group-hover:scale-[1.02]"
+            // Operator photos are hosted off-domain (partner CDN), so
+            // they bypass the Next image optimizer.
+            unoptimized
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center">
@@ -699,12 +626,8 @@ function RentalCard({ listing: v }: { listing: RentalListing }) {
           {v.make}
         </span>
 
-        {/* Track-ready or savings badge top-right */}
-        {v.trackEligible ? (
-          <span className="absolute right-3 top-3 rounded-full bg-red/95 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] text-cream backdrop-blur">
-            Track-ready
-          </span>
-        ) : savingsPct >= 10 ? (
+        {/* Savings badge top-right */}
+        {savingsPct >= 10 ? (
           <span className="absolute right-3 top-3 rounded-full bg-red/95 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] text-cream backdrop-blur">
             Save {savingsPct}%
           </span>

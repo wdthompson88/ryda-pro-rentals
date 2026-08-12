@@ -3,11 +3,11 @@
 // single flat list so the /search page can rank+filter cheaply
 // without a backend.
 //
-// All sources pull from existing typed data: adding a rentable vehicle
-// to VEHICLES, or a new published journal post, surfaces in search
+// All sources pull from existing typed data: adding a car to
+// PARTNER_VEHICLES, or a new published journal post, surfaces in search
 // automatically.
 
-import { VEHICLES } from "@/lib/market-data";
+import { PARTNER_VEHICLES } from "@/lib/partner-fleet";
 import { POSTS as JOURNAL } from "@/lib/journal-content";
 
 export type SearchEntry = {
@@ -91,39 +91,25 @@ const STATIC_PAGES: SearchEntry[] = [
 // Vehicle entries (rental detail pages only)
 // ─────────────────────────────────────────────────────────────────────────
 
-const VEHICLE_ENTRIES: SearchEntry[] = VEHICLES.flatMap((v) => {
-  const baseHaystack = [
-    v.name,
-    v.brand,
-    v.symbol,
-    v.ticker,
-    v.year,
-    v.market,
-    v.category,
-    v.specs.engine,
-    v.specs.power,
-    v.specs.color,
-    v.description,
-  ]
+// One entry per operator listing — the only rental inventory there is.
+// This index is shipped to the browser, so the operator's name is
+// deliberately NOT in the title, subtitle, or haystack: operators are
+// never named on a customer-facing surface.
+const VEHICLE_ENTRIES: SearchEntry[] = PARTNER_VEHICLES.map((v) => {
+  const name = `${v.make} ${v.model}`;
+  const haystack = [v.make, v.model, v.year, v.market, v.category]
     .filter(Boolean)
     .join(" ")
     .toLowerCase();
 
-  // Only rentable cars get an entry. A non-rentable VEHICLES row has
-  // no public page to link to post-pivot, so indexing it would put a
-  // dead result in the search box.
-  return v.rentalAvailable
-    ? [
-        {
-          href: `/rent/${v.symbol.toLowerCase()}`,
-          title: `${v.name}, rental`,
-          subtitle: `Cars · ${v.year} · From $${v.rentalDailyRate.toLocaleString()}/day`,
-          vertical: "cars" as const,
-          type: "vehicle" as const,
-          haystack: `${baseHaystack} rent rental daily`,
-        },
-      ]
-    : [];
+  return {
+    href: `/rent/${v.slug}`,
+    title: `${name}, rental`,
+    subtitle: `Cars · ${v.year ? `${v.year} · ` : ""}From $${v.dailyRate.toLocaleString()}/day`,
+    vertical: "cars" as const,
+    type: "vehicle" as const,
+    haystack: `${haystack} rent rental daily`,
+  };
 });
 
 // ─────────────────────────────────────────────────────────────────────────

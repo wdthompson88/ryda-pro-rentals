@@ -4,7 +4,7 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { HeroSearch } from "@/components/hero-search";
 import { Reveal, RevealStagger } from "@/components/reveal";
-import { VEHICLES, formatUSD } from "@/lib/market-data";
+import { formatUSD } from "@/lib/market-data";
 import {
   PARTNER_VEHICLES,
   getPartnerHero,
@@ -67,10 +67,10 @@ const FEATURED: PartnerVehicle[] = [...PARTNER_VEHICLES]
 const HERO_CAR = FEATURED[0];
 const HERO_PHOTO = HERO_CAR ? getPartnerHero(HERO_CAR) : undefined;
 
-// Total browsable inventory: partner fleet + RYDA cars flagged
-// rentalAvailable — the same merge /rent renders.
-const FLEET_COUNT =
-  PARTNER_VEHICLES.length + VEHICLES.filter((v) => v.rentalAvailable).length;
+// Total browsable inventory. RYDA owns no cars, so this is exactly the
+// partner fleet — the same list /rent renders. Advertising any other
+// number here is advertising cars a visitor cannot find.
+const FLEET_COUNT = PARTNER_VEHICLES.length;
 
 export default function HomePage() {
   return (

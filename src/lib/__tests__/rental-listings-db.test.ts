@@ -169,10 +169,17 @@ describe("rowToRentalListing", () => {
     expect(listing.regularRate).toBeUndefined();
   });
 
-  it("marks every DB listing as operator-owned and not co-ownable (D7)", () => {
-    const listing = rowToRentalListing(row(), [], SUPABASE_URL);
-    expect(listing.kind).toBe("partner");
-    expect(listing.isCoOwnable).toBe(false);
+  it("carries no RYDA-fleet fields — there is one rail (D7)", () => {
+    // The RYDA-owned rail was removed in Aug 2026: RentalListing has no
+    // `kind` discriminator and no co-ownership fields for a row to set,
+    // and re-adding either would mean re-adding a fleet RYDA does not
+    // own.
+    const listing = rowToRentalListing(row(), [], SUPABASE_URL) as Record<
+      string,
+      unknown
+    >;
+    expect(listing.kind).toBeUndefined();
+    expect(listing.isCoOwnable).toBeUndefined();
     expect(listing.sharesAvailable).toBeUndefined();
   });
 
