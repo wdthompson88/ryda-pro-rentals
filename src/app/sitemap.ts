@@ -24,10 +24,13 @@ const PUBLIC_ROUTES = [
   // Rental-first surfaces.
   "/partners",
   "/how-it-works",
-  // Operations explainers. Retained post-pivot pending a rental-first
-  // content audit — indexable, but no longer linked from the footer.
-  "/insurance",
-  "/storage",
+  // Content surfaces. Indexable, but not linked from the footer.
+  //
+  // /insurance and /storage used to sit here. Both were deleted: they
+  // advertised a RYDA fleet policy and RYDA-operated climate-controlled
+  // storage, and RYDA provides neither. Every car on the platform is
+  // owned, insured, stored and serviced by an independent operator, and
+  // Terms §2 now says so in writing. Do not re-add either route.
   "/events",
   "/learn",
   "/journal",
@@ -41,7 +44,9 @@ const PUBLIC_ROUTES = [
   "/investors",
   "/careers",
   "/contact",
-  // Locations.
+  // Locations. The /locations index is a real page with its own
+  // canonical tag, so it belongs here alongside the per-market pages.
+  "/locations",
   "/locations/miami",
   "/locations/los-angeles",
   "/locations/new-york",

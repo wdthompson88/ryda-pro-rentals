@@ -123,11 +123,19 @@ export default function HelpCenterPage() {
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+            {/* This tile used to advertise "24/7 support for active
+                members" behind a phone number. RYDA runs no support
+                line — the number was never answered, and /help/
+                insurance/roadside and /trust-and-safety both now say
+                in writing that there is no RYDA roadside number and no
+                24/7 line. An index tile promising the thing its own
+                article denies is the contradiction, so the tile points
+                at the article instead of at a phone. */}
             <Strip
-              title="Support & roadside"
-              detail="24/7 support for active members. One number, real humans, no IVR."
-              cta="Call (305) 555-0100"
-              href="tel:+13055550100"
+              title="If you're mid-rental"
+              detail="RYDA runs no 24/7 line and dispatches no roadside assistance. The operator who confirmed your booking owns the car and is the fastest route to a tow, a fix, or a swap."
+              cta="What to do if the car stops →"
+              href="/help/insurance/roadside"
             />
             <Strip
               title="Send us a message"
@@ -152,8 +160,9 @@ export default function HelpCenterPage() {
             Didn't find what you needed?
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
-            We'll write you back within one business day. If it's urgent and
-            you're an active member, call the support line.
+            We'll write you back within one business day. If you're
+            mid-rental, the operator who confirmed your booking will
+            always be faster than we can be.
           </p>
           <Link
             href="/contact"

@@ -1,32 +1,34 @@
-import { ComingSoonLocation } from "@/components/coming-soon-location";
+import { PlannedMarket } from "../_components/planned-market";
+
+// Los Angeles: a city RYDA wants, not a city RYDA covers.
+//
+// The previous version promised a Q1 2027 launch, an inaugural
+// six-car fleet ("Ferrari 296 GTB, 2024", "Rolls-Royce Spectre, 2024"
+// …) that RYDA would supply, "storage and registration both work
+// cleanly in California", and a priority list locking early-member
+// pricing for life. RYDA supplies no cars, stores none, and has no
+// members or pricing tiers; the launch quarter had no referent in the
+// codebase and disagreed with the one market-data.ts printed. All of
+// it is deleted. What is left says the only checkable thing: nothing
+// is listed here yet.
 
 export const metadata = {
   title: "Los Angeles",
   description:
-    "RYDA Los Angeles. Q1 2027 launch. Join the LA priority list to lock in early-member pricing.",
+    "RYDA does not list any cars in Los Angeles yet. Every listing on the platform today is a Miami car, run by an independent local operator.",
+  alternates: { canonical: "/locations/los-angeles" },
 };
 
 export default function LosAngelesPage() {
   return (
-    <ComingSoonLocation
+    <PlannedMarket
       city="Los Angeles"
       state="CA"
-      launchQuarter="Q1 2027"
-      intro="LA is the second RYDA market because the fleet is already there, every Ferrari dealership in the country has higher LA delivery rates than anywhere except Miami. The PCH, Mulholland, and Angeles Crest practically require a supercar. Storage and registration both work cleanly in California."
-      whyHere={[
-        "Second-largest US luxury auto market by volume after Miami.",
-        "Driver-friendly geography, PCH, Mulholland, Angeles Crest. The roads themselves are the destination.",
-        "Year-round driving weather (the canyon roads stay dry 9 months a year).",
-        "Concentration of entertainment, tech, and finance executives, the demographic RYDA already attracts.",
-        "Existing community of car culture and clubs that RYDA can plug into rather than recreate.",
-      ]}
-      vehiclePreview={[
-        "Ferrari 296 GTB, 2024",
-        "McLaren 750S Spider, 2024",
-        "Lamborghini Huracán STO, 2023",
-        "Porsche 911 GT3 RS, 2024",
-        "Aston Martin Vantage, 2024",
-        "Rolls-Royce Spectre, 2024 (electric)",
+      slug="los-angeles"
+      whyParagraphs={[
+        "Los Angeles makes its own case for a car worth renting. The PCH, Mulholland, Angeles Crest — the roads are the reason people book, not the errand at the end of them. Weather rarely gets a vote.",
+        "It also already has what RYDA needs to be useful: a deep bench of independent operators renting out exotic inventory, spread across their own websites and social accounts, with no single place to compare them. That is the same problem we started with in Miami.",
+        "None of which is a plan with a date on it. Los Angeles becomes a market on this site the day operators here are listed on it, and not before.",
       ]}
     />
   );

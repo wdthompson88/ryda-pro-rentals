@@ -196,26 +196,32 @@ export default async function RentDetailPage({
         </div>
       </section>
 
-      {/* Trust strip, hosted by, response time, badges */}
+      {/* Trust strip: who hosts the car, then the badges. */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-10 sm:px-10">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
-            {/* Hosted by RYDA */}
+            {/* Hosted by — the operator, never RYDA. RYDA owns, stores,
+                insures and operates no vehicle on this platform (Terms
+                §2), so the RYDA monogram that used to sit here was false
+                on every listing. The attribution stays, because "whose
+                car is this?" is the question this slot answers, but the
+                honest answer is an operator we don't name: listings are
+                unbranded and the operator introduces themselves when
+                they confirm. No response-time claim either — nothing in
+                this codebase measures one. */}
             <div className="lg:col-span-4">
               <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-mute">
                 Hosted by
               </p>
-              <div className="mt-3 flex items-center gap-3">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-ink text-cream font-display text-lg">
-                  R
-                </div>
-                <div>
-                  <p className="font-display text-base text-ink">RYDA</p>
-                  <p className="text-[11px] text-ink-soft">
-                    Typically responds within 30 min · business hours
-                  </p>
-                </div>
-              </div>
+              <p className="mt-3 font-display text-xl text-ink">
+                A vetted Miami operator
+              </p>
+              <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+                The car is owned and run by an independent Miami operator we
+                vet. RYDA lists it and passes your request on — listings
+                stay unbranded, and the operator introduces themselves when
+                they confirm your dates.
+              </p>
             </div>
 
             {/* Trust badges. These may only promise what the lead-gen

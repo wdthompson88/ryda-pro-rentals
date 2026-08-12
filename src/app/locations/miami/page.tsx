@@ -2,38 +2,66 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { HiddenWhenAuthed } from "@/components/auth-aware";
 import { SITE_URL } from "@/lib/site-url";
+import { formatUSD } from "@/lib/market-data";
+import { PARTNER_VEHICLES } from "@/lib/partner-fleet";
+
+// Miami market page, rewritten for the rental product (Aug 2026).
+//
+// What was here before described a different company: a Q3 2026
+// pre-launch co-ownership market with "RYDA's flagship storage and
+// handover hub", climate-controlled bays, 256 cameras, biometric
+// access for RYDA staff, manufacturer-trained in-house technicians,
+// white-glove handover, a five-item member event calendar and a
+// "become a member / claim a share" close. RYDA owns no car, runs no
+// facility, employs no technician and has no members, so every one of
+// those was deleted rather than softened — the sections with no
+// truthful rental equivalent are simply gone, not replaced with
+// invented ones.
+//
+// Miami is live now, not launching: /rent renders the operator
+// inventory in src/lib/partner-fleet.ts. The numbers in the stat band
+// are computed from that array at build time so they cannot drift away
+// from what a visitor can actually browse.
+//
+// Operators are never named on this page — "a vetted Miami operator",
+// the same rule as every other customer-facing surface.
+
+const MIAMI_VEHICLES = PARTNER_VEHICLES.filter((v) => v.market === "Miami");
+const FLEET_COUNT = MIAMI_VEHICLES.length;
+const CATEGORY_COUNT = new Set(MIAMI_VEHICLES.map((v) => v.category)).size;
+// null rather than a placeholder if the market ever empties out: a stat
+// band is not the place to print "$0/day" for cars nobody can rent.
+const LOWEST_RATE = MIAMI_VEHICLES.length
+  ? Math.min(...MIAMI_VEHICLES.map((v) => v.dailyRate))
+  : null;
 
 export const metadata = {
   title: "Miami",
   description:
-    "RYDA's first market. Q3 2026 launch. The story behind Miami, our partner facility, member events, and the member cohort.",
+    "RYDA's live market. Exotic cars in Miami, listed by the independent operators who own and run them. Send your dates and a vetted Miami operator confirms directly with you — no card at request.",
   alternates: { canonical: `${SITE_URL}/locations/miami` },
 };
 
 export default function MiamiPage() {
-  // SEO: Place + parent Organization JSON-LD describes the Miami
-  // market for Google's knowledge graph without claiming the
-  // location is operational yet.
+  // SEO: Place + parent Organization JSON-LD describes the Miami market
+  // for Google's knowledge graph.
   //
-  // Codex round-2 caught that AutomotiveBusiness with 24/7 hours
-  // on a Q3 2026 pre-launch page misrepresents an active business
-  // — Google's Local Business spec is for businesses customers can
-  // visit today. We use `Place` instead and keep the parent-Org
-  // pointer for brand attribution. Once Miami ships and we have a
-  // public-facing partner facility address to share, switch to
-  // `AutomotiveBusiness` with the real `streetAddress` and hours.
-  //
-  // Address is intentionally city-only — the partner facility's
-  // street address is shared at booking per the page copy — and
-  // schema.org allows partial PostalAddress.
+  // Still `Place` rather than `AutomotiveBusiness`, but for a different
+  // reason than it used to be. The old comment said we would switch
+  // once Miami shipped and we had "a public-facing partner facility
+  // address to share". There is no such address and there never will
+  // be: RYDA has no premises a customer can visit, and the cars are in
+  // the operators' garages, not ours. LocalBusiness markup would claim
+  // a storefront that does not exist. Address stays city-only for the
+  // same reason; schema.org allows a partial PostalAddress.
   // The "<" -> "<" escape prevents script-context breakout.
   const placeJsonLd = {
     "@context": "https://schema.org",
     "@type": "Place",
     "@id": `${SITE_URL}/locations/miami`,
-    name: "RYDA Miami (launches Q3 2026)",
+    name: "RYDA Miami",
     description:
-      "RYDA's flagship market. Member-managed LLC supercar co-ownership in Miami-Dade. Climate-controlled storage, in-house service, white-glove handover. Membership opens Q3 2026.",
+      "RYDA's live market. A listing platform for exotic-car rentals in Miami-Dade: the vehicles are owned, insured and operated by independent local operators, and RYDA passes booking requests to them.",
     url: `${SITE_URL}/locations/miami`,
     address: {
       "@type": "PostalAddress",
@@ -81,29 +109,52 @@ export default function MiamiPage() {
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-28">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            Miami · Q3 2026 launch
+            Miami · Live
           </p>
           <h1 className="mt-4 max-w-4xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
             We start where the cars{" "}
             <span className="italic">already live.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
-            Miami has the highest per-capita exotic-car ownership in the US.
-            No state income tax. F1, Art Basel, year-round driving. A
-            concentration of the wealth migrants we exist to serve.
-            That's why RYDA launches here first.
+            Miami is RYDA&apos;s first market and, today, its only one.
+            The cars are not ours: every listing belongs to an
+            independent Miami operator who bought it, garages it and
+            insures it. What RYDA does is put them in one grid, take
+            your dates, and hand the request to the operator who runs
+            that car.
           </p>
+          <div className="mt-8 flex flex-wrap items-center gap-5">
+            <Link
+              href="/rent"
+              className="inline-flex h-12 items-center justify-center rounded-full bg-red px-7 text-sm font-medium text-cream transition-colors hover:bg-red-deep"
+            >
+              Browse the Miami fleet
+            </Link>
+            <Link
+              href="/how-it-works"
+              className="text-sm font-medium text-ink underline-offset-4 hover:text-red hover:underline"
+            >
+              How it works →
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* Market stats */}
+      {/* What is actually here — every figure below is computed from the
+          same inventory /rent renders, so nothing on this page can
+          advertise a car a visitor cannot find. */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10">
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
-            <Stat number="$14.8B" label="US luxury auto market (2025)" />
-            <Stat number="#1" label="US per-capita exotic ownership" />
-            <Stat number="0%" label="Florida state income tax" />
-            <Stat number="365" label="Days/year of driving weather" />
+            <Stat number={String(FLEET_COUNT)} label="Cars listed in Miami" />
+            <Stat number={String(CATEGORY_COUNT)} label="Vehicle categories" />
+            {LOWEST_RATE !== null ? (
+              <Stat
+                number={formatUSD(LOWEST_RATE)}
+                label="Lowest daily rate listed"
+              />
+            ) : null}
+            <Stat number="0" label="Cars RYDA owns" />
           </div>
         </div>
       </section>
@@ -111,120 +162,98 @@ export default function MiamiPage() {
       {/* Why Miami */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10">
-          <h2 className="font-display text-3xl text-ink sm:text-4xl">Why Miami first</h2>
+          <h2 className="font-display text-3xl text-ink sm:text-4xl">
+            Why Miami first
+          </h2>
           <div className="mt-8 space-y-6 text-base leading-relaxed text-ink-soft">
             <p>
-              Miami is the only US city where supercar ownership is a normal
-              part of daily life, not a special-occasion thing. You see a
-              Ferrari in line at a coffee shop. Lamborghinis are not rare.
-              The density of $250K+ vehicles per zip code in Miami-Dade
-              exceeds entire metro areas of comparable wealth.
+              Miami is not short of exotic cars for rent. It is short of
+              one place to see them. The fleets here are independent
+              businesses, their inventory lives across separate websites
+              and social accounts, and comparing three of them means
+              starting the same conversation three times.
             </p>
             <p>
-              That density is the prerequisite for what RYDA is doing. We
-              need a critical mass of buyers, sellers, and active drivers
-              within a 30-mile radius of one storage facility. Miami has it.
-              Most US cities don't.
+              That is the problem RYDA exists to solve, and it is a
+              problem you only have in a city with enough operators to
+              make the search tiring. Miami is where we found the most
+              of them, so it is where we started — with local operators
+              we vetted, listing the cars they already rent out.
             </p>
             <p>
-              The city's culture also matches RYDA's tone. Quiet luxury, not
-              loud flexing. People who appreciate vehicles for their
-              engineering. Wealth that's earned, often globally, often
-              entrepreneurial. The kind of people who would rather own a
-              piece of three Ferraris than the whole one Ferrari.
+              Nothing about the arrangement makes the car ours. The
+              operator sets the price and the terms, confirms whether
+              the dates are free, and closes the rental on their own
+              agreement and insurance. RYDA is paid by them, as a
+              referral commission on the bookings we send — never as a
+              markup on what you pay.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Partner facility */}
+      {/* Renting here — the honest replacement for the old "Our Miami
+          facility" block. Four cards, four things that are true of
+          every Miami rental on this site. */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
-          <h2 className="font-display text-3xl text-ink sm:text-4xl">Our Miami facility</h2>
+          <h2 className="font-display text-3xl text-ink sm:text-4xl">
+            Renting in Miami
+          </h2>
           <p className="mt-4 max-w-2xl text-base text-ink-soft">
-            RYDA's flagship storage and handover hub is in partnership with
-            a vetted Miami-based luxury vehicle facility, climate-controlled,
-            24/7 security, supercar-rated insurance.
+            The same four things are true of every car on this page,
+            whichever operator runs it.
           </p>
           <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            <Feature title="Climate controlled" body="58–72°F year-round. Humidity managed. Hurricane-rated structure." />
-            <Feature title="24/7 monitored" body="On-site security, 256-camera coverage, biometric access for RYDA staff only." />
-            <Feature title="In-house service" body="Manufacturer-trained techs for Ferrari, Lamborghini, McLaren, Porsche, Aston." />
-            <Feature title="White-glove handover" body="Vehicle prepped, photo-documented, fueled. Delivered or pickup." />
-          </div>
-          <p className="mt-8 text-xs text-mute">
-            Full address shared with members at booking confirmation.
-          </p>
-        </div>
-      </section>
-
-      {/* Member calendar */}
-      <section className="border-b border-rule">
-        <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
-          <h2 className="font-display text-3xl text-ink sm:text-4xl">Miami events</h2>
-          <p className="mt-4 max-w-2xl text-base text-ink-soft">
-            Members get invitations to all RYDA Miami programming.
-          </p>
-          <div className="mt-12 space-y-4">
-            <Event
-              when="May 2026"
-              what="F1 Miami Grand Prix Weekend"
-              detail="Founders' track day Friday, paddock access Saturday, gala Saturday night, race day Sunday."
+            <Feature
+              title="A request, not a booking"
+              body="Sending your dates reserves nothing and takes no card. A vetted Miami operator comes back to you with real availability and the final price."
             />
-            <Event
-              when="Aug 2026"
-              what="Soft launch dinner"
-              detail="First 100 dinner with the founders. Vehicle reveal of the inaugural Miami fleet."
+            <Feature
+              title="Handover is the operator's"
+              body="Where you collect the car, whether it can be delivered to you, the deposit and the mileage allowance are the operator's terms, agreed directly between you and them."
             />
-            <Event
-              when="Q4 2026"
-              what="Cars & Cuban Coffee"
-              detail="Quarterly morning meet at our facility. Espresso, pastelitos, and the cars warmed up for sunrise drives down US-1."
+            <Feature
+              title="Their contract and insurance"
+              body="The rental closes on the operator's own rental agreement and their coverage. RYDA is not a party to it, which is also why the operator, not RYDA, is the one who confirms it."
             />
-            <Event
-              when="Dec 2026"
-              what="Art Basel preview night"
-              detail="RYDA + a Miami gallery host members for a preview before public openings."
-            />
-            <Event
-              when="Q1 2027"
-              what="Florida Keys road trip"
-              detail="3-day curated drive from Miami to Key West. Hotels, photographer, support vehicle, all coordinated."
+            <Feature
+              title="No RYDA garage"
+              body="RYDA owns no vehicle and runs no storage, service or handover facility here or anywhere else. Every car sits in the garage of the operator who owns it."
             />
           </div>
         </div>
       </section>
 
-      {/* Sign up */}
+      {/* Close */}
       <section className="border-b border-rule bg-ink py-20 text-cream">
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red-bright">
-            Members · Miami
+            Miami · Live now
           </p>
           <h2 className="mt-4 font-display text-4xl font-light sm:text-5xl">
-            Become a member.
+            {FLEET_COUNT} cars, one request away.
           </h2>
           <p className="mx-auto mt-6 max-w-xl text-base text-cream/70">
-            Miami launches Q3 2026. Create your account to browse the
-            fleet, run the numbers, and claim a share when membership
-            opens.
+            Browse the Miami grid, send your dates, and let the operator
+            take it from there. No card at request.
           </p>
-          <HiddenWhenAuthed>
-            <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <Link
+              href="/rent"
+              className="inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink transition-colors hover:bg-red hover:text-cream"
+            >
+              Browse the fleet →
+            </Link>
+            <HiddenWhenAuthed>
               <Link
                 href="/signup"
-                className="inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink transition-colors hover:bg-red hover:text-cream"
-              >
-                Sign up →
-              </Link>
-              <Link
-                href="/signin"
                 className="inline-flex h-12 items-center justify-center rounded-full border border-cream/30 px-7 text-sm font-medium text-cream transition-colors hover:border-cream hover:bg-cream hover:text-ink"
               >
-                Sign in
+                Create an account
               </Link>
-            </div>
-          </HiddenWhenAuthed>
+            </HiddenWhenAuthed>
+          </div>
         </div>
       </section>
     </>
@@ -234,7 +263,9 @@ export default function MiamiPage() {
 function Stat({ number, label }: { number: string; label: string }) {
   return (
     <div>
-      <p className="font-display text-4xl font-light text-ink sm:text-5xl">{number}</p>
+      <p className="font-display text-4xl font-light text-ink tabular-nums sm:text-5xl">
+        {number}
+      </p>
       <p className="mt-2 text-xs uppercase tracking-wider text-mute">{label}</p>
     </div>
   );
@@ -245,28 +276,6 @@ function Feature({ title, body }: { title: string; body: string }) {
     <div className="rounded-2xl border border-rule bg-surface p-6">
       <p className="font-display text-lg text-ink">{title}</p>
       <p className="mt-3 text-sm leading-relaxed text-ink-soft">{body}</p>
-    </div>
-  );
-}
-
-function Event({
-  when,
-  what,
-  detail,
-}: {
-  when: string;
-  what: string;
-  detail: string;
-}) {
-  return (
-    <div className="grid grid-cols-1 gap-2 rounded-xl border border-rule bg-surface p-6 sm:grid-cols-12 sm:gap-6 sm:p-8">
-      <div className="sm:col-span-2">
-        <p className="font-display text-sm uppercase tracking-wider text-red">{when}</p>
-      </div>
-      <div className="sm:col-span-10">
-        <p className="font-display text-xl text-ink">{what}</p>
-        <p className="mt-2 text-sm text-ink-soft">{detail}</p>
-      </div>
     </div>
   );
 }

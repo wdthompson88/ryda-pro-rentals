@@ -1,9 +1,17 @@
-// /locations — index page listing the three RYDA markets.
+// /locations — index page listing the cities RYDA covers.
 //
 // Previously a 404 (the sitemap pointed to /locations but no page
 // existed at that route, only the per-market subpages). Per the
 // business-readiness audit, links to /locations from search engines,
 // shared URLs, and the sitemap.xml were dead.
+//
+// Rental rewrite (Aug 2026): the old copy sold "fleet curation, storage
+// partner, event calendar, and member cohort" per market and set a
+// 50-vehicle floor for new cities. RYDA curates no fleet, contracts no
+// storage partner and has no members, so all of it is gone. What a
+// market means here is narrow and checkable: are there operator-listed
+// cars in that city on this site, yes or no. Miami is yes; the other
+// two are no, with no date attached to either.
 
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -13,7 +21,7 @@ import { MARKETS, type MarketKey } from "@/lib/market-data";
 export const metadata: Metadata = {
   title: "Locations",
   description:
-    "Where RYDA operates. Miami launching Q3 2026, Los Angeles + New York 2027. Each market has its own fleet curation, storage partner, and member cohort.",
+    "Where RYDA lists cars. Miami is live — every listing owned and operated by an independent local operator. Los Angeles and New York have no operators listed yet.",
   alternates: { canonical: "/locations" },
 };
 
@@ -34,16 +42,18 @@ export default function LocationsPage() {
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-24">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            Where RYDA operates
+            Where RYDA lists cars
           </p>
           <h1 className="mt-4 max-w-3xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
-            Three markets.{" "}
-            <span className="italic">One playbook.</span>
+            One market live.{" "}
+            <span className="italic">Two on the list.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
-            Each market has its own fleet curation, storage partner,
-            event calendar, and member cohort. Miami launches first;
-            LA and NY follow in 2027 once the playbook is proven.
+            RYDA lists cars that independent operators own and run, which
+            means a market only exists here once those operators do.
+            Miami has them today. Los Angeles and New York are cities
+            we want next, and nothing more than that yet — there is no
+            date we could give you and mean.
           </p>
         </div>
       </section>
@@ -75,7 +85,7 @@ export default function LocationsPage() {
                         </span>
                       ) : (
                         <span className="rounded-full border border-rule bg-cream-2 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-mute">
-                          {m.launchLabel ?? "Coming soon"}
+                          No listings yet
                         </span>
                       )}
                     </div>
@@ -100,14 +110,17 @@ export default function LocationsPage() {
             Why these three
           </p>
           <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
-            We follow the cars, not the headcount.
+            We follow the operators, not the headcount.
           </h2>
           <p className="mt-4 max-w-2xl text-base text-ink-soft">
-            The three markets where America&apos;s exotic-car fleet
-            already concentrates: Miami&apos;s F1 + Art Basel calendar,
-            LA&apos;s canyon roads + Pebble axis, NY&apos;s Hamptons-
-            and-back weekend pattern. Other cities follow once we
-            have a 50-vehicle floor in each.
+            RYDA is only useful in a city that already has independent
+            exotic fleets renting cars out — we are the front door to
+            them, not a fleet of our own. Miami went first because that
+            is where the operators we vetted are. Los Angeles and New
+            York are next on the list for the same reason and no other:
+            they are where we expect to find the next ones. A market
+            goes live here when operators in it are listed, not on a
+            quarter we picked in advance.
           </p>
         </div>
       </section>

@@ -40,7 +40,10 @@ const STATIC_PAGES: SearchEntry[] = [
   {
     href: "/rent",
     title: "Rent",
-    subtitle: "Cars · By the day · Miami fleet + partners",
+    // "Miami fleet + partners" implied RYDA ran a fleet of its own
+    // alongside the operators'. It doesn't — the RYDA-owned fleet was
+    // removed and every listing is an independent operator's car.
+    subtitle: "Cars · By the day · Miami operator fleet",
     vertical: "cars",
     type: "page",
     haystack: "rent rental daily hire exotic supercar luxury miami partners fleet",

@@ -1,32 +1,34 @@
-import { ComingSoonLocation } from "@/components/coming-soon-location";
+import { PlannedMarket } from "../_components/planned-market";
+
+// New York: a city RYDA wants, not a city RYDA covers.
+//
+// The previous version had RYDA keeping cars "in vetted upstate
+// facilities, two hours from the city, with white-glove delivery to
+// your weekend home in the Hamptons", promised a Q3 2027 launch, an
+// inaugural fleet RYDA would supply, "Black-tier services", insurance
+// savings from NY-stored policies, and early-member pricing locked for
+// life. RYDA stores no vehicle, delivers nothing, insures nothing, and
+// has no tiers or members — and the launch quarter had no referent in
+// the codebase and disagreed with the one market-data.ts printed. All
+// of it is deleted rather than restated.
 
 export const metadata = {
   title: "New York",
   description:
-    "RYDA New York. Q3 2027 launch. Join the NY priority list to lock in early-member pricing.",
+    "RYDA does not list any cars in New York yet. Every listing on the platform today is a Miami car, run by an independent local operator.",
+  alternates: { canonical: "/locations/new-york" },
 };
 
 export default function NewYorkPage() {
   return (
-    <ComingSoonLocation
+    <PlannedMarket
       city="New York"
       state="NY"
-      launchQuarter="Q3 2027"
-      intro="New York is RYDA's third market, and the most operationally interesting one. The cars don't live in Manhattan; they live in vetted upstate facilities, two hours from the city, with white-glove delivery to your weekend home in the Hamptons or your country house upstate. NY membership skews toward the GT and Grand Tourer, not track cars."
-      whyHere={[
-        "Highest concentration of US wealth, the densest population of high-net-worth households in the country.",
-        "RYDA's Black-tier services (white-glove, member events) match how NY UHNW families already buy services.",
-        "Driving culture is weekend-and-summer, not daily, fits the share model perfectly.",
-        "RYDA programming ties to marquee East Coast events, Miami GP, Watkins Glen, and Pebble Beach.",
-        "Insurance carriers price NY-stored, not NY-driven; significant savings vs. Manhattan-resident exotic policies.",
-      ]}
-      vehiclePreview={[
-        "Rolls-Royce Cullinan Black Badge, 2024",
-        "Bentley Continental GT Speed, 2024",
-        "Aston Martin DB12, 2024",
-        "Ferrari Roma, 2023",
-        "Mercedes-AMG SL 63, 2024",
-        "Porsche 911 Turbo S, 2024",
+      slug="new-york"
+      whyParagraphs={[
+        "New York drives out of the city rather than through it. The East End in July, upstate in October, the odd clear winter weekend — the car is for the trip, and the rest of the year it would be a parking problem.",
+        "That is a renting pattern rather than an owning one, which is the pattern RYDA is built around: you want the car for the days you will actually use it, from someone whose business is having it ready.",
+        "There are no New York operators listed here yet, so there is nothing to browse and no date to promise. When operators in the city list with us, their cars appear in the same grid as everything else.",
       ]}
     />
   );

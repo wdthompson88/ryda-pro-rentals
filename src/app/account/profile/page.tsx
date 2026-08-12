@@ -10,7 +10,15 @@
 //   - preferred_name   (the casual one — what shows on /account)
 //   - phone            (E.164-ish, free text — validation is light)
 //   - date_of_birth    (age-verification on rentals)
-//   - mailing address  (white-glove delivery, K-1s, insurance)
+//   - mailing address  (stored on the account only — see below)
+//
+// The address hint used to read "White-glove delivery, K-1 tax forms,
+// insurance certificates." RYDA delivers no vehicle and issues no
+// insurance document (Terms §2), and the field backs none of those
+// things anyway: it is written to auth user_metadata and read back
+// here. The rental-inquiry path syncs name, phone and consent into
+// rental_profiles — never the address — so it does not reach an
+// operator either. The hint now says that instead.
 //
 // On the email row we link to /account/security since email is an
 // auth credential, not profile data — Supabase requires re-verification
@@ -323,7 +331,7 @@ export default function ProfilePage() {
           {/* Address ─────────────────────────────────── */}
           <Section
             title="Mailing address"
-            hint="White-glove delivery, K-1 tax forms, insurance certificates."
+            hint="Kept on your account. It isn't sent to an operator with a rental request."
           >
             <Row>
               <Field label="Address line 1">
