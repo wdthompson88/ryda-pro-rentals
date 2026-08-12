@@ -1,10 +1,41 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 
-export const metadata = {
+// Rental Trust & Safety. The previous version of this page was written
+// for co-owners — LLC titling, PPI reports, agreed-value policies, a
+// 24/7 member line, and (on a rental-only site) "no rental" listed as a
+// prohibited vehicle use. None of that exists in this product.
+//
+// The rule for every claim below: it has a referent in the codebase.
+//   - operator review + approval status ....... partner_accounts (0042),
+//                                               /admin/partners
+//   - business + bank verification ............ Stripe Express onboarding;
+//                                               partners.stripe_account_id /
+//                                               stripe_onboarded_at (0041)
+//   - "refused, not queued" ................... payment-link route 409s on
+//                                               a paused or un-onboarded
+//                                               operator
+//   - one payment rail ........................ /api/admin/inquiries/[id]/
+//                                               payment-link (Stripe
+//                                               Checkout, direct charge)
+//   - "rejected rather than marked paid" ...... connect-webhook's
+//                                               connected-account check
+//   - listings paused / off the grid .......... rental_listings.status (0044)
+//   - the operator is not named ............... D6; rowToRentalListing and
+//                                               customerEmailHtml both omit
+//                                               the operator's identity
+//
+// Anything without a referent is stated as a LIMIT instead of a promise
+// — see the "What we don't claim" section. Do not add background checks,
+// vehicle inspections, insurance verification, or 24/7 support here
+// unless something in the repo actually does them.
+
+export const metadata: Metadata = {
   title: "Trust & Safety",
   description:
-    "How RYDA protects co-owners, vehicles and the platform. Member verification, asset vetting, insurance, claims and the standards we hold ourselves to.",
+    "What RYDA checks before an operator can list, how a rental payment actually moves, and where RYDA's responsibility ends and the operator's begins.",
+  alternates: { canonical: "/trust-and-safety" },
 };
 
 export default function TrustAndSafetyPage() {
@@ -16,48 +47,55 @@ export default function TrustAndSafetyPage() {
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-28">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            Trust & Safety
+            Trust &amp; Safety
           </p>
           <h1 className="mt-4 max-w-4xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
-            Co-ownership only works if everyone trusts the system.
+            What RYDA checks, and where it stops.
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
-            Vehicles in vetted LLCs. Insurance to agreed value. Members
-            verified before they touch the keys.
+            RYDA lists cars that independent Miami operators own and
+            operate. We review the operator, the payment runs on Stripe,
+            and we keep the record. The car, the contract and the
+            insurance are theirs.
           </p>
         </div>
       </section>
 
-      {/* Why this matters in Miami, Vice-inspired framing without
-          naming names. The Miami exotic-rental scene has well-documented
-          operators who don't verify insurance, sub-lease cars off
-          someone else's title, and run on Instagram clout instead of
-          paperwork. RYDA exists because that market needed a real
-          alternative, not the same model with nicer branding. */}
+      {/* The D6 disclosure boundary, explained rather than glossed over.
+          Listings genuinely do not carry the operator's identity —
+          rowToRentalListing drops partner_id and the customer
+          confirmation email never names them — so the honest thing is to
+          say why, and to say what the rule does NOT do. */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            Why this matters here
+            Who you&apos;re renting from
           </p>
           <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
-            Miami&apos;s exotic-rental scene has a paperwork problem.
+            Listings don&apos;t name the operator. That&apos;s deliberate.
           </h2>
           <div className="mt-8 space-y-5 text-base leading-relaxed text-ink-soft">
             <p>
-              Plenty of cars on Miami roads are operated without verified
-              insurance, without trackers, sub-leased off someone
-              else&apos;s title, and rented on a handshake. That&apos;s
-              not a critique of the people involved. It&apos;s a
-              structural feature of a market built on Instagram clout
-              and short-term cash flow.
+              Every car here is run by a vetted Miami operator, and no
+              listing says which one. It isn&apos;t coyness — the browse
+              grid, the car page, the data behind them and the
+              confirmation email you get all leave the operator&apos;s
+              identity out on purpose.
             </p>
             <p>
-              RYDA is the deliberate opposite. Every vehicle is titled
-              in a single-purpose LLC. Every co-owner is a registered
-              member of that LLC. Every booking runs on documented
-              insurance with named insureds. Every car has a Pre-Purchase
-              Inspection on file before a single share is sold. It is
-              boring, in the way that real ownership is supposed to be.
+              That fixes the order of events. Your request goes to the
+              operator; they come back to you by name, with their
+              availability, their price and their rental agreement. You
+              know exactly who you are renting from before you are asked
+              to pay anything — and RYDA holds a record of each step: the
+              request, the dates, the confirmed price, the charge.
+            </p>
+            <p>
+              It is a disclosure rule, not a shield. It decides when you
+              learn the operator&apos;s name, not whether you learn it —
+              and it is no substitute for reading their rental agreement
+              when it arrives, because that agreement is what governs the
+              rental.
             </p>
           </div>
         </div>
@@ -68,191 +106,248 @@ export default function TrustAndSafetyPage() {
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
           <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3">
             <Pillar
-              eyebrow="Members"
-              title="Verified before they touch the keys"
-              body="Every co-owner clears KYC identity verification, a clean recent driving record check and a 28+ minimum age. Members are added as named insureds on the LLC's vehicle policy. Membership is earned, not bought."
+              eyebrow="Operators"
+              title="Reviewed before anything goes live"
+              body="Listing with RYDA starts with an application — company, contact, phone, website, fleet size — that a person reviews. The status on that application is set by RYDA, not by the operator; an operator cannot put themselves live."
             />
             <Pillar
-              eyebrow="Vehicles"
-              title="Certified pre-owned, PPI-inspected before any share is sold"
-              body="Every RYDA vehicle is certified pre owned with a manufacturer or independent certified pre owned program. Before the LLC closes on a car, a multi-point Pre-Purchase Inspection by a marque specialist documents engine, transmission, suspension, electronics and body condition, plus full title and lien search. Co-owners aren't buying surprises; they're buying a documented car."
+              eyebrow="Verification"
+              title="Stripe verifies the business and the bank account"
+              body="Approved operators complete Stripe Express onboarding, where Stripe checks their business details and the bank account payouts land in. Until that is finished RYDA's own system refuses to create a payment link for them — the attempt is rejected, not queued."
             />
             <Pillar
-              eyebrow="Insurance"
-              title="$1M liability + agreed-value physical damage"
-              body="$1M third-party liability and agreed-value comprehensive coverage on every vehicle, written by carriers that specialize in high-value autos (Hagerty, Travelers, CHUBB tier). Members named as insureds. Low deductibles."
+              eyebrow="Requests"
+              title="No card at request"
+              body="A request carries your name, your contact details and your dates. It takes no card, it is not a booking, and it does not reserve the car. Nothing is charged until you and the operator have agreed on the dates and the price."
             />
             <Pillar
-              eyebrow="Storage"
-              title="Climate-controlled, monitored, indoor"
-              body="Every vehicle is stored in a RYDA-vetted facility, climate-controlled, 24/7 video monitoring, on-site security and segregated bays. We don't park exotics in shared garages or driveways."
+              eyebrow="Payments"
+              title="One rail, and it's Stripe"
+              body="The only payment RYDA ever sends is a Stripe Checkout link, emailed after the operator confirms. The charge is created on the operator's own connected Stripe account, and RYDA's commission is collected as a platform fee on that same charge."
             />
             <Pillar
-              eyebrow="Operations"
-              title="White-glove handover, every booking"
-              body="Vehicles are washed, fueled and pre-inspected before every member booking. Photo-documented condition both at delivery and return. Any new damage is logged and assigned before the next booking."
+              eyebrow="Records"
+              title="The booking is written down"
+              body="RYDA keeps the request, the dates, the price the operator confirmed, the charge and the commission on it. We cannot decide a dispute between you and an operator, but we can produce what we hold."
             />
             <Pillar
-              eyebrow="Support"
-              title="One number, 24/7"
-              body="A dedicated RYDA member line for roadside, claims, inspections and operational issues. Single point of contact, never an outsourced call center. Replacement vehicle dispatched if anything breaks down on the road."
+              eyebrow="Enforcement"
+              title="An operator can be switched off"
+              body="An operator's account can be paused. While it is, no new payment link can be created for any of their cars, and their listings can be pulled from the browse grid. It is the one lever RYDA has, and it is a real one."
             />
           </div>
         </div>
       </section>
 
-      {/* Insurance section */}
+      {/* What the review actually is */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            Insurance
+            The review
           </p>
           <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
-            What's covered, in plain English.
+            What &ldquo;vetted&rdquo; actually means.
           </h2>
+          <p className="mt-6 text-base leading-relaxed text-ink-soft">
+            Four things stand between an operator&apos;s application and a
+            car appearing on RYDA. None of them is a mechanical
+            inspection — the limits are further down this page, stated
+            plainly.
+          </p>
           <div className="mt-10 space-y-5">
             <Coverage
-              line="Third-party liability"
-              detail="$1M per occurrence, primary. Covers bodily injury and property damage you cause to others. Higher limits available on request."
+              line="A company, reviewed by a person"
+              detail="An application carries the company name, the contact, a phone number, a website and a fleet size, and it is read one at a time rather than approved automatically. Under review, approved, paused: that status is RYDA's to set and RYDA's to withdraw."
             />
             <Coverage
-              line="Agreed-value physical damage"
-              detail="The full retail value of the vehicle is agreed up-front and paid in the event of a total loss. No depreciation arguments. Comprehensive (theft, fire, weather) and collision both included."
+              line="Business and bank verification, through Stripe"
+              detail="Approved operators go through Stripe Express onboarding, where Stripe verifies the business and the bank account that payouts will reach. This is the same check Stripe runs on any business taking card payments — and until it completes, no payment link can be created for that operator at all."
             />
             <Coverage
-              line="Uninsured / underinsured motorist"
-              detail="$500K UM/UIM. If someone hits you and they don't have coverage, you're not stuck with the bill."
+              line="Listings set up with us, not uploaded"
+              detail="Photos, specifications, pricing and availability are put together with the partnerships team rather than self-served. A car does not reach the browse grid without RYDA putting it there."
             />
             <Coverage
-              line="Roadside + replacement"
-              detail="If a vehicle breaks down or is in an accident during your booking, RYDA dispatches a replacement vehicle of similar tier within 4 hours."
+              line="A commission agreed before going live"
+              detail="RYDA's referral commission is agreed with the operator up front and charged to the operator, as a fee on their own charge. It is never added to your price — requesting through RYDA costs the same as going direct."
             />
           </div>
           <div className="mt-10 rounded-2xl border border-rule bg-cream-2 p-6">
             <p className="text-xs font-medium uppercase tracking-wider text-red">
-              Sample documents on request
+              The same thing, in the language that governs it
             </p>
             <p className="mt-3 text-sm leading-relaxed text-ink-soft">
-              Reviewable by your counsel or accountant before any commitment.
-              Email request, typical turnaround under 24 hours.
+              The Terms of Service and the Platform Disclaimer describe
+              this arrangement in binding terms, including where the
+              review stops and what it does not warrant. If you only read
+              one, read the disclaimer.
             </p>
-            <ul className="mt-4 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
-              <li>· Sample LLC Operating Agreement</li>
-              <li>· Sample Management Services Agreement</li>
-              <li>· Sample Pre-Purchase Inspection report</li>
-              <li>· Sample insurance certificate</li>
-              <li>· Sample condition report</li>
-              <li>· Sample annual member statement</li>
-            </ul>
-            <Link
-              href="/contact?type=Membership&note=Sample%20document%20packet#form"
-              className="mt-6 inline-flex h-11 items-center justify-center rounded-full bg-ink px-6 text-sm font-medium text-cream hover:bg-red"
-            >
-              Request the document packet →
-            </Link>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link
+                href="/legal/disclaimer"
+                className="inline-flex h-11 items-center justify-center rounded-full bg-ink px-6 text-sm font-medium text-cream hover:bg-red"
+              >
+                Platform Disclaimer →
+              </Link>
+              <Link
+                href="/legal/terms"
+                className="inline-flex h-11 items-center justify-center rounded-full border border-rule bg-surface px-6 text-sm font-medium text-ink hover:border-ink"
+              >
+                Terms of Service
+              </Link>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Mechanical & powertrain protection */}
+      {/* Payments — the anti-fraud section. RYDA has exactly one payment
+          rail in code, which is what makes this statable. */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            Certified pre owned + powertrain protection
+            Payments
           </p>
           <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
-            You're not buying a stranger's mechanical problems.
+            What a real RYDA payment request looks like.
           </h2>
           <p className="mt-6 text-base leading-relaxed text-ink-soft">
-            RYDA only acquires certified pre owned vehicles. Before the LLC
-            closes on any car, three things happen, every time, no exceptions:
+            RYDA has one way of asking you for money, and it happens at
+            one moment: after the operator has confirmed your dates and
+            your price.
           </p>
-          <ul className="mt-8 space-y-5 text-base">
+          <div className="mt-8 space-y-5">
             <Coverage
-              line="Independent Pre-Purchase Inspection (PPI)"
-              detail="A marque specialist (Ferrari Master Tech, McLaren-certified shop, etc.) performs a documented multi-point inspection: engine compression and leak-down, transmission, suspension, brakes, electronics, fluid analysis, body and frame integrity. The full report becomes part of the LLC's permanent record."
+              line="A Stripe Checkout link, by email"
+              detail="It comes from RYDA once the operator has confirmed, and it opens Stripe's own hosted checkout page. That is the only payment RYDA sends. We don't take card numbers over the phone, and we don't ask for a wire, a bank transfer or a payment app."
             />
             <Coverage
-              line="Active certified pre owned warranty"
-              detail="Every vehicle ships with an active manufacturer or independent certified pre owned warranty covering the powertrain and major mechanical systems for the LLC's first ownership period. Co-owners aren't on the hook for surprise engine, transmission or driveline repairs, those are warranty events, not assessments."
+              line="The charge lands on the operator's account"
+              detail="Checkout is created on the operator's own connected Stripe account: the rental price is paid to them, and RYDA's commission is collected as a platform fee on the same charge. A payment is only ever matched to the operator whose link it was — one arriving from any other account is rejected rather than marked paid."
             />
             <Coverage
-              line="LLC-level reserve for post-warranty issues"
-              detail="The LLC's annual budget includes a maintenance reserve scaled to the vehicle's service profile. Out-of-warranty mechanical issues are paid from the reserve, not from members' pockets. If a major repair exhausts the reserve, the group decides next steps by vote, never a surprise bill in your inbox."
+              line="Deposits and refunds belong to the operator"
+              detail="A security deposit, a damage claim, a cancellation or a refund is handled by the operator under their rental agreement and from their own Stripe account. If the operator asks you for a deposit directly, that is theirs to arrange and it sits outside the RYDA link — ask them to put the terms in writing."
             />
-          </ul>
+          </div>
           <p className="mt-8 rounded-2xl border border-rule bg-surface p-6 text-sm leading-relaxed text-ink-soft">
-            <span className="font-medium text-ink">Bottom line:</span>{" "}
-            co-ownership shouldn't mean inheriting someone else's deferred
-            maintenance. RYDA's job is to deliver a documented, warrantied,
-            reserve-backed vehicle to your LLC on day one, and to keep it
-            that way.
+            <span className="font-medium text-ink">
+              If something doesn&apos;t match:
+            </span>{" "}
+            a payment request that reaches you before an operator has
+            confirmed your dates, or by any route other than a Stripe
+            Checkout link, did not come from RYDA. Send it to us before
+            you pay it.
           </p>
         </div>
       </section>
 
-      {/* Claims section */}
+      {/* When something goes wrong */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            Claims
+            If something goes wrong
           </p>
           <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
-            What happens when something goes wrong.
+            Who to call, in order.
           </h2>
           <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            <Step n="01" title="Call us first" body="One phone number, 24/7. Don't admit fault, don't move the vehicle unless safe, photograph everything." />
-            <Step n="02" title="Get medical help if needed" body="Always priority one. The car is replaceable, you're not." />
-            <Step n="03" title="We open the claim" body="RYDA files with the carrier within 24 hours, manages the adjuster and coordinates rental coverage." />
-            <Step n="04" title="Resolution" body="For at-fault collisions, the deductible (typically $2,500) is your responsibility. Everything else flows through the policy." />
+            <Step
+              n="01"
+              title="Safety, then the report"
+              body="After a collision, people come first and the police report comes second. The operator's insurer will want that report, and so will you."
+            />
+            <Step
+              n="02"
+              title="The operator"
+              body="They hold the rental agreement, the insurance and the deposit. Breakdowns, damage, late returns, anything about the car — they are the counterparty on the rental, so they go first."
+            />
+            <Step
+              n="03"
+              title="Then tell RYDA"
+              body="We hold the request, the dates, the confirmed price and the charge. Send us the booking and what happened; we'll provide those records and help where we reasonably can."
+            />
+            <Step
+              n="04"
+              title="What we can't do"
+              body="RYDA is not a party to your rental agreement. We can't decide a dispute, order a refund or release a deposit — each of those runs through the operator and their own Stripe account."
+            />
           </div>
           <p className="mt-12 max-w-2xl rounded-2xl border border-rule bg-surface p-6 text-sm leading-relaxed text-ink-soft">
-            <span className="font-medium text-ink">Note on at-fault claims:</span>{" "}
-            Repeated or willful at-fault incidents are grounds for membership
-            review. We do not protect repeat offenders at the cost of the
-            other co-owners on the same LLC.
+            <span className="font-medium text-ink">
+              When the problem is the operator:
+            </span>{" "}
+            tell us anyway. A pattern of complaints is grounds for pausing
+            an operator&apos;s account, and while it is paused no new
+            payment link can be created for their cars. A complaint we
+            never hear about cannot change anything.
           </p>
         </div>
       </section>
 
-      {/* Standards / what we say no to */}
+      {/* The limits. This is the section that keeps the rest of the page
+          honest — every item here is something the codebase does NOT do.
+          Deleting an item requires shipping the thing it denies. */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            Standards
+            Limits
           </p>
           <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
-            What we say no to.
+            What we don&apos;t claim.
           </h2>
+          <p className="mt-6 text-base leading-relaxed text-ink-soft">
+            A review is only worth anything if you know its edges. These
+            are ours, and we would rather you read them here than
+            discover them later.
+          </p>
           <ul className="mt-10 space-y-4 text-base leading-relaxed text-ink-soft">
             <li>
-              <span className="font-medium text-ink">No commercial use.</span>{" "}
-              Vehicles are for personal use only. No ride-share, no rental
-              re-listing, no commercial photo/video shoots without written
-              approval and a separate insurance rider.
+              <span className="font-medium text-ink">
+                We don&apos;t inspect the cars.
+              </span>{" "}
+              RYDA does not own, store, maintain or service any vehicle on
+              this platform, and nobody from RYDA puts a car on a lift
+              before it is listed. Condition is the operator&apos;s
+              responsibility, and the handover is where you check it.
             </li>
             <li>
-              <span className="font-medium text-ink">No unverified drivers.</span>{" "}
-              Only the named co-owner can drive. We don't extend insurance
-              to unverified family, friends or partners. Co-owners can add
-              a verified household secondary driver on request.
+              <span className="font-medium text-ink">
+                We don&apos;t verify insurance policies.
+              </span>{" "}
+              The rental closes on the operator&apos;s own insurance under
+              their own agreement. RYDA is not an insurance broker and
+              does not confirm any policy, its limits or its exclusions.
+              Ask the operator for the certificate, and read what their
+              agreement says about damage and deductibles.
             </li>
             <li>
-              <span className="font-medium text-ink">No motorsport on RYDA insurance.</span>{" "}
-              Drag strips, autocross without proper insurance and street
-              racing are not covered. We mean it.
+              <span className="font-medium text-ink">
+                We don&apos;t run driver background checks.
+              </span>{" "}
+              Eligibility to rent a particular car — minimum age, licence,
+              proof of your own insurance, deposit — is set by the
+              operator, not by RYDA, and it can differ between operators
+              and between cars.
             </li>
             <li>
-              <span className="font-medium text-ink">No undocumented modifications.</span>{" "}
-              Performance and appearance modifications go through the LLC's
-              decision process, co-owners vote, and RYDA verifies that the
-              change is operationally and insurance-feasible. One member
-              doesn't get to wrap a Ferrari unilaterally.
+              <span className="font-medium text-ink">
+                We aren&apos;t a party to the rental.
+              </span>{" "}
+              RYDA passes your request to the operator and sends the
+              payment link once you both agree. The contract is between
+              you and them, and it takes precedence on everything it
+              covers: deposits, cancellation, mileage, fuel, additional
+              drivers, damage.
             </li>
             <li>
-              <span className="font-medium text-ink">No leaving the operating market.</span>{" "}
-              Vehicles stay in their assigned market by default. Inter-market
-              transit is available for trips with 14+ days notice.
+              <span className="font-medium text-ink">
+                We don&apos;t run a 24/7 line.
+              </span>{" "}
+              There is no RYDA roadside number and no replacement-vehicle
+              guarantee from us. Roadside cover, if the rental has any,
+              comes from the operator&apos;s agreement. Write to us and a
+              person reads it — but mid-rental, the operator is the faster
+              route.
             </li>
           </ul>
         </div>
@@ -262,11 +357,12 @@ export default function TrustAndSafetyPage() {
       <section className="bg-ink py-20 text-cream">
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
           <h2 className="font-display text-3xl sm:text-4xl">
-            Have a specific question?
+            Ask before you book.
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
-            We answer every email. For claims, insurance certificates, or
-            documentation requests, write us directly.
+            Questions about a car, a deposit or the insurance are for the
+            operator when they reach out. Questions about how RYDA works,
+            or about anything on this page, are for us.
           </p>
           <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Link

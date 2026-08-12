@@ -1,10 +1,27 @@
 import { SiteHeader } from "@/components/site-header";
 import { AboutPageTemplate, type AboutPerson } from "@/components/shared/about-page";
 
+// Rental-only About page. The previous version described a
+// "member-managed supercar co-ownership platform" and closed on a
+// founding-cohort pitch — share pricing, residual modelling, LLC
+// structure. None of that product exists in this repo, so it is gone
+// rather than restated.
+//
+// What is left is the true, short story: RYDA lists exotic cars that
+// independent Miami operators own and operate, makes them findable in
+// one place, and earns a referral commission from the operator on
+// bookings it sends them. No fabricated numbers, no operator names,
+// and no claim that RYDA "never touches" payment — RYDA does send the
+// Stripe Checkout link; it is created on the operator's own connected
+// account. The honest promise is "no card at request".
+//
+// Must stay consistent with /how-it-works, /legal/terms and
+// /legal/disclaimer.
+
 export const metadata = {
   title: "About",
   description:
-    "A US member-managed supercar co-ownership platform. Our story, our team, our mission.",
+    "RYDA is a rental marketplace for exotic cars in Miami. The cars belong to vetted independent operators; RYDA makes them findable and keeps the operator's price the price.",
 };
 
 const FOUNDERS: AboutPerson[] = [
@@ -18,7 +35,7 @@ const FOUNDERS: AboutPerson[] = [
     name: "Dave Thompson",
     role: "Co-Founder · CFO / COO",
     image: "/team/dave.jpg",
-    bio: "Co-founder leading capital structuring and operational diligence. Manager, Private Equity Services at SolomonEdwards. Previously spent 3+ years in Investment Banking at Ziegler covering Healthcare M&A, analyst through senior associate. Diamond Capital Advisors before that. SIE + Series 79 certified. Bucknell Economics.",
+    bio: "Co-founder, running finance and operations. Manager, Private Equity Services at SolomonEdwards. Previously spent 3+ years in Investment Banking at Ziegler covering Healthcare M&A, analyst through senior associate. Diamond Capital Advisors before that. SIE + Series 79 certified. Bucknell Economics.",
   },
   {
     name: "Stefano Galli",
@@ -37,45 +54,44 @@ export default function AboutPage() {
           accent: "red",
           hero: {
             eyebrow: "About",
-            title: <>A different way to <span className="italic">own a supercar.</span></>,
+            title: <>Miami&apos;s exotic fleets, <span className="italic">one front door.</span></>,
             body:
-              "Buying one outright costs more than most people care to put in a driveway. Renting is for an afternoon, not a relationship. RYDA is the third option — co-ownership, with professionals operating the car and a clean LLC structure underneath.",
+              "RYDA is a rental marketplace for exotic cars in Miami. Every car on it is owned and operated by an independent local operator we've vetted. Our job is to make finding one straightforward — one grid, one request, your dates — and to make sure the operator's price is the price you pay.",
           },
           story: {
-            title: "Our story",
+            title: "Why RYDA exists",
             paragraphs: [
-              "RYDA started in Florida. Ryan and Dave rented a Lamborghini for a weekend and ran the numbers on Sunday night: solo ownership was unworkable, renting was hollow.",
-              "The math worked, the structure worked, the buyer pool was there. The middle ground, real co-ownership of real supercars, with professional ops and a clean LLC wrapper — just didn't exist in the US.",
-              "We built RYDA to fill that gap, member-managed LLCs, professional ops, US markets. Miami first: highest per-capita luxury auto density, no state income tax, year-round driving.",
+              "Miami is not short of exotic cars for rent. What it lacks is one place to see them. The fleets are independent, their inventory lives across separate sites and social accounts, and comparing them means starting the same conversation over again with each one.",
+              "RYDA puts that inventory in one grid and turns the search into a single request. You pick the car and the dates; the operator who runs it comes back to you directly, confirms what is actually available and what it actually costs, and closes the rental on their own contract and insurance.",
+              "We don't own cars, store them, insure them or drive them — the operators do all of that, and they were doing it before us. What RYDA adds is discovery. That is also how it gets paid: the operator pays a referral commission on the bookings we send them. It is charged to the operator, never added to your price.",
             ],
           },
           founderLetter: {
             eyebrow: "A note from our founder",
-            title: "What we're trying to build, in plain English.",
+            title: "The short version, in plain English.",
             paragraphs: [
-              "I'm going to keep this short. There are roughly three honest ways to put a supercar in your driveway in the United States today. You can buy one outright, which costs $250,000 to $1,000,000 of capital plus $40,000 to $80,000 a year to keep — and the car sits idle 90% of the year. You can rent one for $2,000–$3,000 a day from a marketplace where coverage and quality vary by host. Or you can join a club that hands you rotating access for an annual fee that's consumed regardless of how much you drive.",
-              "None of those was the right answer for us, or for any of our friends who actually wanted to drive an exotic. RYDA is the alternative. It's a real ownership stake, title held by a single-purpose LLC where you and up to four other verified members are the registered owners. We run the operations under a separate Management Services Agreement, the same way an aviation club runs the jets it doesn't own.",
-              "The math is simple: a $34K share in a Ferrari 296, plus $7,080 a year for insurance, storage, maintenance and reserves, gets you up to 32 days behind the wheel and a real exit at year two. We model the residual at 90% of buy-in. We don't pretend the car appreciates, it depreciates, and the model accounts for it. What you walk away with isn't a return. It's the experience of having actually driven a Ferrari, on real roads, for the kind of money that doesn't require selling an equity position to pull off.",
-              "Miami launches Q3 2026. If this fits how you actually want to use a supercar, own a piece, drive it ~32 days a year, never deal with the operational side, sign up and we'll be in touch.",
+              "RYDA does not own a single car. Every vehicle you see here belongs to an independent Miami operator who buys it, garages it, insures it and hands over the keys. We are the front door, not the fleet.",
+              "So the request you send is exactly that — a request. No card is taken, no vehicle is reserved, and it is not a booking until the operator has confirmed your dates and the final price with you directly. If you both agree, we email a Stripe Checkout link created on that operator's own connected account: the rental is paid to them, and our commission is collected as a platform fee on the same charge. The rental itself closes on their contract and their insurance, which is also the reason they, not us, are the ones who confirm it.",
+              "The part that matters most to us is the price. Requesting through RYDA never costs more than going direct, because our commission comes out of the operator's side rather than on top of yours. That is the entire business model, and it only works if the cars are worth renting and the operators are worth recommending — which is why we are slower about who we list than we are about anything else.",
             ],
             signer: { name: "Ryan Galli", role: "Co-founder & CEO, RYDA", image: "/team/ryan.jpg", bio: "" },
-            // Per dual-audit Finding 2: founding-cohort buyers ($68K
-            // minimum) want a founder call first, not an account.
-            // Talk-to-a-founder is primary; account creation is for
-            // members who already know they want in.
+            // No membership exists in this product, so there is nothing
+            // to be sold on and no founder call to book. The two links
+            // are the only two next steps: see the cars, or save 30
+            // seconds on the next request.
             links: [
-              { href: "/contact?type=Membership#form", label: "Talk to a founder" },
+              { href: "/rent", label: "Browse the fleet" },
               { href: "/signup", label: "Create an account →", authedHidden: true },
             ],
           },
           mission: {
             quote:
-              '"To make ownership of extraordinary vehicles possible for more enthusiasts, responsibly, transparently and with a community-first experience."',
+              '"To make renting an extraordinary car in Miami as simple as choosing one — and to keep the operator\'s price the price."',
             values: [
-              { title: "Transparency", body: "Every co-owner sees every cost, every report and every document. No hidden fees. Ever." },
-              { title: "Exclusivity", body: "Membership is earned, not bought. Every member is verified. Every vehicle is vetted." },
-              { title: "Excellence", body: "Premium preparation and handover for every booking. Our standard does not vary." },
-              { title: "Integrity", body: "Asset-backed ownership with unambiguous legal documentation. We do what we say." },
+              { title: "One request", body: "Pick the car, send your dates. No card at request, nothing to subscribe to, and no membership standing between you and the fleet." },
+              { title: "The operator's price", body: "RYDA never marks up a rental. Our commission is charged to the operator on bookings we send them, and never added to what you pay." },
+              { title: "Vetted operators", body: "Every listing is run by a Miami operator we've reviewed, including their business and bank details through Stripe. Vetting is not a warranty, and we don't dress it up as one." },
+              { title: "Plain terms", body: "We describe what the platform actually does — including that the payment link comes from us — rather than whatever would sound most reassuring." },
             ],
           },
           team: {
@@ -88,22 +104,21 @@ export default function AboutPage() {
             title: "Headquarters",
             facts: [
               { label: "Legal entity", value: "RYDA LLC" },
-              { label: "Structure", value: "Member-managed LLC per vehicle" },
+              { label: "What we do", value: "Referral marketplace for exotic-car rentals" },
+              { label: "The vehicles", value: "Owned and operated by independent operators" },
               { label: "Headquarters", value: "Miami, FL, by appointment" },
-              { label: "Operating markets", value: "Miami (2026) · LA (2027) · NY (2027)" },
               { label: "General", value: "hello@ryda.pro" },
               { label: "Press", value: "press@ryda.pro" },
               { label: "Partnerships", value: "partners@ryda.pro" },
-              { label: "Investors (RYDA Inc.)", value: "See /investors" },
             ],
           },
           cta: {
-            title: "Become a member.",
+            title: "See the cars.",
             body:
-              "Miami launches Q3 2026. The founding cohort closes ahead of launch. Talk to a founder to walk through the structure, the operating agreement, and the specific car you'd want a share in.",
+              "Browse the Miami fleet, send your dates, and a vetted operator confirms availability and price directly with you. No card at request.",
             links: [
-              { href: "/contact?type=Membership#form", label: "Talk to a founder" },
-              { href: "/signup", label: "Create an account →", authedHidden: true },
+              { href: "/rent", label: "Browse the fleet" },
+              { href: "/how-it-works", label: "How it works →", variant: "secondary" },
             ],
           },
         }}
