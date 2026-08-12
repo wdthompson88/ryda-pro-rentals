@@ -10,12 +10,8 @@
 // receipt PDFs, and dispute initiation natively. Building that
 // ourselves would burn engineering hours and add PCI scope for no
 // member benefit.
-//
-// "Tax documents" stays a copy-only stub — K-1s ship in February of
-// the year following the first co-ownership tax year.
 
 import { useState } from "react";
-import Link from "next/link";
 import { authedFetch } from "@/lib/api-fetch";
 
 export default function PaymentsPage() {
@@ -36,7 +32,6 @@ export default function PaymentsPage() {
       </header>
 
       <BillingPortalCard />
-      <TaxDocsCard />
     </div>
   );
 }
@@ -95,27 +90,6 @@ function BillingPortalCard() {
       <p className="mt-2 text-[11px] text-mute">
         Portal is generated fresh each time you click — links expire after one
         use, so don't bookmark the destination.
-      </p>
-    </Card>
-  );
-}
-
-// ── Tax documents (informational stub) ────────────────────────
-
-function TaxDocsCard() {
-  return (
-    <Card
-      title="Tax documents"
-      hint="K-1 and 1099-INT, generated annually for each LLC."
-    >
-      <p className="text-sm text-mute">
-        Your first K-1 ships in February of the year following your first full
-        tax year of co-ownership. You'll get an email when it's ready;
-        downloads from{" "}
-        <Link href="/account/documents" className="text-red hover:text-red-deep">
-          Documents
-        </Link>
-        .
       </p>
     </Card>
   );
