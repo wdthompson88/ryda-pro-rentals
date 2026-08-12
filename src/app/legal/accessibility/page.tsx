@@ -11,7 +11,7 @@ export default function AccessibilityPage() {
       sections={[
         {
           heading: "1. Conformance status",
-          body: "We target WCAG 2.1 Level AA. The site is in active development and a third-party audit is scheduled before public launch. Known areas of work-in-progress: ARIA labels on form inputs and form controls, color-contrast verification on accent colors, and keyboard-only navigation for the co-ownership claim flow.",
+          body: "We target WCAG 2.1 Level AA. The site is in active development and a third-party audit is scheduled before public launch. Known areas of work-in-progress: ARIA labels on form inputs and form controls, color-contrast verification on accent colors, and keyboard-only navigation for the booking request flow.",
         },
         {
           heading: "2. What we've done",
