@@ -23,7 +23,7 @@ import {
 export const metadata: Metadata = {
   title: "Rent — browse the Miami fleet",
   description:
-    "Browse every car on RYDA's Miami rental grid — Lamborghini, Ferrari, Rolls-Royce and the rest. Send your dates and a vetted Miami operator confirms directly with you. No card, no payment through RYDA.",
+    "Browse every car on RYDA's Miami rental grid — Lamborghini, Ferrari, Rolls-Royce and the rest. Send your dates and a vetted Miami operator confirms directly with you. No card at request.",
   alternates: { canonical: "/rent" },
 };
 
@@ -53,8 +53,8 @@ export default function RentPage() {
           <p className="mt-4 max-w-2xl text-sm leading-relaxed text-ink-soft">
             Every listing is real, bookable stock run by a vetted Miami
             operator. Send your dates and the operator confirms
-            availability and price directly with you — no card, no
-            payment through RYDA.{" "}
+            availability and price directly with you — no card at
+            request.{" "}
             <Link
               href="/how-it-works"
               className="font-medium text-red hover:text-red-deep"

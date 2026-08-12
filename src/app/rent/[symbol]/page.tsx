@@ -402,8 +402,8 @@ export default async function RentDetailPage({
                   <p className="mt-2 text-sm text-ink-soft">
                     No card at request. Once the operator confirms your
                     dates we send a secure Stripe link — the charge settles
-                    on the operator&apos;s own account and RYDA never holds
-                    your money. Your price is the operator&apos;s price.
+                    on the operator&apos;s own Stripe account. Your price is
+                    the operator&apos;s price.
                   </p>
                 </>
               )}
@@ -488,7 +488,7 @@ export default async function RentDetailPage({
                   body="Inquiring through RYDA never costs more than going direct. Operators pay RYDA a referral commission on bookings we send them — that's the whole model."
                 />
                 <Pillar
-                  title="No payment through RYDA"
+                  title="No card at request"
                   body="No card at request. Nothing is charged until you and the operator confirm the booking together."
                 />
               </>

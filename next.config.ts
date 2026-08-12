@@ -6,21 +6,23 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.join(__dirname),
   },
-  outputFileTracingIncludes: {
-    "/api/sample-documents/[slug]": ["./docs/sample-documents/**/*"],
-    "/api/admin/sample-documents/[slug]": ["./docs/sample-documents/**/*"],
-  },
-  // 301 redirects from the legacy /markets/* paths to /portfolio/*.
-  // Per user feedback May 2026: "still labeled as 'markets' in the
-  // URL." We renamed the listing index + detail pages to /portfolio
-  // and shifted the original member dashboard to /account/portfolio.
-  // 301s preserve any existing inbound links + Google indexing.
+  // 301 redirects from the legacy listing paths to /rent/*.
+  // /markets was renamed to /portfolio in May 2026; /portfolio was then
+  // removed with the co-ownership product, so both legacy paths now land
+  // on the rental listings they were superseded by. 301s preserve any
+  // existing inbound links + Google indexing.
   async redirects() {
     return [
-      { source: "/markets", destination: "/portfolio", permanent: true },
+      { source: "/markets", destination: "/rent", permanent: true },
       {
         source: "/markets/:path*",
-        destination: "/portfolio/:path*",
+        destination: "/rent/:path*",
+        permanent: true,
+      },
+      { source: "/portfolio", destination: "/rent", permanent: true },
+      {
+        source: "/portfolio/:path*",
+        destination: "/rent/:path*",
         permanent: true,
       },
     ];

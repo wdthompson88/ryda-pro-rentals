@@ -69,7 +69,7 @@ const STEPS: { n: string; title: string; body: string }[] = [
   {
     n: "04",
     title: "Activate payments",
-    body: "We send you a Stripe onboarding link. Stripe verifies your business and bank details so bookings pay out directly to you — RYDA never holds your money.",
+    body: "We send you a Stripe onboarding link. Stripe verifies your business and bank details, and bookings are charged directly to your connected account — RYDA's commission is collected as a platform fee on each charge.",
   },
   {
     n: "05",

@@ -31,7 +31,7 @@ import {
 // pinned to the home page's own copy rather than inheriting whatever
 // the layout says later.
 const HOME_SOCIAL_DESCRIPTION =
-  "Miami's most-wanted exotics. One request away. Pick a car, send your dates, and a vetted Miami operator confirms directly with you — no card, no payment through RYDA.";
+  "Miami's most-wanted exotics. One request away. Pick a car, send your dates, and a vetted Miami operator confirms directly with you — no card at request.";
 
 export const metadata: Metadata = {
   title: "Rent Miami's most-wanted exotics",
@@ -209,7 +209,7 @@ export default function HomePage() {
             <StepCard
               n="02"
               title="Request your dates"
-              body="A 30-second account saves your details for next time; no card, no payment through RYDA."
+              body="A 30-second account saves your details for next time; no card at request."
             />
             <StepCard
               n="03"
@@ -260,7 +260,7 @@ export default function HomePage() {
               body="No markup, no booking fee. Requesting through RYDA never costs more than going direct."
             />
             <InkPillar
-              title="No payment through RYDA"
+              title="No card at request"
               body="No card at request. Nothing is charged until you and the operator confirm the booking together."
             />
           </RevealStagger>

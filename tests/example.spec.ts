@@ -62,18 +62,17 @@ test.describe('how-it-works', () => {
     await expect(
       page.getByRole('heading', { name: /referral commission/i }),
     ).toBeVisible();
-    // Where the money goes. This used to assert /never through ryda/i,
-    // which was already failing before the co-ownership strip: the page
-    // deliberately dropped "no payment through RYDA — ever" (see the
-    // comment on that card) because RYDA does send a Stripe Checkout
-    // link once the operator confirms — the charge just settles on the
-    // operator's own connected account. The assertion was never updated
-    // to follow. It now checks the claim the page actually makes.
+    // Where the money goes. The page must describe the mechanism the code
+    // actually implements — a fee-only Stripe Connect direct charge against
+    // the operator's connected account, with RYDA's cut riding along as
+    // application_fee_amount — and must never promise that RYDA holds,
+    // guarantees, or never touches payment. AGENTS.md forbids that claim
+    // outright, so this asserts the mechanism rather than a reassurance.
     await expect(
       page.getByText(/straight to the operator/i).first(),
     ).toBeVisible();
     await expect(
-      page.getByText(/ryda never holds your money/i).first(),
+      page.getByText(/collected as a platform fee/i).first(),
     ).toBeVisible();
   });
 });

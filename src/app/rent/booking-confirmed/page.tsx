@@ -49,9 +49,9 @@ export default async function BookingConfirmedPage({
           You&apos;re booked.
         </h1>
         <p className="mt-4 text-sm leading-relaxed text-ink-soft">
-          Your payment was processed securely by Stripe and settled directly
-          with your operator — RYDA never holds your money. A confirmation
-          email with the details is on its way to your inbox.
+          Your payment was processed by Stripe and charged directly to your
+          operator&apos;s connected account. A confirmation email with the
+          details is on its way to your inbox.
         </p>
 
         <div className="mt-8 rounded-2xl border border-rule bg-surface p-5">

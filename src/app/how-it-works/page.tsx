@@ -66,7 +66,7 @@ export default function HowItWorksPage() {
             <Step
               n="02"
               title="Request with dates"
-              body="Pick your dates and send one request. A 30-second account keeps your details saved for next time — no card, no payment through RYDA. Signed in, the form fills itself and your requests are tracked in one place."
+              body="Pick your dates and send one request. A 30-second account keeps your details saved for next time — no card at request. Signed in, the form fills itself and your requests are tracked in one place."
             />
             <Step
               n="03"
@@ -115,7 +115,7 @@ export default function HowItWorksPage() {
                 // payment request, so "no payment through RYDA — ever"
                 // reads as bait-and-switch when that email lands, and as
                 // a phishing signal to everyone who believed it.
-                note: "No card at request. Once the operator confirms your dates we send a secure Stripe link — the charge settles on the operator's own account and RYDA never holds your money.",
+                note: "No card at request. Once the operator confirms your dates we send a secure Stripe link — the charge settles on the operator's own Stripe account, and RYDA's commission is collected as a platform fee on that charge.",
               },
             ].map((c) => (
               <div key={c.label} className="bg-surface p-6 sm:p-7">
@@ -148,7 +148,7 @@ export default function HowItWorksPage() {
                 </h2>
                 <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-soft">
                   A 30-second account keeps your details saved for next
-                  time — no card, no payment through RYDA. Your name and
+                  time — no card at request. Your name and
                   contact autofill on every future request, and you can
                   see every inquiry you&apos;ve sent in one place. That&apos;s
                   it; there&apos;s nothing to subscribe to and nothing to

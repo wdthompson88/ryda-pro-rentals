@@ -171,7 +171,7 @@ function payLinkEmailHtml(args: {
     </p>
     <p style="margin:0 0 12px;">
       This link expires in 24 hours. Payment is processed by Stripe and
-      goes directly to your operator — RYDA never holds your money.
+      charged directly to your operator's account.
     </p>
     <p style="margin:0;">
       If the link expires or anything looks off, just reply to this

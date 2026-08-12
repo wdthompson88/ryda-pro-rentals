@@ -202,17 +202,21 @@ being slow.
    transitions with service-role-only doors, and a slot state-machine trigger (write-once,
    terminal-stays-terminal). Extend the existing `rental_payments_enforce_status`
    immutability trigger — do not fight it.
-9. **The payment copy rule inverts on the pivot — sweep it in the same PR as the rail.**
-   Today the code says *"RYDA never holds your money."* After D1 that is **false**. When
-   Phase 3B lands, the same PR must correct every such claim. Known locations to fix:
-   `AGENTS.md` (the doctrine paragraph, ~lines 27–30), `src/app/how-it-works/page.tsx`
-   (~118), `src/app/rent/[symbol]/page.tsx` (~407), `src/app/rent/booking-confirmed/page.tsx`
-   (~53), `src/app/partners/page.tsx` (~72), `src/app/member-protection/page.tsx` (~41),
-   admin copy in `src/app/admin/inquiries/page.tsx` (~746) and `src/app/admin/partners/page.tsx`
-   (~29), the customer email in `payment-link/route.ts` (~147), and the doctrine comments in
-   `payment-link/route.ts` (1–13), `connect-webhook` header, `onboarding-link/route.ts`
-   (11–15), and `0041`'s header. **State what the code does — never over-promise
-   holds/guarantees.**
+9. **The payment copy rule — SWEPT, keep it swept.** Two false claims used to ship:
+   *"RYDA never holds your money"* (a promise the rule forbids outright) and
+   *"No payment through RYDA"* (bait-and-switch, because RYDA does create and email the
+   Checkout link — and it reads as a phishing signal to anyone who believed it). Both are
+   gone from every customer-facing surface: `how-it-works`, `rent/[symbol]`,
+   `rent/booking-confirmed`, `rent`, `partners`, the landing page, and the customer email
+   in `payment-link/route.ts`. The e2e assertion in `tests/example.spec.ts` was updated to
+   check the mechanism rather than the reassurance, so a regression fails the suite.
+
+   What ships now, and what any new copy must match: **no card at request**; once the
+   operator confirms, RYDA emails a Stripe Checkout link created on the operator's own
+   connected account; the rental price settles to the operator and RYDA's commission is
+   collected as an application fee. Admin-facing copy in `admin/inquiries` (~746) and the
+   header comment in `admin/partners` (~29) already state this correctly — leave them.
+   **State what the code does — never over-promise holds/guarantees.**
 10. **Operators are never named to customers before confirmation** (D6). The current
     boundary is real: the `replyTo` indirection and the `GET /api/rental-inquiry` stripping
     `partner_name`. Preserve anonymity through browse + request; reveal only post-confirm.
