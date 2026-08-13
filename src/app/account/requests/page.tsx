@@ -96,9 +96,20 @@ export default function RequestsPage() {
       ) : inquiries.length === 0 ? (
         <div className="rounded-2xl border border-rule bg-cream-2 px-8 py-10">
           <p className="font-display text-2xl text-ink">No requests yet.</p>
+          {/* Three things this paragraph is not allowed to say again.
+              "Miami's most-wanted exotics" described 6 of the 37
+              listings (category "Exotic"); the grid is everyday cars
+              through exotics, and the median rate is $255 a day.
+              "No payment" is a promise the next email breaks — RYDA
+              emails a Stripe Checkout link on the operator's connected
+              account, so the only true version is "no card at request".
+              And a request does not reach the operator by itself:
+              PARTNER_INQUIRY_EMAILS is empty, so every lead lands with
+              RYDA and is passed on by hand. */}
           <p className="mt-3 max-w-md text-sm text-ink-soft">
-            Miami&apos;s most-wanted exotics are one request away — no card, no
-            payment, an operator replies directly.
+            Miami cars, everyday to exotic, are one request away — no card at
+            request. We pass your request to the operator who runs the car, and
+            they reply to you directly.
           </p>
           {/* /rent is the canonical browse grid ("/" is the landing page). */}
           <Link

@@ -5,7 +5,7 @@
 // at /account/requests, /account/profile, etc. (sidebar in layout).
 //
 // Real data:
-//   - Display name + member-since from auth.users + user_profiles
+//   - Display name + account-created date from auth.users + user_profiles
 //   - Stats + activity from the caller's rental_inquiries rows, read
 //     through useRentalProfile (GET /api/rental-inquiry, session-gated,
 //     own rows only, newest first) — the same source /account/requests
@@ -28,8 +28,10 @@ import {
 // confirmed trip; `lost` is closed and counts toward neither.
 const OPEN_STATUSES = new Set(["new", "sent"]);
 
-// Member-honest labels for the activity feed. Kept in step with the
-// status chips on /account/requests.
+// Labels for the activity feed, kept in step with the status chips on
+// /account/requests. `sent` means RYDA has passed the lead on — a
+// request that is still `new` is sitting with the RYDA team, so the
+// two states are never collapsed into one reassurance.
 const ACTIVITY_LABEL: Record<string, string> = {
   new: "Request sent",
   sent: "Routed to an operator",
@@ -48,7 +50,7 @@ export default function AccountOverviewPage() {
   );
 
   const [displayName, setDisplayName] = useState<string | null>(null);
-  const [memberSince, setMemberSince] = useState<string | null>(null);
+  const [accountOpened, setAccountOpened] = useState<string | null>(null);
 
   useEffect(() => {
     if (!supabase) return;
@@ -72,7 +74,7 @@ export default function AccountOverviewPage() {
       );
       if (userData.user.created_at) {
         const d = new Date(userData.user.created_at);
-        setMemberSince(
+        setAccountOpened(
           d.toLocaleDateString("en-US", { month: "long", year: "numeric" }),
         );
       }
@@ -100,7 +102,7 @@ export default function AccountOverviewPage() {
           {displayName ? `Welcome back, ${displayName}.` : "Welcome back."}
         </h1>
         <p className="mt-2 text-sm text-mute">
-          {memberSince ? `Member since ${memberSince}` : "RYDA member"} · Miami
+          {accountOpened ? `Account opened ${accountOpened}` : "Your RYDA account"}
         </p>
       </header>
 
@@ -115,7 +117,7 @@ export default function AccountOverviewPage() {
               loading
                 ? undefined
                 : openCount > 0
-                  ? "With a vetted operator"
+                  ? "Not closed yet"
                   : "Browse the fleet"
             }
           />
@@ -156,8 +158,17 @@ export default function AccountOverviewPage() {
             desc="Email, password, sessions"
             href="/account/security"
           />
-          <Card title="Verification" desc="KYC, driving record" href="/account/verification" />
-          <Card title="Payments" desc="Cards, bank ACH" href="/account/payments" />
+          {/* Labels state what the destination page actually holds.
+              "KYC, driving record" claimed a driving-record check that
+              does not exist, and "Cards, bank ACH" claimed RYDA holds
+              payment instruments — /account/payments opens by denying
+              exactly that. */}
+          <Card
+            title="Verification"
+            desc="Stripe Identity check"
+            href="/account/verification"
+          />
+          <Card title="Payments" desc="How a rental is paid" href="/account/payments" />
         </div>
       </section>
 
@@ -248,18 +259,10 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
   );
 }
 
-function Card({ title, desc, href }: { title: string; desc: string; href?: string }) {
-  if (!href) {
-    return (
-      <div className="block rounded-2xl border border-rule bg-surface p-5">
-        <p className="font-display text-base text-ink">{title}</p>
-        <p className="mt-2 text-xs text-ink-soft">{desc}</p>
-        <p className="mt-3 text-[10px] font-medium uppercase tracking-wider text-mute">
-          Available at launch
-        </p>
-      </div>
-    );
-  }
+// Every card links somewhere. The old optional-href branch rendered
+// "Available at launch" for cards with no destination; there are none,
+// and Miami is live, so the branch is gone and href is required.
+function Card({ title, desc, href }: { title: string; desc: string; href: string }) {
   return (
     <Link
       href={href}

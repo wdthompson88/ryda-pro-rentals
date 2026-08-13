@@ -22,12 +22,23 @@ const ITEMS: Item[] = [
   { href: "/account/requests", label: "Rental requests", icon: "◔", hint: "Where each request stands" },
   { href: "/account/profile", label: "Profile", icon: "◐", hint: "Name, contact, address" },
   { href: "/account/security", label: "Login & security", icon: "◆", hint: "Email, password, sessions" },
-  // Stripe Identity. No rental surface gates on it yet, but the stack
-  // is deliberately retained for renter verification, so the member
-  // keeps a way to reach it.
-  { href: "/account/verification", label: "Verification", icon: "✓", hint: "KYC, driving record" },
-  { href: "/account/payments", label: "Payments", icon: "$", hint: "Cards, bank ACH" },
-  { href: "/account/notifications", label: "Notifications", icon: "✉", hint: "Email, SMS, push" },
+  // Stripe Identity — a document + selfie session and nothing else. No
+  // rental surface gates on it, but the stack is deliberately retained
+  // for renter verification, so there is still a way to reach it. The
+  // hint said "KYC, driving record"; RYDA runs no driving-record check
+  // and the destination page says so in writing.
+  { href: "/account/verification", label: "Verification", icon: "✓", hint: "Stripe Identity check" },
+  // Hint was "Cards, bank ACH" — RYDA stores neither. The page it
+  // points at opens with "No card on file".
+  { href: "/account/payments", label: "Payments", icon: "$", hint: "How a rental is paid" },
+  // "Notifications" pointed at /account/notifications, which offered a
+  // weekly/daily email digest, SMS pickup texts, browser and mobile-app
+  // push, and booking reminders. None of it exists: src/lib/notify.ts
+  // sends through Resend and nothing else, there is no SMS provider, no
+  // push registration and no mobile app in this repo, and the only
+  // customer emails that exist — the request confirmation, the pay link
+  // and the booking confirmation — are not optional. The toggles wrote
+  // notif_* columns nothing reads. Route deleted, entry deleted with it.
   { href: "/account/privacy", label: "Privacy & data", icon: "•", hint: "Export, delete account" },
 ];
 

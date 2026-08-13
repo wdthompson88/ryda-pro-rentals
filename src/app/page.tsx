@@ -16,40 +16,32 @@ import {
 // hero, featured fleet, how it works, straight answers, closing CTA —
 // and the car-browsing grid lives at /rent, one click away.
 //
-// The model in one breath: browse → request with dates → a vetted
-// Miami operator confirms and closes the rental on their own contract
-// and insurance. Operators pay RYDA a referral commission on bookings
-// we send them. Operators are never named publicly; they introduce
-// themselves when they confirm.
+// The model in one breath: browse → request with dates → RYDA passes
+// the request to the operator who runs that car → the operator confirms
+// and closes the rental on their own contract and insurance. Operators
+// pay RYDA a referral commission on bookings we send them. Operators are
+// never named publicly; they introduce themselves when they confirm.
+//
+// TWO THINGS THIS PAGE MAY NOT SAY, both fixed Aug 2026:
+//
+// 1. "Exotics" / "supercars" as the whole product. Only 6 of the 37
+//    listings carry category "Exotic"; 21 are under $300/day and the
+//    fleet runs from a Toyota Sienna to a Lamborghini Huracán STO. The
+//    honest story is RANGE — everyday cars through exotics — not a
+//    supercar showroom. Do not swing to the opposite falsehood either:
+//    the Ferraris and Lamborghinis are real.
+// 2. That a request reaches the operator directly. It does not.
+//    PARTNER_INQUIRY_EMAILS in src/lib/partner-contacts.ts is empty (its
+//    one entry is commented out pending a signed referral agreement), so
+//    every lead falls back to the RYDA team inbox and is passed on by
+//    hand. "We pass your request to the operator" is the true sentence.
+//
+// Every number and marque below is derived from PARTNER_VEHICLES at
+// build time rather than typed in, so this page cannot advertise a car
+// or a price a visitor will not find on /rent.
 //
 // Ownership-program content does not belong here, or anywhere in this
 // repo — that product was removed in the rentals-first strip.
-
-// og/twitter are declared here in full because Next merges metadata
-// shallowly per top-level key. The root layout's card is rental-first
-// too, but declaring these locally keeps the home page's social card
-// pinned to the home page's own copy rather than inheriting whatever
-// the layout says later.
-const HOME_SOCIAL_DESCRIPTION =
-  "Miami's most-wanted exotics. One request away. Pick a car, send your dates, and a vetted Miami operator confirms directly with you — no card at request.";
-
-export const metadata: Metadata = {
-  title: "Rent Miami's most-wanted exotics",
-  description: HOME_SOCIAL_DESCRIPTION,
-  openGraph: {
-    title: "RYDA — Rent Miami's most-wanted exotics",
-    description: HOME_SOCIAL_DESCRIPTION,
-    siteName: "RYDA",
-    type: "website",
-    locale: "en_US",
-    url: "/",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "RYDA — Rent Miami's most-wanted exotics",
-    description: HOME_SOCIAL_DESCRIPTION,
-  },
-};
 
 // ─────────────────────────────────────────────────────────────────────────
 // Data — assembled at module scope (build time). The four highest daily
@@ -71,6 +63,40 @@ const HERO_PHOTO = HERO_CAR ? getPartnerHero(HERO_CAR) : undefined;
 // partner fleet — the same list /rent renders. Advertising any other
 // number here is advertising cars a visitor cannot find.
 const FLEET_COUNT = PARTNER_VEHICLES.length;
+const MAKE_COUNT = new Set(PARTNER_VEHICLES.map((v) => v.make)).size;
+const RATES = PARTNER_VEHICLES.map((v) => v.dailyRate);
+const MIN_RATE = Math.min(...RATES);
+const MAX_RATE = Math.max(...RATES);
+const RATE_RANGE = `${formatUSD(MIN_RATE)} to ${formatUSD(MAX_RATE)} a day`;
+// Counterweight to the Featured strip, which is the four dearest cars
+// with photos and therefore reads as a supercar showroom on its own.
+const UNDER_300 = RATES.filter((r) => r < 300).length;
+
+// og/twitter are declared here in full because Next merges metadata
+// shallowly per top-level key. The root layout's card is rental-first
+// too, but declaring these locally keeps the home page's social card
+// pinned to the home page's own copy rather than inheriting whatever
+// the layout says later.
+const HOME_SOCIAL_DESCRIPTION =
+  `Miami cars, everyday to exotic. ${FLEET_COUNT} listings from independent Miami operators, ${RATE_RANGE}. Pick a car, send your dates, and the operator confirms directly with you — no card at request.`;
+
+export const metadata: Metadata = {
+  title: "Rent a car in Miami — everyday to exotic",
+  description: HOME_SOCIAL_DESCRIPTION,
+  openGraph: {
+    title: "RYDA — Rent a car in Miami, everyday to exotic",
+    description: HOME_SOCIAL_DESCRIPTION,
+    siteName: "RYDA",
+    type: "website",
+    locale: "en_US",
+    url: "/",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "RYDA — Rent a car in Miami, everyday to exotic",
+    description: HOME_SOCIAL_DESCRIPTION,
+  },
+};
 
 export default function HomePage() {
   return (
@@ -82,14 +108,15 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-6 sm:px-10">
           <Reveal>
             <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-              Exotic rentals · Miami
+              Car rental · Miami
             </p>
             <h1 className="mt-4 max-w-3xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
-              Miami&apos;s most-wanted exotics. One request away.
+              Miami cars, everyday to exotic. One request away.
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink-soft">
-              Pick a car, send your dates, and a vetted Miami operator
-              confirms directly with you.
+              {FLEET_COUNT} cars from independent Miami operators,{" "}
+              {RATE_RANGE}. Pick one, send your dates, and we pass your
+              request to the operator who runs it.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-5">
               <Link
@@ -162,6 +189,17 @@ export default function HomePage() {
             <h2 className="mt-3 max-w-2xl font-display text-3xl text-ink md:text-4xl">
               The cars Miami asks for by name.
             </h2>
+            {/* The featured strip is the top of the fleet by daily rate,
+                so it reads as a supercar showroom on its own. This line
+                is what keeps the page honest about the other 30-odd
+                cars: SUVs, sedans, convertibles, one seven-seater and
+                one EV all sit in the same grid. */}
+            <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-soft">
+              These are the top of the range, not the whole of it. The same
+              grid holds SUVs, sedans, convertibles, a seven-seater and an
+              EV — {UNDER_300} of the {FLEET_COUNT} cars are under $300 a
+              day.
+            </p>
           </Reveal>
           <RevealStagger
             className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3"
@@ -204,7 +242,7 @@ export default function HomePage() {
             <StepCard
               n="01"
               title="Browse the fleet"
-              body="One curated grid — Lamborghini, Ferrari, Rolls-Royce and the rest of Miami's most-wanted inventory. Every listing is real, bookable stock."
+              body={`One grid, ${FLEET_COUNT} cars across ${MAKE_COUNT} makes — Toyota and Tesla through Land Rover and Porsche to Ferrari and Lamborghini. Every listing is real, bookable stock.`}
             />
             <StepCard
               n="02"
@@ -214,7 +252,7 @@ export default function HomePage() {
             <StepCard
               n="03"
               title="The operator confirms"
-              body="Availability, final price, and keys, directly with you — on their contract and insurance."
+              body="We pass your request to the operator who runs that car. Availability, final price and keys come back directly from them — on their contract and insurance."
             />
           </RevealStagger>
           <Reveal delayMs={80}>
@@ -249,7 +287,7 @@ export default function HomePage() {
           >
             <InkPillar
               title="Vetted operators"
-              body="Every car is run by a Miami operator we've vetted — real fleet, real garage. They introduce themselves when they confirm."
+              body="Every car is run by an independent Miami operator we've vetted — real fleet, real garage. We pass your request on; they introduce themselves when they confirm."
             />
             <InkPillar
               title="Their contract & insurance"
@@ -272,7 +310,8 @@ export default function HomePage() {
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
           <Reveal>
             <h2 className="font-display text-3xl font-light text-ink md:text-4xl">
-              {FLEET_COUNT} cars. One request between you and the keys.
+              {FLEET_COUNT} cars, {RATE_RANGE}. One request between you and
+              the keys.
             </h2>
             <Link
               href="/rent"

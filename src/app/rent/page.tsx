@@ -6,6 +6,8 @@ import {
   RentalListings,
   RentalListingsFromUrl,
 } from "@/components/rental-listings";
+import { formatUSD } from "@/lib/market-data";
+import { PARTNER_VEHICLES } from "@/lib/partner-fleet";
 
 // /rent — the canonical browse page (founder decision, Aug 2026):
 // "/" is a full landing page that tells the story; the car-browsing
@@ -14,15 +16,28 @@ import {
 // inventory-first experiment (the component owns the data; we just
 // mount it). /rent/[slug] detail pages are unaffected.
 //
-// Lead-gen model in one breath: browse → request with dates → a vetted
-// Miami operator confirms and closes the rental on their own contract
-// and insurance. Operators pay RYDA a referral commission on bookings
-// we send them. We never name operators on listings.
+// Lead-gen model in one breath: browse → request with dates → RYDA
+// passes the request to the operator who runs that car → the operator
+// confirms and closes the rental on their own contract and insurance.
+// Operators pay RYDA a referral commission on bookings we send them. We
+// never name operators on listings.
+//
+// The intro copy describes the WHOLE grid, not the top of it. Six of
+// the 37 listings are category "Exotic"; the rest are SUVs, sedans,
+// convertibles, a seven-seater and an EV, and 21 of 37 are under $300 a
+// day. Selling this page as an exotics grid describes a sixth of what
+// renders below it. Numbers here are derived from PARTNER_VEHICLES so
+// they cannot drift from the cards.
+
+const FLEET_COUNT = PARTNER_VEHICLES.length;
+const MAKE_COUNT = new Set(PARTNER_VEHICLES.map((v) => v.make)).size;
+const RATES = PARTNER_VEHICLES.map((v) => v.dailyRate);
+const MIN_RATE = Math.min(...RATES);
+const MAX_RATE = Math.max(...RATES);
 
 export const metadata: Metadata = {
   title: "Rent — browse the Miami fleet",
-  description:
-    "Browse every car on RYDA's Miami rental grid — Lamborghini, Ferrari, Rolls-Royce and the rest. Send your dates and a vetted Miami operator confirms directly with you. No card at request.",
+  description: `Browse every car on RYDA's Miami rental grid — ${FLEET_COUNT} listings across ${MAKE_COUNT} makes, ${formatUSD(MIN_RATE)} to ${formatUSD(MAX_RATE)} a day. SUVs, sedans, convertibles and an EV alongside the exotics. Send your dates and a vetted Miami operator confirms directly with you. No card at request.`,
   alternates: { canonical: "/rent" },
 };
 
@@ -50,10 +65,12 @@ export default function RentPage() {
             Browse the fleet.
           </h1>
           <p className="mt-4 max-w-2xl text-sm leading-relaxed text-ink-soft">
-            Every listing is real, bookable stock run by a vetted Miami
-            operator. Send your dates and the operator confirms
-            availability and price directly with you — no card at
-            request.{" "}
+            {FLEET_COUNT} cars across {MAKE_COUNT} makes — everyday cars
+            through exotics, {formatUSD(MIN_RATE)} to {formatUSD(MAX_RATE)}{" "}
+            a day. Every one is in Miami, and every one is real, bookable
+            stock run by an independent operator we vet. Send your dates; we
+            pass your request to the operator, who confirms availability and
+            price directly with you. No card at request.{" "}
             <Link
               href="/how-it-works"
               className="font-medium text-red hover:text-red-deep"

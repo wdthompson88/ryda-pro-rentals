@@ -8,12 +8,18 @@
 //
 // We keep the SiteHeader at the layout level (not in each page) so
 // switching between sections doesn't re-mount the header (no flicker).
-// DemoBanner stays here for the same reason.
+//
+// A DemoBanner used to render here on every /account/* page reading
+// "Sample view, member-area features ship with the Miami launch. No
+// real co-ownership data is shown here." Every clause of that was
+// false: Miami is live, these pages read the caller's own
+// rental_inquiries rows through a session-gated API, and there is no
+// co-ownership data in this codebase to withhold. Banner and component
+// both deleted rather than reworded.
 
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
-import { DemoBanner } from "@/components/demo-banner";
 import { AccountNav } from "@/components/account-nav";
 import { SignOutButton } from "@/components/sign-out-button";
 import { supabase } from "@/lib/supabase";
@@ -74,7 +80,6 @@ export default function AccountLayout({
   return (
     <>
       <SiteHeader />
-      <DemoBanner />
 
       <section className="mx-auto max-w-7xl px-6 py-10 sm:px-10 sm:py-14">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[260px_1fr] lg:gap-12">

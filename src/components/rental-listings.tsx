@@ -105,8 +105,11 @@ const PRICE_BUCKETS: {
   { value: "3000+", label: "$3,000+/day", test: (r) => r >= 3_000 },
 ];
 
-// Year buckets, partner inventory is recent but not always current model;
-// "Newer than 2022" matches member expectation around modern luxury.
+// Year buckets. Operator inventory is recent but not always the current
+// model year, and most entries carry no `year` at all — a year filter
+// therefore hides more cars than it finds, which is why the neutral
+// "Any year" is the default. (No "member" framing here: RYDA has no
+// membership, and copy in this tree kept re-seeding one from comments.)
 const YEAR_BUCKETS: {
   value: string;
   label: string;
@@ -162,10 +165,13 @@ export function RentalListings({
     [],
   );
 
-  // Markets surfaced in the filter, include all RYDA markets (Miami,
-  // Los Angeles, New York) even if the inventory in some markets is
-  // Coming Soon. Partner inventory is Miami-only today but the
-  // architecture is ready for partner fleets in other cities.
+  // Markets surfaced in the filter. Every listing is in Miami; Los
+  // Angeles and New York are forced into the list ONLY so that picking
+  // one lands on the explicit "no operator lists a car here yet" empty
+  // state below rather than silently returning nothing. They are not
+  // markets RYDA serves, and nothing outside this dropdown may present
+  // them as such — the counter strip's hard-coded "· Miami · LA · NYC"
+  // did exactly that and is gone.
   const locations = useMemo(() => {
     const set = new Set<string>(ALL_LISTINGS.map((v) => v.market));
     // Force the canonical RYDA markets to appear even when a market has
@@ -226,6 +232,17 @@ export function RentalListings({
   }, [filtered, sort]);
 
   const totalListed = visible.length;
+  // Markets actually represented in what is on screen. The counter strip
+  // used to print a hard-coded "· Miami · LA · NYC" whenever no location
+  // filter was set — a claim of inventory in two cities that have none,
+  // sitting directly beside the count of cars that are all in one. It is
+  // derived now, so the strip can only ever name a market a visitor can
+  // scroll to; PartnerVehicle.market is the literal type "Miami", so
+  // today that is exactly "Miami".
+  const marketsShown = useMemo(
+    () => Array.from(new Set(visible.map((v) => v.market))).sort().join(" · "),
+    [visible],
+  );
   const minRate = visible.reduce(
     (acc, v) => Math.min(acc, v.dailyRate),
     Number.MAX_SAFE_INTEGER,
@@ -420,9 +437,9 @@ export function RentalListings({
             </span>
             {location !== ANY ? (
               <span className="ml-1.5 text-mute">in {location}</span>
-            ) : (
-              <span className="ml-1.5 text-mute">· Miami · LA · NYC</span>
-            )}
+            ) : marketsShown ? (
+              <span className="ml-1.5 text-mute">in {marketsShown}</span>
+            ) : null}
           </p>
           {totalListed > 0 ? (
             <p className="text-xs text-ink-soft tabular-nums">

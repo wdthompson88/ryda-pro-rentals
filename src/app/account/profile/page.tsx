@@ -6,11 +6,20 @@
 // involved because user_metadata is owned by the auth row itself.
 //
 // Fields:
-//   - full_name        (legal name on insurance + LLC member register)
+//   - full_name        (legal name as shown on ID)
 //   - preferred_name   (the casual one — what shows on /account)
 //   - phone            (E.164-ish, free text — validation is light)
-//   - date_of_birth    (age-verification on rentals)
+//   - date_of_birth    (stored on the account; nothing reads it)
 //   - mailing address  (stored on the account only — see below)
+//
+// The page header used to tell the customer their legal name was used
+// "to address you on the LLC member register, ship paperwork, and
+// verify your age on rentals". There is no LLC register in this
+// codebase, RYDA ships nothing, and RYDA checks nobody's age — Terms §3
+// puts eligibility with the operator. Same for the date-of-birth hint
+// ("Drivers must be 28+ to rent") and the phone hint ("For booking-day
+// SMS reminders"): no 28+ rule exists in partner-fleet.ts or any
+// migration, and there is no SMS provider in the repo. All deleted.
 //
 // The address hint used to read "White-glove delivery, K-1 tax forms,
 // insurance certificates." RYDA delivers no vehicle and issues no
@@ -86,15 +95,17 @@ export default function ProfilePage() {
   const [form, setForm] = useState<Profile>(EMPTY);
   // Marketing consent is tracked separately from the Profile shape —
   // its canonical home is auth user_metadata, not user_profiles.
-  const [marketingOptIn, setMarketingOptIn] = useState(true);
-  const [initialMarketing, setInitialMarketing] = useState(true);
+  // Starts UNCHECKED: a box the customer never ticked, rendered as
+  // ticked, is a consent record the site made up on their behalf.
+  const [marketingOptIn, setMarketingOptIn] = useState(false);
+  const [initialMarketing, setInitialMarketing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [savedFlash, setSavedFlash] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Load from auth (for email) + user_profiles row on mount. The row
-  // is lazily created on first save (upsert), so a brand-new member
+  // is lazily created on first save (upsert), so a brand-new account
   // sees EMPTY here until they fill it in.
   useEffect(() => {
     if (!supabase) {
@@ -110,12 +121,15 @@ export default function ProfilePage() {
       }
       setEmail(userData.user.email ?? "");
 
-      // Marketing consent: signup wrote it to user_metadata; default
-      // true (opt-out model, matching the signup checkbox default).
+      // Marketing consent: /signup writes an explicit false to
+      // user_metadata, so an account created there reads false. Anything
+      // that is not an explicit true (an OAuth signup, which can't carry
+      // metadata through the provider redirect) reads as no consent
+      // given — this box shows what was recorded, never a default.
       const meta = userData.user.user_metadata as
         | { marketing_opt_in?: unknown }
         | undefined;
-      let marketing = meta?.marketing_opt_in !== false;
+      let marketing = meta?.marketing_opt_in === true;
 
       // Best-effort override from rental_profiles (the row the
       // rental-inquiry API upserts). The table ships with that API's
@@ -258,8 +272,10 @@ export default function ProfilePage() {
           Your details.
         </h1>
         <p className="mt-2 max-w-2xl text-sm text-ink-soft">
-          We use this to address you on the LLC member register, ship paperwork,
-          and verify your age on rentals. Email and password live under{" "}
+          Kept on your account and used to fill in your next rental request.
+          When you send one, your name, email and phone go to the operator
+          with it — nothing else on this page does. Email and password live
+          under{" "}
           <Link href="/account/security" className="text-red hover:text-red-deep">
             Login & security
           </Link>
@@ -272,9 +288,9 @@ export default function ProfilePage() {
       ) : (
         <form onSubmit={onSave} className="space-y-10">
           {/* Identity ─────────────────────────────────── */}
-          <Section title="Identity" hint="Names + age verification">
+          <Section title="Identity" hint="Names and contact">
             <Row>
-              <Field label="Legal name" hint="As shown on your ID. Used on the LLC register.">
+              <Field label="Legal name" hint="As shown on your ID.">
                 <input
                   type="text"
                   autoComplete="name"
@@ -301,7 +317,7 @@ export default function ProfilePage() {
                   className={`${inputCls} cursor-not-allowed bg-cream-2/60 text-mute`}
                 />
               </Field>
-              <Field label="Phone" hint="For booking-day SMS reminders.">
+              <Field label="Phone" hint="Sent to the operator with a rental request.">
                 <input
                   type="tel"
                   autoComplete="tel"
@@ -312,7 +328,10 @@ export default function ProfilePage() {
               </Field>
             </Row>
             <Row>
-              <Field label="Date of birth" hint="Drivers must be 28+ to rent.">
+              <Field
+                label="Date of birth"
+                hint="Optional. Kept on your account — RYDA doesn't check it; the operator sets who may drive their car."
+              >
                 <input
                   type="date"
                   autoComplete="bday"
@@ -400,7 +419,7 @@ export default function ProfilePage() {
           </Section>
 
           {/* Rentals ─────────────────────────────────── */}
-          <Section title="Rentals" hint="Requests + drop alerts">
+          <Section title="Rentals" hint="Requests and email preference">
             <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-rule bg-cream-2/40 p-3 text-xs">
               <input
                 type="checkbox"
@@ -408,8 +427,13 @@ export default function ProfilePage() {
                 onChange={(e) => setMarketingOptIn(e.target.checked)}
                 className="mt-0.5 h-4 w-4 accent-red"
               />
+              {/* The old label offered "Miami drops and member offers".
+                  There is no drops programme and no membership; the
+                  only thing this box does is record a consent flag. */}
               <span className="text-ink-soft">
-                Send me Miami drops and member offers. Unsubscribe any time.
+                RYDA may email me about cars and offers. RYDA sends no
+                marketing email today — this records your permission for
+                if that changes.
               </span>
             </label>
             <p className="text-xs text-ink-soft">

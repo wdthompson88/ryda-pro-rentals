@@ -328,9 +328,18 @@ export default async function RentDetailPage({
             How the rental works
           </h2>
           <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {/* "Your request goes straight to the Miami operator" stood
+                here on all 37 listing pages and was false:
+                PARTNER_INQUIRY_EMAILS in src/lib/partner-contacts.ts is
+                empty — its one entry is commented out pending a signed
+                referral agreement — so partnerInquiryEmail() returns the
+                RYDA team inbox for every car and a person forwards the
+                lead. RYDA in the middle is the truth; say it, so the
+                customer is not left concluding the operator ignored
+                them. */}
             <Pillar
               title="A vetted operator"
-              body="Your request goes straight to the Miami operator who runs this car. They reply by name and confirm availability directly with you."
+              body="Your request comes to RYDA, and we pass it to the Miami operator who runs this car. They reply by name and confirm availability directly with you."
             />
             <Pillar
               title="Their contract & insurance"

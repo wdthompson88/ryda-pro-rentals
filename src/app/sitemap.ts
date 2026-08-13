@@ -35,21 +35,37 @@ const PUBLIC_ROUTES = [
   // exist, and /careers advertised storage, insurance and vehicle-
   // acquisition roles for a fleet RYDA does not own. Do not re-add them.
   //
+  // /sustainability was deleted in the same spirit. Stripped of its
+  // denials it said one thing RYDA already says on /about, in
+  // /trust-and-safety and in Terms §2 — that it owns, stores, insures,
+  // maintains and operates no vehicle — while the footer link promised
+  // a programme that does not exist: no offsets, no data, no
+  // facilities, nothing to measure. A referral marketplace has no
+  // environmental programme to report on. Do not re-add it.
+  //
   // Company + support.
   "/about",
   "/trust-and-safety",
-  "/sustainability",
   "/help",
   "/faq",
   "/press",
   "/investors",
   "/contact",
-  // Locations. The /locations index is a real page with its own
-  // canonical tag, so it belongs here alongside the per-market pages.
-  "/locations",
+  // Locations. Miami is the only market page left, and the only one
+  // there is inventory for: PartnerVehicle.market is the literal type
+  // "Miami", so all 37 listings are Miami listings and no other city
+  // can currently be in the fleet at all.
+  //
+  // The /locations index and the Los Angeles and New York pages were
+  // deleted. The index was a market list for a single-market
+  // marketplace ("One market live. Two on the list."), and the two
+  // city pages were indexed, canonical-tagged landing pages whose
+  // entire unique content was a denial that any car is listed there —
+  // the same false-coverage signal that was deliberately stripped out
+  // of the Organization.areaServed JSON-LD in layout.tsx. When a
+  // second market has operators, the honest version of it is cars in
+  // the /rent grid, not a page announcing an empty city.
   "/locations/miami",
-  "/locations/los-angeles",
-  "/locations/new-york",
   // Search + auth.
   "/search",
   "/signin",

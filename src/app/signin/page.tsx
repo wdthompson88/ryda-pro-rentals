@@ -9,10 +9,10 @@ import { supabase } from "@/lib/supabase";
 import { safeNext } from "@/lib/safe-next";
 
 // /signin, primary path is email+password (shown by default).
-// Magic-link is a secondary action below the form for members who
+// Magic-link is a secondary action below the form for people who
 // don't want to remember a password OR forgot it. The `?next=` query
-// param is preserved so a member who signs in from a gated CTA
-// (e.g. "Reserve a share") returns to that exact page after auth.
+// param is preserved so someone who signs in from a gated page
+// (/account/*, /partner) returns to that exact page after auth.
 
 export default function SignInPage() {
   return (
@@ -26,10 +26,8 @@ function SignInPageInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
   // Sanitize `?next=` against open-redirect / javascript: scheme tricks.
-  // Anything not a same-origin path falls back to /account (real
-  // authenticated overview). /portfolio is the public sample-data demo.
+  // Anything not a same-origin path falls back to /account.
   const next = safeNext(searchParams.get("next"), "/account");
-  const reason = searchParams.get("reason"); // "rent" | "buy" | "checkout", gives copy a hook
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,7 +36,7 @@ function SignInPageInner() {
   const [submittingMagic, setSubmittingMagic] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // If a signed-in member lands on /signin (old bookmark, deep link, or
+  // If a signed-in visitor lands on /signin (old bookmark, deep link, or
   // stale tab), bounce to /account — there's nothing to do here for
   // them. We check once on mount; the auth listener isn't needed
   // because the only state change we care about is sign-in success,
@@ -55,14 +53,10 @@ function SignInPageInner() {
     };
   }, [router, next]);
 
-  const reasonCopy =
-    reason === "rent"
-      ? "Sign in to confirm your rental request."
-      : reason === "buy"
-        ? "Sign in to claim your share."
-        : reason === "checkout"
-          ? "Sign in to complete your reservation."
-          : "Welcome back.";
+  // The heading used to branch on ?reason= — "Sign in to claim your
+  // share" / "complete your reservation". Nothing links here with that
+  // param, and neither a share nor a reservation exists, so the branch
+  // is deleted rather than reworded.
 
   // Primary submit, email + password.
   async function onPasswordSubmit(e: React.FormEvent) {
@@ -103,7 +97,7 @@ function SignInPageInner() {
   }
 
   // Secondary path, send a magic link to whatever email the user has
-  // typed in the form. Doesn't require password. Used when the member
+  // typed in the form. Doesn't require password. Used when the user
   // forgot their password or just doesn't want to type one.
   async function onMagicLink() {
     if (!email.includes("@")) {
@@ -142,9 +136,12 @@ function SignInPageInner() {
           <p className="text-xs font-medium uppercase tracking-[0.22em] text-mute">
             Sign in
           </p>
-          <h1 className="mt-3 font-display text-3xl text-ink">{reasonCopy}</h1>
+          <h1 className="mt-3 font-display text-3xl text-ink">
+            Welcome back.
+          </h1>
           <p className="mt-2 text-sm text-ink-soft">
-            Member sign-in for RYDA, co-owners, renters, and partners.
+            Sign in to see the rental requests you&apos;ve sent. Fleet
+            partners sign in here too.
           </p>
 
           {/* Social sign-in (renders only for providers enabled via

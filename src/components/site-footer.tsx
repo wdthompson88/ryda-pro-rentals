@@ -19,10 +19,15 @@ export function SiteFooter() {
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-10">
             <div className="lg:col-span-7">
               <p className="font-display text-3xl text-ink">RYDA</p>
+              {/* Renders on every page, so it carries the site-wide
+                  positioning: range, not exotics. Six of the 37
+                  listings are category "Exotic" — "Miami's exotic and
+                  luxury rental fleet" described a sixth of the grid. */}
               <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-ink-soft">
-                Miami&apos;s exotic and luxury rental fleet, in one grid.
-                Send one request with your dates and a vetted local
-                operator confirms directly with you.
+                Miami rental cars, everyday to exotic, in one grid.
+                Send one request with your dates, we pass it to the
+                operator who runs the car, and they confirm directly
+                with you.
               </p>
             </div>
             <div className="lg:col-span-5 lg:flex lg:items-end lg:justify-end">
@@ -79,7 +84,11 @@ export function SiteFooter() {
             title="Resources"
             links={[
               ["Trust & safety", "/trust-and-safety"],
-              ["Sustainability", "/sustainability"],
+              // "Sustainability" pointed at /sustainability, a page
+              // whose own answer was that there is no programme, no
+              // offsets, no data and no facilities. A nav label is a
+              // promise; that one promised something RYDA does not
+              // have. Route deleted, link deleted with it.
               ["Help center", "/help"],
             ]}
           />

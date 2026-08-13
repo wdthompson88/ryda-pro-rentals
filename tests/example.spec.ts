@@ -68,11 +68,17 @@ test.describe('how-it-works', () => {
     // guarantees, or never touches payment. AGENTS.md forbids that claim
     // outright, so this asserts the mechanism rather than a reassurance.
     await expect(
-      page.getByText(/straight to the operator/i).first(),
-    ).toBeVisible();
-    await expect(
       page.getByText(/collected as a platform fee/i).first(),
     ).toBeVisible();
+    // A third assertion here pinned /straight to the operator/i. That
+    // phrasing is false and the assertion was holding it in place:
+    // PARTNER_INQUIRY_EMAILS in src/lib/partner-contacts.ts is empty —
+    // its one entry is commented out pending a signed referral
+    // agreement — so partnerInquiryEmail() returns the RYDA team
+    // fallback for every listing and each lead is triaged and passed on
+    // by hand. A smoke test may not require a page to keep saying
+    // something the code contradicts, so it is gone rather than
+    // reworded; the routing copy itself is the copy pass's to fix.
   });
 });
 

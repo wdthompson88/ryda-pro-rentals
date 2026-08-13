@@ -2,20 +2,48 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { Reveal, RevealStagger } from "@/components/reveal";
+import { formatUSD } from "@/lib/market-data";
+import { PARTNER_VEHICLES } from "@/lib/partner-fleet";
 
 // Rental "How it works". The old co-ownership doctrine page (5-step
 // lifecycle, exit doctrine, 4-way comparison) lives only in git history
 // — that product is not part of this repo.
 //
 // This page has one job: explain the lead-gen model honestly in under
-// a minute — browse, request with dates, a vetted operator confirms and
-// closes the rental on their own contract and insurance. RYDA earns a
-// referral commission from the operator, never a markup from you.
+// a minute — browse, request with dates, RYDA passes the request to the
+// operator, the operator confirms and closes the rental on their own
+// contract and insurance. RYDA earns a referral commission from the
+// operator, never a markup from you.
+//
+// Two corrections this page carries scars from, Aug 2026:
+//
+// 1. Step 01 named "McLaren". There has never been a McLaren in
+//    PARTNER_VEHICLES — src/app/layout.tsx:60-63 records deleting the
+//    same marque from the root metadata for the same reason, and missed
+//    this file. Every marque and number on this page is now DERIVED from
+//    PARTNER_VEHICLES at build time, so the page physically cannot
+//    advertise a car that is not on /rent.
+// 2. Step 03 said "your request goes straight to the operator". False:
+//    PARTNER_INQUIRY_EMAILS in src/lib/partner-contacts.ts is empty (its
+//    single entry is commented out pending a signed referral agreement),
+//    so partnerInquiryEmail() returns the RYDA team inbox for every
+//    listing and each lead is triaged and forwarded by hand. /faq
+//    already documents this; the canonical page now matches it.
+//
+// The positioning is RANGE, not exotics. Six of the 37 listings are
+// category "Exotic" and 21 are under $300 a day. Ferraris and
+// Lamborghinis are real and may be named — as part of a fleet that also
+// runs Toyota, Tesla and Volkswagen, not as the whole of it.
+
+const FLEET_COUNT = PARTNER_VEHICLES.length;
+const MAKE_COUNT = new Set(PARTNER_VEHICLES.map((v) => v.make)).size;
+const BY_RATE = [...PARTNER_VEHICLES].sort((a, b) => a.dailyRate - b.dailyRate);
+const CHEAPEST = BY_RATE[0];
+const DEAREST = BY_RATE[BY_RATE.length - 1];
 
 export const metadata: Metadata = {
   title: "How it works",
-  description:
-    "One request. A named operator. The keys. Browse Miami's exotic rental fleet, request your dates, and a vetted operator confirms directly with you — on their contract, at their price. RYDA earns a referral commission from operators, never a markup from you.",
+  description: `One request. A named operator. The keys. Browse ${FLEET_COUNT} Miami rental cars — everyday SUVs and sedans through exotics — send your dates, and the vetted operator who runs that car confirms directly with you, on their contract at their price. RYDA earns a referral commission from operators, never a markup from you.`,
   alternates: { canonical: "/how-it-works" },
 };
 
@@ -29,18 +57,19 @@ export default function HowItWorksPage() {
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-24">
           <Reveal>
             <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-              How it works · Exotic rentals · Miami
+              How it works · Car rental · Miami
             </p>
             <h1 className="mt-4 max-w-4xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
               One request. A named operator.{" "}
               <span className="italic">The keys.</span>
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink-soft">
-              RYDA is the front door to Miami&apos;s exotic-rental fleets.
-              You browse one curated grid, send one request with your
-              dates, and the vetted operator who runs that car confirms
-              availability and price directly with you — then closes the
-              rental on their own contract and insurance.
+              RYDA is the front door to Miami&apos;s independent rental
+              fleets — everyday cars through exotics, in one grid. You send
+              one request with your dates, we pass it to the operator who
+              runs that car, and they confirm availability and price
+              directly with you — then close the rental on their own
+              contract and insurance.
             </p>
           </Reveal>
         </div>
@@ -61,7 +90,7 @@ export default function HowItWorksPage() {
             <Step
               n="01"
               title="Browse"
-              body="One grid, the whole fleet — Lamborghini, Ferrari, McLaren and the rest of Miami's most-wanted inventory. Every listing is real, bookable stock run by a vetted Miami operator. We don't put operator names on listings; we put cars."
+              body={`One grid, the whole fleet — ${FLEET_COUNT} cars across ${MAKE_COUNT} makes in Miami, from a ${CHEAPEST.make} ${CHEAPEST.model} at ${formatUSD(CHEAPEST.dailyRate)} a day to a ${DEAREST.make} ${DEAREST.model} at ${formatUSD(DEAREST.dailyRate)}. Every listing is real, bookable stock run by a vetted Miami operator. We don't put operator names on listings; we put cars.`}
             />
             <Step
               n="02"
@@ -71,7 +100,7 @@ export default function HowItWorksPage() {
             <Step
               n="03"
               title="Operator confirms — and hands you the keys"
-              body="Your request goes straight to the operator who runs that car. They come back to you by name, confirm availability and price, and close the rental on their own contract and insurance. Delivery, deposit, and mileage terms are theirs — agreed directly between you."
+              body="Your request lands with RYDA, and we pass it to the operator who runs that car. They come back to you by name, confirm availability and price, and close the rental on their own contract and insurance. Delivery, deposit, and mileage terms are theirs — agreed directly between you."
             />
           </RevealStagger>
         </div>
@@ -97,7 +126,9 @@ export default function HowItWorksPage() {
               {
                 label: "Your price",
                 value: "The operator's price",
-                note: "Inquiring through RYDA never costs you more than going direct. No markup, no booking fee, no membership required to request.",
+                // No "no membership required" here: RYDA has no
+                // membership, and denying one implies there is one.
+                note: "Inquiring through RYDA never costs you more than going direct. No markup and no booking fee — you pay the rate the operator confirms.",
               },
               {
                 label: "Who you rent from",
