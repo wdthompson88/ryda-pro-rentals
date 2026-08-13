@@ -57,8 +57,12 @@ export const metadata: Metadata = {
     default: "RYDA — Exotic and luxury car rental, Miami",
     template: "%s · RYDA",
   },
+  // Makes named here must exist in PARTNER_VEHICLES — this is the
+  // default snippet for every page that doesn't set its own, and a
+  // marque nobody can find on /rent is an advertised car we don't have.
+  // McLaren was listed here and is not in the fleet.
   description:
-    "Browse Miami's exotic and luxury rental fleet — Ferrari, Lamborghini, McLaren, Rolls-Royce. Send one request with your dates and a vetted local operator confirms directly with you, on their contract and insurance.",
+    "Browse Miami's exotic and luxury rental fleet — Ferrari, Lamborghini, Rolls-Royce, Porsche. Send one request with your dates and the vetted local operator who owns the car confirms directly with you, on their contract and insurance.",
   metadataBase: new URL(siteUrl),
   // Canonical anchor for the home page. Per-page metadata can override
   // alternates.canonical for routes that should self-canonicalize
@@ -109,12 +113,26 @@ export const metadata: Metadata = {
   applicationName: "RYDA",
 };
 
-// Schema.org Organization + WebSite + Service JSON-LD for the home
-// document. This populates the Google knowledge panel + sitelinks
-// when the brand starts to rank, AND gives crawlers a structured
-// description of what RYDA is. The site-wide WebSite block is the
-// most important — it's what tells Google "this domain is RYDA",
-// not "this is some text about supercars."
+// Schema.org Organization + WebSite JSON-LD for every document. This
+// populates the Google knowledge panel + sitelinks when the brand
+// starts to rank, AND gives crawlers a structured description of what
+// RYDA is. The WebSite block is what tells Google "this domain is
+// RYDA", not "this is some text about supercars."
+//
+// There is deliberately NO `Service` node any more. The one that used
+// to sit here declared serviceType "Exotic and luxury car rental" with
+// provider: RYDA and an InStock `Offer` on /rent — a machine-readable
+// assertion that RYDA is the rental company, which Terms §2 and the
+// Platform Disclaimer deny in writing (RYDA does not own, store,
+// insure, maintain or operate any vehicle, and is not a party to the
+// rental). schema.org has no vocabulary for "we refer you to the
+// business that actually provides this": `provider` / `offeredBy` want
+// the operator, and operators are never named on a customer-facing
+// surface (D6) — and this JSON-LD is served on every page. Nor is the
+// availability knowable: a listing is browsable, not InStock, because
+// nothing is reserved until the operator confirms. Removing the node
+// beats misdeclaring the provider; Organization.description carries
+// the referral model in prose, which is the true statement.
 const organizationJsonLd = {
   "@context": "https://schema.org",
   "@graph": [
@@ -126,13 +144,14 @@ const organizationJsonLd = {
       url: siteUrl,
       logo: `${siteUrl}/opengraph-image`,
       description:
-        "RYDA is a marketplace for exotic and luxury car rental. We list vetted local operators' fleets in one grid, route each request to the operator who holds the car, and earn a referral commission on the bookings we send them. Miami now; LA + NY 2027.",
+        "RYDA is a referral marketplace for exotic and luxury car rental. Every vehicle listed is owned and operated by an independent Miami operator: we list their fleets in one grid, pass each request to the operator who holds the car, and earn a referral commission from them. RYDA does not own, store, insure, maintain or operate any vehicle, and is not a party to the rental.",
       foundingDate: "2026",
-      areaServed: [
-        { "@type": "City", name: "Miami" },
-        { "@type": "City", name: "Los Angeles" },
-        { "@type": "City", name: "New York" },
-      ],
+      // Miami only. `PartnerVehicle.market` is the literal type "Miami",
+      // so the inventory cannot currently hold anything else — listing
+      // LA and NY here claimed coverage in two cities with zero
+      // listings. Add a city back when operators in it are listed
+      // (same rule as MARKETS[...].status and /locations/_components).
+      areaServed: [{ "@type": "City", name: "Miami" }],
       address: {
         "@type": "PostalAddress",
         addressLocality: "Miami",
@@ -161,7 +180,7 @@ const organizationJsonLd = {
       url: siteUrl,
       name: "RYDA",
       description:
-        "Rent a Ferrari, Lamborghini, McLaren or Rolls-Royce in Miami. One request; a vetted local operator confirms directly with you.",
+        "Browse Miami's exotic rental fleet in one grid. Send one request with your dates; the vetted local operator who owns the car confirms directly with you, on their contract and insurance.",
       publisher: { "@id": `${siteUrl}#organization` },
       inLanguage: "en-US",
       potentialAction: {
@@ -171,24 +190,6 @@ const organizationJsonLd = {
           urlTemplate: `${siteUrl}/search?q={search_term_string}`,
         },
         "query-input": "required name=search_term_string",
-      },
-    },
-    {
-      "@type": "Service",
-      "@id": `${siteUrl}#service`,
-      serviceType: "Exotic and luxury car rental",
-      provider: { "@id": `${siteUrl}#organization` },
-      areaServed: [
-        { "@type": "City", name: "Miami" },
-        { "@type": "City", name: "Los Angeles" },
-        { "@type": "City", name: "New York" },
-      ],
-      offers: {
-        "@type": "Offer",
-        priceCurrency: "USD",
-        availability: "https://schema.org/InStock",
-        url: `${siteUrl}/rent`,
-        category: "Car rental",
       },
     },
   ],
@@ -203,10 +204,10 @@ export default function RootLayout({
       className={`${inter.variable} ${fraunces.variable} h-full antialiased`}
     >
       <head>
-        {/* Site-wide Organization + WebSite + Service Schema.org graph.
-            This is what Google reads to populate the brand knowledge
-            panel + sitelinks search box. Without this, the search
-            snippet defaults to whatever Google extracts from the
+        {/* Site-wide Organization + WebSite Schema.org graph. This is
+            what Google reads to populate the brand knowledge panel +
+            sitelinks search box. Without this, the search snippet
+            defaults to whatever Google extracts from the
             <meta description> alone. */}
         <script
           type="application/ld+json"

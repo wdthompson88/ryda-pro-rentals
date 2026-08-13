@@ -1,17 +1,15 @@
 "use client";
 
-// /account/privacy — data export + account deletion. Both are
-// "request" flows today (we email RYDA support to action), since:
-//   - GDPR/CCPA-style data export needs to bundle data from auth +
-//     share_purchases + share_holdings + bookings + kyc + amendments
-//     + Stripe + Resend logs — that's a ~5-minute backend job, not a
-//     single-button click yet.
-//   - Account deletion is irreversible; we want a 24-hour cooling-off
-//     window before doing it, and we have to coordinate Stripe
-//     subscriber teardown + LLC-share buyback (legal, not just code).
+// /account/privacy — data export + account deletion.
 //
-// Both buttons fire a /api/contact submission with type=Privacy that
-// the team handles manually for now.
+// Both are REQUEST flows: the button POSTs to /api/account/data-request,
+// which writes a contact_messages row and emails the team. No export is
+// assembled and no account is deleted by any code in this repo. Copy on
+// this page has to say that plainly — the previous version described an
+// automatic ZIP with signed-agreement PDFs, a 24-hour cooling-off
+// window, a 30-day purge and an LLC-share buyback "per your Operating
+// Agreement", none of which exist. RYDA sells no shares and issues no
+// K-1s; there is no membership to end.
 
 import { useState } from "react";
 import { authedFetch } from "@/lib/api-fetch";
@@ -27,9 +25,9 @@ export default function PrivacyPage() {
           Your data, your call.
         </h1>
         <p className="mt-2 max-w-2xl text-sm text-ink-soft">
-          Download everything we have on file, or end your membership and
-          remove your account. Account closure also kicks off LLC-share
-          buyback per your Operating Agreement; legal coordinates that.
+          Ask for a copy of what we hold on you, or ask us to delete your
+          account. Both go to our team as a request — a person actions them,
+          nothing here happens automatically.
         </p>
       </header>
 
@@ -71,13 +69,13 @@ function DataExportCard() {
 
   return (
     <Card
-      title="Download your data"
-      hint="Profile, holdings, bookings, payments, agreements, KYC summary."
+      title="Request your data"
+      hint="Your account details, the rental requests you've sent, any booking that came out of one, and your identity-verification record."
     >
       <p className="text-sm text-ink-soft">
-        We'll bundle a ZIP with JSON exports of every record tied to your
-        account, plus PDFs of every agreement you've signed. Delivery is via
-        email link, expires after 7 days.
+        This sends a request to our team. There's no automatic export button
+        behind it — someone puts the file together and replies to the email
+        address on your account.
       </p>
       {error && (
         <p className="rounded-xl border border-red/40 bg-red/5 px-4 py-3 text-sm text-red">
@@ -95,8 +93,8 @@ function DataExportCard() {
         </button>
       ) : (
         <p className="rounded-xl border border-success/40 bg-success/5 px-4 py-3 text-sm text-success-deep">
-          Request received. We'll email a download link within 30 days
-          (typically 1–3 business days).
+          Request received. Someone from our team will reply to the email
+          address on your account.
         </p>
       )}
     </Card>
@@ -114,36 +112,41 @@ function CookiePreferencesCard() {
       <ul className="space-y-3 text-sm text-ink-soft">
         <CookieRow
           name="Essential"
-          desc="Sign-in session, CSRF protection, security checks."
-          required
+          desc="The Supabase Auth session that keeps you signed in."
+          state="Required"
+          tone="neutral"
         />
         <CookieRow
           name="Analytics"
-          desc="Aggregate-only page-view counts. No cross-site tracking."
-          required={false}
-          enabled
+          desc="Vercel Analytics counts page views on every page and sets no cookies. PostHog loads only if you chose to accept analytics in the cookie banner — and while you're signed in it is given your user ID and email, so those events are tied to your account rather than anonymous."
+          state="Your banner choice"
+          tone="on"
         />
         <CookieRow
           name="Marketing"
-          desc="Off by default. We don't run remarketing."
-          required={false}
-          enabled={false}
+          desc="RYDA loads no advertising or remarketing scripts."
+          state="None"
+          tone="off"
         />
       </ul>
     </Card>
   );
 }
 
+// `state` is written out rather than derived from an on/off boolean:
+// analytics is neither simply on nor simply off — Vercel Analytics
+// always runs, PostHog runs only on an 'all' answer to the cookie
+// banner — and a two-state pill could only have lied about one of them.
 function CookieRow({
   name,
   desc,
-  required,
-  enabled,
+  state,
+  tone,
 }: {
   name: string;
   desc: string;
-  required?: boolean;
-  enabled?: boolean;
+  state: string;
+  tone: "neutral" | "on" | "off";
 }) {
   return (
     <li className="flex items-start justify-between gap-4 border-b border-rule pb-3 last:border-b-0 last:pb-0">
@@ -152,15 +155,15 @@ function CookieRow({
         <p className="text-xs text-mute">{desc}</p>
       </div>
       <span
-        className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${
-          required
-            ? "bg-mute/15 text-mute"
-            : enabled
-              ? "bg-success/10 text-success-deep"
-              : "bg-mute/10 text-mute"
+        className={`inline-flex shrink-0 items-center rounded-full px-3 py-1 text-xs font-medium ${
+          tone === "on"
+            ? "bg-success/10 text-success-deep"
+            : tone === "off"
+              ? "bg-mute/10 text-mute"
+              : "bg-mute/15 text-mute"
         }`}
       >
-        {required ? "Required" : enabled ? "On" : "Off"}
+        {state}
       </span>
     </li>
   );
@@ -200,13 +203,22 @@ function DeleteAccountCard() {
   return (
     <Card
       title="Delete account"
-      hint="Closes membership, cancels future renewal, starts share-buyback. Irreversible after the 24-hour grace period."
+      hint="Sends our team a request to delete your RYDA account. There is no subscription to cancel."
     >
       <ul className="space-y-2 text-sm text-ink-soft">
-        <li>· Active bookings are canceled (refund per cancellation policy)</li>
-        <li>· LLC shares are bought back at the latest fair-value mark</li>
-        <li>· Personal data is purged 30 days after closure</li>
-        <li>· Tax records (K-1s, etc.) retained per IRS rules — 7 years</li>
+        <li>
+          · Deleting your RYDA account does not cancel a rental. Once a request
+          has gone to an operator, the booking, the contract and any deposit
+          are between you and them
+        </li>
+        <li>
+          · Anything already sent to an operator has already left RYDA — we
+          cannot take it back on your behalf
+        </li>
+        <li>
+          · The request itself is recorded so we have a record of who asked and
+          when
+        </li>
       </ul>
       {!confirming && !requested && (
         <button
@@ -260,10 +272,9 @@ function DeleteAccountCard() {
       )}
       {requested && (
         <p className="rounded-xl border border-warn/40 bg-warn/5 px-4 py-3 text-sm text-warn-deep">
-          Deletion request received. Legal will email you within one business
-          day to walk through share-buyback. You stay signed in until they
-          confirm with you — there's a 24-hour cooling-off window before
-          anything is irreversible.
+          Deletion request received. Nothing has been deleted yet — someone
+          from our team actions this by hand and will reply to the email
+          address on your account. You stay signed in until then.
         </p>
       )}
     </Card>

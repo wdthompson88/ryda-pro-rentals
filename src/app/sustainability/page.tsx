@@ -1,10 +1,38 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 
+// Rental-only sustainability page. The previous version was written for
+// the co-ownership product and was built entirely out of numbers this
+// repo cannot produce: "90% reduction in vehicles built", "~360 tons CO2
+// avoided", "5x higher utilization", "0 idle storage acres", "150-250
+// driven days vs 35". It also described RYDA facilities, RYDA vehicle
+// transport, a 2027 hybrid/EV lineup chosen by member vote, and a
+// carbon-offset programme. None of that exists.
+//
+// The replacement carries no statistics at all, and that is deliberate:
+// a rental-flavoured substitute for a co-ownership statistic is still a
+// fabricated statistic. RYDA measures requests, confirmed prices and
+// charges — not mileage, fuel, or how many days a car is out — so there
+// is no honest number to print here.
+//
+// Every claim below has a referent:
+//   - owns/stores/insures/maintains/operates nothing .... /legal/terms §2
+//   - one payment rail, on the operator's account ....... /legal/terms §6,
+//                                                         /trust-and-safety
+//   - the review covers company + Stripe verification ... partner_accounts,
+//                                                         Stripe Express
+//   - no offsets, no emissions data, no facilities ...... nothing in the
+//                                                         repo does these
+//
+// Do not add an offset programme, a utilisation figure, an emissions
+// estimate or a fleet-electrification roadmap to this page unless
+// something in the codebase actually produces it.
+
 export const metadata = {
   title: "Sustainability",
   description:
-    "Six members can share one Ferrari. The math, the environmental impact, and what RYDA does about it.",
+    "RYDA builds no cars and owns none. What a referral marketplace can honestly claim about its environmental footprint, and the figures we don't publish because we don't measure them.",
+  alternates: { canonical: "/sustainability" },
 };
 
 export default function SustainabilityPage() {
@@ -18,163 +46,154 @@ export default function SustainabilityPage() {
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
             Sustainability
           </p>
-          <h1 className="mt-4 max-w-3xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
-            Ten shares.{" "}
-            <span className="italic">One Ferrari.</span>
+          <h1 className="mt-4 max-w-4xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
+            We don&apos;t build cars.{" "}
+            <span className="italic">We don&apos;t own them either.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
-            Not a climate solution. But the math is honest: a single LLC
-            with 10 shares (up to 5 members) beats up to 10 separately-owned cars sitting idle
-            in 10 separate garages, whether those shares are held by ten
-            members or a smaller group.
+            RYDA is a referral marketplace. Every car listed here was
+            already bought, insured and garaged by an independent Miami
+            operator before we listed it. What RYDA adds is a way to find
+            it.
           </p>
         </div>
       </section>
 
-      {/* The math */}
-      <section className="border-b border-rule bg-cream-2">
-        <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
-          <h2 className="font-display text-3xl text-ink sm:text-4xl">The math.</h2>
-          <p className="mt-4 max-w-2xl text-base text-ink-soft">
-            How a single shared Ferrari compares to ten individually-owned
-            ones.
-          </p>
-          <div className="mt-12 grid grid-cols-2 gap-8 sm:grid-cols-4">
-            <Stat
-              number="90%"
-              label="Reduction in vehicles built"
-              detail="10 cars become 1"
-            />
-            <Stat
-              number="~360 tons"
-              label="CO2 avoided in manufacturing"
-              detail="Per shared 10-share vehicle vs. 9 additional buyers (~40 tons each)"
-            />
-            <Stat
-              number="5×"
-              label="Higher utilization"
-              detail="Average driven days per year"
-            />
-            <Stat
-              number="0"
-              label="Idle storage acres"
-              detail="vs. 10 separate garages"
-            />
-          </div>
-          <p className="mt-8 max-w-3xl text-xs text-mute">
-            Numbers indicative. Manufacturing CO2 estimate per Ferrari Sustainability
-            Report 2024 (~40 tons per vehicle); does not include lifetime tailpipe
-            emissions, which depend on actual driving.
-          </p>
-        </div>
-      </section>
-
-      {/* What we do */}
-      <section className="border-b border-rule">
-        <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
-          <h2 className="font-display text-3xl text-ink sm:text-4xl">What RYDA does about it</h2>
-          <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <Card
-              title="Higher utilization"
-              body="Each shared car is driven 150–250 days/year vs. an average of 35 days for solo-owned exotics. The cars actually get used."
-            />
-            <Card
-              title="Curated EV/hybrid expansion"
-              body="Our 2027 lineup is 50% hybrid or fully electric, Spectre, Taycan Turbo S, 296 GTB hybrid. Members vote on additions."
-            />
-            <Card
-              title="Carbon-offset program (planned)"
-              body="At launch, RYDA will offer optional verified carbon offsets keyed to each booking's estimated emissions. Provider partner finalized before Miami goes live."
-            />
-            <Card
-              title="Climate-controlled storage"
-              body="Our Miami storage partner is targeted for high-renewable-energy supply (solar PPA in evaluation). Vehicles are kept in stable climate ranges to minimize wear."
-            />
-            <Card
-              title="Transport optimization"
-              body="When we move vehicles between members or to events, we prefer enclosed truck transport over driver-relocations. Carbon per mile is far lower."
-            />
-            <Card
-              title="Vehicle longevity"
-              body="Shared programs typically run cars longer than solo-owned exotics, more consistent care, complete service records, fewer write-offs from inactivity."
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* The honest part */}
+      {/* What the footprint actually is */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10">
-          <h2 className="font-display text-3xl text-ink sm:text-4xl">
-            Honest about what we are.
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+            The footprint
+          </p>
+          <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
+            A listing grid, a request, an email.
           </h2>
-          <div className="mt-8 space-y-6 text-base leading-relaxed text-ink-soft">
+          <div className="mt-8 space-y-5 text-base leading-relaxed text-ink-soft">
             <p>
-              Driving a 800-horsepower V12 will never be carbon-neutral.
-              Pretending otherwise is the kind of greenwashing we won't do.
+              The honest version of this page is short, because the
+              business is small in this direction. RYDA manufactures
+              nothing and buys no vehicles. It runs no garage, no storage,
+              no workshop and no transport. It does not own, store,
+              insure, maintain or operate a single car on the platform —
+              that is not a positioning line, it is what the Terms of
+              Service commit us to.
             </p>
             <p>
-              What we can honestly say: shared ownership is a meaningfully
-              better outcome than individual ownership across every dimension
-              we measure, manufacturing emissions per driver, idle days,
-              utilization, lifetime, and end-of-life disposition.
+              What the product physically consists of is a browse grid, a
+              request form, an email to an operator, and a Stripe Checkout
+              link created on that operator&apos;s own account once they
+              confirm your dates. Everything with wheels, a roof or an
+              insurance policy behind it belongs to somebody else.
             </p>
             <p>
-              We're not the climate solution. We're the better version of an
-              activity that's going to happen anyway. People will drive
-              supercars. The question is whether they each build one or share
-              one. We're betting on share.
+              If RYDA does anything here at all, it is at the margin: it
+              points demand at cars that already exist, and a car being
+              rented is a car being used rather than sitting. That is the
+              entire environmental argument for a referral marketplace —
+              and it is an argument, not a measurement.
             </p>
           </div>
         </div>
       </section>
 
-      {/* CTA */}
+      {/* Limits. This section is what keeps the rest of the page honest:
+          every item is something this repo does NOT do. Removing one
+          requires shipping the thing it denies. */}
+      <section className="border-b border-rule">
+        <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+            Limits
+          </p>
+          <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
+            What we don&apos;t claim.
+          </h2>
+          <p className="mt-6 text-base leading-relaxed text-ink-soft">
+            This page used to carry a row of statistics. They are gone,
+            and nothing has replaced them, because we cannot stand behind
+            a single one. Here is what is missing and why.
+          </p>
+          <ul className="mt-10 space-y-4 text-base leading-relaxed text-ink-soft">
+            <li>
+              <span className="font-medium text-ink">
+                We don&apos;t publish emissions or utilisation figures.
+              </span>{" "}
+              RYDA records the request, the dates, the price the operator
+              confirmed and the charge. It does not record mileage, fuel,
+              or how many days a year a car is out — so there is no data
+              set behind a number, and we would rather print none than
+              print one we invented.
+            </li>
+            <li>
+              <span className="font-medium text-ink">
+                There is no carbon-offset programme.
+              </span>{" "}
+              Nothing at checkout offers one, and there is no offset
+              partner. If that ever ships, you will meet it in the payment
+              flow before you read about it here.
+            </li>
+            <li>
+              <span className="font-medium text-ink">
+                There are no RYDA facilities.
+              </span>{" "}
+              No storage, no climate-controlled garage, no renewable-energy
+              supply to speak for, and no RYDA transport moving cars
+              around. Where a car sleeps and how it reaches you are the
+              operator&apos;s arrangements under the operator&apos;s
+              rental agreement.
+            </li>
+            <li>
+              <span className="font-medium text-ink">
+                We don&apos;t vet operators on environmental grounds.
+              </span>{" "}
+              Our review covers the company and, through Stripe, its
+              business and bank details. It does not look at how a
+              building is powered or how a car is maintained, and we
+              don&apos;t set an electrification target for fleets we
+              don&apos;t own.
+            </li>
+            <li>
+              <span className="font-medium text-ink">
+                This is not a low-carbon product.
+              </span>{" "}
+              Renting a V12 for a weekend has a tailpipe, and no framing
+              of shared use changes that. Directing existing demand at
+              cars that already exist is the most this model can claim,
+              and we are not going to dress it up as more.
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      {/* Closing — the same limits in the language that binds us. */}
       <section className="bg-ink py-20 text-cream">
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
-          <h2 className="font-display text-3xl sm:text-4xl">
-            More questions?
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-red-bright">
+            The same thing, in binding terms
+          </p>
+          <h2 className="mt-4 font-display text-3xl sm:text-4xl">
+            Owning nothing is the whole model.
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
-            We publish annual sustainability data starting Year 1, vehicle
-            utilization rates, fleet emissions, offsets purchased,
-            renewable-energy use at our facilities.
+            The Terms of Service and the Platform Disclaimer say the same
+            thing where it counts: RYDA does not own, store, insure,
+            maintain or operate any vehicle listed here.
           </p>
-          <Link
-            href="/contact"
-            className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-red hover:text-cream"
-          >
-            Talk to us →
-          </Link>
+          <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+            <Link
+              href="/trust-and-safety"
+              className="inline-flex h-12 items-center justify-center rounded-full bg-cream px-7 text-sm font-medium text-ink hover:bg-red hover:text-cream"
+            >
+              What RYDA checks →
+            </Link>
+            <Link
+              href="/legal/terms"
+              className="inline-flex h-12 items-center justify-center rounded-full border border-cream/30 px-7 text-sm font-medium text-cream hover:border-cream hover:bg-cream/5"
+            >
+              Terms of Service
+            </Link>
+          </div>
         </div>
       </section>
     </>
-  );
-}
-
-function Stat({
-  number,
-  label,
-  detail,
-}: {
-  number: string;
-  label: string;
-  detail: string;
-}) {
-  return (
-    <div>
-      <p className="font-display text-4xl font-light text-ink sm:text-5xl">{number}</p>
-      <p className="mt-2 text-xs uppercase tracking-wider text-red">{label}</p>
-      <p className="mt-1 text-xs text-mute">{detail}</p>
-    </div>
-  );
-}
-
-function Card({ title, body }: { title: string; body: string }) {
-  return (
-    <div className="rounded-2xl border border-rule bg-surface p-8">
-      <p className="font-display text-lg text-ink">{title}</p>
-      <p className="mt-3 text-sm leading-relaxed text-ink-soft">{body}</p>
-    </div>
   );
 }

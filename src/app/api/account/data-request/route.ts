@@ -1,9 +1,12 @@
 // POST /api/account/data-request
 // Body: { kind: 'export' | 'delete' }
 //
-// Privacy actions a member can request: data export (GDPR/CCPA bundle)
-// or account deletion (irreversible after a 24h cooling-off, requires
-// LLC-share buyback coordination by legal).
+// Privacy actions an account holder can request: a copy of their data,
+// or deletion of their account. Neither is performed by code — this
+// route records the request and notifies the team, and a person does
+// the rest. The ops copy below is an instruction to that person, so it
+// has to describe work that exists: it used to say "coordinate
+// share-buyback with legal", and RYDA sells no shares.
 //
 // Reliability:
 //   1. Persist a contact_messages row FIRST. That's the durable
@@ -57,8 +60,8 @@ export async function POST(req: NextRequest) {
   const heading = kind === "delete" ? "Account deletion request" : "Data export request";
   const cta =
     kind === "delete"
-      ? "<p>Coordinate share-buyback with legal, then schedule deletion after the 24h cooling-off window.</p>"
-      : "<p>Bundle this user's profile + holdings + bookings + payments + agreements + KYC summary; email a 7-day download link.</p>";
+      ? "<p>Delete this user's RYDA account and the personal data attached to it: auth user, rental_profiles, rental_inquiries, rental_bookings, kyc_verifications. Reply to them at the address above when it is done. Rentals already arranged with an operator are not ours to cancel — say so if they ask.</p>"
+      : "<p>Assemble what we hold on this user — auth profile, rental_profiles, rental_inquiries, rental_bookings, kyc_verifications status — and email it to the address above.</p>";
 
   // Persist to contact_messages first (existing table, has the
   // 'context' column for surfacing the request type to ops).
@@ -72,8 +75,8 @@ export async function POST(req: NextRequest) {
       market: "Not sure",
       message:
         kind === "delete"
-          ? `Account deletion request from ${user.email ?? user.id}. User initiated from /account/privacy. Coordinate share-buyback + 24h cooling-off before any irreversible action.`
-          : `Data export (GDPR/CCPA) request from ${user.email ?? user.id}. Bundle profile + holdings + bookings + payments + agreements + KYC summary; email 7-day download link.`,
+          ? `Account deletion request from ${user.email ?? user.id}. User initiated from /account/privacy. Delete the auth user plus rental_profiles, rental_inquiries, rental_bookings and kyc_verifications rows, then reply to them. Rentals already arranged with an operator are between the user and that operator.`
+          : `Data request from ${user.email ?? user.id}. Assemble auth profile + rental_profiles + rental_inquiries + rental_bookings + kyc_verifications status and email it to them.`,
       context: kind === "delete" ? "Account deletion" : "Data export",
     });
     if (persist.error) {
@@ -101,7 +104,7 @@ export async function POST(req: NextRequest) {
       html: emailLayout(
         heading,
         `
-          <p>Member: <strong>${escapeHtml(user.email ?? "(no email)")}</strong></p>
+          <p>Account: <strong>${escapeHtml(user.email ?? "(no email)")}</strong></p>
           <p>User ID: <code>${escapeHtml(user.id)}</code></p>
           <p>Submitted: ${new Date().toISOString()}</p>
           ${cta}

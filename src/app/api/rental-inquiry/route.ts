@@ -99,6 +99,12 @@ function partnerEmailHtml(inquiry: RentalInquiry, linked: boolean): string {
 
 // Customer confirmation. NEVER name the operator here — the public promise
 // is "a vetted Miami operator", the commission model is stated plainly.
+//
+// The closing line said "No card, no payment" until the truth pass. RYDA
+// does email a Stripe Checkout link once the operator confirms, so a
+// blanket "no payment" is a promise the next email breaks — which is
+// exactly what makes a genuine pay link look like phishing. The honest
+// version is "no card at request", followed by the mechanism.
 function customerEmailHtml(inquiry: RentalInquiry): string {
   return emailLayout("Your request is in", `
     <p style="margin:0 0 12px;">Hi ${escapeHtml(inquiry.name)},</p>
@@ -117,8 +123,9 @@ function customerEmailHtml(inquiry: RentalInquiry): string {
       we send them; that's the whole model.
     </p>
     <p style="margin:0;">
-      No card, no payment — nothing is charged until you and the operator confirm
-      the booking together.
+      No card at request. Once you and the operator have agreed the dates, we'll
+      send you a secure Stripe link — that charge settles on the operator's own
+      Stripe account, and RYDA's commission is collected as a platform fee on it.
     </p>
   `);
 }

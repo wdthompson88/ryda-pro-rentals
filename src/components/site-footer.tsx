@@ -89,7 +89,10 @@ export function SiteFooter() {
               ["About", "/about"],
               ["Investors", "/investors"],
               ["Press", "/press"],
-              ["Careers", "/careers"],
+              // "Careers" pointed at /careers, which advertised a Head
+              // of Vehicle Acquisition plus storage and insurance
+              // partnership roles — jobs for a fleet RYDA does not own,
+              // store or insure. Route deleted; link deleted with it.
               ["Contact", "/contact"],
             ]}
           />

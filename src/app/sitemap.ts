@@ -1,15 +1,13 @@
 import type { MetadataRoute } from "next";
 import { PARTNER_VEHICLES } from "@/lib/partner-fleet";
-import { POSTS as JOURNAL_POSTS } from "@/lib/journal-content";
 import { HELP as HELP_CATEGORIES } from "@/lib/help-content";
-import { LEARN_ARTICLES } from "@/lib/learn-content";
 
 // Sitemap of every crawlable, public RYDA route. Generated at build
 // time. Three categories:
 //   1. Static landing pages (hand-maintained list below).
 //   2. Per-vehicle rental detail routes, partner fleet
 //      (/lib/partner-fleet) — the only fleet there is.
-//   3. Per-help-article, per-journal-post and per-learn-article routes.
+//   3. Per-help-category and per-help-article routes.
 //
 // Routes that are gated, member-only, or stub previews (e.g. /account/*,
 // /onboarding, /admin/*) are intentionally NOT listed.
@@ -24,16 +22,19 @@ const PUBLIC_ROUTES = [
   // Rental-first surfaces.
   "/partners",
   "/how-it-works",
-  // Content surfaces. Indexable, but not linked from the footer.
-  //
   // /insurance and /storage used to sit here. Both were deleted: they
   // advertised a RYDA fleet policy and RYDA-operated climate-controlled
   // storage, and RYDA provides neither. Every car on the platform is
   // owned, insured, stored and serviced by an independent operator, and
   // Terms §2 now says so in writing. Do not re-add either route.
-  "/events",
-  "/learn",
-  "/journal",
+  //
+  // /learn, /journal, /events and /careers were deleted for the same
+  // reason: /learn and /journal were wall-to-wall co-ownership content
+  // (one post asserted "RYDA owns each vehicle in an LLC"), /events
+  // advertised gatherings at a "RYDA Miami Facility" that does not
+  // exist, and /careers advertised storage, insurance and vehicle-
+  // acquisition roles for a fleet RYDA does not own. Do not re-add them.
+  //
   // Company + support.
   "/about",
   "/trust-and-safety",
@@ -42,7 +43,6 @@ const PUBLIC_ROUTES = [
   "/faq",
   "/press",
   "/investors",
-  "/careers",
   "/contact",
   // Locations. The /locations index is a real page with its own
   // canonical tag, so it belongs here alongside the per-market pages.
@@ -99,15 +99,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }),
   );
 
-  const journalEntries: MetadataRoute.Sitemap = JOURNAL_POSTS
-    .filter((p) => p.status === "published")
-    .map((p) => ({
-      url: `${siteUrl}/journal/${p.slug}`,
-      lastModified,
-      changeFrequency: "monthly" as const,
-      priority: 0.6,
-    }));
-
   // Per-help-category landing pages and per-article pages. The help
   // center has dozens of articles across multiple categories; surface
   // each one to crawlers so support content is discoverable from search.
@@ -128,20 +119,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ],
   );
 
-  // Per-learn-article entries. The /learn hub is the educational
-  // content surface; each article is a standalone SEO landing page.
-  const learnEntries: MetadataRoute.Sitemap = LEARN_ARTICLES.map((a) => ({
-    url: `${siteUrl}/learn/${a.slug}`,
-    lastModified,
-    changeFrequency: "monthly" as const,
-    priority: 0.55,
-  }));
-
-  return [
-    ...staticEntries,
-    ...partnerEntries,
-    ...journalEntries,
-    ...helpEntries,
-    ...learnEntries,
-  ];
+  return [...staticEntries, ...partnerEntries, ...helpEntries];
 }

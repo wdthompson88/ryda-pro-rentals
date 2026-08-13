@@ -2,8 +2,8 @@
 
 // Site-search results component. Reads the query from the URL,
 // searches the static index built at module-load time, and renders
-// grouped results (Cars / Boats / Journal / Other). Live re-search
-// as the user types into the input.
+// grouped results (Cars / Boats / Other). Live re-search as the user
+// types into the input.
 
 import Link from "next/link";
 import { useMemo, useState, useEffect } from "react";
@@ -20,7 +20,6 @@ const VERTICAL_LABEL: Record<string, string> = {
 const TYPE_LABEL: Record<string, string> = {
   vehicle: "Vehicle",
   boat: "Yacht",
-  journal: "Journal",
   vs: "Comparison",
   page: "Page",
   doc: "Documents",
@@ -96,7 +95,7 @@ export function SearchResults() {
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Try Wajer, Ferrari, charter, LLC, journal…"
+                placeholder="Try Ferrari, Lamborghini, convertible, Miami…"
                 className="h-full min-w-0 flex-1 bg-transparent text-base text-ink placeholder:text-mute focus:outline-none"
               />
               {query ? (
@@ -124,7 +123,7 @@ export function SearchResults() {
                 </span>
               </>
             ) : (
-              "Type to search across vehicles, boats, journal posts, comparison pages, and FAQ."
+              "Type to search the Miami rental fleet and the main pages."
             )}
           </p>
         </div>
@@ -198,6 +197,24 @@ function VerticalSection({
   );
 }
 
+// Every suggestion has to return something from SEARCH_INDEX, which is
+// PARTNER_VEHICLES + a handful of pages.
+// "Wajer" and "Charter" pointed at a boats catalogue that isn't in the
+// index, and "LLC" at a co-ownership product this platform doesn't
+// sell — three of six links landed the visitor on "No matches found."
+// These five are makes and a category that exist in the fleet today
+// (4 Ferraris, 4 Lamborghinis, 4 Porsches, 2 Rolls-Royces, 8
+// convertibles), plus Miami, which every listing matches. All carry
+// the cars accent; there is no boats vertical to search.
+const COMMON_SEARCHES = [
+  "Ferrari",
+  "Lamborghini",
+  "Porsche",
+  "Rolls-Royce",
+  "Convertible",
+  "Miami",
+];
+
 function EmptyHint() {
   return (
     <div className="rounded-2xl border border-rule bg-cream-2/40 p-8">
@@ -205,36 +222,16 @@ function EmptyHint() {
         Common searches
       </p>
       <ul className="mt-5 grid grid-cols-1 gap-2 text-sm text-ink-soft sm:grid-cols-2">
-        <li>
-          <Link href="/search?q=ferrari" className="hover:text-red">
-            Ferrari →
-          </Link>
-        </li>
-        <li>
-          <Link href="/search?q=wajer" className="hover:text-marine">
-            Wajer →
-          </Link>
-        </li>
-        <li>
-          <Link href="/search?q=charter" className="hover:text-marine">
-            Charter →
-          </Link>
-        </li>
-        <li>
-          <Link href="/search?q=llc" className="hover:text-red">
-            LLC →
-          </Link>
-        </li>
-        <li>
-          <Link href="/search?q=insurance" className="hover:text-red">
-            Insurance →
-          </Link>
-        </li>
-        <li>
-          <Link href="/search?q=miami" className="hover:text-red">
-            Miami →
-          </Link>
-        </li>
+        {COMMON_SEARCHES.map((q) => (
+          <li key={q}>
+            <Link
+              href={`/search?q=${encodeURIComponent(q.toLowerCase())}`}
+              className="hover:text-red"
+            >
+              {q} →
+            </Link>
+          </li>
+        ))}
       </ul>
     </div>
   );
@@ -247,8 +244,8 @@ function NoResults({ query }: { query: string }) {
       <p className="mt-3 text-sm text-ink-soft">
         Nothing in the index matches{" "}
         <span className="font-medium text-ink">&quot;{query.trim()}&quot;</span>.
-        Try a vehicle name, a brand, a topic like &quot;hurricane&quot; or
-        &quot;charter,&quot; or check the{" "}
+        Try a make like &quot;Ferrari,&quot; a body style like
+        &quot;convertible,&quot; or check the{" "}
         <Link href="/help" className="text-red hover:text-red-deep">
           help center
         </Link>

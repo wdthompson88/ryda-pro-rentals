@@ -4,7 +4,8 @@ import { ContactForm } from "@/components/contact-form";
 
 export const metadata = {
   title: "Contact",
-  description: "Talk to a RYDA membership advisor. Press, partnerships, and investor relations.",
+  description:
+    "Get in touch with RYDA — questions about a rental or a request you've sent, press, operator partnerships, and investor relations.",
 };
 
 export default function ContactPage() {
@@ -30,12 +31,16 @@ export default function ContactPage() {
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {/* There is no membership and no co-ownership product in
+                this platform, so the first card is the thing most
+                people are actually writing in about: a car on /rent, or
+                a request already sent. */}
             <ContactCard
-              title="Membership"
-              subtitle="Interested in co-ownership?"
-              detail="Talk to a RYDA membership advisor."
-              cta="Book a call"
-              href="#consultation"
+              title="Rentals"
+              subtitle="A car, a date, a request you've sent"
+              detail="We'll answer it or pass it to the operator."
+              cta="Ask about a rental"
+              href="/contact?type=Rental#form"
             />
             <ContactCard
               title="Press"
@@ -44,10 +49,13 @@ export default function ContactPage() {
               cta="Send a press inquiry"
               href="/contact?type=Press#form"
             />
+            {/* RYDA has no dealer or insurance programme — it lists
+                independent operators' cars and takes a referral
+                commission. The partners it looks for are operators. */}
             <ContactCard
               title="Partnerships"
-              subtitle="Dealers, insurance & partners"
-              detail="Open to strategic intros."
+              subtitle="Operators & referral partners"
+              detail="Run an exotic fleet? Start here."
               cta="Send a partnership inquiry"
               href="/contact?type=Partnership#form"
             />
@@ -85,29 +93,35 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* Consultation */}
+      {/* Prefer to talk. The #consultation anchor stays — /help links
+          straight to it — but there is no membership, no advisor and no
+          30-minute consultation to book. What RYDA can honestly offer
+          is the same reply the rest of this page promises. */}
       <section id="consultation" className="border-b border-rule bg-ink py-20 text-cream">
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red-bright">
-            Membership consultation
+            Prefer to talk
           </p>
           <h2 className="mt-4 font-display text-4xl font-light sm:text-5xl">
-            Prefer to talk? Book a 30-minute call.
+            Rather talk it through?
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
-            Speak with a RYDA membership advisor. Walk through the model, ask
-            any questions, explore which vehicles suit you. No commitment.
+            There&apos;s no field on the form for that, so put it in the
+            message: what you&apos;re after, and when you&apos;re
+            reachable. Someone from RYDA replies within one business day.
           </p>
           <div className="mx-auto mt-10 max-w-md rounded-2xl border border-cream/10 bg-cream/5 p-8">
             <p className="text-sm text-cream/70">
-              Send a quick note and a RYDA membership advisor will reply
-              within one business day with a calendar link.
+              If it&apos;s about one specific car, sending your dates from
+              its listing is faster. That request goes to the operator who
+              owns it, and they confirm availability and price with you
+              directly — no card at request.
             </p>
             <Link
-              href="/contact?type=Membership#form"
+              href="/contact?type=Rental#form"
               className="mt-6 inline-flex h-11 items-center justify-center rounded-full bg-cream px-6 text-sm font-medium text-ink hover:bg-red hover:text-cream"
             >
-              Request a call
+              Send a note
             </Link>
           </div>
         </div>

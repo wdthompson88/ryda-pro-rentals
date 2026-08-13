@@ -1,7 +1,6 @@
 // Smoke tests against the RYDA marketing surface. Validates that the
 // rental-first restructure (Aug 2026 pivot: landing story on /, browse
-// grid at /rent, lead-gen how-it-works) plus the surviving learn hub
-// render correctly post-deploy.
+// grid at /rent, lead-gen how-it-works) renders correctly post-deploy.
 //
 // Run locally:    npm run test:e2e
 // Run UI mode:    npm run test:e2e:ui
@@ -77,20 +76,11 @@ test.describe('how-it-works', () => {
   });
 });
 
-// NOTE: /learn survives the co-ownership strip by operator decision, but
-// its *copy* is still the old co-ownership curriculum and is queued for a
-// content audit. This test asserts what the page says today on purpose —
-// when the audit rewrites the hub, this spec should fail loudly rather
-// than let a half-rewritten page ship unnoticed.
-test.describe('learn hub', () => {
-  test('renders the 5 stages', async ({ page }) => {
-    await page.goto('/learn');
-    await expect(
-      page.getByRole('heading', { name: /how co-ownership/i }),
-    ).toBeVisible();
-    // The five stage labels — Understand / Choose / Buy / Drive / Exit
-    for (const stage of ['Understand', 'Choose', 'Buy', 'Drive', 'Exit']) {
-      await expect(page.getByText(stage, { exact: false }).first()).toBeVisible();
-    }
-  });
-});
+// The 'learn hub' describe block lived here. It pinned the /learn
+// co-ownership curriculum (the "How co-ownership works" heading and the
+// Understand → Choose → Buy → Drive → Exit stage labels) so a rewrite
+// would fail loudly instead of shipping half-done. /learn was not
+// rewritten — it was deleted, along with /journal, /events and
+// /careers, because all four described a co-ownership business RYDA
+// does not run. There is no rental equivalent to re-point these
+// assertions at, so the block is gone rather than weakened.

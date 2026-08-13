@@ -36,9 +36,9 @@ export default function HelpCenterPage() {
           </h1>
 
           {/* Search, submits to the site-wide /search route which
-              indexes vehicles, boats, journal, vs pages, and help.
-              Help-tagged hits are surfaced first when the query
-              matches a help-category keyword. */}
+              indexes vehicles, vs pages, and help. Help-tagged hits
+              are surfaced first when the query matches a help-category
+              keyword. */}
           <form action="/search" method="get" className="mt-10 max-w-2xl">
             <label className="sr-only" htmlFor="help-search">
               Search help articles

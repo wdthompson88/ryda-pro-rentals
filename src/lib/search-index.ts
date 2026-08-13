@@ -1,14 +1,15 @@
 // Site-wide search index. Compiles all searchable surfaces (rental
-// listings, journal posts, FAQ topics, key marketing pages) into a
-// single flat list so the /search page can rank+filter cheaply
-// without a backend.
+// listings, FAQ topics, key marketing pages) into a single flat list
+// so the /search page can rank+filter cheaply without a backend.
 //
 // All sources pull from existing typed data: adding a car to
-// PARTNER_VEHICLES, or a new published journal post, surfaces in search
-// automatically.
+// PARTNER_VEHICLES surfaces it in search automatically.
+//
+// The /journal entries were removed with the route: every published
+// post was co-ownership content, including one asserting that RYDA
+// owns each vehicle in an LLC. RYDA owns no vehicles.
 
 import { PARTNER_VEHICLES } from "@/lib/partner-fleet";
-import { POSTS as JOURNAL } from "@/lib/journal-content";
 
 export type SearchEntry = {
   /** URL the result links to. */
@@ -23,7 +24,6 @@ export type SearchEntry = {
   type:
     | "vehicle"
     | "boat"
-    | "journal"
     | "page"
     | "doc"
     | "faq";
@@ -73,14 +73,6 @@ const STATIC_PAGES: SearchEntry[] = [
     haystack: "about founders ryan dave stefano team mission story",
   },
   {
-    href: "/journal",
-    title: "Journal",
-    subtitle: "Long-form notes from the team",
-    vertical: "general",
-    type: "page",
-    haystack: "journal blog posts notes long-form",
-  },
-  {
     href: "/contact",
     title: "Contact",
     subtitle: "Get in touch",
@@ -116,43 +108,12 @@ const VEHICLE_ENTRIES: SearchEntry[] = PARTNER_VEHICLES.map((v) => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────
-// Journal entries (published posts only)
-// ─────────────────────────────────────────────────────────────────────────
-
-const JOURNAL_ENTRIES: SearchEntry[] = JOURNAL.filter(
-  (p) => p.status === "published",
-).map((p) => {
-  // Determine vertical from tag, journal posts use a "Boats" suffix
-  // when they're boat-themed.
-  const isBoats = /boats|yacht|marine|charter|captain/i.test(
-    `${p.tag} ${p.title} ${p.excerpt}`,
-  );
-  return {
-    href: `/journal/${p.slug}`,
-    title: p.title,
-    subtitle: `Journal · ${p.tag} · ${p.date}`,
-    vertical: isBoats ? "boats" : "cars",
-    type: "journal",
-    haystack: [
-      p.title,
-      p.excerpt,
-      p.tag,
-      p.author,
-      p.body?.slice(0, 6).join(" ") ?? "",
-    ]
-      .join(" ")
-      .toLowerCase(),
-  };
-});
-
-// ─────────────────────────────────────────────────────────────────────────
 // Final flat index
 // ─────────────────────────────────────────────────────────────────────────
 
 export const SEARCH_INDEX: SearchEntry[] = [
   ...STATIC_PAGES,
   ...VEHICLE_ENTRIES,
-  ...JOURNAL_ENTRIES,
 ];
 
 // ─────────────────────────────────────────────────────────────────────────

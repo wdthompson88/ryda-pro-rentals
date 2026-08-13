@@ -466,30 +466,38 @@ function EmptyState({
   location: string | null;
   onReset: () => void;
 }) {
-  // Special case: filtered to LA or NY where partner fleet hasn't shipped
-  // yet. Show a "Coming soon" treatment instead of the generic empty state.
+  // Special case: filtered to LA or NY, where no operator lists a car
+  // yet. Say that plainly instead of the generic empty state.
+  //
+  // What this may claim is narrow, and matches
+  // src/app/locations/_components/planned-market.tsx: no cars are
+  // listed here yet, a market opens when operators in it list, and
+  // telling us you want it is the only thing on offer. RYDA assembles
+  // no storage — it owns, stores and services nothing — and there is
+  // no launch date to be notified of.
   const isComingSoonMarket =
     location === "Los Angeles" || location === "New York";
   if (isComingSoonMarket) {
     return (
       <div className="rounded-2xl border border-rule bg-surface p-12 text-center">
         <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-          {location} · Coming soon
+          {location} · No listings yet
         </p>
         <p className="mt-3 font-display text-2xl text-ink">
-          The {location} fleet ships with the local launch.
+          No {location} operator lists a car on RYDA yet.
         </p>
         <p className="mx-auto mt-3 max-w-md text-sm text-ink-soft">
-          We&apos;re assembling fleet partners and storage in {location} now.
-          Want first-look access when listings open? Tell us and we&apos;ll
-          get in touch.
+          Every car you can browse today is in Miami, owned and run by an
+          independent operator there. {location} opens when operators in{" "}
+          {location} list on it. Tell us you want it — where people ask is
+          part of how we decide where to look next.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           <Link
-            href={`/contact?type=Membership&note=${encodeURIComponent(`Want ${location} rental access`)}#form`}
+            href={`/contact?type=Other&note=${encodeURIComponent(`Market request: ${location}`)}#form`}
             className="inline-flex h-11 items-center justify-center rounded-full bg-red px-5 text-sm font-medium text-cream hover:bg-red-deep"
           >
-            Notify me at launch →
+            Tell us you want {location} →
           </Link>
           <button
             type="button"
