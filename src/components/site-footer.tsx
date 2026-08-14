@@ -76,6 +76,14 @@ export function SiteFooter() {
             title="Cars"
             links={[
               ["Rent", "/rent"],
+              // /locations/miami is the only city page left — the
+              // /locations index and the LA and NY pages were deleted —
+              // and nothing linked to it, so it sat indexed and
+              // orphaned. It goes here, in Cars, rather than under a
+              // "Locations" heading of its own: a locations column with
+              // one entry reads as the first of several markets, and
+              // there is only the one.
+              ["Renting in Miami", "/locations/miami"],
               ["How it works", "/how-it-works"],
               ["FAQ", "/faq"],
             ]}

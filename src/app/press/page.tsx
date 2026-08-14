@@ -23,6 +23,13 @@ import { SiteHeader } from "@/components/site-header";
 //   - RYDA LLC, Miami FL; press@ryda.pro ................... /legal/terms §14,
 //                                                            /about
 //
+// "The operator introduces themselves when they confirm, before the
+// customer is asked to pay anything" was deleted from /faq and
+// /trust-and-safety as unguaranteeable — nothing in the code makes an
+// introduction happen — and it is deleted here too. A sheet labelled
+// "Quotable as written" is the last place a promise like that should
+// survive.
+//
 // There is no brand-asset library in this repo — the wordmark is type,
 // not a logo file — so the asset grid is gone rather than restated as
 // eight dashed placeholders promising files nobody can send. Do not add
@@ -113,7 +120,7 @@ export default function PressPage() {
             />
             <Fact
               label="Operator names"
-              value="Listings don't name the operator. The operator introduces themselves when they confirm, before the customer is asked to pay anything."
+              value="Listings don't name the operator."
             />
             <Fact
               label="Founders"

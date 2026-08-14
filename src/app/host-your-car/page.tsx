@@ -9,10 +9,16 @@ import { redirect } from "next/navigation";
 // from press mentions, email footers and old search results is real
 // and the destination already exists.
 
+// The description is deleted rather than rewritten. It said "We route
+// qualified rental leads to vetted local operators", which packed three
+// claims into one sentence: nothing qualifies a lead (they arrive in
+// RYDA's inbox and are forwarded by hand), "operators" plural asserted a
+// roster, and "vetted" appeared with no route to the single definition
+// at /trust-and-safety#vetting — which a metadata string cannot link to.
+// This route is noindex and redirects to /partners, so the description
+// was doing no work worth keeping.
 export const metadata = {
   title: "For partners",
-  description:
-    "List your fleet with RYDA. We route qualified rental leads to vetted local operators.",
   robots: { index: false, follow: false },
 };
 

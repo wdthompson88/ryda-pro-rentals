@@ -59,12 +59,18 @@ export default function AboutPage() {
             // "we've vetted" deleted from the end of this sentence. A
             // bare, unqualified "vetted" in the hero is the same
             // screening claim /how-it-works, /rent, /rent/[symbol] and
-            // the inquiry form all had it deleted from: the only checks
-            // RYDA runs are a human read of the partner application and
-            // Stripe Express verification of the business and bank
-            // account. Where the word survives on this page (the
-            // "Vetted operators" value below) it is scoped to exactly
-            // those two things and says it is not a warranty.
+            // the inquiry form all had it deleted from.
+            //
+            // "vetted" is defined in exactly one place —
+            // /trust-and-safety, "What 'vetted' actually means" — and
+            // every other use is supposed to route there. The mission
+            // grid renders plain strings, so a value card cannot carry
+            // that link; the word is therefore dropped from this page
+            // entirely. The former "Vetted operators" card is now
+            // "Verified through Stripe", which states the mechanism the
+            // code actually gates on (payment-link creation requires
+            // stripe_account_id + stripe_onboarded_at) instead of
+            // asserting a roster or a review broader than Stripe.
             body:
               "Every car is owned and operated by an independent local operator.",
           },
@@ -97,7 +103,7 @@ export default function AboutPage() {
             values: [
               { title: "One request", body: "Pick the car, send your dates. No card at request, nothing to subscribe to, and no membership standing between you and the fleet." },
               { title: "The operator's price", body: "RYDA never marks up a rental. Our commission is charged to the operator on bookings we send them, and never added to what you pay." },
-              { title: "Vetted operators", body: "Every listing is run by a Miami operator we've reviewed, including their business and bank details through Stripe. Vetting is not a warranty, and we don't dress it up as one." },
+              { title: "Verified through Stripe", body: "Before RYDA can send a payment link for a car, the operator who runs it completes Stripe Connect onboarding, which verifies their business and bank details. That is not a warranty, and we don't dress it up as one." },
               { title: "Plain terms", body: "We describe what the platform actually does — including that the payment link comes from us — rather than whatever would sound most reassuring." },
             ],
           },

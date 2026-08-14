@@ -97,7 +97,11 @@ export default function InvestorsPage() {
             <ModelCard
               label="What we list"
               value={`${FLEET_COUNT} cars in Miami`}
-              note="Every one owned and operated by an independent local operator we've reviewed. The browse grid is the whole of the inventory — there is no second fleet behind it."
+              // "we've reviewed" deleted: an unscoped review claim, on a
+              // page with no route to the one place "vetted" is defined
+              // (/trust-and-safety). Deleted rather than rescoped — the
+              // page is about the model, not the screening.
+              note="Every one owned and operated by an independent local operator. The browse grid is the whole of the inventory — there is no second fleet behind it."
             />
             <ModelCard
               label="What we own"

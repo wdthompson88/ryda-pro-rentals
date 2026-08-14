@@ -25,12 +25,23 @@
 // honest promise is "no card at request". Operators are never named on
 // customer-facing surfaces (D6): "a vetted Miami operator".
 //
-// Still stale as of the 2026-08-12 false-service pass, deliberately left
-// for the co-ownership rewrite: the `shares` and `legal` categories, the
-// membership/LLC articles under `getting-started` and `account`, and
-// `bookings/fair-use`. Several of those still describe RYDA procuring
-// insurance, storage and maintenance for an LLC — fix them when that
-// product content is rewritten, not piecemeal.
+// "Vetted" is defined in exactly one place — /trust-and-safety, under
+// "What 'vetted' actually means" — and there it means the operator
+// completed Stripe Connect onboarding, which verifies their business
+// and bank details. It does not mean an inspection, an insurance
+// check, a licence check or a background check, none of which this
+// codebase performs. A HelpBlock cannot render a link, so an article
+// body has no way to route a reader to that definition: do not use the
+// word in one.
+//
+// The co-ownership help centre was deleted on 2026-08-13, not rewritten.
+// The `shares` and `legal` categories are gone, along with every
+// article about membership tiers, claiming a share, the Operating
+// Agreement, member-managed LLCs, transfers, K-1s, a member dashboard,
+// a booking calendar, fair-use caps, referral credits and the 2027 LA
+// and NY markets. None of that product exists. Do not reintroduce any
+// of it, and do not add a response-time promise — nothing in this
+// codebase measures one.
 // ─────────────────────────────────────────────────────────────────────
 
 export type HelpBlock =
@@ -61,112 +72,17 @@ export const HELP: HelpCategory[] = [
     icon: "→",
     title: "Getting started",
     blurb:
-      "New to RYDA. How membership works, what tier to pick, what happens after you apply.",
+      "What RYDA is, and where the cars are.",
     articles: [
       {
         slug: "what-is-ryda",
         q: "What is RYDA, in one paragraph?",
         summary:
-          "Supercar co-ownership and rentals. Each vehicle is held in a single-purpose, member-managed LLC; up to 5 verified members co-own and manage it together. Members can also rent any car in the fleet by the day.",
+          "A referral marketplace for car rental in Miami. Every car listed is owned and run by an independent operator; RYDA lists it, passes your request on, and earns a referral commission from the operator when a booking completes.",
         body: [
-          {
-            type: "p",
-            text: "RYDA is a US member-managed supercar co-ownership platform. Each vehicle in the fleet is held in a single-purpose LLC with 10 shares, split across up to 5 members with a 2-share minimum per person. Each share entitles its holder to ~32 days and ~3,200 miles per year (100 mi/day allowance). Usage and cost scale linearly. A 5-share holder gets ~160 days; a 10-share holder is essentially the solo owner with professional ops.",
-          },
           {
             type: "p",
             text: "RYDA does not own, store, insure, maintain, or operate any vehicle on the platform. Every car listed for rent is owned and run by an independent Miami operator, and the rental closes on that operator's own contract and their own insurance. RYDA lists the car, passes your request to the operator, and earns a referral commission from the operator when a booking completes.",
-          },
-          {
-            type: "p",
-            text: "RYDA also facilitates the LLC paperwork when a member transfers their share to another verified member after the 12-month minimum hold.",
-          },
-          {
-            type: "p",
-            text: "It's not a timeshare, not a fund, not an investment product. It's real member-managed co-ownership of a real car.",
-          },
-        ],
-      },
-      {
-        slug: "vs-timeshare",
-        q: "How is co-ownership different from a timeshare?",
-        summary:
-          "You hold a registered LLC membership interest, not a club point. You can sell, you have voting rights, and the asset is on a balance sheet.",
-        body: [
-          {
-            type: "p",
-            text: "A timeshare gives you the right to use a property for a fixed period each year. It's a use-right, not an asset. You can't sell it back to anyone but the operator (often at a steep discount), you have no claim on the underlying property, and the operator holds the strings.",
-          },
-          {
-            type: "p",
-            text: "A RYDA share is a registered LLC membership interest in a entity that owns a specific vehicle. You're a partial owner of the actual asset. Three things follow from that:",
-          },
-          {
-            type: "ul",
-            items: [
-              "If the LLC sells the vehicle, the LLC's proceeds are distributed pro-rata to members per the Operating Agreement.",
-              "You can transfer your share to another verified RYDA member after the 12-month minimum hold. RYDA facilitates the LLC paperwork.",
-              "You have voting rights on material decisions (sale, modifications, replacement) defined in the Operating Agreement.",
-            ],
-          },
-          {
-            type: "p",
-            text: "Functionally: timeshares are unsellable use-rights with hidden costs. Co-ownership is real ownership with transparent costs.",
-          },
-        ],
-      },
-      {
-        slug: "membership-tiers",
-        q: "Membership tiers explained: Core, Blue, Black",
-        summary:
-          "Core is free and lets you browse the fleet. Blue ($500/yr) unlocks co-ownership and rentals. Black ($1,500/yr) adds priority and premium perks.",
-        body: [
-          { type: "h3", text: "Core, Free" },
-          {
-            type: "p",
-            text: "Free, no commitment. You can browse the fleet, see vehicle data, and read all marketing materials. You cannot claim a co-ownership share, book vehicles, or transfer between members on Core.",
-          },
-          { type: "h3", text: "Blue, $500/year ($350 early)" },
-          {
-            type: "p",
-            text: "The standard tier for active co-owners. Includes co-ownership shares, member-to-member transfers, member event invitations, and standard member services. Early-100 members lock in $350/year for life.",
-          },
-          { type: "h3", text: "Black, $1,500/year ($1,000 early)" },
-          {
-            type: "p",
-            text: "For high-utilization members. Adds priority booking during peak season, a dedicated contact, and first-look access on new fleet additions. Early-100 lock in $1,000/year for life.",
-          },
-          {
-            type: "callout",
-            tone: "info",
-            text: "Most active members start on Blue. You can upgrade to Black at any time and the price difference is prorated.",
-          },
-        ],
-      },
-      {
-        slug: "accreditation",
-        q: "Do I need to be an accredited investor?",
-        summary:
-          "No. RYDA is a luxury access platform, not an investment platform. Co-ownership is open to anyone who clears KYC verification and the standard membership requirements.",
-        body: [
-          {
-            type: "p",
-            text: "No accredited-investor status required. RYDA does not offer investments, co-ownership stakes are not registered securities and are not offered for investment purposes. They're a way to share the cost and use of a real car with a small group of other verified members.",
-          },
-          { type: "h3", text: "What you do need" },
-          {
-            type: "ul",
-            items: [
-              "Be 28 years or older.",
-              "Hold a valid US driver's license with a clean recent driving record.",
-              "Pass standard KYC (government ID + selfie match via Stripe Identity).",
-              "Be willing to be added to the LLC's insurance policy.",
-            ],
-          },
-          { type: "h3", text: "Why the structure works without accreditation" },
-          {
-            type: "p",
-            text: "Each car is held in an LLC that you and the other verified members manage together, up to 5 co-owners per vehicle, with a 2-share minimum per person. RYDA operates the car under a separate management services agreement, but the LLC itself is yours. You're not buying a passive investment product; you're buying the right to use a car you and your co-owners actually own. Because the structure is consumption-first (real ownership, real usage rights, no profit expectation), it falls outside SEC investment-contract classification.",
           },
         ],
       },
@@ -174,450 +90,15 @@ export const HELP: HelpCategory[] = [
         slug: "markets",
         q: "What markets is RYDA in?",
         summary:
-          "Miami first (Q3 2026), then Los Angeles (2027), then New York (2027). Members can join from anywhere in the US.",
+          "Miami. Every car on the browse grid today is run by a Miami operator.",
         body: [
           {
             type: "p",
-            text: "RYDA does not own or operate a fleet. It lists cars that independent operators own and run, market by market, and membership is available anywhere in the US.",
-          },
-          {
-            type: "ul",
-            items: [
-              "Miami, live now. First market because of high HNW density, year-round driving weather, F1 Grand Prix and Art Basel anchors, and no state income tax. Every car on the browse grid today is run by a Miami operator.",
-              "Los Angeles, 2027. Second market, focused on the Westside and South Bay.",
-              "New York, 2027. Third market, focused on the Tri-state area.",
-            ],
+            text: "RYDA does not own or operate a fleet. It lists cars that independent operators own and run.",
           },
           {
             type: "p",
-            text: "If you live outside an active market, you can still join (the membership is national) and use vehicles when you travel to one of the operating cities. Members can also join early to lock in early-100 pricing.",
-          },
-        ],
-      },
-      {
-        slug: "rental-vs-ownership",
-        q: "Should I rent or claim a co-ownership share?",
-        summary:
-          "Rent first to test the experience and the specific vehicle. Claim a share when usage exceeds ~10 days a year and you want priority and a relationship with the car.",
-        body: [
-          { type: "h3", text: "Rent if any of these apply" },
-          {
-            type: "ul",
-            items: [
-              "You drive a supercar fewer than 10 days per year.",
-              "You don't want long-term commitment to a specific vehicle.",
-              "You're testing whether the platform actually fits your life before committing.",
-              "You want to swap between different makes (Ferrari one weekend, McLaren another) instead of holding one.",
-            ],
-          },
-          { type: "h3", text: "Claim a co-ownership share if any of these apply" },
-          {
-            type: "ul",
-            items: [
-              "You want 30+ days a year of usage and the rental math no longer pencils.",
-              "You want priority access during peak season (F1, Art Basel, summer weekends).",
-              "You want real ownership and member governance, not a paid usage right.",
-              "You're a car enthusiast who wants the relationship with one specific vehicle.",
-            ],
-          },
-          { type: "h3", text: "Per-day comparison" },
-          {
-            type: "p",
-            text: "On a co-owned Ferrari 296 GTB at $34K per share (1 of 10) with ~32 days entitlement, the effective daily ops cost works out to about $221/day. The rental rate on the same vehicle is $1,500–3,000/day at the Miami market floor. If you'll drive 15+ days a year, co-ownership pays for itself.",
-          },
-          {
-            type: "callout",
-            tone: "info",
-            text: "Many members rent first, then convert that experience into a co-ownership share on the same vehicle. We credit a portion of recent rental payments toward the buy-in, capped at the most recent 30 days of payments.",
-          },
-        ],
-      },
-      {
-        slug: "early-member-benefits",
-        q: "What do early-100 members get?",
-        summary:
-          "Locked-for-life membership pricing ($350 Blue / $1,000 Black), early-100 badge, priority on first vehicle launches, member-event access, and faster onboarding for additional shares.",
-        body: [
-          { type: "h3", text: "Pricing locked for life" },
-          {
-            type: "p",
-            text: "The first 100 members lock in $350/year for Blue tier or $1,000/year for Black tier, for as long as they hold continuous membership. Standard pricing is $500 and $1,500 respectively, so over a 10-year horizon a Black early member saves $5,000.",
-          },
-          { type: "h3", text: "Priority on launch fleet" },
-          {
-            type: "p",
-            text: "Early-100 members get first-look on every new vehicle that joins the fleet. They see the listing 7 days before it goes public, with priority on share allocation. Particularly valuable for limited-production vehicles where shares move quickly.",
-          },
-          { type: "h3", text: "Other early benefits" },
-          {
-            type: "ul",
-            items: [
-              "Early-100 badge on member directory and event invitations.",
-              "Reduced KYC friction (single identity verification carries across multiple co-ownership shares).",
-              "Invitation to RYDA's annual early-member dinner.",
-              "Direct line to RYDA founders for product feedback during the launch year.",
-            ],
-          },
-          {
-            type: "p",
-            text: "Early-100 status is non-transferable. If you cancel and re-enroll, you re-enroll at standard pricing.",
-          },
-        ],
-      },
-      {
-        slug: "share-financing",
-        q: "Can I finance my co-ownership buy-in?",
-        summary:
-          "Yes, through your own personal credit (Marcus, LightStream, SoFi) or a securities-backed line of credit if you have a brokerage account. RYDA itself doesn't lend.",
-        body: [
-          {
-            type: "p",
-            text: "RYDA does not finance buy-ins directly. Members usually use one of three personal-credit paths:",
-          },
-          { type: "h3", text: "Personal unsecured loan" },
-          {
-            type: "p",
-            text: "Many members use unsecured personal loans (Marcus, LightStream, SoFi) to fund a buy-in. Rates are typically 7–14% APR for high-credit borrowers. The LLC share isn't pledged, the loan is just personal credit on your name.",
-          },
-          { type: "h3", text: "Securities-backed line of credit" },
-          {
-            type: "p",
-            text: "If you have a brokerage account at Schwab, Fidelity, or Morgan Stanley, you may already have access to a securities-backed line of credit (against your stocks/bonds, not against the LLC share) at lower rates (5–8% APR). This is often the cheapest path. Talk to your wealth manager.",
-          },
-          { type: "h3", text: "Specialty leisure-asset finance" },
-          {
-            type: "p",
-            text: "Putnam Leasing and a few specialty lenders offer financing for fractional vehicle interests and luxury memberships. Higher rates (8–15%) but they understand the structure.",
-          },
-          {
-            type: "callout",
-            tone: "warn",
-            text: "Cars depreciate. Co-ownership is a luxury access expense, not an investment that's expected to appreciate. Don't borrow more than you'd be comfortable spending, your buy-in funds a depreciating consumption product, like a country-club membership or a jet card.",
-          },
-        ],
-      },
-    ],
-  },
-
-  // ── Co-ownership ─────────────────────────────────────────────────
-  {
-    slug: "shares",
-    icon: "$",
-    title: "Co-ownership",
-    blurb:
-      "Claiming a co-ownership share, the Operating Agreement, the 12-month minimum hold, member-to-member transfers.",
-    articles: [
-      {
-        slug: "how-to-buy",
-        q: "How do I claim a co-ownership share?",
-        summary:
-          "Pick a vehicle, complete KYC, sign the Operating Agreement and Management Services Agreement, fund your share, you're a co-owner. No accreditation required.",
-        body: [
-          { type: "h3", text: "1. Pick the vehicle" },
-          {
-            type: "p",
-            text: "Browse the fleet at /portfolio, pick a vehicle and the number of shares you want. Each vehicle is held in a separate LLC. RYDA's default share count is 10 per vehicle.",
-          },
-          { type: "h3", text: "2. Identity verification (KYC)" },
-          {
-            type: "p",
-            text: "We verify identity through Stripe Identity. Government ID upload, selfie match, and a clean recent driving record check. Typically takes 5–10 minutes. Required to be added to the LLC's insurance policy.",
-          },
-          { type: "h3", text: "3. Documents" },
-          {
-            type: "p",
-            text: "Two documents to sign electronically. The LLC Operating Agreement (governs how you and your co-owners run the LLC together, voting, fair-use, transfers, dissolution) and the Management Services Agreement (the contract between the LLC and RYDA covering operations, insurance, storage, scheduling, maintenance). Both are sent via secure e-signature.",
-          },
-          { type: "h3", text: "4. Funding" },
-          {
-            type: "p",
-            text: "Wire or ACH your buy-in into the LLC's escrow account. RYDA holds funds in escrow until all signatures are collected, then releases to the LLC and your share is officially recorded in the LLC's member register.",
-          },
-          { type: "h3", text: "5. Onboarding" },
-          {
-            type: "p",
-            text: "First booking can be scheduled the day funds clear. We schedule a 30-minute walkthrough on the vehicle (controls, etiquette, condition baseline) before your first drive.",
-          },
-          {
-            type: "callout",
-            tone: "info",
-            text: "No accredited-investor status required. RYDA is a luxury access platform, not an investment platform. Co-ownership stakes are not registered securities and are not offered for investment purposes.",
-          },
-        ],
-      },
-      {
-        slug: "documents",
-        q: "What documents will I sign?",
-        summary:
-          "Operating Agreement (governs how you and your co-owners run the LLC) + Management Services Agreement (the LLC's contract with RYDA for operations). Both via e-signature, both reviewed by counsel.",
-        body: [
-          { type: "h3", text: "Operating Agreement" },
-          {
-            type: "p",
-            text: "The Operating Agreement governs the LLC. The LLC is member-managed, meaning you and your co-owners hold authority over material decisions. Covers: voting thresholds (typically 75% supermajority for sale, replacement, modifications), fair-use rules during peak and off-season, what happens if a co-owner stops paying, how the vehicle gets sold or replaced, transfer mechanics, and dispute resolution. Standard length: 30–40 pages. We provide a 2-page plain-English summary alongside the full document.",
-          },
-          { type: "h3", text: "Management Services Agreement (MSA)" },
-          {
-            type: "p",
-            text: "The MSA is between the LLC and RYDA. It defines the services RYDA provides, storage, insurance procurement, scheduling, maintenance, member services, and the all-in annual management fee charged to the LLC (~7–9% of vehicle value, covering RYDA's service component plus pass-through costs). RYDA is a service provider engaged by the LLC's members, not a manager of the LLC itself. The MSA can be renewed or terminated by member vote per the Operating Agreement.",
-          },
-          { type: "h3", text: "Annual documents" },
-          {
-            type: "p",
-            text: "Each year you'll receive an updated certificate of insurance for the vehicle, an annual condition and service report (mileage, maintenance, inspections), an updated insurance valuation (used for the LLC's policy renewal), and an annual statement summarizing your contributions, fees paid, and usage.",
-          },
-          {
-            type: "callout",
-            tone: "info",
-            text: "All documents are stored in your member dashboard and re-downloadable any time. We retain originals indefinitely.",
-          },
-        ],
-      },
-      {
-        slug: "entitlement",
-        q: "What does a co-ownership share actually entitle me to?",
-        summary:
-          "~32 days and up to ~3,200 miles per share per year (100 mi/day allowance; members hold 2–10 shares each), voting rights on material LLC decisions, and pro-rata participation in the LLC's assets at dissolution.",
-        body: [
-          { type: "h3", text: "Usage" },
-          {
-            type: "p",
-            text: "Each share entitles you to ~32 days and up to ~3,200 miles of vehicle usage per year (100 mi/day allowance), with the exact entitlement set per vehicle when the LLC is formed. Members hold two shares or more, usage scales linearly (5 shares ≈ 160 days; 10 shares ≈ 320 days, with the rest reserved for service and rental pool). Days are booked on a shared calendar with the other co-owners. Fair-use rules cap consecutive days during peak season.",
-          },
-          { type: "h3", text: "Membership" },
-          {
-            type: "p",
-            text: "You hold a registered LLC membership interest. The LLC is member-managed, you and your co-owners run it together. If the LLC eventually winds down (e.g., the group decides to sell the car and dissolve), the LLC's remaining assets are distributed pro-rata to members per the Operating Agreement.",
-          },
-          { type: "h3", text: "Voting" },
-          {
-            type: "p",
-            text: "Material decisions, selling the vehicle, performing modifications, replacing the vehicle, require a vote per the Operating Agreement (typically a 75% supermajority by member interest). Routine maintenance, scheduling, and operations are delegated to RYDA via the Management Services Agreement.",
-          },
-          { type: "h3", text: "What it does not include" },
-          {
-            type: "ul",
-            items: [
-              "Title to the vehicle (the LLC holds title; you hold a member interest in the LLC).",
-              "Unilateral decision-making (you share authority with co-owners).",
-              "Commercial use of the vehicle.",
-            ],
-          },
-        ],
-      },
-      {
-        slug: "selling",
-        q: "Can I transfer my share whenever I want?",
-        summary:
-          "After a 12-month minimum hold, yes, directly to another verified RYDA member. RYDA facilitates the LLC paperwork. 3% transfer fee.",
-        body: [
-          {
-            type: "p",
-            text: "Yes, with two conditions:",
-          },
-          {
-            type: "ul",
-            items: [
-              "12-month minimum hold from your closing date. This is in the Operating Agreement to keep co-owner groups stable through at least one full year of use.",
-              "The new co-owner must be a verified RYDA member who has cleared KYC. Shares can only transfer between RYDA members under the Operating Agreement.",
-            ],
-          },
-          {
-            type: "p",
-            text: "Once the hold period clears, signal your intent to transfer through your dashboard. RYDA helps you negotiate directly with another interested verified member, there's no public marketplace, no order book, and no auction. You and the new co-owner agree on a price; RYDA handles the LLC paperwork to update the member register and Operating Agreement.",
-          },
-          { type: "h3", text: "How pricing usually works" },
-          {
-            type: "p",
-            text: "Members typically reference a quarterly condition report and comparable-cost context for the vehicle (auction comparables, current retail offers) as a starting point and negotiate from there. This is not an exit price, a published bid, or a guaranteed transfer value, it's plain market context to help two co-owners agree on a number.",
-          },
-          {
-            type: "p",
-            text: "RYDA charges a 3% transfer fee on the agreed price, deducted at settlement. Settlement is typically 1–3 business days once both parties have signed updated documents.",
-          },
-          {
-            type: "callout",
-            tone: "info",
-            text: "Co-ownership shares are illiquid by design. Cars depreciate, transfer requires another verified member to want your share, and timing isn't guaranteed. Don't claim a share expecting on-demand exit, claim it because you want to drive the car.",
-          },
-        ],
-      },
-      {
-        slug: "pricing",
-        q: "How is a transfer price determined?",
-        summary:
-          "Two members negotiate directly. RYDA shares each LLC's current insurance agreed value and a condition/comparable-cost summary as context, but co-owners agree on the actual transfer price between themselves.",
-        body: [
-          {
-            type: "p",
-            text: "There is no marketplace, no order book, and no auction. Transfers happen by direct negotiation between two verified RYDA members.",
-          },
-          { type: "h3", text: "What RYDA provides as context" },
-          {
-            type: "ul",
-            items: [
-              "A quarterly vehicle condition report and comparable-cost summary (auction comparables on Bring a Trailer, RM Sotheby's, Mecum; current retail offers).",
-              "A simple reference number for the share: (current comparable-cost estimate + accrued LLC reserves) ÷ share count.",
-              "A summary of any prior transfers on the same vehicle for transparency.",
-            ],
-          },
-          {
-            type: "p",
-            text: "These are reference numbers only, not exit prices, not published bids, not guaranteed transfer values. Co-owners negotiating a transfer can use them as a starting point or ignore them. There is no automatic matching engine, the transfer happens at whatever price the two members agree to.",
-          },
-          {
-            type: "callout",
-            tone: "info",
-            text: "Cars depreciate. Reference numbers typically decline over time. Don't claim a share expecting it to hold or grow in value, claim it for the use you'll get from the car.",
-          },
-        ],
-      },
-      {
-        slug: "transfer-fee",
-        q: "What's the 3% transfer fee?",
-        summary:
-          "A flat 3% of the agreed price on every member-to-member share transfer, paid to RYDA. Covers LLC paperwork, KYC re-verification of the new co-owner, and registry updates.",
-        body: [
-          {
-            type: "p",
-            text: "Every member-to-member share transfer that RYDA facilitates carries a 3% fee on the agreed price. It's deducted from seller proceeds at settlement.",
-          },
-          { type: "h3", text: "What the fee covers" },
-          {
-            type: "ul",
-            items: [
-              "Transfer paperwork and updated Operating Agreement signatures from the new co-owner.",
-              "KYC verification and driving record check on the new co-owner.",
-              "Updated certificates of insurance and updated LLC member register entry for the new co-owner.",
-              "Registry update with the LLC's state registrar.",
-              "Onboarding of the new member into the booking calendar with the other co-owners.",
-            ],
-          },
-          {
-            type: "p",
-            text: "It's competitive with, usually below, comparable structures (jet card transfer fees run 5–10%). The fee is fixed and disclosed in the Operating Agreement and Management Services Agreement.",
-          },
-        ],
-      },
-      {
-        slug: "gifting-and-inheritance",
-        q: "Can I gift a share or pass it to my heirs?",
-        summary:
-          "Gifts to a verified RYDA member: yes, with a transfer of the membership interest. Inheritance: yes, your share passes to your estate per your will or trust, then to your heirs after they verify.",
-        body: [
-          { type: "h3", text: "Lifetime gifts" },
-          {
-            type: "p",
-            text: "You can transfer a share to a family member as a gift, but the recipient has to clear RYDA's standard verification (KYC + clean driving record) before the transfer completes. The 3% transfer fee is waived for first-degree family transfers (spouse, children, parents, siblings).",
-          },
-          { type: "h3", text: "Inheritance and estate transfer" },
-          {
-            type: "p",
-            text: "When a co-owner dies, the share is part of their estate and passes per their will or trust. The estate can either transfer the share to another verified member (transfer fee waived for estate transfers) or hand it to a named heir. Heirs must complete RYDA verification before the share transfers.",
-          },
-          { type: "h3", text: "If no heir wants it" },
-          {
-            type: "p",
-            text: "The estate can list the share through RYDA for transfer to another verified member. Transfers can take 30–90 days depending on member demand. There's no guaranteed buyer.",
-          },
-          {
-            type: "callout",
-            tone: "info",
-            text: "Talk to your estate attorney about how to title the share. Many members hold shares through a revocable trust to simplify transfer at death, RYDA accepts trust ownership.",
-          },
-        ],
-      },
-      {
-        slug: "whole-vs-fractional",
-        q: "How does this compare to buying a car outright?",
-        summary:
-          "You give up exclusive use, but cut your one-time spend ~10×, eliminate operational overhead entirely, and avoid the carrying-cost math of regular ownership. Works for people who'd drive an exotic less than 50–80 days a year.",
-        body: [
-          { type: "h3", text: "Up-front cost" },
-          {
-            type: "p",
-            text: "A solo Ferrari 296 GTB is $340,000 plus tax (~$365K all-in). A 1/10 share is roughly $34,000. Same vehicle, ten times less up-front cost. Either way, the car depreciates, co-ownership just lets you split the depreciation with the rest of the LLC's members.",
-          },
-          { type: "h3", text: "Annual carrying cost" },
-          {
-            type: "ul",
-            items: [
-              "Solo: $40-80K+/year, depending on the car (insurance, storage, maintenance, depreciation reserve, taxes/registration).",
-              "Co-owned (Ferrari 296 example): ~$7,080/year per share, all-in. Covers your share of insurance, storage, scheduled maintenance, LLC reserves, and RYDA's service fee. Other vehicles vary, see the order panel on each listing.",
-            ],
-          },
-          { type: "h3", text: "What you trade away" },
-          {
-            type: "p",
-            text: "Three things: exclusive use of the vehicle (you share with 5–4 other co-owners), unilateral decision-making (modifications and sale require co-owner vote), and the 'always there' factor (the car isn't always physically yours).",
-          },
-          { type: "h3", text: "What you gain" },
-          {
-            type: "ul",
-            items: [
-              "Lower up-front cost and lower annual carry, more access for less commitment.",
-              "Operational ease. RYDA handles every layer, insurance renewals, service appointments, storage, registration, claims.",
-              "Variety. Some members hold shares in 2–3 different vehicles to vary their experience across the year.",
-            ],
-          },
-          {
-            type: "p",
-            text: "Bottom line: if you'd drive a solo-owned exotic 60+ days a year and you love the operational responsibility, buy outright. If you'd drive 10–32 days a year and prefer to outsource the rest, share.",
-          },
-        ],
-      },
-      {
-        slug: "llc-default",
-        q: "What if a co-owner stops paying?",
-        summary:
-          "The Operating Agreement has remedies, typically a 30-day cure period, then forced sale of the delinquent share. RYDA's reserve covers operations during cure so other owners are unaffected.",
-        body: [
-          { type: "h3", text: "Cure period" },
-          {
-            type: "p",
-            text: "If a co-owner misses a quarterly management fee or a special assessment, the LLC's Operating Agreement triggers a 30-day cure period. The delinquent member receives written notice and has 30 days to make the payment plus a small late fee.",
-          },
-          { type: "h3", text: "If they don't cure" },
-          {
-            type: "p",
-            text: "The LLC can force transfer of the delinquent share to another verified member at the most recent reference value. Proceeds first cover the unpaid amount, then any LLC-level transaction costs, then the rest goes to the former member. The remaining co-owners aren't on the hook for the unpaid amount, the share itself secures the obligation.",
-          },
-          { type: "h3", text: "Why it doesn't disrupt operations" },
-          {
-            type: "p",
-            text: "RYDA maintains a vehicle-level operating reserve at the LLC (built into the annual management fee) that covers ongoing operating costs during a delinquency-and-cure cycle. So while the legal process plays out, the vehicle stays insured, stored, and bookable for the other co-owners.",
-          },
-          {
-            type: "callout",
-            tone: "info",
-            text: "Forced sales are rare. RYDA underwrites every member upfront and the Operating Agreement caps the cumulative exposure of any single non-paying member.",
-          },
-        ],
-      },
-      {
-        slug: "share-count-changes",
-        q: "Can a vehicle's share count change after launch?",
-        summary:
-          "No, share count is fixed at LLC formation. New shares cannot be added later. Existing co-owners can buy each other out, but the total share count stays the same.",
-        body: [
-          {
-            type: "p",
-            text: "When a vehicle's LLC is formed, the share count is set permanently in the Operating Agreement (typically 6, sometimes 8 or 10 for higher-value vehicles). This is by design, letting the LLC add shares later would dilute existing co-owners' usage entitlement.",
-          },
-          { type: "h3", text: "Why it's fixed" },
-          {
-            type: "ul",
-            items: [
-              "Protects existing members from dilution.",
-              "Provides predictable usage entitlement (10 shares × 32 days = 320 days/yr; the remaining ~45 days are reserved for service, downtime, and the rental pool).",
-              "Keeps the co-owner group small enough to coordinate.",
-              "Keeps the LLC's member-managed governance simple and stable.",
-            ],
-          },
-          { type: "h3", text: "Buyouts within the same LLC" },
-          {
-            type: "p",
-            text: "Existing co-owners can transfer between each other at any time. If one member transfers two shares to another member, the total is still 6, just held differently. This is how members consolidate more shares in a vehicle they love.",
+            text: "Every car on the browse grid today is run by a Miami operator.",
           },
         ],
       },
@@ -630,70 +111,8 @@ export const HELP: HelpCategory[] = [
     icon: "◷",
     title: "Bookings & usage",
     blurb:
-      "Reserving days, fair-use rules, peak-season caps, cancellations, no-shows.",
+      "Cancellations, mileage, second drivers, parking, storms, lost keys.",
     articles: [
-      {
-        slug: "how-to-book",
-        q: "How do I book my time on a vehicle?",
-        summary:
-          "Open the booking calendar in your dashboard, pick available dates, confirm. Preparation, handover and any delivery are the operator's — RYDA does not prepare, store or deliver vehicles.",
-        body: [
-          { type: "h3", text: "Where to book" },
-          {
-            type: "p",
-            text: "Bookings happen in your member dashboard under My Cars → [Vehicle] → Calendar. The calendar shows your remaining days for the year, other co-owners' bookings, blackout dates, and the fair-use status for the period.",
-          },
-          { type: "h3", text: "Booking windows" },
-          {
-            type: "ul",
-            items: [
-              "Standard booking: up to 90 days in advance.",
-              "Black tier members: up to 180 days in advance.",
-              "Peak season (May–September in Miami): a separate weekly draft system applies during the first 30 days of the year. Beyond that, bookings are first-come-first-served.",
-            ],
-          },
-          { type: "h3", text: "Preparation, handover and delivery" },
-          {
-            type: "p",
-            text: "All three belong to the operator who runs the car. RYDA does not wash, fuel, photograph, store, or deliver any vehicle. If you want the car brought to you, say so in the note on your request — most Miami operators deliver and collect across the region, but the delivery window, the minimum rental length and the rate are theirs, and they confirm them when they reply.",
-          },
-        ],
-      },
-      {
-        slug: "fair-use",
-        q: "Fair-use rules during high season",
-        summary:
-          "Peak season caps consecutive bookings to 7 days per share. Off-season allows up to 14 consecutive days. No member can book two adjacent peak weekends.",
-        body: [
-          {
-            type: "p",
-            text: "Fair-use rules exist to prevent any one co-owner from monopolizing peak windows when 5–7 other members want the same days. They apply per share, if you hold two shares, you get double the budget.",
-          },
-          { type: "h3", text: "Peak season (Miami: May–Sep)" },
-          {
-            type: "ul",
-            items: [
-              "7 consecutive days max per share, per booking.",
-              "Two peak weekends per share, max, and not adjacent.",
-              "F1 Grand Prix weekend: separate lottery among all co-owners.",
-            ],
-          },
-          { type: "h3", text: "Off-season (Oct–Apr)" },
-          {
-            type: "ul",
-            items: [
-              "14 consecutive days max per share, per booking.",
-              "No weekend cap.",
-              "Holidays (Thanksgiving, Christmas, NYE): lottery if multiple co-owners request.",
-            ],
-          },
-          {
-            type: "callout",
-            tone: "info",
-            text: "Fair-use rules are formally defined in each LLC's Operating Agreement and can be amended by member vote (75% threshold).",
-          },
-        ],
-      },
       {
         slug: "cancellations",
         q: "Cancellations and refunds",
@@ -1206,7 +625,7 @@ export const HELP: HelpCategory[] = [
     icon: "◉",
     title: "Account & billing",
     blurb:
-      "How a rental is actually paid, what RYDA stores, taxes, KYC verification.",
+      "How a rental is actually paid, what RYDA stores, identity verification, closing your account.",
     articles: [
       {
         slug: "payment-methods",
@@ -1269,44 +688,6 @@ export const HELP: HelpCategory[] = [
         ],
       },
       {
-        slug: "taxes",
-        q: "Tax treatment of co-ownership",
-        summary:
-          "Co-ownership is a personal-use luxury expense, not an income-producing investment. No K-1 in normal cases. Some members receive an informational K-1 if the LLC has incidental rental income.",
-        body: [
-          {
-            type: "callout",
-            tone: "warn",
-            text: "RYDA does not provide tax advice. Always consult your CPA or tax professional for your specific situation. The information below is educational, not advisory.",
-          },
-          { type: "h3", text: "Default treatment: personal-use expense" },
-          {
-            type: "p",
-            text: "RYDA co-ownership is structured as a personal-use luxury product. Cars are depreciating consumption goods, like a country-club membership or a jet card. Under IRS rules (Pub. 946 / IRC §280F), members generally cannot deduct depreciation on luxury vehicles used for personal access, because the asset is not in business or income-producing use.",
-          },
-          { type: "h3", text: "What you'll receive" },
-          {
-            type: "ul",
-            items: [
-              "Annual statement summarizing your contributions, fees paid, and usage for the year.",
-              "Member directory entries for each LLC you co-own (LLC records).",
-              "If applicable, a state sales/use tax statement on your buy-in (varies by state).",
-              "If the LLC has incidental rental income (e.g., off-utilized days rented to non-members), an informational K-1 reflecting your pro-rata share. Most members will not have this.",
-            ],
-          },
-          { type: "h3", text: "Sales and use tax" },
-          {
-            type: "p",
-            text: "Vehicle purchases and some inter-member transfers may be subject to state sales/use tax. Florida is 6%; California is ~7.25%; New York varies by county. RYDA collects and remits where required. Your annual statement will reflect anything paid on your behalf.",
-          },
-          { type: "h3", text: "If you use the vehicle for actual business" },
-          {
-            type: "p",
-            text: "Members who use a co-owned vehicle for genuine business purposes may have different treatment, including potential deductibility of operating costs allocable to business mileage. This requires recordkeeping that goes beyond what RYDA's normal reporting captures. Talk to your CPA before relying on it.",
-          },
-        ],
-      },
-      {
         slug: "kyc",
         q: "KYC verification, what we collect and why",
         summary:
@@ -1329,12 +710,12 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Where it's stored" },
           {
             type: "p",
-            text: "Documents are processed by Stripe Identity. RYDA never sees raw ID images. We retain only the verification result, ID type, name, address, and DOB, encrypted, in our member system.",
+            text: "Documents are processed by Stripe Identity. RYDA never sees raw ID images. We retain only the verification result and the name, address and date of birth Stripe reads from the document.",
           },
           { type: "h3", text: "Sharing" },
           {
             type: "p",
-            text: "We don't share KYC data with anyone except (a) state or federal regulators when legally required, and (b) the new co-owner's verification flow on a member-to-member share transfer (limited fields, with your consent). RYDA does not pass it to an insurance carrier, because RYDA does not place insurance on any vehicle.",
+            text: "We don't share KYC data with anyone except state or federal regulators when legally required. RYDA does not pass it to an insurance carrier, because RYDA does not place insurance on any vehicle.",
           },
         ],
       },
@@ -1342,319 +723,22 @@ export const HELP: HelpCategory[] = [
         slug: "close",
         q: "Closing my account",
         summary:
-          "If you hold no co-ownership shares: instant. If you hold shares: transfer them to other verified members first, then close. Settlement of any open obligations happens at closure.",
+          "It is a request, not a switch. The delete-account flow at /account/privacy reaches the RYDA team and a person actions it. There is no subscription to cancel.",
         body: [
-          { type: "h3", text: "If you hold no shares" },
+          { type: "h3", text: "How to close it" },
           {
             type: "p",
-            text: "Email hello@ryda.pro or use the close-account flow in your dashboard. We deactivate the account, cancel any auto-renewals, and email a final account statement. Membership data is retained per our privacy policy retention schedule.",
+            text: "Use the delete-account flow at /account/privacy, or email hello@ryda.pro. Either way it reaches the RYDA team as a request: someone actions it by hand and replies to the email address on your account. Nothing is deleted automatically, and you stay signed in until it is.",
           },
-          { type: "h3", text: "If you hold one or more shares" },
+          { type: "h3", text: "What closing does not do" },
           {
             type: "p",
-            text: "You'll need to transfer your shares to other verified members before closing. The process:",
+            text: "It does not cancel a rental. Once a request has gone to an operator, the booking, the contract and any deposit are between you and them, and RYDA cannot take it back on your behalf.",
           },
-          {
-            type: "ul",
-            items: [
-              "Signal your intent to transfer through your dashboard. Typical resolution: 30–90 days depending on vehicle and price.",
-              "If no member is interested at your price, you can lower it, hold and wait, or, in some cases, RYDA may help facilitate a transfer to a member on the waitlist.",
-            ],
-          },
+          { type: "h3", text: "Asking for your data instead" },
           {
             type: "p",
-            text: "Once shares are sold and proceeds settled, we close the account on request. Outstanding management fees, mileage overages, or deductibles are settled from sale proceeds.",
-          },
-        ],
-      },
-      {
-        slug: "referral-program",
-        q: "Is there a referral program?",
-        summary:
-          "Yes. Refer a member who completes membership: $500 credit. Refer a member who buys a share: $2,500 credit. Early-100 members get 2× referral credits.",
-        body: [
-          { type: "h3", text: "Tiers" },
-          {
-            type: "ul",
-            items: [
-              "$500 credit when your referral becomes a paid member (Blue or Black).",
-              "$2,500 credit when your referral closes their first co-ownership share.",
-              "Early-100 members earn 2× credits on every successful referral.",
-            ],
-          },
-          { type: "h3", text: "How to refer" },
-          {
-            type: "p",
-            text: "Account → Referral Program in your dashboard. Generate a unique link. Share it however you like, text, email, in person at a member event, social media (within RYDA's brand guidelines). When someone signs up through your link, the credit lands in your account at the qualifying milestone.",
-          },
-          { type: "h3", text: "What credits can be used for" },
-          {
-            type: "ul",
-            items: [
-              "Annual membership renewal.",
-              "Mileage overage charges.",
-              "Premium delivery upgrades.",
-              "Cannot be applied directly to a co-ownership buy-in (referrals are credits against fees and incidentals, not discounts on the buy-in itself).",
-            ],
-          },
-          {
-            type: "p",
-            text: "Credits don't expire as long as you remain an active member. Cap of $25,000 in unused credits per account.",
-          },
-        ],
-      },
-      {
-        slug: "early-pricing",
-        q: "What's the early-100 pricing lock?",
-        summary:
-          "First 100 members lock in $350 Blue / $1,000 Black for life. As long as your membership stays active, the price never increases.",
-        body: [
-          {
-            type: "p",
-            text: "When RYDA launched, the first 100 members were eligible for permanently locked membership pricing at a $150–500 annual discount. The lock applies to the membership fee only, co-ownership buy-in prices, management fees, and other charges are at standard rates.",
-          },
-          { type: "h3", text: "Locked rates" },
-          {
-            type: "ul",
-            items: [
-              "Early Blue: $350/year, locked. (Standard $500/year.)",
-              "Early Black: $1,000/year, locked. (Standard $1,500/year.)",
-              "10-year savings vs. standard pricing: $1,500 (Blue) or $5,000 (Black).",
-            ],
-          },
-          { type: "h3", text: "Status terms" },
-          {
-            type: "ul",
-            items: [
-              "The lock applies as long as your membership remains active and continuous.",
-              "If you cancel and re-enroll later, you re-enroll at standard pricing, early status is non-recoverable.",
-              "Status is non-transferable. You can't sell or gift early-100 status to another member.",
-              "Status carries through tier changes (e.g., upgrading from Blue to Black keeps your early lock).",
-            ],
-          },
-          {
-            type: "p",
-            text: "All 100 early shares are allocated by sign-up order, with priority weighting for members in launch markets and members making early share commitments.",
-          },
-        ],
-      },
-    ],
-  },
-
-  // ── Legal & compliance ───────────────────────────────────────────
-  {
-    slug: "legal",
-    icon: "§",
-    title: "Legal & compliance",
-    blurb:
-      "Operating Agreement, member-managed LLC, co-ownership disclaimer, data privacy.",
-    articles: [
-      {
-        slug: "operating-agreement",
-        q: "The Operating Agreement, explained",
-        summary:
-          "Governs the LLC: decision-making, fair-use, default remedies, sale and replacement rules. We provide a 2-page summary alongside the full document.",
-        body: [
-          {
-            type: "p",
-            text: "The Operating Agreement is the LLC's governance document. It defines how decisions get made, what each member owes the others, and how disputes resolve. Each vehicle's LLC has its own Operating Agreement, but they share the same template.",
-          },
-          { type: "h3", text: "What it covers" },
-          {
-            type: "ul",
-            items: [
-              "Member rights and obligations (capital contributions, fair-use rules, voting).",
-              "Decision thresholds (75% supermajority for material decisions like sale, modification, replacement).",
-              "Default remedies (what happens if a member stops paying or repeatedly causes damage).",
-              "Distribution waterfall (how proceeds flow on a sale or total loss).",
-              "Exit terms (12-month minimum hold, member-to-member transfer process, no guaranteed buyer or price).",
-              "Dispute resolution (mandatory mediation, then arbitration under AAA rules).",
-            ],
-          },
-          {
-            type: "callout",
-            tone: "info",
-            text: "We always provide a 2-page plain-English summary alongside the full 30–40 page document. Read both before signing. Your accountant or attorney is welcome to review.",
-          },
-        ],
-      },
-      {
-        slug: "member-managed-llc",
-        q: "What is a member-managed LLC, and why does RYDA use it?",
-        summary:
-          "It's an LLC where the members (the co-owners) hold authority over material decisions, not an outside manager. This is what keeps RYDA a luxury access platform, not an investment product.",
-        body: [
-          { type: "h3", text: "Two types of LLC governance" },
-          {
-            type: "p",
-            text: "LLCs come in two flavors: manager-managed and member-managed.",
-          },
-          {
-            type: "ul",
-            items: [
-              "Manager-managed: a designated manager runs the LLC. Members are passive, like shareholders. This is what most fractional investment platforms use, which is what makes those products securities.",
-              "Member-managed: the members themselves run the LLC, vote on material decisions, and hire service providers as needed. This is what RYDA uses.",
-            ],
-          },
-          { type: "h3", text: "Why this matters for RYDA" },
-          {
-            type: "p",
-            text: "Member-managed structure is a cornerstone of RYDA's non-investment positioning. The SEC's Howey test for what counts as a security asks whether members expect to profit from the efforts of others. In a member-managed LLC, you and your co-owners ARE the others, you hold authority. RYDA is hired to perform specific services, not to run the LLC. This is structurally similar to how a country club, condo association, or vacation-home co-ownership group operates, none of which are securities.",
-          },
-          { type: "h3", text: "What you actually decide as a member" },
-          {
-            type: "ul",
-            items: [
-              "Whether to sell the vehicle (75% supermajority).",
-              "Whether to perform modifications (75% supermajority).",
-              "Whether to replace the vehicle on a total loss (75% supermajority).",
-              "Whether to renew or terminate the management services agreement with RYDA.",
-              "Day-to-day operations are delegated to RYDA, but you can revoke that delegation by member vote.",
-            ],
-          },
-          {
-            type: "callout",
-            tone: "info",
-            text: "This is fundamental to the structure, not a marketing angle. If RYDA were the manager of the LLC making the operational and financial decisions on behalf of passive members, the arrangement would be a security and require Reg D / Reg A registration. Member governance is what keeps the structure consumption-first.",
-          },
-        ],
-      },
-      {
-        slug: "securities",
-        q: "Are RYDA co-ownership stakes securities?",
-        summary:
-          "No. They are LLC membership interests in a member-managed LLC where you actually co-own and use the vehicle. Not registered securities. Not offered for investment purposes.",
-        body: [
-          {
-            type: "p",
-            text: "No. RYDA is a luxury access platform, not an investment platform. Each car is held in a member-managed LLC that you and your co-owners run together. RYDA provides operations under a separate management services agreement. The arrangement is consumption-first, real ownership of a real car, with real usage rights, not a passive investment product.",
-          },
-          { type: "h3", text: "Why this isn't a security" },
-          {
-            type: "p",
-            text: "Under the SEC's Howey test, an investment contract requires (1) investment of money, (2) in a common enterprise, (3) with expectation of profit, (4) derived from the efforts of others. RYDA's structure breaks the third and fourth prongs:",
-          },
-          {
-            type: "ul",
-            items: [
-              "Cars depreciate. Co-owners aren't buying with appreciation expectation, the asset is a depreciating consumption good, like a jet card or a country-club membership.",
-              "The LLC is member-managed. You and your co-owners hold authority over material decisions (sale, modifications, replacement). RYDA is a hired service provider, not the LLC's decision-maker.",
-              "No income distribution. Members get usage; they don't earn yield from the LLC's operations.",
-              "Resale is member-to-member transfer of an LLC share, not a public marketplace trade.",
-            ],
-          },
-          { type: "h3", text: "What this means in practice" },
-          {
-            type: "ul",
-            items: [
-              "No accredited-investor verification required.",
-              "No SEC filings, no Form D, no Reg D 506(c) restrictions.",
-              "Open to anyone 28+ who clears KYC and the standard membership requirements.",
-              "12-month minimum hold still applies (Operating Agreement), but this is a co-ownership stability rule, not a securities lock-up.",
-            ],
-          },
-          {
-            type: "callout",
-            tone: "info",
-            text: "RYDA is not a broker-dealer, investment adviser, or fund manager. Co-ownership stakes are not offered for investment purposes. If you're considering this primarily for financial return, this is the wrong product, buy a Ferrari outright or look at a registered fund instead.",
-          },
-        ],
-      },
-      {
-        slug: "privacy",
-        q: "Data privacy & member information",
-        summary:
-          "We collect what's necessary, store it securely, and don't sell to third parties. Full policy at /legal/privacy.",
-        body: [
-          { type: "h3", text: "What we collect" },
-          {
-            type: "ul",
-            items: [
-              "Identity (KYC: name, DOB, ID, address, last-4 SSN).",
-              "Driving record (for insurance underwriting).",
-              "Accreditation evidence (CPA/attorney letter or equivalent).",
-              "Booking and usage history (telemetry from vehicle systems during your bookings).",
-              "Payment information (encrypted, processed by Stripe, RYDA doesn't store card numbers).",
-            ],
-          },
-          { type: "h3", text: "Who we share with" },
-          {
-            type: "ul",
-            items: [
-              "Insurance carriers (when adding you to a policy).",
-              "Federal/state regulators (when legally required).",
-              "Other co-owners on your specific LLC (limited: your name, contact, share count, for booking calendar coordination).",
-              "Buyer KYC systems on member-to-member share transfers (limited fields, with your consent).",
-            ],
-          },
-          { type: "h3", text: "Who we don't share with" },
-          {
-            type: "p",
-            text: "We don't sell or rent member data. We don't share with advertising networks. We don't share with other RYDA LLCs you're not a member of. The full policy is at /legal/privacy.",
-          },
-        ],
-      },
-      {
-        slug: "llc-dissolution",
-        q: "What if the LLC has to wind down?",
-        summary:
-          "Triggered by total loss, 75% co-owner vote, or insolvency. Vehicle is sold, debts paid, remaining proceeds distributed pro-rata. RYDA handles all paperwork.",
-        body: [
-          { type: "h3", text: "When dissolution happens" },
-          {
-            type: "ul",
-            items: [
-              "Total loss: vehicle is destroyed and the group doesn't elect to roll proceeds into a replacement.",
-              "Voluntary: a 75% co-owner vote elects to wind down (e.g., the group decides to sell the car and end the LLC).",
-              "Forced: the LLC becomes insolvent, or the members determine continued operation is no longer viable.",
-            ],
-          },
-          { type: "h3", text: "Sequence of events" },
-          {
-            type: "p",
-            text: "Per the Operating Agreement and the Management Services Agreement, RYDA performs the wind-down operations: marshalling assets (insurance proceeds or sale proceeds), paying outstanding liabilities (carrier balances, vendor invoices, taxes), and distributing the remainder pro-rata to co-owners according to their shares held. The dissolution decision itself is a member vote; RYDA executes it. Distribution happens within 60 days of the decision.",
-          },
-          { type: "h3", text: "Tax implications" },
-          {
-            type: "p",
-            text: "The dissolution generates a final K-1 for the year, including any gain or loss on the disposition. Co-owners report it on their personal tax returns. As always, talk to your CPA, RYDA does not provide tax advice.",
-          },
-        ],
-      },
-      {
-        slug: "dispute-resolution",
-        q: "How do disagreements between co-owners get resolved?",
-        summary:
-          "Most disagreements never escalate, RYDA Operations enforces the Operating Agreement consistently. For ones that do: mandatory mediation first, then arbitration under AAA rules.",
-        body: [
-          { type: "h3", text: "Day-to-day governance" },
-          {
-            type: "p",
-            text: "RYDA, as the LLC's hired service provider, performs most operational decisions (scheduling, service, condition issues) by applying the Operating Agreement consistently. The LLC remains member-managed, co-owners hold authority over material decisions, but day-to-day operations are delegated to RYDA via the Management Services Agreement. RYDA's authority is bounded by what the Operating Agreement and MSA explicitly delegate.",
-          },
-          { type: "h3", text: "When co-owners disagree" },
-          {
-            type: "p",
-            text: "Material issues, sale, replacement, modification, or expulsion of a delinquent member, require a vote per the OA's threshold (typically 75%). If a vote fails to reach threshold, the status quo continues until a new vote is called.",
-          },
-          { type: "h3", text: "Formal disputes" },
-          {
-            type: "p",
-            text: "If a member believes the LLC, RYDA, or another member has materially breached the Operating Agreement, the OA requires:",
-          },
-          {
-            type: "ul",
-            items: [
-              "Written notice with 30 days for cure.",
-              "Mandatory mediation (60 days) with a neutral mediator.",
-              "If mediation fails: binding arbitration in under AAA rules under AAA rules.",
-              "Litigation only as a last resort, with a forum-selection clause.",
-            ],
-          },
-          {
-            type: "callout",
-            tone: "info",
-            text: "Disputes are rare. The Operating Agreement is well-drafted, RYDA enforces consistently, and the small-group nature of co-ownership encourages co-owners to talk things out before formal escalation.",
+            text: "The same page has a request-your-data button. That is a request too — there is no automatic export behind it. Someone puts the file together and replies to the email address on your account.",
           },
         ],
       },
@@ -1856,31 +940,11 @@ export function getArticle(categorySlug: string, articleSlug: string) {
 const ARTICLE_KEYWORDS: Record<string, string[]> = {
   // Getting started
   "getting-started/what-is-ryda": ["overview", "introduction", "explain", "platform", "model", "company", "what is", "tell me about", "summary", "elevator pitch"],
-  "getting-started/vs-timeshare": ["timeshare", "different", "compare", "club", "points", "ownership", "vs timeshare", "is this a timeshare"],
-  "getting-started/membership-tiers": ["pricing", "cost", "how much", "tier", "core", "blue", "black", "free", "subscription", "annual fee", "membership cost", "monthly", "yearly", "expensive", "cheap"],
-  "getting-started/accreditation": ["accredited", "qualify", "investor", "income requirement", "net worth", "sec", "wealthy", "rich", "qualified", "income", "$200k", "$1m", "net worth"],
   "getting-started/markets": ["where", "miami", "los angeles", "la", "new york", "ny", "city", "location", "available", "operating cities", "states", "regions"],
-  "getting-started/rental-vs-ownership": ["rent or buy", "rental vs ownership", "should i rent", "should i buy", "test drive first", "try it out", "before commit", "compare rental"],
-  "getting-started/early-member-benefits": ["early", "first 100", "early member", "early member", "what do founders get", "lifetime pricing", "locked rate", "perks"],
-  "getting-started/share-financing": ["finance", "loan", "borrow", "financing", "credit", "payment plan", "installments", "monthly payment", "afford"],
-
-  // Shares
-  "shares/how-to-buy": ["buy", "purchase", "process", "steps", "onboard", "get started buying", "how do i invest", "buying a share", "first share", "step by step"],
-  "shares/documents": ["paperwork", "operating agreement", "subscription", "sign", "contract", "legal docs", "k-1", "kyc docs", "what do i sign", "agreements", "forms"],
-  "shares/entitlement": ["what do i get", "rights", "days per year", "miles", "voting", "ownership rights", "what does a share include", "benefits", "perks", "entitled to"],
-  "shares/selling": ["sell", "exit", "liquidate", "minimum hold", "lockup", "12 month", "resell", "transfer", "get out", "cash out"],
-  "shares/pricing": ["price", "valuation", "worth", "value", "appraisal", "market price", "list price", "fair market", "how priced", "share price"],
-  "shares/transfer-fee": ["fee", "commission", "3%", "transfer cost", "selling fee", "platform fee", "what's the fee", "selling cost"],
-  "shares/gifting-and-inheritance": ["gift", "give", "transfer to family", "spouse", "inheritance", "heir", "inherit", "estate", "trust", "death", "die", "will", "probate", "pass to children"],
-  "shares/whole-vs-fractional": ["versus buying outright", "whole car", "buy outright", "compare to buying", "vs buying", "outright", "solo ownership", "alone"],
-  "shares/llc-default": ["default", "stops paying", "doesn't pay", "miss payment", "delinquent", "fail to pay", "what if someone doesn't pay", "deadbeat"],
-  "shares/share-count-changes": ["share count", "number of shares", "more shares", "dilution", "issue shares", "add shares", "change shares"],
 
   // Bookings
-  "bookings/how-to-book": ["book", "reserve", "schedule", "calendar", "availability", "drive", "use the car", "make a booking", "reservation"],
-  "bookings/fair-use": ["fair use", "peak", "high season", "summer", "consecutive days", "limit", "weekly cap", "cap", "monopolize", "hog", "block out", "f1", "art basel"],
   "bookings/cancellations": ["cancel", "reschedule", "refund", "no show", "cancellation fee", "change date", "back out", "withdraw"],
-  "bookings/mileage": ["miles", "mileage", "overage", "kilometers", "limit", "annual miles", "$4 per mile", "exceed", "go over", "extra miles"],
+  "bookings/mileage": ["miles", "mileage", "overage", "kilometers", "limit", "annual miles", "exceed", "go over", "extra miles"],
   "bookings/passengers": ["passenger", "co-driver", "secondary driver", "spouse", "partner", "friend", "additional driver", "guests", "wife", "husband", "kids ride"],
   "bookings/out-of-state-travel": ["out of state", "another state", "state line", "border", "mexico", "canada", "long distance", "across country", "interstate", "transit"],
   "bookings/weather-and-storms": ["weather", "rain", "storm", "hurricane", "tornado", "snow", "hail", "ice", "tropical storm", "evacuation", "evacuate", "noaa"],
@@ -1903,19 +967,8 @@ const ARTICLE_KEYWORDS: Record<string, string[]> = {
   // Account
   "account/payment-methods": ["pay", "payment", "card", "ach", "bank", "credit card", "wire", "billing method", "amex", "visa", "mastercard", "stripe"],
   "account/billing": ["bill", "invoice", "charged", "statement", "billing cycle", "when am i charged", "monthly", "quarterly", "annual", "receipt", "auto pay"],
-  "account/taxes": ["tax", "k-1", "k1", "1099", "depreciation", "deduction", "irs", "cpa", "tax treatment", "income tax", "tax return", "schedule e"],
   "account/kyc": ["kyc", "id verification", "identity", "verify me", "documents required", "passport", "license", "selfie", "persona", "background check"],
   "account/close": ["cancel account", "leave", "quit", "close account", "deactivate", "delete account", "unsubscribe", "i'm done", "not interested"],
-  "account/referral-program": ["referral", "refer a friend", "credit", "rewards", "bonus", "earn", "invite code", "promo code", "incentive", "bring a friend"],
-  "account/early-pricing": ["early price", "early-member pricing", "locked pricing", "lifetime price", "permanently locked", "founder rate"],
-
-  // Legal
-  "legal/operating-agreement": ["operating agreement", "oa", "llc agreement", "governance", "voting", "decision rules", "bylaws"],
-  "legal/member-managed-llc": ["member managed", "member-managed", "llc structure", "who manages", "governance", "manager", "decision making", "control", "vote", "voting"],
-  "legal/securities": ["securities", "regulated", "stocks", "is this regulated", "sec", "registered", "broker dealer", "investment", "investments", "is this an investment"],
-  "legal/privacy": ["privacy", "data", "personal information", "what do you collect", "share my data", "third parties", "gdpr", "ccpa"],
-  "legal/llc-dissolution": ["dissolve", "wind down", "shut down", "close llc", "dissolution", "exit", "wind up", "end of life"],
-  "legal/dispute-resolution": ["dispute", "disagree", "argument", "fight", "lawsuit", "sue", "arbitration", "mediation", "conflict", "co-owner conflict"],
 
   // Vehicle use & etiquette
   "vehicle-use/aggressive-driving": ["drift", "drag race", "burnout", "launch", "launch control", "redline", "aggressive", "spirited", "drive fast", "speed", "race"],

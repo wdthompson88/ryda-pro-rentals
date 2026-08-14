@@ -5,17 +5,24 @@ import { HELP } from "@/lib/help-content";
 export const metadata = {
   title: "Help Center",
   description:
-    "Answers about RYDA membership, co-ownership, bookings, insurance, maintenance, and account management.",
+    "Answers about renting a car listed on RYDA: sending a request, paying, insurance, mileage, and your account.",
 };
 
+// Five of these seven pointed at co-ownership articles that no longer
+// exist — claiming a share, transferring one, the member-managed LLC,
+// the securities question, tax treatment — plus fair-use rules for a
+// booking calendar this platform does not have. Each label below is the
+// linked article's own `q` verbatim, so a tile cannot drift from the
+// page it opens, and every href resolves to a live article in HELP. If
+// you delete an article, delete its tile in the same commit.
 const TOP_TOPICS: { label: string; href: string }[] = [
-  { label: "How to claim a co-ownership share", href: "/help/shares/how-to-buy" },
-  { label: "Is this an investment?", href: "/help/legal/securities" },
-  { label: "Member-managed LLC explained", href: "/help/legal/member-managed-llc" },
-  { label: "Fair-use rules", href: "/help/bookings/fair-use" },
-  { label: "File an insurance claim", href: "/help/insurance/file-claim" },
-  { label: "Tax treatment", href: "/help/account/taxes" },
-  { label: "Transfer your share", href: "/help/shares/selling" },
+  { label: "What is RYDA, in one paragraph?", href: "/help/getting-started/what-is-ryda" },
+  { label: "Who insures the car I rent?", href: "/help/insurance/coverage" },
+  { label: "How do I pay, and does RYDA keep my card?", href: "/help/account/payment-methods" },
+  { label: "Cancellations and refunds", href: "/help/bookings/cancellations" },
+  { label: "Mileage limits and overages", href: "/help/bookings/mileage" },
+  { label: "Who maintains and stores the cars?", href: "/help/maintenance/process" },
+  { label: "What do I pay if the car is damaged?", href: "/help/insurance/deductible" },
 ];
 
 export default function HelpCenterPage() {
@@ -49,7 +56,7 @@ export default function HelpCenterPage() {
                 id="help-search"
                 name="q"
                 type="search"
-                placeholder="Search bookings, insurance, share transfer, KYC…"
+                placeholder="Search bookings, insurance, payment, mileage…"
                 className="h-full flex-1 bg-transparent text-base text-ink placeholder:text-mute focus:outline-none"
               />
               <button
@@ -137,16 +144,30 @@ export default function HelpCenterPage() {
               cta="What to do if the car stops →"
               href="/help/insurance/roadside"
             />
+            {/* "within one business day" is deleted from both tiles
+                below, and from the CTA underneath. Nothing in this
+                codebase measures or enforces a reply time: a contact
+                message writes a contact_messages row and emails the
+                team, and a help-chat escalation writes a
+                help_escalations row and does the same. Neither carries
+                an SLA, so neither tile may advertise one.
+
+                The third tile offered a bookable 30-minute consultation
+                about "membership, shares, or anything else" — there is
+                no membership, no share, no advisor and no calendar to
+                book. /contact#consultation still exists and its own copy
+                says to put the request in the message instead, so the
+                tile now says what that section actually does. */}
             <Strip
               title="Send us a message"
-              detail="For general questions, send a message and we'll route it to the right person within one business day."
+              detail="For general questions, send a message and we'll route it to the right person."
               cta="Open contact form →"
               href="/contact#form"
             />
             <Strip
-              title="Book a 30-minute call"
-              detail="Talk to a real human about membership, shares, or anything else. No commitment."
-              cta="Book a consultation →"
+              title="Rather talk it through?"
+              detail="There's no field on the contact form for a call. Put it in the message: what you're after, and when you're reachable."
+              cta="Send a note →"
               href="/contact#consultation"
             />
           </div>
@@ -160,9 +181,8 @@ export default function HelpCenterPage() {
             Didn't find what you needed?
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
-            We'll write you back within one business day. If you're
-            mid-rental, the operator who confirmed your booking will
-            always be faster than we can be.
+            If you're mid-rental, the operator who confirmed your booking
+            will always be faster than we can be.
           </p>
           <Link
             href="/contact"

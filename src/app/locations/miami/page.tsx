@@ -2,7 +2,6 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { HiddenWhenAuthed } from "@/components/auth-aware";
 import { SITE_URL } from "@/lib/site-url";
-import { PARTNER_VEHICLES } from "@/lib/partner-fleet";
 
 // Miami market page, rewritten for the rental product (Aug 2026).
 //
@@ -18,27 +17,48 @@ import { PARTNER_VEHICLES } from "@/lib/partner-fleet";
 // invented ones.
 //
 // Miami is live now, not launching: /rent renders the operator
-// inventory in src/lib/partner-fleet.ts. The numbers in the stat band
-// are computed from that array at build time so they cannot drift away
-// from what a visitor can actually browse.
+// inventory in src/lib/partner-fleet.ts.
 //
-// Operators are never named on this page — "a vetted Miami operator",
-// the same rule as every other customer-facing surface.
-
-const MIAMI_VEHICLES = PARTNER_VEHICLES.filter((v) => v.market === "Miami");
-const FLEET_COUNT = MIAMI_VEHICLES.length;
-const CATEGORY_COUNT = new Set(MIAMI_VEHICLES.map((v) => v.category)).size;
+// Three later corrections, all of them deletions:
+//
+//   1. Fleet-wide statistics are out of copy by operator decision. The
+//      stat band (cars listed / vehicle categories / cars RYDA owns)
+//      and the "N cars, one request away" close both counted the
+//      fleet, so both are gone, along with the PARTNER_VEHICLES import
+//      that fed them. Per-listing rates on /rent and /rent/[symbol]
+//      are unaffected — this rule is about aggregates.
+//   2. "Vetted" is defined in exactly one place, on /trust-and-safety,
+//      and every use of the word has to route the reader there. Neither
+//      use on this page could (one was a meta description, one was a
+//      plain string prop), so both were deleted rather than linked.
+//   3. The grid is not exotics-only and there is not a roster of
+//      operators, so copy here says neither. Phrasing is per listing —
+//      "the operator who runs that car" — which stays true whether the
+//      platform has one operator or twenty.
+//
+// Operators are never named on this page (D6).
 
 export const metadata = {
   title: "Miami",
   description:
-    "RYDA's live market. Exotic cars in Miami, listed by the independent operators who own and run them. Send your dates and a vetted Miami operator confirms directly with you — no card at request.",
+    "Rental cars in Miami, everyday to exotic, listed by the independent operator who owns and runs each one. Send your dates — no card at request.",
   alternates: { canonical: `${SITE_URL}/locations/miami` },
 };
 
 export default function MiamiPage() {
-  // SEO: Place + parent Organization JSON-LD describes the Miami market
-  // for Google's knowledge graph.
+  // SEO: a single Place node describing the Miami market for Google's
+  // knowledge graph.
+  //
+  // The second node that used to sit beside it — an Organization with
+  // "@id": SITE_URL and areaServed Miami / Miami Beach / Coral Gables /
+  // Coconut Grove / Miami-Dade — is deleted, for two reasons. It was a
+  // duplicate: layout.tsx already emits an Organization on every page,
+  // under a different @id ("#organization"), so this one published a
+  // second, competing RYDA entity. And its areaServed re-added exactly
+  // the false coverage layout.tsx had stripped out: four named
+  // localities, none of which has a listing of its own. Coverage claims
+  // follow the inventory, and the inventory's market field is the
+  // literal type "Miami".
   //
   // Still `Place` rather than `AutomotiveBusiness`, but for a different
   // reason than it used to be. The old comment said we would switch
@@ -54,8 +74,10 @@ export default function MiamiPage() {
     "@type": "Place",
     "@id": `${SITE_URL}/locations/miami`,
     name: "RYDA Miami",
+    // Machine-readable, so it carries the same two corrections the
+    // prose does: not exotics-only, and no plural roster of operators.
     description:
-      "RYDA's live market. A listing platform for exotic-car rentals in Miami-Dade: the vehicles are owned, insured and operated by independent local operators, and RYDA passes booking requests to them.",
+      "A listing platform for car rentals in Miami-Dade: each vehicle is owned, insured and operated by the independent operator who lists it, and RYDA passes rental requests on to them.",
     url: `${SITE_URL}/locations/miami`,
     address: {
       "@type": "PostalAddress",
@@ -68,20 +90,6 @@ export default function MiamiPage() {
       name: "Miami-Dade County",
     },
   };
-  const orgJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "@id": SITE_URL,
-    name: "RYDA",
-    url: SITE_URL,
-    areaServed: [
-      { "@type": "City", name: "Miami" },
-      { "@type": "City", name: "Miami Beach" },
-      { "@type": "City", name: "Coral Gables" },
-      { "@type": "City", name: "Coconut Grove" },
-      { "@type": "AdministrativeArea", name: "Miami-Dade County" },
-    ],
-  };
 
   return (
     <>
@@ -90,12 +98,6 @@ export default function MiamiPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(placeJsonLd).replace(/</g, "\\u003c"),
-        }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(orgJsonLd).replace(/</g, "\\u003c"),
         }}
       />
 
@@ -134,49 +136,30 @@ export default function MiamiPage() {
         </div>
       </section>
 
-      {/* What is actually here — every figure below is computed from the
-          same inventory /rent renders, so nothing on this page can
-          advertise a car a visitor cannot find. */}
-      <section className="border-b border-rule bg-cream-2">
-        <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10">
-          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
-            <Stat number={String(FLEET_COUNT)} label="Cars listed in Miami" />
-            <Stat number={String(CATEGORY_COUNT)} label="Vehicle categories" />
-            <Stat number="0" label="Cars RYDA owns" />
-          </div>
-        </div>
-      </section>
+      {/* The stat band that used to sit here — cars listed in Miami,
+          vehicle categories, cars RYDA owns — is deleted. Every figure
+          in it was a fleet-wide aggregate, and aggregates are out of
+          copy. */}
 
-      {/* Why Miami */}
+      {/* What RYDA does here. Two paragraphs are missing from this
+          section on purpose. The first argued that Miami is full of
+          exotic-car fleets whose sites are tiring to compare, which is
+          both exotics-only framing and a claim about a market RYDA has
+          not surveyed; the second said RYDA started here because it
+          "found the most of them" and listed "local operators we
+          vetted". One operator is on the platform. Both are gone; what
+          is left is the part that describes the actual arrangement. */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10">
           <h2 className="font-display text-3xl text-ink sm:text-4xl">
-            Why Miami first
+            What RYDA does here
           </h2>
-          <div className="mt-8 space-y-6 text-base leading-relaxed text-ink-soft">
-            <p>
-              Miami is not short of exotic cars for rent. It is short of
-              one place to see them. The fleets here are independent
-              businesses, their inventory lives across separate websites
-              and social accounts, and comparing three of them means
-              starting the same conversation three times.
-            </p>
-            <p>
-              That is the problem RYDA exists to solve, and it is a
-              problem you only have in a city with enough operators to
-              make the search tiring. Miami is where we found the most
-              of them, so it is where we started — with local operators
-              we vetted, listing the cars they already rent out.
-            </p>
-            <p>
-              Nothing about the arrangement makes the car ours. The
-              operator sets the price and the terms, confirms whether
-              the dates are free, and closes the rental on their own
-              agreement and insurance. RYDA is paid by them, as a
-              referral commission on the bookings we send — never as a
-              markup on what you pay.
-            </p>
-          </div>
+          <p className="mt-8 text-base leading-relaxed text-ink-soft">
+            The operator sets the price and the terms, confirms whether
+            the dates are free, and closes the rental on their own
+            agreement and insurance. RYDA is paid by the operator, as a
+            referral commission — never as a markup on what you pay.
+          </p>
         </div>
       </section>
 
@@ -188,14 +171,14 @@ export default function MiamiPage() {
           <h2 className="font-display text-3xl text-ink sm:text-4xl">
             Renting in Miami
           </h2>
-          <p className="mt-4 max-w-2xl text-base text-ink-soft">
-            The same four things are true of every car on this page,
-            whichever operator runs it.
-          </p>
+          {/* "The same four things are true of every car on this page,
+              whichever operator runs it" is deleted: "whichever"
+              implies a roster to choose between. The four cards say
+              what they say without a preamble. */}
           <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             <Feature
               title="A request, not a booking"
-              body="Sending your dates reserves nothing and takes no card. A vetted Miami operator comes back to you with real availability and the final price."
+              body="Sending your dates reserves nothing and takes no card. Availability and the final price come from the operator who runs the car."
             />
             <Feature
               title="Handover is the operator's"
@@ -219,8 +202,11 @@ export default function MiamiPage() {
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red-bright">
             Miami · Live now
           </p>
+          {/* Was "{FLEET_COUNT} cars, one request away." The count is a
+              fleet-wide aggregate; the rest of the sentence is true on
+              its own. */}
           <h2 className="mt-4 font-display text-4xl font-light sm:text-5xl">
-            {FLEET_COUNT} cars, one request away.
+            One request away.
           </h2>
           <p className="mx-auto mt-6 max-w-xl text-base text-cream/70">
             Browse the Miami grid, send your dates, and let the operator
@@ -248,16 +234,7 @@ export default function MiamiPage() {
   );
 }
 
-function Stat({ number, label }: { number: string; label: string }) {
-  return (
-    <div>
-      <p className="font-display text-4xl font-light text-ink tabular-nums sm:text-5xl">
-        {number}
-      </p>
-      <p className="mt-2 text-xs uppercase tracking-wider text-mute">{label}</p>
-    </div>
-  );
-}
+// The Stat component went with the stat band it was written for.
 
 function Feature({ title, body }: { title: string; body: string }) {
   return (

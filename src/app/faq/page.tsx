@@ -34,6 +34,10 @@ export const metadata = {
 // customer told "instantly" who then waits on a manual forward trusts
 // us less than one who was told there is a person in the middle.
 //
+// "Vetted" is defined in exactly one place, /trust-and-safety#vetting.
+// Answers here are plain strings rather than JSX, so the word cannot be
+// linked to that definition from this page — it is dropped instead.
+//
 // Operators are not named here (D6).
 
 const SECTIONS: FaqSection[] = [
@@ -42,7 +46,7 @@ const SECTIONS: FaqSection[] = [
     questions: [
       {
         q: "What happens when I send a request?",
-        a: "It comes to RYDA first, and a copy of it lands in your inbox straight away. From there a person here passes it to the vetted Miami operator who runs that car — that hand-off is done by hand rather than automatically, so it isn't instant. The operator then comes back to you directly to confirm whether your dates are open and what the final price is. No card is taken at any point in that, and nothing is charged.",
+        a: "It comes to RYDA first, and a copy of it lands in your inbox straight away. From there a person here passes it to the Miami operator who runs that car — that hand-off is done by hand rather than automatically, so it isn't instant. The operator then confirms whether your dates are open and what the final price is. No card is taken at any point in that, and nothing is charged.",
       },
       {
         q: "Is a request a booking?",
@@ -84,7 +88,7 @@ const SECTIONS: FaqSection[] = [
     questions: [
       {
         q: "Who am I actually renting from?",
-        a: "An independent Miami operator who owns and runs the car. RYDA lists the vehicle, vets the operator and passes your request to them. RYDA does not own, store, insure, maintain or operate any vehicle on the platform, and is not a party to your rental agreement.",
+        a: "An independent Miami operator who owns and runs the car. RYDA lists the vehicle and passes your request to them. RYDA does not own, store, insure, maintain or operate any vehicle on the platform, and is not a party to your rental agreement.",
       },
       {
         q: "Why don't listings say which company owns the car?",

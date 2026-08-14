@@ -50,6 +50,10 @@ const GREETING: ChatMessage = {
   text: "Hi, I'm RYDA's help assistant. Ask me about renting one of the cars listed here — sending a request, what happens once an operator confirms, whose contract and insurance the rental closes on, how you pay, mileage, cancellations. I'll answer from the help articles and link you to the full one. Need a real human? Just say so.",
 };
 
+// No reply-time promise anywhere in this component. An escalation writes
+// a help_escalations row and emails the team; nothing measures or
+// enforces a turnaround, so "within one business day" is deleted from
+// both the escalation prompt and the confirmation below.
 const INTROS = ["Here's the gist:", "Quick answer:", "Short version:", "From the help docs:"];
 function pickIntro(seed: number) {
   return INTROS[seed % INTROS.length];
@@ -131,7 +135,7 @@ export function HelpChat() {
       botMsg = {
         id: `b-${Date.now()}`,
         role: "bot",
-        text: "Of course. Drop your email and a short note about what you're looking for, and someone from RYDA will reach out within one business day.",
+        text: "Of course. Drop your email and a short note about what you're looking for, and someone from RYDA will reach out.",
         escalation: "prompt",
       };
     } else {
@@ -201,7 +205,7 @@ export function HelpChat() {
                 ...m,
                 escalation: "submitted",
                 submittedEmail: payload.email,
-                text: `Got it, we'll email ${payload.email} within one business day. Anything else I can help with in the meantime?`,
+                text: `Got it, we'll email ${payload.email}. Anything else I can help with in the meantime?`,
               }
             : m,
         ),

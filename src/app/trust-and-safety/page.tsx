@@ -30,6 +30,9 @@ import { SiteHeader } from "@/components/site-header";
 // — see the "What we don't claim" section. Do not add background checks,
 // vehicle inspections, insurance verification, or 24/7 support here
 // unless something in the repo actually does them.
+//
+// "Vetted" is defined exactly once, in the #vetting section below. Any
+// other use of the word on the site links there or drops the word.
 
 export const metadata: Metadata = {
   title: "Trust & Safety",
@@ -53,9 +56,9 @@ export default function TrustAndSafetyPage() {
             What RYDA checks, and where it stops.
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
-            RYDA lists cars that independent Miami operators own and
-            operate. We review the operator, the payment runs on Stripe,
-            and we keep the record. The car, the contract and the
+            Every car RYDA lists is owned and operated by an independent
+            Miami operator. We review the operator, the payment runs on
+            Stripe, and we keep the record. The car, the contract and the
             insurance are theirs.
           </p>
         </div>
@@ -76,11 +79,10 @@ export default function TrustAndSafetyPage() {
           </h2>
           <div className="mt-8 space-y-5 text-base leading-relaxed text-ink-soft">
             <p>
-              Every car here is run by a vetted Miami operator, and no
-              listing says which one. It isn&apos;t coyness — the browse
-              grid, the car page, the data behind them and the
-              confirmation email you get all leave the operator&apos;s
-              identity out on purpose.
+              No listing here says which operator runs the car. It
+              isn&apos;t coyness — the browse grid, the car page, the
+              data behind them and the confirmation email you get all
+              leave the operator&apos;s identity out on purpose.
             </p>
             <p>
               It is a disclosure rule, not a shield. It decides when you
@@ -131,8 +133,15 @@ export default function TrustAndSafetyPage() {
         </div>
       </section>
 
-      {/* What the review actually is */}
-      <section className="border-b border-rule">
+      {/* What the review actually is — and the SINGLE canonical
+          definition of "vetted", at #vetting. The word had been stripped
+          and reinstated four times because it was never defined
+          anywhere; the ruling is that it stays, is defined here, and
+          every other use on the site either links here or drops the
+          word. Its scope is bounded by what the code does — Stripe
+          Connect onboarding — so do not widen it with inspections,
+          insurance checks, licence checks or background checks. */}
+      <section id="vetting" className="scroll-mt-24 border-b border-rule">
         <div className="mx-auto max-w-3xl px-6 py-20 sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
             The review
@@ -141,19 +150,25 @@ export default function TrustAndSafetyPage() {
             What &ldquo;vetted&rdquo; actually means.
           </h2>
           <p className="mt-6 text-base leading-relaxed text-ink-soft">
-            Four things stand between an operator&apos;s application and a
-            car appearing on RYDA. None of them is a mechanical
-            inspection — the limits are further down this page, stated
-            plainly.
+            Where this site calls an operator vetted, it means one thing:
+            the operator has completed Stripe Connect onboarding, which
+            verifies their business details and the bank account their
+            payouts reach. That is the whole of it. RYDA does not inspect
+            the cars, verify anyone&apos;s insurance, check driving
+            licences or run background checks. Until that onboarding is
+            finished, RYDA&apos;s own system refuses to create a payment
+            link for that operator — the attempt is rejected, not queued.
+          </p>
+          <p className="mt-6 text-base leading-relaxed text-ink-soft">
+            Three other things stand between an operator&apos;s
+            application and a car appearing on RYDA, and none of them is
+            part of that word. The limits are further down this page,
+            stated plainly.
           </p>
           <div className="mt-10 space-y-5">
             <Coverage
               line="A company, reviewed by a person"
               detail="An application carries the company name, the contact, a phone number, a website and a fleet size, and it is read one at a time rather than approved automatically. Under review, approved, paused: that status is RYDA's to set and RYDA's to withdraw."
-            />
-            <Coverage
-              line="Business and bank verification, through Stripe"
-              detail="Approved operators go through Stripe Express onboarding, where Stripe verifies the business and the bank account that payouts will reach. This is the same check Stripe runs on any business taking card payments — and until it completes, no payment link can be created for that operator at all."
             />
             <Coverage
               line="Listings set up with us, not uploaded"
