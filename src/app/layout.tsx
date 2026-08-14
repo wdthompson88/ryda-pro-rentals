@@ -57,8 +57,11 @@ export const metadata: Metadata = {
     default: "RYDA — Car rental in Miami, everyday to exotic",
     template: "%s · RYDA",
   },
-  // Two standing rules for this block, which is the default snippet for
-  // every page that does not set its own:
+  // Three standing rules for this block, which is the default snippet for
+  // every page that does not set its own — and note that "does not set
+  // its own" is the whole point: Next merges metadata per top-level key,
+  // so deleting a page's `description` does not delete a claim, it
+  // inherits this one. Fix the claim here, not by removing it downstream.
   //
   // 1. Makes named here must exist in PARTNER_VEHICLES. A marque nobody
   //    can find on /rent is an advertised car we don't have. McLaren was
@@ -70,8 +73,15 @@ export const metadata: Metadata = {
   //    inventory and undersold the rest. Range is the honest story —
   //    which is not licence to drop the Ferraris and Lamborghinis
   //    either, because those are real too.
+  // 3. No screening claim, and no plural supply side. "Vetted" asserted
+  //    a check nobody runs: the only operator screening in this repo is
+  //    Stripe Connect onboarding of business and bank details.
+  //    PartnerVehicle.partner is one literal operator, so "fleets"
+  //    claimed a roster of suppliers that does not exist. Both deleted
+  //    Aug 2026, here and in the openGraph/twitter/JSON-LD copies below,
+  //    which are separate strings and were separately wrong.
   description:
-    "Browse Miami's independent rental fleets in one grid — Toyota, Tesla and Land Rover through Porsche, Ferrari and Lamborghini. Send one request with your dates and the vetted local operator who owns the car confirms directly with you, on their contract and insurance.",
+    "Browse Miami rental cars in one grid — Toyota, Tesla and Land Rover through Porsche, Ferrari and Lamborghini. Send one request with your dates and the local operator who owns the car confirms directly with you, on their contract and insurance.",
   metadataBase: new URL(siteUrl),
   // Canonical anchor for the home page. Per-page metadata can override
   // alternates.canonical for routes that should self-canonicalize
@@ -105,7 +115,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "RYDA — Car rental in Miami, everyday to exotic",
     description:
-      "One grid of Miami rental cars, everyday to exotic. Send your dates; a vetted local operator confirms directly with you.",
+      "One grid of Miami rental cars, everyday to exotic. Send your dates; a local operator confirms directly with you.",
     siteName: "RYDA",
     type: "website",
     locale: "en_US",
@@ -115,7 +125,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "RYDA — Car rental in Miami, everyday to exotic",
     description:
-      "One grid of Miami rental cars, everyday to exotic. Send your dates; a vetted local operator confirms directly with you.",
+      "One grid of Miami rental cars, everyday to exotic. Send your dates; a local operator confirms directly with you.",
   },
   // Categorization helps some crawlers and embeds.
   category: "Car rental",
@@ -153,7 +163,7 @@ const organizationJsonLd = {
       url: siteUrl,
       logo: `${siteUrl}/opengraph-image`,
       description:
-        "RYDA is a referral marketplace for car rental in Miami, spanning everyday cars through exotics. Every vehicle listed is owned and operated by an independent Miami operator: we list their fleets in one grid, pass each request to the operator who holds the car, and earn a referral commission from them. RYDA does not own, store, insure, maintain or operate any vehicle, and is not a party to the rental.",
+        "RYDA is a referral marketplace for car rental in Miami, spanning everyday cars through exotics. Every vehicle listed is owned and operated by an independent Miami operator: we list their fleet in one grid, pass each request to the operator who holds the car, and earn a referral commission from them. RYDA does not own, store, insure, maintain or operate any vehicle, and is not a party to the rental.",
       // No `foundingDate`. The one that sat here published "2026" as a
       // machine-readable fact on every document with nothing in the
       // repo to source it from — the exact category /press refuses to
@@ -194,7 +204,7 @@ const organizationJsonLd = {
       url: siteUrl,
       name: "RYDA",
       description:
-        "Browse Miami's rental fleets in one grid, everyday cars through exotics. Send one request with your dates; the vetted local operator who owns the car confirms directly with you, on their contract and insurance.",
+        "Browse Miami rental cars in one grid, everyday cars through exotics. Send one request with your dates; the local operator who owns the car confirms directly with you, on their contract and insurance.",
       publisher: { "@id": `${siteUrl}#organization` },
       inLanguage: "en-US",
       potentialAction: {

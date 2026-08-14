@@ -31,8 +31,15 @@ import { PARTNER_VEHICLES } from "@/lib/partner-fleet";
 
 const FLEET_COUNT = PARTNER_VEHICLES.length;
 
+// The `description` is set here on purpose, and rule 1 above still holds
+// for it. Next merges metadata per top-level key, so a page without one
+// inherits the root layout's consumer rental snippet — deleting a page
+// description forwards a claim rather than removing it. Both sentences
+// below are restatements of copy already in the hero.
 export const metadata = {
   title: "Investor inquiry",
+  description:
+    "Investor contact for RYDA, a referral marketplace for car rentals in Miami. The round, the numbers and the deck are not published on this page.",
   alternates: { canonical: "/investors" },
 };
 

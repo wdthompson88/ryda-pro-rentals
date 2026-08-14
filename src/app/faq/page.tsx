@@ -34,8 +34,7 @@ export const metadata = {
 // customer told "instantly" who then waits on a manual forward trusts
 // us less than one who was told there is a person in the middle.
 //
-// Operators are not named here (D6). "A vetted Miami operator" until
-// they introduce themselves on reply.
+// Operators are not named here (D6).
 
 const SECTIONS: FaqSection[] = [
   {
@@ -89,7 +88,7 @@ const SECTIONS: FaqSection[] = [
       },
       {
         q: "Why don't listings say which company owns the car?",
-        a: "Because until there's a booking, an operator's fleet and their open dates are theirs to publish, not ours. Every car on the grid is run by an operator we have vetted, and the operator introduces themselves by name when they reply to your request.",
+        a: "Because until there's a booking, an operator's fleet and their open dates are theirs to publish, not ours.",
       },
       {
         q: "Whose contract and insurance is the rental on?",

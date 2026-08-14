@@ -103,11 +103,12 @@ export default function RequestsPage() {
           {/* Three things this paragraph is not allowed to say again.
               "Miami's most-wanted exotics" described 6 of the 37
               listings (category "Exotic"); the grid is everyday cars
-              through exotics. No fleet-wide rate figure belongs in copy
-              or in this comment: the daily rates in partner-fleet.ts
-              are known to be wrong for part of the fleet, so any
-              median, average or range computed off them describes a
-              pricing error rather than the fleet.
+              through exotics. No fleet-wide rate figure belongs in this
+              copy: a median, average or range is out by operator
+              decision, not because the data is bad. The daily rates in
+              partner-fleet.ts are sound — an earlier note calling them
+              broken came from a script that read the numeric separator
+              in 1_403 as 1.
               "No payment" is a promise the next email breaks — RYDA
               emails a Stripe Checkout link on the operator's connected
               account, so the only true version is "no card at request".

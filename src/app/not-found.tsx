@@ -20,9 +20,12 @@ export const metadata = { title: "Not found" };
 // Two notes on these cards were invented and are gone (Aug 2026):
 //   · "Daily rates from $1,200" — a floor 14x the real one. Replacing
 //     it with a derived minimum was the wrong fix and that has now gone
-//     too: a "from $X" is a fleet-wide rate claim whichever way it is
-//     computed, and partner-fleet.ts is the operator's rate table, not
-//     RYDA's headline. The card states the count and nothing else.
+//     too: fleet-wide rate figures are out of the copy by operator
+//     decision, not because the data is bad. The rate table is sound;
+//     partner-fleet.ts just writes rates with JavaScript numeric
+//     separators (dailyRate: 1_403), so a script reading that file must
+//     handle the separator rather than truncating at it. The card
+//     states the count and nothing else.
 //   · "Real humans, fast replies" — nothing in this repo measures or
 //     queues against a reply time. /api/contact writes a row and emails
 //     the team inbox; /faq explicitly refuses to put a number on it.

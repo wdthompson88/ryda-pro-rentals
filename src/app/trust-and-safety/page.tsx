@@ -83,12 +83,6 @@ export default function TrustAndSafetyPage() {
               identity out on purpose.
             </p>
             <p>
-              You know exactly who you are renting from before you are
-              asked to pay anything — and RYDA holds a record of each
-              step: the request, the dates, the confirmed price, the
-              charge.
-            </p>
-            <p>
               It is a disclosure rule, not a shield. It decides when you
               learn the operator&apos;s name, not whether you learn it —
               and it is no substitute for reading their rental agreement

@@ -58,8 +58,7 @@ export function LegalPage({
             <p className="mt-2">
               <Link href="/contact?type=Other#form" className="text-red hover:text-red-deep">
                 Send us a message
-              </Link>{" "}
-              and a member of our team will respond within one business day.
+              </Link>
             </p>
           </div>
         </div>

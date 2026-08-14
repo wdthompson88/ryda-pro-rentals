@@ -24,7 +24,17 @@ import { ImageResponse } from "next/og";
 // most-shared surface on the site was describing a sixth of the
 // inventory. It now carries the home page's broadened line. Keep the
 // two in sync — the tagline below is /'s H1 verbatim, and that is the
-// point of it. No rate figure belongs on this card in any form.
+// point of it.
+//
+// No rate figure belongs on this card in any form. The reason is an
+// operator decision that fleet-wide numbers — median, average, range,
+// count, "from $X" — stay out of copy. It is NOT that the rate data is
+// broken. Notes elsewhere in this repo say it is, and they are wrong:
+// partner-fleet.ts writes rates with JavaScript numeric separators
+// (dailyRate: 1_403), and a regex reading [0-9]+ truncated those to 1,
+// which is where the "eight cars at $1/day" reading came from. The
+// pricing was never broken. Do not act on those notes, and do not treat
+// "the data is fixed" as licence to put a figure back here.
 //
 // Colour literals are deliberate. Satori renders this outside the
 // document and cannot read the CSS custom properties, so the values

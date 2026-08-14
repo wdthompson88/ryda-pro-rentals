@@ -29,8 +29,16 @@ import { SiteHeader } from "@/components/site-header";
 // a founding year, a headcount, a funding stage, a market outside Miami
 // or a customer-cost comparison without something in the code behind it.
 
+// This page carries its own `description` deliberately. Next merges
+// metadata per top-level key, so a page with no description inherits the
+// root layout's — the consumer rental pitch, marques and all. Deleting a
+// page description therefore removes nothing; it forwards whatever the
+// root says. Both lines below are restatements of copy already on this
+// page.
 export const metadata = {
   title: "Press",
+  description:
+    "Fact sheet and press contact for RYDA, a referral marketplace for car rentals in Miami.",
   alternates: { canonical: "/press" },
 };
 

@@ -36,9 +36,9 @@ import {
 //    hand. "We pass your request to the operator" is the true sentence.
 // 3. Any fleet-wide rate figure — a range, a median, an average, a
 //    "from $X", a count of cars under some price. Deleted Aug 2026 and
-//    not to be re-derived: the numbers in partner-fleet.ts are the
-//    operator's to correct, and a statistic computed over them is a
-//    RYDA claim about a dataset RYDA does not own.
+//    not to be re-derived: those figures are out of the copy by
+//    operator decision. The rate data itself is sound — see the note
+//    above the constants below.
 // 4. That the cars come from several operators. PartnerVehicle.partner
 //    is the literal type "GM LUXE" — one operator runs all 37 — so a
 //    plural supply side ("independent Miami operators") is a roster
@@ -73,10 +73,14 @@ const HERO_PHOTO = HERO_CAR ? getPartnerHero(HERO_CAR) : undefined;
 const FLEET_COUNT = PARTNER_VEHICLES.length;
 const MAKE_COUNT = new Set(PARTNER_VEHICLES.map((v) => v.make)).size;
 // NO FLEET-WIDE RATE ARITHMETIC HERE. A rate range, a median, an
-// "under $300" count or a "from $X" floor is a statistic about
-// partner-fleet.ts, and the rates in that file are the operator's to
-// correct — every derived figure this page printed was a claim RYDA
-// could not stand behind. Per-car rates on the cards below are the
+// "under $300" count or a "from $X" floor stays out of the copy by
+// operator decision — NOT because the rates are wrong. An earlier note
+// in this repo called the pricing data broken and quoted $1/day
+// listings; that was a reading bug, not a data bug. partner-fleet.ts
+// writes rates with JavaScript numeric separators (dailyRate: 1_403),
+// and a regex matching [0-9]+ truncated them at the underscore. The
+// rate table is correct as written, and any script that parses it has
+// to handle the separators. Per-car rates on the cards below are the
 // operator's own listed rate and stay; nothing aggregates them.
 
 // og/twitter are declared here in full because Next merges metadata
@@ -211,7 +215,9 @@ export default function HomePage() {
                 types in the same grid. The category mix is real — 16
                 SUV, 8 Convertible, 6 Exotic, 5 Sedan, 1 7-Seater, 1 EV
                 — but the sentence ended in an "under $300 a day" count,
-                a fleet-wide rate statistic. The clause is gone. */}
+                a fleet-wide rate statistic. Those stay out by operator
+                decision, not because the rates are wrong. The clause is
+                gone. */}
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-soft">
               The same grid holds SUVs, sedans, convertibles, a seven-seater
               and an EV.

@@ -97,8 +97,8 @@ function partnerEmailHtml(inquiry: RentalInquiry, linked: boolean): string {
   `);
 }
 
-// Customer confirmation. NEVER name the operator here — the public promise
-// is "a vetted Miami operator", the commission model is stated plainly.
+// Customer confirmation. NEVER name the operator here — the commission
+// model is stated plainly.
 //
 // The closing line said "No card, no payment" until the truth pass. RYDA
 // does email a Stripe Checkout link once the operator confirms, so a
@@ -111,11 +111,6 @@ function customerEmailHtml(inquiry: RentalInquiry): string {
     <p style="margin:0 0 12px;">
       We've received your request for the <strong>${escapeHtml(inquiry.vehicleLabel)}</strong>,
       ${escapeHtml(inquiry.startDate)} to ${escapeHtml(inquiry.endDate)}.
-    </p>
-    <p style="margin:0 0 12px;">
-      Here's what happens next: we route your request to a vetted Miami operator,
-      who reaches out to you directly to confirm availability and put the keys in
-      your hands on their rental agreement and insurance.
     </p>
     <p style="margin:0 0 12px;">
       Your price is the operator's price — inquiring through RYDA never costs you

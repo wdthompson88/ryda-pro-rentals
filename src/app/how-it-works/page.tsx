@@ -31,10 +31,11 @@ import { PARTNER_VEHICLES } from "@/lib/partner-fleet";
 //
 // 3. Step 01 sorted PARTNER_VEHICLES by dailyRate and printed the two
 //    ends of the fleet ("from a ... at $X a day to a ... at $Y"). The
-//    derivation was sound and the sentence was still wrong to ship: it
-//    republished the operator's rate table as a RYDA headline figure,
-//    so a single bad row in partner-fleet.ts became the first price a
-//    visitor read. The sort and both constants are deleted. Deriving
+//    derivation was sound and so is the data behind it; the sentence
+//    goes because fleet-wide rate figures are out of the copy by
+//    operator decision. (partner-fleet.ts writes rates with numeric
+//    separators — 1_403 — so a script parsing it must handle those.)
+//    The sort and both constants are deleted. Deriving
 //    the MARQUES and the COUNTS from the array is the good half and
 //    stays — no rate arithmetic anywhere on this page.
 // 4. The model card said "We vet the operators behind every listing —

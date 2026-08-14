@@ -30,9 +30,10 @@ import { PARTNER_VEHICLES } from "@/lib/partner-fleet";
 //
 // NO fleet-wide rate figure on this page — the "$X to $Y a day" that
 // ran in the metadata and the intro is deleted and must not come back.
-// Aggregating partner-fleet.ts turns the operator's per-car rates into
-// a RYDA statistic; the per-card prices in the grid below are the
-// operator's own and stay.
+// That is an operator decision, not a data problem: the rates in
+// partner-fleet.ts are sound, they are just written with numeric
+// separators (1_403), which a naive parse truncates. The per-card
+// prices in the grid below are the operator's own and stay.
 
 const FLEET_COUNT = PARTNER_VEHICLES.length;
 const MAKE_COUNT = new Set(PARTNER_VEHICLES.map((v) => v.make)).size;

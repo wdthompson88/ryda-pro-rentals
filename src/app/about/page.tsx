@@ -15,8 +15,14 @@ import { AboutPageTemplate, type AboutPerson } from "@/components/shared/about-p
 // Must stay consistent with /how-it-works, /legal/terms and
 // /legal/disclaimer.
 
+// The `description` is set here on purpose. Next merges metadata per
+// top-level key, so a page without one inherits the root layout's — a
+// page with no description is not a page with no claim. The line below
+// restates the hero body and the referral model already on this page.
 export const metadata = {
   title: "About",
+  description:
+    "RYDA is a referral marketplace for car rental in Miami. Every car is owned and operated by an independent local operator; RYDA owns none of them.",
 };
 
 const FOUNDERS: AboutPerson[] = [

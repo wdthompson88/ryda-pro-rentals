@@ -2,7 +2,6 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { HiddenWhenAuthed } from "@/components/auth-aware";
 import { SITE_URL } from "@/lib/site-url";
-import { formatUSD } from "@/lib/market-data";
 import { PARTNER_VEHICLES } from "@/lib/partner-fleet";
 
 // Miami market page, rewritten for the rental product (Aug 2026).
@@ -29,11 +28,6 @@ import { PARTNER_VEHICLES } from "@/lib/partner-fleet";
 const MIAMI_VEHICLES = PARTNER_VEHICLES.filter((v) => v.market === "Miami");
 const FLEET_COUNT = MIAMI_VEHICLES.length;
 const CATEGORY_COUNT = new Set(MIAMI_VEHICLES.map((v) => v.category)).size;
-// null rather than a placeholder if the market ever empties out: a stat
-// band is not the place to print "$0/day" for cars nobody can rent.
-const LOWEST_RATE = MIAMI_VEHICLES.length
-  ? Math.min(...MIAMI_VEHICLES.map((v) => v.dailyRate))
-  : null;
 
 export const metadata = {
   title: "Miami",
@@ -145,15 +139,9 @@ export default function MiamiPage() {
           advertise a car a visitor cannot find. */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10">
-          <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
             <Stat number={String(FLEET_COUNT)} label="Cars listed in Miami" />
             <Stat number={String(CATEGORY_COUNT)} label="Vehicle categories" />
-            {LOWEST_RATE !== null ? (
-              <Stat
-                number={formatUSD(LOWEST_RATE)}
-                label="Lowest daily rate listed"
-              />
-            ) : null}
             <Stat number="0" label="Cars RYDA owns" />
           </div>
         </div>
