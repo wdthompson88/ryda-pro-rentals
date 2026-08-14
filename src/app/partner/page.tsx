@@ -235,7 +235,7 @@ function SignInPrompt() {
       </h2>
       <p className="mt-2 max-w-xl text-sm text-ink-soft">
         Your application status and company profile live behind your
-        account. New here? Partner signup takes about a minute.
+        account.
       </p>
       <div className="mt-6 flex flex-wrap gap-3">
         <Link
@@ -276,8 +276,8 @@ function ApplySection({
         </h2>
         <p className="mt-2 max-w-xl text-sm text-ink-soft">
           {intent
-            ? "You signed up as a fleet partner. Add your company details below and your application goes straight into review — we respond personally within 3 business days."
-            : "Tell us about your company. We respond to every application personally within 3 business days, and this page tracks the review from the moment you submit."}
+            ? "You signed up as a fleet partner. Add your company details below and your application goes straight into review."
+            : "Tell us about your company. This page tracks the review from the moment you submit."}
         </p>
         <PartnerForm
           submitLabel="Submit application →"
@@ -329,16 +329,18 @@ function Dashboard({
   );
 }
 
-// Mirrors the four steps on /partners plus the one that page used to
-// omit: before any money can move the operator must finish Stripe
-// Express onboarding (identity, business details, bank account). Landing
-// an approved operator on a KYC gate the journey never mentioned is how
-// a "days not months" promise turns into a complaint.
-const REVIEW_STEPS = [
+// Mirrors the steps on /partners plus the one that page used to omit:
+// before any money can move the operator must finish Stripe Express
+// onboarding (identity, business details, bank account).
+//
+// `body` is optional because a step with nothing substantiable to say
+// says nothing: "Fleet review" used to claim RYDA confirms vehicles
+// "meet RYDA's standards", and /trust-and-safety states in writing that
+// RYDA does not inspect cars and holds no vehicle standard.
+const REVIEW_STEPS: { title: string; body?: string }[] = [
   { title: "Apply", body: "Application received." },
   {
     title: "Fleet review",
-    body: "We confirm which vehicles meet RYDA's standards.",
   },
   {
     title: "Listing setup",
@@ -348,7 +350,7 @@ const REVIEW_STEPS = [
     title: "Activate payments",
     body: "We send a Stripe link; Stripe verifies your business and bank details so payouts reach you directly.",
   },
-  { title: "Live", body: "Your fleet goes live. Enquiries reach you directly." },
+  { title: "Live", body: "Your fleet goes live." },
 ];
 
 function StatusCard({ partner }: { partner: PartnerAccount }) {
@@ -397,9 +399,11 @@ function StatusCard({ partner }: { partner: PartnerAccount }) {
                   {done && " ✓"}
                   {current && " · in progress"}
                 </p>
-                <p className="mt-1 text-xs leading-relaxed text-ink-soft">
-                  {s.body}
-                </p>
+                {s.body && (
+                  <p className="mt-1 text-xs leading-relaxed text-ink-soft">
+                    {s.body}
+                  </p>
+                )}
               </li>
             );
           })}
@@ -509,7 +513,6 @@ function PaymentsCard({
         // approval and its operator row.
         <p className="mt-4 text-sm text-ink-soft">
           You&apos;re approved — we&apos;re setting up your operator entry.
-          Your Stripe onboarding link follows shortly.
         </p>
       ) : operator.paused ? (
         <div className="mt-4 rounded-xl bg-warn/15 px-4 py-3 text-sm text-warn-deep">
@@ -517,8 +520,8 @@ function PaymentsCard({
         </div>
       ) : operator.stripeOnboarded ? (
         <div className="mt-4 rounded-xl bg-success/10 px-4 py-3 text-sm text-success-deep">
-          Payments active — you receive bookings directly; RYDA&apos;s
-          commission is deducted automatically.
+          Payments active — RYDA&apos;s commission is deducted
+          automatically.
         </div>
       ) : (
         <p className="mt-4 text-sm text-ink-soft">

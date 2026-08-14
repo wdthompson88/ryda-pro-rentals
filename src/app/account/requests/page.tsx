@@ -70,13 +70,17 @@ export default function RequestsPage() {
         <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
           Rental requests
         </p>
+        {/* The H1 was "One request. A named operator. The keys." — D6
+            forbids naming an operator on a customer-facing surface, and
+            nothing here hands anyone keys. Plain page label instead.
+            The subtitle's second sentence, "A vetted Miami operator
+            replies directly", is the routing falsehood: every lead
+            lands in RYDA's inbox and is forwarded by hand. Deleted. */}
         <h1 className="mt-3 font-display text-3xl font-light text-ink sm:text-4xl">
-          One request. A named operator. The keys.
+          Your requests.
         </h1>
         <p className="mt-2 max-w-2xl text-sm text-ink-soft">
-          Every request you&apos;ve sent and where it stands. A vetted Miami
-          operator replies directly — your price is always the operator&apos;s
-          price.
+          Every request you&apos;ve sent and where it stands.
         </p>
       </header>
 
@@ -99,7 +103,11 @@ export default function RequestsPage() {
           {/* Three things this paragraph is not allowed to say again.
               "Miami's most-wanted exotics" described 6 of the 37
               listings (category "Exotic"); the grid is everyday cars
-              through exotics, and the median rate is $255 a day.
+              through exotics. No fleet-wide rate figure belongs in copy
+              or in this comment: the daily rates in partner-fleet.ts
+              are known to be wrong for part of the fleet, so any
+              median, average or range computed off them describes a
+              pricing error rather than the fleet.
               "No payment" is a promise the next email breaks — RYDA
               emails a Stripe Checkout link on the operator's connected
               account, so the only true version is "no card at request".

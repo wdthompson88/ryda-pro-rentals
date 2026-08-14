@@ -22,7 +22,6 @@ import { SiteHeader } from "@/components/site-header";
 //   - Miami only ........................................... src/lib/partner-fleet
 //   - RYDA LLC, Miami FL; press@ryda.pro ................... /legal/terms §14,
 //                                                            /about
-//   - operator-supplied imagery stays the operator's ....... /legal/terms §9
 //
 // There is no brand-asset library in this repo — the wordmark is type,
 // not a logo file — so the asset grid is gone rather than restated as
@@ -32,8 +31,6 @@ import { SiteHeader } from "@/components/site-header";
 
 export const metadata = {
   title: "Press",
-  description:
-    "What RYDA is, in the words we would want quoted: a referral marketplace listing exotic cars that independent Miami operators own and operate. Press contact: press@ryda.pro.",
   alternates: { canonical: "/press" },
 };
 
@@ -52,13 +49,7 @@ export default function PressPage() {
             What RYDA is, in the words{" "}
             <span className="italic">we&apos;d want quoted.</span>
           </h1>
-          <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
-            RYDA lists exotic cars that independent Miami operators own
-            and operate, passes booking requests to them, and is paid a
-            referral commission by the operator. Everything below is
-            checkable against the product.
-          </p>
-          <p className="mt-6 text-base text-ink-soft">
+          <p className="mt-8 text-base text-ink-soft">
             Press contact:{" "}
             <a
               href="mailto:press@ryda.pro"
@@ -86,7 +77,7 @@ export default function PressPage() {
             <Fact label="Headquarters" value="Miami, FL" />
             <Fact
               label="What it is"
-              value="A referral marketplace for exotic-car rentals."
+              value="A referral marketplace for car rentals."
             />
             <Fact
               label="Where it operates"
@@ -106,7 +97,7 @@ export default function PressPage() {
             />
             <Fact
               label="How RYDA earns"
-              value="A referral commission, agreed with the operator up front and charged to the operator. It is never added to the customer's price — requesting through RYDA costs the same as going direct."
+              value="A referral commission, agreed with the operator up front and charged to the operator. It is never added to the customer's price."
             />
             <Fact
               label="Whose contract"
@@ -171,13 +162,6 @@ export default function PressPage() {
               files we don&apos;t have. The RYDA wordmark is set in type
               rather than drawn as a logo, and there is no asset library
               behind it yet.
-            </p>
-            <p>
-              The vehicle photography on this site was supplied by the
-              operators. Under our terms it remains their property or
-              their licensors&apos;, so it is not ours to clear for
-              reuse — if you need a car image for a story, tell us which
-              listing and we will ask the operator who owns it.
             </p>
             <p>
               For anything else — the wordmark, a founder portrait, a

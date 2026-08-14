@@ -83,12 +83,10 @@ export default function TrustAndSafetyPage() {
               identity out on purpose.
             </p>
             <p>
-              That fixes the order of events. Your request goes to the
-              operator; they come back to you by name, with their
-              availability, their price and their rental agreement. You
-              know exactly who you are renting from before you are asked
-              to pay anything — and RYDA holds a record of each step: the
-              request, the dates, the confirmed price, the charge.
+              You know exactly who you are renting from before you are
+              asked to pay anything — and RYDA holds a record of each
+              step: the request, the dates, the confirmed price, the
+              charge.
             </p>
             <p>
               It is a disclosure rule, not a shield. It decides when you
@@ -169,7 +167,7 @@ export default function TrustAndSafetyPage() {
             />
             <Coverage
               line="A commission agreed before going live"
-              detail="RYDA's referral commission is agreed with the operator up front and charged to the operator, as a fee on their own charge. It is never added to your price — requesting through RYDA costs the same as going direct."
+              detail="RYDA's referral commission is agreed with the operator up front and charged to the operator, as a fee on their own charge. It is never added to your price."
             />
           </div>
           <div className="mt-10 rounded-2xl border border-rule bg-cream-2 p-6">

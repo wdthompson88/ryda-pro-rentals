@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { Reveal, RevealStagger } from "@/components/reveal";
-import { formatUSD } from "@/lib/market-data";
 import { PARTNER_VEHICLES } from "@/lib/partner-fleet";
 
 // Rental "How it works". The old co-ownership doctrine page (5-step
@@ -15,7 +14,7 @@ import { PARTNER_VEHICLES } from "@/lib/partner-fleet";
 // contract and insurance. RYDA earns a referral commission from the
 // operator, never a markup from you.
 //
-// Two corrections this page carries scars from, Aug 2026:
+// Four corrections this page carries scars from, Aug 2026:
 //
 // 1. Step 01 named "McLaren". There has never been a McLaren in
 //    PARTNER_VEHICLES — src/app/layout.tsx:60-63 records deleting the
@@ -30,20 +29,33 @@ import { PARTNER_VEHICLES } from "@/lib/partner-fleet";
 //    listing and each lead is triaged and forwarded by hand. /faq
 //    already documents this; the canonical page now matches it.
 //
+// 3. Step 01 sorted PARTNER_VEHICLES by dailyRate and printed the two
+//    ends of the fleet ("from a ... at $X a day to a ... at $Y"). The
+//    derivation was sound and the sentence was still wrong to ship: it
+//    republished the operator's rate table as a RYDA headline figure,
+//    so a single bad row in partner-fleet.ts became the first price a
+//    visitor read. The sort and both constants are deleted. Deriving
+//    the MARQUES and the COUNTS from the array is the good half and
+//    stays — no rate arithmetic anywhere on this page.
+// 4. The model card said "We vet the operators behind every listing —
+//    real fleets, real insurance, real garages." Nothing in this
+//    codebase reads an insurance certificate, counts a fleet or
+//    inspects a garage; the only operator check is Stripe Connect
+//    onboarding of a business and a bank account, and
+//    /trust-and-safety states in writing that RYDA verifies no policy.
+//    Deleted, along with the bare "vetted" it leaned on.
+//
 // The positioning is RANGE, not exotics. Six of the 37 listings are
-// category "Exotic" and 21 are under $300 a day. Ferraris and
-// Lamborghinis are real and may be named — as part of a fleet that also
-// runs Toyota, Tesla and Volkswagen, not as the whole of it.
+// category "Exotic". Ferraris and Lamborghinis are real and may be
+// named — as part of a fleet that also runs Toyota, Tesla and
+// Volkswagen, not as the whole of it.
 
 const FLEET_COUNT = PARTNER_VEHICLES.length;
 const MAKE_COUNT = new Set(PARTNER_VEHICLES.map((v) => v.make)).size;
-const BY_RATE = [...PARTNER_VEHICLES].sort((a, b) => a.dailyRate - b.dailyRate);
-const CHEAPEST = BY_RATE[0];
-const DEAREST = BY_RATE[BY_RATE.length - 1];
 
 export const metadata: Metadata = {
   title: "How it works",
-  description: `One request. A named operator. The keys. Browse ${FLEET_COUNT} Miami rental cars — everyday SUVs and sedans through exotics — send your dates, and the vetted operator who runs that car confirms directly with you, on their contract at their price. RYDA earns a referral commission from operators, never a markup from you.`,
+  description: `One request. The keys. Browse ${FLEET_COUNT} Miami rental cars — everyday SUVs and sedans through exotics — send your dates, and the operator who runs that car confirms directly with you, on their contract at their price. RYDA earns a referral commission from operators, never a markup from you.`,
   alternates: { canonical: "/how-it-works" },
 };
 
@@ -59,17 +71,26 @@ export default function HowItWorksPage() {
             <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
               How it works · Car rental · Miami
             </p>
+            {/* "A named operator." is deleted from the H1 and from the
+                metadata. Listings are unbranded by decision, nothing in
+                the code names an operator to a customer at any point,
+                and no mechanism makes one introduce themselves — so the
+                headline was promising an outcome the product does not
+                produce. tests/example.spec.ts:55 still asserts the old
+                heading and will fail until that assertion is removed.
+
+                "Miami's independent rental fleets" went with it:
+                PartnerVehicle.partner is the literal type "GM LUXE", so
+                the plural described one fleet as several. */}
             <h1 className="mt-4 max-w-4xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
-              One request. A named operator.{" "}
-              <span className="italic">The keys.</span>
+              One request. <span className="italic">The keys.</span>
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink-soft">
-              RYDA is the front door to Miami&apos;s independent rental
-              fleets — everyday cars through exotics, in one grid. You send
-              one request with your dates, we pass it to the operator who
-              runs that car, and they confirm availability and price
-              directly with you — then close the rental on their own
-              contract and insurance.
+              Everyday cars through exotics, in one grid. You send one
+              request with your dates, we pass it to the operator who runs
+              that car, and they confirm availability and price directly
+              with you — then close the rental on their own contract and
+              insurance.
             </p>
           </Reveal>
         </div>
@@ -90,7 +111,7 @@ export default function HowItWorksPage() {
             <Step
               n="01"
               title="Browse"
-              body={`One grid, the whole fleet — ${FLEET_COUNT} cars across ${MAKE_COUNT} makes in Miami, from a ${CHEAPEST.make} ${CHEAPEST.model} at ${formatUSD(CHEAPEST.dailyRate)} a day to a ${DEAREST.make} ${DEAREST.model} at ${formatUSD(DEAREST.dailyRate)}. Every listing is real, bookable stock run by a vetted Miami operator. We don't put operator names on listings; we put cars.`}
+              body={`One grid, the whole fleet — ${FLEET_COUNT} cars across ${MAKE_COUNT} makes in Miami. We don't put operator names on listings; we put cars.`}
             />
             <Step
               n="02"
@@ -100,7 +121,10 @@ export default function HowItWorksPage() {
             <Step
               n="03"
               title="Operator confirms — and hands you the keys"
-              body="Your request lands with RYDA, and we pass it to the operator who runs that car. They come back to you by name, confirm availability and price, and close the rental on their own contract and insurance. Delivery, deposit, and mileage terms are theirs — agreed directly between you."
+              // "They come back to you by name" is deleted for the same
+              // reason as the H1's "A named operator": no code names an
+              // operator to a customer, and nothing obliges one to.
+              body="Your request lands with RYDA, and we pass it to the operator who runs that car. They confirm availability and price, and close the rental on their own contract and insurance. Delivery, deposit, and mileage terms are theirs — agreed directly between you."
             />
           </RevealStagger>
         </div>
@@ -132,8 +156,12 @@ export default function HowItWorksPage() {
               },
               {
                 label: "Who you rent from",
-                value: "A vetted Miami operator",
-                note: "We vet the operators behind every listing — real fleets, real insurance, real garages. Listings stay unbranded; the operator introduces themselves when they confirm.",
+                value: "A Miami operator",
+                // See correction 4 in the header comment. Nothing
+                // replaces the deleted vetting sentence — the only
+                // thing this card can state about the operator is that
+                // the listing does not name them, which it does.
+                note: "Listings stay unbranded.",
               },
               {
                 label: "Where money moves",

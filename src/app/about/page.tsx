@@ -7,10 +7,7 @@ import { AboutPageTemplate, type AboutPerson } from "@/components/shared/about-p
 // structure. None of that product exists in this repo, so it is gone
 // rather than restated.
 //
-// What is left is the true, short story: RYDA lists exotic cars that
-// independent Miami operators own and operate, makes them findable in
-// one place, and earns a referral commission from the operator on
-// bookings it sends them. No fabricated numbers, no operator names,
+// No fabricated numbers, no operator names,
 // and no claim that RYDA "never touches" payment — RYDA does send the
 // Stripe Checkout link; it is created on the operator's own connected
 // account. The honest promise is "no card at request".
@@ -20,8 +17,6 @@ import { AboutPageTemplate, type AboutPerson } from "@/components/shared/about-p
 
 export const metadata = {
   title: "About",
-  description:
-    "RYDA is a rental marketplace for exotic cars in Miami. The cars belong to vetted independent operators; RYDA makes them findable and keeps the operator's price the price.",
 };
 
 const FOUNDERS: AboutPerson[] = [
@@ -54,16 +49,23 @@ export default function AboutPage() {
           accent: "red",
           hero: {
             eyebrow: "About",
-            title: <>Miami&apos;s exotic fleets, <span className="italic">one front door.</span></>,
+            title: "About RYDA",
+            // "we've vetted" deleted from the end of this sentence. A
+            // bare, unqualified "vetted" in the hero is the same
+            // screening claim /how-it-works, /rent, /rent/[symbol] and
+            // the inquiry form all had it deleted from: the only checks
+            // RYDA runs are a human read of the partner application and
+            // Stripe Express verification of the business and bank
+            // account. Where the word survives on this page (the
+            // "Vetted operators" value below) it is scoped to exactly
+            // those two things and says it is not a warranty.
             body:
-              "RYDA is a rental marketplace for exotic cars in Miami. Every car on it is owned and operated by an independent local operator we've vetted. Our job is to make finding one straightforward — one grid, one request, your dates — and to make sure the operator's price is the price you pay.",
+              "Every car is owned and operated by an independent local operator.",
           },
           story: {
             title: "Why RYDA exists",
             paragraphs: [
-              "Miami is not short of exotic cars for rent. What it lacks is one place to see them. The fleets are independent, their inventory lives across separate sites and social accounts, and comparing them means starting the same conversation over again with each one.",
-              "RYDA puts that inventory in one grid and turns the search into a single request. You pick the car and the dates; the operator who runs it comes back to you directly, confirms what is actually available and what it actually costs, and closes the rental on their own contract and insurance.",
-              "We don't own cars, store them, insure them or drive them — the operators do all of that, and they were doing it before us. What RYDA adds is discovery. That is also how it gets paid: the operator pays a referral commission on the bookings we send them. It is charged to the operator, never added to your price.",
+              "We don't own cars, store them, insure them or drive them. What RYDA adds is discovery. That is also how it gets paid: the operator pays a referral commission on the bookings we send them. It is charged to the operator, never added to your price.",
             ],
           },
           founderLetter: {
@@ -72,7 +74,6 @@ export default function AboutPage() {
             paragraphs: [
               "RYDA does not own a single car. Every vehicle you see here belongs to an independent Miami operator who buys it, garages it, insures it and hands over the keys. We are the front door, not the fleet.",
               "So the request you send is exactly that — a request. No card is taken, no vehicle is reserved, and it is not a booking until the operator has confirmed your dates and the final price with you directly. If you both agree, we email a Stripe Checkout link created on that operator's own connected account: the rental is paid to them, and our commission is collected as a platform fee on the same charge. The rental itself closes on their contract and their insurance, which is also the reason they, not us, are the ones who confirm it.",
-              "The part that matters most to us is the price. Requesting through RYDA never costs more than going direct, because our commission comes out of the operator's side rather than on top of yours. That is the entire business model, and it only works if the cars are worth renting and the operators are worth recommending — which is why we are slower about who we list than we are about anything else.",
             ],
             signer: { name: "Ryan Galli", role: "Co-founder & CEO, RYDA", image: "/team/ryan.jpg", bio: "" },
             // No membership exists in this product, so there is nothing
@@ -86,7 +87,7 @@ export default function AboutPage() {
           },
           mission: {
             quote:
-              '"To make renting an extraordinary car in Miami as simple as choosing one — and to keep the operator\'s price the price."',
+              '"To make renting a car in Miami as simple as choosing one — and to keep the operator\'s price the price."',
             values: [
               { title: "One request", body: "Pick the car, send your dates. No card at request, nothing to subscribe to, and no membership standing between you and the fleet." },
               { title: "The operator's price", body: "RYDA never marks up a rental. Our commission is charged to the operator on bookings we send them, and never added to what you pay." },
@@ -104,9 +105,7 @@ export default function AboutPage() {
             title: "Headquarters",
             facts: [
               { label: "Legal entity", value: "RYDA LLC" },
-              { label: "What we do", value: "Referral marketplace for exotic-car rentals" },
-              { label: "The vehicles", value: "Owned and operated by independent operators" },
-              { label: "Headquarters", value: "Miami, FL, by appointment" },
+              { label: "Headquarters", value: "Miami, FL" },
               { label: "General", value: "hello@ryda.pro" },
               { label: "Press", value: "press@ryda.pro" },
               { label: "Partnerships", value: "partners@ryda.pro" },
@@ -115,7 +114,8 @@ export default function AboutPage() {
           cta: {
             title: "See the cars.",
             body:
-              "Browse the Miami fleet, send your dates, and a vetted operator confirms availability and price directly with you. No card at request.",
+              // "vetted" deleted here for the same reason as the hero.
+              "Browse the Miami fleet, send your dates, and an operator confirms availability and price directly with you. No card at request.",
             links: [
               { href: "/rent", label: "Browse the fleet" },
               { href: "/how-it-works", label: "How it works →", variant: "secondary" },

@@ -27,10 +27,6 @@ export const metadata: Metadata = {
 
 const BENEFITS: { label: string; body: string }[] = [
   {
-    label: "Found by people already looking",
-    body: "Someone on RYDA is picking a specific car in Miami for specific dates, and filters by make, category and price to get there. Your listings sit in front of that search rather than cold traffic you've paid to warm up.",
-  },
-  {
     label: "Leads arrive whole",
     body: "A request reaches RYDA with the customer's name, email, phone, the exact car, the dates and any note. Our team checks it and passes the lot to you, contact details included, so you answer the customer yourself.",
   },
@@ -44,7 +40,7 @@ const BENEFITS: { label: string; body: string }[] = [
   },
   {
     label: "No marketing overhead",
-    body: "No ad accounts, no SEO, no content calendar. You run the rentals; RYDA runs the site that finds the customer.",
+    body: "No ad accounts, no SEO, no content calendar. You run the rentals; RYDA runs the site.",
   },
   {
     label: "You stay in control",
@@ -105,8 +101,6 @@ export default function PartnersPage() {
             RYDA is a Miami rental marketplace spanning everyday cars
             through exotics. We list your fleet, pass on the requests we
             receive, and take a commission when one turns into a booking.
-            If you have the cars and not the marketing reach, list your
-            inventory with us and let the demand come to you.
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
             <Link
@@ -125,7 +119,7 @@ export default function PartnersPage() {
         </div>
       </section>
 
-      {/* What you get — 6 benefits */}
+      {/* What you get */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
@@ -154,7 +148,7 @@ export default function PartnersPage() {
         </div>
       </section>
 
-      {/* Getting listed — 4 steps */}
+      {/* Getting listed */}
       <section id="how-it-works" className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">

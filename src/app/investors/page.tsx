@@ -33,8 +33,6 @@ const FLEET_COUNT = PARTNER_VEHICLES.length;
 
 export const metadata = {
   title: "Investor inquiry",
-  description:
-    "RYDA is a referral marketplace for exotic-car rentals in Miami: independent operators own and operate the cars, RYDA passes them booking requests and earns a commission from the operator. Round detail is private — request the deck.",
   alternates: { canonical: "/investors" },
 };
 
@@ -51,13 +49,10 @@ export default function InvestorsPage() {
           </p>
           <h1 className="mt-4 max-w-4xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
             A referral marketplace for{" "}
-            <span className="italic">exotic-car rentals.</span>
+            <span className="italic">car rentals.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
-            RYDA lists exotic cars that independent Miami operators own
-            and operate, passes booking requests to the operator, and is
-            paid a referral commission by the operator when a booking
-            completes. RYDA owns no vehicles and carries no fleet.
+            RYDA owns no vehicles and carries no fleet.
           </p>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-ink-soft">
             The round, the numbers and the deck are not published on this

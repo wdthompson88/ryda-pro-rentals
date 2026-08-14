@@ -2,8 +2,10 @@
 
 // Rental inquiry form — the conversion surface of the rentals-first
 // funnel. Lives in the /rent/[symbol] booking column and posts to
-// POST /api/rental-inquiry (structured lead → routed to a vetted Miami
-// operator, who closes the rental on their own contract/insurance).
+// POST /api/rental-inquiry (structured lead → RYDA's inbox → forwarded
+// by hand to the Miami operator, who closes the rental on their own
+// contract/insurance). Not "routed to a vetted operator": nothing
+// routes and nothing vets beyond Stripe Connect onboarding.
 //
 // Account-first, but the lead is never lost:
 //   - Signed-in members: email/password hidden, name/phone prefilled
@@ -76,13 +78,14 @@ export function RentalInquiryForm({
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
   const [message, setMessage] = useState("");
-  const [marketingOptIn, setMarketingOptIn] = useState(true);
-  // Whether the visitor has touched the consent checkbox this mount.
-  // Until they do, a signed-in member's STORED preference wins over
-  // the opt-out default — the API persists whatever this form submits
-  // (rental_profiles upsert), so pre-ticking the box for a member who
-  // opted out on /account/profile would silently re-enroll them.
-  const [optInTouched, setOptInTouched] = useState(false);
+  // Marketing consent is no longer asked for on this form (the
+  // pre-ticked "Miami drops and member offers" box is deleted — see the
+  // note where it used to render). The value is still submitted because
+  // the API upserts rental_profiles from it: false for anyone not
+  // signed in, and for a signed-in member whatever they already chose
+  // on /account/profile, so sending a request neither enrolls them nor
+  // silently opts them out.
+  const [marketingOptIn, setMarketingOptIn] = useState(false);
 
   // `min` attrs + default dates are set post-mount (not at render) so
   // the statically-prerendered page never hydrates against a stale
@@ -123,19 +126,19 @@ export function RentalInquiryForm({
     setPhone((cur) => cur || profile?.phone || "");
   }, [authStatus, user, profile]);
 
-  // Reflect a signed-in member's stored marketing consent instead of
-  // always pre-ticking opt-in. Same precedence as /account/profile:
-  // rental_profiles boolean overrides user_metadata (default true —
-  // the signup checkbox's opt-out model). Never overrides a checkbox
-  // the visitor has already touched this mount.
+  // Carry a signed-in member's STORED marketing consent through the
+  // submit unchanged. Same precedence as /account/profile:
+  // rental_profiles boolean overrides user_metadata. Without this the
+  // API's upsert would write false over a preference the member set
+  // elsewhere.
   useEffect(() => {
-    if (authStatus !== "authed" || optInTouched) return;
+    if (authStatus !== "authed") return;
     let stored = user?.user_metadata?.marketing_opt_in !== false;
     if (typeof profile?.marketingOptIn === "boolean") {
       stored = profile.marketingOptIn;
     }
     setMarketingOptIn(stored);
-  }, [authStatus, user, profile, optInTouched]);
+  }, [authStatus, user, profile]);
 
   const showAccountFields = authStatus !== "authed";
 
@@ -152,8 +155,9 @@ export function RentalInquiryForm({
       (Date.parse(`${endDate}T00:00:00Z`) -
         Date.parse(`${startDate}T00:00:00Z`)) /
       86_400_000;
-    if (span > 30)
-      return "For rentals over 30 days, contact us directly — we'll arrange it.";
+    // "— we'll arrange it" deleted: RYDA arranges no rental. The lead
+    // goes to the operator and the operator decides.
+    if (span > 30) return "For rentals over 30 days, contact us directly.";
     if (name.trim().length < 2) return "Your name, so the operator knows who's asking.";
     if (showAccountFields && !email.includes("@"))
       return "A valid email — it's where the operator's reply lands.";
@@ -262,10 +266,19 @@ export function RentalInquiryForm({
     return (
       <div>
         <p className="font-display text-2xl text-ink">Request sent.</p>
+        {/* "A vetted Miami operator will reply shortly." is deleted.
+            Three things wrong with one sentence: nothing in this
+            codebase measures a reply time, so "shortly" is a promise
+            with no mechanism behind it; the lead does not reach the
+            operator on submit (PARTNER_INQUIRY_EMAILS is empty, so it
+            lands in RYDA's inbox and a person forwards it); and
+            "vetted" describes Stripe Connect onboarding of a business
+            and a bank account, not a check on the car or the operator.
+            The state now says what was sent and nothing about what
+            happens next. */}
         <p className="mt-3 text-sm leading-relaxed text-ink-soft">
           The <span className="font-medium text-ink">{vehicleName}</span>,{" "}
-          {prettyDate(startDate)} – {prettyDate(endDate)} in {market}. A vetted
-          Miami operator will reply shortly.
+          {prettyDate(startDate)} – {prettyDate(endDate)} in {market}.
         </p>
         <p className="mt-3 text-xs text-mute">
           We&apos;ve emailed you a confirmation with the details.
@@ -414,20 +427,15 @@ export function RentalInquiryForm({
         />
       </label>
 
-      <label className="flex cursor-pointer items-start gap-3 px-1 text-xs">
-        <input
-          type="checkbox"
-          checked={marketingOptIn}
-          onChange={(e) => {
-            setMarketingOptIn(e.target.checked);
-            setOptInTouched(true);
-          }}
-          className="mt-0.5 h-4 w-4 accent-red"
-        />
-        <span className="text-mute">
-          Send me Miami drops and member offers. Unsubscribe any time.
-        </span>
-      </label>
+      {/* A marketing-consent checkbox stood here reading "Send me Miami
+          drops and member offers", pre-ticked. Deleted rather than
+          relabelled: there is no drops programme and no membership, so
+          the box described a product that does not exist, and a
+          pre-ticked consent for it is the one thing that must not ship.
+          RYDA sends no marketing email today. The submitted value is
+          now a signed-in member's stored preference (set on
+          /account/profile) and false for everyone else, so requesting a
+          car enrolls nobody. */}
 
       {status === "error" && (
         <p role="alert" className="rounded-xl border border-red/40 bg-red/5 px-4 py-3 text-xs text-red">

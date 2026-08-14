@@ -102,7 +102,10 @@ const PRICE_BUCKETS: {
   { value: "200-500", label: "$200 – $500/day", test: (r) => r >= 200 && r < 500 },
   { value: "500-1000", label: "$500 – $1,000/day", test: (r) => r >= 500 && r < 1_000 },
   { value: "1000-3000", label: "$1,000 – $3,000/day", test: (r) => r >= 1_000 && r < 3_000 },
-  { value: "3000+", label: "$3,000+/day", test: (r) => r >= 3_000 },
+  // A "$3,000+/day" bucket sat here and matched zero cars — the same
+  // fault as the "Coupe"/"GT"/"Hypercar" categories above, and the same
+  // fix. An option that can only ever return the empty state advertises
+  // inventory at a price nobody can rent.
 ];
 
 // Year buckets. Operator inventory is recent but not always the current
@@ -165,20 +168,19 @@ export function RentalListings({
     [],
   );
 
-  // Markets surfaced in the filter. Every listing is in Miami; Los
-  // Angeles and New York are forced into the list ONLY so that picking
-  // one lands on the explicit "no operator lists a car here yet" empty
-  // state below rather than silently returning nothing. They are not
-  // markets RYDA serves, and nothing outside this dropdown may present
-  // them as such — the counter strip's hard-coded "· Miami · LA · NYC"
-  // did exactly that and is gone.
-  const locations = useMemo(() => {
-    const set = new Set<string>(ALL_LISTINGS.map((v) => v.market));
-    // Force the canonical RYDA markets to appear even when a market has
-    // no inventory yet, clearer "Coming soon" UX than silently hiding.
-    ["Miami", "Los Angeles", "New York"].forEach((m) => set.add(m));
-    return Array.from(set).sort();
-  }, []);
+  // Markets surfaced in the filter, derived from the listings and
+  // nothing else. Los Angeles and New York were force-injected here as
+  // "the canonical RYDA markets"; both are deleted. Zero cars are
+  // listed in either — PartnerVehicle.market is the literal type
+  // "Miami" — so the dropdown was offering two cities as places RYDA
+  // operates, which is the same claim the counter strip, the schema's
+  // areaServed and the deleted city pages were all stripped of. A
+  // filter that can only return nothing is not UX; it is a market
+  // claim.
+  const locations = useMemo(
+    () => Array.from(new Set(ALL_LISTINGS.map((v) => v.market))).sort(),
+    [],
+  );
 
   const filtered: RentalListing[] = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -243,11 +245,12 @@ export function RentalListings({
     () => Array.from(new Set(visible.map((v) => v.market))).sort().join(" · "),
     [visible],
   );
-  const minRate = visible.reduce(
-    (acc, v) => Math.min(acc, v.dailyRate),
-    Number.MAX_SAFE_INTEGER,
-  );
-  const maxRate = visible.reduce((acc, v) => Math.max(acc, v.dailyRate), 0);
+  // No minRate/maxRate here any more. The strip printed "From $X to $Y
+  // / day" across whatever was on screen — a rate statistic computed
+  // over partner-fleet.ts, which is the operator's rate table and not
+  // RYDA's to summarise. Each card still shows the operator's own rate
+  // for that car, which is a fact about one listing rather than a
+  // claim about the fleet.
 
   const anyFilterActive =
     query.trim().length > 0 ||
@@ -441,29 +444,13 @@ export function RentalListings({
               <span className="ml-1.5 text-mute">in {marketsShown}</span>
             ) : null}
           </p>
-          {totalListed > 0 ? (
-            <p className="text-xs text-ink-soft tabular-nums">
-              From{" "}
-              <span className="font-display text-base text-ink">
-                {formatUSD(minRate)}
-              </span>{" "}
-              to{" "}
-              <span className="font-display text-base text-ink">
-                {formatUSD(maxRate)}
-              </span>
-              <span className="ml-1 text-mute">/ day</span>
-            </p>
-          ) : null}
         </div>
       </div>
 
       {/* Card grid */}
       <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
         {visible.length === 0 ? (
-          <EmptyState
-            location={location !== ANY ? location : null}
-            onReset={clearAll}
-          />
+          <EmptyState onReset={clearAll} />
         ) : (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {visible.map((v) => (
@@ -476,57 +463,15 @@ export function RentalListings({
   );
 }
 
-function EmptyState({
-  location,
-  onReset,
-}: {
-  location: string | null;
-  onReset: () => void;
-}) {
-  // Special case: filtered to LA or NY, where no operator lists a car
-  // yet. Say that plainly instead of the generic empty state.
-  //
-  // What this may claim is narrow, and matches
-  // src/app/locations/_components/planned-market.tsx: no cars are
-  // listed here yet, a market opens when operators in it list, and
-  // telling us you want it is the only thing on offer. RYDA assembles
-  // no storage — it owns, stores and services nothing — and there is
-  // no launch date to be notified of.
-  const isComingSoonMarket =
-    location === "Los Angeles" || location === "New York";
-  if (isComingSoonMarket) {
-    return (
-      <div className="rounded-2xl border border-rule bg-surface p-12 text-center">
-        <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-          {location} · No listings yet
-        </p>
-        <p className="mt-3 font-display text-2xl text-ink">
-          No {location} operator lists a car on RYDA yet.
-        </p>
-        <p className="mx-auto mt-3 max-w-md text-sm text-ink-soft">
-          Every car you can browse today is in Miami, owned and run by an
-          independent operator there. {location} opens when operators in{" "}
-          {location} list on it. Tell us you want it — where people ask is
-          part of how we decide where to look next.
-        </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <Link
-            href={`/contact?type=Other&note=${encodeURIComponent(`Market request: ${location}`)}#form`}
-            className="inline-flex h-11 items-center justify-center rounded-full bg-red px-5 text-sm font-medium text-cream hover:bg-red-deep"
-          >
-            Tell us you want {location} →
-          </Link>
-          <button
-            type="button"
-            onClick={onReset}
-            className="inline-flex h-11 items-center justify-center rounded-full border border-rule px-5 text-sm font-medium text-ink-soft hover:border-ink hover:text-ink"
-          >
-            See Miami inventory instead
-          </button>
-        </div>
-      </div>
-    );
-  }
+function EmptyState({ onReset }: { onReset: () => void }) {
+  // The Los-Angeles/New-York "no operator lists a car here yet" panel
+  // that used to branch off this component is deleted with the two
+  // cities that reached it — heading, the "opens when operators in
+  // {location} list on it" line, and the "Tell us you want {location}"
+  // CTA into /contact. It could only render for a location the filter
+  // no longer offers, and it cited
+  // src/app/locations/_components/planned-market.tsx, deleted in the
+  // same strip. One generic empty state remains.
   return (
     <div className="rounded-2xl border border-rule bg-surface p-12 text-center">
       <p className="font-display text-xl text-ink">

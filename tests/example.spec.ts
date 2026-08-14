@@ -20,10 +20,13 @@ test.describe('home page', () => {
       page.getByRole('heading', { name: /one request away/i }),
     ).toBeVisible();
     await expect(page.locator('a[href="/rent"]').first()).toBeVisible();
-    // Featured fleet section renders its heading.
-    await expect(
-      page.getByRole('heading', { name: /the cars miami asks for by name/i }),
-    ).toBeVisible();
+    // Featured fleet section renders. This asserted the H2 "The cars
+    // Miami asks for by name", which is deleted: nothing in this repo
+    // measures what Miami asks for — no demand signal, no search log,
+    // no booking history — so the assertion was holding an unbacked
+    // claim in place. The section has no replacement heading, so this
+    // now pins the eyebrow, which is a factual section label.
+    await expect(page.getByText(/featured fleet/i).first()).toBeVisible();
     // How-it-works teaser links through to the full page.
     await expect(
       page.locator('a[href="/how-it-works"]').first(),
@@ -50,9 +53,13 @@ test.describe('home page', () => {
 test.describe('how-it-works', () => {
   test('renders the three-step lead-gen model', async ({ page }) => {
     await page.goto('/how-it-works');
-    // Hero of the rental-first page.
+    // Hero of the rental-first page. "A named operator." is gone from
+    // the H1 — listings are unbranded by decision and nothing in the
+    // code names an operator to a customer or obliges one to introduce
+    // themselves — so this tracks the surviving heading rather than
+    // pinning the deleted promise.
     await expect(
-      page.getByRole('heading', { name: /one request\. a named operator/i }),
+      page.getByRole('heading', { name: /one request\. the keys/i }),
     ).toBeVisible();
     // The three steps.
     await expect(page.getByText(/request with dates/i).first()).toBeVisible();

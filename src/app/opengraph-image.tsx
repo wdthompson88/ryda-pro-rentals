@@ -2,9 +2,15 @@ import { ImageResponse } from "next/og";
 
 // Root-level OG image — the card that renders whenever ANY RYDA link is
 // shared, so it is the single most-seen surface on the site. It says
-// what the product is and nothing else: cars from independent Miami
-// operators, everyday through exotic, listed in one grid, one request
-// away.
+// what the product is and nothing else: Miami cars, everyday through
+// exotic, one request away.
+//
+// The footer's left slot read "Independent Miami operators" and is
+// deleted (Aug 2026). PartnerVehicle.partner is the literal type
+// "GM LUXE": one operator runs all 37 listings, so the plural claimed a
+// roster of suppliers that does not exist — on the one surface that
+// travels off-site into every share, screenshot and link preview.
+// Nothing replaces it; the card carries the domain and the tagline.
 //
 // What used to be here — "Co-own or rent the world's most coveted
 // vehicles — cars, boats, planes", an "Asset-backed · LLC" footer and a
@@ -14,11 +20,11 @@ import { ImageResponse } from "next/og";
 // link that says "asset-backed" contradicts it before the page loads.
 //
 // The card then read "Miami's most-wanted exotics" (Aug 2026 fix): six
-// of the 37 listings in partner-fleet.ts are category "Exotic" and 21
-// are under $300 a day, so the most-shared surface on the site was
-// describing a sixth of the inventory. It now carries the home page's
-// broadened line. Keep the two in sync — the tagline below is /'s H1
-// verbatim, and that is the point of it.
+// of the 37 listings in partner-fleet.ts are category "Exotic", so the
+// most-shared surface on the site was describing a sixth of the
+// inventory. It now carries the home page's broadened line. Keep the
+// two in sync — the tagline below is /'s H1 verbatim, and that is the
+// point of it. No rate figure belongs on this card in any form.
 //
 // Colour literals are deliberate. Satori renders this outside the
 // document and cannot read the CSS custom properties, so the values
@@ -97,7 +103,7 @@ export default async function OpenGraphImage() {
             paddingTop: 24,
             borderTop: "1px solid rgba(244, 241, 236, 0.15)",
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent: "flex-end",
             alignItems: "center",
             color: "#9A9590",
             fontSize: 24,
@@ -106,7 +112,6 @@ export default async function OpenGraphImage() {
             fontWeight: 500,
           }}
         >
-          <div>Independent Miami operators</div>
           <div>ryda.pro</div>
         </div>
       </div>

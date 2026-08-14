@@ -299,7 +299,11 @@ export default function ProfilePage() {
                   {...field("full_name")}
                 />
               </Field>
-              <Field label="Preferred name" hint="What we call you in emails + the dashboard.">
+              {/* Hint deleted: it said "What we call you in emails +
+                  the dashboard". preferred_name is read by /account and
+                  by the Stripe billing-portal customer name; no email
+                  in this repo uses it. */}
+              <Field label="Preferred name">
                 <input
                   type="text"
                   className={inputCls}

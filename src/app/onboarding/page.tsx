@@ -24,6 +24,10 @@ import { supabase } from "@/lib/supabase";
 // RYDA underwrites no insurance and has no membership. Stripe Identity
 // already reads name, DOB and address off the document, so there was
 // nothing left for that step to honestly do.
+//
+// "Takes 30 seconds" is gone from the Basic step for the same reason
+// ./layout.tsx lost "Most members finish in under 8 minutes": nothing
+// in this repo times a completion, so neither figure had a source.
 const STEPS = ["Basic", "Identity", "Done"];
 const IDENTITY_STEP = STEPS.indexOf("Identity");
 
@@ -206,7 +210,7 @@ function Basic({ onNext }: { onNext: () => void }) {
       <p className="mt-2 text-sm text-ink-soft">
         {emailLocked
           ? "Your email carries over from sign-in — just add your name and number. You'll never be asked for these again."
-          : "We'll start with the basics. Takes 30 seconds."}
+          : "We'll start with the basics."}
       </p>
       {session === "anon" && supabase && (
         <p className="mt-4 rounded-xl border border-rule bg-cream-2/40 p-3 text-xs text-ink-soft">

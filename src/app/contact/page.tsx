@@ -20,10 +20,6 @@ export default function ContactPage() {
           <h1 className="mt-4 max-w-3xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
             Talk to a real person.
           </h1>
-          <p className="mt-6 max-w-2xl text-lg text-ink-soft">
-            Our team responds to every message within one business day. Pick the
-            channel that fits.
-          </p>
         </div>
       </section>
 
@@ -45,7 +41,6 @@ export default function ContactPage() {
             <ContactCard
               title="Press"
               subtitle="Media inquiries"
-              detail="Response within 1 business day."
               cta="Send a press inquiry"
               href="/contact?type=Press#form"
             />
@@ -55,14 +50,12 @@ export default function ContactPage() {
             <ContactCard
               title="Partnerships"
               subtitle="Operators & referral partners"
-              detail="Run an exotic fleet? Start here."
               cta="Send a partnership inquiry"
               href="/contact?type=Partnership#form"
             />
             <ContactCard
               title="Investors"
               subtitle="Investor relations"
-              detail="Data room available on request."
               cta="Send an investor inquiry"
               href="/contact?type=Investor#form"
             />
@@ -82,8 +75,6 @@ export default function ContactPage() {
               you to the right person.
             </p>
             <div className="mt-10 space-y-4 text-sm">
-              <Row label="Office hours" value="Mon-Fri, 9 AM – 6 PM ET" />
-              <Row label="Response time" value="Within 1 business day" />
               <Row label="HQ" value="Miami, FL" />
             </div>
           </div>
@@ -95,8 +86,7 @@ export default function ContactPage() {
 
       {/* Prefer to talk. The #consultation anchor stays — /help links
           straight to it — but there is no membership, no advisor and no
-          30-minute consultation to book. What RYDA can honestly offer
-          is the same reply the rest of this page promises. */}
+          30-minute consultation to book. */}
       <section id="consultation" className="border-b border-rule bg-ink py-20 text-cream">
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red-bright">
@@ -108,22 +98,14 @@ export default function ContactPage() {
           <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
             There&apos;s no field on the form for that, so put it in the
             message: what you&apos;re after, and when you&apos;re
-            reachable. Someone from RYDA replies within one business day.
+            reachable.
           </p>
-          <div className="mx-auto mt-10 max-w-md rounded-2xl border border-cream/10 bg-cream/5 p-8">
-            <p className="text-sm text-cream/70">
-              If it&apos;s about one specific car, sending your dates from
-              its listing is faster. That request goes to the operator who
-              owns it, and they confirm availability and price with you
-              directly — no card at request.
-            </p>
-            <Link
-              href="/contact?type=Rental#form"
-              className="mt-6 inline-flex h-11 items-center justify-center rounded-full bg-cream px-6 text-sm font-medium text-ink hover:bg-red hover:text-cream"
-            >
-              Send a note
-            </Link>
-          </div>
+          <Link
+            href="/contact?type=Rental#form"
+            className="mt-10 inline-flex h-11 items-center justify-center rounded-full bg-cream px-6 text-sm font-medium text-ink hover:bg-red hover:text-cream"
+          >
+            Send a note
+          </Link>
         </div>
       </section>
     </>
@@ -139,7 +121,9 @@ function ContactCard({
 }: {
   title: string;
   subtitle: string;
-  detail: string;
+  /** Optional: cards whose only detail line was an unsubstantiated
+   *  promise (a response-time SLA, a data room) now omit it. */
+  detail?: string;
   cta: string;
   href: string;
 }) {
@@ -147,7 +131,11 @@ function ContactCard({
     <div className="flex flex-col rounded-2xl border border-rule bg-surface p-6">
       <p className="text-xs font-medium uppercase tracking-wider text-red">{title}</p>
       <p className="mt-3 font-display text-lg text-ink">{subtitle}</p>
-      <p className="mt-2 flex-1 text-sm text-ink-soft">{detail}</p>
+      {detail ? (
+        <p className="mt-2 flex-1 text-sm text-ink-soft">{detail}</p>
+      ) : (
+        <div className="flex-1" />
+      )}
       <Link
         href={href}
         className="mt-5 inline-flex items-center text-sm font-medium text-ink hover:text-red"

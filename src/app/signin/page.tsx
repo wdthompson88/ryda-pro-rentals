@@ -155,10 +155,13 @@ function SignInPageInner() {
           {magicSent ? (
             <div className="mt-8 rounded-xl border border-rule bg-cream-2/40 p-5 text-sm">
               <p className="font-medium text-ink">Check your inbox.</p>
+              {/* "The link expires in 15 minutes" deleted. Nothing in
+                  this repo sets the OTP lifetime — there is no
+                  supabase/config.toml and no expiry is passed to
+                  signInWithOtp — so the number had no source. */}
               <p className="mt-2 text-ink-soft">
                 We sent a sign-in link to{" "}
-                <span className="font-medium text-ink">{email}</span>. The
-                link expires in 15 minutes.
+                <span className="font-medium text-ink">{email}</span>.
               </p>
               <button
                 type="button"

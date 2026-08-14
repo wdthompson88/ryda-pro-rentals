@@ -54,10 +54,6 @@ const SECTIONS: FaqSection[] = [
         a: "Your request reaches RYDA the moment you send it, and we email you a copy at the same time. Getting it in front of the operator is a manual step at our end, and the reply after that runs on the operator's own clock — so we don't put a number on either, and we won't promise you one on their behalf. If your dates are tight and it has gone quiet, reply to that confirmation email: the reply comes back to RYDA, and we'll chase it.",
       },
       {
-        q: "Can I ask for delivery?",
-        a: "Yes — put the address in the note on the request form. Most operators deliver and collect across the region, but the delivery windows, the minimum rental length and the rate are theirs, and they confirm the details when they reply.",
-      },
-      {
         q: "Can I rent for longer than 30 days?",
         a: "The request form covers rentals up to 30 days. For anything longer, message us through the contact form and we'll arrange it with the operator directly.",
       },
@@ -72,11 +68,11 @@ const SECTIONS: FaqSection[] = [
       },
       {
         q: "Does RYDA mark up the price or add a booking fee?",
-        a: "No. Your price is the operator's price, and requesting through RYDA never costs more than going direct. Operators pay RYDA a referral commission on the bookings we send them — the standard rate is 15% — and it is collected as a platform fee on that same charge, out of what the operator receives. It is never added to your side.",
+        a: "No. Your price is the operator's price. Operators pay RYDA a referral commission on the bookings we send them — the standard rate is 15% — and it is collected as a platform fee on that same charge, out of what the operator receives. It is never added to your side.",
       },
       {
         q: "Is there a security deposit?",
-        a: "That is the operator's call, and most ask for one. The deposit, the mileage allowance, the fuel policy and what happens on a late return are all set in the operator's rental agreement, and they confirm them with you before you pay. Where an operator has given us a mileage figure it's on the listing; where they haven't, the listing says the operator confirms it rather than inventing a number.",
+        a: "That is the operator's call. The deposit, the mileage allowance, the fuel policy and what happens on a late return are all set in the operator's rental agreement, and they confirm them with you before you pay. Where an operator has given us a mileage figure it's on the listing; where they haven't, the listing says the operator confirms it rather than inventing a number.",
       },
       {
         q: "What if I need to cancel, or want a refund?",
@@ -101,7 +97,7 @@ const SECTIONS: FaqSection[] = [
       },
       {
         q: "What do I need to qualify to drive?",
-        a: "The requirements are the operator's and can differ by car. Listings show the general bar — 28 or older, with at least five years of licensed driving — and the operator confirms their own requirements when they reply, typically a valid licence, proof of insurance and a security deposit.",
+        a: "The requirements are the operator's and can differ by car. The operator confirms their own requirements when they reply, typically a valid licence, proof of insurance and a security deposit.",
       },
       {
         q: "Something's wrong with the car. Who do I call?",
@@ -109,7 +105,7 @@ const SECTIONS: FaqSection[] = [
       },
       {
         q: "Where does RYDA operate?",
-        a: "Miami, and only Miami for now. Every car on the grid is run by a Miami operator, and most deliver across the region — Miami Beach, Fort Lauderdale, Palm Beach, Naples and the Keys are ordinary drop-offs, on the operator's own delivery terms.",
+        a: "Miami, and only Miami for now. Every car on the grid is run by a Miami operator.",
       },
     ],
   },
@@ -118,7 +114,7 @@ const SECTIONS: FaqSection[] = [
     questions: [
       {
         q: "Do I need an account to request a car?",
-        a: "The request form creates one as you go — your email and a password sit alongside your dates. Thirty seconds, no card, nothing to subscribe to and nothing to cancel. If you already have an account, sign in first and your name and phone fill themselves in.",
+        a: "The request form creates one as you go — your email and a password sit alongside your dates. No card, nothing to subscribe to and nothing to cancel. If you already have an account, sign in first and your name and phone fill themselves in.",
       },
       {
         q: "What does the account actually do?",

@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
-import { formatUSD } from "@/lib/market-data";
 import { PARTNER_VEHICLES } from "@/lib/partner-fleet";
 
 export const metadata = { title: "Not found" };
@@ -18,22 +17,21 @@ export const metadata = { title: "Not found" };
 // the field's type is the literal "Miami", so that is the whole answer.
 // Two cards share the /rent href, hence the label-keyed map below.
 //
-// Two notes on these cards were invented and are now derived or gone
-// (Aug 2026):
-//   · "Daily rates from $1,200" — the fleet's cheapest car is $85 a day
-//     and its dearest is $1,403, so the 404 was quoting a floor 14x the
-//     real one and /rent's own counter strip contradicted it one click
-//     later. The figure is computed below instead of typed.
+// Two notes on these cards were invented and are gone (Aug 2026):
+//   · "Daily rates from $1,200" — a floor 14x the real one. Replacing
+//     it with a derived minimum was the wrong fix and that has now gone
+//     too: a "from $X" is a fleet-wide rate claim whichever way it is
+//     computed, and partner-fleet.ts is the operator's rate table, not
+//     RYDA's headline. The card states the count and nothing else.
 //   · "Real humans, fast replies" — nothing in this repo measures or
 //     queues against a reply time. /api/contact writes a row and emails
 //     the team inbox; /faq explicitly refuses to put a number on it.
-const MIN_RATE = Math.min(...PARTNER_VEHICLES.map((v) => v.dailyRate));
 
 const POPULAR = [
   {
     label: "Browse the fleet",
     href: "/rent",
-    note: `${PARTNER_VEHICLES.length} cars, from ${formatUSD(MIN_RATE)} a day`,
+    note: `${PARTNER_VEHICLES.length} cars`,
   },
   { label: "How it works", href: "/how-it-works", note: "Browse, request, the operator confirms" },
   { label: "Where we operate", href: "/rent", note: "Every listing is in Miami" },
