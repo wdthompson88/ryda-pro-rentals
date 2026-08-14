@@ -360,12 +360,15 @@ export default function TrustAndSafetyPage() {
         </div>
       </section>
 
-      {/* CTA. Do not point this at /help — that tree is still the
-          co-ownership help center (src/lib/help-content.ts: shares,
-          membership, the portfolio), and it contradicts every claim on
-          this page. The copy below splits questions into "for the
-          operator" and "for us", so the primary is the channel that
-          reaches us and the secondary is the rental FAQ. */}
+      {/* CTA. This used to carry a warning not to link /help, because
+          that tree was still the co-ownership help center and
+          contradicted every claim on this page. It no longer is — the
+          co-ownership articles were removed and what remains is
+          rental-only — so the warning is retired. The split below is
+          kept on its own merits: questions divide into "for the
+          operator" and "for us", so the primary CTA is the channel that
+          reaches us and the secondary is the rental FAQ. Linking /help
+          here is now a reasonable option rather than a contradiction. */}
       <section className="bg-ink py-20 text-cream">
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
           <h2 className="font-display text-3xl sm:text-4xl">

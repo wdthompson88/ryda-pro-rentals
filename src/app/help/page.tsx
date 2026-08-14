@@ -42,35 +42,20 @@ export default function HelpCenterPage() {
             How can we help?
           </h1>
 
-          {/* Search, submits to the site-wide /search route which
-              indexes vehicles, vs pages, and help. Help-tagged hits
-              are surfaced first when the query matches a help-category
-              keyword. */}
-          <form action="/search" method="get" className="mt-10 max-w-2xl">
-            <label className="sr-only" htmlFor="help-search">
-              Search help articles
-            </label>
-            <div className="flex h-14 items-center gap-3 rounded-full border border-rule bg-surface px-6 shadow-sm focus-within:border-red focus-within:ring-2 focus-within:ring-red/20">
-              <span className="text-base text-mute">⌕</span>
-              <input
-                id="help-search"
-                name="q"
-                type="search"
-                placeholder="Search bookings, insurance, payment, mileage…"
-                className="h-full flex-1 bg-transparent text-base text-ink placeholder:text-mute focus:outline-none"
-              />
-              <button
-                type="submit"
-                className="text-xs font-medium uppercase tracking-[0.18em] text-red hover:text-red-deep"
-              >
-                Search
-              </button>
-            </div>
-            <p className="mt-3 text-xs text-mute">
-              {totalArticles} help articles across {HELP.length} categories.
-              Search also covers the rest of the site.
-            </p>
-          </form>
+          {/* The search box that used to sit here submitted to /search
+              and was labelled "Search help articles" — but SEARCH_INDEX
+              in src/lib/search-index.ts contains no help entry at all,
+              so every one of its placeholder examples (bookings,
+              insurance, payment, mileage) returned nothing. The comment
+              above it claimed the index covered help; it never did.
+              Deleted rather than relabelled: the site header already
+              carries a search that works, and a second box promising
+              help results the index cannot return is worse than none.
+              If help articles are added to SEARCH_INDEX later, this is
+              the place to put it back. */}
+          <p className="mt-10 text-sm text-ink-soft">
+            {totalArticles} articles across {HELP.length} categories.
+          </p>
         </div>
       </section>
 

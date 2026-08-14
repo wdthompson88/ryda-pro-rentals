@@ -77,7 +77,7 @@ export default async function BookingConfirmedPage({
         </div>
 
         <p className="mt-6 text-sm text-ink-soft">
-          Members can follow the booking under{" "}
+          Signed in, you can follow the booking under{" "}
           <Link
             href="/account/requests"
             className="text-ink underline decoration-rule underline-offset-2 hover:decoration-ink"

@@ -186,7 +186,7 @@ const organizationJsonLd = {
         {
           "@type": "ContactPoint",
           contactType: "customer support",
-          email: "support@ryda.pro",
+          email: "hello@ryda.pro",
           availableLanguage: ["en"],
         },
       ],

@@ -31,7 +31,7 @@ export default function PrivacyPage() {
         },
         {
           heading: "6. Data retention",
-          body: "We keep your information for as long as your account is active and for a reasonable period after, typically 7 years for transactional records, in line with US tax and securities recordkeeping requirements.",
+          body: "We keep your information for as long as your account is active and for a reasonable period after, typically 7 years for transactional records, in line with US tax recordkeeping requirements.",
         },
         {
           heading: "7. Security",
@@ -39,11 +39,11 @@ export default function PrivacyPage() {
         },
         {
           heading: "8. Children's privacy",
-          body: "RYDA is not directed to anyone under 28. We do not knowingly collect information from minors.",
+          body: "RYDA is not directed to anyone under 18. We do not knowingly collect information from children.",
         },
         {
           heading: "9. Changes to this policy",
-          body: "We will post material changes here and notify members by email at least 14 days before they take effect.",
+          body: "We will post material changes here. The effective date at the top reflects the most recent change.",
         },
         {
           heading: "10. Contact",

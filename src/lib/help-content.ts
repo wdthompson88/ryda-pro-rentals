@@ -299,7 +299,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "What it costs" },
           {
             type: "p",
-            text: "Exotic key fobs are expensive and generally have to be ordered and programmed through the manufacturer's dealer, so a replacement costs time as well as money. Who pays, and how much, is set in the operator's rental agreement — typically taken against the security deposit if there is one.",
+            text: "Key fobs are expensive and generally have to be ordered and programmed through the manufacturer's dealer, so a replacement costs time as well as money. Who pays, and how much, is set in the operator's rental agreement — typically taken against the security deposit if there is one.",
           },
           { type: "h3", text: "How you'll be charged" },
           {
@@ -799,7 +799,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Smoking and vaping" },
           {
             type: "p",
-            text: "Assume it is prohibited unless the agreement says otherwise. Smoke odour in an exotic interior is expensive and slow to remove, and rental agreements price it accordingly. The charge, and how it is collected, is the operator's.",
+            text: "Assume it is prohibited unless the agreement says otherwise. Smoke odour in a car interior is expensive and slow to remove, and rental agreements price it accordingly. The charge, and how it is collected, is the operator's.",
           },
           { type: "h3", text: "Pets" },
           {
@@ -809,7 +809,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Food and drink" },
           {
             type: "p",
-            text: "Usually tolerated, rarely welcomed — exotic interiors are typically Alcantara or hand-stitched leather, and neither forgives a spill. Cleaning beyond normal use is chargeable under most agreements, generally against the security deposit.",
+            text: "Usually tolerated, rarely welcomed — many interiors on the grid are Alcantara or hand-stitched leather, and neither forgives a spill. Cleaning beyond normal use is chargeable under most agreements, generally against the security deposit.",
           },
           {
             type: "callout",
@@ -844,7 +844,7 @@ export const HELP: HelpCategory[] = [
             items: [
               "Premium fuel is not on every interstate exit. Plan the stops.",
               "Hotels with secured indoor parking beat hoping for a good kerb — and some agreements require secured parking anyway.",
-              "Bring a USB-C cable. Modern exotic infotainment is iPhone-default but cables are car-specific.",
+              "Bring a USB-C cable. Modern infotainment is iPhone-default but cables are car-specific.",
               "Photograph the car and the odometer at the start and the end of the trip.",
             ],
           },
@@ -892,7 +892,7 @@ export const HELP: HelpCategory[] = [
           { type: "h3", text: "Whether the car takes one" },
           {
             type: "p",
-            text: "Most modern exotics with rear seats carry ISOFIX/LATCH child-seat anchors; many two-seat configurations cannot take a child seat safely at all, because the airbag arrangement isn't designed for it and there is no rear seat to move to. Ask the operator about the specific car before you book.",
+            text: "Most modern cars with rear seats carry ISOFIX/LATCH child-seat anchors; many two-seat configurations cannot take a child seat safely at all, because the airbag arrangement isn't designed for it and there is no rear seat to move to. Ask the operator about the specific car before you book.",
           },
           { type: "h3", text: "Ask the operator first" },
           {
@@ -904,7 +904,7 @@ export const HELP: HelpCategory[] = [
             type: "ul",
             items: [
               "Put a protector underneath. Buckles and anchor points mark leather and Alcantara.",
-              "Don't over-tighten the anchors — exotic interior trim deforms.",
+              "Don't over-tighten the anchors — interior trim deforms.",
               "Take the seat out before you hand the car back, and photograph the seat area.",
             ],
           },
