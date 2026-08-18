@@ -506,27 +506,70 @@ Condensed from a full read-only inventory. **KEEP** = leave as-is; **MODIFY** = 
 
 Tick as PRs merge; add the PR link + one line each. (Boxes mirror §4.)
 
-- [ ] 0A rental_listings + media bucket + RLS
-- [ ] 0B renter / operator-staff roles
-- [ ] 0C notifications table + notify()
-- [ ] 0D partner_id FK migration
-- [ ] 1A renter identity + license/age verification
-- [ ] 1B rental signup / onboarding
-- [ ] 2A availability + blackout model
-- [ ] 2B rental_bookings + EXCLUDE + state-machine trigger
-- [ ] 2C availability calendar UI + server quote
-- [ ] 2D request-to-book flow
-- [ ] 2E renter↔operator messaging
-- [ ] 2F operator fleet dashboard
-- [ ] 2G renter "my rentals" dashboard
-- [ ] 3A configurable fee engine
-- [ ] 3B full on-platform rail
-- [ ] 3C security-deposit hold
-- [ ] 3D refunds / disputes / cancellation
-- [ ] 4A payment copy + legal sweep
-- [ ] 4B reservation agreement / e-sign
-- [ ] 4C check-in / return rewire
-- [ ] 4D CSP + images + expiry job
+**Migration head: 0050.** Nothing below is applied to a database yet — see the
+note under the table.
+
+| | Task | PR | Note |
+|---|---|---|---|
+| [x] | 0A rental_listings + media bucket + RLS | #17 | migration 0044 |
+| [ ] | 0B renter / operator-staff roles | — | not started; `is_partner_staff()` (0042) covers operator staff, renter has no role of its own |
+| [x] | 0C notifications table + notify() | #24 | migration 0049; feed + channel preferences |
+| [x] | 0D partner_id FK migration | #19 | migration 0045 |
+| [ ] | 1A renter identity + license/age verification | — | **not started, and nothing gates confirm.** Stripe Identity is wired to co-ownership's 28+ gate only; no rental age-25 constant, no license capture, no Checkr |
+| [~] | 1B rental signup / onboarding | #14 | one-touch identity captures name/phone once; the booking form prefills from `rental_profiles` and hides email/password for members |
+| [x] | 2A availability + blackout model | #20 | migration 0046 |
+| [x] | 2B rental_bookings + EXCLUDE + state-machine trigger | #20 | migration 0047 |
+| [x] | 2C availability calendar UI + server quote | #21 → #24 | `rental-date-picker.tsx`, `GET /api/rental-availability/[slug]`, `rental-quote.ts` |
+| [x] | 2D request-to-book flow | #21 → #24 | `POST /api/rental-bookings`, `[id]/decision` (approve/decline/propose) |
+| [ ] | 2E renter↔operator messaging | — | not started |
+| [~] | 2F operator fleet dashboard | #22 → #24 | request inbox at `/partner/requests` is live. **No listing or availability editor** — an operator cannot set a blackout or edit a rate, so every seeded calendar is default-open for 180 days |
+| [x] | 2G renter "my rentals" dashboard | #22 → #24 | `/account/rentals` |
+| [x] | 3A configurable fee engine | #24 | migration 0048. **Wired to the pay-link rail only** — see the seam below |
+| [ ] | 3B full on-platform rail | — | not started. A booking reaches `confirmed` and no money moves |
+| [ ] | 3C security-deposit hold | — | not started; 0047 already carries the deposit state columns |
+| [ ] | 3D refunds / disputes / cancellation | — | not started |
+| [ ] | 4A payment copy + legal sweep | — | not started — must land with 3B, which is what makes the current copy false |
+| [ ] | 4B reservation agreement / e-sign | — | not started |
+| [ ] | 4C check-in / return rewire | — | not started |
+| [ ] | 4D CSP + images + expiry job | — | not started. 0047 defaults `expires_at` to +24h but nothing sweeps or lazy-expires it |
+
+Plus, beyond §4's original list:
+
+| | Task | PR | Note |
+|---|---|---|---|
+| [x] | Seed the static fleet into `rental_listings` | #25 | `npm run seed:rental-listings` — without this the whole loop is unreachable |
+| [x] | `instant_book` per-listing flag | #25 | migration 0050. Column only; nothing reads it until 3B makes it honest |
+
+### Blocking everything above: the migrations are not applied
+
+**0044–0050 have never been applied to any database.** Every rental route
+degrades deliberately — a missing table answers
+`{ available: false, reason: 'not_configured' }` with a 200 and the date picker
+falls back to plain `<input type="date">`. So the entire booking loop can be
+merged, green, and invisible. Apply in numeric order (SETUP.md §1), then run the
+seed, then confirm a calendar renders on `/rent/<any-slug>`.
+
+### Two open seams worth naming
+
+1. **The fee engine reaches only one of two rails.** `payment-link/route.ts`
+   honors the full 0048 config via `rentalFeeConfigFromPartner()`. The booking
+   path (`rental-bookings/route.ts`, `[id]/decision`,
+   `rental-availability/[slug]`) selects only `commission_rate`, and
+   `rental-quote.ts` hardcodes `RENTAL_FEE_PAYER_CURRENT = "operator"`. Not
+   wrong at 0048's defaults (`percent` / `operator`); wrong the moment an admin
+   sets a flat fee or renter-pays, at which point the admin preview and the
+   renter's frozen quote disagree — the exact divergence `fees.ts`'s header
+   exists to prevent. Wiring it changes the public availability route's D6
+   posture: under `fee_payer = 'renter'` the renter total becomes `base + fee`,
+   so that route must compute the fee server-side while still emitting no
+   commission column.
+
+2. **A default-open calendar with no editor oversells.** 0046 is default-open by
+   design (an un-managed calendar would otherwise be a dead listing), and D3's
+   operator approval is what absorbs a request for a day the operator cannot
+   serve. That contract holds only while every booking passes an operator — so
+   2F's availability editor is a prerequisite for `instant_book`, not a polish
+   item after it.
 
 ---
 
