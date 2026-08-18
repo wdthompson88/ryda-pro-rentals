@@ -1,12 +1,24 @@
-// computeRentalFee unit tests — the rental rail's money math. This
-// function's output becomes application_fee_amount on a live Stripe
-// direct charge, so the invariants that matter are: the split always
-// reconciles to the charged amount exactly (no lost/created cents),
-// rounding is deterministic, and bad input throws instead of charging
-// a wrong fee.
+// computeRentalFee unit tests — the rental rail's money math, in its
+// ORIGINAL call form. This function's output becomes
+// application_fee_amount on a live Stripe direct charge, so the
+// invariants that matter are: the split always reconciles to the
+// charged amount exactly (no lost/created cents), rounding is
+// deterministic, and bad input throws instead of charging a wrong fee.
+//
+// This file is deliberately still written against the pre-D2 signature
+// — computeRentalFee(cents) and computeRentalFee(cents, rate) — because
+// that is what makes it a REGRESSION suite for task 3A's compatibility
+// overload rather than a second copy of the new one. If generalizing
+// the engine ever changes what the old two-argument call means, these
+// tests fail. The config-object form, both payers, flat mode and the
+// floor/cap clamps live in rental-fee-config.test.ts.
 
 import { describe, it, expect } from "vitest";
-import { RENTAL_COMMISSION_RATE_DEFAULT, computeRentalFee } from "../fees";
+import {
+  RENTAL_COMMISSION_RATE_DEFAULT,
+  RENTAL_COMMISSION_RATE_MAX,
+  computeRentalFee,
+} from "../fees";
 
 describe("computeRentalFee", () => {
   it("defaults to the 15% platform commission", () => {
@@ -49,9 +61,10 @@ describe("computeRentalFee", () => {
     expect(result.operatorNetCents).toBe(40_000);
   });
 
-  it("accepts the rate bounds themselves (0 and 0.5)", () => {
-    // Matches the DB check constraint on partners.commission_rate —
-    // both endpoints are legal values, not errors.
+  it("accepts the rate bounds themselves (0 and RENTAL_COMMISSION_RATE_MAX)", () => {
+    // Matches the DB check constraint on partners.commission_rate
+    // (partners_commission_rate_bounded, migration 0048) — both
+    // endpoints are legal values, not errors.
     const free = computeRentalFee(10_000, 0);
     expect(free.applicationFeeCents).toBe(0);
     expect(free.operatorNetCents).toBe(10_000);
@@ -59,6 +72,13 @@ describe("computeRentalFee", () => {
     const half = computeRentalFee(10_001, 0.5);
     expect(half.applicationFeeCents).toBe(5_001); // 5000.5 rounds up
     expect(half.operatorNetCents).toBe(5_000);
+
+    // The ceiling itself. 0.5 used to be the wall and is now an
+    // ordinary value — a rate above it must no longer throw.
+    const ceiling = computeRentalFee(10_000, RENTAL_COMMISSION_RATE_MAX);
+    expect(ceiling.applicationFeeCents).toBe(7_500);
+    expect(ceiling.operatorNetCents).toBe(2_500);
+    expect(() => computeRentalFee(10_000, 0.51)).not.toThrow();
   });
 
   it("handles a 1-cent charge without producing a negative net", () => {
@@ -85,15 +105,29 @@ describe("computeRentalFee", () => {
   });
 
   it("rejects out-of-bounds commission rates", () => {
-    expect(() => computeRentalFee(10_000, -0.01)).toThrow(/\[0, 0\.5\]/);
-    expect(() => computeRentalFee(10_000, 0.51)).toThrow(/\[0, 0\.5\]/);
-    // A percentage passed where a fraction belongs (15 vs 0.15) must
-    // throw, not silently take a 15x fee.
-    expect(() => computeRentalFee(10_000, 15)).toThrow(/\[0, 0\.5\]/);
+    expect(() => computeRentalFee(10_000, -0.01)).toThrow(/\[0, 0\.75\]/);
+    expect(() => computeRentalFee(10_000, 0.76)).toThrow(/\[0, 0\.75\]/);
+    // The typo guard the ceiling exists for, and the reason widening it
+    // to 0.75 rather than to 1 or beyond still leaves it doing a job: a
+    // percentage passed where a fraction belongs (15 vs 0.15, or 1.5
+    // for 0.15) must throw, not silently take a 15x or 10x fee.
+    expect(() => computeRentalFee(10_000, 15)).toThrow(/\[0, 0\.75\]/);
+    expect(() => computeRentalFee(10_000, 1.5)).toThrow(/\[0, 0\.75\]/);
   });
 
   it("rejects non-finite commission rates", () => {
-    expect(() => computeRentalFee(10_000, NaN)).toThrow(/\[0, 0\.5\]/);
-    expect(() => computeRentalFee(10_000, Infinity)).toThrow(/\[0, 0\.5\]/);
+    expect(() => computeRentalFee(10_000, NaN)).toThrow(/\[0, 0\.75\]/);
+    expect(() => computeRentalFee(10_000, Infinity)).toThrow(/\[0, 0\.75\]/);
+  });
+
+  it("still returns amountCents as the amount actually charged", () => {
+    // The pre-D2 field name, kept so the payment-link route compiles
+    // and keeps meaning the same thing. Under the legacy call the
+    // operator carries the fee, so the charge IS the base.
+    const result = computeRentalFee(110_500);
+    expect(result.amountCents).toBe(110_500);
+    expect(result.amountCents).toBe(result.renterTotalCents);
+    expect(result.applicationFeeCents).toBe(result.feeCents);
+    expect(result.feePayer).toBe("operator");
   });
 });
