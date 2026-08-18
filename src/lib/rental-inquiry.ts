@@ -20,7 +20,7 @@ export type RentalInquiry = {
   vehicleSlug: string;        // canonical id: the partner listing's slug
   vehicleLabel: string;       // display name for emails + admin triage
   // Ops attribution ONLY. Customers never see the operator's name —
-  // listings and emails say "a vetted Miami operator".
+  // listings and emails say "a Miami operator".
   partnerName: string;
   startDate: string;          // YYYY-MM-DD
   endDate: string;            // YYYY-MM-DD

@@ -16,7 +16,7 @@
 // D6 IS NOT RE-DERIVED HERE. Operators are anonymous until a booking is
 // confirmed, and this page renders whatever `operator` block the API
 // hands it: rental-booking-access.ts's discloseOperator() either returns
-// an identity or returns the "a vetted Miami operator" label, and there
+// an identity or returns the "a Miami operator" label, and there
 // is deliberately no branch below that reaches for a name the server did
 // not disclose. A request is pre-confirmation by definition, so on the
 // normal path this page shows the label — but it shows the name without

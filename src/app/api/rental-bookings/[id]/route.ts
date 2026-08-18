@@ -9,7 +9,7 @@
 //
 // D6 lives in the same place. The operator's name, and their contact
 // email, reach the renter only once the booking is confirmed — before
-// that the payload carries "a vetted Miami operator" and nothing else.
+// that the payload carries "a Miami operator" and nothing else.
 // The identity is not even LOADED unless the disclosure rule has already
 // said yes, so a future edit to the payload cannot leak what was never
 // fetched.

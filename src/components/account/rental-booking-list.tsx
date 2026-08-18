@@ -829,7 +829,7 @@ function cancelledLine(cancelledBy: string | null): string {
  *
  * `operator.revealed` is the ONLY thing consulted. It is
  * discloseOperator()'s verdict for this caller on this row, and when it
- * is false the payload carries a label ("a vetted Miami operator") and
+ * is false the payload carries a label ("a Miami operator") and
  * no identity at all — so the anonymous branch is not hiding a name that
  * arrived, it is rendering the only thing that did.
  */

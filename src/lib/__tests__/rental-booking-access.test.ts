@@ -10,7 +10,7 @@
 //      does not announce itself — it just quietly serves the row.
 //   2. An operator's identity reaching a renter before the booking is
 //      confirmed. That is decision D6, it is a promise made in public
-//      copy ("a vetted Miami operator"), and the whole point of routing
+//      copy ("a Miami operator"), and the whole point of routing
 //      every payload through discloseOperator() is that it can be
 //      pinned here once instead of in each route.
 
@@ -269,7 +269,7 @@ describe("D6 — the operator is withheld until the booking is confirmed", () =>
       expect(access.ok && access.operatorRevealed).toBe(false);
       expect(discloseOperator(access, OPERATOR, "Miami")).toEqual({
         revealed: false,
-        label: "A vetted Miami operator",
+        label: "A Miami operator",
       });
     }
   });
@@ -327,7 +327,7 @@ describe("D6 — the operator is withheld until the booking is confirmed", () =>
       expect(access.ok).toBe(false);
       expect(discloseOperator(access, OPERATOR, "Miami")).toEqual({
         revealed: false,
-        label: "A vetted Miami operator",
+        label: "A Miami operator",
       });
     }
   });
@@ -341,17 +341,17 @@ describe("D6 — the operator is withheld until the booking is confirmed", () =>
     );
     expect(discloseOperator(access, null, "Miami")).toEqual({
       revealed: false,
-      label: "A vetted Miami operator",
+      label: "A Miami operator",
     });
     expect(
       discloseOperator(access, { partnerId: PARTNER, name: "" }, "Miami"),
-    ).toEqual({ revealed: false, label: "A vetted Miami operator" });
+    ).toEqual({ revealed: false, label: "A Miami operator" });
   });
 
   it("names the market when it has one and stays honest when it does not", () => {
-    expect(anonymousOperatorLabel("Miami")).toBe("A vetted Miami operator");
-    expect(anonymousOperatorLabel("  ")).toBe("A vetted RYDA operator");
-    expect(anonymousOperatorLabel(null)).toBe("A vetted RYDA operator");
+    expect(anonymousOperatorLabel("Miami")).toBe("A Miami operator");
+    expect(anonymousOperatorLabel("  ")).toBe("The operator");
+    expect(anonymousOperatorLabel(null)).toBe("The operator");
   });
 });
 

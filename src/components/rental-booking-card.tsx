@@ -77,18 +77,22 @@ export function RentalBookingCard({
       )}
       <p className="mt-1 text-xs text-ink-soft">{includesNote}</p>
 
-      {/* Driver requirements — operators impose these, so they qualify
-          the lead. */}
-      <div className="mt-4 space-y-2 rounded-xl border border-rule bg-cream-2/40 p-3 text-[11px] text-ink-soft">
-        <div className="flex items-baseline justify-between">
-          <span className="text-mute">Min. driver age</span>
-          <span className="font-medium text-ink">28+</span>
-        </div>
-        <div className="flex items-baseline justify-between">
-          <span className="text-mute">Driving experience</span>
-          <span className="font-medium text-ink">5+ years</span>
-        </div>
-      </div>
+      {/* A "Driver requirements" panel stood here — "Min. driver age 28+",
+          "Driving experience 5+ years" — and it is deleted, not softened.
+          Neither figure appears in partner-fleet.ts, in any migration, or
+          in anything an operator sends us; the 28 was the co-ownership
+          member floor, which has nothing to do with renting a car. Terms
+          §3 and /trust-and-safety both state that eligibility for a
+          particular car is the operator's to set and differs car to car,
+          so a platform-wide number here turns away drivers the operator
+          would rent to and implies RYDA checks something it never sees.
+
+          This panel outlived its first deletion. The co-ownership strip
+          removed it from /rent/[symbol], but the markup had already been
+          copied into this component, so extracting the card silently put
+          it back on all 37 listings — a clean merge and a green build
+          both missed it. There is no replacement: RYDA holds no
+          eligibility data to show. */}
 
       <div className="mt-5 border-t border-rule pt-5">
         <RentalInquiryForm

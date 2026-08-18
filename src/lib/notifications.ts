@@ -30,7 +30,7 @@
 // service-role key's module graph into the bundle.
 //
 // ── D6 LIVES IN THE TYPES HERE ──────────────────────────────────────
-// Decision D6: operators are anonymous ("a vetted Miami operator")
+// Decision D6: operators are anonymous ("a Miami operator")
 // through browse and request, and are named to the renter only after
 // the booking is confirmed. A notification is a renter-facing surface
 // and obeys it — but obeying it with an `if` in each builder would mean
@@ -72,6 +72,7 @@
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { nightsBetween } from "./rental-availability";
+import { anonymousOperatorLabel } from "./rental-booking-access";
 
 // ── The vocabulary ──────────────────────────────────────────────────
 
@@ -574,20 +575,14 @@ export type AnonymousBookingDigest = RentalBookingDigest & {
   market?: string | null;
 };
 
-/**
- * The pre-confirmation stand-in for an operator's name.
- *
- * Byte-identical to anonymousOperatorLabel() in
- * src/lib/rental-booking-access.ts, which is the authority on D6 and
- * lands with the 2D booking routes. Deliberately NOT exported: two
- * exported functions with the same job invite a caller to pick the
- * wrong one. When 2D merges, delete this and import that — the wording
- * is matched so the swap is a no-op.
- */
-function vettedOperator(market?: string | null): string {
-  const m = (market ?? "").trim();
-  return m ? `A vetted ${m} operator` : "A vetted RYDA operator";
-}
+// The local copy of the pre-confirmation stand-in is gone, exactly as its
+// own note instructed: "When 2D merges, delete this and import that."
+// 2D has merged, so anonymousOperatorLabel() in rental-booking-access.ts
+// — the authority on D6 — is now the single wording for every surface,
+// this file's seven notification bodies included. That matters more than
+// it did when the two were byte-identical: the label has since dropped
+// the word "vetted", and a private duplicate here would have kept
+// claiming it in a renter's notifications after every screen stopped.
 
 /**
  * "Mar 14 – Mar 18" — or "Mar 14, 2027 – Mar 18, 2027" when the trip is
@@ -681,7 +676,7 @@ export function bookingApprovedForRenter(
     market?: string | null;
   },
 ): NotificationContent {
-  const who = (input.operatorName ?? "").trim() || vettedOperator(input.market);
+  const who = (input.operatorName ?? "").trim() || anonymousOperatorLabel(input.market);
   return {
     type: "booking_approved",
     title: `Confirmed: ${input.car}`,
@@ -708,7 +703,7 @@ export function bookingDeclinedForRenter(
   return {
     type: "booking_declined",
     title: `Not available: ${input.car}`,
-    body: `${vettedOperator(input.market)} could not take ${formatBookingDates(input.startDate, input.endDate)}. Your dates are free — try another car or another week.`,
+    body: `${anonymousOperatorLabel(input.market)} could not take ${formatBookingDates(input.startDate, input.endDate)}. Your dates are free — try another car or another week.`,
     link: renterBookingLink(),
   };
 }
@@ -727,7 +722,7 @@ export function bookingCounterOfferedForRenter(
   return {
     type: "booking_counter_offered",
     title: `Alternate dates offered: ${input.car}`,
-    body: `${vettedOperator(input.market)} can't do your original week but offered ${tripPhrase(input.startDate, input.endDate)}. Accept or decline before it expires.`,
+    body: `${anonymousOperatorLabel(input.market)} can't do your original week but offered ${tripPhrase(input.startDate, input.endDate)}. Accept or decline before it expires.`,
     link: renterBookingLink(),
   };
 }
@@ -788,7 +783,7 @@ export function bookingExpiringSoon(
   return {
     type: "booking_expiring_soon",
     title: `Expiring in ${window}: ${input.car}`,
-    body: `${vettedOperator(input.market)} is waiting on your answer for ${dates}. The offer lapses when the window closes.`,
+    body: `${anonymousOperatorLabel(input.market)} is waiting on your answer for ${dates}. The offer lapses when the window closes.`,
     link: renterBookingLink(),
   };
 }
@@ -820,7 +815,7 @@ export function bookingExpired(
     // "No days are reserved" rather than "nothing is held": a renter
     // reading "nothing is held" on a request that just lapsed will hear
     // it as a card hold, and RYDA has never held anything of theirs.
-    body: `${vettedOperator(input.market)} didn't answer in time, so your request for ${dates} has closed. No days are reserved, and you can request again.`,
+    body: `${anonymousOperatorLabel(input.market)} didn't answer in time, so your request for ${dates} has closed. No days are reserved, and you can request again.`,
     link: renterBookingLink(),
   };
 }
@@ -857,8 +852,8 @@ export function bookingCancelledForRenter(
   },
 ): NotificationContent {
   const who = input.wasConfirmed
-    ? (input.operatorName ?? "").trim() || vettedOperator(input.market)
-    : vettedOperator(input.market);
+    ? (input.operatorName ?? "").trim() || anonymousOperatorLabel(input.market)
+    : anonymousOperatorLabel(input.market);
   const dates = formatBookingDates(input.startDate, input.endDate);
 
   let body: string;

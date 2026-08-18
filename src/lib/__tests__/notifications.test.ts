@@ -476,13 +476,13 @@ describe("D6 — the operator is not named before confirmation", () => {
 
   it("declined names the market, never the company", () => {
     const c = bookingDeclinedForRenter({ ...TRIP, market: "Miami" });
-    expect(c.body).toContain("A vetted Miami operator");
+    expect(c.body).toContain("A Miami operator");
     expect(`${c.title} ${c.body}`).not.toContain(OPERATOR);
   });
 
   it("a counter-offer is still pre-confirmation, so still anonymous", () => {
     const c = bookingCounterOfferedForRenter({ ...TRIP, market: "Miami" });
-    expect(c.body).toContain("A vetted Miami operator");
+    expect(c.body).toContain("A Miami operator");
   });
 
   it("an expiring or expired request never names the operator", () => {
@@ -490,14 +490,14 @@ describe("D6 — the operator is not named before confirmation", () => {
       bookingExpiringSoon({ ...TRIP, market: "Miami", audience: "renter" }),
       bookingExpired({ ...TRIP, market: "Miami", audience: "renter" }),
     ]) {
-      expect(c.body).toContain("A vetted Miami operator");
+      expect(c.body).toContain("A Miami operator");
       expect(`${c.title} ${c.body}`).not.toContain(OPERATOR);
     }
   });
 
   it("falls back to a market-less label when the market is unknown", () => {
     const c = bookingDeclinedForRenter({ ...TRIP });
-    expect(c.body).toContain("A vetted RYDA operator");
+    expect(c.body).toContain("The operator");
   });
 
   it("APPROVAL names the operator — the one event that reveals", () => {
@@ -512,7 +512,7 @@ describe("D6 — the operator is not named before confirmation", () => {
   it("approval degrades to the anonymous label when no name loaded", () => {
     // A failed partners lookup must not produce a half-sentence.
     const c = bookingApprovedForRenter({ ...TRIP, market: "Miami" });
-    expect(c.body).toContain("A vetted Miami operator");
+    expect(c.body).toContain("A Miami operator");
     expect(c.body).not.toContain("undefined");
     expect(c.body).not.toContain("null");
   });
@@ -529,7 +529,7 @@ describe("D6 — the operator is not named before confirmation", () => {
       cancelledBy: "operator",
     });
     expect(`${c.title} ${c.body}`).not.toContain(OPERATOR);
-    expect(c.body).toContain("A vetted Miami operator");
+    expect(c.body).toContain("A Miami operator");
   });
 
   it("a cancellation AFTER confirmation keeps the name", () => {

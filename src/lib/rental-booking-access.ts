@@ -26,7 +26,7 @@
 // the label is a convenience.
 //
 // D6 IS THE REASON THIS FILE EXISTS. Operators stay anonymous — "a
-// vetted Miami operator" — through browse and request, and are named to
+// Miami operator" — through browse and request, and are named to
 // the renter only once the booking is confirmed. That is a rule about a
 // RENTER's view of a row, not about the row: an operator reading their
 // own booking obviously knows who they are, and so does an admin. The
@@ -299,13 +299,24 @@ export type RentalOperatorDisclosure =
   | { revealed: false; label: string };
 
 /**
- * The pre-confirmation stand-in. Same promise the public grid and the
- * customer inquiry email already make — see the customer-facing copy in
- * /api/rental-inquiry, which this must not contradict.
+ * The pre-confirmation stand-in, and the ONE place it is worded.
+ *
+ * It used to say "A vetted Miami operator". "Vetted" is gone, and not
+ * for brevity: it described Stripe Connect onboarding — a business and a
+ * bank account verified by Stripe — and readers hear an inspected car
+ * and a checked driving record. /trust-and-safety now defines the word
+ * in exactly one place and bounds it to what payment-link enforces, so
+ * an unlinked "vetted" on a confirmation screen is the claim that
+ * definition exists to prevent. This matches the listing page's
+ * "Fulfilled by a Miami operator on their contract and insurance".
+ *
+ * The no-market fallback is "The operator", not "A RYDA operator": RYDA
+ * owns, stores and insures no vehicle (Terms §2), so a RYDA-branded
+ * operator is a party that does not exist.
  */
 export function anonymousOperatorLabel(market?: string | null): string {
   const m = (market ?? "").trim();
-  return m ? `A vetted ${m} operator` : "A vetted RYDA operator";
+  return m ? `A ${m} operator` : "The operator";
 }
 
 /**
@@ -317,7 +328,7 @@ export function anonymousOperatorLabel(market?: string | null): string {
  * identity — including when access was denied outright, and including
  * when the caller IS entitled but no identity was loaded (a partners
  * lookup that failed or a pre-0041 environment). A missing name degrades
- * to "a vetted Miami operator", never to a half-populated object.
+ * to "a Miami operator", never to a half-populated object.
  */
 export function discloseOperator(
   access: RentalBookingAccess,
