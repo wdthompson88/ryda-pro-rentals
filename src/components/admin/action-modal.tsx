@@ -22,7 +22,24 @@
 // Render `{modal}` once near the root of the page; subsequent open()
 // calls reuse the same overlay.
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+/**
+ * What Tab is allowed to reach inside the dialog. Deliberately narrow —
+ * everything this modal renders is a button, a textarea or a checkbox.
+ */
+const FOCUSABLE =
+  'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+/**
+ * The dialog's buttons are now genuinely reachable by keyboard, so they
+ * need to be visible when they are reached. An outline rather than a
+ * ring, and never beside `focus:outline-none` — the same treatment
+ * rental-booking-display.ts's FOCUS_RING documents, inlined so this
+ * admin component takes no rental import.
+ */
+const MODAL_FOCUS =
+  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red";
 
 export type ActionModalConfig = {
   title: string;
@@ -105,17 +122,102 @@ export function useActionModal(): {
     [config, note, checked],
   );
 
+  /**
+   * FOCUS, ESCAPE AND TAB — none of which the dialog used to manage.
+   *
+   * The only focus management here was `autoFocus` on the ops-note
+   * textarea, and Escape was bound to the overlay div's own onKeyDown.
+   * That held for as long as every caller passed a note label. It stops
+   * holding the moment one passes `noteLabel: false` (the operator's
+   * Approve / Decline / Propose doors): the dialog renders with nothing
+   * but two buttons, no focus ever moves into it, and because the
+   * keydown originates on the element that still has focus — the trigger
+   * BEHIND the overlay — Escape never fires. Worse, `{modal}` is
+   * typically rendered above the list it belongs to, so tabbing forward
+   * from the trigger walks into the page rather than into the dialog.
+   *
+   * So: move focus in on open, trap Tab inside, listen for Escape on the
+   * document, and hand focus back to whatever opened it on close. The
+   * textarea keeps `autoFocus`, and it is the first focusable element
+   * when it is rendered, so nothing changes for the admin callers.
+   */
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  // finish() closes over `note` and `checked`, so it changes identity on
+  // every keystroke. The listener below is installed once per open and
+  // reads the current one through this.
+  const finishRef = useRef(finish);
+  finishRef.current = finish;
+
+  useEffect(() => {
+    if (!config) return;
+    const panel = panelRef.current;
+    if (!panel) return;
+
+    const restoreTo =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+
+    const focusable = () =>
+      Array.from(panel.querySelectorAll<HTMLElement>(FOCUSABLE));
+
+    // The textarea's autoFocus already did this when it is rendered;
+    // this is what covers the dialogs that have no textarea.
+    if (!panel.contains(document.activeElement)) {
+      (focusable()[0] ?? panel).focus();
+    }
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        finishRef.current(false);
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const items = focusable();
+      if (items.length === 0) {
+        e.preventDefault();
+        panel.focus();
+        return;
+      }
+      const first = items[0];
+      const last = items[items.length - 1];
+      const active =
+        document.activeElement instanceof HTMLElement
+          ? document.activeElement
+          : null;
+      const inside = !!active && panel.contains(active);
+      if (e.shiftKey) {
+        if (!inside || active === first) {
+          e.preventDefault();
+          last.focus();
+        }
+      } else if (!inside || active === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener("keydown", onKeyDown, true);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown, true);
+      // A no-op when the trigger was unmounted by the action itself.
+      restoreTo?.focus?.();
+    };
+  }, [config]);
+
   const modal = config ? (
     <div
       role="dialog"
       aria-modal="true"
       aria-labelledby="action-modal-title"
       className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4 backdrop-blur-sm"
-      onKeyDown={(e) => {
-        if (e.key === "Escape") finish(false);
-      }}
     >
-      <div className="w-full max-w-md rounded-2xl border border-rule bg-surface p-6 shadow-xl">
+      <div
+        ref={panelRef}
+        tabIndex={-1}
+        className="w-full max-w-md rounded-2xl border border-rule bg-surface p-6 shadow-xl focus:outline-none"
+      >
         <h3
           id="action-modal-title"
           className="font-display text-lg font-medium text-ink"
@@ -173,14 +275,14 @@ export function useActionModal(): {
           <button
             type="button"
             onClick={() => finish(false)}
-            className="inline-flex h-9 items-center rounded-full border border-rule bg-cream-2 px-4 text-sm font-medium text-ink-soft hover:border-ink hover:text-ink"
+            className={`inline-flex h-9 items-center rounded-full border border-rule bg-cream-2 px-4 text-sm font-medium text-ink-soft hover:border-ink hover:text-ink ${MODAL_FOCUS}`}
           >
             {config.cancelLabel ?? "Cancel"}
           </button>
           <button
             type="button"
             onClick={() => finish(true)}
-            className={`inline-flex h-9 items-center rounded-full border px-4 text-sm font-medium transition-colors ${
+            className={`inline-flex h-9 items-center rounded-full border px-4 text-sm font-medium transition-colors ${MODAL_FOCUS} ${
               config.tone === "danger"
                 ? "border-red bg-red text-cream hover:bg-red-deep"
                 : "border-ink bg-ink text-cream hover:bg-red hover:border-red"

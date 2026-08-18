@@ -5,12 +5,20 @@
 // created ON the operator's Express connected account — a DIRECT
 // charge, via the `stripeAccount` request option. The rental price
 // settles straight to the operator and never enters RYDA's balance;
-// RYDA's commission rides along as
-// payment_intent_data.application_fee_amount (partner.commission_rate,
-// default 15% — computeRentalFee in src/lib/fees.ts is the ONLY place
-// that math lives). Chargebacks and refunds are the operator's. Never
-// rework this into destination charges or transfers through the
-// platform balance.
+// RYDA's fee rides along as
+// payment_intent_data.application_fee_amount. Chargebacks and refunds
+// are the operator's. Never rework this into destination charges or
+// transfers through the platform balance.
+//
+// THE FEE IS THE OPERATOR'S CONFIGURED TERMS, not a bare percentage:
+// partners.fee_mode / fee_flat_cents / fee_payer / fee_floor_cents /
+// fee_cap_cents (migration 0048, decision D2), read through
+// rentalFeeConfigFromPartner and computed by computeRentalFee — the
+// ONLY place that math lives (src/lib/fees.ts). Under renter-pays the
+// fee is ADDED to the charge, so the amount on the Checkout page is the
+// renter's total and not the operator's quoted price; under
+// operator-pays it is deducted from the payout, which is what every
+// pre-D2 link did.
 //
 // Pipeline position: the inquiry must be 'sent' — the operator has
 // confirmed availability + price off-platform, and the admin types
@@ -36,7 +44,7 @@ import type Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
 import { requireAdmin } from "@/lib/admin-auth";
 import { supabaseAdmin } from "@/lib/supabase-admin";
-import { computeRentalFee } from "@/lib/fees";
+import { computeRentalFee, rentalFeeConfigFromPartner } from "@/lib/fees";
 import { emailLayout, escapeHtml } from "@/lib/notify";
 import { partnerInquiryEmail } from "@/lib/partner-contacts";
 import { SITE_URL } from "@/lib/site-url";
@@ -128,8 +136,25 @@ const INQUIRY_COLS =
 
 // Everything the charge needs from the operator, read identically
 // whether the lead resolved by id or by legacy name.
-const PARTNER_COLS =
+const PARTNER_BASE_COLS =
   "id, name, status, contact_email, commission_rate, stripe_account_id, stripe_onboarded_at";
+
+// The fee TERMS (0048). Selected here, not just parked in the partners
+// admin, because this route is the rail that actually charges a card:
+// leave them out of the select and rentalFeeConfigFromPartner sees no
+// fee_* keys, falls back to percent / operator-pays by design (that
+// fallback exists for pre-0048 rows), and the route charges the old math
+// with no error to notice. Adding a column here is therefore part of
+// wiring the terms up, not a detail of it.
+const PARTNER_FEE_COLS = [
+  "fee_mode",
+  "fee_flat_cents",
+  "fee_payer",
+  "fee_floor_cents",
+  "fee_cap_cents",
+] as const;
+
+const PARTNER_COLS = `${PARTNER_BASE_COLS}, ${PARTNER_FEE_COLS.join(", ")}`;
 
 type OperatorRow = {
   id: string;
@@ -139,6 +164,14 @@ type OperatorRow = {
   commission_rate: number;
   stripe_account_id: string | null;
   stripe_onboarded_at: string | null;
+  // Optional: a database that has not had 0048 applied returns rows
+  // without them, and the fee engine resolves that absence to exactly
+  // the percent / operator-pays behavior that shipped before D2.
+  fee_mode?: string | null;
+  fee_flat_cents?: number | string | null;
+  fee_payer?: string | null;
+  fee_floor_cents?: number | string | null;
+  fee_cap_cents?: number | string | null;
 };
 
 // Customer-facing pay-link email. NEVER name the operator here — the
@@ -294,10 +327,29 @@ export async function POST(
   // Every lead captured today names an operator, so that is now a
   // legacy row from before the RYDA-owned rail was removed, or one
   // whose operator was never added to the roster.
-  const resolved = await resolveInquiryOperator<OperatorRow>(
-    inquiry,
-    partnerFetchers<OperatorRow>(db, PARTNER_COLS),
-  );
+  const resolveWith = (columns: string) =>
+    resolveInquiryOperator<OperatorRow>(
+      inquiry,
+      partnerFetchers<OperatorRow>(db, columns),
+    );
+  let resolved = await resolveWith(PARTNER_COLS);
+  // Pre-0048 window: the fee-terms columns do not exist yet, so the
+  // select errors on the column name. Retry with the 0041 shape rather
+  // than 500 every payment link until a human applies the migration —
+  // same degradation as the partner_id select above. The engine then
+  // resolves the absent terms to percent / operator-pays, which is
+  // precisely what this rail did before D2.
+  //
+  // 0048 is applied on the live project, so this is now a guard for a
+  // fresh database rather than the everyday path. It stays: the cost is
+  // one retry on a query that already failed, and the alternative is a
+  // rail that breaks on any environment seeded from an older chain.
+  if (!resolved.ok && resolved.reason === "lookup_failed") {
+    const lookupError = resolved.error;
+    if (PARTNER_FEE_COLS.some((col) => isColumnMissing(lookupError, col))) {
+      resolved = await resolveWith(PARTNER_BASE_COLS);
+    }
+  }
   if (!resolved.ok) {
     if (resolved.reason === "no_attribution") {
       return NextResponse.json(
@@ -358,16 +410,48 @@ export async function POST(
   // keeps that narrowing alive inside the closures.
   const stripeAccount = partner.stripe_account_id;
 
-  // The ONLY fee math. Throws if a partners row was edited out-of-band
-  // to a rate outside the [0, 0.5] contract — better a loud 500 than a
-  // silently wrong application fee on a live charge.
+  // The ONLY fee math, and it reads the operator's FULL terms (0048):
+  // percent or flat, operator-pays or renter-pays, floor and cap. This
+  // rail is currently the only one that charges a card, and the admin's
+  // confirm modal on /admin/partners promises in as many words that new
+  // terms "apply to bookings and payment links quoted from now on" — so
+  // a payment link computed from commission_rate alone would be the
+  // preview-vs-charge split this file's engine exists to make
+  // impossible ($2,250 previewed, $2,000 charged, on a flat renter-pays
+  // operator). Task 3A's acceptance criterion is that the admin preview
+  // and the server charge call the SAME function and agree to the cent
+  // for every payer/mode combination; this call is that agreement.
+  //
+  // amountCents here is the operator-confirmed BASE. The result's
+  // amountCents is the renter's total — base under operator-pays, base
+  // + fee under renter-pays — and it is what the Checkout unit_amount
+  // and the rental_payments row below are built from, so the identity
+  // `application_fee + operator_net === amount` holds under both payers
+  // on this direct charge.
+  //
+  // Throws if a partners row carries terms outside contract (a rate
+  // outside [0, RENTAL_COMMISSION_RATE_MAX], an incoherent mode/amount
+  // pair, an operator-paid fee larger than this particular rental) —
+  // better a loud refusal than a silently wrong application fee.
+  //
+  // STILL OUTSTANDING for 3B: rental_payments has no fee_payer column,
+  // so a renter-pays row records the renter's total as amount_cents
+  // without recording which side carried the fee. That is a reporting
+  // gap, not a money gap — the amount charged and the fee taken are both
+  // correct and frozen — and the column lands with 3B's migration.
   let fee: ReturnType<typeof computeRentalFee>;
   try {
-    fee = computeRentalFee(amountCents, Number(partner.commission_rate));
+    fee = computeRentalFee(amountCents, rentalFeeConfigFromPartner(partner));
   } catch (err) {
     console.error("[payment-link · fee]", err);
     return NextResponse.json(
-      { error: "Fee computation failed — check the partner's commission rate." },
+      {
+        error: `Fee computation failed — check this operator's fee terms in Admin → Partners. ${
+          err instanceof Error
+            ? err.message.replace(/^computeRentalFee:\s*/, "")
+            : "Unknown error."
+        }`,
+      },
       { status: 500 },
     );
   }
