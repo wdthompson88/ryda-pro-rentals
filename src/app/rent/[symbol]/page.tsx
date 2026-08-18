@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { PhotoGallery } from "@/components/photo-gallery";
-import { RentalInquiryForm } from "@/components/rental-inquiry-form";
+import { RentalBookingCard } from "@/components/rental-booking-card";
 import {
   VEHICLES,
   getVehicleBySymbol,
@@ -204,59 +204,24 @@ export default async function RentDetailPage({
               )}
             </div>
 
-            {/* Booking card */}
+            {/* Booking card. The headline rate lives INSIDE the client
+                card now: `dailyRate` here is partner-fleet.ts's static
+                figure, and the quote inside the form is priced from
+                rental_listings.daily_rate_cents — the card resolves the
+                two rather than rendering both. */}
             <div className="lg:col-span-4">
-              <div className="rounded-2xl border border-rule bg-surface p-6 shadow-sm">
-                <div className="flex items-baseline justify-between">
-                  <p className="font-display text-3xl text-ink tabular-nums">
-                    {formatUSD(dailyRate)}
-                  </p>
-                  <p className="text-sm text-mute">/day</p>
-                </div>
-                {r.kind === "partner" && r.vehicle.regularRate &&
-                r.vehicle.regularRate > dailyRate ? (
-                  <p className="mt-1 text-xs text-mute">
-                    Regular{" "}
-                    <span className="line-through tabular-nums">
-                      {formatUSD(r.vehicle.regularRate)}
-                    </span>
-                    /day
-                  </p>
-                ) : null}
-                <p className="mt-1 text-xs text-ink-soft">
-                  {r.kind === "ryda"
+              <RentalBookingCard
+                vehicleSlug={r.kind === "ryda" ? r.vehicle.symbol : r.vehicle.slug}
+                vehicleName={title}
+                market={market}
+                fallbackDailyRate={dailyRate}
+                regularRate={r.kind === "partner" ? r.vehicle.regularRate : null}
+                includesNote={
+                  r.kind === "ryda"
                     ? "Includes 100 mi/day, full insurance, white-glove handover"
-                    : "Fulfilled by a vetted Miami operator on their contract and insurance"}
-                </p>
-
-                {/* Driver requirements — kept from the old estimate card;
-                    operators impose these, so they qualify the lead. */}
-                <div className="mt-4 space-y-2 rounded-xl border border-rule bg-cream-2/40 p-3 text-[11px] text-ink-soft">
-                  <div className="flex items-baseline justify-between">
-                    <span className="text-mute">Min. driver age</span>
-                    <span className="font-medium text-ink">28+</span>
-                  </div>
-                  <div className="flex items-baseline justify-between">
-                    <span className="text-mute">Driving experience</span>
-                    <span className="font-medium text-ink">5+ years</span>
-                  </div>
-                </div>
-
-                {/* Rentals-first pivot: the static fee-estimate mock +
-                    signup-gated contact CTA are replaced by the real
-                    inquiry form. One request → a named operator → the
-                    keys. Anon visitors get an account created alongside
-                    the inquiry; the lead itself is never gated. */}
-                <div className="mt-5 border-t border-rule pt-5">
-                  <RentalInquiryForm
-                    vehicleSlug={
-                      r.kind === "ryda" ? r.vehicle.symbol : r.vehicle.slug
-                    }
-                    vehicleName={title}
-                    market={market}
-                  />
-                </div>
-              </div>
+                    : "Fulfilled by a vetted Miami operator on their contract and insurance"
+                }
+              />
             </div>
           </div>
         </div>
