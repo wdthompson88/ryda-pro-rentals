@@ -15,9 +15,10 @@
 //               member can apply without re-registering)
 //   pending   — application received: review timeline + editable
 //               company profile
-//   approved  — live-ready: fleet panel (listing setup is white-glove,
-//               so it's an empty state until ops wires inventory) +
-//               editable company profile
+//   approved  — live-ready: fleet panel (the booking-request inbox at
+//               /partner/requests, badged with what's waiting; listing
+//               setup stays white-glove, so inventory is still an empty
+//               state until ops wires it) + editable company profile
 //   suspended — paused/declined notice + contact
 //
 // Status is admin-owned (/admin/partners). This page never writes it.
@@ -32,6 +33,15 @@ import {
   PARTNER_FLEET_SIZES,
   type PartnerAccount,
 } from "@/lib/partner";
+// From the lib, NOT from the inbox component: that module is "use
+// client" and imports RentalDatePicker, the admin action modal and the
+// quote engine at module scope, and this page renders none of them — it
+// renders a count badge. See src/lib/operator-bookings.ts.
+import { fetchOperatorBookings } from "@/lib/operator-bookings";
+import {
+  FOCUS_RING,
+  countOperatorRequests,
+} from "@/lib/rental-booking-display";
 
 // Admin approval bridges an application (partner_accounts) to a Stripe
 // operator (partners row). /api/partner/me surfaces that link as an
@@ -534,14 +544,72 @@ function PaymentsCard({
 }
 
 // Listing setup is white-glove (an ops conversation, not a self-serve
-// upload), so the approved fleet panel is an honest empty state until
-// inventory exists in the system.
+// upload), so the approved fleet panel is still an honest empty state
+// where INVENTORY is concerned. What it is no longer empty about is
+// BOOKINGS: build loop 2F puts the request inbox at /partner/requests,
+// and an operator has 24 hours to answer a request (open default O5),
+// so the count of what is waiting on them belongs on the page they
+// actually land on rather than behind a link they have no reason to
+// click.
+//
+// The count comes from the SAME fetch and the SAME predicate the inbox
+// itself uses — fetchOperatorBookings() + countOperatorRequests(),
+// which reads awaitsDecisionFrom (whose turn it is, per
+// rentalBookingDecider) and lazily expires anything past its window.
+// Two definitions of "waiting on you" would eventually disagree, and
+// the one on this page would be the one nobody notices is wrong.
+//
+// Best-effort: a failed load leaves the count unknown and the panel
+// simply does not badge it. The inbox is one click away and answers for
+// itself; a partner dashboard must not break because a booking table is
+// not applied yet.
 function FleetPanel() {
+  const [pending, setPending] = useState<number | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const res = await fetchOperatorBookings();
+      if (cancelled || !res.ok) return;
+      setPending(countOperatorRequests(res.bookings, Date.now()));
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <section className="rounded-2xl border border-rule bg-surface p-6 sm:p-8">
       <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
         Your fleet
       </p>
+
+      <Link
+        href="/partner/requests"
+        className={`mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-rule bg-cream-2/50 px-5 py-4 transition-colors hover:border-ink ${FOCUS_RING}`}
+      >
+        <span>
+          <span className="block font-display text-lg text-ink">
+            Booking requests
+          </span>
+          <span className="mt-1 block text-sm text-ink-soft">
+            {pending === null
+              ? "Renters asking for dates on your cars."
+              : pending === 0
+                ? "Nothing waiting on you right now."
+                : "Answer within 24 hours or the request expires."}
+          </span>
+        </span>
+        <span className="flex items-center gap-3">
+          {pending !== null && pending > 0 && (
+            <span className="inline-flex items-center rounded-full bg-red px-3 py-1 text-xs font-medium tabular-nums text-cream">
+              {pending} waiting
+            </span>
+          )}
+          <span className="text-sm font-medium text-ink">Open inbox →</span>
+        </span>
+      </Link>
+
       <div className="mt-4 rounded-xl border border-rule bg-cream-2/50 p-8 text-center">
         <p className="font-display text-lg text-ink">
           Listing setup starts with a conversation.

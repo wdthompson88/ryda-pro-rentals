@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { PhotoGallery } from "@/components/photo-gallery";
-import { RentalInquiryForm } from "@/components/rental-inquiry-form";
+import { RentalBookingCard } from "@/components/rental-booking-card";
 import { formatUSD } from "@/lib/market-data";
 import {
   PARTNER_VEHICLES,
@@ -144,57 +144,32 @@ export default async function RentDetailPage({
               </div>
             </div>
 
-            {/* Booking card */}
+            {/* Booking card. The headline rate lives INSIDE the client
+                card now: `dailyRate` here is partner-fleet.ts's static
+                figure, and the quote inside the form is priced from
+                rental_listings.daily_rate_cents — the card resolves the
+                two rather than rendering both. */}
             <div className="lg:col-span-4">
-              <div className="rounded-2xl border border-rule bg-surface p-6 shadow-sm">
-                <div className="flex items-baseline justify-between">
-                  <p className="font-display text-3xl text-ink tabular-nums">
-                    {formatUSD(dailyRate)}
-                  </p>
-                  <p className="text-sm text-mute">/day</p>
-                </div>
-                {r.regularRate && r.regularRate > dailyRate ? (
-                  <p className="mt-1 text-xs text-mute">
-                    Regular{" "}
-                    <span className="line-through tabular-nums">
-                      {formatUSD(r.regularRate)}
-                    </span>
-                    /day
-                  </p>
-                ) : null}
-                <p className="mt-1 text-xs text-ink-soft">
-                  Fulfilled by a Miami operator on their contract and
-                  insurance
-                </p>
-
-                {/* A "Driver requirements" panel stood here on all 37
-                    listing pages: "Min. driver age 28+" and "Driving
-                    experience 5+ years". Both figures are deleted, not
-                    softened. Neither appears in partner-fleet.ts, in
-                    any migration, or in anything the operator sends us
-                    — the previous comment admitted they were "kept from
-                    the old estimate card" — and Terms §3 plus
-                    /trust-and-safety both state that eligibility to
-                    rent a particular car is the operator's to set and
-                    can differ car to car. A platform-wide number here
-                    turns away drivers the operator would rent to and
-                    implies RYDA checks something it never sees. There
-                    is no replacement panel: RYDA has no eligibility
-                    data to show. */}
-
-                {/* Rentals-first pivot: the static fee-estimate mock +
-                    signup-gated contact CTA are replaced by the real
-                    inquiry form. One request → a named operator → the
-                    keys. Anon visitors get an account created alongside
-                    the inquiry; the lead itself is never gated. */}
-                <div className="mt-5 border-t border-rule pt-5">
-                  <RentalInquiryForm
-                    vehicleSlug={r.slug}
-                    vehicleName={title}
-                    market={market}
-                  />
-                </div>
-              </div>
+              {/* A "Driver requirements" panel stood here on all 37
+                  listing pages: "Min. driver age 28+" and "Driving
+                  experience 5+ years". Both figures are deleted, not
+                  softened. Neither appears in partner-fleet.ts, in any
+                  migration, or in anything the operator sends us, and
+                  Terms §3 plus /trust-and-safety both state that
+                  eligibility to rent a particular car is the operator's
+                  to set and can differ car to car. A platform-wide number
+                  turns away drivers the operator would rent to and implies
+                  RYDA checks something it never sees. The booking card
+                  below deliberately does not reinstate it: RYDA still has
+                  no eligibility data to show. */}
+              <RentalBookingCard
+                vehicleSlug={r.slug}
+                vehicleName={title}
+                market={market}
+                fallbackDailyRate={dailyRate}
+                regularRate={r.regularRate ?? null}
+                includesNote="Fulfilled by a Miami operator on their contract and insurance"
+              />
             </div>
           </div>
         </div>

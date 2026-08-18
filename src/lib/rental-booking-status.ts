@@ -40,6 +40,35 @@ export const RENTAL_BOOKING_STATUSES = [
 export type RentalBookingStatus = (typeof RENTAL_BOOKING_STATUSES)[number];
 
 /**
+ * The statuses by name, so nothing outside this file writes one as a
+ * bare string.
+ *
+ * The two shapes a route needs — `.eq("status", "requested")` and
+ * `.update({ status: "confirmed" })` — are BOTH untyped at the
+ * supabase-js boundary: `.eq()` takes a string and an update object takes
+ * anything, so `"requsted"` compiles cleanly, matches no row, and
+ * surfaces as a 409 claiming the request was already answered. Going
+ * through this object turns every mention of a status into a property
+ * access the compiler resolves against 0047's CHECK constraint, and makes
+ * "what cares about `confirmed`" a single grep.
+ *
+ * `as const satisfies { [K in RentalBookingStatus]: K }` is doing real
+ * work in both halves: `as const` keeps the literal types, so a value
+ * from here can still narrow a union, and the `satisfies` clause pins
+ * key to value, so a status that is missing, misspelled, or mapped to a
+ * neighbour's string is a compile error rather than a runtime one.
+ */
+export const RENTAL_BOOKING_STATUS = {
+  requested: "requested",
+  confirmed: "confirmed",
+  in_progress: "in_progress",
+  completed: "completed",
+  declined: "declined",
+  expired: "expired",
+  cancelled: "cancelled",
+} as const satisfies { readonly [K in RentalBookingStatus]: K };
+
+/**
  * The legal transition map, mirroring the trigger in 0047 §4.
  *
  * Typed as a total Record over the union, which is what makes it
