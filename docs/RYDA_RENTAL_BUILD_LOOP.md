@@ -506,8 +506,8 @@ Condensed from a full read-only inventory. **KEEP** = leave as-is; **MODIFY** = 
 
 Tick as PRs merge; add the PR link + one line each. (Boxes mirror §4.)
 
-**Migration head: 0050.** Nothing below is applied to a database yet — see the
-note under the table.
+**Migration head: 0050 — applied.** Local and remote agree through 0050, and the
+37-car fleet is seeded. See the state note under the table.
 
 | | Task | PR | Note |
 |---|---|---|---|
@@ -540,14 +540,27 @@ Plus, beyond §4's original list:
 | [x] | Seed the static fleet into `rental_listings` | #25 | `npm run seed:rental-listings` — without this the whole loop is unreachable |
 | [x] | `instant_book` per-listing flag | #25 | migration 0050. Column only; nothing reads it until 3B makes it honest |
 
-### Blocking everything above: the migrations are not applied
+### Database state (2026-08-18)
 
-**0044–0050 have never been applied to any database.** Every rental route
-degrades deliberately — a missing table answers
-`{ available: false, reason: 'not_configured' }` with a 200 and the date picker
-falls back to plain `<input type="date">`. So the entire booking loop can be
-merged, green, and invisible. Apply in numeric order (SETUP.md §1), then run the
-seed, then confirm a calendar renders on `/rent/<any-slug>`.
+**0044–0050 are applied** to the linked project, and `npm run seed:rental-listings:apply`
+has inserted all 37 static cars. Verified end to end against the live database:
+`GET /api/rental-availability/lamborghini-huracan-evo` returns a 180-day open calendar,
+and a Sep 12→15 range prices at 3 nights × $1,105 = **$3,315** with
+`feePayer: "operator"` and `renterTotalCents == baseAmountCents`. The public payload
+carries no commission, operator, or VIN, so the D6 boundary holds on the anonymous route.
+
+0048's columns landed with behavior-preserving defaults — GM LUXE reads
+`fee_mode: percent`, `fee_payer: operator`, `commission_rate: 0.150` — which is what
+keeps seam 1 below latent rather than live.
+
+Two things this does **not** mean:
+
+- **The booking loop is not in production.** PR #24 is not merged, so deployed code has no
+  `/api/rental-bookings` and no date picker. The schema and the rows are ahead of the
+  code, which is the correct order (expand, then deploy) — but nothing is renter-visible
+  until #24 and #25 land.
+- **Every route still degrades on a missing table**, and that behavior is worth keeping.
+  It is why a half-applied chain never 500s a public page.
 
 ### Two open seams worth naming
 
