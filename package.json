@@ -28,7 +28,9 @@
     "marketing:smoke-video": "tsx scripts/marketing/video/__smoke__/composer-smoke.ts",
     "marketing:brief": "tsx scripts/marketing/daily-brief.ts",
     "sample-docs:pdf": "node scripts/generate-sample-document-pdfs.mjs",
-    "check:dropbox-sign": "tsx scripts/check-dropbox-sign.ts"
+    "check:dropbox-sign": "tsx scripts/check-dropbox-sign.ts",
+    "seed:rental-listings": "tsx scripts/seed-rental-listings.ts",
+    "seed:rental-listings:apply": "tsx scripts/seed-rental-listings.ts --apply"
   },
   "dependencies": {
     "@dropbox/sign": "^1.10.0",
