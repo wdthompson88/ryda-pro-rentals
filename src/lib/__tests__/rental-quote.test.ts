@@ -42,7 +42,7 @@ import {
   type RentalAvailabilityRow,
 } from "../rental-availability";
 import {
-  RENTAL_FEE_PAYER_CURRENT,
+
   RENTAL_QUOTE_CURRENCY,
   canStartStay,
   checkOpenRange,
@@ -198,7 +198,7 @@ describe("quoteRentalBooking — fees come from fees.ts", () => {
   });
 
   it("honours a per-operator commission rate", () => {
-    const res = quote({ commissionRate: 0.2 });
+    const res = quote({ feeConfig: { rate: 0.2 } });
     expect(res.ok).toBe(true);
     if (!res.ok) return;
     const base = DAILY_RATE_CENTS * 3;
@@ -214,15 +214,15 @@ describe("quoteRentalBooking — fees come from fees.ts", () => {
   });
 
   it("rejects an out-of-contract rate instead of clamping or throwing", () => {
-    expect(quote({ commissionRate: 0.9 })).toEqual({
+    expect(quote({ feeConfig: { rate: 0.9 } })).toEqual({
       ok: false,
       reason: "invalid_fee_config",
     });
-    expect(quote({ commissionRate: -0.1 })).toEqual({
+    expect(quote({ feeConfig: { rate: -0.1 } })).toEqual({
       ok: false,
       reason: "invalid_fee_config",
     });
-    expect(quote({ commissionRate: Number.NaN })).toEqual({
+    expect(quote({ feeConfig: { rate: Number.NaN } })).toEqual({
       ok: false,
       reason: "invalid_fee_config",
     });
@@ -232,7 +232,7 @@ describe("quoteRentalBooking — fees come from fees.ts", () => {
     for (const rate of [0, 0.05, 0.15, 0.3, 0.5]) {
       for (const nights of [1, 2, 7, 30]) {
         const res = quote({
-          commissionRate: rate,
+          feeConfig: { rate },
           startDate: "2026-08-10",
           endDate: addUtcDays("2026-08-10", nights)!,
         });
@@ -251,6 +251,102 @@ describe("quoteRentalBooking — fees come from fees.ts", () => {
         expect(q.operatorNetCents).toBeGreaterThanOrEqual(0);
         expect(q.depositAmountCents).toBeGreaterThanOrEqual(0);
       }
+    }
+  });
+
+  // ── fee_payer = 'renter' (D2, 0048) ───────────────────────────────
+  //
+  // The half this module could not express before 0048. Until the fee
+  // config replaced a bare commissionRate, every quote was priced as
+  // operator-pays regardless of the operator's actual terms — so a
+  // renter-pays operator's fee was silently deducted from their payout
+  // instead of added to the renter's card, and the admin preview and the
+  // frozen snapshot disagreed about the same booking.
+
+  it("adds the fee ON TOP for a renter-pays operator", () => {
+    const res = quote({ feeConfig: { payer: "renter", rate: 0.2 } });
+    expect(res.ok).toBe(true);
+    if (!res.ok) return;
+    const base = DAILY_RATE_CENTS * 3;
+    const fee = Math.round(base * 0.2);
+    expect(res.quote.feePayer).toBe("renter");
+    expect(res.quote.baseAmountCents).toBe(base);
+    expect(res.quote.feeCents).toBe(fee);
+    // The renter pays base + fee; the operator keeps the whole base.
+    expect(res.quote.renterTotalCents).toBe(base + fee);
+    expect(res.quote.operatorNetCents).toBe(base);
+  });
+
+  it("satisfies rental_bookings_quote_consistent for fee_payer = renter", () => {
+    for (const rate of [0, 0.05, 0.15, 0.3, 0.5]) {
+      for (const nights of [1, 2, 7, 30]) {
+        const res = quote({
+          feeConfig: { payer: "renter", rate },
+          startDate: "2026-08-10",
+          endDate: addUtcDays("2026-08-10", nights)!,
+        });
+        expect(res.ok).toBe(true);
+        if (!res.ok) continue;
+        const q = res.quote;
+        // The other branch of 0047's CHECK:
+        //   renter → renter_total = base + fee and operator_net = base
+        expect(q.feePayer).toBe("renter");
+        expect(q.renterTotalCents).toBe(q.baseAmountCents + q.feeCents);
+        expect(q.operatorNetCents).toBe(q.baseAmountCents);
+        expect(q.renterTotalCents).toBeGreaterThan(0);
+        expect(q.operatorNetCents).toBeGreaterThanOrEqual(0);
+      }
+    }
+  });
+
+  it("prices a flat fee, under either payer", () => {
+    const flat = 7_500;
+    const base = DAILY_RATE_CENTS * 3;
+
+    const operatorPays = quote({
+      feeConfig: { mode: "flat", flatCents: flat, payer: "operator" },
+    });
+    expect(operatorPays.ok).toBe(true);
+    if (operatorPays.ok) {
+      expect(operatorPays.quote.feeCents).toBe(flat);
+      expect(operatorPays.quote.renterTotalCents).toBe(base);
+      expect(operatorPays.quote.operatorNetCents).toBe(base - flat);
+    }
+
+    const renterPays = quote({
+      feeConfig: { mode: "flat", flatCents: flat, payer: "renter" },
+    });
+    expect(renterPays.ok).toBe(true);
+    if (renterPays.ok) {
+      expect(renterPays.quote.feeCents).toBe(flat);
+      expect(renterPays.quote.renterTotalCents).toBe(base + flat);
+      expect(renterPays.quote.operatorNetCents).toBe(base);
+    }
+  });
+
+  it("honours a floor and a cap", () => {
+    const base = DAILY_RATE_CENTS * 3;
+
+    const floored = quote({ feeConfig: { rate: 0, floorCents: 5_000 } });
+    expect(floored.ok && floored.quote.feeCents).toBe(5_000);
+
+    const capped = quote({ feeConfig: { rate: 0.5, capCents: 1_000 } });
+    expect(capped.ok && capped.quote.feeCents).toBe(1_000);
+    // A cap still leaves the operator whole-minus-fee, not whole-minus-raw.
+    expect(capped.ok && capped.quote.operatorNetCents).toBe(base - 1_000);
+  });
+
+  it("never lets a fee exceed the base under operator-pays", () => {
+    // operator_net_cents >= 0 is a 0047 column CHECK, so a floor larger
+    // than the whole rental must not produce a negative payout row.
+    const base = DAILY_RATE_CENTS * 3;
+    const res = quote({
+      feeConfig: { rate: 0, floorCents: base * 2, payer: "operator" },
+    });
+    if (res.ok) {
+      expect(res.quote.operatorNetCents).toBeGreaterThanOrEqual(0);
+    } else {
+      expect(res.reason).toBe("invalid_fee_config");
     }
   });
 
@@ -611,7 +707,10 @@ describe("0047 agreement", () => {
     const allowed = (match?.[1] ?? "")
       .split(",")
       .map((s) => s.trim().replace(/^'|'$/g, ""));
-    expect(allowed).toContain(RENTAL_FEE_PAYER_CURRENT);
+    // Both payers are now quotable — RENTAL_FEE_PAYER_CURRENT is gone
+    // and the payer comes from the operator's 0048 row.
+    expect(allowed).toContain("operator");
+    expect(allowed).toContain("renter");
     // The union in rental-quote.ts must be exactly the column's domain —
     // a value added in SQL without one here silently becomes unquotable.
     expect(allowed.sort()).toEqual(["operator", "renter"]);

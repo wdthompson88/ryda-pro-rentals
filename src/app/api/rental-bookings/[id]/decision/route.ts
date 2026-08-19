@@ -48,6 +48,12 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 import { getUserFromRequest } from "@/lib/api-auth";
 import { requireAdmin } from "@/lib/admin-auth";
 import { isAllowed, clientIp } from "@/lib/rate-limit";
+import {
+  PARTNER_FEE_SELECT,
+  rentalFeeConfigFromPartner,
+  type PartnerFeeColumns,
+  type RentalFeeConfig,
+} from "@/lib/fees";
 import { isColumnMissing } from "@/lib/partner-resolution";
 import {
   DEFAULT_BOOKING_HORIZON_DAYS,
@@ -738,18 +744,24 @@ async function propose(
     );
   }
 
-  let commissionRate: number | undefined;
+  // The operator's full fee terms (0048), not commission_rate alone.
+  // This route re-quotes a counter-offer, so it must reach the same
+  // numbers the request route did for the same operator — reading a
+  // narrower set of columns here than the POST reads is how a
+  // counter-offer would come to be priced on different terms from the
+  // request it answers.
+  let feeConfig: RentalFeeConfig | undefined;
   const partnerRes = await db
     .from("partners")
-    .select("commission_rate")
+    .select(PARTNER_FEE_SELECT)
     .eq("id", listing.partner_id)
     .maybeSingle();
   if (partnerRes.error) {
-    console.warn("[rental-decision · commission]", partnerRes.error.message);
-  } else {
-    const raw = partnerRes.data?.commission_rate;
-    const rate = typeof raw === "string" ? Number(raw) : raw;
-    if (typeof rate === "number" && Number.isFinite(rate)) commissionRate = rate;
+    console.warn("[rental-decision · fee terms]", partnerRes.error.message);
+  } else if (partnerRes.data) {
+    feeConfig = rentalFeeConfigFromPartner(
+      partnerRes.data as unknown as PartnerFeeColumns,
+    );
   }
 
   const quoted = quoteRentalBooking({
@@ -758,7 +770,7 @@ async function propose(
     endDate: decision.endDate,
     rows: (availability.data ?? []) as RentalAvailabilityRow[],
     booked: (bookedRes.data ?? []) as BookedRange[],
-    commissionRate,
+    feeConfig,
   });
   if (!quoted.ok) {
     return NextResponse.json(

@@ -386,6 +386,37 @@ export type PartnerFeeColumns = {
   fee_cap_cents?: number | string | null;
 };
 
+/**
+ * The 0048 fee-terms column names, as a select list.
+ *
+ * Hoisted here because THREE rails now price with them — the admin
+ * payment-link route, the booking request, and the operator decision —
+ * and a route that forgets one does not fail: rentalFeeConfigFromPartner
+ * simply sees no such key and resolves that term to its default. A
+ * missing `fee_payer` in a select list is therefore indistinguishable
+ * from an operator who is on operator-pays, which is exactly how the
+ * booking path came to charge a renter-pays operator's fee to the
+ * operator for an entire release.
+ *
+ * Kept separate from commission_rate (0041) because the pre-0048
+ * fallback in payment-link retries with only the older column, and that
+ * retry needs the two lists to be distinguishable.
+ */
+export const PARTNER_FEE_COLUMNS = [
+  "fee_mode",
+  "fee_flat_cents",
+  "fee_payer",
+  "fee_floor_cents",
+  "fee_cap_cents",
+] as const;
+
+/**
+ * Everything computeRentalFee needs about an operator, as one select
+ * string. Any route pricing a rental should use this rather than naming
+ * columns by hand.
+ */
+export const PARTNER_FEE_SELECT = `commission_rate, ${PARTNER_FEE_COLUMNS.join(", ")}`;
+
 /** null / undefined stay absent (so the default applies); anything else
  *  is coerced once, here, rather than at four call sites. Note that
  *  Number(null) === 0 — coercing a null commission_rate would quietly
