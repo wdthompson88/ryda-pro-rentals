@@ -4,7 +4,7 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { HeroSearch } from "@/components/hero-search";
 import { Reveal, RevealStagger } from "@/components/reveal";
-import { VEHICLES, formatUSD } from "@/lib/market-data";
+import { formatUSD } from "@/lib/market-data";
 import {
   PARTNER_VEHICLES,
   getPartnerHero,
@@ -16,42 +16,40 @@ import {
 // hero, featured fleet, how it works, straight answers, closing CTA —
 // and the car-browsing grid lives at /rent, one click away.
 //
-// The model in one breath: browse → request with dates → a vetted
-// Miami operator confirms and closes the rental on their own contract
-// and insurance. Operators pay RYDA a referral commission on bookings
-// we send them. Operators are never named publicly; they introduce
-// themselves when they confirm.
+// The model in one breath: browse → request with dates → RYDA passes
+// the request to the operator who runs that car → the operator confirms
+// and closes the rental on their own contract and insurance. Operators
+// pay RYDA a referral commission on bookings we send them. Operators are
+// never named publicly; they introduce themselves when they confirm.
 //
-// Ownership-program content stays OFF this page entirely — that
-// program's single quiet home is its own page, reachable from the
-// footer (Cars column in site-footer) and a quiet pointer at the
-// end of /how-it-works.
-
-// og/twitter are declared here in full because Next merges metadata
-// shallowly per top-level key: without them the home page inherits
-// the root layout's co-ownership-led social card ("Supercar
-// co-ownership and rentals"), which contradicts the rental-first
-// rule above the moment the URL is pasted into iMessage/Slack/X.
-const HOME_SOCIAL_DESCRIPTION =
-  "Miami's most-wanted exotics. One request away. Pick a car, send your dates, and a vetted Miami operator confirms directly with you — no card, no payment through RYDA.";
-
-export const metadata: Metadata = {
-  title: "Rent Miami's most-wanted exotics",
-  description: HOME_SOCIAL_DESCRIPTION,
-  openGraph: {
-    title: "RYDA — Rent Miami's most-wanted exotics",
-    description: HOME_SOCIAL_DESCRIPTION,
-    siteName: "RYDA",
-    type: "website",
-    locale: "en_US",
-    url: "/",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "RYDA — Rent Miami's most-wanted exotics",
-    description: HOME_SOCIAL_DESCRIPTION,
-  },
-};
+// FOUR THINGS THIS PAGE MAY NOT SAY:
+//
+// 1. "Exotics" / "supercars" as the whole product. Only 6 of the 37
+//    listings carry category "Exotic". The honest story is RANGE —
+//    everyday cars through exotics — not a supercar showroom. Do not
+//    swing to the opposite falsehood either: the Ferraris and
+//    Lamborghinis are real.
+// 2. That a request reaches the operator directly. It does not.
+//    PARTNER_INQUIRY_EMAILS in src/lib/partner-contacts.ts is empty (its
+//    one entry is commented out pending a signed referral agreement), so
+//    every lead falls back to the RYDA team inbox and is passed on by
+//    hand. "We pass your request to the operator" is the true sentence.
+// 3. Any fleet-wide rate figure — a range, a median, an average, a
+//    "from $X", a count of cars under some price. Deleted Aug 2026 and
+//    not to be re-derived: those figures are out of the copy by
+//    operator decision. The rate data itself is sound — see the note
+//    above the constants below.
+// 4. That the cars come from several operators. PartnerVehicle.partner
+//    is the literal type "GM LUXE" — one operator runs all 37 — so a
+//    plural supply side ("independent Miami operators") is a roster
+//    claim, deleted rather than reworded.
+//
+// Every count and marque below is derived from PARTNER_VEHICLES at
+// build time rather than typed in, so this page cannot advertise a car
+// a visitor will not find on /rent.
+//
+// Ownership-program content does not belong here, or anywhere in this
+// repo — that product was removed in the rentals-first strip.
 
 // ─────────────────────────────────────────────────────────────────────────
 // Data — assembled at module scope (build time). The four highest daily
@@ -69,10 +67,47 @@ const FEATURED: PartnerVehicle[] = [...PARTNER_VEHICLES]
 const HERO_CAR = FEATURED[0];
 const HERO_PHOTO = HERO_CAR ? getPartnerHero(HERO_CAR) : undefined;
 
-// Total browsable inventory: partner fleet + RYDA cars flagged
-// rentalAvailable — the same merge /rent renders.
-const FLEET_COUNT =
-  PARTNER_VEHICLES.length + VEHICLES.filter((v) => v.rentalAvailable).length;
+// Total browsable inventory. RYDA owns no cars, so this is exactly the
+// partner fleet — the same list /rent renders. Advertising any other
+// number here is advertising cars a visitor cannot find.
+const FLEET_COUNT = PARTNER_VEHICLES.length;
+const MAKE_COUNT = new Set(PARTNER_VEHICLES.map((v) => v.make)).size;
+// NO FLEET-WIDE RATE ARITHMETIC HERE. A rate range, a median, an
+// "under $300" count or a "from $X" floor stays out of the copy by
+// operator decision — NOT because the rates are wrong. An earlier note
+// in this repo called the pricing data broken and quoted $1/day
+// listings; that was a reading bug, not a data bug. partner-fleet.ts
+// writes rates with JavaScript numeric separators (dailyRate: 1_403),
+// and a regex matching [0-9]+ truncated them at the underscore. The
+// rate table is correct as written, and any script that parses it has
+// to handle the separators. Per-car rates on the cards below are the
+// operator's own listed rate and stay; nothing aggregates them.
+
+// og/twitter are declared here in full because Next merges metadata
+// shallowly per top-level key. The root layout's card is rental-first
+// too, but declaring these locally keeps the home page's social card
+// pinned to the home page's own copy rather than inheriting whatever
+// the layout says later.
+const HOME_SOCIAL_DESCRIPTION =
+  `Miami cars, everyday to exotic. ${FLEET_COUNT} listings. Pick a car, send your dates, and the operator confirms directly with you — no card at request.`;
+
+export const metadata: Metadata = {
+  title: "Rent a car in Miami — everyday to exotic",
+  description: HOME_SOCIAL_DESCRIPTION,
+  openGraph: {
+    title: "RYDA — Rent a car in Miami, everyday to exotic",
+    description: HOME_SOCIAL_DESCRIPTION,
+    siteName: "RYDA",
+    type: "website",
+    locale: "en_US",
+    url: "/",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "RYDA — Rent a car in Miami, everyday to exotic",
+    description: HOME_SOCIAL_DESCRIPTION,
+  },
+};
 
 export default function HomePage() {
   return (
@@ -84,14 +119,20 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-6 sm:px-10">
           <Reveal>
             <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-              Exotic rentals · Miami
+              Car rental · Miami
             </p>
             <h1 className="mt-4 max-w-3xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl">
-              Miami&apos;s most-wanted exotics. One request away.
+              Miami cars, everyday to exotic. One request away.
             </h1>
+            {/* "from independent Miami operators" is deleted, not
+                reworded: PartnerVehicle.partner is the literal type
+                "GM LUXE", so all {FLEET_COUNT} listings belong to ONE
+                operator and the plural was a claim about a roster that
+                does not exist. The rate range went with it (see the
+                note above the constants). */}
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-ink-soft">
-              Pick a car, send your dates, and a vetted Miami operator
-              confirms directly with you.
+              {FLEET_COUNT} cars. Pick one, send your dates, and we pass
+              your request to the operator who runs it.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-5">
               <Link
@@ -161,9 +202,26 @@ export default function HomePage() {
             <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
               Featured fleet
             </p>
-            <h2 className="mt-3 max-w-2xl font-display text-3xl text-ink md:text-4xl">
-              The cars Miami asks for by name.
-            </h2>
+            {/* The H2 here was "The cars Miami asks for by name." —
+                deleted. Nothing in this repo measures what Miami asks
+                for; there is no demand signal, no search log and no
+                booking history behind that sentence. The eyebrow above
+                names the section factually and is enough.
+                NOTE: tests/example.spec.ts:25 still asserts the deleted
+                heading and will fail until that assertion is removed.
+
+                The paragraph under it counterweighted the strip (which
+                is the four dearest cars with photos) by naming the body
+                types in the same grid. The category mix is real — 16
+                SUV, 8 Convertible, 6 Exotic, 5 Sedan, 1 7-Seater, 1 EV
+                — but the sentence ended in an "under $300 a day" count,
+                a fleet-wide rate statistic. Those stay out by operator
+                decision, not because the rates are wrong. The clause is
+                gone. */}
+            <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-soft">
+              The same grid holds SUVs, sedans, convertibles, a seven-seater
+              and an EV.
+            </p>
           </Reveal>
           <RevealStagger
             className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3"
@@ -206,17 +264,21 @@ export default function HomePage() {
             <StepCard
               n="01"
               title="Browse the fleet"
-              body="One curated grid — Lamborghini, Ferrari, Rolls-Royce and the rest of Miami's most-wanted inventory. Every listing is real, bookable stock."
+              // "Every listing is real, bookable stock" is deleted:
+              // nothing in this repo knows whether a car is free on any
+              // date — the operator confirms availability, which the
+              // third step says.
+              body={`One grid, ${FLEET_COUNT} cars across ${MAKE_COUNT} makes — Toyota and Tesla through Land Rover and Porsche to Ferrari and Lamborghini.`}
             />
             <StepCard
               n="02"
               title="Request your dates"
-              body="A 30-second account saves your details for next time; no card, no payment through RYDA."
+              body="A 30-second account saves your details for next time; no card at request."
             />
             <StepCard
               n="03"
               title="The operator confirms"
-              body="Availability, final price, and keys, directly with you — on their contract and insurance."
+              body="We pass your request to the operator who runs that car. Availability, final price and keys come back directly from them — on their contract and insurance."
             />
           </RevealStagger>
           <Reveal delayMs={80}>
@@ -245,14 +307,17 @@ export default function HomePage() {
               What RYDA is — and what it isn&apos;t.
             </h2>
           </Reveal>
+          {/* A fourth pillar, "Vetted operators" — "an independent
+              Miami operator we've vetted — real fleet, real garage" —
+              is deleted whole. The only operator check this codebase
+              performs is Stripe Connect onboarding of a business and a
+              bank account. Nothing reads an insurance certificate,
+              counts a fleet or inspects a garage, and /trust-and-safety
+              says so in writing. Three pillars, three true ones. */}
           <RevealStagger
-            className="mt-10 grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4"
+            className="mt-10 grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3"
             staggerMs={80}
           >
-            <InkPillar
-              title="Vetted operators"
-              body="Every car is run by a Miami operator we've vetted — real fleet, real garage. They introduce themselves when they confirm."
-            />
             <InkPillar
               title="Their contract & insurance"
               body="The rental closes on the operator's own agreement and coverage — the same terms you'd get going direct."
@@ -262,7 +327,7 @@ export default function HomePage() {
               body="No markup, no booking fee. Requesting through RYDA never costs more than going direct."
             />
             <InkPillar
-              title="No payment through RYDA"
+              title="No card at request"
               body="No card at request. Nothing is charged until you and the operator confirm the booking together."
             />
           </RevealStagger>

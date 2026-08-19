@@ -7,7 +7,28 @@ import { StepProgress } from "@/components/step-progress";
 import { authedFetch } from "@/lib/api-fetch";
 import { supabase } from "@/lib/supabase";
 
-const STEPS = ["Basic", "Phone", "Personal", "Identity", "Financial", "Tier", "Done"];
+// Basic → Identity → Done. Every step here is wired to something real:
+// Basic writes name/phone to user_metadata, Identity is the Stripe
+// Identity entry point (kept deliberately for renter verification), and
+// Done is a confirmation.
+//
+// Four steps have been removed over two passes, all for the same
+// reason — they described or collected things nothing in this codebase
+// does. "Financial" and "Tier" went with the rentals-first strip (they
+// were co-ownership disclaimers and share-buy-in credits). "Phone" and
+// "Personal" went in the truth pass: Phone told the user "we sent a
+// 6-digit code to your number" when no code-sending code exists, and
+// Personal collected date of birth, driver's licence number and a home
+// address — none of them persisted anywhere, under the stated reason
+// "required for insurance underwriting. RYDA membership is 28+", and
+// RYDA underwrites no insurance and has no membership. Stripe Identity
+// already reads name, DOB and address off the document, so there was
+// nothing left for that step to honestly do.
+//
+// "Takes 30 seconds" is gone from the Basic step for the same reason
+// ./layout.tsx lost "Most members finish in under 8 minutes": nothing
+// in this repo times a completion, so neither figure had a source.
+const STEPS = ["Basic", "Identity", "Done"];
 const IDENTITY_STEP = STEPS.indexOf("Identity");
 
 export default function OnboardingPage() {
@@ -22,7 +43,7 @@ export default function OnboardingPage() {
   // Stripe Identity returns to `/onboarding?kyc=ok` (the return_url is
   // built in api/kyc/start). The wizard's position is component state,
   // so without this the user would land back on step 1 having just
-  // completed step 4. Read from window rather than useSearchParams to
+  // completed step 2. Read from window rather than useSearchParams to
   // avoid forcing a Suspense boundary on an already-client page.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -36,7 +57,7 @@ export default function OnboardingPage() {
       <SiteHeader />
       <section className="mx-auto max-w-2xl px-6 py-12 sm:px-10 sm:py-16">
         <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-          Member onboarding
+          Account setup
         </p>
         <h1 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
           {STEPS[step] === "Done"
@@ -44,26 +65,22 @@ export default function OnboardingPage() {
             : "Let's get you set up."}
         </h1>
         <p className="mt-2 text-sm text-ink-soft">
-          Step {step + 1} of {STEPS.length} · Most members complete this in
-          under 8 minutes.
+          Step {step + 1} of {STEPS.length}
         </p>
 
         <div className="mt-12 rounded-2xl border border-rule bg-surface p-8 sm:p-10">
           <StepProgress steps={STEPS} current={step} />
 
           {step === 0 && <Basic onNext={next} />}
-          {step === 1 && <Phone onNext={next} onBack={back} />}
-          {step === 2 && <Personal onNext={next} onBack={back} />}
-          {step === 3 && (
+          {step === 1 && (
             <Identity onNext={next} onBack={back} returned={kycReturned} />
           )}
-          {step === 4 && <Financial onNext={next} onBack={back} />}
-          {step === 5 && <Tier onNext={next} onBack={back} />}
-          {step === 6 && <Done />}
+          {step === 2 && <Done />}
         </div>
 
         <p className="mt-6 text-center text-xs text-mute">
-          Your progress saves automatically. You can pick up where you left off.
+          Your name and number save to your account when you continue, and the
+          identity step picks up wherever Stripe left it.
         </p>
       </section>
     </>
@@ -193,7 +210,7 @@ function Basic({ onNext }: { onNext: () => void }) {
       <p className="mt-2 text-sm text-ink-soft">
         {emailLocked
           ? "Your email carries over from sign-in — just add your name and number. You'll never be asked for these again."
-          : "We'll start with the basics. Takes 30 seconds."}
+          : "We'll start with the basics."}
       </p>
       {session === "anon" && supabase && (
         <p className="mt-4 rounded-xl border border-rule bg-cream-2/40 p-3 text-xs text-ink-soft">
@@ -242,67 +259,7 @@ function Basic({ onNext }: { onNext: () => void }) {
   );
 }
 
-function Phone({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
-  return (
-    <div>
-      <h2 className="font-display text-2xl text-ink">Verify your phone.</h2>
-      <p className="mt-2 text-sm text-ink-soft">
-        We sent a 6-digit code to your number. Type it below.
-      </p>
-      <fieldset className="mt-8 border-0 p-0">
-        <legend className="sr-only">6-digit phone verification code</legend>
-        <div className="mx-auto flex max-w-sm justify-between gap-2">
-          {Array.from({ length: 6 }, (_, i) => (
-            <input
-              key={i}
-              id={`onboarding-otp-${i + 1}`}
-              name={`otp-${i + 1}`}
-              type="text"
-              inputMode="numeric"
-              maxLength={1}
-              autoComplete={i === 0 ? "one-time-code" : "off"}
-              aria-label={`Verification code digit ${i + 1} of 6`}
-              className="h-14 w-12 rounded-xl border border-rule bg-cream text-center font-display text-2xl text-ink focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
-            />
-          ))}
-        </div>
-        <p className="mt-4 text-center text-xs text-mute">
-          Didn't get it?{" "}
-          <button type="button" className="text-red hover:text-red-deep">
-            Resend
-          </button>
-        </p>
-      </fieldset>
-      <BackNext onBack={onBack} onNext={onNext} />
-    </div>
-  );
-}
-
-function Personal({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
-  return (
-    <div>
-      <h2 className="font-display text-2xl text-ink">Personal details.</h2>
-      <p className="mt-2 text-sm text-ink-soft">
-        Required for insurance underwriting. RYDA membership is 28+.
-      </p>
-      <div className="mt-8 space-y-4">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <Field label="Date of birth" type="date" />
-          <Field label="Driver's license #" />
-        </div>
-        <Field label="Street address" autoComplete="street-address" />
-        <div className="grid grid-cols-3 gap-4">
-          <Field label="City" autoComplete="address-level2" />
-          <Field label="State" autoComplete="address-level1" />
-          <Field label="ZIP" autoComplete="postal-code" />
-        </div>
-      </div>
-      <BackNext onBack={onBack} onNext={onNext} />
-    </div>
-  );
-}
-
-// Identity — the one step in this wizard wired to a real backend.
+// Identity — the Stripe Identity entry point.
 // POSTs to /api/kyc/start, which mints a Stripe Identity session and
 // returns a hosted URL; we hand the browser over to Stripe and it
 // returns to /onboarding?kyc=ok.
@@ -399,21 +356,26 @@ function Identity({
   // The webhook that flips the row to 'verified' lands out-of-band, so
   // someone who just finished at Stripe can still read as
   // 'requires_input' here for a few seconds. Treat the return trip
-  // itself as enough to move on — this wizard is not the gate. The
-  // rental API re-checks verification server-side before any booking.
+  // itself as enough to move on — this wizard is not a gate, and nor is
+  // anything downstream of it: no route in this repo requires a
+  // 'verified' kyc_verifications row before a rental request is
+  // accepted. Say nothing here that implies otherwise.
   const canContinue = phase === "verified" || phase === "pending" || returned;
 
   return (
     <div>
       <h2 className="font-display text-2xl text-ink">Identity verification.</h2>
       <p className="mt-2 text-sm text-ink-soft">
-        We use Stripe Identity to verify your government ID and match it to a
-        live selfie. Takes 2–3 minutes.
+        We use Stripe Identity to check a government ID and match it to a live
+        selfie.
       </p>
       <ul className="mt-8 space-y-4">
         <Bullet ok>Government photo ID</Bullet>
         <Bullet ok>Live selfie match</Bullet>
-        <Bullet>Stripe checks the document — RYDA gets a pass or fail</Bullet>
+        <Bullet>
+          Stripe captures and checks the document. RYDA stores the result, plus
+          the name, date of birth and address Stripe reads off it.
+        </Bullet>
       </ul>
 
       {phase === "verified" && (
@@ -424,8 +386,8 @@ function Identity({
 
       {phase !== "verified" && (returned || phase === "pending") && (
         <p className="mt-8 rounded-xl border border-warn/30 bg-warn/15 px-4 py-3 text-sm text-warn-deep">
-          Verification submitted. Stripe usually clears it within minutes —
-          we&rsquo;ll email you when it does. You can continue in the meantime.
+          Verification submitted. Stripe is still processing it — the current
+          status is on your verification page. You can continue in the meantime.
         </p>
       )}
 
@@ -451,109 +413,14 @@ function Identity({
       )}
 
       <p className="mt-4 text-center text-xs text-mute">
-        Stripe Identity stores verification data, not RYDA. See our{" "}
+        Stripe handles the document capture and the selfie; RYDA keeps the
+        result and the identity details Stripe returns from it. See our{" "}
         <Link href="/legal/privacy" className="underline hover:text-ink">
           Privacy Policy
         </Link>
         .
       </p>
       <BackNext onBack={onBack} onNext={onNext} hideNext={!canContinue} />
-    </div>
-  );
-}
-
-function Financial({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
-  return (
-    <div>
-      <h2 className="font-display text-2xl text-ink">A bit about you.</h2>
-      <p className="mt-2 text-sm text-ink-soft">
-        Helps us match you to the right vehicles, markets, and member events.
-        No accredited-investor status or financial qualification required —
-        RYDA is a luxury access platform, not an investment platform.
-      </p>
-      <div className="mt-8 space-y-5">
-        <Select
-          label="Why are you interested in RYDA?"
-          options={[
-            "I love these cars and want to drive more of them",
-            "I want a Ferrari without buying one outright",
-            "I rent exotics now and the math no longer works",
-            "I'm exploring, not sure yet",
-          ]}
-        />
-        <Select
-          label="How often do you drive a supercar today?"
-          options={[
-            "Never, but I want to",
-            "A few days a year (rentals, friends' cars)",
-            "I own one already and want a second flavor",
-            "Regularly via a club or my own collection",
-          ]}
-        />
-        <Select
-          label="Primary market"
-          options={["Miami", "Los Angeles", "New York", "I travel between these cities", "Somewhere else"]}
-        />
-        <div>
-          <label className="block text-xs font-medium uppercase tracking-wider text-mute">
-            Anything we should know? (optional)
-          </label>
-          <textarea
-            rows={3}
-            className="mt-2 w-full rounded-xl border border-rule bg-cream px-4 py-3 text-sm text-ink placeholder:text-mute focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
-            placeholder="Track-day enthusiast, prefer naturally aspirated V8s, occasional Aspen trips..."
-          />
-        </div>
-        <label className="flex items-start gap-3 text-xs text-ink-soft">
-          <input type="checkbox" className="mt-0.5 accent-red" />
-          <span>
-            I acknowledge the{" "}
-            <Link href="/legal/disclaimer" className="underline hover:text-ink">
-              Co-Ownership Disclaimer
-            </Link>
-            . I understand co-ownership stakes are not investments and the
-            cars I co-own will depreciate over time.
-          </span>
-        </label>
-      </div>
-      <BackNext onBack={onBack} onNext={onNext} />
-    </div>
-  );
-}
-
-function Tier({ onNext, onBack }: { onNext: () => void; onBack: () => void }) {
-  const [tier, setTier] = useState<"core" | "blue" | "black">("blue");
-  return (
-    <div>
-      <h2 className="font-display text-2xl text-ink">Pick a tier.</h2>
-      <p className="mt-2 text-sm text-ink-soft">
-        Most active members start on Blue. Upgrade or downgrade anytime.
-      </p>
-      <div className="mt-8 grid grid-cols-1 gap-3">
-        <TierOption
-          name="RYDA Core"
-          price="Free"
-          tagline="Browse, rent, and claim co-ownership shares. Standard handover."
-          selected={tier === "core"}
-          onClick={() => setTier("core")}
-        />
-        <TierOption
-          name="RYDA Blue"
-          price="$500 / yr"
-          tagline="$200 buy-in credit · 1 free delivery · monthly meetups · member-to-member transfers."
-          selected={tier === "blue"}
-          onClick={() => setTier("blue")}
-          badge="Most chosen"
-        />
-        <TierOption
-          name="RYDA Black"
-          price="$1,500 / yr"
-          tagline="$500 share credit · 3 deliveries · 3 service hrs · flagship events · dedicated contact."
-          selected={tier === "black"}
-          onClick={() => setTier("black")}
-        />
-      </div>
-      <BackNext onBack={onBack} onNext={onNext} />
     </div>
   );
 }
@@ -566,24 +433,24 @@ function Done() {
       </div>
       <h2 className="mt-6 font-display text-3xl text-ink">You're in.</h2>
       <p className="mt-3 text-base text-ink-soft">
-        Welcome to RYDA. Your account is active — identity verification
-        usually clears within minutes, and we'll email you the moment
-        it does.
+        Welcome to RYDA. Your account is active, and your details will autofill
+        the next time you send a rental request.
       </p>
-      <div className="mt-8 rounded-xl border border-rule bg-cream-2/40 p-5 text-left text-sm">
-        <p className="font-medium text-ink">Member #00104</p>
-        <ul className="mt-3 space-y-2 text-ink-soft">
-          <li>· Identity verification: Processing</li>
-          <li>· Financial qualification: Submitted</li>
-          <li>· Membership tier: RYDA Core</li>
-          <li>· Status: Active</li>
-        </ul>
-      </div>
+      <p className="mt-4 text-sm text-ink-soft">
+        Where your identity check stands is on your{" "}
+        <Link
+          href="/account/verification"
+          className="underline hover:text-ink"
+        >
+          verification page
+        </Link>
+        .
+      </p>
       <Link
-        href="/portfolio"
+        href="/rent"
         className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-ink px-7 text-sm font-medium text-cream hover:bg-red"
       >
-        Browse vehicles →
+        Browse the fleet →
       </Link>
     </div>
   );
@@ -611,8 +478,8 @@ function Field({
   type?: string;
   placeholder?: string;
   autoComplete?: string;
-  /** Controlled mode — pass with onChange. Omit for the mock steps
-   *  that don't persist yet. */
+  /** Controlled mode — pass with onChange. Every remaining caller does;
+   *  the steps that rendered unsaved inputs are gone. */
   value?: string;
   onChange?: (v: string) => void;
   readOnly?: boolean;
@@ -647,29 +514,6 @@ function Field({
           {hint}
         </p>
       ) : null}
-    </div>
-  );
-}
-
-function Select({ label, options }: { label: string; options: string[] }) {
-  const id = fieldId(label);
-  return (
-    <div>
-      <label
-        htmlFor={id}
-        className="block text-xs font-medium uppercase tracking-wider text-mute"
-      >
-        {label}
-      </label>
-      <select
-        id={id}
-        name={id}
-        className="mt-2 h-12 w-full rounded-xl border border-rule bg-cream px-4 text-sm text-ink focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
-      >
-        {options.map((o) => (
-          <option key={o}>{o}</option>
-        ))}
-      </select>
     </div>
   );
 }
@@ -730,40 +574,4 @@ function BackNext({
       )}
     </div>
   );
-}
-
-function TierOption({
-  name,
-  price,
-  tagline,
-  selected,
-  onClick,
-  badge,
-}: {
-  name: string;
-  price: string;
-  tagline: string;
-  selected: boolean;
-  onClick: () => void;
-  badge?: string;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={`relative w-full rounded-2xl border p-6 text-left transition-colors ${
-        selected ? "border-red bg-red/5" : "border-rule bg-cream hover:border-ink-soft"
-      }`}
-    >
-      {badge && (
-        <span className="absolute -top-3 right-6 rounded-full bg-red px-3 py-1 text-xs font-medium text-cream">
-          {badge}
-        </span>
-      )}
-      <div className="flex items-baseline justify-between">
-        <p className="font-display text-lg text-ink">{name}</p>
-        <p className="font-display text-xl text-ink tabular-nums">{price}</p>
-      </div>
-      <p className="mt-2 text-sm text-ink-soft">{tagline}</p>
-    </button>
-  );
-}
+}

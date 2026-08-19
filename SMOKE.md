@@ -1,21 +1,23 @@
-# RYDA — Production Smoke-Test Runbook
+# RYDA Rentals — Production Smoke-Test Runbook
 
-A short, repeatable checklist for verifying production end-to-end after a
-deploy. Run this on the live origin `https://ryda.pro` using a real test
-card.
+A short, repeatable checklist for verifying production end-to-end after a deploy. Run it on
+the live origin `https://ryda.pro` using a real Stripe test card.
 
-Time: 8–10 minutes. Run after any release that touches auth, Stripe,
-Supabase, or webhooks.
+Time: 8–10 minutes. Run after any release that touches auth, Stripe, Supabase, or webhooks.
 
 ---
 
 ## 0. Prep
 
-- One test member account you control (e.g. `you+ryda-smoke@gmail.com`)
+- One test account you control (e.g. `you+ryda-smoke@gmail.com`)
+- An admin account (`npx tsx scripts/grant-admin.ts <email>`)
+- At least one operator onboarded through Stripe Connect with `charges_enabled` true —
+  without it there is nothing to charge against
 - Stripe test card `4242 4242 4242 4242` (any future date, any CVC)
-- A second tab open at the Vercel function logs:
-  - `vercel logs $(production_url) --follow --environment production`
-- `.env.local` has `SUPABASE_ACCESS_TOKEN` for any DB checks below
+- A second tab on the function logs:
+  `vercel logs $(production_url) --follow --environment production`
+
+---
 
 ## 1. Sign-in / sign-out
 
@@ -24,7 +26,7 @@ Supabase, or webhooks.
 | Visit `/signin`, request magic link to test email | Email lands within 30s |
 | Click magic link | Redirect to `/account` (or the gated `next` URL) |
 | Header shows "Account" pill (no Log in / Sign up) | ✓ |
-| Visit `/account/security` → "Sign out of every device" | Redirected to `/`; header flips back to anon |
+| `/account/security` → "Sign out of every device" | Redirected to `/`; header flips back to anon |
 | Sign back in for the rest of the smoke | ✓ |
 
 ## 2. Profile + notifications
@@ -32,136 +34,137 @@ Supabase, or webhooks.
 | Step | Expect |
 |------|--------|
 | `/account/profile` → enter Legal name, Phone, City | Save succeeds; "Profile saved." flash |
-| Hard refresh | Values still present (loaded from `user_profiles`) |
-| `/account/notifications` → flip "SMS" toggle | Brief "Saved." footer; reload preserves state |
+| Hard refresh | Values still present |
+| `/account/notifications` → flip a toggle | "Saved." footer; reload preserves state |
 
-## 3. KYC
+## 3. Browse the fleet (anonymous)
+
+Open a private window — this is the path most visitors take.
+
+| Step | Expect |
+|------|--------|
+| `/` | Landing page renders; fleet count matches the browse grid |
+| `/rent` | Browse grid lists cars; no co-ownership or share language anywhere |
+| `/rent/<slug>` for a RYDA car and a partner car | Both render; photo gallery works |
+| Operator names | Never shown — copy reads "a vetted Miami operator" or similar |
+| `/how-it-works` | Three-step referral model |
+
+## 4. Rental inquiry (the funnel entry point)
+
+| Step | Expect |
+|------|--------|
+| On `/rent/<slug>`, submit the inquiry form with real dates | Success state; no error flash |
+| `rental_inquiries` has a new row, `status = 'new'` | ✓ |
+| Team notification email arrives at `RYDA_NOTIFY_TO` | ✓ |
+| Submit the same form twice quickly (double-tap) | Only ONE row — `client_token` unique index holds |
+| While signed in, `/account/requests` | The inquiry is listed against your account |
+
+## 5. Admin triage
+
+Signed in as admin.
+
+| Step | Expect |
+|------|--------|
+| `/admin` | Funnel overview: counts strip + recent inquiries / bookings / payments |
+| Counts reflect the inquiry you just made | `inquiries_new` incremented |
+| Non-admin account hits `/admin` | "No permission" empty state; the API 403s |
+| `/admin/inquiries` | Your inquiry is in the list |
+| Move it to `sent` (operator confirmed price off-platform) | Status updates |
+| `/admin/partners` | Operator roster; onboarded operators show `stripe_onboarded_at` |
+
+## 6. Payment link (Connect direct charge)
+
+This is the money path. Take it slowly.
+
+| Step | Expect |
+|------|--------|
+| On the `sent` inquiry, enter a price and send the payment link | `{ ok: true, url }`; customer receives the email |
+| `rental_payments` row created, `status = 'pending'` | ✓ |
+| `application_fee_cents` matches `computeRentalFee` at the partner's `commission_rate` | ✓ |
+| Click the link — inspect the Checkout page | It is on the OPERATOR's account, not the platform |
+| Press "send link" again at the SAME amount | Returns the same URL, `deduped: true` — no second session |
+| Press "send link" at a DIFFERENT amount | 409 — re-quoting requires expiring the old link first |
+| Pay with `4242…` | Checkout succeeds |
+| Within ~60s: `rental_payments.status = 'paid'`, inquiry `status = 'booked'` | ✓ |
+| Confirmation emails to customer and operator | ✓ |
+| Stripe dashboard → the operator's connected account | Charge is there, with the application fee split out |
+| Platform balance | Only the application fee. The rental price never lands here |
+
+## 7. Webhook dedup
+
+| Step | Expect |
+|------|--------|
+| Stripe Dashboard → the Connect endpoint → Events → the `checkout.session.completed` from step 6 → "Resend" | Logs show `duplicate event, skipping <id>` |
+| `rental_payments` row unchanged | ✓ |
+
+## 8. Expired link recovery
+
+| Step | Expect |
+|------|--------|
+| Create a link, let it expire (or expire the session from the Stripe dashboard) | `checkout.session.expired` fires |
+| `rental_payments.status` flips `pending → expired` | ✓ |
+| Admin can now mint a fresh link at a new price | ✓ |
+
+## 9. KYC (built, not yet in the rental funnel)
+
+Identity is wired but no rental step depends on it. Smoke it only if you touched
+`/api/kyc/*`.
 
 | Step | Expect |
 |------|--------|
 | `/account/verification` → Start verification | Redirect to Stripe Identity hosted page |
-| Complete the Stripe sandbox flow | Redirect to `/account/verification?kyc=ok` |
-| Page shows "Verified" pill within ~60s | ✓ |
+| Complete the sandbox flow | Redirect to `/account/verification?kyc=ok` |
+| "Verified" pill within ~60s | ✓ |
 
-If pill doesn't update, check `vercel logs` for `[kyc webhook]` — the
-webhook may have hit a signature error or dedup conflict.
+If the pill doesn't update, check logs for `[kyc webhook]` — usually a signature error.
 
-## 4. Share purchase (card)
-
-| Step | Expect |
-|------|--------|
-| `/markets/F296/buy?shares=2` (or boats equivalent) | KYC step shows "Verified" |
-| Walk through Documents step (typed-name fallback OK in test) | ✓ |
-| Funding → Card → Stripe Checkout opens | ✓ |
-| Pay with `4242…` | Land at `/share-purchase/<id>?ok=1` |
-| Tracker page transitions "Pending" → "Paid · LLC amendment in flight" within ~60s | ✓ |
-| Welcome email with LLC amendment PDF attached | Lands in test inbox |
-
-## 5. Share purchase (ACH)
-
-Repeat step 4 but pick ACH at the Funding step. Stripe test ACH:
-
-- Routing `110000000`, account `000123456789`
-- Click "Confirm payment" — settlement is async, Stripe simulates it
-  successfully
-
-| Step | Expect |
-|------|--------|
-| Tracker stays at "Pending" until simulated settlement (test mode: ~minutes) | ✓ |
-| `async_payment_succeeded` webhook flips to Paid | ✓ |
-| Welcome email arrives | ✓ |
-
-## 6. Webhook event-id dedup
-
-| Step | Expect |
-|------|--------|
-| In Stripe Dashboard → Webhooks → endpoint → Events → pick a recent `checkout.session.completed` | ✓ |
-| Click "Resend" | `vercel logs` shows `duplicate event, skipping <id>` |
-| `share_purchases` row state unchanged | ✓ |
-
-## 7. Refund (self-serve, within window)
-
-| Step | Expect |
-|------|--------|
-| For the test purchase from step 4, hit `POST /api/share-purchase/<id>/refund` (via dev tools / curl with auth cookie or Bearer) | Returns `{ ok: true, action: "refunded" }` |
-| Stripe dashboard shows refund issued | ✓ |
-| `share_purchases.status` = `canceled` | ✓ |
-| `share_holdings.transferred_at` set (rows soft-released) | ✓ |
-| `contact_messages` has a row with `context = "Refund · self_serve_refund"` | ✓ |
-
-## 8. Resend amendment
-
-| Step | Expect |
-|------|--------|
-| For a paid purchase, `POST /api/share-purchase/<id>/resend-amendment` | Returns `{ ok: true }` |
-| Inbox receives a fresh email with subject `Re-sent: your … amendment` | ✓ |
-
-## 9. Bookings + calendar
-
-| Step | Expect |
-|------|--------|
-| `/bookings/new` → pick a vehicle the test member co-owns → 3-day range 14 days out | Confirm; row in `bookings` |
-| `/my-cars/<symbol>` calendar shows the booking with "You" badge | ✓ |
-| Try a past-dated booking (`startDate=2020-01-01`) | API returns 400 |
-| Try `?vehicleSymbol=F296&boatSlug=foo` on GET | 400 "Provide at most one of …" |
-
-## 10. Account section sweep
+## 10. Account sweep
 
 | Page | Expect |
 |------|--------|
-| `/account` overview | Real stats (assets count, upcoming bookings) |
-| `/account/membership` | Lists actual LLCs owned |
-| `/account/documents` | Lists real `llc_amendments` + `document_signatures` rows |
-| `/account/payments` → "Open Stripe Customer Portal" | Redirects to billing.stripe.com session |
-| `/account/privacy` → "Request my data" | `contact_messages` row inserted with `context = "Data export"` |
+| `/account` | Overview renders, no co-ownership panels |
+| `/account/requests` | Your rental inquiries with status |
+| `/account/payments` → "Open Stripe Customer Portal" | Redirects to billing.stripe.com |
+| `/account/privacy` → "Request my data" | `contact_messages` row with `context = "Data export"` |
 
-## 11. Admin (if your test account has `role: admin`)
+## 11. Operator-facing
 
-| Step | Expect |
+| Page | Expect |
 |------|--------|
-| `/admin` | Loads with counts + recent rows tables |
-| Non-admin account hits `/admin` | 403 panel "no admin access" |
+| `/partners` | Operator acquisition page |
+| `/partner` signed in as a linked operator | Their own view resolves via `partner_accounts` |
 
 ## 12. Logs sanity
 
-After running through 1–11, `vercel logs --environment production` from
-the same window should show:
+After 1–11, the log window should show:
 
 - No 500s
-- `[stripe webhook]` lines for each Stripe event delivered
-- One `duplicate event, skipping` from step 6
-- KYC: `[kyc-start · 401]` only if you tested without auth
-- Auth diag: every signed-in request shows `diag: ok:header` (no `getuser_error`)
+- `[connect webhook]` lines for each Stripe event delivered
+- One `duplicate event, skipping` from step 7
+- Every signed-in request showing `diag: ok:header` (no `getuser_error`)
 
 ## 13. Failure modes
 
-If anything red surfaces:
-
-1. **Webhook 400 invalid signature** — `STRIPE_WEBHOOK_SECRET` or
-   `STRIPE_KYC_WEBHOOK_SECRET` mismatched between Stripe dashboard
-   endpoint and Vercel env. Re-pull from dashboard, re-push to Vercel.
-2. **401 with `getuser_error:AuthApiError:Invalid API key`** —
-   `SUPABASE_SERVICE_ROLE_KEY` corrupted (fixed in commit `1324d27`,
-   but worth verifying with `vercel env pull --environment production`
-   and confirming length matches `.env.local`).
-3. **Duplicate amendment emails** — `stripe_events` dedup not
-   inserting; check `[stripe webhook] dedup insert failed`. Most
-   often means migration 0015 wasn't applied.
-4. **Empty `/account` overview after creating bookings** — RLS
-   blocking? `share_holdings` and `bookings` policies should allow
-   `auth.uid()` reads. Verify with the Supabase SQL editor:
-   ```sql
-   set role authenticated;
-   set request.jwt.claims = '{"sub":"<your_user_id>"}';
-   select count(*) from bookings;
-   ```
+1. **Connect webhook never fires.** The endpoint was created without "Listen to events on
+   connected accounts." Direct-charge events never reach a platform-account endpoint. Recreate
+   it with the toggle on.
+2. **Webhook 400 invalid signature.** `STRIPE_CONNECT_WEBHOOK_SECRET` or
+   `STRIPE_KYC_WEBHOOK_SECRET` mismatched between the dashboard endpoint and Vercel. One
+   secret per endpoint — they are not interchangeable. Re-pull and re-push.
+3. **Payment link returns 503.** `STRIPE_SECRET_KEY` unset.
+4. **Payment link refuses to mint.** The operator's connected account can't accept charges —
+   check `charges_enabled`, re-send an onboarding link.
+5. **401 `getuser_error:AuthApiError:Invalid API key`.** `SUPABASE_SERVICE_ROLE_KEY`
+   corrupted. `vercel env pull --environment production` and compare length to `.env.local`.
+6. **Inquiry submits but no email.** `RESEND_API_KEY` / `RYDA_NOTIFY_FROM` /
+   `RYDA_NOTIFY_TO` unset — `notifyTeam()` degrades to a log by design, so the form still
+   succeeds. Check the logs before assuming the form is broken.
 
 ---
 
-## After-launch follow-ups (not part of smoke)
+## Not part of smoke
 
-- 7-day refund-window edge cases (paid 6.5 days ago → still self-serve;
-  paid 7.5 days ago → ticket branch)
-- Share-transfer happy-path once `/account/transfers/[id]` page lands
-- KYC `requires_input` recovery path (test member uploads bad photo →
-  retry flow)
+- `rental_bookings` end-to-end. The schema (`0047`) is in place but the request/approve flow
+  is still being built — smoke it once the routes land.
+- Deposit authorization and the re-auth sweep (`deposit_auth_expires_at`).
+- Renter KYC as a gate in the booking flow.

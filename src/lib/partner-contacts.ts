@@ -22,9 +22,11 @@ const PARTNER_INQUIRY_EMAILS: Record<string, string> = {
   // "GM LUXE": "…@gmluxe.net",  // pending signed referral agreement
 };
 
-/** Inbox that should receive an inquiry for the given partner. Null
- *  partner (RYDA fleet) and unsigned partners both fall back to the
- *  team inbox. Empty string means email is unconfigured — the caller's
+/** Inbox that should receive an inquiry for the given partner. Unsigned
+ *  partners fall back to the team inbox, as does a null partner — which
+ *  today means a caller asking for the team inbox on purpose (the
+ *  customer-confirmation reply-to), since every lead now names an
+ *  operator. Empty string means email is unconfigured — the caller's
  *  send wrapper treats that as a logged no-op. */
 export function partnerInquiryEmail(partnerName: string | null): string {
   if (partnerName) {

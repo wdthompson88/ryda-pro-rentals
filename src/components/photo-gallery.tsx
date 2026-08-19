@@ -17,20 +17,14 @@ import {
 export function PhotoGallery({
   photos,
   alt,
-  flipFirst,
-  imagePosition,
   optimize = false,
 }: {
   photos: string[];
   alt: string;
-  /** Mirror the first (hero) photo horizontally. RYDA fleet uses this
-   *  for cars sourced facing the wrong way. */
-  flipFirst?: boolean;
-  /** CSS object-position for the hero crop (RYDA fleet only). */
-  imagePosition?: string;
   /** When false, renders <Image unoptimized />, needed for partner
    *  Wix CDN images that aren't in the next/image allowlist's
-   *  optimization budget. */
+   *  optimization budget. Defaults to false because every photo the
+   *  gallery renders today is an operator's, served off their CDN. */
   optimize?: boolean;
 }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -92,10 +86,8 @@ export function PhotoGallery({
           fill
           priority
           sizes="(min-width: 1024px) 66vw, 100vw"
-          className={`object-cover transition-transform duration-500 group-hover:scale-[1.02] ${
-            flipFirst ? "-scale-x-100" : ""
-          }`}
-          style={{ objectPosition: imagePosition ?? "center 55%" }}
+          className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+          style={{ objectPosition: "center 55%" }}
           unoptimized={!optimize}
         />
         {photos.length > 1 ? (

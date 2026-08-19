@@ -1,5 +1,5 @@
 {
-  "name": "ryda-web",
+  "name": "ryda-pro-rentals",
   "version": "0.1.0",
   "engines": {
     "node": ">=24 <25"
@@ -27,12 +27,10 @@
     "marketing:daily-spot": "tsx scripts/marketing/video/daily-spot.ts",
     "marketing:smoke-video": "tsx scripts/marketing/video/__smoke__/composer-smoke.ts",
     "marketing:brief": "tsx scripts/marketing/daily-brief.ts",
-    "sample-docs:pdf": "node scripts/generate-sample-document-pdfs.mjs",
-    "check:dropbox-sign": "tsx scripts/check-dropbox-sign.ts"
+    "seed:rental-listings": "tsx scripts/seed-rental-listings.ts",
+    "seed:rental-listings:apply": "tsx scripts/seed-rental-listings.ts --apply"
   },
   "dependencies": {
-    "@dropbox/sign": "^1.10.0",
-    "@react-pdf/renderer": "^4.5.1",
     "@sentry/nextjs": "^10.51.0",
     "@supabase/supabase-js": "^2.105.0",
     "@upstash/redis": "^1.38.0",

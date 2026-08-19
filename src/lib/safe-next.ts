@@ -11,11 +11,11 @@
 // Rules: only allow same-origin paths (`/whatever`). Reject anything
 // that could be interpreted as an external URL or a non-http(s) scheme.
 
-// Sign-in / auth-callback fallback. Was `/portfolio` — but that route
-// is the public sample-data demo, not the member dashboard. Members
-// who hit a sign-in flow with no ?next= param land on /account, the
-// real authenticated overview. /portfolio remains for the marketing
-// preview surface only.
+// Sign-in / auth-callback fallback. Members who hit a sign-in flow with
+// no ?next= param land on /account, the real authenticated overview.
+// Note this is a purely syntactic sanitizer — it has no allow-list of
+// real routes, so it neither knew nor cared that the co-ownership
+// surfaces went away.
 const FALLBACK = "/account";
 
 /**

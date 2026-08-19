@@ -80,7 +80,7 @@ function partnerEmailHtml(inquiry: RentalInquiry, linked: boolean): string {
     <div style="margin-top:14px;">
       <div style="font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#9A9590;">Vehicle</div>
       <div style="margin-top:2px;font-weight:500;">${escapeHtml(inquiry.vehicleLabel)}</div>
-      <div style="margin-top:2px;font-size:12px;color:#3c3c3c;">${inquiry.fleet === "partner" ? `Operator: ${escapeHtml(inquiry.partnerName ?? "unknown")}` : "RYDA fleet"} · ${escapeHtml(inquiry.vehicleSlug)}</div>
+      <div style="margin-top:2px;font-size:12px;color:#3c3c3c;">Operator: ${escapeHtml(inquiry.partnerName)} · ${escapeHtml(inquiry.vehicleSlug)}</div>
     </div>
     <div style="margin-top:14px;">
       <div style="font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:#9A9590;">Dates</div>
@@ -97,8 +97,14 @@ function partnerEmailHtml(inquiry: RentalInquiry, linked: boolean): string {
   `);
 }
 
-// Customer confirmation. NEVER name the operator here — the public promise
-// is "a vetted Miami operator", the commission model is stated plainly.
+// Customer confirmation. NEVER name the operator here — the commission
+// model is stated plainly.
+//
+// The closing line said "No card, no payment" until the truth pass. RYDA
+// does email a Stripe Checkout link once the operator confirms, so a
+// blanket "no payment" is a promise the next email breaks — which is
+// exactly what makes a genuine pay link look like phishing. The honest
+// version is "no card at request", followed by the mechanism.
 function customerEmailHtml(inquiry: RentalInquiry): string {
   return emailLayout("Your request is in", `
     <p style="margin:0 0 12px;">Hi ${escapeHtml(inquiry.name)},</p>
@@ -107,18 +113,14 @@ function customerEmailHtml(inquiry: RentalInquiry): string {
       ${escapeHtml(inquiry.startDate)} to ${escapeHtml(inquiry.endDate)}.
     </p>
     <p style="margin:0 0 12px;">
-      Here's what happens next: we route your request to a vetted Miami operator,
-      who reaches out to you directly to confirm availability and put the keys in
-      your hands on their rental agreement and insurance.
-    </p>
-    <p style="margin:0 0 12px;">
       Your price is the operator's price — inquiring through RYDA never costs you
       more than going direct. Operators pay RYDA a referral commission on bookings
       we send them; that's the whole model.
     </p>
     <p style="margin:0;">
-      No card, no payment — nothing is charged until you and the operator confirm
-      the booking together.
+      No card at request. Once you and the operator have agreed the dates, we'll
+      send you a secure Stripe link — that charge settles on the operator's own
+      Stripe account, and RYDA's commission is collected as a platform fee on it.
     </p>
   `);
 }
@@ -191,7 +193,6 @@ export async function POST(req: NextRequest) {
       }
       console.log("[rental-inquiry · dev no-db]", {
         vehicle: inquiry.vehicleSlug,
-        fleet: inquiry.fleet,
         ts: new Date().toISOString(),
       });
       return NextResponse.json({ ok: true, persisted: false });
@@ -213,7 +214,12 @@ export async function POST(req: NextRequest) {
       phone: inquiry.phone,
       vehicle_slug: inquiry.vehicleSlug,
       vehicle_label: inquiry.vehicleLabel,
-      fleet: inquiry.fleet,
+      // Every lead is an operator's — the RYDA-owned rail is gone. The
+      // column itself survives because 0039 declares it
+      // `not null check (fleet in ('ryda','partner'))` and migrations
+      // are not rewritten in place; historical rows keep whatever they
+      // were captured as.
+      fleet: "partner",
       partner_name: inquiry.partnerName,
       market: "Miami",
       start_date: inquiry.startDate,
@@ -366,11 +372,12 @@ export async function GET(req: NextRequest) {
   // Service-role client bypasses RLS, so the user_id filter here IS the
   // authorization boundary — mirror bookings GET. partner_name is
   // deliberately excluded from the select: operators are never named
-  // publicly, the UI says "a vetted Miami operator".
+  // publicly, the UI says "a vetted Miami operator". `fleet` is excluded
+  // too — there is only one rail now, so it tells a member nothing.
   const { data, error } = await admin
     .from("rental_inquiries")
     .select(
-      "id, vehicle_slug, vehicle_label, fleet, market, start_date, end_date, message, marketing_opt_in, status, created_at",
+      "id, vehicle_slug, vehicle_label, market, start_date, end_date, message, marketing_opt_in, status, created_at",
     )
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });

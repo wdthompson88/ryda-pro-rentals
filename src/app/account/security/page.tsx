@@ -11,13 +11,16 @@
 //   - Sign out everywhere (revokes all sessions for this user across
 //     every device + browser)
 //
-// Stubs with clearly-labeled "ships at launch" copy:
-//   - Two-factor (TOTP) enrollment — Supabase MFA factors API exists
-//     but the QR + verify UI is its own design pass
-//   - Session list — Supabase doesn't expose a session inventory by
-//     default; we'd need to log sessions ourselves to show device +
-//     last-seen. Surfacing as "All your sessions" with a global
-//     sign-out button is the meaningful 80% today.
+//   - Two-factor (TOTP) enrollment — enroll, verify, disable, and the
+//     aal2 step-up at /signin. This comment used to file it as a stub
+//     "shipping at launch"; it shipped, and the page header still said
+//     "(soon)".
+//
+// Supabase exposes no per-device session inventory, so this page has
+// never had one. The row that said "Per-device session list ships at
+// Miami launch" is deleted rather than re-dated: Miami is live, and
+// nothing in this repo logs sessions, so there is no launch to point
+// at. "Sign out of every device" is the control that actually exists.
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -36,7 +39,7 @@ export default function SecurityPage() {
         </h1>
         <p className="mt-2 max-w-2xl text-sm text-ink-soft">
           Change your sign-in email and password, sign out of every device, and
-          (soon) turn on two-factor authentication.
+          turn on two-factor authentication.
         </p>
       </header>
 
@@ -594,8 +597,13 @@ function TwoFactorCard() {
             {submitting ? "Disabling…" : "Turn off 2FA"}
           </button>
           <p className="mt-2 text-[11px] text-mute">
+            {/* Was "every time you sign in on a new device". /signin
+                calls getAuthenticatorAssuranceLevel after every
+                password sign-in and steps up to aal2 whenever a
+                verified factor exists — there is no device memory in
+                that check, so the qualifier was false. */}
             You&apos;ll be asked for a 6-digit code from your authenticator
-            every time you sign in on a new device.
+            every time you sign in.
           </p>
         </>
       )}
@@ -642,14 +650,6 @@ function SessionsCard() {
           This device
         </span>
         <span className="text-sm text-ink">Active now</span>
-      </Row>
-      <Row>
-        <span className="text-xs uppercase tracking-wider text-mute">
-          Other devices
-        </span>
-        <span className="text-sm text-mute">
-          Per-device session list ships at Miami launch
-        </span>
       </Row>
       {error && <ErrorBanner>{error}</ErrorBanner>}
       <button

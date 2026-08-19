@@ -1,13 +1,18 @@
 "use client";
 
-// /account/verification — read-only display of the member's
-// verification state. KYC (Stripe Identity) is the only real one
-// today; driving record + marine operator's license are stubs that
-// will be wired to Checkr / USCG vendors later.
+// /account/verification — read-only display of the account's identity
+// verification state. Stripe Identity is the ONLY check this codebase
+// performs. Two other cards used to sit here — a "driving record"
+// pulled from Checkr and a USCG marine operator's licence — and both
+// were removed: no code ever called either vendor, the driving-record
+// card invented an eligibility rule ("under 28 or at-fault incidents in
+// the last 5 years are ineligible by carrier policy") for insurance
+// RYDA does not underwrite, and the boats vertical the marine licence
+// belonged to is gone. Do not re-add a card for a check no route runs.
 //
 // KYC: queries the kyc_verifications table directly via the Supabase
 // JS client (RLS already filters to the calling user). Shows the
-// freshest row's status. Members can re-trigger verification via the
+// freshest row's status. Users can re-trigger verification via the
 // existing /api/kyc/start endpoint when they're not yet verified.
 
 import { useEffect, useState } from "react";
@@ -107,16 +112,18 @@ export default function VerificationPage() {
           Who you are, on file.
         </h1>
         <p className="mt-2 max-w-2xl text-sm text-ink-soft">
-          Co-ownership and rentals require identity + driving-record checks.
-          Numbers, photos, and document IDs stay with the verification vendor —
-          we keep only the pass / fail status.
+          RYDA runs one check: a Stripe Identity document and selfie match, to
+          confirm the person behind this account. RYDA does not run a
+          driving-record check and does not put anyone on an insurance policy —
+          who is allowed to rent a particular car, including age, licence and
+          driving history, is set and checked by the operator.
         </p>
       </header>
 
       {/* KYC ──────────────────────────────────────────── */}
       <Card
         title="Identity (KYC)"
-        hint="Government-issued ID + selfie via Stripe Identity. Required once before your first co-ownership share or rental."
+        hint="Government photo ID plus a live selfie, handled by Stripe Identity."
       >
         {loading ? (
           <p className="text-sm text-mute">Loading…</p>
@@ -184,49 +191,14 @@ export default function VerificationPage() {
                 Re-verify only if your ID changes (renewal, name change, etc.).
               </p>
             )}
+            <p className="border-t border-rule pt-4 text-[11px] leading-relaxed text-mute">
+              Stripe captures and checks the document. RYDA stores the result
+              and the name, date of birth and address Stripe reads from it.
+              Nothing on RYDA is gated on this today — sending a rental request
+              does not require it.
+            </p>
           </>
         )}
-      </Card>
-
-      {/* Driving record (stub) ─────────────────────────── */}
-      <Card
-        title="Driving record"
-        hint="Pulled from a third-party DMV vendor (Checkr) before your first car rental. Re-pulled annually."
-      >
-        <Row>
-          <span className="text-xs uppercase tracking-wider text-mute">Status</span>
-          <Pill tone="off">Not yet checked</Pill>
-        </Row>
-        <button
-          type="button"
-          disabled
-          className={`${btnSecondary} cursor-not-allowed opacity-60`}
-        >
-          Initiate driving-record check — ships with rentals
-        </button>
-        <p className="text-[11px] text-mute">
-          Trigger happens automatically the first time you book a car rental.
-          Members under 28 or with at-fault incidents in the last 5 years are
-          ineligible by carrier policy.
-        </p>
-      </Card>
-
-      {/* Marine operator (stub) ─────────────────────────── */}
-      <Card
-        title="Marine operator's license"
-        hint="USCG-issued for vessels over 26 feet. Required for boat charters where the member operates."
-      >
-        <Row>
-          <span className="text-xs uppercase tracking-wider text-mute">Status</span>
-          <Pill tone="off">Not on file</Pill>
-        </Row>
-        <button
-          type="button"
-          disabled
-          className={`${btnSecondary} cursor-not-allowed opacity-60`}
-        >
-          Upload license — coming Q3 2026
-        </button>
       </Card>
     </div>
   );
@@ -234,8 +206,6 @@ export default function VerificationPage() {
 
 const btnPrimary =
   "inline-flex h-11 items-center justify-center rounded-full bg-ink px-6 text-sm font-medium text-cream transition-colors hover:bg-red disabled:cursor-not-allowed disabled:opacity-60";
-const btnSecondary =
-  "inline-flex h-11 items-center justify-center rounded-full border border-rule bg-cream-2 px-6 text-sm font-medium text-ink transition-colors hover:border-red hover:text-red";
 
 function Card({
   title,

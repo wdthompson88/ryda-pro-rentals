@@ -1,15 +1,46 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
+import { PARTNER_VEHICLES } from "@/lib/partner-fleet";
 
 export const metadata = { title: "Not found" };
 
+// A 404 is the one page guaranteed to be reached by a stale link, so
+// every destination here has to resolve. Three of these used to point
+// at /portfolio, /sample-documents and /membership.
+//
+// "Where we operate" pointed at /locations, a market index for a
+// single-market marketplace: it listed two cities with no cars in them
+// alongside the one that has them. Index and both empty city pages are
+// deleted, so this card points at the browse grid instead — where the
+// question "where do you operate" is answered by the listings
+// themselves. Every car in PARTNER_VEHICLES has market: "Miami", and
+// the field's type is the literal "Miami", so that is the whole answer.
+// Two cards share the /rent href, hence the label-keyed map below.
+//
+// Two notes on these cards were invented and are gone (Aug 2026):
+//   · "Daily rates from $1,200" — a floor 14x the real one. Replacing
+//     it with a derived minimum was the wrong fix and that has now gone
+//     too: fleet-wide rate figures are out of the copy by operator
+//     decision, not because the data is bad. The rate table is sound;
+//     partner-fleet.ts just writes rates with JavaScript numeric
+//     separators (dailyRate: 1_403), so a script reading that file must
+//     handle the separator rather than truncating at it. The card
+//     states the count and nothing else.
+//   · "Real humans, fast replies" — nothing in this repo measures or
+//     queues against a reply time. /api/contact writes a row and emails
+//     the team inbox; /faq explicitly refuses to put a number on it.
+
 const POPULAR = [
-  { label: "See the fleet", href: "/portfolio", note: "Co-ownership shares" },
-  { label: "Browse rentals", href: "/rent", note: "Daily rates from $1,200" },
-  { label: "How it works", href: "/how-it-works", note: "The 5-step explainer" },
-  { label: "Sample documents", href: "/sample-documents", note: "Operating Agreement, MSA, more" },
-  { label: "Membership tiers", href: "/membership", note: "Core · Blue · Black" },
-  { label: "Contact us", href: "/contact", note: "Real humans, fast replies" },
+  {
+    label: "Browse the fleet",
+    href: "/rent",
+    note: `${PARTNER_VEHICLES.length} cars`,
+  },
+  { label: "How it works", href: "/how-it-works", note: "Browse, request, the operator confirms" },
+  { label: "Where we operate", href: "/rent", note: "Every listing is in Miami" },
+  { label: "For partners", href: "/partners", note: "List your fleet with RYDA" },
+  { label: "Help center", href: "/help", note: "Answers to the common ones" },
+  { label: "Contact us", href: "/contact", note: "Send the team a note" },
 ];
 
 export default function NotFound() {
@@ -31,7 +62,7 @@ export default function NotFound() {
         <div className="mx-auto mt-12 grid max-w-4xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {POPULAR.map((p) => (
             <Link
-              key={p.href}
+              key={p.label}
               href={p.href}
               className="group block rounded-2xl border border-rule bg-surface p-5 text-left transition-shadow hover:shadow-md"
             >

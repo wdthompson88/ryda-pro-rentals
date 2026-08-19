@@ -102,11 +102,17 @@ export default async function CategoryPage({
       </section>
 
       {/* CTA */}
+      {/* "We answer everything within one business day" is deleted, the
+          same deletion made on /help and in help-chat. Nothing in this
+          codebase measures or enforces a reply time: a contact message
+          writes a contact_messages row and emails the team. This copy
+          renders on every help category page, so it was the last and
+          widest surviving instance of the promise. */}
       <section className="bg-ink py-16 text-cream">
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
           <h2 className="font-display text-3xl">Didn't find your answer?</h2>
           <p className="mx-auto mt-3 max-w-xl text-sm text-cream/70">
-            Email a real human. We answer everything within one business day.
+            Email a real human.
           </p>
           <Link
             href="/contact"

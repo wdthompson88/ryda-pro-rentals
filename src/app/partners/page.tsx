@@ -1,9 +1,18 @@
 // /partners — RYDA Fleet Partner Program landing page (B2B).
-// Pitch to exotic-rental operators: list your inventory with us, our
-// pre-screened HNW members come to you, you keep the operational
-// relationship + pricing control.
+// Pitch to Miami rental operators: list your inventory with us, we pass
+// on the requests we get, you keep the operational relationship and
+// pricing control.
 //
-// Sourced from the user-provided 1-pager PDF (May 2026).
+// This page previously promised operators that "every RYDA member
+// passes multi-layer underwriting — identity, driving record, and
+// financial verification", sold an audience of "pre-screened HNW
+// members", and dated the market as "Miami launch Q3 2026". None of
+// that is true: the only check in the codebase is an OPTIONAL Stripe
+// Identity document + selfie session (api/kyc/start) that no rental
+// surface gates on, there is no membership table or tier anywhere, and
+// Miami is live. An operator handing over a car on the strength of a
+// screening RYDA does not perform is the most expensive falsehood on
+// the site, so those claims are deleted rather than softened.
 
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -12,34 +21,30 @@ import { SiteHeader } from "@/components/site-header";
 export const metadata: Metadata = {
   title: "Fleet Partner Program",
   description:
-    "RYDA's Fleet Partner Program lets exotic-rental operators reach our pre-screened HNW members. List your inventory, hold your rates, keep your client relationships. Miami launch Q3 2026.",
+    "RYDA lists Miami rental operators' cars, passes on the requests it receives, and takes a commission on the bookings it brings. Hold your own rates, keep your own client relationships.",
   alternates: { canonical: "/partners" },
 };
 
 const BENEFITS: { label: string; body: string }[] = [
   {
-    label: "Discovery by clients already looking",
-    body: "RYDA members are actively searching for exotic rentals in Miami. Your listings reach an audience with intent — not cold traffic you've paid to warm up.",
+    label: "Leads arrive whole",
+    body: "A request reaches RYDA with the customer's name, email, phone, the exact car, the dates and any note. Our team checks it and passes the lot to you, contact details included, so you answer the customer yourself.",
   },
   {
-    label: "Pre-screened renters",
-    body: "Every RYDA member passes multi-layer underwriting — identity, driving record, and financial verification. Fewer problems, better clients.",
+    label: "You decide who you rent to",
+    body: "RYDA offers renters an optional identity check through Stripe — photo ID plus a live selfie — and nothing on RYDA depends on it. Licence, age, driving history and deposit are yours to set and check, exactly as they are on a walk-in.",
   },
   {
-    label: "Higher effective rates",
-    body: "Clients coming through RYDA aren't price-shopping on aggregators. They're looking for the right car, which lets you hold your rates.",
-  },
-  {
-    label: "Professional listing presentation",
-    body: "Your cars appear in a polished, luxury-positioned context — not alongside budget rentals. The platform reflects the tier your fleet is at.",
+    label: "A listing page per car",
+    body: "Every vehicle gets its own page: photography, specs, your daily rate, and a request form. RYDA lists everyday cars through exotics, and each one gets the same treatment.",
   },
   {
     label: "No marketing overhead",
-    body: "No ad accounts, no SEO, no content calendar. You run the rentals; RYDA handles the audience.",
+    body: "No ad accounts, no SEO, no content calendar. You run the rentals; RYDA runs the site.",
   },
   {
     label: "You stay in control",
-    body: "Set your own availability, pricing, and blackout dates. You keep the client relationship and the rental contract; RYDA is the channel that brings them to you and takes a commission when it does.",
+    body: "You set the rate, you confirm the dates, and the rental runs on your own agreement and insurance. RYDA is the channel that brings the customer to you and takes a commission when it does.",
   },
 ];
 
@@ -54,27 +59,27 @@ const STEPS: { n: string; title: string; body: string }[] = [
   {
     n: "01",
     title: "Apply",
-    body: "Tell us about your company and fleet. We respond to every application personally within 3 business days.",
+    body: "Create an account, then tell us about your company and fleet from your partner dashboard. Your application sits as pending until a RYDA admin reviews it.",
   },
   {
     n: "02",
     title: "Fleet review",
-    body: "We confirm which vehicles meet RYDA's standards — modern, well-presented exotics from marques our members seek.",
+    body: "We go through your vehicles with you and agree which ones RYDA lists.",
   },
   {
     n: "03",
     title: "Listing setup",
-    body: "We work with you on photos, specs, pricing, and availability to present your cars the way they deserve.",
+    body: "We work with you on photos, specs and pricing so each car reads the way you'd want it to.",
   },
   {
     n: "04",
     title: "Activate payments",
-    body: "We send you a Stripe onboarding link. Stripe verifies your business and bank details so bookings pay out directly to you — RYDA never holds your money.",
+    body: "We send you a Stripe onboarding link. Stripe verifies your business and bank details, and bookings are charged directly to your connected account — RYDA's commission is collected as a platform fee on each charge.",
   },
   {
     n: "05",
     title: "Live",
-    body: "Your fleet goes live on RYDA. Enquiries reach you directly, you confirm the price, and the customer pays on your own Stripe account.",
+    body: "Your fleet goes live on RYDA. Requests come in through the site, our team passes each one to you, you confirm the dates and price, and the customer pays on your own Stripe account.",
   },
 ];
 
@@ -87,18 +92,15 @@ export default function PartnersPage() {
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-28">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-            Fleet Partner Program · Miami 2026 · For exotic rental companies
+            Fleet Partner Program · Miami · For rental operators
           </p>
           <h1 className="mt-6 max-w-4xl font-display text-5xl font-light leading-[1.05] text-ink sm:text-6xl lg:text-7xl">
-            The audience your fleet{" "}
-            <span className="italic text-red">deserves.</span>
+            Your cars, <span className="italic text-red">listed in Miami.</span>
           </h1>
           <p className="mt-8 max-w-2xl text-lg leading-relaxed text-ink-soft">
-            RYDA is a curated platform for exotic car rentals, built
-            for a membership of high-net-worth clients actively looking
-            to book. If you have the cars and not the marketing reach,
-            we&apos;re a natural fit — list your inventory with us and
-            let the demand come to you.
+            RYDA is a Miami rental marketplace spanning everyday cars
+            through exotics. We list your fleet, pass on the requests we
+            receive, and take a commission when one turns into a booking.
           </p>
           <div className="mt-10 flex flex-wrap gap-3">
             <Link
@@ -117,14 +119,14 @@ export default function PartnersPage() {
         </div>
       </section>
 
-      {/* What you get — 6 benefits */}
+      {/* What you get */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
             What you get
           </p>
           <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
-            Six reasons RYDA pays back the listing.
+            What listing with RYDA gets you.
           </h2>
 
           <ul className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -146,14 +148,14 @@ export default function PartnersPage() {
         </div>
       </section>
 
-      {/* Getting listed — 4 steps */}
+      {/* Getting listed */}
       <section id="how-it-works" className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
             Getting listed
           </p>
           <h2 className="mt-3 font-display text-3xl text-ink sm:text-4xl">
-            From application to live in days, not months.
+            Five steps from application to live.
           </h2>
 
           <ol className="mt-12 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-5 lg:gap-8">
@@ -232,9 +234,9 @@ export default function PartnersPage() {
             Let&apos;s talk about your fleet.
           </h2>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-cream/85">
-            We respond to every partner application personally within
-            three business days. No commitment — just a conversation
-            about whether RYDA is the right channel for you.
+            Tell us what you run and we&apos;ll come back to you. No
+            commitment — just a conversation about whether RYDA is the
+            right channel for you.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link

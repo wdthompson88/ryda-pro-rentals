@@ -27,7 +27,6 @@ export type RentalInquiry = {
   phone?: string | null;
   vehicle_slug: string;
   vehicle_label: string;
-  fleet?: "ryda" | "partner";
   market?: string;
   start_date: string; // YYYY-MM-DD
   end_date: string; // YYYY-MM-DD

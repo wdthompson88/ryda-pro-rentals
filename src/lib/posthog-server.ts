@@ -2,8 +2,8 @@
 // is the client-side shim with cookie-consent gating).
 //
 // Use this in:
-//   - API routes (e.g. /api/share-purchase/webhook → fire
-//     `share_purchase_completed`)
+//   - API routes (e.g. /api/stripe/connect-webhook → fire
+//     `rental_payment_completed`)
 //   - Server components / actions (e.g. KYC verification → fire
 //     `kyc_verified`)
 //   - Vercel cron jobs (e.g. social-publisher → fire `post_published`)

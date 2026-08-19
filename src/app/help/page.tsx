@@ -5,17 +5,24 @@ import { HELP } from "@/lib/help-content";
 export const metadata = {
   title: "Help Center",
   description:
-    "Answers about RYDA membership, co-ownership, bookings, insurance, maintenance, and account management.",
+    "Answers about renting a car listed on RYDA: sending a request, paying, insurance, mileage, and your account.",
 };
 
+// Five of these seven pointed at co-ownership articles that no longer
+// exist — claiming a share, transferring one, the member-managed LLC,
+// the securities question, tax treatment — plus fair-use rules for a
+// booking calendar this platform does not have. Each label below is the
+// linked article's own `q` verbatim, so a tile cannot drift from the
+// page it opens, and every href resolves to a live article in HELP. If
+// you delete an article, delete its tile in the same commit.
 const TOP_TOPICS: { label: string; href: string }[] = [
-  { label: "How to claim a co-ownership share", href: "/help/shares/how-to-buy" },
-  { label: "Is this an investment?", href: "/help/legal/securities" },
-  { label: "Member-managed LLC explained", href: "/help/legal/member-managed-llc" },
-  { label: "Fair-use rules", href: "/help/bookings/fair-use" },
-  { label: "File an insurance claim", href: "/help/insurance/file-claim" },
-  { label: "Tax treatment", href: "/help/account/taxes" },
-  { label: "Transfer your share", href: "/help/shares/selling" },
+  { label: "What is RYDA, in one paragraph?", href: "/help/getting-started/what-is-ryda" },
+  { label: "Who insures the car I rent?", href: "/help/insurance/coverage" },
+  { label: "How do I pay, and does RYDA keep my card?", href: "/help/account/payment-methods" },
+  { label: "Cancellations and refunds", href: "/help/bookings/cancellations" },
+  { label: "Mileage limits and overages", href: "/help/bookings/mileage" },
+  { label: "Who maintains and stores the cars?", href: "/help/maintenance/process" },
+  { label: "What do I pay if the car is damaged?", href: "/help/insurance/deductible" },
 ];
 
 export default function HelpCenterPage() {
@@ -35,35 +42,20 @@ export default function HelpCenterPage() {
             How can we help?
           </h1>
 
-          {/* Search, submits to the site-wide /search route which
-              indexes vehicles, boats, journal, vs pages, and help.
-              Help-tagged hits are surfaced first when the query
-              matches a help-category keyword. */}
-          <form action="/search" method="get" className="mt-10 max-w-2xl">
-            <label className="sr-only" htmlFor="help-search">
-              Search help articles
-            </label>
-            <div className="flex h-14 items-center gap-3 rounded-full border border-rule bg-surface px-6 shadow-sm focus-within:border-red focus-within:ring-2 focus-within:ring-red/20">
-              <span className="text-base text-mute">⌕</span>
-              <input
-                id="help-search"
-                name="q"
-                type="search"
-                placeholder="Search bookings, insurance, share transfer, KYC…"
-                className="h-full flex-1 bg-transparent text-base text-ink placeholder:text-mute focus:outline-none"
-              />
-              <button
-                type="submit"
-                className="text-xs font-medium uppercase tracking-[0.18em] text-red hover:text-red-deep"
-              >
-                Search
-              </button>
-            </div>
-            <p className="mt-3 text-xs text-mute">
-              {totalArticles} help articles across {HELP.length} categories.
-              Search also covers the rest of the site.
-            </p>
-          </form>
+          {/* The search box that used to sit here submitted to /search
+              and was labelled "Search help articles" — but SEARCH_INDEX
+              in src/lib/search-index.ts contains no help entry at all,
+              so every one of its placeholder examples (bookings,
+              insurance, payment, mileage) returned nothing. The comment
+              above it claimed the index covered help; it never did.
+              Deleted rather than relabelled: the site header already
+              carries a search that works, and a second box promising
+              help results the index cannot return is worse than none.
+              If help articles are added to SEARCH_INDEX later, this is
+              the place to put it back. */}
+          <p className="mt-10 text-sm text-ink-soft">
+            {totalArticles} articles across {HELP.length} categories.
+          </p>
         </div>
       </section>
 
@@ -123,22 +115,44 @@ export default function HelpCenterPage() {
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+            {/* This tile used to advertise "24/7 support for active
+                members" behind a phone number. RYDA runs no support
+                line — the number was never answered, and /help/
+                insurance/roadside and /trust-and-safety both now say
+                in writing that there is no RYDA roadside number and no
+                24/7 line. An index tile promising the thing its own
+                article denies is the contradiction, so the tile points
+                at the article instead of at a phone. */}
             <Strip
-              title="Support & roadside"
-              detail="24/7 support for active members. One number, real humans, no IVR."
-              cta="Call (305) 555-0100"
-              href="tel:+13055550100"
+              title="If you're mid-rental"
+              detail="RYDA runs no 24/7 line and dispatches no roadside assistance. The operator who confirmed your booking owns the car and is the fastest route to a tow, a fix, or a swap."
+              cta="What to do if the car stops →"
+              href="/help/insurance/roadside"
             />
+            {/* "within one business day" is deleted from both tiles
+                below, and from the CTA underneath. Nothing in this
+                codebase measures or enforces a reply time: a contact
+                message writes a contact_messages row and emails the
+                team, and a help-chat escalation writes a
+                help_escalations row and does the same. Neither carries
+                an SLA, so neither tile may advertise one.
+
+                The third tile offered a bookable 30-minute consultation
+                about "membership, shares, or anything else" — there is
+                no membership, no share, no advisor and no calendar to
+                book. /contact#consultation still exists and its own copy
+                says to put the request in the message instead, so the
+                tile now says what that section actually does. */}
             <Strip
               title="Send us a message"
-              detail="For general questions, send a message and we'll route it to the right person within one business day."
+              detail="For general questions, send a message and we'll route it to the right person."
               cta="Open contact form →"
               href="/contact#form"
             />
             <Strip
-              title="Book a 30-minute call"
-              detail="Talk to a real human about membership, shares, or anything else. No commitment."
-              cta="Book a consultation →"
+              title="Rather talk it through?"
+              detail="There's no field on the contact form for a call. Put it in the message: what you're after, and when you're reachable."
+              cta="Send a note →"
               href="/contact#consultation"
             />
           </div>
@@ -152,8 +166,8 @@ export default function HelpCenterPage() {
             Didn't find what you needed?
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base text-cream/70">
-            We'll write you back within one business day. If it's urgent and
-            you're an active member, call the support line.
+            If you're mid-rental, the operator who confirmed your booking
+            will always be faster than we can be.
           </p>
           <Link
             href="/contact"

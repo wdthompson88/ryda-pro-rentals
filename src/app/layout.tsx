@@ -54,11 +54,34 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: "RYDA — Supercar co-ownership and rentals",
+    default: "RYDA — Car rental in Miami, everyday to exotic",
     template: "%s · RYDA",
   },
+  // Three standing rules for this block, which is the default snippet for
+  // every page that does not set its own — and note that "does not set
+  // its own" is the whole point: Next merges metadata per top-level key,
+  // so deleting a page's `description` does not delete a claim, it
+  // inherits this one. Fix the claim here, not by removing it downstream.
+  //
+  // 1. Makes named here must exist in PARTNER_VEHICLES. A marque nobody
+  //    can find on /rent is an advertised car we don't have. McLaren was
+  //    listed here and is not in the fleet.
+  // 2. The fleet is not an exotics fleet. Six of the 37 listings carry
+  //    category "Exotic" and 22 of the 37 are mainstream marques
+  //    (Chevrolet, Toyota, Tesla, VW, Ram, …), so "exotic and luxury
+  //    car rental" as the site-wide default described a sixth of the
+  //    inventory and undersold the rest. Range is the honest story —
+  //    which is not licence to drop the Ferraris and Lamborghinis
+  //    either, because those are real too.
+  // 3. No screening claim, and no plural supply side. "Vetted" asserted
+  //    a check nobody runs: the only operator screening in this repo is
+  //    Stripe Connect onboarding of business and bank details.
+  //    PartnerVehicle.partner is one literal operator, so "fleets"
+  //    claimed a roster of suppliers that does not exist. Both deleted
+  //    Aug 2026, here and in the openGraph/twitter/JSON-LD copies below,
+  //    which are separate strings and were separately wrong.
   description:
-    "Co-own or rent a curated certified pre owned Ferrari, Lamborghini, or McLaren in the US. Asset-backed LLC, professionally operated. Launching in Miami Q3 2026.",
+    "Browse Miami rental cars in one grid — Toyota, Tesla and Land Rover through Porsche, Ferrari and Lamborghini. Send one request with your dates and the local operator who owns the car confirms directly with you, on their contract and insurance.",
   metadataBase: new URL(siteUrl),
   // Canonical anchor for the home page. Per-page metadata can override
   // alternates.canonical for routes that should self-canonicalize
@@ -90,9 +113,9 @@ export const metadata: Metadata = {
       : undefined,
   },
   openGraph: {
-    title: "RYDA — Supercar co-ownership and rentals",
+    title: "RYDA — Car rental in Miami, everyday to exotic",
     description:
-      "Co-own or rent a curated supercar with verified members. Asset-backed LLC, professionally operated. Launching in Miami Q3 2026.",
+      "One grid of Miami rental cars, everyday to exotic. Send your dates; a local operator confirms directly with you.",
     siteName: "RYDA",
     type: "website",
     locale: "en_US",
@@ -100,21 +123,35 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "RYDA — Supercar co-ownership and rentals",
+    title: "RYDA — Car rental in Miami, everyday to exotic",
     description:
-      "Co-own or rent a curated supercar with verified members. Asset-backed LLC, professionally operated. Launching in Miami Q3 2026.",
+      "One grid of Miami rental cars, everyday to exotic. Send your dates; a local operator confirms directly with you.",
   },
   // Categorization helps some crawlers and embeds.
-  category: "Luxury vehicle co-ownership",
+  category: "Car rental",
   applicationName: "RYDA",
 };
 
-// Schema.org Organization + WebSite + Service JSON-LD for the home
-// document. This populates the Google knowledge panel + sitelinks
-// when the brand starts to rank, AND gives crawlers a structured
-// description of what RYDA is. The site-wide WebSite block is the
-// most important — it's what tells Google "this domain is RYDA",
-// not "this is some text about supercars."
+// Schema.org Organization + WebSite JSON-LD for every document. This
+// populates the Google knowledge panel + sitelinks when the brand
+// starts to rank, AND gives crawlers a structured description of what
+// RYDA is. The WebSite block is what tells Google "this domain is
+// RYDA", not "this is some text about supercars."
+//
+// There is deliberately NO `Service` node any more. The one that used
+// to sit here declared serviceType "Exotic and luxury car rental" with
+// provider: RYDA and an InStock `Offer` on /rent — a machine-readable
+// assertion that RYDA is the rental company, which Terms §2 and the
+// Platform Disclaimer deny in writing (RYDA does not own, store,
+// insure, maintain or operate any vehicle, and is not a party to the
+// rental). schema.org has no vocabulary for "we refer you to the
+// business that actually provides this": `provider` / `offeredBy` want
+// the operator, and operators are never named on a customer-facing
+// surface (D6) — and this JSON-LD is served on every page. Nor is the
+// availability knowable: a listing is browsable, not InStock, because
+// nothing is reserved until the operator confirms. Removing the node
+// beats misdeclaring the provider; Organization.description carries
+// the referral model in prose, which is the true statement.
 const organizationJsonLd = {
   "@context": "https://schema.org",
   "@graph": [
@@ -126,13 +163,19 @@ const organizationJsonLd = {
       url: siteUrl,
       logo: `${siteUrl}/opengraph-image`,
       description:
-        "Asset-backed co-ownership of certified pre-owned Ferraris, Lamborghinis, McLarens, and curated boats. Member-managed single-purpose LLCs. Professional operations. Launching Q3 2026 in Miami; LA + NY 2027.",
-      foundingDate: "2026",
-      areaServed: [
-        { "@type": "City", name: "Miami" },
-        { "@type": "City", name: "Los Angeles" },
-        { "@type": "City", name: "New York" },
-      ],
+        "RYDA is a referral marketplace for car rental in Miami, spanning everyday cars through exotics. Every vehicle listed is owned and operated by an independent Miami operator: we list their fleet in one grid, pass each request to the operator who holds the car, and earn a referral commission from them. RYDA does not own, store, insure, maintain or operate any vehicle, and is not a party to the rental.",
+      // No `foundingDate`. The one that sat here published "2026" as a
+      // machine-readable fact on every document with nothing in the
+      // repo to source it from — the exact category /press refuses to
+      // put on the fact sheet ("no founding year, no headcount, no
+      // funding stage"). Add one back only against an incorporation
+      // record, not against a guess at the first commit.
+      // Miami only. `PartnerVehicle.market` is the literal type "Miami",
+      // so the inventory cannot currently hold anything else — listing
+      // LA and NY here claimed coverage in two cities with zero
+      // listings. Add a city back when operators in it are listed
+      // (same rule as MARKETS[...].status and /locations/_components).
+      areaServed: [{ "@type": "City", name: "Miami" }],
       address: {
         "@type": "PostalAddress",
         addressLocality: "Miami",
@@ -143,7 +186,7 @@ const organizationJsonLd = {
         {
           "@type": "ContactPoint",
           contactType: "customer support",
-          email: "support@ryda.pro",
+          email: "hello@ryda.pro",
           availableLanguage: ["en"],
         },
       ],
@@ -161,7 +204,7 @@ const organizationJsonLd = {
       url: siteUrl,
       name: "RYDA",
       description:
-        "Co-own or rent a Ferrari, Lamborghini, McLaren, or boat in the US. Asset-backed LLC, professionally operated.",
+        "Browse Miami rental cars in one grid, everyday cars through exotics. Send one request with your dates; the local operator who owns the car confirms directly with you, on their contract and insurance.",
       publisher: { "@id": `${siteUrl}#organization` },
       inLanguage: "en-US",
       potentialAction: {
@@ -171,28 +214,6 @@ const organizationJsonLd = {
           urlTemplate: `${siteUrl}/search?q={search_term_string}`,
         },
         "query-input": "required name=search_term_string",
-      },
-    },
-    {
-      "@type": "Service",
-      "@id": `${siteUrl}#service`,
-      serviceType: "Luxury vehicle co-ownership",
-      provider: { "@id": `${siteUrl}#organization` },
-      areaServed: [
-        { "@type": "City", name: "Miami" },
-        { "@type": "City", name: "Los Angeles" },
-        { "@type": "City", name: "New York" },
-      ],
-      offers: {
-        "@type": "Offer",
-        priceCurrency: "USD",
-        availability: "https://schema.org/PreOrder",
-        url: `${siteUrl}/cars`,
-        category: "Co-ownership share",
-      },
-      audience: {
-        "@type": "PeopleAudience",
-        suggestedMinAge: 28,
       },
     },
   ],
@@ -207,10 +228,10 @@ export default function RootLayout({
       className={`${inter.variable} ${fraunces.variable} h-full antialiased`}
     >
       <head>
-        {/* Site-wide Organization + WebSite + Service Schema.org graph.
-            This is what Google reads to populate the brand knowledge
-            panel + sitelinks search box. Without this, the search
-            snippet defaults to whatever Google extracts from the
+        {/* Site-wide Organization + WebSite Schema.org graph. This is
+            what Google reads to populate the brand knowledge panel +
+            sitelinks search box. Without this, the search snippet
+            defaults to whatever Google extracts from the
             <meta description> alone. */}
         <script
           type="application/ld+json"

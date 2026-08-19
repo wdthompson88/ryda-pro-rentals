@@ -1,9 +1,9 @@
 // Rental listings — the database-backed read path (migration 0044).
 //
-// Today /rent renders from two hard-coded modules (market-data.ts and
-// partner-fleet.ts). Migration 0044 introduces rental_listings +
-// rental_listing_photos so operators can eventually own their own
-// inventory. This module is the boundary between those rows and the
+// Today /rent renders from one hard-coded module (partner-fleet.ts).
+// Migration 0044 introduces rental_listings + rental_listing_photos so
+// operators can eventually own their own inventory. This module is the
+// boundary between those rows and the
 // RentalListing shape the grid already renders — nothing here queries
 // yet; wiring the grid is a later PR (build loop 2C).
 //
@@ -139,11 +139,10 @@ export function rentalCoverPath(
 /**
  * Map a database row onto the shape the /rent grid renders.
  *
- * Every DB listing is `kind: "partner"` and `isCoOwnable: false`:
- * decision D7 of the build loop is that rental inventory belongs to
- * partner operators, and a "RYDA rents its own fleet" path is
- * explicitly deferred. The co-ownable cars still come from
- * market-data.ts.
+ * Every listing is an operator's, which is why RentalListing no longer
+ * carries a `kind` or an `isCoOwnable` flag to set: decision D7 of the
+ * build loop is that rental inventory belongs to partner operators, and
+ * the RYDA-owned rail was removed outright in Aug 2026.
  *
  * Note what is NOT carried across: partner_id, vin, and the operator's
  * identity never enter this object. D6 keeps operators anonymous until
@@ -157,7 +156,6 @@ export function rowToRentalListing(
 ): RentalListing {
   return {
     slug: row.slug,
-    kind: "partner",
     make: row.make,
     model: row.model,
     year: row.year ?? undefined,
@@ -169,7 +167,6 @@ export function rowToRentalListing(
         : centsToDollars(row.regular_rate_cents),
     market: row.market,
     hero: rentalPhotoUrl(rentalCoverPath(row, photos), supabaseUrl),
-    isCoOwnable: false,
   };
 }
 

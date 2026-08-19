@@ -15,9 +15,10 @@
 //               member can apply without re-registering)
 //   pending   — application received: review timeline + editable
 //               company profile
-//   approved  — live-ready: fleet panel (listing setup is white-glove,
-//               so it's an empty state until ops wires inventory) +
-//               editable company profile
+//   approved  — live-ready: fleet panel (the booking-request inbox at
+//               /partner/requests, badged with what's waiting; listing
+//               setup stays white-glove, so inventory is still an empty
+//               state until ops wires it) + editable company profile
 //   suspended — paused/declined notice + contact
 //
 // Status is admin-owned (/admin/partners). This page never writes it.
@@ -32,6 +33,15 @@ import {
   PARTNER_FLEET_SIZES,
   type PartnerAccount,
 } from "@/lib/partner";
+// From the lib, NOT from the inbox component: that module is "use
+// client" and imports RentalDatePicker, the admin action modal and the
+// quote engine at module scope, and this page renders none of them — it
+// renders a count badge. See src/lib/operator-bookings.ts.
+import { fetchOperatorBookings } from "@/lib/operator-bookings";
+import {
+  FOCUS_RING,
+  countOperatorRequests,
+} from "@/lib/rental-booking-display";
 
 // Admin approval bridges an application (partner_accounts) to a Stripe
 // operator (partners row). /api/partner/me surfaces that link as an
@@ -235,7 +245,7 @@ function SignInPrompt() {
       </h2>
       <p className="mt-2 max-w-xl text-sm text-ink-soft">
         Your application status and company profile live behind your
-        account. New here? Partner signup takes about a minute.
+        account.
       </p>
       <div className="mt-6 flex flex-wrap gap-3">
         <Link
@@ -276,8 +286,8 @@ function ApplySection({
         </h2>
         <p className="mt-2 max-w-xl text-sm text-ink-soft">
           {intent
-            ? "You signed up as a fleet partner. Add your company details below and your application goes straight into review — we respond personally within 3 business days."
-            : "Tell us about your company. We respond to every application personally within 3 business days, and this page tracks the review from the moment you submit."}
+            ? "You signed up as a fleet partner. Add your company details below and your application goes straight into review."
+            : "Tell us about your company. This page tracks the review from the moment you submit."}
         </p>
         <PartnerForm
           submitLabel="Submit application →"
@@ -329,16 +339,18 @@ function Dashboard({
   );
 }
 
-// Mirrors the four steps on /partners plus the one that page used to
-// omit: before any money can move the operator must finish Stripe
-// Express onboarding (identity, business details, bank account). Landing
-// an approved operator on a KYC gate the journey never mentioned is how
-// a "days not months" promise turns into a complaint.
-const REVIEW_STEPS = [
+// Mirrors the steps on /partners plus the one that page used to omit:
+// before any money can move the operator must finish Stripe Express
+// onboarding (identity, business details, bank account).
+//
+// `body` is optional because a step with nothing substantiable to say
+// says nothing: "Fleet review" used to claim RYDA confirms vehicles
+// "meet RYDA's standards", and /trust-and-safety states in writing that
+// RYDA does not inspect cars and holds no vehicle standard.
+const REVIEW_STEPS: { title: string; body?: string }[] = [
   { title: "Apply", body: "Application received." },
   {
     title: "Fleet review",
-    body: "We confirm which vehicles meet RYDA's standards.",
   },
   {
     title: "Listing setup",
@@ -348,7 +360,7 @@ const REVIEW_STEPS = [
     title: "Activate payments",
     body: "We send a Stripe link; Stripe verifies your business and bank details so payouts reach you directly.",
   },
-  { title: "Live", body: "Your fleet goes live. Enquiries reach you directly." },
+  { title: "Live", body: "Your fleet goes live." },
 ];
 
 function StatusCard({ partner }: { partner: PartnerAccount }) {
@@ -397,9 +409,11 @@ function StatusCard({ partner }: { partner: PartnerAccount }) {
                   {done && " ✓"}
                   {current && " · in progress"}
                 </p>
-                <p className="mt-1 text-xs leading-relaxed text-ink-soft">
-                  {s.body}
-                </p>
+                {s.body && (
+                  <p className="mt-1 text-xs leading-relaxed text-ink-soft">
+                    {s.body}
+                  </p>
+                )}
               </li>
             );
           })}
@@ -509,7 +523,6 @@ function PaymentsCard({
         // approval and its operator row.
         <p className="mt-4 text-sm text-ink-soft">
           You&apos;re approved — we&apos;re setting up your operator entry.
-          Your Stripe onboarding link follows shortly.
         </p>
       ) : operator.paused ? (
         <div className="mt-4 rounded-xl bg-warn/15 px-4 py-3 text-sm text-warn-deep">
@@ -517,8 +530,8 @@ function PaymentsCard({
         </div>
       ) : operator.stripeOnboarded ? (
         <div className="mt-4 rounded-xl bg-success/10 px-4 py-3 text-sm text-success-deep">
-          Payments active — you receive bookings directly; RYDA&apos;s
-          commission is deducted automatically.
+          Payments active — RYDA&apos;s commission is deducted
+          automatically.
         </div>
       ) : (
         <p className="mt-4 text-sm text-ink-soft">
@@ -531,14 +544,72 @@ function PaymentsCard({
 }
 
 // Listing setup is white-glove (an ops conversation, not a self-serve
-// upload), so the approved fleet panel is an honest empty state until
-// inventory exists in the system.
+// upload), so the approved fleet panel is still an honest empty state
+// where INVENTORY is concerned. What it is no longer empty about is
+// BOOKINGS: build loop 2F puts the request inbox at /partner/requests,
+// and an operator has 24 hours to answer a request (open default O5),
+// so the count of what is waiting on them belongs on the page they
+// actually land on rather than behind a link they have no reason to
+// click.
+//
+// The count comes from the SAME fetch and the SAME predicate the inbox
+// itself uses — fetchOperatorBookings() + countOperatorRequests(),
+// which reads awaitsDecisionFrom (whose turn it is, per
+// rentalBookingDecider) and lazily expires anything past its window.
+// Two definitions of "waiting on you" would eventually disagree, and
+// the one on this page would be the one nobody notices is wrong.
+//
+// Best-effort: a failed load leaves the count unknown and the panel
+// simply does not badge it. The inbox is one click away and answers for
+// itself; a partner dashboard must not break because a booking table is
+// not applied yet.
 function FleetPanel() {
+  const [pending, setPending] = useState<number | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const res = await fetchOperatorBookings();
+      if (cancelled || !res.ok) return;
+      setPending(countOperatorRequests(res.bookings, Date.now()));
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <section className="rounded-2xl border border-rule bg-surface p-6 sm:p-8">
       <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
         Your fleet
       </p>
+
+      <Link
+        href="/partner/requests"
+        className={`mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-rule bg-cream-2/50 px-5 py-4 transition-colors hover:border-ink ${FOCUS_RING}`}
+      >
+        <span>
+          <span className="block font-display text-lg text-ink">
+            Booking requests
+          </span>
+          <span className="mt-1 block text-sm text-ink-soft">
+            {pending === null
+              ? "Renters asking for dates on your cars."
+              : pending === 0
+                ? "Nothing waiting on you right now."
+                : "Answer within 24 hours or the request expires."}
+          </span>
+        </span>
+        <span className="flex items-center gap-3">
+          {pending !== null && pending > 0 && (
+            <span className="inline-flex items-center rounded-full bg-red px-3 py-1 text-xs font-medium tabular-nums text-cream">
+              {pending} waiting
+            </span>
+          )}
+          <span className="text-sm font-medium text-ink">Open inbox →</span>
+        </span>
+      </Link>
+
       <div className="mt-4 rounded-xl border border-rule bg-cream-2/50 p-8 text-center">
         <p className="font-display text-lg text-ink">
           Listing setup starts with a conversation.

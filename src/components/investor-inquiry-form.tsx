@@ -57,10 +57,11 @@ export function InvestorInquiryForm() {
   if (status === "success") {
     return (
       <div className="mx-auto mt-10 max-w-xl rounded-2xl border border-rule bg-surface px-6 py-10 text-ink">
+        {/* The second line promised the deck "within 24 hours" and a
+            diligence call. Nothing measures or queues against a response
+            time, and no diligence process exists in this repo — deleted
+            rather than restated more vaguely. */}
         <p className="font-display text-2xl">Thanks, we'll be in touch.</p>
-        <p className="mt-3 text-sm text-ink-soft">
-          We send the deck to qualified investors within 24 hours, followed by a call to walk through diligence materials.
-        </p>
       </div>
     );
   }

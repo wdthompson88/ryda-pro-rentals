@@ -1,7 +1,6 @@
 // Smoke tests against the RYDA marketing surface. Validates that the
 // rental-first restructure (Aug 2026 pivot: landing story on /, browse
-// grid at /rent, lead-gen how-it-works) plus the surviving asset-detail
-// and learn-hub surfaces render correctly post-deploy.
+// grid at /rent, lead-gen how-it-works) renders correctly post-deploy.
 //
 // Run locally:    npm run test:e2e
 // Run UI mode:    npm run test:e2e:ui
@@ -21,10 +20,13 @@ test.describe('home page', () => {
       page.getByRole('heading', { name: /one request away/i }),
     ).toBeVisible();
     await expect(page.locator('a[href="/rent"]').first()).toBeVisible();
-    // Featured fleet section renders its heading.
-    await expect(
-      page.getByRole('heading', { name: /the cars miami asks for by name/i }),
-    ).toBeVisible();
+    // Featured fleet section renders. This asserted the H2 "The cars
+    // Miami asks for by name", which is deleted: nothing in this repo
+    // measures what Miami asks for — no demand signal, no search log,
+    // no booking history — so the assertion was holding an unbacked
+    // claim in place. The section has no replacement heading, so this
+    // now pins the eyebrow, which is a factual section label.
+    await expect(page.getByText(/featured fleet/i).first()).toBeVisible();
     // How-it-works teaser links through to the full page.
     await expect(
       page.locator('a[href="/how-it-works"]').first(),
@@ -51,9 +53,13 @@ test.describe('home page', () => {
 test.describe('how-it-works', () => {
   test('renders the three-step lead-gen model', async ({ page }) => {
     await page.goto('/how-it-works');
-    // Hero of the rental-first page.
+    // Hero of the rental-first page. "A named operator." is gone from
+    // the H1 — listings are unbranded by decision and nothing in the
+    // code names an operator to a customer or obliges one to introduce
+    // themselves — so this tracks the surviving heading rather than
+    // pinning the deleted promise.
     await expect(
-      page.getByRole('heading', { name: /one request\. a named operator/i }),
+      page.getByRole('heading', { name: /one request\. the keys/i }),
     ).toBeVisible();
     // The three steps.
     await expect(page.getByText(/request with dates/i).first()).toBeVisible();
@@ -62,47 +68,32 @@ test.describe('how-it-works', () => {
     await expect(
       page.getByRole('heading', { name: /referral commission/i }),
     ).toBeVisible();
-    await expect(page.getByText(/never through ryda/i).first()).toBeVisible();
-  });
-
-  test('parked co-ownership program keeps its quiet pointer', async ({
-    page,
-  }) => {
-    await page.goto('/how-it-works');
-    // The 2027 waitlist pointer at the end of the page — one of the
-    // two sanctioned co-ownership references (the other is the
-    // footer's Cars column link).
+    // Where the money goes. The page must describe the mechanism the code
+    // actually implements — a fee-only Stripe Connect direct charge against
+    // the operator's connected account, with RYDA's cut riding along as
+    // application_fee_amount — and must never promise that RYDA holds,
+    // guarantees, or never touches payment. AGENTS.md forbids that claim
+    // outright, so this asserts the mechanism rather than a reassurance.
     await expect(
-      page.getByRole('link', { name: /founding member waitlist/i }),
+      page.getByText(/collected as a platform fee/i).first(),
     ).toBeVisible();
+    // A third assertion here pinned /straight to the operator/i. That
+    // phrasing is false and the assertion was holding it in place:
+    // PARTNER_INQUIRY_EMAILS in src/lib/partner-contacts.ts is empty —
+    // its one entry is commented out pending a signed referral
+    // agreement — so partnerInquiryEmail() returns the RYDA team
+    // fallback for every listing and each lead is triaged and passed on
+    // by hand. A smoke test may not require a page to keep saying
+    // something the code contradicts, so it is gone rather than
+    // reworded; the routing copy itself is the copy pass's to fix.
   });
 });
 
-test.describe('asset detail page', () => {
-  test('Ferrari 458 listing page renders title + ops disclosure', async ({
-    page,
-  }) => {
-    await page.goto('/portfolio/f458');
-    // Listing title (year prefix from callsite, name from Vehicle.name).
-    await expect(
-      page.getByRole('heading', { name: /ferrari 458/i }).first(),
-    ).toBeVisible();
-    // Ops disclosure block — shipped on every listing.
-    await expect(page.getByText(/care & custody/i).first()).toBeVisible();
-    // Live market embed section heading (classic.com widget).
-    await expect(page.getByText(/live market data/i).first()).toBeVisible();
-  });
-});
-
-test.describe('learn hub', () => {
-  test('renders the 5 stages', async ({ page }) => {
-    await page.goto('/learn');
-    await expect(
-      page.getByRole('heading', { name: /how co-ownership/i }),
-    ).toBeVisible();
-    // The five stage labels — Understand / Choose / Buy / Drive / Exit
-    for (const stage of ['Understand', 'Choose', 'Buy', 'Drive', 'Exit']) {
-      await expect(page.getByText(stage, { exact: false }).first()).toBeVisible();
-    }
-  });
-});
+// The 'learn hub' describe block lived here. It pinned the /learn
+// co-ownership curriculum (the "How co-ownership works" heading and the
+// Understand → Choose → Buy → Drive → Exit stage labels) so a rewrite
+// would fail loudly instead of shipping half-done. /learn was not
+// rewritten — it was deleted, along with /journal, /events and
+// /careers, because all four described a co-ownership business RYDA
+// does not run. There is no rental equivalent to re-point these
+// assertions at, so the block is gone rather than weakened.

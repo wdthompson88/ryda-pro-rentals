@@ -72,7 +72,7 @@ export default async function ArticlePage({
             <div>
               <p className="font-display text-base text-ink">Was this helpful?</p>
               <p className="mt-1 text-xs text-mute">
-                If not, write us, we improve articles based on what members
+                If not, write us, we improve articles based on what people
                 actually ask.
               </p>
             </div>

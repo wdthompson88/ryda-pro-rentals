@@ -105,8 +105,11 @@ Read these first (they are the RYDA conventions every task must obey):
   (the `btree_gist` EXCLUDE constraint). The co-ownership handover flow to rewire:
   **`0034_vehicle_handovers.sql`** + `src/app/bookings/[id]/checkin` + `/return` +
   `src/app/api/bookings/[id]/handover/route.ts`.
-- **`docs/DROPBOX_SIGN_SETUP.md`** — Dropbox Sign is already installed (`@dropbox/sign`) and
-  configured; it is the tool for the reservation agreement (Phase 4).
+- **E-signature is NOT installed.** An earlier draft of this doc said Dropbox Sign was
+  already wired; that was true of the co-ownership product and is no longer true here. The
+  `@dropbox/sign` dependency, `src/lib/dropbox-sign.ts`, the document routes and
+  `docs/DROPBOX_SIGN_SETUP.md` were all removed in the rentals-first strip. Phase 4B starts
+  from a vendor choice, not from configuration.
 
 **Runtime facts:** Node **24** is mandatory (`.npmrc` `engine-strict=true`; wrong major
 fails `npm install`). Migration **head present = `0043`; the next number is almost certainly
@@ -199,17 +202,21 @@ being slow.
    transitions with service-role-only doors, and a slot state-machine trigger (write-once,
    terminal-stays-terminal). Extend the existing `rental_payments_enforce_status`
    immutability trigger — do not fight it.
-9. **The payment copy rule inverts on the pivot — sweep it in the same PR as the rail.**
-   Today the code says *"RYDA never holds your money."* After D1 that is **false**. When
-   Phase 3B lands, the same PR must correct every such claim. Known locations to fix:
-   `AGENTS.md` (the doctrine paragraph, ~lines 27–30), `src/app/how-it-works/page.tsx`
-   (~118), `src/app/rent/[symbol]/page.tsx` (~407), `src/app/rent/booking-confirmed/page.tsx`
-   (~53), `src/app/partners/page.tsx` (~72), `src/app/member-protection/page.tsx` (~41),
-   admin copy in `src/app/admin/inquiries/page.tsx` (~746) and `src/app/admin/partners/page.tsx`
-   (~29), the customer email in `payment-link/route.ts` (~147), and the doctrine comments in
-   `payment-link/route.ts` (1–13), `connect-webhook` header, `onboarding-link/route.ts`
-   (11–15), and `0041`'s header. **State what the code does — never over-promise
-   holds/guarantees.**
+9. **The payment copy rule — SWEPT, keep it swept.** Two false claims used to ship:
+   *"RYDA never holds your money"* (a promise the rule forbids outright) and
+   *"No payment through RYDA"* (bait-and-switch, because RYDA does create and email the
+   Checkout link — and it reads as a phishing signal to anyone who believed it). Both are
+   gone from every customer-facing surface: `how-it-works`, `rent/[symbol]`,
+   `rent/booking-confirmed`, `rent`, `partners`, the landing page, and the customer email
+   in `payment-link/route.ts`. The e2e assertion in `tests/example.spec.ts` was updated to
+   check the mechanism rather than the reassurance, so a regression fails the suite.
+
+   What ships now, and what any new copy must match: **no card at request**; once the
+   operator confirms, RYDA emails a Stripe Checkout link created on the operator's own
+   connected account; the rental price settles to the operator and RYDA's commission is
+   collected as an application fee. Admin-facing copy in `admin/inquiries` (~746) and the
+   header comment in `admin/partners` (~29) already state this correctly — leave them.
+   **State what the code does — never over-promise holds/guarantees.**
 10. **Operators are never named to customers before confirmation** (D6). The current
     boundary is real: the `replyTo` indirection and the `GET /api/rental-inquiry` stripping
     `partner_name`. Preserve anonymity through browse + request; reveal only post-confirm.
@@ -432,9 +439,9 @@ pattern** to borrow (if any), a **Definition of Done (DoD)**, and an **Acceptanc
   operator's price" style claims — none remain that contradict the on-platform rail.
 
 - [ ] **4B. Reservation agreement / e-sign.**
-  Use **Dropbox Sign** (already installed; see `docs/DROPBOX_SIGN_SETUP.md`) for a renter+
-  operator rental agreement issued at confirmation; or Mainstable's lighter **click-accept**
-  (`/trial-agreement`) pattern if a full e-sign is overkill for v1.
+  Pick a vendor first — nothing is installed (see the note in §1). Dropbox Sign is the
+  known-good option since the team has used it before, or take the lighter **click-accept**
+  pattern if a full e-sign is overkill for v1.
   **Acceptance:** a confirmed booking produces a signed/accepted agreement stored against it.
 
 - [ ] **4C. Rewire check-in / return to the rental booking.**
@@ -506,27 +513,83 @@ Condensed from a full read-only inventory. **KEEP** = leave as-is; **MODIFY** = 
 
 Tick as PRs merge; add the PR link + one line each. (Boxes mirror §4.)
 
-- [ ] 0A rental_listings + media bucket + RLS
-- [ ] 0B renter / operator-staff roles
-- [ ] 0C notifications table + notify()
-- [ ] 0D partner_id FK migration
-- [ ] 1A renter identity + license/age verification
-- [ ] 1B rental signup / onboarding
-- [ ] 2A availability + blackout model
-- [ ] 2B rental_bookings + EXCLUDE + state-machine trigger
-- [ ] 2C availability calendar UI + server quote
-- [ ] 2D request-to-book flow
-- [ ] 2E renter↔operator messaging
-- [ ] 2F operator fleet dashboard
-- [ ] 2G renter "my rentals" dashboard
-- [ ] 3A configurable fee engine
-- [ ] 3B full on-platform rail
-- [ ] 3C security-deposit hold
-- [ ] 3D refunds / disputes / cancellation
-- [ ] 4A payment copy + legal sweep
-- [ ] 4B reservation agreement / e-sign
-- [ ] 4C check-in / return rewire
-- [ ] 4D CSP + images + expiry job
+**Migration head: 0050 — applied.** Local and remote agree through 0050, and the
+37-car fleet is seeded. See the state note under the table.
+
+| | Task | PR | Note |
+|---|---|---|---|
+| [x] | 0A rental_listings + media bucket + RLS | #17 | migration 0044 |
+| [ ] | 0B renter / operator-staff roles | — | not started; `is_partner_staff()` (0042) covers operator staff, renter has no role of its own |
+| [x] | 0C notifications table + notify() | #24 | migration 0049; feed + channel preferences |
+| [x] | 0D partner_id FK migration | #19 | migration 0045 |
+| [ ] | 1A renter identity + license/age verification | — | **not started, and nothing gates confirm.** Stripe Identity is wired to co-ownership's 28+ gate only; no rental age-25 constant, no license capture, no Checkr |
+| [~] | 1B rental signup / onboarding | #14 | one-touch identity captures name/phone once; the booking form prefills from `rental_profiles` and hides email/password for members |
+| [x] | 2A availability + blackout model | #20 | migration 0046 |
+| [x] | 2B rental_bookings + EXCLUDE + state-machine trigger | #20 | migration 0047 |
+| [x] | 2C availability calendar UI + server quote | #21 → #24 | `rental-date-picker.tsx`, `GET /api/rental-availability/[slug]`, `rental-quote.ts` |
+| [x] | 2D request-to-book flow | #21 → #24 | `POST /api/rental-bookings`, `[id]/decision` (approve/decline/propose) |
+| [ ] | 2E renter↔operator messaging | — | not started |
+| [~] | 2F operator fleet dashboard | #22 → #24 | request inbox at `/partner/requests` is live. **No listing or availability editor** — an operator cannot set a blackout or edit a rate, so every seeded calendar is default-open for 180 days |
+| [x] | 2G renter "my rentals" dashboard | #22 → #24 | `/account/rentals` |
+| [x] | 3A configurable fee engine | #24 | migration 0048. **Wired to the pay-link rail only** — see the seam below |
+| [ ] | 3B full on-platform rail | — | not started. A booking reaches `confirmed` and no money moves |
+| [ ] | 3C security-deposit hold | — | not started; 0047 already carries the deposit state columns |
+| [ ] | 3D refunds / disputes / cancellation | — | not started |
+| [ ] | 4A payment copy + legal sweep | — | not started — must land with 3B, which is what makes the current copy false |
+| [ ] | 4B reservation agreement / e-sign | — | not started |
+| [ ] | 4C check-in / return rewire | — | not started |
+| [ ] | 4D CSP + images + expiry job | — | not started. 0047 defaults `expires_at` to +24h but nothing sweeps or lazy-expires it |
+
+Plus, beyond §4's original list:
+
+| | Task | PR | Note |
+|---|---|---|---|
+| [x] | Seed the static fleet into `rental_listings` | #25 | `npm run seed:rental-listings` — without this the whole loop is unreachable |
+| [x] | `instant_book` per-listing flag | #25 | migration 0050. Column only; nothing reads it until 3B makes it honest |
+
+### Database state (2026-08-18)
+
+**0044–0050 are applied** to the linked project, and `npm run seed:rental-listings:apply`
+has inserted all 37 static cars. Verified end to end against the live database:
+`GET /api/rental-availability/lamborghini-huracan-evo` returns a 180-day open calendar,
+and a Sep 12→15 range prices at 3 nights × $1,105 = **$3,315** with
+`feePayer: "operator"` and `renterTotalCents == baseAmountCents`. The public payload
+carries no commission, operator, or VIN, so the D6 boundary holds on the anonymous route.
+
+0048's columns landed with behavior-preserving defaults — GM LUXE reads
+`fee_mode: percent`, `fee_payer: operator`, `commission_rate: 0.150` — which is what
+keeps seam 1 below latent rather than live.
+
+Two things this does **not** mean:
+
+- **The booking loop is not in production.** PR #24 is not merged, so deployed code has no
+  `/api/rental-bookings` and no date picker. The schema and the rows are ahead of the
+  code, which is the correct order (expand, then deploy) — but nothing is renter-visible
+  until #24 and #25 land.
+- **Every route still degrades on a missing table**, and that behavior is worth keeping.
+  It is why a half-applied chain never 500s a public page.
+
+### Two open seams worth naming
+
+1. **The fee engine reaches only one of two rails.** `payment-link/route.ts`
+   honors the full 0048 config via `rentalFeeConfigFromPartner()`. The booking
+   path (`rental-bookings/route.ts`, `[id]/decision`,
+   `rental-availability/[slug]`) selects only `commission_rate`, and
+   `rental-quote.ts` hardcodes `RENTAL_FEE_PAYER_CURRENT = "operator"`. Not
+   wrong at 0048's defaults (`percent` / `operator`); wrong the moment an admin
+   sets a flat fee or renter-pays, at which point the admin preview and the
+   renter's frozen quote disagree — the exact divergence `fees.ts`'s header
+   exists to prevent. Wiring it changes the public availability route's D6
+   posture: under `fee_payer = 'renter'` the renter total becomes `base + fee`,
+   so that route must compute the fee server-side while still emitting no
+   commission column.
+
+2. **A default-open calendar with no editor oversells.** 0046 is default-open by
+   design (an un-managed calendar would otherwise be a dead listing), and D3's
+   operator approval is what absorbs a request for a day the operator cannot
+   serve. That contract holds only while every booking passes an operator — so
+   2F's availability editor is a prerequisite for `instant_book`, not a polish
+   item after it.
 
 ---
 

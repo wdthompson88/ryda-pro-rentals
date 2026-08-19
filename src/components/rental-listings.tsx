@@ -1,19 +1,18 @@
 "use client";
 
-// Unified rental listings, RYDA co-ownership fleet + extended Miami
-// inventory in ONE filterable card grid. Each card links to a detail
-// page at /rent/[slug] regardless of which fleet it came from. The
-// route handler resolves slug → Vehicle (RYDA) or PartnerVehicle.
+// The rental listings grid: every car a partner operator lists with
+// RYDA, in ONE filterable card grid. Each card links to a detail page at
+// /rent/[slug], which resolves the slug back to a PartnerVehicle.
+//
+// There is exactly one rail. RYDA owns no vehicle and rents none of its
+// own — the RYDA-owned fleet (and with it `kind`, `isCoOwnable`, and the
+// co-ownable-first sort tier) was removed in Aug 2026.
 
 import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
-import {
-  VEHICLES,
-  formatUSD,
-  type Vehicle,
-} from "@/lib/market-data";
+import { formatUSD } from "@/lib/market-data";
 import {
   PARTNER_VEHICLES,
   brandTint,
@@ -30,46 +29,20 @@ import {
 // rental inventory finishes moving into the database (build loop 0A →
 // 2C) this type and its adapters should move to src/lib/.
 export type RentalListing = {
-  slug: string;             // route param: vehicle.symbol.toLowerCase() OR partner.slug
-  kind: "ryda" | "partner";
+  slug: string;             // route param: partner.slug
   make: string;
   model: string;
   year?: number;
   category: string;
   dailyRate: number;
-  regularRate?: number;     // discounted-vs-sticker price (partner cars only)
+  regularRate?: number;     // discounted-vs-sticker price
   market: string;
   hero?: string;
-  flipImage?: boolean;
-  imagePosition?: string;
-  trackEligible?: boolean;
-  isCoOwnable: boolean;     // RYDA fleet → can also claim a share
-  sharesAvailable?: number; // RYDA fleet only
 };
-
-function vehicleToListing(v: Vehicle): RentalListing {
-  return {
-    slug: v.symbol.toLowerCase(),
-    kind: "ryda",
-    make: v.brand,
-    model: v.name.replace(`${v.brand} `, "").trim() || v.name,
-    year: v.year,
-    category: v.category,
-    dailyRate: v.rentalDailyRate,
-    market: v.market,
-    hero: v.hero,
-    flipImage: v.flipImage,
-    imagePosition: v.imagePosition,
-    trackEligible: v.trackEligible,
-    isCoOwnable: true,
-    sharesAvailable: v.sharesAvailable,
-  };
-}
 
 function partnerToListing(p: PartnerVehicle): RentalListing {
   return {
     slug: p.slug,
-    kind: "partner",
     make: p.make,
     model: p.model,
     year: p.year,
@@ -78,14 +51,10 @@ function partnerToListing(p: PartnerVehicle): RentalListing {
     regularRate: p.regularRate,
     market: p.market,
     hero: getPartnerHero(p),
-    isCoOwnable: false,
   };
 }
 
-const ALL_LISTINGS: RentalListing[] = [
-  ...VEHICLES.filter((v) => v.rentalAvailable).map(vehicleToListing),
-  ...PARTNER_VEHICLES.map(partnerToListing),
-];
+const ALL_LISTINGS: RentalListing[] = PARTNER_VEHICLES.map(partnerToListing);
 
 // ─────────────────────────────────────────────────────────────────────────
 // Filters & sort
@@ -100,13 +69,15 @@ type SortOption =
 
 const ANY = "__any__";
 
+// Exactly the PartnerCategory union, nothing more. "Coupe", "GT" and
+// "Hypercar" used to live here because the RYDA-owned fleet was typed
+// on its own category union; with that fleet gone they matched zero
+// inventory, so picking one dropped the visitor on the empty state.
+// A filter that can only ever return nothing is worse than no filter.
 const CATEGORY_OPTIONS: { value: string; label: string }[] = [
   { value: ANY, label: "All types" },
-  { value: "Coupe", label: "Coupe" },
-  { value: "Convertible", label: "Convertible" },
-  { value: "GT", label: "GT" },
-  { value: "Hypercar", label: "Hypercar" },
   { value: "Exotic", label: "Exotic" },
+  { value: "Convertible", label: "Convertible" },
   { value: "SUV", label: "SUV" },
   { value: "Sedan", label: "Sedan" },
   { value: "7-Seater", label: "7-Seater" },
@@ -131,11 +102,17 @@ const PRICE_BUCKETS: {
   { value: "200-500", label: "$200 – $500/day", test: (r) => r >= 200 && r < 500 },
   { value: "500-1000", label: "$500 – $1,000/day", test: (r) => r >= 500 && r < 1_000 },
   { value: "1000-3000", label: "$1,000 – $3,000/day", test: (r) => r >= 1_000 && r < 3_000 },
-  { value: "3000+", label: "$3,000+/day", test: (r) => r >= 3_000 },
+  // A "$3,000+/day" bucket sat here and matched zero cars — the same
+  // fault as the "Coupe"/"GT"/"Hypercar" categories above, and the same
+  // fix. An option that can only ever return the empty state advertises
+  // inventory at a price nobody can rent.
 ];
 
-// Year buckets, partner inventory is recent but not always current model;
-// "Newer than 2022" matches member expectation around modern luxury.
+// Year buckets. Operator inventory is recent but not always the current
+// model year, and most entries carry no `year` at all — a year filter
+// therefore hides more cars than it finds, which is why the neutral
+// "Any year" is the default. (No "member" framing here: RYDA has no
+// membership, and copy in this tree kept re-seeding one from comments.)
 const YEAR_BUCKETS: {
   value: string;
   label: string;
@@ -183,7 +160,6 @@ export function RentalListings({
   const [category, setCategory] = useState<string>(ANY);
   const [priceBucket, setPriceBucket] = useState<string>(ANY);
   const [yearBucket, setYearBucket] = useState<string>(ANY);
-  const [trackOnly, setTrackOnly] = useState(false);
   const [sort, setSort] = useState<SortOption>("featured");
 
   const makes = useMemo(
@@ -192,17 +168,19 @@ export function RentalListings({
     [],
   );
 
-  // Markets surfaced in the filter, include all RYDA markets (Miami,
-  // Los Angeles, New York) even if the inventory in some markets is
-  // Coming Soon. Partner inventory is Miami-only today but the
-  // architecture is ready for partner fleets in other cities.
-  const locations = useMemo(() => {
-    const set = new Set<string>(ALL_LISTINGS.map((v) => v.market));
-    // Force the canonical RYDA markets to appear even when a market has
-    // no inventory yet, clearer "Coming soon" UX than silently hiding.
-    ["Miami", "Los Angeles", "New York"].forEach((m) => set.add(m));
-    return Array.from(set).sort();
-  }, []);
+  // Markets surfaced in the filter, derived from the listings and
+  // nothing else. Los Angeles and New York were force-injected here as
+  // "the canonical RYDA markets"; both are deleted. Zero cars are
+  // listed in either — PartnerVehicle.market is the literal type
+  // "Miami" — so the dropdown was offering two cities as places RYDA
+  // operates, which is the same claim the counter strip, the schema's
+  // areaServed and the deleted city pages were all stripped of. A
+  // filter that can only return nothing is not UX; it is a market
+  // claim.
+  const locations = useMemo(
+    () => Array.from(new Set(ALL_LISTINGS.map((v) => v.market))).sort(),
+    [],
+  );
 
   const filtered: RentalListing[] = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -223,10 +201,9 @@ export function RentalListings({
         const bucket = YEAR_BUCKETS.find((b) => b.value === yearBucket);
         if (bucket?.test && !bucket.test(v.year)) return false;
       }
-      if (trackOnly && !v.trackEligible) return false;
       return true;
     });
-  }, [query, location, make, category, priceBucket, yearBucket, trackOnly]);
+  }, [query, location, make, category, priceBucket, yearBucket]);
 
   const visible = useMemo(() => {
     const out = [...filtered];
@@ -249,23 +226,31 @@ export function RentalListings({
         break;
       case "featured":
       default:
-        // RYDA fleet first (co-own option), then by price descending
-        out.sort((a, b) => {
-          const aTier = a.isCoOwnable ? 0 : 1;
-          const bTier = b.isCoOwnable ? 0 : 1;
-          if (aTier !== bTier) return aTier - bTier;
-          return b.dailyRate - a.dailyRate;
-        });
+        // One rail, so there is no tier to lead with: the headline cars
+        // are simply the most expensive ones.
+        out.sort((a, b) => b.dailyRate - a.dailyRate);
     }
     return out;
   }, [filtered, sort]);
 
   const totalListed = visible.length;
-  const minRate = visible.reduce(
-    (acc, v) => Math.min(acc, v.dailyRate),
-    Number.MAX_SAFE_INTEGER,
+  // Markets actually represented in what is on screen. The counter strip
+  // used to print a hard-coded "· Miami · LA · NYC" whenever no location
+  // filter was set — a claim of inventory in two cities that have none,
+  // sitting directly beside the count of cars that are all in one. It is
+  // derived now, so the strip can only ever name a market a visitor can
+  // scroll to; PartnerVehicle.market is the literal type "Miami", so
+  // today that is exactly "Miami".
+  const marketsShown = useMemo(
+    () => Array.from(new Set(visible.map((v) => v.market))).sort().join(" · "),
+    [visible],
   );
-  const maxRate = visible.reduce((acc, v) => Math.max(acc, v.dailyRate), 0);
+  // No minRate/maxRate here any more. The strip printed "From $X to $Y
+  // / day" across whatever was on screen — a rate statistic computed
+  // over partner-fleet.ts, which is the operator's rate table and not
+  // RYDA's to summarise. Each card still shows the operator's own rate
+  // for that car, which is a fact about one listing rather than a
+  // claim about the fleet.
 
   const anyFilterActive =
     query.trim().length > 0 ||
@@ -273,8 +258,7 @@ export function RentalListings({
     make !== ANY ||
     category !== ANY ||
     priceBucket !== ANY ||
-    yearBucket !== ANY ||
-    trackOnly;
+    yearBucket !== ANY;
 
   function clearAll() {
     setQuery("");
@@ -283,7 +267,6 @@ export function RentalListings({
     setCategory(ANY);
     setPriceBucket(ANY);
     setYearBucket(ANY);
-    setTrackOnly(false);
     setSort("featured");
   }
 
@@ -303,8 +286,6 @@ export function RentalListings({
     const lbl = YEAR_BUCKETS.find((b) => b.value === yearBucket)?.label;
     if (lbl) chips.push({ label: lbl, onClear: () => setYearBucket(ANY) });
   }
-  if (trackOnly)
-    chips.push({ label: "Track-ready", onClear: () => setTrackOnly(false) });
 
   return (
     <section>
@@ -401,13 +382,6 @@ export function RentalListings({
               }))}
             />
 
-            {/* Boolean chip toggle — filled red reads as pressed. */}
-            <FilterToggle
-              label="Track-ready"
-              active={trackOnly}
-              onClick={() => setTrackOnly((v) => !v)}
-            />
-
             <div className="ml-auto flex flex-none items-center gap-2">
               {anyFilterActive ? (
                 <button
@@ -466,37 +440,21 @@ export function RentalListings({
             </span>
             {location !== ANY ? (
               <span className="ml-1.5 text-mute">in {location}</span>
-            ) : (
-              <span className="ml-1.5 text-mute">· Miami · LA · NYC</span>
-            )}
+            ) : marketsShown ? (
+              <span className="ml-1.5 text-mute">in {marketsShown}</span>
+            ) : null}
           </p>
-          {totalListed > 0 ? (
-            <p className="text-xs text-ink-soft tabular-nums">
-              From{" "}
-              <span className="font-display text-base text-ink">
-                {formatUSD(minRate)}
-              </span>{" "}
-              to{" "}
-              <span className="font-display text-base text-ink">
-                {formatUSD(maxRate)}
-              </span>
-              <span className="ml-1 text-mute">/ day</span>
-            </p>
-          ) : null}
         </div>
       </div>
 
       {/* Card grid */}
       <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
         {visible.length === 0 ? (
-          <EmptyState
-            location={location !== ANY ? location : null}
-            onReset={clearAll}
-          />
+          <EmptyState onReset={clearAll} />
         ) : (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {visible.map((v) => (
-              <RentalCard key={`${v.kind}-${v.slug}`} listing={v} />
+              <RentalCard key={v.slug} listing={v} />
             ))}
           </div>
         )}
@@ -505,49 +463,15 @@ export function RentalListings({
   );
 }
 
-function EmptyState({
-  location,
-  onReset,
-}: {
-  location: string | null;
-  onReset: () => void;
-}) {
-  // Special case: filtered to LA or NY where partner fleet hasn't shipped
-  // yet. Show a "Coming soon" treatment instead of the generic empty state.
-  const isComingSoonMarket =
-    location === "Los Angeles" || location === "New York";
-  if (isComingSoonMarket) {
-    return (
-      <div className="rounded-2xl border border-rule bg-surface p-12 text-center">
-        <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-          {location} · Coming soon
-        </p>
-        <p className="mt-3 font-display text-2xl text-ink">
-          The {location} fleet ships with the local launch.
-        </p>
-        <p className="mx-auto mt-3 max-w-md text-sm text-ink-soft">
-          We&apos;re assembling fleet partners and storage in {location} now.
-          Want first-look access when listings open? Tell us and we&apos;ll
-          get in touch.
-        </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <Link
-            href={`/contact?type=Membership&note=${encodeURIComponent(`Want ${location} rental access`)}#form`}
-            className="inline-flex h-11 items-center justify-center rounded-full bg-red px-5 text-sm font-medium text-cream hover:bg-red-deep"
-          >
-            Notify me at launch →
-          </Link>
-          <button
-            type="button"
-            onClick={onReset}
-            className="inline-flex h-11 items-center justify-center rounded-full border border-rule px-5 text-sm font-medium text-ink-soft hover:border-ink hover:text-ink"
-          >
-            See Miami inventory instead
-          </button>
-        </div>
-      </div>
-    );
-  }
+function EmptyState({ onReset }: { onReset: () => void }) {
+  // The Los-Angeles/New-York "no operator lists a car here yet" panel
+  // that used to branch off this component is deleted with the two
+  // cities that reached it — heading, the "opens when operators in
+  // {location} list on it" line, and the "Tell us you want {location}"
+  // CTA into /contact. It could only render for a location the filter
+  // no longer offers, and it cited
+  // src/app/locations/_components/planned-market.tsx, deleted in the
+  // same strip. One generic empty state remains.
   return (
     <div className="rounded-2xl border border-rule bg-surface p-12 text-center">
       <p className="font-display text-xl text-ink">
@@ -616,32 +540,6 @@ function FilterSelect({
   );
 }
 
-function FilterToggle({
-  label,
-  active,
-  onClick,
-}: {
-  label: string;
-  active: boolean;
-  onClick: () => void;
-}) {
-  // Compact chip button — filled red when pressed, hairline pill when not.
-  return (
-    <button
-      type="button"
-      aria-pressed={active}
-      onClick={onClick}
-      className={`h-9 flex-none rounded-full border px-3.5 text-sm font-medium transition-colors ${
-        active
-          ? "border-red bg-red text-cream hover:bg-red-deep"
-          : "border-rule bg-surface text-ink-soft hover:border-ink hover:text-ink"
-      }`}
-    >
-      {label}
-    </button>
-  );
-}
-
 function RentalCard({ listing: v }: { listing: RentalListing }) {
   const savings = v.regularRate ? v.regularRate - v.dailyRate : 0;
   const savingsPct = v.regularRate
@@ -657,11 +555,11 @@ function RentalCard({ listing: v }: { listing: RentalListing }) {
       href={`/rent/${v.slug}`}
       className="group flex flex-col overflow-hidden rounded-2xl border border-rule bg-surface transition-all hover:-translate-y-0.5 hover:border-ink/40 hover:shadow-lg"
     >
-      {/* Photo — brand chip top-left, track/save badge top-right (never
-          stacked), price chip bottom-right. */}
+      {/* Photo — brand chip top-left, savings badge top-right, price chip
+          bottom-right. */}
       <div
         className="relative aspect-[16/10] w-full overflow-hidden"
-        style={{ backgroundColor: v.kind === "partner" ? tint : undefined }}
+        style={{ backgroundColor: tint }}
       >
         {v.hero ? (
           <Image
@@ -669,11 +567,10 @@ function RentalCard({ listing: v }: { listing: RentalListing }) {
             alt={`${v.make} ${v.model}`}
             fill
             sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-            className={`object-cover transition-transform duration-500 group-hover:scale-[1.02] ${
-              v.flipImage ? "-scale-x-100" : ""
-            }`}
-            style={{ objectPosition: v.imagePosition ?? "center" }}
-            unoptimized={v.kind === "partner"}
+            className="object-cover object-center transition-transform duration-500 group-hover:scale-[1.02]"
+            // Operator photos are hosted off-domain (partner CDN), so
+            // they bypass the Next image optimizer.
+            unoptimized
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center">
@@ -699,12 +596,8 @@ function RentalCard({ listing: v }: { listing: RentalListing }) {
           {v.make}
         </span>
 
-        {/* Track-ready or savings badge top-right */}
-        {v.trackEligible ? (
-          <span className="absolute right-3 top-3 rounded-full bg-red/95 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] text-cream backdrop-blur">
-            Track-ready
-          </span>
-        ) : savingsPct >= 10 ? (
+        {/* Savings badge top-right */}
+        {savingsPct >= 10 ? (
           <span className="absolute right-3 top-3 rounded-full bg-red/95 px-3 py-1 text-[10px] font-medium uppercase tracking-[0.16em] text-cream backdrop-blur">
             Save {savingsPct}%
           </span>

@@ -8,24 +8,31 @@ import { OAuthButtons } from "@/components/oauth-buttons";
 import { supabase } from "@/lib/supabase";
 import { safeNext } from "@/lib/safe-next";
 
-// /signup, traditional account creation (modeled on the mainstable
-// signup: minimal fields, neutral copy, passive consent line — NOT an
-// application funnel). Email + password ONLY — name and phone are
-// entered exactly once, in the onboarding Basic step, where email
-// autofills from the session. That keeps the flow identical across
-// auth methods: social sign-ins (OAuthButtons; Google/Facebook/
-// Microsoft as providers get configured) skip this form entirely and
-// land in the same onboarding with the provider's profile prefilled.
+// /signup, traditional account creation: minimal fields, neutral copy,
+// passive consent line — NOT an application funnel. Email + password
+// ONLY — name and phone are entered exactly once, in the onboarding
+// Basic step, where email autofills from the session. That keeps the
+// flow identical across auth methods: social sign-ins (OAuthButtons;
+// Google/Facebook/Microsoft as providers get configured) skip this form
+// entirely and land in the same onboarding with the provider's profile
+// prefilled.
 // Two account types:
-//   - Member (default): account → guided onboarding (KYC, prefs, 28+).
+//   - Renter (default): account → onboarding (Basic details, then the
+//     optional Stripe Identity check). An account gates nothing on the
+//     rental side — /api/rental-inquiry accepts an anonymous POST — so
+//     what it buys the visitor is /account/requests, a session-gated
+//     list of their own leads, plus prefill on the next request.
 //   - Fleet partner (?as=partner, linked from /partners): same minimal
 //     account; company details are collected once on the /partner
 //     dashboard, where the application shows as pending until an
 //     admin approves it. (B2B partnering IS reviewed, so its copy
 //     keeps the apply framing.)
-// Preserves `?next=` so post-onboarding the member is returned to the
-// gated action they tried to take (e.g. claim a share, request a
-// rental). Real auth ships at Miami launch.
+// The toggle used to label the default option "Rent + co-own" and the
+// subtitle sold an account as unlocking "rentals, bookings, and
+// co-ownership". There is no ownership product in this codebase and no
+// membership; both strings are gone rather than softened.
+// Preserves `?next=` so post-onboarding the visitor is returned to the
+// page they came from.
 
 export default function SignUpPage() {
   // The form lives inside a Suspense boundary because it depends on
@@ -49,29 +56,33 @@ export default function SignUpPage() {
 function SignUpPageInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const reason = searchParams.get("reason"); // "rent" | "buy" | "checkout"
+  // Attribution only — recorded as the waitlist `source` below. Nothing
+  // in the app links here with ?reason=, and the copy it used to branch
+  // ("One quick step before you claim your share") described a product
+  // that does not exist, so the branching is gone and the read stays.
+  const reason = searchParams.get("reason");
 
   // /signup?as=partner preselects the Fleet Partner path (the CTA on
   // /partners deep-links here). The toggle in the form switches freely.
-  const [accountType, setAccountType] = useState<"member" | "partner">(
-    searchParams.get("as") === "partner" ? "partner" : "member",
+  const [accountType, setAccountType] = useState<"renter" | "partner">(
+    searchParams.get("as") === "partner" ? "partner" : "renter",
   );
 
   // Sanitize `?next=` against open-redirect / javascript: scheme tricks.
   // Anything not a same-origin path falls back to /onboarding.
   const next = safeNext(searchParams.get("next"), "/onboarding");
-  // Partners ALWAYS land on /partner, even when a member-gated CTA's
-  // `?next=` is in the URL and the visitor toggled to partner after
+  // Partners ALWAYS land on /partner, even when a renter-side `?next=`
+  // is in the URL and the visitor toggled to partner after
   // arriving: the pending application only materializes on the
-  // dashboard's first authenticated fetch, so carrying a member
+  // dashboard's first authenticated fetch, so carrying a renter
   // destination through the email round-trip would silently skip
   // provisioning (and make the success CTA's label a lie).
   // ?from=signup lets the dashboard stamp partner_intent for OAuth
   // signups, which can't carry metadata through the provider redirect.
   const dest = accountType === "partner" ? "/partner?from=signup" : next;
 
-  // If a signed-in member lands on /signup (clicked an old marketing
-  // link, etc.), bounce them to the gated destination — they don't
+  // If a signed-in visitor lands on /signup (clicked an old marketing
+  // link, etc.), bounce them to the destination — they don't
   // need to create another account.
   useEffect(() => {
     if (!supabase) return;
@@ -90,30 +101,22 @@ function SignUpPageInner() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const reasonCopy =
-    accountType === "partner"
-      ? "Partner with RYDA."
-      : reason === "rent"
-        ? "One quick step before you book."
-        : reason === "buy"
-          ? "One quick step before you claim your share."
-          : reason === "checkout"
-            ? "One quick step before you reserve."
-            : "Create your account.";
+  const headline =
+    accountType === "partner" ? "Partner with RYDA." : "Create your account.";
 
-  const reasonSub =
+  const subline =
     accountType === "partner"
-      ? "Create your account, then tell us about your fleet from your partner dashboard. We respond to every application personally within 3 business days."
-      : reason === "rent" || reason === "buy" || reason === "checkout"
-        ? "Browsing is open to everyone, we just need an account before you can transact. 60 seconds."
-        : "Free to join. An account unlocks rentals, bookings, and co-ownership — browsing stays open to everyone.";
+      ? "Create your account, then tell us about your fleet from your partner dashboard."
+      : "Free to join. An account keeps every rental request you send in one place and prefills your details next time. Browsing and requesting stay open to everyone.";
 
   // Email + password is the whole form. Name and phone are collected
   // once in onboarding (email autofills there from the session), so
   // password and social signups converge on the same steps. No
-  // attestation checkboxes: identity, age (28+), and preferences live
-  // in onboarding/booking; ToS/privacy consent is the passive line
-  // under the submit button.
+  // attestation checkboxes: the one identity check RYDA runs (Stripe
+  // Identity, document + selfie) is offered in onboarding and gates
+  // nothing, and who may rent a given car is set and checked by the
+  // operator. ToS/privacy consent is the passive line under the submit
+  // button.
   const ready = email.includes("@") && password.length >= 8;
 
   const [error, setError] = useState<string | null>(null);
@@ -161,10 +164,10 @@ function SignUpPageInner() {
           options: {
             emailRedirectTo: redirectTo,
             // NOTE: user_metadata is user-editable, so nothing here is
-            // a security primitive. Age/identity verification happens
-            // in /onboarding KYC, which writes to a server-owned
-            // `members` table that the rental API checks before any
-            // booking can be created.
+            // a security primitive. The identity check offered in
+            // /onboarding writes a server-owned kyc_verifications row;
+            // no rental surface reads it, so it gates nothing today
+            // (see /account/verification, which says so on the page).
             //
             // Partner signup follows the same trust model: the
             // partner_* keys are a REQUEST that /api/partner/me turns
@@ -179,8 +182,7 @@ function SignUpPageInner() {
               // name + email themselves).
               //
               // No marketing opt-in exists at signup (traditional
-              // setup — marketing is managed in /account/notifications
-              // and is off by default per /account/privacy). Record
+              // setup — the toggle lives on /account/profile). Record
               // the explicit false so there's a durable consent signal
               // saying "never opted in here".
               marketing_opt_in: false,
@@ -224,8 +226,8 @@ function SignUpPageInner() {
               <span className="font-medium text-ink">{email}</span> to confirm
               your account.{" "}
               {accountType === "partner"
-                ? "Once you're in, tell us about your company from your partner dashboard — we respond to every application within 3 business days."
-                : "Continue to onboarding to verify your identity and complete your member profile, or pick up where you left off."}
+                ? "Once you're in, tell us about your company from your partner dashboard — that's what starts the review."
+                : "Continue to onboarding to add your name and phone, or pick up where you left off."}
             </p>
 
             <div className="mt-7 flex flex-col gap-3">
@@ -262,11 +264,11 @@ function SignUpPageInner() {
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
             Sign up
           </p>
-          <h1 className="mt-3 font-display text-3xl text-ink">{reasonCopy}</h1>
-          <p className="mt-2 text-sm text-ink-soft">{reasonSub}</p>
+          <h1 className="mt-3 font-display text-3xl text-ink">{headline}</h1>
+          <p className="mt-2 text-sm text-ink-soft">{subline}</p>
 
           <form className="mt-7 space-y-4" onSubmit={onSubmit}>
-            {/* Account type. Member is the default; the /partners
+            {/* Account type. Renter is the default; the /partners
                 marketing page deep-links here with ?as=partner.
                 Toggle buttons (aria-pressed), NOT ARIA radios: each
                 option is its own Tab stop and there's no roving
@@ -278,10 +280,10 @@ function SignUpPageInner() {
               className="grid grid-cols-2 gap-1.5 rounded-xl border border-rule bg-cream-2/40 p-1.5"
             >
               <TypeOption
-                label="Member"
-                hint="Rent + co-own"
-                active={accountType === "member"}
-                onSelect={() => setAccountType("member")}
+                label="Renter"
+                hint="Send and track requests"
+                active={accountType === "renter"}
+                onSelect={() => setAccountType("renter")}
               />
               <TypeOption
                 label="Fleet partner"
@@ -373,7 +375,7 @@ function SignUpPageInner() {
           <p className="mt-5 text-center text-xs text-mute">
             {accountType === "partner"
               ? "No commitment — your account is the first step; you tell us about your fleet from the dashboard, and that's what starts the review."
-              : "RYDA membership is 28+ — identity and eligibility are verified during onboarding, not here."}
+              : "Who can rent a particular car — age, licence, driving history — is set and checked by the operator, not by RYDA."}
           </p>
 
           <div className="mt-10 border-t border-rule pt-6 text-center text-sm text-ink-soft">

@@ -1,43 +1,56 @@
-# RYDA — Production Setup Runbook
+# RYDA Rentals — Production Setup Runbook
 
-End-to-end checklist for a fresh `ryda-web` clone, from cold install to
-production-ready. Order matters. Each section ends with a verification step
-so you know it landed before moving on.
+End-to-end checklist for a fresh `ryda-pro-rentals` clone, from cold install to
+production-ready. Order matters. Each section ends with a verification step so you know it
+landed before moving on.
 
-> This repo split from `ryangalli-app` on 2026-05-19. Production is live at
-> `https://ryda.pro`. The marketing-demo phase is historical — the app
-> transacts real share purchases via Stripe + Supabase.
+> This repo is the rentals product only. It carries the git history of the original
+> `ryda-web` repo, but the co-ownership product — share purchases, LLC formation,
+> e-signature documents, the boats tree — has been removed. If a step below seems to be
+> missing something you remember from that runbook, that is why.
 
 ---
 
 ## 0. Prerequisites
 
-You need accounts on:
-- **Vercel** (already linked locally — `vercel whoami` works)
-- **Supabase** — https://supabase.com (database + auth)
-- **Stripe** — https://dashboard.stripe.com (payments + Identity for KYC)
-- **Resend** — https://resend.com (transactional email — already configured)
-- **Dropbox Sign** — https://app.hellosign.com (e-signature, optional)
+- **Node 24.** `.npmrc` sets `engine-strict=true`, so `npm install` on any other major
+  fails with `EBADENGINE` rather than quietly rewriting the lockfile. `nvm use` reads
+  `.nvmrc`.
+- Accounts on:
+  - **Vercel** — hosting (`vercel whoami` should work)
+  - **Supabase** — database + auth
+  - **Stripe** — payments (**Connect** is required) and Identity for KYC
+  - **Resend** — transactional email
+
+```bash
+node -v          # must be v24.x
+npm install
+```
 
 ---
 
 ## 1. Run database migrations (Supabase)
 
-The full migration chain currently runs `0007_share_purchases.sql` through
-`0037_content_queue_creative_generation.sql` (37 files as of 2026-05-19 —
-`ls supabase/migrations/` for current state). Apply them in numeric order
-against a fresh project.
+The chain is **46 files, `0001` through `0047`, with one gap at `0026`**. The gap is
+inherited and harmless — `scripts/__tests__/migration-numbering.test.ts` tolerates gaps and
+fails only on duplicate ordinals.
 
-**Recommended: Supabase CLI** (handles ordering + applies idempotently)
+Roughly half of these migrations create **co-ownership tables that no application code
+reads any more** (`share_purchases`, `share_holdings`, `llc_entities`, `llc_votes`,
+`dispute_cases`, `boats`, …). They are kept so the chain stays intact and applied history
+is never rewritten. Against a fresh project they will be created and sit empty. That is
+expected, not a misconfiguration.
+
+**Recommended: Supabase CLI** (handles ordering, applies idempotently)
 
 ```bash
 brew install supabase/tap/supabase   # if not already installed
 supabase login
 supabase link --project-ref <YOUR_PROJECT_REF>
-supabase db push                      # applies every migration in supabase/migrations/
+supabase db push                     # applies every migration in supabase/migrations/
 ```
 
-**Alternative: psql one-liner**
+**Alternative: psql loop**
 
 ```bash
 for f in supabase/migrations/*.sql; do
@@ -45,259 +58,230 @@ for f in supabase/migrations/*.sql; do
 done
 ```
 
-**Last resort: paste into Supabase SQL Editor**, one migration at a time,
-in numeric order. Slow but works without any CLI installs.
-
-**Verification** — after applying, run in SQL Editor:
+**Verification** — in the SQL Editor:
 
 ```sql
 select table_name from information_schema.tables
 where table_schema='public' order by table_name;
 ```
 
-You should see ~30 tables including: `bookings`, `boats`, `cars`,
-`content_queue`, `dispute_cases`, `document_signatures`, `kyc_verifications`,
-`llc_amendments`, `llc_insurance`, `llc_messages`, `llc_votes`,
-`prospects`, `reservation_agreements`, `share_holdings`, `share_purchases`,
-`vehicle_handovers`, `waitlist`, etc.
+The tables the rental app actually uses:
+
+| Table | Migration | What it holds |
+|---|---|---|
+| `rental_inquiries` | `0039`, `0045` | Inbound leads. Status `new → sent → booked / lost` |
+| `rental_profiles` | `0040` | Renter profile linked to `auth.users` |
+| `partners` | `0041` | Operators, incl. `commission_rate` and Connect account id |
+| `rental_payments` | `0041` | The Connect charge ledger, one row per payment link |
+| `partner_accounts` | `0042` | Operator ↔ user linkage |
+| `rental_listings` | `0044` | Per-operator car inventory (the `/rent/[symbol]` key) |
+| `rental_availability` | `0046` | Blackout / availability windows |
+| `rental_bookings` | `0047` | Booking requests and their quote snapshot |
+| `kyc_verifications` | `0011`, `0029` | Stripe Identity results (built, not yet in the rental flow) |
+| `content_queue` | `0037` | Marketing generation queue |
+| `audit_log`, `stripe_events` | `0020` etc. | Admin audit trail, webhook dedup |
 
 ---
 
-## 2. Wire env vars in Vercel
+## 2. Wire env vars
 
-The site needs these to actually transact. Get each, then run the
-commands below. Each `vercel env add` will prompt you for the value
-and which environments to set it in (you typically want all three:
-Production, Preview, Development).
-
-### 2.1 Supabase service-role key
-
-- Supabase dashboard → Project Settings → API → `service_role` `secret`.
-  This is the LONG key (`eyJhbGciOiJIUzI1NiIs...`), not the publishable one.
-- Run:
-  ```bash
-  vercel env add SUPABASE_SERVICE_ROLE_KEY
-  ```
-
-### 2.2 Stripe keys
-
-- https://dashboard.stripe.com/apikeys → Standard keys (test mode is fine to start)
-- Run:
-  ```bash
-  vercel env add STRIPE_SECRET_KEY
-  vercel env add NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
-  ```
-
-### 2.3 Stripe webhook signing secret
-
-After step 3 below (creating webhook endpoints), copy the signing
-secret from the Stripe dashboard, then:
+`.env.local.example` is the authoritative list — it documents every variable the app reads
+and what degrades when it is unset. Copy it and fill in real values:
 
 ```bash
-vercel env add STRIPE_WEBHOOK_SECRET
+cp .env.local.example .env.local
 ```
 
-### 2.4 Dropbox Sign (optional — e-signature)
+For Vercel, `vercel env add <NAME>` prompts for the value and the environments (you usually
+want all three).
 
-If you've created Dropbox Sign API credentials + templates:
+### 2.1 Supabase
 
 ```bash
-vercel env add DROPBOX_SIGN_API_KEY
-vercel env add DROPBOX_SIGN_CLIENT_ID
-vercel env add DROPBOX_SIGN_OA_TEMPLATE_ID
-vercel env add DROPBOX_SIGN_MSA_TEMPLATE_ID
-vercel env add DROPBOX_SIGN_SUBSCRIPTION_TEMPLATE_ID
+vercel env add NEXT_PUBLIC_SUPABASE_URL
+vercel env add NEXT_PUBLIC_SUPABASE_ANON_KEY
+vercel env add SUPABASE_SERVICE_ROLE_KEY     # Project Settings → API → service_role
 ```
 
-Without these, the DocumentsStep keeps the typed-name signature
-fallback and the routes return 503.
+The service-role key bypasses RLS and is server-only. Never prefix it `NEXT_PUBLIC_`.
 
-### 2.5 Verify
+### 2.2 Stripe
+
+```bash
+vercel env add STRIPE_SECRET_KEY
+vercel env add NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+```
+
+Webhook signing secrets come after step 3.
+
+### 2.3 Resend
+
+```bash
+vercel env add RESEND_API_KEY
+vercel env add RYDA_NOTIFY_FROM     # verified sender on a domain you own
+vercel env add RYDA_NOTIFY_TO       # team alias that receives lead notifications
+```
+
+Unset, `notifyTeam()` logs and no-ops — forms still succeed, they just don't email.
+
+### 2.4 Verify
 
 ```bash
 vercel env ls production
 ```
 
-You should see all the new vars listed as `Encrypted`.
+Everything should list as `Encrypted`.
 
 ---
 
-## 3. Configure Stripe webhooks
+## 3. Configure Stripe
 
-Two webhook endpoints — both POST to your deployed origin.
+### 3.1 Enable Connect
 
-### 3.1 Share-purchase webhook (Stripe Checkout)
+The rental rail is **direct charges on operators' Express accounts**. Without Connect there
+is no payment flow at all.
+
+- https://dashboard.stripe.com/connect → enable Connect
+- Platform profile → choose **Express** accounts
+- Set your platform name, support email and branding — operators see these during onboarding
+
+### 3.2 Connect webhook
 
 - https://dashboard.stripe.com/webhooks → Add endpoint
-- Endpoint URL: `https://YOUR-DOMAIN.com/api/share-purchase/webhook`
-- Events to send:
+- URL: `https://YOUR-DOMAIN.com/api/stripe/connect-webhook`
+- **Tick "Listen to events on connected accounts."** This is not cosmetic. Rental checkouts
+  are direct charges on the operators' accounts, so their events only ever arrive on a
+  connected-account endpoint. A platform-account endpoint will never fire.
+- Events:
   - `checkout.session.completed`
+  - `checkout.session.async_payment_succeeded`
   - `checkout.session.expired`
-  - `payment_intent.payment_failed`
-- Save → click into the endpoint → Reveal "Signing secret" → copy it.
-- That goes into `STRIPE_WEBHOOK_SECRET` (step 2.3 above).
+  - `checkout.session.async_payment_failed`
+- Reveal the signing secret, then:
+  ```bash
+  vercel env add STRIPE_CONNECT_WEBHOOK_SECRET
+  ```
 
-### 3.2 KYC webhook (Stripe Identity)
+There is deliberately **no fallback** for this secret in code — a fallback would turn a
+missing env var into a silent invalid-signature loop instead of a loud misconfiguration.
 
-You have two valid layouts. Pick one:
+### 3.3 Identity (KYC) webhook
 
-**Option A — Two Stripe endpoints (recommended).** Each endpoint gets
-its own signing secret; reusing the share-purchase secret on the KYC
-endpoint will fail signature verification on every event.
+Stripe Identity is wired end to end (`/account/verification`, `/api/kyc/*`, the onboarding
+step) but is **not yet part of the rental flow**. It is kept for renter verification later.
+Set it up now or skip it; nothing in the rental funnel blocks on it.
 
-- Same dashboard → Add another endpoint
-- Endpoint URL: `https://YOUR-DOMAIN.com/api/kyc/webhook`
+- Add a second, ordinary (platform-account) endpoint
+- URL: `https://YOUR-DOMAIN.com/api/kyc/webhook`
 - Events:
   - `identity.verification_session.verified`
   - `identity.verification_session.processing`
   - `identity.verification_session.requires_input`
   - `identity.verification_session.canceled`
-- Reveal that endpoint's signing secret and set:
-  ```bash
+- ```bash
   vercel env add STRIPE_KYC_WEBHOOK_SECRET
   ```
-  The KYC route reads `STRIPE_KYC_WEBHOOK_SECRET` first, with a
-  fallback to `STRIPE_WEBHOOK_SECRET` (so Option B below stays
-  working without code changes).
 
-**Option B — One Stripe endpoint with all event groups.** Point a
-single endpoint at any one of the routes (typically share-purchase),
-subscribe it to all six event types above plus the three checkout
-events, and you only need `STRIPE_WEBHOOK_SECRET`. The trade-off is
-that Identity events get POSTed to `/api/share-purchase/webhook`,
-which currently ignores them. To use Option B you'd need to add a
-single dispatcher route that fans events out by `event.type`. Most
-teams prefer Option A.
+Stripe assigns one signing secret per endpoint. Reusing the Connect secret here will 400
+every event.
 
-### 3.3 Verify
+To activate Identity itself: https://dashboard.stripe.com/identity → Activate, and set the
+redirect-back domain to your production origin. No further env change needed. Confirm
+current per-verification pricing before high-volume use.
 
-In the Stripe dashboard endpoint detail → "Send test webhook" →
-pick `checkout.session.completed` → Send. Check your Vercel
-function logs for the matching POST. Status 200 = signature
-verified.
-
----
-
-## 4. Activate Stripe Identity (KYC)
-
-Stripe Identity is included in your Stripe account but ships
-disabled.
-
-- https://dashboard.stripe.com/identity → click "Activate"
-- Set the redirect-back domain to your production origin.
-- Pricing: ~$1.50 per verification at the time of writing — confirm
-  current rate before high-volume use.
-
-No env-var change needed; `stripe.identity.verificationSessions.create`
-works as soon as Identity is active.
-
----
-
-## 5. Configure Dropbox Sign (optional — for real e-signatures)
-
-Skip this if you're OK with the typed-name signature in the
-DocumentsStep for now. The system keeps that path as a fallback.
-
-### 5.1 API key + Client ID
-
-- https://app.hellosign.com → Settings → API → API Keys → create one
-- Settings → API → Embedded Signing → create a Client ID. Whitelist:
-  - `https://YOUR-DOMAIN.com`
-  - `https://*.vercel.app` (for preview deploys)
-
-### 5.2 Templates
-
-Create three templates from your finalized PDF documents:
-- Operating Agreement
-- Management Services Agreement
-- Subscription Agreement
-
-Each template MUST define merge fields with these exact names so the
-API route can populate them:
-- `member_name`
-- `member_email`
-- `asset_label`
-- `llc_name`
-- `shares`
-- `buy_in`
-
-Copy each template's ID from the URL into Vercel as
-`DROPBOX_SIGN_OA_TEMPLATE_ID`, `DROPBOX_SIGN_MSA_TEMPLATE_ID`,
-`DROPBOX_SIGN_SUBSCRIPTION_TEMPLATE_ID`.
-
-### 5.3 Webhook
-
-- Settings → API → Webhooks → set URL to
-  `https://YOUR-DOMAIN.com/api/documents/webhook`
-- Dropbox Sign signs payloads with HMAC-SHA256 against your API
-  key — the route verifies automatically. No additional secret env
-  var needed.
-
----
-
-## 6. Redeploy
-
-After env vars and webhooks land:
+### 3.4 Local webhook development
 
 ```bash
+stripe listen --forward-to localhost:3000/api/stripe/connect-webhook
+```
+
+Put the printed `whsec_*` into `STRIPE_CONNECT_WEBHOOK_SECRET` in `.env.local`.
+
+### 3.5 Verify
+
+Stripe dashboard → the endpoint → "Send test webhook" → `checkout.session.completed`. A 200
+in the Vercel function logs means the signature verified.
+
+---
+
+## 4. Grant yourself admin
+
+Admin is `app_metadata.role === 'admin'`, which is service-role-only writable — a user
+cannot self-promote from the browser.
+
+```bash
+npx tsx scripts/grant-admin.ts you@example.com
+```
+
+It creates the user if needed and prints a one-time magic-link sign-in URL. Verify by
+loading `/admin` — you should see the rental funnel overview rather than the
+"no permission" empty state.
+
+---
+
+## 5. Onboard your first operator
+
+1. Sign in as admin → `/admin/partners` → create the operator (name, contact,
+   `commission_rate` — defaults to 15%).
+2. Click to mint a **Stripe Express onboarding link**
+   (`POST /api/admin/partners/[id]/onboarding-link`). The first call creates the connected
+   account, idempotency-keyed on the partner id; later calls reuse the stored `acct_…`.
+3. Send the operator the link. Account links are single-use and expire in minutes — minting
+   a fresh one *is* the resend flow.
+4. Once they finish, `GET /api/admin/partners` stamps `stripe_onboarded_at` when
+   `charges_enabled` flips true. The roster shows onboarded state.
+
+An operator who has not completed onboarding cannot be paid — the payment-link route refuses
+to mint against an account that can't accept charges.
+
+---
+
+## 6. Redeploy and smoke-test
+
+```bash
+npm run verify     # typecheck + test + build
 vercel --prod
 ```
 
-Smoke-test in production:
-1. Sign in at `/signin` (Supabase magic-link email arrives → click).
-2. Go to `/markets/F296/buy?shares=2` → walk through the flow.
-3. At the Funding step, pick **Card** → Stripe Checkout opens.
-4. Use Stripe test card `4242 4242 4242 4242` (any future date, any CVC).
-5. Land on `/share-purchase/<id>` and watch the stage flip from
-   "Pending payment" to "Paid · LLC amendment in flight" within
-   seconds (webhook fires).
-6. Check your inbox for the welcome email with the LLC amendment PDF
-   attached.
+Then walk [SMOKE.md](SMOKE.md).
 
 ---
 
 ## 7. Post-launch hardening (later)
 
-These aren't required to flip the switch but are worth scheduling:
-
-- **Stripe Connect** if you want per-LLC escrow accounts (currently
-  funds land in your Stripe balance and you transfer to the LLC bank
-  account out-of-band).
-- **Driving-record check** vendor (Checkr, ClearMechanic, etc.) —
-  Stripe Identity verifies ID + selfie but doesn't check driving
-  history. The LLC's insurance carrier will require this anyway.
-- **Marine operator's license check** for boat side (USCG license
-  validation).
-- **Audit log** for `share_holdings` mutations — useful when transfers
-  ship.
-- **Stripe webhook deduplication** — current code is idempotent on
-  `checkout.session.completed` (checks status before re-applying)
-  but doesn't dedupe by event_id. Add an `event_log` table if you
-  see duplicate-fire issues at volume.
+- **Driving-record / license check** vendor. Stripe Identity verifies ID + selfie but does
+  not check driving history; an operator's insurer will want it.
+- **Renter KYC in the funnel.** The Identity stack is already built — wiring it into the
+  booking flow is a product decision, not a build.
+- **Deposit re-authorization sweep.** `0047` documents this: a card authorization lasts
+  roughly seven days, so a multi-week rental's deposit hold expires mid-trip.
+  `deposit_auth_expires_at` is the column a sweep would drive off.
+- **Rate limiting at volume.** `UPSTASH_REDIS_REST_*` switches the limiter from in-memory to
+  shared; without it each serverless instance counts separately.
 
 ---
 
 ## Operational runbook
 
-### A purchase failed and the buyer wants to retry
+### A payment link expired before the customer paid
 
-Find the `share_purchases` row by id (the `/share-purchase/[id]` URL
-is the row id). If status = 'failed' or 'canceled', the buyer can
-restart the buy flow; a new purchase row + Checkout session will be
-created. The old row stays for audit.
+`rental_payments.status` flips `pending → expired` on
+`checkout.session.expired`. Mint a new link from `/admin/inquiries` — the expired row stays
+for audit.
 
-### A booking conflict needs to be resolved
+### A payment landed on an inquiry that was already closed
 
-`/api/bookings` returns 409 with the conflicting row id when dates
-overlap. The team can mark the older booking `canceled` via the
-Supabase dashboard (or build an admin tool later) to free the slot.
+The Connect webhook emails a team alert instead of a booking confirmation. Money on a dead
+lead is an ops incident, not a booking — reconcile manually and refund from the Stripe
+dashboard on the connected account.
 
-### Resending the LLC amendment PDF
+### An operator's charges stopped working
 
-The `/api/share-purchase/webhook` flow auto-emails it on payment
-success. To resend manually:
-1. Find the `share_purchases.id`
-2. Re-trigger the webhook from Stripe dashboard (Events → re-deliver),
-   or
-3. (Future) `POST /api/share-purchase/[id]/resend-amendment` — not
-   built yet.
+Check `charges_enabled` on their connected account in the Stripe dashboard. Express accounts
+get restricted when Stripe's own verification requirements go stale. Re-mint an onboarding
+link to send them back through.
+
+### Webhook events look duplicated
+
+They are deduplicated by `event.id` in `stripe_events`, scoped per endpoint. A replay from
+the Stripe dashboard is safe.

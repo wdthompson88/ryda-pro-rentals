@@ -5,23 +5,26 @@ import { useState, useEffect } from "react";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
-const VALID_TYPES = ["Membership", "Rental", "Press", "Partnership", "Investor", "Other"] as const;
+// "Membership" is gone from the picker: there is no membership in this
+// platform, so offering it as an inquiry type advertises a product that
+// does not exist. /api/contact still accepts the value (it is a wider
+// allow-list), so any old deep link degrades to "Other" rather than 400.
+const VALID_TYPES = ["Rental", "Press", "Partnership", "Investor", "Other"] as const;
 type InquiryType = (typeof VALID_TYPES)[number];
 
 export function ContactForm() {
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [type, setType] = useState<InquiryType>("Membership");
+  const [type, setType] = useState<InquiryType>("Rental");
   // CTA-attribution string passed via `?note=` from upstream pages
-  // (e.g. "Charter request: Wajer 55 S"). We display it as a pinned
+  // (e.g. "Fleet Partner Program question"). We display it as a pinned
   // reference badge above the form AND submit it as `context` so the
   // team email + DB row reflects which surface produced the lead.
   const [ctaNote, setCtaNote] = useState<string | null>(null);
 
   // Read URL params after mount so deep-linked CTAs from elsewhere
-  // on the site (e.g. /press, /investors, /contact?type=Press,
-  // /boats/portfolio/wajer-55s?note=Charter+request) pre-select the
-  // right inquiry type AND surface the asset/intent as context.
+  // on the site (e.g. /press, /investors, /contact?type=Press) pre-select
+  // the right inquiry type AND surface the asset/intent as context.
   // Done in useEffect to avoid Next.js static-prerender bail-outs.
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -85,9 +88,6 @@ export function ContactForm() {
     return (
       <div className="rounded-2xl border border-rule bg-cream-2 px-8 py-10">
         <p className="font-display text-2xl text-ink">Thanks, message received.</p>
-        <p className="mt-3 text-sm text-ink-soft">
-          A team member will respond within one business day.
-        </p>
       </div>
     );
   }
@@ -112,7 +112,10 @@ export function ContactForm() {
         value={type}
         onChange={(v) => setType(v as InquiryType)}
       />
-      <Select name="market" label="Market" options={["Miami", "Los Angeles", "New York", "Not sure"]} />
+      {/* Miami is the only market with any inventory; Los Angeles and
+          New York were removed rather than presented as places RYDA
+          operates. /api/contact maps anything else to "Not sure". */}
+      <Select name="market" label="Market" options={["Miami", "Not sure"]} />
       <div className="hidden sm:block" />
       <div className="sm:col-span-2">
         <label

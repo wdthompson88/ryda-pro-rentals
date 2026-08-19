@@ -23,16 +23,29 @@
 //   operator unless the admin ticks the opt-in — operators have a
 //   lifecycle of their own.
 //
-//   Operators — the Stripe Connect roster (partners, 0041). Rental
-//   payments are fee-only via DIRECT charges: the customer pays a
-//   Checkout link created on the operator's own Express account — the
-//   rental price settles straight to the operator and never enters
-//   RYDA's balance; RYDA's commission is collected automatically as
-//   an application fee (per-partner commission_rate, default 15%).
+//   Operators — the Stripe Connect roster (partners, 0041 + 0048).
 //   Before a payment link can be sent from /admin/inquiries, the
 //   operator needs an Express account with onboarding completed. This
-//   tab manages that: add operators, edit commission rates, pause /
+//   tab manages that: add operators, set their FEE TERMS, pause /
 //   resume, and create + send the Stripe onboarding link.
+//
+//   FEE TERMS (decision D2, migration 0048) are four levers, not one:
+//   percent or flat, carried by the operator (deducted from their
+//   payout) or by the renter (added on top of the price they see), with
+//   an optional floor and cap. The editor previews every combination
+//   against a $2,000 reference booking by calling computeRentalFee —
+//   the same function the server charges with. It never re-derives a
+//   fee in JSX; see the note above FeeTermsFields for the incident that
+//   rule comes from.
+//
+//   WHICH RAIL THE FEE RIDES depends on which flow charged it, and this
+//   tab is deliberately agnostic. The /admin/inquiries payment link is
+//   a Connect DIRECT charge on the operator's own Express account,
+//   where the fee is Stripe's application_fee_amount. The request-to-
+//   book rental flow (decision D1, task 3B) charges on RYDA's own
+//   platform account and pays the operator out by transfer after a
+//   clean return. The terms set here describe what RYDA charges, not
+//   which Stripe object carries it.
 //
 // Stripe state chip per operator row:
 //   Not started     — no stripe_account_id yet
@@ -62,6 +75,21 @@ import { SiteHeader } from "@/components/site-header";
 import { authedFetch } from "@/lib/api-fetch";
 import { useActionModal } from "@/components/admin/action-modal";
 import type { PartnerAccount, PartnerStatus } from "@/lib/partner";
+import {
+  RENTAL_FEE_EXAMPLE_BASE_CENTS,
+  computeRentalFee,
+  type RentalFeeMode,
+  type RentalFeePayer,
+} from "@/lib/fees";
+import {
+  BLANK_FEE_FORM,
+  MAX_PCT,
+  dollarsFromCents,
+  parseFeeForm,
+  pctFromRate,
+  usd,
+  type FeeFormState,
+} from "@/lib/partner-fee-form";
 
 /** Passed down so both tabs confirm destructive actions the same way
  *  (and capture the same audit note) instead of one tab falling back
@@ -72,10 +100,23 @@ type Partner = {
   id: string;
   name: string;
   contact_email: string | null;
-  // Decimal share of the rental price (0.15 = 15%), applied as the
-  // Checkout application fee. All math lives server-side in fees.ts —
-  // this page only displays and edits the rate.
+  // Decimal share of the rental price (0.15 = 15%). Live when
+  // fee_mode = 'percent'; kept but dormant in flat mode (0041 declared
+  // the column NOT NULL, so it cannot be cleared). The math itself
+  // lives in fees.ts and is never re-derived here — this page reads
+  // the terms and previews them through the very same function the
+  // server charges with.
   commission_rate: number;
+  // Fee terms, migration 0048 / decision D2. OPTIONAL on this type on
+  // purpose: migrations are applied by a human, so there is a window in
+  // which this page is deployed and the columns do not exist yet. The
+  // API reports that as feeConfigReady and the editor degrades to the
+  // commission-only control rather than POSTing an unknown column.
+  fee_mode?: RentalFeeMode | null;
+  fee_flat_cents?: number | null;
+  fee_payer?: RentalFeePayer | null;
+  fee_floor_cents?: number | null;
+  fee_cap_cents?: number | null;
   stripe_account_id: string | null;
   stripe_onboarded_at: string | null;
   // 0041 status column: 'paused' blocks new payment links at the API.
@@ -153,6 +194,11 @@ export default function AdminPartnersPage() {
   const [error, setError] = useState<string | null>(null);
   const [degraded, setDegraded] = useState<Degraded>(null);
   const [showAdd, setShowAdd] = useState(false);
+  // Reported by the API (see its GET). false until proven true, so an
+  // older API build that does not send the flag degrades to the
+  // commission-only editor rather than POSTing columns that may not
+  // exist — the safe direction for a page that edits live money terms.
+  const [feeConfigReady, setFeeConfigReady] = useState(false);
   // Result of the last review action, shown inline instead of a
   // window.alert. `tone` decides banner colour; "info" carries the
   // API's own report of what it did (linked vs created, paused or not).
@@ -199,6 +245,7 @@ export default function AdminPartnersPage() {
         partners?: Partner[];
         applications?: PartnerAccount[];
         applicationsError?: string | null;
+        feeConfigReady?: boolean;
         error?: string;
       };
       if (res.status === 401) {
@@ -227,6 +274,7 @@ export default function AdminPartnersPage() {
       setPartners(body.partners ?? []);
       setApplications(body.applications ?? []);
       setApplicationsError(body.applicationsError ?? null);
+      setFeeConfigReady(body.feeConfigReady === true);
     } catch (err) {
       // Drop the data with the error. Anything still on screen under an
       // error banner is unverified: a stats row of zeros would assert
@@ -632,6 +680,7 @@ export default function AdminPartnersPage() {
             sent={sent}
             notStarted={notStarted}
             showAdd={showAdd}
+            feeConfigReady={feeConfigReady}
             openModal={openModal}
             onAdded={() => {
               setShowAdd(false);
@@ -951,6 +1000,7 @@ function OperatorsTab({
   sent,
   notStarted,
   showAdd,
+  feeConfigReady,
   openModal,
   onAdded,
   onChanged,
@@ -960,6 +1010,8 @@ function OperatorsTab({
   sent: number;
   notStarted: number;
   showAdd: boolean;
+  /** Whether migration 0048 is applied here — see the Partner type. */
+  feeConfigReady: boolean;
   openModal: ModalOpener;
   onAdded: () => void;
   onChanged: () => void;
@@ -981,7 +1033,9 @@ function OperatorsTab({
         <Stat label="Not started" value={notStarted} cls="text-mute" />
       </section>
 
-      {showAdd && <AddPartnerForm onSaved={onAdded} />}
+      {showAdd && (
+        <AddPartnerForm feeConfigReady={feeConfigReady} onSaved={onAdded} />
+      )}
 
       {partners.length === 0 && (
         <div className="mt-12 rounded-2xl border border-rule bg-cream-2/50 p-12 text-center">
@@ -1000,7 +1054,7 @@ function OperatorsTab({
           <table className="w-full text-sm">
             <thead className="border-b border-rule bg-cream-2/40">
               <tr>
-                {["Operator", "Contact", "Commission", "Stripe", ""].map(
+                {["Operator", "Contact", "Fee terms", "Stripe", ""].map(
                   (c, i) => (
                     <th
                       key={i}
@@ -1017,6 +1071,7 @@ function OperatorsTab({
                 <PartnerRow
                   key={p.id}
                   partner={p}
+                  feeConfigReady={feeConfigReady}
                   openModal={openModal}
                   onChanged={onChanged}
                 />
@@ -1065,34 +1120,369 @@ function StripeChip({ state }: { state: StripeState }) {
 const INPUT_CLS =
   "rounded-lg border border-rule bg-surface px-3 py-2 text-sm text-ink placeholder:text-mute focus:border-ink focus:outline-none focus:ring-2 focus:ring-ink/10";
 
-function AddPartnerForm({ onSaved }: { onSaved: () => void }) {
+// ── operator fee terms (decision D2 / migration 0048) ────────────────
+//
+// Four levers instead of one: percent or flat, carried by the operator
+// or added on top for the renter, with an optional floor and cap.
+//
+// TWO RULES GOVERN THIS WHOLE BLOCK.
+//
+// 1. The preview calls computeRentalFee — the SAME function the server
+//    charges with. It never re-derives a fee from a rate. fees.ts's
+//    header records why: a client preview and a server charge that each
+//    computed "the fee" their own way once disagreed by $13,500 on a
+//    single boat share, and the audit that caught it is the reason all
+//    money math lives in one module. An operator-terms screen that
+//    multiplies by 0.15 in JSX would recreate that exact bug, one
+//    surface over.
+//
+// 2. Dollars on screen, CENTS on the wire — and parseFeeForm is the
+//    only place the x100 crossing happens. The preview and the POST
+//    body are both built from its output, so what the admin is shown is
+//    arithmetically the same object the server is asked to store.
+
+// The pure half — form state, the dollars↔cents crossing and
+// parseFeeForm — lives in src/lib/partner-fee-form.ts so it can be unit
+// tested without rendering a client component. What stays here is the
+// rendering and the Partner-typed summaries.
+
+function feeFormFromPartner(p: Partner): FeeFormState {
+  return {
+    pct: String(pctFromRate(p.commission_rate)),
+    mode: p.fee_mode ?? "percent",
+    flat: dollarsFromCents(p.fee_flat_cents),
+    payer: p.fee_payer ?? "operator",
+    floor: dollarsFromCents(p.fee_floor_cents),
+    cap: dollarsFromCents(p.fee_cap_cents),
+  };
+}
+
+/** One-line terms for the roster cell. */
+function feeTermsSummary(p: Partner): string {
+  const mode = p.fee_mode ?? "percent";
+  return mode === "flat" && p.fee_flat_cents != null
+    ? `${usd(p.fee_flat_cents)} flat`
+    : pctLabel(p.commission_rate);
+}
+
+function feePayerSummary(p: Partner): string {
+  const parts = [
+    (p.fee_payer ?? "operator") === "renter"
+      ? "renter pays on top"
+      : "from operator payout",
+  ];
+  if (p.fee_floor_cents != null) parts.push(`min ${usd(p.fee_floor_cents)}`);
+  if (p.fee_cap_cents != null) parts.push(`max ${usd(p.fee_cap_cents)}`);
+  return parts.join(" · ");
+}
+
+/** Radio rendered as a design-system pill. sr-only input + peer-styled
+ *  span keeps native radio semantics (arrow keys, one tab stop per
+ *  group, screen-reader announcement) while looking like the rest of
+ *  the page; peer-focus-visible restores the ring the sr-only input
+ *  would otherwise take with it. */
+function ChoicePill({
+  name,
+  value,
+  checked,
+  onSelect,
+  children,
+}: {
+  name: string;
+  value: string;
+  checked: boolean;
+  onSelect: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className="cursor-pointer">
+      <input
+        type="radio"
+        name={name}
+        value={value}
+        checked={checked}
+        onChange={onSelect}
+        className="peer sr-only"
+      />
+      <span className="inline-flex h-8 items-center rounded-full border border-rule bg-surface px-3.5 text-[11px] font-medium text-mute transition-colors hover:border-ink hover:text-ink peer-checked:border-ink peer-checked:bg-ink peer-checked:text-cream peer-focus-visible:ring-2 peer-focus-visible:ring-ink/25">
+        {children}
+      </span>
+    </label>
+  );
+}
+
+function FieldGroup({
+  legend,
+  children,
+}: {
+  legend: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <fieldset className="flex flex-col gap-1">
+      <legend className="text-xs text-mute">{legend}</legend>
+      <div className="flex gap-1.5">{children}</div>
+    </fieldset>
+  );
+}
+
+function FeeTermsFields({
+  value,
+  onChange,
+  idPrefix,
+}: {
+  value: FeeFormState;
+  onChange: (next: FeeFormState) => void;
+  idPrefix: string;
+}) {
+  const set = (patch: Partial<FeeFormState>) => onChange({ ...value, ...patch });
+  return (
+    <div className="flex flex-wrap items-end gap-x-4 gap-y-3">
+      <FieldGroup legend="Fee basis">
+        <ChoicePill
+          name={`${idPrefix}-mode`}
+          value="percent"
+          checked={value.mode === "percent"}
+          onSelect={() => set({ mode: "percent" })}
+        >
+          Percent
+        </ChoicePill>
+        <ChoicePill
+          name={`${idPrefix}-mode`}
+          value="flat"
+          checked={value.mode === "flat"}
+          onSelect={() => set({ mode: "flat" })}
+        >
+          Flat
+        </ChoicePill>
+      </FieldGroup>
+
+      {/* Commission % is rendered in BOTH modes on purpose. parseFeeForm
+          requires it in both — commission_rate is NOT NULL on partners
+          and keeps its value while an operator is on flat terms — so
+          hiding it in flat mode produced a save the admin could not
+          unblock: "Commission % is required" naming a field that was not
+          on screen, fixable only by switching back to percent, retyping
+          the rate, and switching to flat again. */}
+      <label className="flex flex-col gap-1 text-xs text-mute">
+        Commission %
+        <input
+          type="number"
+          min="0"
+          max={MAX_PCT}
+          step="0.1"
+          value={value.pct}
+          onChange={(e) => set({ pct: e.target.value })}
+          className={`w-24 tabular-nums ${INPUT_CLS}`}
+        />
+      </label>
+
+      {value.mode === "flat" && (
+        <label className="flex flex-col gap-1 text-xs text-mute">
+          Flat fee (USD)
+          <input
+            type="number"
+            min="0"
+            step="1"
+            value={value.flat}
+            onChange={(e) => set({ flat: e.target.value })}
+            placeholder="250"
+            className={`w-28 tabular-nums ${INPUT_CLS}`}
+          />
+        </label>
+      )}
+
+      <FieldGroup legend="Who pays it">
+        <ChoicePill
+          name={`${idPrefix}-payer`}
+          value="operator"
+          checked={value.payer === "operator"}
+          onSelect={() => set({ payer: "operator" })}
+        >
+          Operator
+        </ChoicePill>
+        <ChoicePill
+          name={`${idPrefix}-payer`}
+          value="renter"
+          checked={value.payer === "renter"}
+          onSelect={() => set({ payer: "renter" })}
+        >
+          Renter
+        </ChoicePill>
+      </FieldGroup>
+
+      <label className="flex flex-col gap-1 text-xs text-mute">
+        Min fee (USD)
+        <input
+          type="number"
+          min="0"
+          step="1"
+          value={value.floor}
+          onChange={(e) => set({ floor: e.target.value })}
+          placeholder="none"
+          className={`w-28 tabular-nums ${INPUT_CLS}`}
+        />
+      </label>
+      <label className="flex flex-col gap-1 text-xs text-mute">
+        Max fee (USD)
+        <input
+          type="number"
+          min="0"
+          step="1"
+          value={value.cap}
+          onChange={(e) => set({ cap: e.target.value })}
+          placeholder="none"
+          className={`w-28 tabular-nums ${INPUT_CLS}`}
+        />
+      </label>
+
+      {value.mode === "flat" && (
+        <p className="w-full text-xs leading-relaxed text-mute">
+          The flat fee is what RYDA charges. The commission % above stays on the
+          operator&rsquo;s row and applies again if you switch back to percent —
+          it is not deleted, just dormant, so it still has to be a rate you would
+          stand behind.
+        </p>
+      )}
+    </div>
+  );
+}
+
+function PreviewLine({
+  label,
+  value,
+  strong,
+}: {
+  label: string;
+  value: string;
+  strong?: boolean;
+}) {
+  return (
+    <div className="flex items-baseline justify-between gap-4">
+      <dt className={strong ? "text-ink" : "text-ink-soft"}>{label}</dt>
+      <dd
+        className={`tabular-nums ${strong ? "font-medium text-ink" : "text-ink-soft"}`}
+      >
+        {value}
+      </dd>
+    </div>
+  );
+}
+
+/**
+ * The terms, worked through one concrete booking, live as the admin
+ * types. This is the acceptance criterion for task 3A in visible form:
+ * the number on this card and the number the server charges come out of
+ * the same call to the same function, so they cannot disagree.
+ */
+function FeePreview({ state }: { state: FeeFormState }) {
+  const parsed = parseFeeForm(state);
+  let result: ReturnType<typeof computeRentalFee> | null = null;
+  let error: string | null = parsed.ok ? null : parsed.error;
+  if (parsed.ok) {
+    try {
+      result = computeRentalFee(RENTAL_FEE_EXAMPLE_BASE_CENTS, parsed.config);
+    } catch (e) {
+      // The engine refuses an operator-paid fee larger than the booking
+      // (it would make the payout negative, which 0047 CHECKs against).
+      // Showing it here is the point — the alternative is a booking that
+      // 500s months later on a cheap rental.
+      error = (e instanceof Error ? e.message : String(e)).replace(
+        /^computeRentalFee:\s*/,
+        "",
+      );
+    }
+  }
+
+  return (
+    <div className="mt-4 max-w-md rounded-xl border border-rule bg-cream-2/50 p-4">
+      <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-mute">
+        Worked example · {usd(RENTAL_FEE_EXAMPLE_BASE_CENTS)} booking
+      </p>
+      {error && <p className="mt-2 text-xs leading-relaxed text-red-deep">{error}</p>}
+      {result && (
+        <>
+          <dl className="mt-3 space-y-1.5 text-xs">
+            <PreviewLine
+              label="Operator's price"
+              value={usd(result.baseAmountCents)}
+            />
+            <PreviewLine
+              label={
+                result.config.mode === "percent"
+                  ? `RYDA fee · ${pctLabel(result.config.rate)}`
+                  : "RYDA fee · flat"
+              }
+              value={usd(result.feeCents)}
+            />
+            <div className="border-t border-rule" />
+            <PreviewLine label="Renter pays" value={usd(result.renterTotalCents)} strong />
+            <PreviewLine
+              label="Operator receives"
+              value={usd(result.operatorNetCents)}
+              strong
+            />
+          </dl>
+          <p className="mt-3 text-xs leading-relaxed text-ink-soft">
+            {result.feePayer === "renter"
+              ? "The renter pays the operator's price plus RYDA's fee. The operator receives their full price."
+              : "The renter pays the operator's price. RYDA's fee comes out of the operator's payout."}
+            {result.clampedBy === "floor" &&
+              ` The ${usd(result.rawFeeCents)} computed fee was raised to the ${usd(
+                result.config.floorCents ?? 0,
+              )} minimum.`}
+            {result.clampedBy === "cap" &&
+              ` The ${usd(result.rawFeeCents)} computed fee was capped at ${usd(
+                result.config.capCents ?? 0,
+              )}.`}
+          </p>
+        </>
+      )}
+    </div>
+  );
+}
+
+/** The same worked example as plain text, for the confirm modal and the
+ *  audit note — so the sentence the admin approves is the sentence the
+ *  log records. Returns null when the terms do not compute (the form
+ *  blocks the save in that case anyway). */
+function feeExampleSentence(state: FeeFormState): string | null {
+  const parsed = parseFeeForm(state);
+  if (!parsed.ok) return null;
+  try {
+    const r = computeRentalFee(RENTAL_FEE_EXAMPLE_BASE_CENTS, parsed.config);
+    return `On a ${usd(r.baseAmountCents)} booking: renter pays ${usd(
+      r.renterTotalCents,
+    )}, operator receives ${usd(r.operatorNetCents)}, RYDA keeps ${usd(r.feeCents)}.`;
+  } catch {
+    return null;
+  }
+}
+
+function AddPartnerForm({
+  feeConfigReady,
+  onSaved,
+}: {
+  feeConfigReady: boolean;
+  onSaved: () => void;
+}) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  // Percent in the UI, decimal on the wire — default matches the
-  // fee module's 15% standard commission.
-  const [pct, setPct] = useState("15");
+  // Dollars/percent in the UI, cents/decimal on the wire — parseFeeForm
+  // owns that crossing for both this form and the row editor.
+  const [fee, setFee] = useState<FeeFormState>(BLANK_FEE_FORM);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    const rate = Number(pct) / 100;
     if (!name.trim()) {
       setErr("Operator name is required.");
       return;
     }
-    // An emptied input would coerce to Number('') === 0 and silently
-    // save a 0%-commission operator — require an explicit value
-    // instead (typing 0 deliberately still works).
-    if (!pct.trim()) {
-      setErr("Commission % is required — enter 0 explicitly for a no-commission operator.");
-      return;
-    }
-    // [0, 50%] mirrors the API's [0, 0.5] bound and the 0041 check
-    // constraint — reject here so the admin never round-trips a value
-    // the server is guaranteed to refuse.
-    if (!Number.isFinite(rate) || rate < 0 || rate > 0.5) {
-      setErr("Commission must be between 0 and 50%.");
+    const parsed = parseFeeForm(fee);
+    if (!parsed.ok) {
+      setErr(parsed.error);
       return;
     }
     setBusy(true);
@@ -1104,7 +1494,11 @@ function AddPartnerForm({ onSaved }: { onSaved: () => void }) {
         body: JSON.stringify({
           name: name.trim(),
           contact_email: email.trim() || null,
-          commission_rate: rate,
+          // Without 0048 applied the fee_* columns do not exist, so send
+          // only the rate — the same body this form sent before D2.
+          ...(feeConfigReady
+            ? parsed.payload
+            : { commission_rate: parsed.payload.commission_rate }),
         }),
       });
       if (!res.ok) {
@@ -1149,18 +1543,20 @@ function AddPartnerForm({ onSaved }: { onSaved: () => void }) {
             className={`w-64 ${INPUT_CLS}`}
           />
         </label>
-        <label className="flex flex-col gap-1 text-xs text-mute">
-          Commission %
-          <input
-            type="number"
-            min="0"
-            max="50"
-            step="0.5"
-            value={pct}
-            onChange={(e) => setPct(e.target.value)}
-            className={`w-24 tabular-nums ${INPUT_CLS}`}
-          />
-        </label>
+        {!feeConfigReady && (
+          <label className="flex flex-col gap-1 text-xs text-mute">
+            Commission %
+            <input
+              type="number"
+              min="0"
+              max={MAX_PCT}
+              step="0.1"
+              value={fee.pct}
+              onChange={(e) => setFee({ ...fee, pct: e.target.value })}
+              className={`w-24 tabular-nums ${INPUT_CLS}`}
+            />
+          </label>
+        )}
         <button
           type="submit"
           disabled={busy}
@@ -1169,27 +1565,61 @@ function AddPartnerForm({ onSaved }: { onSaved: () => void }) {
           {busy ? "Saving…" : "Save operator"}
         </button>
       </div>
+
+      {feeConfigReady ? (
+        <div className="mt-5 border-t border-rule pt-5">
+          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-mute">
+            Fee terms
+          </p>
+          <div className="mt-3">
+            <FeeTermsFields value={fee} onChange={setFee} idPrefix="add" />
+          </div>
+          <FeePreview state={fee} />
+        </div>
+      ) : (
+        <FeeSchemaNotice />
+      )}
+
       {err && <p className="mt-3 text-xs text-red">{err}</p>}
     </form>
   );
 }
 
+/** Shown wherever the fee-terms editor would be if migration 0048 were
+ *  applied. The page's existing 0041/0042 degradation idiom: say which
+ *  migration, say that applying it needs a human, keep working. */
+function FeeSchemaNotice() {
+  return (
+    <p className="mt-4 max-w-2xl text-xs leading-relaxed text-mute">
+      Flat fees, renter-paid terms and fee floors/caps need migration{" "}
+      <code className="text-ink-soft">0048</code> (partner fee config), which is
+      not applied in this environment yet — so only the commission % is
+      editable here. Applying migrations requires operator approval; see
+      AGENTS.md.
+    </p>
+  );
+}
+
 function PartnerRow({
   partner: p,
+  feeConfigReady,
   openModal,
   onChanged,
 }: {
   partner: Partner;
+  feeConfigReady: boolean;
   openModal: ModalOpener;
   onChanged: () => void;
 }) {
   const state = stripeState(p);
   const paused = p.status === "paused";
 
-  // Inline commission edit
+  // Fee-terms edit. Opens the row's expansion panel rather than editing
+  // in the cell: there are five levers now, and a worked example beside
+  // them is what makes the terms legible to whoever is setting them.
   const [editing, setEditing] = useState(false);
-  const [pct, setPct] = useState("");
-  const [savingRate, setSavingRate] = useState(false);
+  const [fee, setFee] = useState<FeeFormState>(BLANK_FEE_FORM);
+  const [savingTerms, setSavingTerms] = useState(false);
 
   // Pause / resume — the API 409s payment links for paused partners,
   // so the roster must both SHOW paused and offer the way back.
@@ -1204,41 +1634,43 @@ function PartnerRow({
   const [rowErr, setRowErr] = useState<string | null>(null);
 
   function startEdit() {
-    setPct(String(Math.round(p.commission_rate * 10000) / 100));
+    setFee(feeFormFromPartner(p));
+    setRowErr(null);
     setEditing(true);
   }
 
-  async function saveRate() {
-    const rate = Number(pct) / 100;
-    // Same rails as the add form: an emptied input must not coerce to
-    // a silent 0% (Number('') === 0), and the [0, 50%] bound mirrors
-    // the API / DB constraint.
-    if (!pct.trim()) {
-      setRowErr(
-        "Commission % is required — enter 0 explicitly for a no-commission operator.",
-      );
+  async function saveFeeTerms() {
+    const parsed = parseFeeForm(fee);
+    if (!parsed.ok) {
+      setRowErr(parsed.error);
       return;
     }
-    if (!Number.isFinite(rate) || rate < 0 || rate > 0.5) {
-      setRowErr("Commission must be between 0 and 50%.");
-      return;
-    }
-    // A commission change is a commercial term on every future charge:
-    // same confirm-with-note treatment as an application review, and
-    // the note lands in the audit log with the before/after.
+    // Fee terms are a commercial term on every future booking: same
+    // confirm-with-note treatment as an application review, and the note
+    // lands in the audit log with the before/after. The modal quotes the
+    // SAME worked example the preview above it showed — computed by the
+    // same computeRentalFee call — so the sentence the admin approves is
+    // the sentence the log records.
+    const example = feeExampleSentence(fee);
+    const next: Partner = { ...p, ...parsed.payload };
     const res = await openModal({
-      title: "Change commission",
-      message: `${p.name}: ${pctLabel(p.commission_rate)} → ${pctLabel(rate)}.\n\nApplies to payment links created from now on. Links already sent keep the fee frozen at creation time.`,
-      confirmLabel: "Save commission",
+      title: "Change fee terms",
+      message:
+        `${p.name}\n\n` +
+        `From: ${feeTermsSummary(p)} · ${feePayerSummary(p)}\n` +
+        `To:   ${feeTermsSummary(next)} · ${feePayerSummary(next)}\n` +
+        (example ? `\n${example}\n` : "") +
+        `\nApplies to bookings and payment links quoted from now on. Anything already quoted keeps its fee frozen at that moment.`,
+      confirmLabel: "Save fee terms",
       noteRequired: true,
       noteLabel: "Why · required (audit log)",
     });
     if (!res.confirmed) return;
-    setSavingRate(true);
+    setSavingTerms(true);
     setRowErr(null);
     try {
       // The partners POST is an upsert — send the full row identity so
-      // only the rate changes.
+      // only the terms change.
       const r = await authedFetch("/api/admin/partners", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1246,7 +1678,9 @@ function PartnerRow({
           id: p.id,
           name: p.name,
           contact_email: p.contact_email,
-          commission_rate: rate,
+          ...(feeConfigReady
+            ? parsed.payload
+            : { commission_rate: parsed.payload.commission_rate }),
           note: res.note,
         }),
       });
@@ -1261,7 +1695,7 @@ function PartnerRow({
     } catch (e) {
       setRowErr(e instanceof Error ? e.message : "Save failed.");
     } finally {
-      setSavingRate(false);
+      setSavingTerms(false);
     }
   }
 
@@ -1362,48 +1796,23 @@ function PartnerRow({
         <td className="px-4 py-3 align-top text-xs text-ink-soft">
           {p.contact_email ?? <span className="text-mute">—</span>}
         </td>
-        <td className="whitespace-nowrap px-4 py-3 align-top">
-          {editing ? (
-            <span className="inline-flex items-center gap-1.5">
-              <input
-                type="number"
-                min="0"
-                max="50"
-                step="0.5"
-                value={pct}
-                onChange={(e) => setPct(e.target.value)}
-                className={`w-20 !py-1 text-xs tabular-nums ${INPUT_CLS}`}
-              />
-              <button
-                type="button"
-                onClick={() => void saveRate()}
-                disabled={savingRate}
-                className="inline-flex h-7 items-center rounded-full border border-success/40 px-3 text-[11px] font-medium text-success-deep hover:bg-success hover:text-cream disabled:opacity-50"
-              >
-                {savingRate ? "…" : "Save"}
-              </button>
-              <button
-                type="button"
-                onClick={() => setEditing(false)}
-                className="inline-flex h-7 items-center rounded-full border border-rule px-3 text-[11px] font-medium text-mute hover:border-ink hover:text-ink"
-              >
-                Cancel
-              </button>
-            </span>
-          ) : (
-            <span className="inline-flex items-center gap-2">
-              <span className="tabular-nums text-ink">
-                {pctLabel(p.commission_rate)}
-              </span>
-              <button
-                type="button"
-                onClick={startEdit}
-                className="text-[11px] font-medium text-ink-soft hover:text-ink"
-              >
-                Edit
-              </button>
-            </span>
-          )}
+        {/* Not whitespace-nowrap: the payer + clamp line can run long
+            ("renter pays on top · min $25.00 · max $500.00") and a
+            nowrap cell would push the Stripe and action columns off
+            into the horizontal scroll for every row. */}
+        <td className="px-4 py-3 align-top">
+          <span className="inline-flex items-center gap-2 whitespace-nowrap">
+            <span className="tabular-nums text-ink">{feeTermsSummary(p)}</span>
+            <button
+              type="button"
+              onClick={() => (editing ? setEditing(false) : startEdit())}
+              aria-expanded={editing}
+              className="text-[11px] font-medium text-ink-soft hover:text-ink"
+            >
+              {editing ? "Close" : "Edit"}
+            </button>
+          </span>
+          <p className="mt-0.5 text-xs text-mute">{feePayerSummary(p)}</p>
         </td>
         <td className="whitespace-nowrap px-4 py-3 align-top">
           <span className="inline-flex flex-wrap items-center gap-1.5">
@@ -1450,9 +1859,61 @@ function PartnerRow({
         </td>
       </tr>
 
-      {(link || rowErr) && (
+      {(editing || link || rowErr) && (
         <tr>
           <td colSpan={5} className="bg-cream-2/40 px-6 py-4">
+            {editing && (
+              <div className="mb-4 max-w-4xl">
+                <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-mute">
+                  Fee terms · {p.name}
+                </p>
+                {feeConfigReady ? (
+                  <>
+                    <div className="mt-3">
+                      <FeeTermsFields
+                        value={fee}
+                        onChange={setFee}
+                        idPrefix={`row-${p.id}`}
+                      />
+                    </div>
+                    <FeePreview state={fee} />
+                  </>
+                ) : (
+                  <>
+                    <label className="mt-3 flex w-32 flex-col gap-1 text-xs text-mute">
+                      Commission %
+                      <input
+                        type="number"
+                        min="0"
+                        max={MAX_PCT}
+                        step="0.1"
+                        value={fee.pct}
+                        onChange={(e) => setFee({ ...fee, pct: e.target.value })}
+                        className={`tabular-nums ${INPUT_CLS}`}
+                      />
+                    </label>
+                    <FeeSchemaNotice />
+                  </>
+                )}
+                <div className="mt-4 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => void saveFeeTerms()}
+                    disabled={savingTerms}
+                    className="inline-flex h-8 items-center rounded-full border border-success/40 px-4 text-[11px] font-medium text-success-deep hover:bg-success hover:text-cream disabled:opacity-50"
+                  >
+                    {savingTerms ? "Saving…" : "Save fee terms"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditing(false)}
+                    className="inline-flex h-8 items-center rounded-full border border-rule px-4 text-[11px] font-medium text-mute hover:border-ink hover:text-ink"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
             {rowErr && (
               <p className="text-xs text-red-deep">
                 {rowErr}

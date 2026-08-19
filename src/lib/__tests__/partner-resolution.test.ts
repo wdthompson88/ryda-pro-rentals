@@ -61,7 +61,7 @@ describe("planOperatorLookup", () => {
     });
   });
 
-  it("returns null when the lead names no operator (RYDA fleet)", () => {
+  it("returns null when the lead names no operator (legacy pre-strip row)", () => {
     expect(planOperatorLookup({ partner_id: null, partner_name: null })).toBeNull();
     expect(planOperatorLookup({})).toBeNull();
   });

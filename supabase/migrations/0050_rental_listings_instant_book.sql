@@ -1,0 +1,89 @@
+-- 0050: rental_listings.instant_book — the per-listing switch between
+-- the two confirmation models. (Claims 0050; 0049 is notifications.)
+--
+-- WHY A FLAG AND NOT A PLATFORM DECISION
+-- Decision D3 settled request-to-book: the renter asks, the operator
+-- answers within 24h, and the dates are reserved at the transition to
+-- 'confirmed'. That is the right default and 0047 encodes it. But it is
+-- not the right answer for every car, and the reason is not policy — it
+-- is whether the calendar is TRUE.
+--
+-- An operator who actually maintains blackouts can be booked instantly
+-- with no risk: the open days on their calendar are days the car is free,
+-- so confirming on the spot cannot oversell. An operator whose calendar
+-- is default-open because they have never touched it is offering 180 days
+-- they have not agreed to, and instant confirmation there sells a car
+-- that may be in the shop. Request-to-book is what absorbs that — the
+-- operator's approval IS the calendar, applied late.
+--
+-- So the two models are not competing preferences, they are two states of
+-- one variable: does this listing's calendar mean anything? That is a
+-- per-listing fact, it changes as an operator's habits change, and only
+-- the operator knows it. Hence a column on the listing, owned by the
+-- operator, rather than a platform-wide mode or a partner-level setting.
+--
+-- 0047 needs no change to support this. Its state machine already allows
+-- requested → confirmed and its EXCLUDE constraint already fires on that
+-- transition; an instant booking is the same transition with no operator
+-- in between, and a same-instant race between two instant bookings loses
+-- at the database exactly as an approval race does. That is the whole
+-- reason the reservation was scoped to the STATUS rather than to the
+-- route that writes it.
+--
+-- ── DEFAULT false, AND THE REASON IT MUST STAY false FOR NOW ──────────
+--
+-- Instant book is only coherent once a card is charged at confirmation
+-- (build-loop phase 3B). Today the approval route moves no money: the
+-- booking reaches 'confirmed' and RYDA holds nothing — no charge, no
+-- SetupIntent, no payment method on file. Under request-to-book that gap
+-- is survivable, because an operator is looking at every booking and the
+-- renter is told an operator is. Under instant book it means a renter
+-- can lock a $1,400/day car for a week, with the operator's calendar
+-- blocked by 0047's EXCLUDE constraint, having provided nothing but an
+-- email address — and the operator finds out by having lost the week.
+--
+-- Enabling this flag before the charge rail exists therefore converts a
+-- lead-generation site into an unpriced reservation system. That is why
+-- this migration ships the column and NOTHING that reads it: the request
+-- route does not branch on it and no surface renders a badge for it. The
+-- column lands now only so the migration batch is applied once; the
+-- auto-confirm path lands with the charge that makes it honest.
+--
+-- The route-level gate, when it is written, is an AND and not a
+-- substitute for this column:
+--
+--   instant-confirm  ⇔  listing.instant_book
+--                       AND the operator's Connect account is
+--                           payouts_enabled AND details_submitted
+--                       AND the charge succeeded
+--
+-- The flag is operator INTENT; payout-readiness is a fact about Stripe;
+-- the charge is an event. Only the first belongs in this table, which is
+-- why the other two are not columns here.
+
+alter table public.rental_listings
+  add column if not exists instant_book boolean not null default false;
+
+comment on column public.rental_listings.instant_book is
+  'When true, a renter''s request on an open range confirms immediately instead of waiting for the operator (decision D3''s per-listing exception). Operator intent only: the request route must also require a payouts_enabled Connect account and a successful charge. Default false, and it must stay false until the charge rail (phase 3B) exists — confirming without a charge reserves a car against 0047''s EXCLUDE constraint for a renter who has paid nothing.';
+
+-- No index. This column is read only alongside the listing row a booking
+-- request already fetched by id or slug, never filtered on across the
+-- table -- and even when /rent grows an "Instant book" facet, a boolean
+-- with a skewed distribution is the textbook case where a btree index
+-- earns nothing over the sequential scan the planner will choose anyway.
+--
+-- No update-guard change either. rental_listings_enforce_update (0044)
+-- bumps updated_at, pins partner_id and polices status transitions;
+-- toggling this flag is a same-status edit, which that trigger already
+-- passes through, and it is a change the owning operator is entitled to
+-- make in both directions. Unlike the booking status machine there is no
+-- terminal state to protect: an operator who turns instant book off after
+-- turning it on has changed their mind, not corrupted a record.
+--
+-- RLS needs nothing: this is a new column on a table whose three policies
+-- (0044) are column-blind -- public SELECT on active listings, operator
+-- FOR ALL scoped by is_partner_staff(partner_id), admin everything. The
+-- operator can already write every commercial column on their own row,
+-- and this one is no more sensitive than daily_rate_cents. Nothing here
+-- widens who can read or write a listing.

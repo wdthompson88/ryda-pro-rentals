@@ -15,15 +15,15 @@ export default function PrivacyPage() {
         },
         {
           heading: "2. What we collect",
-          body: "Account information you provide (name, email, phone, address, date of birth, driver's license).\n\nIdentity verification data (government ID, selfie liveness check) and driving record check collected via our KYC partner.\n\nPayment information (handled by our payment processor; we never see full card numbers).\n\nUsage data (pages viewed, features used, device type, IP address) to operate and improve the platform.\n\nVehicle telematics, where applicable, to verify trip starts/ends and detect abuse.",
+          body: "Account information you provide (name, email, phone, address).\n\nBooking request details (the vehicle, your dates, and any notes you send to an operator).\n\nIdentity verification data (government ID, selfie liveness check) collected via our KYC partner, where identity verification is required.\n\nPayment information (handled by our payment processor; we never see full card numbers).\n\nUsage data (pages viewed, features used, device type, IP address) to operate and improve the platform.",
         },
         {
           heading: "3. How we use your information",
-          body: "To verify your identity and eligibility for membership.\n\nTo facilitate rentals and co-ownership share onboarding, including LLC documents, payments, and member records.\n\nTo communicate about your account, bookings, billing, and changes to our service.\n\nTo prevent fraud, enforce our Terms of Service, and comply with the law.",
+          body: "To pass your booking request to the operator whose vehicle you selected, so they can confirm availability and price with you.\n\nTo verify your identity where identity verification is required.\n\nTo send you a payment link for a confirmed booking and to keep a record of it.\n\nTo communicate about your account, requests, and changes to our service.\n\nTo prevent fraud, enforce our Terms of Service, and comply with the law.",
         },
         {
           heading: "4. How we share your information",
-          body: "We share information with: identity verification partners (KYC), payment processors, insurance carriers, our managed-storage and roadside partners, and legal/regulatory authorities when required by law.\n\nWe do not sell your personal information.",
+          body: "We share information with: the rental operator whose vehicle you request, so they can confirm and fulfil the booking; identity verification partners (KYC); payment processors; and legal or regulatory authorities when required by law.\n\nOperators receive the details needed to contact you and complete the rental. What they do with that information is governed by their own privacy practices, not ours.\n\nWe do not sell your personal information.",
         },
         {
           heading: "5. Your rights",
@@ -31,19 +31,19 @@ export default function PrivacyPage() {
         },
         {
           heading: "6. Data retention",
-          body: "We keep your information for as long as your account is active and for a reasonable period after, typically 7 years for transactional records, in line with US tax and securities recordkeeping requirements.",
+          body: "We keep your information for as long as your account is active and for a reasonable period after, typically 7 years for transactional records, in line with US tax recordkeeping requirements.",
         },
         {
           heading: "7. Security",
-          body: "We use industry-standard administrative, technical, and physical safeguards. No system is perfectly secure, but we treat your data with the same care we treat the cars in our fleet.",
+          body: "We use industry-standard administrative, technical, and physical safeguards. No system is perfectly secure, but your information is accessed only by the people who need it to route your request, and shared only as described in this policy.",
         },
         {
           heading: "8. Children's privacy",
-          body: "RYDA is not directed to anyone under 28. We do not knowingly collect information from minors.",
+          body: "RYDA is not directed to anyone under 18. We do not knowingly collect information from children.",
         },
         {
           heading: "9. Changes to this policy",
-          body: "We will post material changes here and notify members by email at least 14 days before they take effect.",
+          body: "We will post material changes here. The effective date at the top reflects the most recent change.",
         },
         {
           heading: "10. Contact",

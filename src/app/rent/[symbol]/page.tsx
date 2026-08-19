@@ -2,13 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { PhotoGallery } from "@/components/photo-gallery";
-import { RentalInquiryForm } from "@/components/rental-inquiry-form";
-import {
-  VEHICLES,
-  getVehicleBySymbol,
-  formatUSD,
-  type Vehicle,
-} from "@/lib/market-data";
+import { RentalBookingCard } from "@/components/rental-booking-card";
+import { formatUSD } from "@/lib/market-data";
 import {
   PARTNER_VEHICLES,
   brandTint,
@@ -17,17 +12,13 @@ import {
   type PartnerVehicle,
 } from "@/lib/partner-fleet";
 
-// /rent/[symbol] handles BOTH:
-//   - RYDA fleet symbols (lowercased): /rent/f296, /rent/mc75, ...
-//   - Partner slugs: /rent/lamborghini-huracan-evo, ...
-// generateStaticParams pre-renders both kinds.
+// /rent/[symbol] resolves ONE kind of thing: a partner listing slug
+// (/rent/lamborghini-huracan-evo). The route param is still named
+// `symbol` because renaming a dynamic segment renames the folder and
+// every link that reaches it; the RYDA-fleet symbols it was named for
+// are gone.
 export async function generateStaticParams() {
-  return [
-    ...VEHICLES.filter((v) => v.rentalAvailable).map((v) => ({
-      symbol: v.symbol.toLowerCase(),
-    })),
-    ...PARTNER_VEHICLES.map((p) => ({ symbol: p.slug })),
-  ];
+  return PARTNER_VEHICLES.map((p) => ({ symbol: p.slug }));
 }
 
 // Revalidate hourly so statically-prerendered listing content stays fresh.
@@ -35,26 +26,12 @@ export async function generateStaticParams() {
 // so there's no build-time date to go stale.)
 export const revalidate = 3600;
 
-type ResolvedListing =
-  | { kind: "ryda"; vehicle: Vehicle }
-  | { kind: "partner"; vehicle: PartnerVehicle };
-
-function resolve(slug: string): ResolvedListing | null {
-  const ryda = getVehicleBySymbol(slug);
-  if (ryda && ryda.rentalAvailable) return { kind: "ryda", vehicle: ryda };
-  const partner = getPartnerVehicleBySlug(slug);
-  if (partner) return { kind: "partner", vehicle: partner };
-  return null;
+function resolve(slug: string): PartnerVehicle | null {
+  return getPartnerVehicleBySlug(slug) ?? null;
 }
 
-function listingTitle(r: ResolvedListing): string {
-  return r.kind === "ryda"
-    ? r.vehicle.name
-    : `${r.vehicle.make} ${r.vehicle.model}`;
-}
-
-function listingDailyRate(r: ResolvedListing): number {
-  return r.kind === "ryda" ? r.vehicle.rentalDailyRate : r.vehicle.dailyRate;
+function listingTitle(v: PartnerVehicle): string {
+  return `${v.make} ${v.model}`;
 }
 
 export async function generateMetadata({
@@ -66,15 +43,13 @@ export async function generateMetadata({
   const r = resolve(symbol);
   if (!r) return { title: "Rentals" };
   const title = listingTitle(r);
-  const rate = listingDailyRate(r);
   return {
-    title: `Rent the ${title} · ${formatUSD(rate)}/day`,
-    // Partner cars are fulfilled by the operator on their own contract
-    // and insurance — the metadata must not promise RYDA fulfillment.
-    description:
-      r.kind === "ryda"
-        ? `Hand-prepared, fully insured, white-glove delivered. ${title} in ${r.vehicle.market}.`
-        : `Request your dates and a vetted Miami operator confirms availability and price directly with you. ${title} in ${r.vehicle.market}.`,
+    title: `Rent the ${title} · ${formatUSD(r.dailyRate)}/day`,
+    // Every car is fulfilled by the operator on their own contract and
+    // insurance — the metadata must not promise RYDA fulfillment, and
+    // must not call the operator "vetted": the only check RYDA runs is
+    // Stripe Connect onboarding of a business and a bank account.
+    description: `Request your dates and a Miami operator confirms availability and price directly with you. ${title} in ${r.market}.`,
   };
 }
 
@@ -87,20 +62,12 @@ export default async function RentDetailPage({
   const r = resolve(symbol);
   if (!r) notFound();
 
-  const dailyRate = listingDailyRate(r);
+  const dailyRate = r.dailyRate;
   const title = listingTitle(r);
-  const market = r.vehicle.market;
+  const market = r.market;
 
-  const ratesByDuration = [
-    { days: 3, total: dailyRate * 3, save: 0 },
-    { days: 7, total: dailyRate * 7 * 0.95, save: 5 },
-    { days: 14, total: dailyRate * 14 * 0.92, save: 8 },
-    { days: 30, total: dailyRate * 30 * 0.88, save: 12 },
-  ];
-
-  const tint = r.kind === "partner" ? brandTint(r.vehicle.make) : undefined;
-  const partnerGallery =
-    r.kind === "partner" ? getPartnerGallery(r.vehicle) : [];
+  const tint = brandTint(r.make);
+  const partnerGallery = getPartnerGallery(r);
 
   return (
     <>
@@ -121,23 +88,15 @@ export default async function RentDetailPage({
           <div className="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-12">
             {/* Hero + meta */}
             <div className="lg:col-span-8">
-              {r.kind === "ryda" ? (
-                <PhotoGallery
-                  photos={[r.vehicle.hero]}
-                  alt={`${r.vehicle.year} ${title}`}
-                  flipFirst={r.vehicle.flipImage}
-                  imagePosition={r.vehicle.imagePosition}
-                  optimize
-                />
-              ) : partnerGallery.length > 0 ? (
+              {partnerGallery.length > 0 ? (
                 <PhotoGallery
                   photos={partnerGallery}
-                  alt={`${r.vehicle.year ?? ""} ${title}`.trim()}
+                  alt={`${r.year ?? ""} ${title}`.trim()}
                 />
               ) : (
                 <div
                   className="relative aspect-[16/10] w-full overflow-hidden rounded-2xl"
-                  style={tint ? { backgroundColor: tint } : undefined}
+                  style={{ backgroundColor: tint }}
                 >
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div
@@ -150,11 +109,9 @@ export default async function RentDetailPage({
                     />
                     <div className="relative text-center text-cream/90">
                       <p className="text-[10px] uppercase tracking-[0.24em] opacity-70">
-                        {r.vehicle.make}
+                        {r.make}
                       </p>
-                      <p className="mt-1 font-display text-3xl">
-                        {r.vehicle.model}
-                      </p>
+                      <p className="mt-1 font-display text-3xl">{r.model}</p>
                     </div>
                   </div>
                 </div>
@@ -162,348 +119,195 @@ export default async function RentDetailPage({
 
               <div className="mt-8">
                 <p className="text-xs text-mute">
-                  {r.kind === "ryda"
-                    ? `${r.vehicle.brand} · ${r.vehicle.year} · ${market}`
-                    : `${r.vehicle.make}${r.vehicle.year ? ` · ${r.vehicle.year}` : ""} · ${market}`}
+                  {`${r.make}${r.year ? ` · ${r.year}` : ""} · ${market}`}
                 </p>
                 <h1 className="mt-1 font-display text-4xl font-light text-ink sm:text-5xl">
                   {title}
                 </h1>
                 <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-soft">
-                  {r.kind === "ryda"
-                    ? r.vehicle.description
-                    : `The ${title} is run by a vetted Miami operator on RYDA's rental grid. Send your dates and the operator confirms availability and price directly with you — then closes the rental on their own contract and insurance, at their price. Inquiring through RYDA never costs more than going direct.`}
+                  {`The ${title} is run by a Miami operator on RYDA's rental grid. Send your dates and the operator confirms availability and price directly with you — then closes the rental on their own contract and insurance, at their price. Inquiring through RYDA never costs more than going direct.`}
                 </p>
               </div>
 
-              {/* Specs grid, only RYDA fleet has full specs; partner cards
-                  use a compact info row instead. */}
-              {r.kind === "ryda" ? (
-                <div className="mt-10 grid grid-cols-2 gap-x-10 gap-y-6 border-t border-rule pt-8 sm:grid-cols-3 lg:grid-cols-6">
-                  <Spec label="Engine" value={r.vehicle.specs.engine} />
-                  <Spec label="Power" value={r.vehicle.specs.power} />
-                  <Spec label="0–60 mph" value={r.vehicle.specs.zeroToSixty} />
-                  <Spec label="Top speed" value={r.vehicle.specs.topSpeed} />
-                  <Spec label="Transmission" value={r.vehicle.specs.transmission} />
-                  <Spec label="Color" value={r.vehicle.specs.color} />
-                </div>
-              ) : (
-                <div className="mt-10 grid grid-cols-2 gap-x-10 gap-y-6 border-t border-rule pt-8 sm:grid-cols-3">
-                  <Spec label="Type" value={r.vehicle.category} />
-                  <Spec
-                    label="Year"
-                    value={r.vehicle.year ? String(r.vehicle.year) : "—"}
-                  />
-                  <Spec
-                    label="Mileage included"
-                    // No fabricated default — mileage terms are the
-                    // operator's when the listing doesn't state them.
-                    value={r.vehicle.milesIncluded ?? "Confirmed by operator"}
-                  />
-                </div>
-              )}
+              {/* Compact info row. RYDA does not hold the car, so it does
+                  not publish a spec sheet for it — only what the operator's
+                  listing states. */}
+              <div className="mt-10 grid grid-cols-2 gap-x-10 gap-y-6 border-t border-rule pt-8 sm:grid-cols-3">
+                <Spec label="Type" value={r.category} />
+                <Spec label="Year" value={r.year ? String(r.year) : "—"} />
+                <Spec
+                  label="Mileage included"
+                  // No fabricated default — mileage terms are the
+                  // operator's when the listing doesn't state them.
+                  value={r.milesIncluded ?? "Confirmed by operator"}
+                />
+              </div>
             </div>
 
-            {/* Booking card */}
+            {/* Booking card. The headline rate lives INSIDE the client
+                card now: `dailyRate` here is partner-fleet.ts's static
+                figure, and the quote inside the form is priced from
+                rental_listings.daily_rate_cents — the card resolves the
+                two rather than rendering both. */}
             <div className="lg:col-span-4">
-              <div className="rounded-2xl border border-rule bg-surface p-6 shadow-sm">
-                <div className="flex items-baseline justify-between">
-                  <p className="font-display text-3xl text-ink tabular-nums">
-                    {formatUSD(dailyRate)}
-                  </p>
-                  <p className="text-sm text-mute">/day</p>
-                </div>
-                {r.kind === "partner" && r.vehicle.regularRate &&
-                r.vehicle.regularRate > dailyRate ? (
-                  <p className="mt-1 text-xs text-mute">
-                    Regular{" "}
-                    <span className="line-through tabular-nums">
-                      {formatUSD(r.vehicle.regularRate)}
-                    </span>
-                    /day
-                  </p>
-                ) : null}
-                <p className="mt-1 text-xs text-ink-soft">
-                  {r.kind === "ryda"
-                    ? "Includes 100 mi/day, full insurance, white-glove handover"
-                    : "Fulfilled by a vetted Miami operator on their contract and insurance"}
-                </p>
-
-                {/* Driver requirements — kept from the old estimate card;
-                    operators impose these, so they qualify the lead. */}
-                <div className="mt-4 space-y-2 rounded-xl border border-rule bg-cream-2/40 p-3 text-[11px] text-ink-soft">
-                  <div className="flex items-baseline justify-between">
-                    <span className="text-mute">Min. driver age</span>
-                    <span className="font-medium text-ink">28+</span>
-                  </div>
-                  <div className="flex items-baseline justify-between">
-                    <span className="text-mute">Driving experience</span>
-                    <span className="font-medium text-ink">5+ years</span>
-                  </div>
-                </div>
-
-                {/* Rentals-first pivot: the static fee-estimate mock +
-                    signup-gated contact CTA are replaced by the real
-                    inquiry form. One request → a named operator → the
-                    keys. Anon visitors get an account created alongside
-                    the inquiry; the lead itself is never gated. */}
-                <div className="mt-5 border-t border-rule pt-5">
-                  <RentalInquiryForm
-                    vehicleSlug={
-                      r.kind === "ryda" ? r.vehicle.symbol : r.vehicle.slug
-                    }
-                    vehicleName={title}
-                    market={market}
-                  />
-                </div>
-              </div>
+              {/* A "Driver requirements" panel stood here on all 37
+                  listing pages: "Min. driver age 28+" and "Driving
+                  experience 5+ years". Both figures are deleted, not
+                  softened. Neither appears in partner-fleet.ts, in any
+                  migration, or in anything the operator sends us, and
+                  Terms §3 plus /trust-and-safety both state that
+                  eligibility to rent a particular car is the operator's
+                  to set and can differ car to car. A platform-wide number
+                  turns away drivers the operator would rent to and implies
+                  RYDA checks something it never sees. The booking card
+                  below deliberately does not reinstate it: RYDA still has
+                  no eligibility data to show. */}
+              <RentalBookingCard
+                vehicleSlug={r.slug}
+                vehicleName={title}
+                market={market}
+                fallbackDailyRate={dailyRate}
+                regularRate={r.regularRate ?? null}
+                includesNote="Fulfilled by a Miami operator on their contract and insurance"
+              />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Trust strip, hosted by, response time, badges */}
+      {/* Trust strip: who hosts the car, then the badges. */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-10 sm:px-10">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
-            {/* Hosted by RYDA */}
+            {/* Hosted by — the operator, never RYDA. RYDA owns, stores,
+                insures and operates no vehicle on this platform (Terms
+                §2), so the RYDA monogram that used to sit here was false
+                on every listing. The attribution stays, because "whose
+                car is this?" is the question this slot answers, but the
+                honest answer is an operator we don't name. No
+                response-time claim either — nothing in this codebase
+                measures one — and no vetting claim: Stripe Connect
+                onboarding of a business and a bank account is the only
+                check RYDA runs on an operator. The promise that the
+                operator "introduces themselves when they confirm" is
+                deleted too; nothing in the code produces it. */}
             <div className="lg:col-span-4">
               <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-mute">
                 Hosted by
               </p>
-              <div className="mt-3 flex items-center gap-3">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-ink text-cream font-display text-lg">
-                  R
-                </div>
-                <div>
-                  <p className="font-display text-base text-ink">RYDA</p>
-                  <p className="text-[11px] text-ink-soft">
-                    Typically responds within 30 min · business hours
-                  </p>
-                </div>
-              </div>
+              <p className="mt-3 font-display text-xl text-ink">
+                A Miami operator
+              </p>
+              <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+                The car is owned and run by an independent Miami operator.
+                RYDA lists it and passes your request on. Listings stay
+                unbranded.
+              </p>
             </div>
 
-            {/* Trust badges grid. RYDA-fleet cars carry RYDA's own
-                fulfillment promises; partner cars must only promise
-                what the lead-gen model delivers — insurance, mileage,
-                and availability are the operator's to confirm. */}
+            {/* Trust badges. These may only promise what the lead-gen
+                model delivers — insurance, mileage, and availability are
+                the operator's to confirm, never RYDA's to guarantee.
+                Three badges are deleted: "Min driver age 28+" and
+                "Experience 5+ years" (see the booking column — no such
+                figure exists anywhere in this repo, and eligibility is
+                the operator's), and "Operator · Vetted by RYDA", which
+                presented a payments onboarding step as a safety check.
+                Nothing replaces them. */}
             <div className="lg:col-span-8">
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                <TrustBadge label="Min driver age" value="28+" />
-                <TrustBadge label="Experience" value="5+ years" />
-                {r.kind === "ryda" ? (
-                  <>
-                    <TrustBadge label="Booking" value="Secured" />
-                    <TrustBadge label="Insurance" value="$1M liability" />
-                    <TrustBadge label="Mileage" value="100 mi/day incl." />
-                    <TrustBadge label="Availability" value="Live calendar" />
-                  </>
-                ) : (
-                  <>
-                    <TrustBadge label="Operator" value="Vetted by RYDA" />
-                    <TrustBadge label="Insurance" value="Operator's policy" />
-                    <TrustBadge label="Your price" value="The operator's price" />
-                    <TrustBadge label="Availability" value="Operator confirms" />
-                  </>
-                )}
+                <TrustBadge label="Insurance" value="Operator's policy" />
+                <TrustBadge label="Your price" value="The operator's price" />
+                <TrustBadge label="Availability" value="Operator confirms" />
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Deliverable to + Payment options */}
+      {/* Payment options.
+          A "Deliverable to" column stood beside this one on all 37
+          listing pages and is deleted whole: the heading "Delivery
+          across the region", the line "Most operators deliver and
+          collect across the region", and a six-city drop-off list
+          (Miami Beach, Fort Lauderdale, Palm Beach, Naples, The Keys)
+          plus dead Los Angeles and New York variants of the same list.
+          Nothing in this repo carries a delivery radius, window,
+          minimum or rate for any car — PartnerVehicle has no delivery
+          field — so every word of it was invented, and "most operators"
+          described a population of one (partner is the literal type
+          "GM LUXE"). The LA/NY branches could never render either:
+          market is the literal type "Miami". Delivery is a question for
+          the operator's reply; RYDA has nothing to state here. */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-10 sm:px-10">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+            {/* Payment settles on the OPERATOR's own Stripe account
+                (fee-only direct charges, 0041) — rental money never
+                enters a RYDA balance, and this page must not imply it
+                does. It must not claim the opposite either: the Checkout
+                link is created and emailed BY RYDA, so "no payment
+                through RYDA" sets up a bait-and-switch when that email
+                arrives. */}
             <div className="lg:col-span-7">
-              <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-red">
-                Deliverable to
-              </p>
-              <p className="mt-2 font-display text-2xl text-ink">
-                {r.kind === "ryda"
-                  ? "White-glove delivery across the region."
-                  : "Delivery across the region."}
-              </p>
-              <p className="mt-2 text-sm text-ink-soft">
-                {r.kind === "ryda"
-                  ? "We deliver and collect the vehicle to any address. Min 3-day rental for in-market delivery; 7-day minimum for cross-state. Delivery and pick-up rates from $450."
-                  : "Most operators deliver and collect across the region. Delivery windows, minimums, and rates are the operator's — they confirm the details directly with you when they reply."}
-              </p>
-              <ul className="mt-4 grid grid-cols-2 gap-y-2 text-sm text-ink-soft sm:grid-cols-3">
-                {(market === "Miami"
-                  ? [
-                      "Miami",
-                      "Miami Beach",
-                      "Fort Lauderdale",
-                      "Palm Beach",
-                      "Naples",
-                      "The Keys",
-                    ]
-                  : market === "Los Angeles"
-                    ? [
-                        "Los Angeles",
-                        "Beverly Hills",
-                        "Malibu",
-                        "Newport Beach",
-                        "Palm Springs",
-                        "Pasadena",
-                      ]
-                    : [
-                        "New York",
-                        "Hamptons",
-                        "Greenwich",
-                        "Hudson Valley",
-                        "Newport",
-                        "Cape Cod",
-                      ]
-                ).map((city) => (
-                  <li key={city} className="flex items-center gap-2">
-                    <span className="inline-block h-1 w-1 rounded-full bg-red" />
-                    {city}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Payment: RYDA-fleet cars settle with RYDA; partner cars
-                settle on the OPERATOR's own Stripe account (fee-only
-                direct charges, 0041) — rental money never enters a RYDA
-                balance, and this page must not imply it does. It must
-                not claim the opposite either: the Checkout link is
-                created and emailed BY RYDA, so "no payment through RYDA"
-                sets up a bait-and-switch when that email arrives. (No
-                membership upsell here — co-ownership/membership copy
-                stays off rental surfaces.) */}
-            <div className="lg:col-span-5">
               <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-red">
                 Payment
               </p>
-              {r.kind === "ryda" ? (
-                <>
-                  <p className="mt-2 font-display text-2xl text-ink">
-                    Multiple ways to settle.
-                  </p>
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {["Wire", "ACH", "Credit card", "Debit card"].map((p) => (
-                      <span
-                        key={p}
-                        className="rounded-full border border-rule bg-surface px-3 py-1 text-xs font-medium text-ink"
-                      >
-                        {p}
-                      </span>
-                    ))}
-                  </div>
-                </>
-              ) : (
-                <>
-                  <p className="mt-2 font-display text-2xl text-ink">
-                    Straight to the operator.
-                  </p>
-                  <p className="mt-2 text-sm text-ink-soft">
-                    No card at request. Once the operator confirms your
-                    dates we send a secure Stripe link — the charge settles
-                    on the operator&apos;s own account and RYDA never holds
-                    your money. Your price is the operator&apos;s price.
-                  </p>
-                </>
-              )}
+              <p className="mt-2 font-display text-2xl text-ink">
+                Straight to the operator.
+              </p>
+              <p className="mt-2 text-sm text-ink-soft">
+                No card at request. Once the operator confirms your dates we
+                send a secure Stripe link — the charge settles on the
+                operator&apos;s own Stripe account. Your price is the
+                operator&apos;s price.
+              </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Duration discounts — RYDA fleet only. Partner pricing is the
-          operator's; quoting duration discounts RYDA can't honor would
-          contradict "your price is the operator's price". */}
-      {r.kind === "ryda" && (
-        <section className="border-b border-rule bg-cream-2">
-          <div className="mx-auto max-w-7xl px-6 py-12 sm:px-10">
-            <h2 className="font-display text-3xl text-ink">Longer trips, better rates</h2>
-            <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
-              {ratesByDuration.map((rate) => (
-                <div key={rate.days} className="rounded-xl border border-rule bg-surface p-5">
-                  <p className="text-xs text-mute">{rate.days} days</p>
-                  <p className="mt-2 font-display text-xl text-ink tabular-nums">
-                    {formatUSD(rate.total)}
-                  </p>
-                  {rate.save > 0 && (
-                    <p className="mt-1 text-xs font-medium text-red">
-                      Save {rate.save}%
-                    </p>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* What's included (RYDA fleet) / How the rental works (partner).
-          The RYDA pillars are fulfillment promises — insurance, mileage,
-          roadside, handover — that only hold for RYDA's own cars. On
-          partner listings the honest pillars are the lead-gen model. */}
+      {/* How the rental works. Every pillar here has to be something the
+          lead-gen model actually delivers — RYDA holds no car, so it
+          promises no insurance, no mileage, no handover, and quotes no
+          duration discount it could not honor. */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-7xl px-6 py-14 sm:px-10">
           <h2 className="font-display text-3xl text-ink">
-            {r.kind === "ryda" ? "What's included" : "How the rental works"}
+            How the rental works
           </h2>
           <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {r.kind === "ryda" ? (
-              <>
-                <Pillar
-                  title="Full insurance"
-                  body="$1M third-party liability. Agreed-value physical damage with low deductible."
-                />
-                <Pillar
-                  title="100 miles / day"
-                  body="Industry-standard included mileage. Extra miles at $4/mi at the time of booking."
-                />
-                <Pillar
-                  title="24/7 roadside"
-                  body="Single number, replacement vehicle if anything goes wrong."
-                />
-                <Pillar
-                  title="White-glove handover"
-                  body="Vehicle delivered washed, fueled, photo-documented."
-                />
-                {r.vehicle.trackEligible && (
-                  <Pillar
-                    title="Track-day eligible"
-                    body="Optional unlimited-miles track package + helmet drop-off."
-                  />
-                )}
-              </>
-            ) : (
-              <>
-                <Pillar
-                  title="A vetted operator"
-                  body="Your request goes straight to the Miami operator who runs this car. They reply by name and confirm availability directly with you."
-                />
-                <Pillar
-                  title="Their contract & insurance"
-                  body="The rental closes on the operator's own agreement and coverage — the same terms you'd get going direct. Delivery, deposit, and mileage are theirs to confirm."
-                />
-                <Pillar
-                  title="The operator's price"
-                  body="Inquiring through RYDA never costs more than going direct. Operators pay RYDA a referral commission on bookings we send them — that's the whole model."
-                />
-                <Pillar
-                  title="No payment through RYDA"
-                  body="No card at request. Nothing is charged until you and the operator confirm the booking together."
-                />
-              </>
-            )}
+            {/* "Your request goes straight to the Miami operator" stood
+                here on all 37 listing pages and was false:
+                PARTNER_INQUIRY_EMAILS in src/lib/partner-contacts.ts is
+                empty — its one entry is commented out pending a signed
+                referral agreement — so partnerInquiryEmail() returns the
+                RYDA team inbox for every car and a person forwards the
+                lead. RYDA in the middle is the truth; say it, so the
+                customer is not left concluding the operator ignored
+                them. */}
+            <Pillar
+              title="An operator"
+              body="Your request comes to RYDA, and we pass it to the Miami operator who runs this car. They confirm availability directly with you."
+            />
+            <Pillar
+              title="Their contract & insurance"
+              body="The rental closes on the operator's own agreement and coverage — the same terms you'd get going direct. Delivery, deposit, and mileage are theirs to confirm."
+            />
+            <Pillar
+              title="The operator's price"
+              body="Inquiring through RYDA never costs more than going direct. Operators pay RYDA a referral commission on bookings we send them — that's the whole model."
+            />
+            <Pillar
+              title="No card at request"
+              body="No card at request. Nothing is charged until you and the operator confirm the booking together."
+            />
           </div>
         </div>
       </section>
 
-      {/* No co-ownership pitch here. The program is parked (2027
-          waitlist) and the pivot's rule is co-ownership stays out of
-          rental-surface copy — the footer link (Cars column in
-          site-footer) and the quiet pointer at the end of
-          /how-it-works are the only sanctioned references. */}
+      {/* No ownership-program pitch here, and nowhere else either —
+          that product is not part of this repo. */}
     </>
   );
 }

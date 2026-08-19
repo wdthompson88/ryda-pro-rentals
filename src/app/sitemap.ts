@@ -1,19 +1,16 @@
 import type { MetadataRoute } from "next";
-import { VEHICLES } from "@/lib/market-data";
 import { PARTNER_VEHICLES } from "@/lib/partner-fleet";
-import { BOATS } from "@/lib/boat-data";
-import { POSTS as JOURNAL_POSTS } from "@/lib/journal-content";
 import { HELP as HELP_CATEGORIES } from "@/lib/help-content";
-import { LEARN_ARTICLES } from "@/lib/learn-content";
 
 // Sitemap of every crawlable, public RYDA route. Generated at build
 // time. Three categories:
 //   1. Static landing pages (hand-maintained list below).
-//   2. Per-vehicle dynamic routes derived from /lib/market-data.
-//   3. Per-boat + per-journal-post dynamic routes.
+//   2. Per-vehicle rental detail routes, partner fleet
+//      (/lib/partner-fleet) — the only fleet there is.
+//   3. Per-help-category and per-help-article routes.
 //
-// Routes that are gated, member-only, or stub previews (e.g. /portfolio,
-// /onboarding, /bookings/*, /admin/*) are intentionally NOT listed.
+// Routes that are gated, member-only, or stub previews (e.g. /account/*,
+// /onboarding, /admin/*) are intentionally NOT listed.
 
 const PUBLIC_ROUTES = [
   // "" is the rentals-first landing page; /rent is the canonical
@@ -24,47 +21,51 @@ const PUBLIC_ROUTES = [
   "/rent",
   // Rental-first surfaces.
   "/partners",
-  "/co-ownership",
-  // Verticals, splash for each line of business.
-  "/cars",
-  "/boats",
-  "/planes",
-  // Cars marketing surfaces.
-  "/portfolio",
-  "/membership",
   "/how-it-works",
+  // /insurance and /storage used to sit here. Both were deleted: they
+  // advertised a RYDA fleet policy and RYDA-operated climate-controlled
+  // storage, and RYDA provides neither. Every car on the platform is
+  // owned, insured, stored and serviced by an independent operator, and
+  // Terms §2 now says so in writing. Do not re-add either route.
+  //
+  // /learn, /journal, /events and /careers were deleted for the same
+  // reason: /learn and /journal were wall-to-wall co-ownership content
+  // (one post asserted "RYDA owns each vehicle in an LLC"), /events
+  // advertised gatherings at a "RYDA Miami Facility" that does not
+  // exist, and /careers advertised storage, insurance and vehicle-
+  // acquisition roles for a fleet RYDA does not own. Do not re-add them.
+  //
+  // /sustainability was deleted in the same spirit. Stripped of its
+  // denials it said one thing RYDA already says on /about, in
+  // /trust-and-safety and in Terms §2 — that it owns, stores, insures,
+  // maintains and operates no vehicle — while the footer link promised
+  // a programme that does not exist: no offsets, no data, no
+  // facilities, nothing to measure. A referral marketplace has no
+  // environmental programme to report on. Do not re-add it.
+  //
+  // Company + support.
   "/about",
-  "/insurance",
-  "/storage",
   "/trust-and-safety",
-  "/sustainability",
-  "/host-your-car",
   "/help",
   "/faq",
-  "/learn",
-  "/journal",
   "/press",
   "/investors",
-  "/inside",
-  "/member-protection",
-  "/careers",
   "/contact",
-  "/events",
-  "/sample-documents",
-  // Locations.
+  // Locations. Miami is the only market page left, and the only one
+  // there is inventory for: PartnerVehicle.market is the literal type
+  // "Miami", so all 37 listings are Miami listings and no other city
+  // can currently be in the fleet at all.
+  //
+  // The /locations index and the Los Angeles and New York pages were
+  // deleted. The index was a market list for a single-market
+  // marketplace ("One market live. Two on the list."), and the two
+  // city pages were indexed, canonical-tagged landing pages whose
+  // entire unique content was a denial that any car is listed there —
+  // the same false-coverage signal that was deliberately stripped out
+  // of the Organization.areaServed JSON-LD in layout.tsx. When a
+  // second market has operators, the honest version of it is cars in
+  // the /rent grid, not a page announcing an empty city.
   "/locations/miami",
-  "/locations/los-angeles",
-  "/locations/new-york",
-  // Boats marketing surfaces (parity with cars).
-  // NOTE: /boats/journal does NOT exist as a route, boat-themed posts
-  // live in the main /journal listing tagged accordingly.
-  "/boats/about",
-  "/boats/faq",
-  "/boats/how-it-works",
-  "/boats/membership",
-  "/boats/portfolio",
-  "/boats/rent",
-  "/boats/sample-documents",
   // Search + auth.
   "/search",
   "/signin",
@@ -97,45 +98,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     changeFrequency: "weekly" as const,
     // Priorities: the landing page leads, the browse grid sits just
     // under it (and above every secondary marketing page).
-    priority:
-      path === ""
-        ? 1.0
-        : path === "/rent"
-          ? 0.9
-          : path === "/cars" || path === "/boats" || path === "/planes"
-            ? 0.8
-            : 0.7,
+    priority: path === "" ? 1.0 : path === "/rent" ? 0.9 : 0.7,
   }));
 
-  const vehicleEntries: MetadataRoute.Sitemap = VEHICLES.flatMap((v) => [
-    {
-      url: `${siteUrl}/portfolio/${v.symbol.toLowerCase()}`,
-      lastModified,
-      changeFrequency: "weekly" as const,
-      priority: 0.8,
-    },
-    {
-      url: `${siteUrl}/portfolio/${v.symbol.toLowerCase()}/cost-sheet`,
-      lastModified,
-      changeFrequency: "monthly" as const,
-      priority: 0.6,
-    },
-    ...(v.rentalAvailable
-      ? [
-          {
-            url: `${siteUrl}/rent/${v.symbol.toLowerCase()}`,
-            lastModified,
-            changeFrequency: "weekly" as const,
-            priority: 0.7,
-          },
-        ]
-      : []),
-  ]);
-
   // Partner-fleet rental detail pages. These are the marketplace's
-  // primary SEO surface post-pivot: one indexable page per partner car
-  // at /rent/[slug]. Priority sits above the co-own marketing pages
-  // and equal to the RYDA-fleet rental pages emitted above.
+  // primary SEO surface: one indexable page per operator car at
+  // /rent/[slug], and they are exactly what /rent/[symbol]'s
+  // generateStaticParams prerenders, so no URL here can 404 a crawler.
+  // Priority sits above the secondary marketing pages.
   const partnerEntries: MetadataRoute.Sitemap = PARTNER_VEHICLES.map(
     (p) => ({
       url: `${siteUrl}/rent/${p.slug}`,
@@ -144,36 +114,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     }),
   );
-
-  const boatEntries: MetadataRoute.Sitemap = BOATS.flatMap((b) => [
-    {
-      url: `${siteUrl}/boats/portfolio/${b.slug}`,
-      lastModified,
-      changeFrequency: "weekly" as const,
-      priority: 0.8,
-    },
-    {
-      url: `${siteUrl}/boats/portfolio/${b.slug}/cost-sheet`,
-      lastModified,
-      changeFrequency: "monthly" as const,
-      priority: 0.6,
-    },
-    {
-      url: `${siteUrl}/boats/rent/${b.slug}`,
-      lastModified,
-      changeFrequency: "weekly" as const,
-      priority: 0.7,
-    },
-  ]);
-
-  const journalEntries: MetadataRoute.Sitemap = JOURNAL_POSTS
-    .filter((p) => p.status === "published")
-    .map((p) => ({
-      url: `${siteUrl}/journal/${p.slug}`,
-      lastModified,
-      changeFrequency: "monthly" as const,
-      priority: 0.6,
-    }));
 
   // Per-help-category landing pages and per-article pages. The help
   // center has dozens of articles across multiple categories; surface
@@ -195,22 +135,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ],
   );
 
-  // Per-learn-article entries. The /learn hub is the educational
-  // content surface; each article is a standalone SEO landing page.
-  const learnEntries: MetadataRoute.Sitemap = LEARN_ARTICLES.map((a) => ({
-    url: `${siteUrl}/learn/${a.slug}`,
-    lastModified,
-    changeFrequency: "monthly" as const,
-    priority: 0.55,
-  }));
-
-  return [
-    ...staticEntries,
-    ...vehicleEntries,
-    ...partnerEntries,
-    ...boatEntries,
-    ...journalEntries,
-    ...helpEntries,
-    ...learnEntries,
-  ];
+  return [...staticEntries, ...partnerEntries, ...helpEntries];
 }

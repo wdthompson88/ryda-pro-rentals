@@ -2,7 +2,12 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { searchHelp, extractAnswer, type SearchResult } from "@/lib/help-content";
+import {
+  HELP,
+  searchHelp,
+  extractAnswer,
+  type SearchResult,
+} from "@/lib/help-content";
 
 type ChatMessage =
   | { id: string; role: "user"; text: string }
@@ -15,20 +20,40 @@ type ChatMessage =
       submittedEmail?: string;
     };
 
+// Counted from the help content itself so the header can never
+// advertise more articles than exist — it claimed 61 while HELP held
+// considerably fewer.
+const ARTICLE_COUNT = HELP.reduce((n, c) => n + c.articles.length, 0);
+
+// Chips a renter would actually tap, each worded to land on a real
+// article. Four are article questions verbatim (insurance/coverage,
+// bookings/cancellations, bookings/mileage, vehicle-use/road-trips);
+// the card one scores account/payment-methods on its `card` keyword
+// and its summary. A chip that returns nothing is worse than no chip,
+// so re-check searchHelp before editing one.
+//
+// The previous set asked how to claim a co-ownership share and whether
+// you could gift it to your kids — a product this platform does not
+// sell — and "What's covered by insurance?" implied RYDA covers
+// something. It doesn't; the rental closes on the operator's policy.
 const SUGGESTIONS = [
-  "How do I claim a co-ownership share?",
-  "Can I take it on a road trip?",
-  "What's covered by insurance?",
-  "What if I total the car?",
-  "Can I gift my share to my kids?",
+  "Who insures the car I rent?",
+  "Does RYDA keep my card on file?",
+  "Cancellations and refunds",
+  "Mileage limits and overages",
+  "Can I take the car on a road trip?",
 ];
 
 const GREETING: ChatMessage = {
   id: "greeting",
   role: "bot",
-  text: "Hi, I'm RYDA's help assistant. Ask me anything about membership, shares, bookings, insurance, maintenance, or how the platform works. I'll do my best to answer directly and point you to the full article. Need a real human? Just say so.",
+  text: "Hi, I'm RYDA's help assistant. Ask me about renting one of the cars listed here — sending a request, what happens once an operator confirms, whose contract and insurance the rental closes on, how you pay, mileage, cancellations. I'll answer from the help articles and link you to the full one. Need a real human? Just say so.",
 };
 
+// No reply-time promise anywhere in this component. An escalation writes
+// a help_escalations row and emails the team; nothing measures or
+// enforces a turnaround, so "within one business day" is deleted from
+// both the escalation prompt and the confirmation below.
 const INTROS = ["Here's the gist:", "Quick answer:", "Short version:", "From the help docs:"];
 function pickIntro(seed: number) {
   return INTROS[seed % INTROS.length];
@@ -110,7 +135,7 @@ export function HelpChat() {
       botMsg = {
         id: `b-${Date.now()}`,
         role: "bot",
-        text: "Of course. Drop your email and a short note about what you're looking for, and someone from RYDA will reach out within one business day.",
+        text: "Of course. Drop your email and a short note about what you're looking for, and someone from RYDA will reach out.",
         escalation: "prompt",
       };
     } else {
@@ -180,7 +205,7 @@ export function HelpChat() {
                 ...m,
                 escalation: "submitted",
                 submittedEmail: payload.email,
-                text: `Got it, we'll email ${payload.email} within one business day. Anything else I can help with in the meantime?`,
+                text: `Got it, we'll email ${payload.email}. Anything else I can help with in the meantime?`,
               }
             : m,
         ),
@@ -237,7 +262,8 @@ export function HelpChat() {
                 Ask RYDA
               </p>
               <p className="text-[11px] uppercase tracking-wider text-cream/70">
-                Answers from 61 help articles · Real human on request
+                Answers from {ARTICLE_COUNT} help articles · Real human on
+                request
               </p>
             </div>
             <button

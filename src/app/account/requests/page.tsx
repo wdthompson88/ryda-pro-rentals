@@ -70,13 +70,17 @@ export default function RequestsPage() {
         <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
           Rental requests
         </p>
+        {/* The H1 was "One request. A named operator. The keys." — D6
+            forbids naming an operator on a customer-facing surface, and
+            nothing here hands anyone keys. Plain page label instead.
+            The subtitle's second sentence, "A vetted Miami operator
+            replies directly", is the routing falsehood: every lead
+            lands in RYDA's inbox and is forwarded by hand. Deleted. */}
         <h1 className="mt-3 font-display text-3xl font-light text-ink sm:text-4xl">
-          One request. A named operator. The keys.
+          Your requests.
         </h1>
         <p className="mt-2 max-w-2xl text-sm text-ink-soft">
-          Every request you&apos;ve sent and where it stands. A vetted Miami
-          operator replies directly — your price is always the operator&apos;s
-          price.
+          Every request you&apos;ve sent and where it stands.
         </p>
       </header>
 
@@ -96,9 +100,25 @@ export default function RequestsPage() {
       ) : inquiries.length === 0 ? (
         <div className="rounded-2xl border border-rule bg-cream-2 px-8 py-10">
           <p className="font-display text-2xl text-ink">No requests yet.</p>
+          {/* Three things this paragraph is not allowed to say again.
+              "Miami's most-wanted exotics" described 6 of the 37
+              listings (category "Exotic"); the grid is everyday cars
+              through exotics. No fleet-wide rate figure belongs in this
+              copy: a median, average or range is out by operator
+              decision, not because the data is bad. The daily rates in
+              partner-fleet.ts are sound — an earlier note calling them
+              broken came from a script that read the numeric separator
+              in 1_403 as 1.
+              "No payment" is a promise the next email breaks — RYDA
+              emails a Stripe Checkout link on the operator's connected
+              account, so the only true version is "no card at request".
+              And a request does not reach the operator by itself:
+              PARTNER_INQUIRY_EMAILS is empty, so every lead lands with
+              RYDA and is passed on by hand. */}
           <p className="mt-3 max-w-md text-sm text-ink-soft">
-            Miami&apos;s most-wanted exotics are one request away — no card, no
-            payment, an operator replies directly.
+            Miami cars, everyday to exotic, are one request away — no card at
+            request. We pass your request to the operator who runs the car, and
+            they reply to you directly.
           </p>
           {/* /rent is the canonical browse grid ("/" is the landing page). */}
           <Link

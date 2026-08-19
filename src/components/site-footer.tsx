@@ -5,7 +5,7 @@ import { HiddenWhenAuthed } from "@/components/auth-aware";
 // scrolls to the legal strip. Critical-path bundle saving.
 import { HealthBadgeLazy } from "@/components/health-badge-lazy";
 
-// Footer, brand row on top + 4 link columns below + legal strip.
+// Footer, brand row on top + 3 link columns below + legal strip.
 // Pacaso / Brunello pattern: full sitemap visible, but quiet eyebrows
 // and 15px body so the density doesn't shout. Theme toggle lives in
 // the bottom legal strip, power-user setting, not a top-level nav.
@@ -19,10 +19,15 @@ export function SiteFooter() {
           <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-10">
             <div className="lg:col-span-7">
               <p className="font-display text-3xl text-ink">RYDA</p>
+              {/* Renders on every page, so it carries the site-wide
+                  positioning: range, not exotics. Six of the 37
+                  listings are category "Exotic" — "Miami's exotic and
+                  luxury rental fleet" described a sixth of the grid. */}
               <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-ink-soft">
-                Luxury vehicle access, Cars, Boats, and (soon) Planes.
-                Member-managed LLCs, professionally operated.
-                Miami launching Q3 2026.
+                Miami rental cars, everyday to exotic, in one grid.
+                Send one request with your dates, we pass it to the
+                operator who runs the car, and they confirm directly
+                with you.
               </p>
             </div>
             <div className="lg:col-span-5 lg:flex lg:items-end lg:justify-end">
@@ -64,47 +69,34 @@ export function SiteFooter() {
         </div>
       </div>
 
-      {/* 4 link columns */}
+      {/* 3 link columns */}
       <div className="mx-auto max-w-7xl px-6 py-16 sm:px-10 sm:py-20">
-        <div className="grid grid-cols-2 gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-12">
+        <div className="grid grid-cols-2 gap-10 sm:grid-cols-2 lg:grid-cols-3 lg:gap-12">
           <FooterCol
             title="Cars"
             links={[
-              ["Portfolio", "/portfolio"],
               ["Rent", "/rent"],
-              ["Membership", "/membership"],
-              // The parked ownership program's single quiet home. This
-              // footer link is what the "reachable from the footer"
-              // comments on / and in site-header promise — keep it.
-              ["Co-ownership", "/co-ownership"],
+              // /locations/miami is the only city page left — the
+              // /locations index and the LA and NY pages were deleted —
+              // and nothing linked to it, so it sat indexed and
+              // orphaned. It goes here, in Cars, rather than under a
+              // "Locations" heading of its own: a locations column with
+              // one entry reads as the first of several markets, and
+              // there is only the one.
+              ["Renting in Miami", "/locations/miami"],
               ["How it works", "/how-it-works"],
-              ["Insurance", "/insurance"],
-              ["Storage", "/storage"],
               ["FAQ", "/faq"],
-            ]}
-          />
-          <FooterCol
-            title="Boats"
-            links={[
-              ["Portfolio", "/boats/portfolio"],
-              ["Charter", "/boats/rent"],
-              ["Membership", "/boats/membership"],
-              ["How it works", "/boats/how-it-works"],
-              ["About boats", "/boats/about"],
-              ["FAQ", "/boats/faq"],
-              ["Sample documents", "/boats/sample-documents"],
             ]}
           />
           <FooterCol
             title="Resources"
             links={[
-              ["Journal", "/journal"],
-              ["Inside RYDA", "/inside"],
-              ["Sample documents", "/sample-documents"],
               ["Trust & safety", "/trust-and-safety"],
-              ["Member protection", "/member-protection"],
-              ["Sustainability", "/sustainability"],
-              ["Host your vehicle", "/host-your-car"],
+              // "Sustainability" pointed at /sustainability, a page
+              // whose own answer was that there is no programme, no
+              // offsets, no data and no facilities. A nav label is a
+              // promise; that one promised something RYDA does not
+              // have. Route deleted, link deleted with it.
               ["Help center", "/help"],
             ]}
           />
@@ -114,7 +106,10 @@ export function SiteFooter() {
               ["About", "/about"],
               ["Investors", "/investors"],
               ["Press", "/press"],
-              ["Careers", "/careers"],
+              // "Careers" pointed at /careers, which advertised a Head
+              // of Vehicle Acquisition plus storage and insurance
+              // partnership roles — jobs for a fleet RYDA does not own,
+              // store or insure. Route deleted; link deleted with it.
               ["Contact", "/contact"],
             ]}
           />
@@ -140,7 +135,7 @@ export function SiteFooter() {
               Terms
             </Link>
             <Link href="/legal/disclaimer" className="hover:text-ink">
-              Co-ownership disclaimer
+              Disclaimer
             </Link>
             <Link href="/legal/cookies" className="hover:text-ink">
               Cookies

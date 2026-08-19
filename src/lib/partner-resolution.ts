@@ -48,7 +48,9 @@ export type PartnerFetch<T> = (value: string) => Promise<PartnerFetchResult<T>>;
 
 export type OperatorResolution<T> =
   | { ok: true; partner: T; via: OperatorLookupVia }
-  /** The lead names no operator at all — RYDA fleet, by design. */
+  /** The lead names no operator at all. Every lead captured today does
+   *  (the RYDA-owned rail that produced unattributed leads is gone), so
+   *  this is a legacy row from before the strip. */
   | { ok: false; reason: "no_attribution" }
   /** We knew what to look for and it is not on the roster. */
   | { ok: false; reason: "not_found"; via: OperatorLookupVia; value: string }
