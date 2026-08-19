@@ -610,6 +610,26 @@ function FleetPanel() {
         </span>
       </Link>
 
+      {/* The counterpart to the inbox above: that answers requests one at
+          a time, this prevents the ones an operator would only decline.
+          It sits directly beneath because a car is bookable on every open
+          day in its window by default (0046) — an operator who never
+          opens this screen is advertising days nobody agreed to. */}
+      <Link
+        href="/partner/availability"
+        className={`mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-rule bg-cream-2/50 px-5 py-4 transition-colors hover:border-ink ${FOCUS_RING}`}
+      >
+        <span>
+          <span className="block font-display text-lg text-ink">
+            Availability
+          </span>
+          <span className="mt-1 block text-sm text-ink-soft">
+            Block the days you can&apos;t serve, before someone asks for them.
+          </span>
+        </span>
+        <span className="text-sm font-medium text-ink">Manage calendar →</span>
+      </Link>
+
       <div className="mt-4 rounded-xl border border-rule bg-cream-2/50 p-8 text-center">
         <p className="font-display text-lg text-ink">
           Listing setup starts with a conversation.
