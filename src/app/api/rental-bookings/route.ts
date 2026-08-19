@@ -41,6 +41,12 @@ import { getUserFromRequest } from "@/lib/api-auth";
 import { isAllowed, clientIp } from "@/lib/rate-limit";
 import { isColumnMissing } from "@/lib/partner-resolution";
 import {
+  PARTNER_FEE_SELECT,
+  rentalFeeConfigFromPartner,
+  type PartnerFeeColumns,
+  type RentalFeeConfig,
+} from "@/lib/fees";
+import {
   DEFAULT_BOOKING_HORIZON_DAYS,
   RENTAL_AVAILABILITY_COLS,
   RENTAL_BOOKING_RESERVING_STATUSES,
@@ -453,27 +459,32 @@ export async function POST(req: NextRequest) {
     }
     const rows = availabilityRows.rows;
 
-    // The operator's commission, for the frozen snapshot. Best-effort:
-    // partners is service-role-only and may predate this environment, and
-    // fees.ts's default is the same 15% the column defaults to in 0041.
-    let commissionRate: number | undefined;
+    // The operator's FULL fee terms (0048), for the frozen snapshot.
+    //
+    // This read used to take commission_rate alone, which silently priced
+    // a flat-fee or renter-pays operator as a percent charged to the
+    // operator. rentalFeeConfigFromPartner() is the same reader the
+    // payment-link route uses, so the two rails cannot come to disagree
+    // about one operator's terms — the divergence fees.ts's header exists
+    // to prevent, and the one this route was on the wrong side of.
+    //
+    // Best-effort: partners is service-role-only and its fee columns may
+    // predate an environment, so a failed read falls through to fees.ts's
+    // defaults (percent / operator-pays / 15%) rather than refusing the
+    // booking. Those defaults are 0041 and 0048's own column defaults, so
+    // degrading here reproduces the pre-3A behaviour exactly.
+    let feeConfig: RentalFeeConfig | undefined;
     const partnerRes = await db
       .from("partners")
-      .select("commission_rate")
+      .select(PARTNER_FEE_SELECT)
       .eq("id", listing.partner_id)
       .maybeSingle();
     if (partnerRes.error) {
-      console.warn("[rental-bookings · commission]", partnerRes.error.message);
-    } else {
-      // numeric(4,3) crosses PostgREST as a JSON number, but a driver or
-      // a future column type could hand it over as a string; parsing
-      // covers both and an unparseable value falls through to fees.ts's
-      // default rather than throwing inside the quote.
-      const raw = partnerRes.data?.commission_rate;
-      const parsedRate = typeof raw === "string" ? Number(raw) : raw;
-      if (typeof parsedRate === "number" && Number.isFinite(parsedRate)) {
-        commissionRate = parsedRate;
-      }
+      console.warn("[rental-bookings · fee terms]", partnerRes.error.message);
+    } else if (partnerRes.data) {
+      feeConfig = rentalFeeConfigFromPartner(
+        partnerRes.data as unknown as PartnerFeeColumns,
+      );
     }
 
     const quoted = quoteRentalBooking({
@@ -482,7 +493,7 @@ export async function POST(req: NextRequest) {
       endDate,
       rows,
       booked,
-      commissionRate,
+      feeConfig,
     });
     if (!quoted.ok) {
       const message = rentalQuoteMessage(quoted.reason, {

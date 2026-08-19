@@ -51,7 +51,7 @@
 // Supabase client and no `server-only`, so a client component can import
 // it.
 
-import { computeRentalFee } from "./fees";
+import { computeRentalFee, type RentalFeeConfig } from "./fees";
 import {
   addUtcDays,
   checkRange,
@@ -75,20 +75,17 @@ export const RENTAL_QUOTE_CURRENCY = "usd";
  */
 export type RentalFeePayer = "renter" | "operator";
 
-/**
- * The only payer this build can price, and it is not a placeholder: the
- * live rail (0041 + payment-link) charges the operator's account and
- * takes the commission as an application fee, which IS
- * fee_payer = 'operator' — renter_total = base, operator_net = base -
- * fee, the second branch of rental_bookings_quote_consistent.
- *
- * 'renter' becomes representable when 3A generalises computeRentalFee to
- * a config object. Deliberately NOT anticipated here with a
- * `base + fee` line of its own: that arithmetic is the fee engine's, and
- * writing it in this file now would put decision D2 in two places, which
- * is the exact divergence fees.ts's header exists to prevent.
- */
-export const RENTAL_FEE_PAYER_CURRENT: RentalFeePayer = "operator";
+// RENTAL_FEE_PAYER_CURRENT is gone. It pinned every quote to
+// fee_payer = 'operator' and its own note said "'renter' becomes
+// representable when 3A generalises computeRentalFee to a config
+// object" — 3A has landed (0048), so the payer now comes from the
+// operator's row via computeRentalFee's resolved config, and a constant
+// asserting one payer would be a second, wrong answer to a question the
+// engine already answers.
+//
+// The refusal it recorded still stands, and is why nothing in this file
+// writes `base + fee`: that arithmetic belongs to the fee engine, and
+// spelling it out here would put decision D2 in two places.
 
 /** Everything a quote needs from the listing: the calendar plus the price. */
 export type RentalQuoteListing = RentalListingAvailability & {
@@ -159,10 +156,19 @@ export type RentalQuoteInput = {
   /** UTC calendar day to treat as "now". Injectable so tests do not race the clock. */
   today?: string;
   /**
-   * partners.commission_rate for the owning operator. Omitted → fees.ts's
-   * default. Out-of-contract values are rejected, not clamped.
+   * The owning operator's fee terms (0048), as
+   * rentalFeeConfigFromPartner() reads them off the partners row.
+   * Omitted → fees.ts's defaults, which are percent / operator-pays and
+   * therefore the pre-0048 behaviour. Out-of-contract values are
+   * rejected, not clamped.
+   *
+   * This replaced a bare `commissionRate: number`. The rate alone could
+   * not express 0048's other four columns, so a flat fee or a
+   * renter-pays operator was silently priced as a percent charged to the
+   * operator — the quote and the admin preview disagreeing about the
+   * same booking, which is the exact divergence fees.ts exists to stop.
    */
-  commissionRate?: number;
+  feeConfig?: RentalFeeConfig;
   /**
    * The security-deposit authorization (D5). Zero until 3C gives an
    * operator somewhere to set it; carried now because it is part of the
@@ -225,14 +231,22 @@ export function quoteRentalBooking(input: RentalQuoteInput): RentalQuoteResult {
   // rejection instead of a 500 on a public route.
   let fee;
   try {
-    fee = computeRentalFee(baseAmountCents, input.commissionRate);
+    fee = computeRentalFee(baseAmountCents, input.feeConfig ?? {});
   } catch {
     return { ok: false, reason: "invalid_fee_config" };
   }
 
-  // fee_payer = 'operator': the renter pays the base, the operator is
-  // paid the base minus RYDA's cut. Both numbers come straight out of
-  // computeRentalFee — nothing is re-derived here.
+  // EVERY money field comes straight out of the engine, including which
+  // side pays. This used to hardcode fee_payer = 'operator' and read
+  // amountCents as the renter's total — true only while the operator
+  // always carried the fee. Under payer = 'renter' the fee is added on
+  // top, so renterTotalCents is base + fee and the two differ; taking
+  // the engine's own fields is what makes the arithmetic follow the
+  // payer instead of being re-derived here under an assumption.
+  //
+  // 0047's rental_bookings_quote_consistent CHECK re-derives these same
+  // numbers from fee_payer, so a snapshot built from any other pairing
+  // is rejected at the insert.
   return {
     ok: true,
     quote: {
@@ -241,10 +255,10 @@ export function quoteRentalBooking(input: RentalQuoteInput): RentalQuoteResult {
       nights: check.nights,
       dailyRateCents: listing.daily_rate_cents,
       baseAmountCents,
-      feeCents: fee.applicationFeeCents,
-      feePayer: RENTAL_FEE_PAYER_CURRENT,
+      feeCents: fee.feeCents,
+      feePayer: fee.feePayer,
       depositAmountCents,
-      renterTotalCents: fee.amountCents,
+      renterTotalCents: fee.renterTotalCents,
       operatorNetCents: fee.operatorNetCents,
       currency: RENTAL_QUOTE_CURRENCY,
     },

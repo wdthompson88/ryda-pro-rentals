@@ -10,11 +10,19 @@
 //
 // WHAT IT WILL NOT TELL YOU (decision D6). Operators stay anonymous
 // through browse and request; the reveal happens after confirmation and
-// it happens in a route, not in RLS. So nothing here selects
-// partner_id, vin, or any operator contact detail, and the response
-// carries no field from public.partners at all. The quote crosses the
-// wire through renterFacingQuote(), which withholds the same two
-// commission columns 0047's `grant select (...)` withholds.
+// it happens in a route, not in RLS. So the RESPONSE carries no operator
+// identity, no vin, no partner_id and no commercial term, and the quote
+// crosses the wire through renterFacingQuote(), which withholds the same
+// two commission columns 0047's `grant select (...)` withholds.
+//
+// It does now READ partner_id and the operator's fee terms, which it did
+// not before 0048. Pricing needs them: under fee_payer = 'renter' the fee
+// is added on top of the base, so a route that cannot resolve the terms
+// publishes a renter total the booking would refuse to honour. The
+// distinction the guardrail draws is about what reaches a BROWSER, not
+// which columns a server may join on — and the projection that decides
+// what reaches the browser is an explicit nine-field list, so a column
+// read here cannot leak by being forgotten.
 //
 // It also does not say WHY a day is closed. openDays is a flat set: a
 // blackout, a confirmed booking and a day past the horizon are
@@ -36,6 +44,12 @@ import { NextResponse, type NextRequest } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { isAllowed, clientIp } from "@/lib/rate-limit";
 import { isColumnMissing } from "@/lib/partner-resolution";
+import {
+  PARTNER_FEE_SELECT,
+  rentalFeeConfigFromPartner,
+  type PartnerFeeColumns,
+  type RentalFeeConfig,
+} from "@/lib/fees";
 import {
   RENTAL_AVAILABILITY_COLS,
   RENTAL_BOOKING_RESERVING_STATUSES,
@@ -71,18 +85,32 @@ const RATE_WINDOW_MS = 60_000;
 // of a LIKE-free equality filter's way.
 const SLUG_RE = /^[a-z0-9][a-z0-9._-]{0,80}$/i;
 
-// The listing columns this route may read. Note what is NOT here:
-// partner_id and vin (D6), and every commercial column. 0046's three
-// window columns arrive on rental_listings, so a pre-0046 database
-// fails this select and lands in the not_configured branch below —
-// which is the correct answer, since without a window there is no
-// calendar to serve.
+// The listing columns this route may read. `vin` is still not here (D6),
+// and no operator contact detail is. 0046's three window columns arrive
+// on rental_listings, so a pre-0046 database fails this select and lands
+// in the not_configured branch below — which is the correct answer, since
+// without a window there is no calendar to serve.
+//
+// partner_id IS here, and it was not before. Pricing a range now needs
+// the operator's fee terms (0048): under fee_payer = 'renter' the fee is
+// added on top, so a route that cannot resolve the terms publishes a
+// renter total the booking will not honour. partner_id is the key that
+// reaches them.
+//
+// It is read and never returned. The response body is built field by
+// field below and carries no partner_id, and the quote crosses the wire
+// through renterFacingQuote(), whose projection names nine fields and
+// omits feeCents and operatorNetCents — the pair that together ARE the
+// commission. Guardrail 3.7 is about what reaches a browser, not about
+// which columns a server route may join on.
 const LISTING_COLS =
-  "id, slug, status, daily_rate_cents, min_nights, max_nights, " +
+  "id, partner_id, slug, status, daily_rate_cents, min_nights, max_nights, " +
   "available_from, available_until, booking_horizon_days";
 
 type ListingRow = {
   id: string;
+  /** Server-side only — never enters the response. */
+  partner_id: string;
   slug: string;
   status: string;
   daily_rate_cents: number;
@@ -279,37 +307,55 @@ export async function GET(
   let quoteError: { reason: RentalQuoteRejection; message: string } | null = null;
 
   if (start !== null || end !== null) {
+    // The operator's fee terms, resolved only when a quote is actually
+    // being asked for — a bare calendar read costs no extra query.
+    //
+    // Best-effort, and the failure mode is deliberate: a partners row
+    // that cannot be read falls through to fees.ts's defaults (percent /
+    // operator-pays), which is what every operator is on until an admin
+    // says otherwise, and which is the behaviour this route had before
+    // 0048 existed. Refusing to quote because a commission lookup
+    // flickered would take a car off sale over a number the renter is
+    // never shown.
+    let feeConfig: RentalFeeConfig | undefined;
+    const partnerRes = await admin
+      .from("partners")
+      .select(PARTNER_FEE_SELECT)
+      .eq("id", listing.partner_id)
+      .maybeSingle();
+    if (partnerRes.error) {
+      console.warn("[rental-availability · fee terms]", partnerRes.error.message);
+    } else if (partnerRes.data) {
+      feeConfig = rentalFeeConfigFromPartner(
+        partnerRes.data as unknown as PartnerFeeColumns,
+      );
+    }
+
     const priced = quoteRentalBooking({
       ...availability,
       startDate: start ?? "",
       endDate: end ?? "",
-      // commissionRate is deliberately NOT resolved: reading
-      // partners.commission_rate on a public route would pull a
-      // service-role-only column (guardrail 3.7) into a request the
-      // browser initiated, and under fee_payer = 'operator' — the only
-      // payer this build prices — the renter's total is base regardless
-      // of the rate. When 3A lands 'renter' (fee added on top), THIS is
-      // the line that has to change, and the operator's config must be
-      // resolved server-side before a renter-facing total is returned.
+      // 3A HAS LANDED, SO THE FEE TERMS ARE RESOLVED HERE NOW.
       //
-      // WHY THIS DOES NOT PUT THIS ROUTE OUT OF STEP WITH THE POST, which
-      // does resolve the rate. Two things have to hold, and both do:
+      // This used to pass nothing, on the reasoning that under
+      // fee_payer = 'operator' the renter's total is the base regardless
+      // of the rate — true, and the note said in as many words that when
+      // 'renter' became representable THIS was the line that had to
+      // change. 0048 made it representable: under payer = 'renter' the
+      // fee is added on top, so renterTotalCents is base + fee and a
+      // route that cannot see the terms publishes a total the booking
+      // will not honour.
       //
-      //   the NUMBERS agree — every field renterFacingQuote() publishes
-      //   (base, renter total, daily rate, nights, deposit) is computed
-      //   before the rate is applied; the rate only moves fee_cents and
-      //   operator_net_cents, which 0047 withholds from the browser and
-      //   this route never returns. So a renter reads the same total
-      //   here that the booking row freezes.
-      //
-      //   the VERDICTS agree — the only rate-driven rejection is
-      //   `invalid_fee_config`, raised when the rate is outside fees.ts's
-      //   [0, 0.5]. 0041 declares commission_rate as
-      //   `check (>= 0 and <= 0.5)`, so no real row can carry one, and
-      //   the POST cannot refuse a range this route offered on a ground
-      //   this route could not see. If 3A ever widens or drops that
-      //   constraint, this stops being true and the rate has to be
-      //   resolved here too.
+      // READING THE TERMS IS NOT PUBLISHING THEM. Guardrail 3.7 keeps
+      // commission_rate and the fee columns out of the BROWSER, not out
+      // of a server route — this file already reads partner-owned rows
+      // (the listing itself). What crosses the wire is
+      // renterFacingQuote()'s explicit projection, which names nine
+      // fields and omits feeCents and operatorNetCents: the pair that
+      // together ARE the commission, and the same pair 0047's column
+      // grant withholds. So the fee is computed here and never returned,
+      // exactly as the booking row computes it and never returns it.
+      feeConfig,
     });
     if (priced.ok) {
       quote = renterFacingQuote(priced.quote);
