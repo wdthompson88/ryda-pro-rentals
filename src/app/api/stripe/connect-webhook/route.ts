@@ -531,6 +531,59 @@ export async function POST(req: NextRequest) {
         break;
       }
 
+      // ── payout readiness (0052, decision D4) ──────────────────────
+      //
+      // Stripe tells us when a connected account's capabilities change;
+      // this is the only way to learn that payouts were disabled AFTER
+      // onboarding completed — a document expiring, a bank account
+      // rejected, verification reopened. All routine, and all invisible
+      // to stripe_onboarded_at, which is stamped once on charges_enabled
+      // and never revisited.
+      //
+      // The columns this writes are a CACHE. The payout route re-checks
+      // with Stripe before moving money; what they buy is a
+      // reconciliation view that can render "who is blocked and why"
+      // from one query instead of a rate-limited round trip per operator.
+      //
+      // Best-effort by design: a partners row we cannot match (an account
+      // belonging to a different product, a row deleted mid-flight) is
+      // acked, not retried. Failing here would make Stripe redeliver an
+      // event that will never match, and the payout gate fails closed
+      // anyway — a stale cache blocks a payout, it never authorises one.
+      case "account.updated": {
+        const account = event.data.object as {
+          id?: string;
+          payouts_enabled?: boolean;
+          details_submitted?: boolean;
+          capabilities?: { transfers?: string };
+        };
+        if (!account.id) break;
+
+        const update = await admin
+          .from("partners")
+          .update({
+            payouts_enabled: account.payouts_enabled === true,
+            details_submitted: account.details_submitted === true,
+            transfers_capability: account.capabilities?.transfers ?? null,
+            payout_status_at: new Date().toISOString(),
+          })
+          .eq("stripe_account_id", account.id);
+
+        if (update.error) {
+          // A pre-0052 database has none of these columns. That is the
+          // same degrade-don't-500 posture the rental routes take for
+          // the pre-migration window: log it and ack, because a webhook
+          // that 500s here is retried forever against a schema that will
+          // not change until a human applies the migration.
+          console.warn(
+            "[connect webhook · account.updated]",
+            account.id,
+            update.error.message,
+          );
+        }
+        break;
+      }
+
       default:
         // Not an event we subscribe to; ack quietly AND skip recording
         // so we don't poison the per-endpoint dedup table for an event
