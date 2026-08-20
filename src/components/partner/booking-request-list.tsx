@@ -475,6 +475,26 @@ function RequestCard({
                 </Link>
               </>
             ) : null}
+            {/* Pickup and return (4C). Only in the two states where a
+                handover is due: 0053 accepts a checkin from `confirmed`
+                and a return from `in_progress`. An operator handing over
+                keys and a renter collecting from a lockbox reach the same
+                page — the API decides who may record, not the surface
+                that links to it. */}
+            {(booking.status === RENTAL_BOOKING_STATUS.confirmed ||
+              booking.status === RENTAL_BOOKING_STATUS.in_progress) && (
+              <>
+                {" · "}
+                <Link
+                  href={`/bookings/${booking.id}/handover`}
+                  className={`rounded-sm font-medium text-red underline transition-colors hover:text-red-deep ${FOCUS_RING}`}
+                >
+                  {booking.status === RENTAL_BOOKING_STATUS.confirmed
+                    ? "Record pickup"
+                    : "Record return"}
+                </Link>
+              </>
+            )}
           </p>
         </div>
         <StatusPill booking={booking} nowMs={nowMs} />

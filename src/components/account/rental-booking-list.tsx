@@ -566,14 +566,35 @@ function BookingCard({
 
       <OperatorBlock booking={booking} />
 
-      {listing && (
-        <Link
-          href={`/rent/${listing.slug}`}
-          className={`mt-4 inline-flex rounded-sm text-xs font-medium text-red transition-colors hover:text-red-deep ${FOCUS_RING}`}
-        >
-          View this car →
-        </Link>
-      )}
+      <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
+        {listing && (
+          <Link
+            href={`/rent/${listing.slug}`}
+            className={`inline-flex rounded-sm text-xs font-medium text-red transition-colors hover:text-red-deep ${FOCUS_RING}`}
+          >
+            View this car →
+          </Link>
+        )}
+
+        {/* Pickup and return (4C). Shown only in the two states where a
+            handover is actually due — 0053's trigger accepts a checkin
+            from `confirmed` and a return from `in_progress`, and offering
+            the link anywhere else sends a renter to a page whose only
+            content is a refusal. The wording follows the same rule: which
+            handover is due is a fact about the status, so the link names
+            it rather than asking. */}
+        {(booking.status === RENTAL_BOOKING_STATUS.confirmed ||
+          booking.status === RENTAL_BOOKING_STATUS.in_progress) && (
+          <Link
+            href={`/bookings/${booking.id}/handover`}
+            className={`inline-flex rounded-sm text-xs font-medium text-red transition-colors hover:text-red-deep ${FOCUS_RING}`}
+          >
+            {booking.status === RENTAL_BOOKING_STATUS.confirmed
+              ? "Record pickup →"
+              : "Record return →"}
+          </Link>
+        )}
+      </div>
     </li>
   );
 }
