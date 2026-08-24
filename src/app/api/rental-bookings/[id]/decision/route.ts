@@ -55,6 +55,11 @@ import {
   type RentalFeeConfig,
 } from "@/lib/fees";
 import { isColumnMissing } from "@/lib/partner-resolution";
+import { loadRentalEligibility } from "@/lib/rental-eligibility-server";
+import {
+  rentalEligibilityMessage,
+  rentalEligibilityOperatorMessage,
+} from "@/lib/rental-eligibility";
 import {
   DEFAULT_BOOKING_HORIZON_DAYS,
   RENTAL_AVAILABILITY_COLS,
@@ -540,6 +545,44 @@ async function answer(
     //
     // DECLINE IS DELIBERATELY NOT GATED: an operator who has archived a
     // car must still be able to answer the requests it left behind.
+    // THE RENTER HAS TO BE ELIGIBLE (1A / O6). Confirmation is the moment
+    // the dates lock and — once the charge rail lands — the card is
+    // charged, so it is the right and last place to establish that the
+    // person collecting the keys is identity-verified and old enough on
+    // the PICKUP date.
+    //
+    // Checked here rather than at request on purpose. Blocking the
+    // request would refuse a renter who is midway through their ID check,
+    // or who turns 25 before the trip; blocking the confirmation lets
+    // them ask, gives them the window to finish, and still cannot end in
+    // a confirmed booking for an ineligible driver.
+    //
+    // The operator is told nothing about WHY. A renter's date of birth
+    // and the state of their ID check are theirs — the operator needs to
+    // know they cannot approve yet and that it is not theirs to fix,
+    // which is the same instinct D6 applies to identity.
+    const eligibility = await loadRentalEligibility(
+      db,
+      booking.renter_user_id,
+      booking.start_date,
+    );
+    if (!eligibility.eligible) {
+      console.warn("[rental-decision · renter ineligible]", {
+        bookingId: booking.id,
+        reason: eligibility.reason,
+      });
+      return NextResponse.json(
+        {
+          error:
+            audience === "renter"
+              ? rentalEligibilityMessage(eligibility.reason)
+              : rentalEligibilityOperatorMessage(),
+          reason: "renter_ineligible",
+        },
+        { status: 409 },
+      );
+    }
+
     if (!listing || listing.status !== "active") {
       return NextResponse.json(
         {
