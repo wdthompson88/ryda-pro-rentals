@@ -4,6 +4,7 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { HeroSearch } from "@/components/hero-search";
 import { Reveal, RevealStagger } from "@/components/reveal";
+import { MarketplaceCard } from "@/components/marketplace-card";
 import { formatUSD } from "@/lib/market-data";
 import {
   PARTNER_VEHICLES,
@@ -142,7 +143,7 @@ export default function HomePage() {
                 Browse the fleet
               </Link>
               <Link
-                href="/how-it-works"
+                href="#how-it-works"
                 className="text-sm font-medium text-ink underline-offset-4 hover:text-red hover:underline"
               >
                 How it works →
@@ -230,7 +231,21 @@ export default function HomePage() {
             {/* Grid takes the three cars AFTER the hero — FEATURED[0]
                 already fills the hero image above. */}
             {FEATURED.slice(1, 4).map((v) => (
-              <FeaturedCard key={v.slug} vehicle={v} />
+              <MarketplaceCard
+                key={v.slug}
+                vehicle={{
+                  slug: v.slug,
+                  make: v.make,
+                  model: v.model,
+                  year: v.year,
+                  category: v.category,
+                  dailyRate: v.dailyRate,
+                  regularRate: v.regularRate,
+                  market: v.market,
+                  hero: getPartnerHero(v),
+                  milesIncluded: v.milesIncluded,
+                }}
+              />
             ))}
           </RevealStagger>
           <Reveal delayMs={80}>
@@ -247,7 +262,14 @@ export default function HomePage() {
       </section>
 
       {/* ── How it works ─────────────────────────────────────────── */}
-      <section className="border-b border-rule bg-cream-2 py-16 md:py-24">
+      {/* id="how-it-works" — the /how-it-works page was merged into this
+          section (Aug 2026, one-page revamp): the header, footer and
+          every other in-repo link to /how-it-works now points here, and
+          next.config.ts 301-redirects the old URL to this anchor. */}
+      <section
+        id="how-it-works"
+        className="scroll-mt-20 border-b border-rule bg-cream-2 py-16 md:py-24"
+      >
         <div className="mx-auto max-w-7xl px-6 sm:px-10">
           <Reveal>
             <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
@@ -272,25 +294,80 @@ export default function HomePage() {
             />
             <StepCard
               n="02"
-              title="Request your dates"
-              body="A 30-second account saves your details for next time; no card at request."
+              title="Request with dates"
+              body="Pick your dates and send one request. A 30-second account keeps your details saved for next time — no card at request. Signed in, the form fills itself and your requests are tracked in one place."
             />
             <StepCard
               n="03"
-              title="The operator confirms"
-              body="We pass your request to the operator who runs that car. Availability, final price and keys come back directly from them — on their contract and insurance."
+              title="Operator confirms — and hands you the keys"
+              body="Your request lands with RYDA, and we pass it to the operator who runs that car. They confirm availability and price, and close the rental on their own contract and insurance. Delivery, deposit, and mileage terms are theirs — agreed directly between you."
             />
           </RevealStagger>
-          <Reveal delayMs={80}>
-            <p className="mt-10">
-              <Link
-                href="/how-it-works"
-                className="text-sm font-medium text-red hover:text-red-deep"
-              >
-                The full picture →
-              </Link>
+        </div>
+      </section>
+
+      {/* ── The model — commission transparency. Formerly its own
+             section on /how-it-works; merged here so the whole story
+             (steps → money mechanics → trust) reads in one scroll. The
+             payment-mechanism copy below ("collected as a platform
+             fee") is compliance load-bearing — it is what keeps this
+             page from ever implying RYDA holds or guarantees a
+             payment; see tests/example.spec.ts. ─────────────────────── */}
+      <section className="border-b border-rule">
+        <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
+          <Reveal>
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+              The model
             </p>
+            <h2 className="mt-3 max-w-3xl font-display text-3xl text-ink md:text-4xl">
+              Operators pay RYDA a referral commission on bookings we
+              send them — that&apos;s the whole model.
+            </h2>
           </Reveal>
+          <RevealStagger
+            className="mt-10 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-rule bg-rule sm:grid-cols-3"
+            staggerMs={80}
+          >
+            {[
+              {
+                label: "Your price",
+                value: "The operator's price",
+                // No "no membership required" here: RYDA has no
+                // membership, and denying one implies there is one.
+                note: "Inquiring through RYDA never costs you more than going direct. No markup and no booking fee — you pay the rate the operator confirms.",
+              },
+              {
+                label: "Who you rent from",
+                value: "A Miami operator",
+                note: "Listings stay unbranded.",
+              },
+              {
+                label: "Where money moves",
+                value: "Straight to the operator",
+                // Must match what actually ships: no card at request,
+                // but once the operator confirms, RYDA emails a Stripe
+                // Checkout link created on the OPERATOR's own connected
+                // account (fee-only direct charges — see 0041). Money
+                // never enters a RYDA balance, but it IS a RYDA-sent
+                // payment request, so "no payment through RYDA — ever"
+                // reads as bait-and-switch when that email lands, and as
+                // a phishing signal to everyone who believed it.
+                note: "No card at request. Once the operator confirms your dates we send a secure Stripe link — the charge settles on the operator's own Stripe account, and RYDA's commission is collected as a platform fee on that charge.",
+              },
+            ].map((c) => (
+              <div key={c.label} className="bg-surface p-6 sm:p-7">
+                <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-mute">
+                  {c.label}
+                </p>
+                <p className="mt-3 font-display text-xl leading-snug text-ink">
+                  {c.value}
+                </p>
+                <p className="mt-3 text-sm leading-relaxed text-ink-soft">
+                  {c.note}
+                </p>
+              </div>
+            ))}
+          </RevealStagger>
         </div>
       </section>
 
@@ -334,6 +411,50 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── Why the account? — formerly its own section on
+             /how-it-works; merged here as the last stop before the
+             closing CTA. ─────────────────────────────────────────── */}
+      <section className="border-b border-rule bg-cream-2 py-16 md:py-24">
+        <div className="mx-auto max-w-7xl px-6 sm:px-10">
+          <Reveal>
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-16">
+              <div className="lg:col-span-7">
+                <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+                  Why the account?
+                </p>
+                <h2 className="mt-3 font-display text-3xl text-ink">
+                  Thirty seconds, once.
+                </h2>
+                <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-soft">
+                  A 30-second account keeps your details saved for next
+                  time — no card at request. Your name and
+                  contact autofill on every future request, and you can
+                  see every inquiry you&apos;ve sent in one place. That&apos;s
+                  it; there&apos;s nothing to subscribe to and nothing to
+                  cancel.
+                </p>
+              </div>
+              <div className="flex items-end lg:col-span-5">
+                <div className="flex flex-wrap gap-3">
+                  <Link
+                    href="/signup"
+                    className="inline-flex h-12 items-center justify-center rounded-full bg-red px-7 text-sm font-medium text-cream transition-colors hover:bg-red-deep"
+                  >
+                    Create the account →
+                  </Link>
+                  <Link
+                    href="/rent"
+                    className="inline-flex h-12 items-center justify-center rounded-full border border-rule bg-surface px-7 text-sm font-medium text-ink hover:border-ink"
+                  >
+                    Browse the fleet first
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
       {/* ── Closing CTA ──────────────────────────────────────────── */}
       <section className="bg-cream py-16 md:py-24">
         <div className="mx-auto max-w-3xl px-6 text-center sm:px-10">
@@ -355,59 +476,10 @@ export default function HomePage() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// Local components — the featured cards are deliberately NOT the
-// marketplace RentalCard: no savings badges, no ownership-program chrome,
-// just photo · name · category · rate.
+// Local components — the Featured fleet grid above uses MarketplaceCard
+// (src/components/marketplace-card.tsx), the same card the /rent browse
+// grid renders. One card shape for every car grid on the site.
 // ─────────────────────────────────────────────────────────────────────────
-
-function FeaturedCard({ vehicle: v }: { vehicle: PartnerVehicle }) {
-  const hero = getPartnerHero(v);
-  return (
-    <Link
-      href={`/rent/${v.slug}`}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-rule bg-surface transition-all hover:-translate-y-0.5 hover:border-ink/40 hover:shadow-lg"
-    >
-      <div className="relative aspect-[16/10] w-full overflow-hidden">
-        {hero ? (
-          <Image
-            src={hero}
-            alt={`${v.make} ${v.model}`}
-            fill
-            sizes="(min-width: 768px) 33vw, 100vw"
-            className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
-            unoptimized
-          />
-        ) : null}
-      </div>
-      <div className="flex flex-1 flex-col p-5">
-        <p className="text-[11px] uppercase tracking-[0.14em] text-mute">
-          {v.make}
-        </p>
-        <h3 className="mt-1 font-display text-xl leading-tight text-ink">
-          {v.model}
-        </h3>
-        <p className="mt-1 text-xs text-mute">
-          {v.category} · {v.market}
-        </p>
-        <div className="mt-4 flex items-end justify-between gap-4 border-t border-rule pt-4">
-          <p className="font-display text-2xl text-ink tabular-nums">
-            {formatUSD(v.dailyRate)}
-            <span className="ml-1 text-sm text-mute">/day</span>
-          </p>
-          <span className="inline-flex items-center gap-1.5 text-sm font-medium text-red transition-colors group-hover:text-red-deep">
-            View
-            <span
-              aria-hidden
-              className="transition-transform group-hover:translate-x-0.5"
-            >
-              →
-            </span>
-          </span>
-        </div>
-      </div>
-    </Link>
-  );
-}
 
 function StepCard({
   n,

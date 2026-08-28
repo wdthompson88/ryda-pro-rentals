@@ -1,6 +1,9 @@
 // Smoke tests against the RYDA marketing surface. Validates that the
 // rental-first restructure (Aug 2026 pivot: landing story on /, browse
-// grid at /rent, lead-gen how-it-works) renders correctly post-deploy.
+// grid at /rent) renders correctly post-deploy. /how-it-works was later
+// merged into the "#how-it-works" section of / (Aug 2026, one-page
+// revamp) — its own describe block below now runs against / rather
+// than a separate route.
 //
 // Run locally:    npm run test:e2e
 // Run UI mode:    npm run test:e2e:ui
@@ -27,9 +30,10 @@ test.describe('home page', () => {
     // claim in place. The section has no replacement heading, so this
     // now pins the eyebrow, which is a factual section label.
     await expect(page.getByText(/featured fleet/i).first()).toBeVisible();
-    // How-it-works teaser links through to the full page.
+    // Hero's "How it works →" link jumps to the merged section below,
+    // it no longer navigates to a separate page.
     await expect(
-      page.locator('a[href="/how-it-works"]').first(),
+      page.locator('a[href="#how-it-works"]').first(),
     ).toBeVisible();
   });
 
@@ -50,16 +54,15 @@ test.describe('home page', () => {
   });
 });
 
-test.describe('how-it-works', () => {
+test.describe('how-it-works (merged into home)', () => {
   test('renders the three-step lead-gen model', async ({ page }) => {
-    await page.goto('/how-it-works');
-    // Hero of the rental-first page. "A named operator." is gone from
-    // the H1 — listings are unbranded by decision and nothing in the
-    // code names an operator to a customer or obliges one to introduce
-    // themselves — so this tracks the surviving heading rather than
-    // pinning the deleted promise.
+    await page.goto('/');
+    // The merged section's own heading. This used to be the H1 of a
+    // standalone /how-it-works page ("One request. The keys.") — that
+    // hero was dropped rather than duplicated when the page merged into
+    // home, since home already has its own H1 saying the same thing.
     await expect(
-      page.getByRole('heading', { name: /one request\. the keys/i }),
+      page.getByRole('heading', { name: /three steps between you and the keys/i }),
     ).toBeVisible();
     // The three steps.
     await expect(page.getByText(/request with dates/i).first()).toBeVisible();

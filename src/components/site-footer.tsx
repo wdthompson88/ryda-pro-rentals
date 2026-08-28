@@ -84,7 +84,7 @@ export function SiteFooter() {
               // one entry reads as the first of several markets, and
               // there is only the one.
               ["Renting in Miami", "/locations/miami"],
-              ["How it works", "/how-it-works"],
+              ["How it works", "/#how-it-works"],
               ["FAQ", "/faq"],
             ]}
           />

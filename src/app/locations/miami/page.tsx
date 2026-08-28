@@ -127,7 +127,7 @@ export default function MiamiPage() {
               Browse the Miami fleet
             </Link>
             <Link
-              href="/how-it-works"
+              href="/#how-it-works"
               className="text-sm font-medium text-ink underline-offset-4 hover:text-red hover:underline"
             >
               How it works →

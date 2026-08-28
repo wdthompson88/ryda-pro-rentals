@@ -21,7 +21,9 @@ const PUBLIC_ROUTES = [
   "/rent",
   // Rental-first surfaces.
   "/partners",
-  "/how-it-works",
+  // /how-it-works was merged into the "" (home) entry above as its
+  // "#how-it-works" section (Aug 2026) and 301-redirects there now —
+  // listing it separately would be a duplicate URL for the same page.
   // /insurance and /storage used to sit here. Both were deleted: they
   // advertised a RYDA fleet policy and RYDA-operated climate-controlled
   // storage, and RYDA provides neither. Every car on the platform is

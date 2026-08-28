@@ -204,7 +204,7 @@ export default function AccountOverviewPage() {
 
       <p className="text-xs text-mute">
         Your price is always the operator&apos;s price. See{" "}
-        <Link href="/how-it-works" className="text-red hover:text-red-deep">
+        <Link href="/#how-it-works" className="text-red hover:text-red-deep">
           how it works
         </Link>
         .

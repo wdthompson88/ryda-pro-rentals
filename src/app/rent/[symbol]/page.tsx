@@ -129,10 +129,15 @@ export default async function RentDetailPage({
                 </p>
               </div>
 
-              {/* Compact info row. RYDA does not hold the car, so it does
-                  not publish a spec sheet for it — only what the operator's
-                  listing states. */}
-              <div className="mt-10 grid grid-cols-2 gap-x-10 gap-y-6 border-t border-rule pt-8 sm:grid-cols-3">
+              {/* Compact spec table — bordered hairline grid (the same
+                  gap-px bg-rule pattern /how-it-works uses for "The
+                  model"), formalized in the design system as the
+                  standard fact-grid treatment. RYDA does not hold the
+                  car, so it does not publish a spec sheet for it — only
+                  what the operator's listing states; these are the same
+                  three fields the old loose layout showed, just given
+                  the visual weight of a real spec table. */}
+              <div className="mt-10 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-rule bg-rule sm:grid-cols-3">
                 <Spec label="Type" value={r.category} />
                 <Spec label="Year" value={r.year ? String(r.year) : "—"} />
                 <Spec
@@ -148,8 +153,14 @@ export default async function RentDetailPage({
                 card now: `dailyRate` here is partner-fleet.ts's static
                 figure, and the quote inside the form is priced from
                 rental_listings.daily_rate_cents — the card resolves the
-                two rather than rendering both. */}
-            <div className="lg:col-span-4">
+                two rather than rendering both.
+
+                lg:sticky keeps the CTA in view while scrolling the
+                gallery/specs — the closest honest equivalent to an
+                auction site's persistent bid button, using no new
+                data. top-24 clears the 71px sticky site header plus
+                breathing room. */}
+            <div className="lg:sticky lg:top-24 lg:col-span-4 lg:self-start">
               {/* A "Driver requirements" panel stood here on all 37
                   listing pages: "Min. driver age 28+" and "Driving
                   experience 5+ years". Both figures are deleted, not
@@ -287,18 +298,22 @@ export default async function RentDetailPage({
                 customer is not left concluding the operator ignored
                 them. */}
             <Pillar
+              n="01"
               title="An operator"
               body="Your request comes to RYDA, and we pass it to the Miami operator who runs this car. They confirm availability directly with you."
             />
             <Pillar
+              n="02"
               title="Their contract & insurance"
               body="The rental closes on the operator's own agreement and coverage — the same terms you'd get going direct. Delivery, deposit, and mileage are theirs to confirm."
             />
             <Pillar
+              n="03"
               title="The operator's price"
               body="Inquiring through RYDA never costs more than going direct. Operators pay RYDA a referral commission on bookings we send them — that's the whole model."
             />
             <Pillar
+              n="04"
               title="No card at request"
               body="No card at request. Nothing is charged until you and the operator confirm the booking together."
             />
@@ -314,17 +329,28 @@ export default async function RentDetailPage({
 
 function Spec({ label, value }: { label: string; value: string }) {
   return (
-    <div>
-      <dt className="text-xs uppercase tracking-wider text-mute">{label}</dt>
-      <dd className="mt-1 text-sm text-ink">{value}</dd>
+    <div className="bg-surface p-5">
+      <dt className="text-[10px] font-medium uppercase tracking-[0.18em] text-mute">
+        {label}
+      </dt>
+      <dd className="mt-2 font-display text-lg text-ink">{value}</dd>
     </div>
   );
 }
 
-function Pillar({ title, body }: { title: string; body: string }) {
+function Pillar({
+  n,
+  title,
+  body,
+}: {
+  n: string;
+  title: string;
+  body: string;
+}) {
   return (
     <div>
-      <p className="font-display text-lg text-ink">{title}</p>
+      <p className="font-display text-2xl text-red">{n}</p>
+      <p className="mt-3 font-display text-lg text-ink">{title}</p>
       <p className="mt-2 text-sm leading-relaxed text-ink-soft">{body}</p>
     </div>
   );

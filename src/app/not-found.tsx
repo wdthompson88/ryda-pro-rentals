@@ -36,7 +36,7 @@ const POPULAR = [
     href: "/rent",
     note: `${PARTNER_VEHICLES.length} cars`,
   },
-  { label: "How it works", href: "/how-it-works", note: "Browse, request, the operator confirms" },
+  { label: "How it works", href: "/#how-it-works", note: "Browse, request, the operator confirms" },
   { label: "Where we operate", href: "/rent", note: "Every listing is in Miami" },
   { label: "For partners", href: "/partners", note: "List your fleet with RYDA" },
   { label: "Help center", href: "/help", note: "Answers to the common ones" },

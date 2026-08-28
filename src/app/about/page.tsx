@@ -130,7 +130,7 @@ export default function AboutPage() {
               "Browse the Miami fleet, send your dates, and an operator confirms availability and price directly with you. No card at request.",
             links: [
               { href: "/rent", label: "Browse the fleet" },
-              { href: "/how-it-works", label: "How it works →", variant: "secondary" },
+              { href: "/#how-it-works", label: "How it works →", variant: "secondary" },
             ],
           },
         }}

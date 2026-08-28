@@ -20,7 +20,7 @@ import {
 const NAV = [
   // /rent is the canonical browse grid; "/" is the landing page.
   { href: "/rent", label: "Browse" },
-  { href: "/how-it-works", label: "How it works" },
+  { href: "/#how-it-works", label: "How it works" },
   { href: "/partners", label: "For partners" },
 ];
 

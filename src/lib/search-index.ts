@@ -49,7 +49,7 @@ const STATIC_PAGES: SearchEntry[] = [
     haystack: "rent rental daily hire exotic supercar luxury miami partners fleet",
   },
   {
-    href: "/how-it-works",
+    href: "/#how-it-works",
     title: "How it works",
     subtitle: "Cars · Browse, request your dates, the operator confirms",
     vertical: "cars",

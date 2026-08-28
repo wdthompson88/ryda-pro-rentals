@@ -97,9 +97,9 @@ Tailwind default spacing scale (4px base, so `p-4` = 16px, `gap-6` = 24px, etc.)
 ```
 Hover variant adds `hover:border-ink/40 hover:shadow-lg` (or use framer-motion `whileHover` for spring physics — see `src/components/portfolio-listings.tsx` for the spring values).
 
-### Dense listing card (marketplace browse grids only)
+### Marketplace card (every car grid on the site)
 
-A sanctioned one-step-denser variant for high-inventory browse grids (4-up at `xl`, e.g. the `/rent` marketplace) where the **photo carries the price chip and badges**, so the body is only three short lines: `p-4` body padding and `font-display text-lg` title. Everything else keeps the standard card grammar — `rounded-2xl border border-rule bg-surface`, `rounded-full` chips, Fraunces + `tabular-nums` prices, `hover:border-ink/40 hover:shadow-lg`.
+The one card shape for any car grid — `/rent`'s browse grid and the landing page's Featured fleet both render this same component. It used to be two near-identical components (a dense browse card and a simpler featured card); they were merged because a visitor sees the same object in both places and a revamp toward more confident, information-forward cards (Aug 2026, "Cars & Bids"–influenced formatting pass) closed that gap rather than widen it. The **photo carries the price chip and badges**, so the body stays two short lines: `p-4` body padding and `font-display text-lg` title. Everything else keeps the standard card grammar — `rounded-2xl border border-rule bg-surface`, `rounded-full` chips, Fraunces + `tabular-nums` prices, `hover:border-ink/40 hover:shadow-lg`.
 
 ```tsx
 <Link className="group flex flex-col overflow-hidden rounded-2xl border border-rule bg-surface transition-all hover:-translate-y-0.5 hover:border-ink/40 hover:shadow-lg">
@@ -111,7 +111,43 @@ A sanctioned one-step-denser variant for high-inventory browse grids (4-up at `x
 </Link>
 ```
 
-**Only** use this when the price lives on the photo (as a `bg-ink/85` chip with `text-cream` — ≈11.4:1). A card whose body shows the price stays `p-5`/`text-xl`; `src/components/portfolio-listings.tsx` remains the canonical standard card. Reference implementation: `src/components/rental-listings.tsx`. Don't mix the two densities within one grid.
+**Only** use this when the price lives on the photo (as a `bg-ink/85` chip with `text-cream` — ≈11.4:1). A card whose body shows the price stays `p-5`/`text-xl`; `src/components/portfolio-listings.tsx` remains the canonical standard card for non-vehicle listings. Reference implementation: `src/components/marketplace-card.tsx`. Every field it renders must come from real listing data (`PartnerVehicle` / `RentalListing`) — never add a badge, stat, or line that isn't backed by an actual field.
+
+### Numbered pillar/step grid
+
+The standard shape for a 3–4 column explanatory grid (a "how it works" or "how the rental works" section): each cell leads with a two-digit number in `font-display text-2xl text-red`, then a title, then body copy. Used on the landing page ("How it works"), `/how-it-works`, and the rental detail page ("How the rental works").
+
+```tsx
+<div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+  <div>
+    <p className="font-display text-2xl text-red">01</p>
+    <p className="mt-3 font-display text-lg text-ink">Title</p>
+    <p className="mt-2 text-sm leading-relaxed text-ink-soft">Body copy.</p>
+  </div>
+  ...
+</div>
+```
+
+Any new 3–4 column explanatory grid gets numbered this way — don't ship an unnumbered variant next to numbered ones elsewhere on the same page flow.
+
+### Bordered hairline spec table
+
+The standard shape for a compact label/value fact grid (vehicle specs, a pricing/commission breakdown): cells sit in a `rounded-2xl border border-rule` frame, separated by 1px hairlines via the `gap-px bg-rule` trick (the grid's own background shows through the `gap-px` gutters as rule-colored dividers).
+
+```tsx
+<div className="grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-rule bg-rule sm:grid-cols-3">
+  {facts.map((f) => (
+    <div key={f.label} className="bg-surface p-5">
+      <dt className="text-[10px] font-medium uppercase tracking-[0.18em] text-mute">
+        {f.label}
+      </dt>
+      <dd className="mt-2 font-display text-lg text-ink">{f.value}</dd>
+    </div>
+  ))}
+</div>
+```
+
+Use this instead of a loose `gap-x-10 gap-y-6` label/value layout whenever the facts read as a table (3+ short entries) rather than a paragraph-length pillar. Reference implementations: `/how-it-works`'s "The model" section and the rental detail page's spec block.
 
 ### Pill / status badge
 ```tsx
@@ -187,6 +223,7 @@ Drift is the enemy of design systems. Discipline now = consistency in 6 months w
 
 - `src/app/globals.css` — token definitions
 - `src/app/layout.tsx` — font loading
-- `src/components/portfolio-listings.tsx` — canonical card implementation (study this when building any new card)
+- `src/components/portfolio-listings.tsx` — canonical standard card implementation (study this when building any new non-vehicle card)
+- `src/components/marketplace-card.tsx` — canonical vehicle card, used by every car grid on the site
 - `src/components/reveal.tsx` — animation primitives
 - `src/components/splitter-intro.tsx` — homepage splitter (the brand's most distinctive element)

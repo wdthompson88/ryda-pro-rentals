@@ -3,9 +3,9 @@
 // Visibility-gated wrapper around HealthBadge. The badge itself
 // polls /api/health every 60s and ships its own ~3KB of UI logic;
 // dynamic-importing it shaves the chunk off the critical-path JS
-// bundle on every marketing page (homepage, /how-it-works, /portfolio,
-// etc.) where the user typically never scrolls to the legal strip
-// and never sees it.
+// bundle on every marketing page (homepage, /portfolio, etc.) where
+// the user typically never scrolls to the legal strip and never
+// sees it.
 //
 // Pattern:
 //   1. Empty <span> renders immediately, server + client.

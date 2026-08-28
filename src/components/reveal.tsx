@@ -3,8 +3,9 @@
 // Reveal + RevealStagger — scroll-triggered fade-up animations
 // powered by framer-motion. The single Reveal preserves the
 // pre-framer-motion API (callers keep working unchanged — today
-// that's the landing page and /how-it-works, the two most important
-// rental surfaces) but the implementation now uses
+// that's the landing page, the one long-scroll rental surface
+// /how-it-works was merged into in Aug 2026) but the implementation
+// now uses
 // motion.div with whileInView + viewport={{once}} which gives:
 //   - Built-in spring physics on the transform
 //   - Free GPU acceleration via the framer-motion compositor

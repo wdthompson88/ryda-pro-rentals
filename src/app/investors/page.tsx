@@ -74,7 +74,7 @@ export default function InvestorsPage() {
               Request the deck
             </Link>
             <Link
-              href="/how-it-works"
+              href="/#how-it-works"
               className="text-sm font-medium text-ink underline-offset-4 hover:text-red hover:underline"
             >
               How the product works →
@@ -122,7 +122,7 @@ export default function InvestorsPage() {
           <p className="mt-8 max-w-3xl text-sm leading-relaxed text-ink-soft">
             The customer-facing description of the same mechanism is on{" "}
             <Link
-              href="/how-it-works"
+              href="/#how-it-works"
               className="font-medium text-red hover:text-red-deep"
             >
               How it works

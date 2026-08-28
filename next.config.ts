@@ -25,6 +25,14 @@ const nextConfig: NextConfig = {
         destination: "/rent/:path*",
         permanent: true,
       },
+      // /how-it-works was merged into the "#how-it-works" section of the
+      // home page (Aug 2026, one-page revamp) so the whole story reads
+      // in one scroll instead of two pages.
+      {
+        source: "/how-it-works",
+        destination: "/#how-it-works",
+        permanent: true,
+      },
     ];
   },
   // Allow next/image to optimize the Unsplash hero placeholders we ship

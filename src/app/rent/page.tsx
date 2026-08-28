@@ -79,7 +79,7 @@ export default function RentPage() {
             pass your request to the operator, who confirms availability and
             price directly with you. No card at request.{" "}
             <Link
-              href="/how-it-works"
+              href="/#how-it-works"
               className="font-medium text-red hover:text-red-deep"
             >
               How it works →
