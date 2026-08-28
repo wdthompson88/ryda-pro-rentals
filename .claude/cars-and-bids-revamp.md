@@ -94,9 +94,20 @@ data that isn't already there.
       the Card pattern. Everything else on the page (hero, section
       bands, CTA) already matched established patterns — no other
       changes needed.
-- [ ] `/help`, `/help/[category]`, `/help/[category]/[slug]` — help
-      center. Likely the biggest surface area; do the shared layout
-      shell first, individual articles should inherit it for free.
+- [x] `/help`, `/help/[category]`, `/help/[category]/[slug]` — help
+      center. Was already close to the system (cards, sections, pills
+      all matched established shapes). Fixed three inconsistencies:
+      the `/help` info-strip tiles and the article-list link cards on
+      `/help/[category]/[slug]` were `rounded-xl` (reserved for nested
+      surfaces) instead of `rounded-2xl` (standalone cards); the
+      category grid and article-list cards used a bare `hover:shadow-md`
+      instead of the standard card hover (`hover:border-ink/40
+      hover:shadow-lg`); and the article body's `tone: "warn"` callout
+      was styled with `red` tokens instead of `warn`/`warn-deep`, which
+      contradicted the token table's semantic split between "brand
+      action" and "warning". No copy or data changed — `help-chat.tsx`
+      and `help-content.ts` were left untouched (the chat widget already
+      matches the system; the content file is data, not layout).
 - [ ] `/contact`
 - [ ] `/trust-and-safety`
 - [ ] `/locations/miami`
