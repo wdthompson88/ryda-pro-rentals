@@ -166,9 +166,31 @@ data that isn't already there.
       Miami" even though every sibling page's sections have one, because
       that would mean writing new label copy; noted below instead of
       guessing at wording.
-- [ ] `/host-your-car` — operator recruitment landing.
-- [ ] `/about`
-- [ ] `/investors`
+- [x] `/host-your-car` — this route is already a bare `redirect("/partners")`
+      (noindex, no rendered content) — the co-ownership-era recruitment
+      page it used to be was retired when this repo was stripped. Nothing
+      to restyle; `/partners` (already done) is the real destination.
+- [x] `/about` — shared `AboutPageTemplate`
+      (`src/components/shared/about-page.tsx`). Two sections were plain
+      unbordered lists next to bordered/tabular patterns used everywhere
+      else on the site: the "Mission" values grid (4 cards: One request /
+      The operator's price / Verified through Stripe / Plain terms) had
+      no border and no numeral, unlike the identically-shaped benefit
+      grids on `/partners` and `/trust-and-safety`; converted to the same
+      bordered numbered card. The "Headquarters" fact list was a bare
+      `dl` with `border-b` row dividers — a 5-entry label/value table,
+      exactly the shape the bordered hairline spec table pattern exists
+      for; converted `Fact` and its wrapping `dl` to that pattern (same
+      cell markup as `/`'s "The model" and `/rent/[symbol]`'s spec
+      block). Hero, "Why RYDA exists" prose, the founder letter and the
+      founder cards were already consistent with established patterns —
+      left alone. This template is used only by `/about`, so no other
+      page was touched. No copy or data changed.
+- [x] `/investors` — already fully matches the system: hero pattern,
+      the exact bordered hairline model-card grid (`ModelCard`,
+      identical markup to the documented pattern), no stray `rounded-xl`
+      on standalone surfaces, no raw hex. No changes made — noting it
+      as checked rather than leaving it to be re-examined next run.
 - [ ] `/press`
 - [ ] `/search` — results page.
 - [ ] `/signup`, `/signin` — auth forms. Light touch: form field/button

@@ -157,10 +157,13 @@ export function AboutPageTemplate({ data }: { data: AboutPageData }) {
           <p className="mt-4 max-w-3xl font-display text-2xl leading-tight text-ink sm:text-3xl">
             {data.mission.quote}
           </p>
-          <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {data.mission.values.map((value) => (
-              <div key={value.title}>
-                <p className="font-display text-xl text-ink">{value.title}</p>
+          <div className="mt-16 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {data.mission.values.map((value, i) => (
+              <div key={value.title} className="rounded-2xl border border-rule bg-surface p-6">
+                <p className={`font-display text-2xl ${accentText}`}>
+                  {String(i + 1).padStart(2, "0")}
+                </p>
+                <p className="mt-3 font-display text-xl text-ink">{value.title}</p>
                 <p className="mt-3 text-sm leading-relaxed text-ink-soft">{value.body}</p>
               </div>
             ))}
@@ -192,7 +195,7 @@ export function AboutPageTemplate({ data }: { data: AboutPageData }) {
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10 sm:py-24">
           <h2 className="font-display text-3xl text-ink sm:text-4xl">{data.hq.title}</h2>
-          <dl className="mt-8 grid max-w-2xl grid-cols-1 gap-5 text-sm sm:grid-cols-2">
+          <dl className="mt-8 grid max-w-3xl grid-cols-1 gap-px overflow-hidden rounded-2xl border border-rule bg-rule sm:grid-cols-2">
             {data.hq.facts.map((fact) => (
               <Fact key={fact.label} fact={fact} />
             ))}
@@ -252,9 +255,11 @@ function Founder({ person, accentText }: { person: AboutPerson; accentText: stri
 
 function Fact({ fact }: { fact: AboutFact }) {
   return (
-    <div className="flex flex-col border-b border-rule pb-3 sm:flex-row sm:items-baseline sm:justify-between">
-      <dt className="text-xs uppercase tracking-wider text-mute">{fact.label}</dt>
-      <dd className="text-sm text-ink sm:text-right">{fact.value}</dd>
+    <div className="bg-surface p-5">
+      <dt className="text-[10px] font-medium uppercase tracking-[0.18em] text-mute">
+        {fact.label}
+      </dt>
+      <dd className="mt-2 font-display text-lg text-ink">{fact.value}</dd>
     </div>
   );
 }
