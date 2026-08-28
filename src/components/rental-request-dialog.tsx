@@ -6,11 +6,15 @@
 // send. Nothing in this file talks to an API; it collects, validates
 // and hands back, and RentalInquiryForm does the sending.
 //
-//   RentalSignInDialog   no session. Sign in / create an account, with
-//                        the car AND the chosen dates in `next` so the
-//                        visitor lands back here with them still
-//                        selected. "Not now" simply closes it — the
-//                        dates stay on the page.
+//   RentalSignInDialog   no session. Sign in or create an account
+//                        RIGHT HERE — password, the configured OAuth
+//                        providers, a magic link — and the popup then
+//                        becomes the confirm step. Anything that must
+//                        leave the page (an OAuth redirect, an email
+//                        link, the MFA challenge) carries the car AND
+//                        the chosen dates in `next`, so the visitor
+//                        lands back with them still selected. "Not now"
+//                        simply closes it — the dates stay on the page.
 //
 //   RentalConfirmDialog  signed in. The car, the dates and the price
 //                        about to be asked for, then the renter's
@@ -27,8 +31,11 @@
 // what the send does and no more.
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
+import { supabase } from "@/lib/supabase";
 import { Dialog } from "@/components/dialog";
+import { OAuthButtons } from "@/components/oauth-buttons";
 import {
   FOCUS_RING,
   formatBookingCents,
@@ -49,7 +56,38 @@ const INPUT =
   "mt-2 h-11 w-full rounded-xl border border-rule bg-cream px-4 text-sm text-ink placeholder:text-mute focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20 aria-[invalid=true]:border-red";
 const LABEL = "block text-xs font-medium uppercase tracking-wider text-mute";
 
-// ── Sign in first ─────────────────────────────────────────────────────
+// ── Sign in first — without leaving the car ──────────────────────────
+//
+// The whole of /signin's mechanics, in the popup: email + password,
+// the configured OAuth providers, a magic link for the forgotten
+// password, and the TOTP step-up when an account has it. Plus /signup's
+// create-account path. The one thing that cannot stay in the popup is a
+// round trip the browser must make — an OAuth redirect, an email link —
+// and each of those lands on /auth/callback?next=<this car + dates>,
+// so the visitor comes back to the dates they picked and the confirm
+// step reopens by itself (RentalInquiryForm's returnedWithDates).
+//
+// This component never closes itself on success. A password sign-in
+// flips the session, useAuthStatus hears it through onAuthStateChange,
+// and the form swaps this dialog for RentalConfirmDialog — the click's
+// intent was to request, and that is what it goes on to do.
+
+type SignInMode = "signin" | "signup";
+
+/** Supabase's sentences are for developers. These are for the renter. */
+function friendlyAuthError(err: unknown): string {
+  const msg = err instanceof Error ? err.message : "";
+  if (/invalid login credentials/i.test(msg)) {
+    return "That email and password don't match.";
+  }
+  if (/email not confirmed/i.test(msg)) {
+    return "Confirm your email first — the link is in your inbox.";
+  }
+  if (/rate limit|too many/i.test(msg)) {
+    return "Too many attempts. Try again in a minute.";
+  }
+  return msg || "Something went wrong. Try again.";
+}
 
 export function RentalSignInDialog({
   open,
@@ -58,37 +96,296 @@ export function RentalSignInDialog({
 }: {
   open: boolean;
   onClose: () => void;
-  /** Same-origin path to come back to — the car, with the dates in the
-   *  query so they survive the round trip (safeNext allows `?`). */
+  /** Same-origin path a round trip (OAuth, an email link, the MFA
+   *  challenge) comes back to — the car, with the dates in the query
+   *  so they survive it (safeNext allows `?`). */
   returnTo: string;
 }) {
   const titleId = useId();
-  const next = encodeURIComponent(returnTo);
+  const fieldId = useId();
+  const router = useRouter();
+  const [mode, setMode] = useState<SignInMode>("signin");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  /** An email is on its way; the popup now says so instead of asking
+   *  for a password. `confirm` after signUp, `magic` after a link. */
+  const [sent, setSent] = useState<null | "confirm" | "magic">(null);
+
+  // Fresh on each open. The email survives a Back-and-reopen — it is
+  // the one thing worth not retyping — the rest does not.
+  const wasOpen = useRef(false);
+  useEffect(() => {
+    if (open && !wasOpen.current) {
+      setMode("signin");
+      setPassword("");
+      setError(null);
+      setSent(null);
+      setBusy(false);
+    }
+    wasOpen.current = open;
+  }, [open]);
+
+  function callbackUrl(): string {
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    return `${origin}/auth/callback?next=${encodeURIComponent(returnTo)}`;
+  }
+
+  async function submit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (busy) return;
+    if (!email.includes("@")) {
+      setError("Enter your email.");
+      return;
+    }
+    if (mode === "signup" ? password.length < 8 : password.length < 1) {
+      setError(
+        mode === "signup"
+          ? "A password of at least 8 characters."
+          : "Enter your password.",
+      );
+      return;
+    }
+    if (!supabase) {
+      setError("Sign-in isn't available right now. Try again shortly.");
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    try {
+      if (mode === "signin") {
+        const { error: err } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (err) throw err;
+        // MFA step-up, exactly as /signin does it: a password sign-in
+        // lands at aal1, and an account with an enrolled TOTP factor
+        // must pass the challenge before it counts. That page cannot
+        // live in a popup, so it gets `next` and brings the renter back.
+        const aal = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+        if (
+          aal.data?.nextLevel === "aal2" &&
+          aal.data.currentLevel !== "aal2"
+        ) {
+          router.push(
+            `/auth/mfa-challenge?next=${encodeURIComponent(returnTo)}`,
+          );
+          return;
+        }
+        // Signed in. Nothing more to do here — see the header.
+        return;
+      }
+
+      // Create an account. Same call and the same metadata /signup
+      // makes (an explicit marketing_opt_in: false — the toggle lives
+      // on /account/profile). Email confirmation, when the project has
+      // it on, returns no session, so the popup turns into "check your
+      // email" and the link brings them back here.
+      const { data, error: err } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: callbackUrl(),
+          data: { marketing_opt_in: false },
+        },
+      });
+      if (err) throw err;
+      if (data.session) return; // confirmation off: already signed in
+      if (
+        // Enumeration protection: an existing email "succeeds" with a
+        // user that has no identities. Say so, and offer the other door.
+        data.user &&
+        Array.isArray(data.user.identities) &&
+        data.user.identities.length === 0
+      ) {
+        setMode("signin");
+        setError("You already have a RYDA account with this email — sign in instead.");
+        return;
+      }
+      setSent("confirm");
+    } catch (err) {
+      setError(friendlyAuthError(err));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  // The forgotten-password door, as on /signin: a link to whatever
+  // email is typed above. No password involved.
+  async function magicLink() {
+    if (busy) return;
+    if (!email.includes("@")) {
+      setError("Enter your email above first.");
+      return;
+    }
+    if (!supabase) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const { error: err } = await supabase.auth.signInWithOtp({
+        email,
+        options: { emailRedirectTo: callbackUrl() },
+      });
+      if (err) throw err;
+      setSent("magic");
+    } catch (err) {
+      setError(friendlyAuthError(err));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const emailId = `${fieldId}-email`;
+  const passwordId = `${fieldId}-password`;
+
+  if (sent) {
+    return (
+      <Dialog open={open} onClose={onClose} labelledBy={titleId}>
+        <h2 id={titleId} className="font-display text-2xl leading-tight text-ink">
+          Check your email
+        </h2>
+        <p className="mt-3 text-sm leading-relaxed text-ink-soft">
+          We sent {sent === "confirm" ? "a confirmation" : "a sign-in"} link to{" "}
+          <span className="font-medium text-ink">{email}</span>. Open it and
+          you&apos;ll land back on this car with your dates still selected.
+        </p>
+        <div className="mt-6 grid gap-2">
+          <button type="button" onClick={onClose} data-autofocus="" className={SECONDARY_BTN}>
+            Back to the car
+          </button>
+        </div>
+      </Dialog>
+    );
+  }
+
   return (
-    <Dialog open={open} onClose={onClose} labelledBy={titleId}>
-      <h2 id={titleId} className="font-display text-2xl leading-tight text-ink">
-        Sign in to request these dates
-      </h2>
-      <p className="mt-3 text-sm leading-relaxed text-ink-soft">
-        Your request goes to the operator with your name and phone number,
-        so it needs an account behind it. Your dates stay saved while you
-        sign in.
-      </p>
-      <div className="mt-6 grid gap-2">
-        <Link href={`/signin?next=${next}`} data-autofocus="" className={PRIMARY_BTN}>
-          Sign in
-        </Link>
-        <Link href={`/signup?next=${next}`} className={SECONDARY_BTN}>
-          Create an account
-        </Link>
-        <button
-          type="button"
-          onClick={onClose}
-          className={`mt-1 rounded-sm py-2 text-center text-xs font-medium text-ink-soft hover:text-ink ${FOCUS_RING}`}
+    <Dialog open={open} onClose={onClose} labelledBy={titleId} dismissable={!busy}>
+      <form onSubmit={submit} noValidate>
+        <h2 id={titleId} className="font-display text-2xl leading-tight text-ink">
+          {mode === "signin"
+            ? "Sign in to request these dates"
+            : "Create an account to request these dates"}
+        </h2>
+        <p className="mt-3 text-sm leading-relaxed text-ink-soft">
+          Your request goes to the operator with your name and phone number,
+          so it needs an account behind it. Your dates stay right here.
+        </p>
+
+        {/* Two doors, one control. Buttons rather than links: neither
+            navigates, and the choice must survive a failed attempt. */}
+        <div
+          role="group"
+          aria-label="Sign in or create an account"
+          className="mt-5 grid grid-cols-2 gap-1 rounded-full border border-rule bg-cream-2/40 p-1"
         >
-          Not now
-        </button>
-      </div>
+          {(["signin", "signup"] as const).map((m) => (
+            <button
+              key={m}
+              type="button"
+              aria-pressed={mode === m}
+              disabled={busy}
+              onClick={() => {
+                setMode(m);
+                setError(null);
+              }}
+              className={`h-9 rounded-full text-sm font-medium transition-colors ${FOCUS_RING} ${
+                mode === m
+                  ? "bg-ink text-cream"
+                  : "text-ink-soft hover:text-ink"
+              }`}
+            >
+              {m === "signin" ? "Sign in" : "Create account"}
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-5">
+          <OAuthButtons
+            next={returnTo}
+            verb={mode === "signin" ? "Continue" : "Sign up"}
+          />
+        </div>
+
+        <div className="space-y-3">
+          <div>
+            <label htmlFor={emailId} className={LABEL}>
+              Email
+            </label>
+            <input
+              id={emailId}
+              type="email"
+              autoComplete="email"
+              placeholder="you@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={busy}
+              data-autofocus=""
+              className={INPUT}
+            />
+          </div>
+          <div>
+            <label htmlFor={passwordId} className={LABEL}>
+              Password
+            </label>
+            <input
+              id={passwordId}
+              type="password"
+              autoComplete={mode === "signin" ? "current-password" : "new-password"}
+              placeholder={mode === "signin" ? "Your password" : "At least 8 characters"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={busy}
+              className={INPUT}
+            />
+          </div>
+        </div>
+
+        {error && (
+          <p
+            role="alert"
+            className="mt-4 rounded-xl border border-red/40 bg-red/5 px-4 py-3 text-xs text-red"
+          >
+            {error}
+          </p>
+        )}
+
+        <div className="mt-5 grid gap-2">
+          <button type="submit" disabled={busy} className={PRIMARY_BTN}>
+            {busy
+              ? mode === "signin"
+                ? "Signing in…"
+                : "Creating account…"
+              : mode === "signin"
+                ? "Sign in"
+                : "Create account"}
+          </button>
+          {mode === "signin" ? (
+            <button
+              type="button"
+              onClick={() => void magicLink()}
+              disabled={busy}
+              className={`rounded-sm py-2 text-center text-xs font-medium text-ink-soft hover:text-ink disabled:opacity-50 ${FOCUS_RING}`}
+            >
+              Forgot your password? Email me a sign-in link
+            </button>
+          ) : (
+            <p className="py-2 text-center text-[11px] leading-relaxed text-mute">
+              Free to join. We&apos;ll email you a confirmation link that brings
+              you straight back here.
+            </p>
+          )}
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={busy}
+            className={`rounded-sm py-2 text-center text-xs font-medium text-ink-soft hover:text-ink disabled:opacity-50 ${FOCUS_RING}`}
+          >
+            Not now
+          </button>
+        </div>
+      </form>
     </Dialog>
   );
 }

@@ -466,6 +466,15 @@ export function RentalInquiryForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authStatus, profileLoading, availability.kind, quote, startDate, endDate]);
 
+  // Signing in INSIDE the sign-in dialog flips authStatus (useAuthStatus
+  // hears it through onAuthStateChange). The click that opened it meant
+  // "request", so the confirm step takes its place without another
+  // press. A magic-link / OAuth round trip is the other route here: it
+  // lands with the dates in the URL and the effect above opens confirm.
+  useEffect(() => {
+    if (dialog === "signin" && authStatus === "authed") setDialog("confirm");
+  }, [dialog, authStatus]);
+
   // Carry a signed-in member's STORED marketing consent through the
   // submit unchanged. Same precedence as /account/profile:
   // rental_profiles boolean overrides user_metadata. Without this the
