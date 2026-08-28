@@ -32,18 +32,36 @@ why, and move on.
 
 ## Ground rules for every run
 
+**Calibration note (added after the first three runs undershot):** the
+first few runs made real but tiny fixes — a rounded-corner radius here, a
+hover-state token there. That is NOT what "go 70% of the way to Cars &
+Bids, largely clean" means. Dave looked at the result and correctly said
+it barely looked different. Fixing token/spacing drift is necessary but
+not sufficient. Every page in the checklist below should come out of its
+turn visibly, obviously different when you screenshot before/after — a
+tighter hero, a restructured section, cards where there was a plain list,
+a bordered fact-table where there was loose prose, real whitespace and
+typographic confidence. If your diff for a page is under ~30 lines,
+you almost certainly under-scoped it — go back and do more on that same
+page before moving on, rather than checking it off and moving to the next
+one.
+
 1. `git pull` on `feat/dt-cars-bids-formatting` before starting — another
    run may have pushed since you cloned.
 2. Read `.claude/skills/frontend-design/SKILL.md` and skim
    `AGENTS.md` before editing.
 3. Pick the next unchecked item below. Prefer finishing a page you (or a
    prior run) already started over starting a new one.
-4. Make the change. Reuse the established patterns (marketplace card,
-   numbered pillar/step grid, bordered hairline spec table) wherever a
-   page has a shape that matches one — that's what "standardized" means
-   here. Don't invent new component shapes; if you hit a real gap the
-   design system doesn't cover, add it to SKILL.md first (see that file's
-   own "When to add to this skill" section), then use it.
+4. Make the change — and make it a real one (see calibration note above).
+   Reuse the established patterns (marketplace card, numbered pillar/step
+   grid, bordered hairline spec table) wherever a page has a shape that
+   matches one, but don't stop at pattern-matching: also look at each
+   section's hero/heading treatment, whitespace rhythm (py-16 md:py-24
+   section padding, gap-6 grids), and whether a plain paragraph or list
+   should become a card grid, a numbered sequence, or a bordered table.
+   Don't invent new component shapes beyond what SKILL.md documents; if
+   you hit a real gap, add it to SKILL.md first (see that file's own
+   "When to add to this skill" section), then use it.
 5. Verify: `npm run typecheck && npm run test` at minimum; `npm run build`
    before your final commit of the session.
 6. Check off what you finished in this file, note anything you skipped
@@ -69,6 +87,11 @@ why, and move on.
 - [x] Landing page (`/`) gained "The model" (commission/payment
       breakdown, bordered hairline grid) and "Why the account?"
       sections, both carried over from the old `/how-it-works`.
+- [x] Merged `main` into this branch (main had moved ahead with PR #11,
+      the sign-in-first request flow — `rental-inquiry-form.tsx` and
+      `rental-request-dialog.tsx` are now the current versions of those
+      files, not the ones from earlier in this doc's history). No
+      conflicts; verified clean after.
 
 ## To do — public marketing/marketplace pages
 
