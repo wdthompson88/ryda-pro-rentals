@@ -79,8 +79,21 @@ card/spacing consistency, and generally push toward "clean, confident
 marketplace" over "sleepy brochure" — without touching copy or adding
 data that isn't already there.
 
-- [ ] `/partners` — partner recruitment page.
-- [ ] `/faq` — check accordion/list styling against the design system.
+- [x] `/partners` — partner recruitment page. Was already close: the
+      "Getting listed" steps already used the numbered pillar/step
+      pattern. Fixed the one inconsistency — "What you get" benefit
+      cards had a small uppercase-caption numeral instead of the
+      established `font-display text-2xl text-red` numeral used by the
+      steps directly below and by the landing page's StepCard. No copy
+      or data changed.
+- [x] `/faq` — check accordion/list styling against the design system.
+      Shared `FaqPageTemplate` (`src/components/shared/faq-page.tsx`)
+      renders each question as a `<details>` card; it was `rounded-xl`,
+      which the design system's border-radius table reserves for nested
+      surfaces, not standalone cards. Changed to `rounded-2xl` to match
+      the Card pattern. Everything else on the page (hero, section
+      bands, CTA) already matched established patterns — no other
+      changes needed.
 - [ ] `/help`, `/help/[category]`, `/help/[category]/[slug]` — help
       center. Likely the biggest surface area; do the shared layout
       shell first, individual articles should inherit it for free.

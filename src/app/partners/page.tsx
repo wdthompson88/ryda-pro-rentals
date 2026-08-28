@@ -135,7 +135,7 @@ export default function PartnersPage() {
                 key={b.label}
                 className="rounded-2xl border border-rule bg-surface p-6"
               >
-                <p className="text-xs font-medium uppercase tracking-[0.18em] text-red">
+                <p className="font-display text-2xl text-red">
                   {String(i + 1).padStart(2, "0")}
                 </p>
                 <p className="mt-3 font-display text-xl text-ink">{b.label}</p>
