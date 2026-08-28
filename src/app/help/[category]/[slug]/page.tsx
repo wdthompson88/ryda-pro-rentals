@@ -98,7 +98,7 @@ export default async function ArticlePage({
                 <li key={a.slug}>
                   <Link
                     href={`/help/${cat.slug}/${a.slug}`}
-                    className="block rounded-xl border border-rule bg-surface px-5 py-4 text-sm text-ink-soft hover:text-ink"
+                    className="block rounded-2xl border border-rule bg-surface px-5 py-4 text-sm text-ink-soft hover:text-ink"
                   >
                     <span className="text-red">→</span> {a.q}
                   </Link>
@@ -131,7 +131,7 @@ function Block({ block }: { block: HelpBlock }) {
         <div
           className={`rounded-xl border px-5 py-4 text-sm ${
             block.tone === "warn"
-              ? "border-red/40 bg-red/5 text-ink"
+              ? "border-warn/40 bg-warn/15 text-warn-deep"
               : "border-rule bg-surface text-ink"
           }`}
         >

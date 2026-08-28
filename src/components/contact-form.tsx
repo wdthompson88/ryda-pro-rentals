@@ -132,7 +132,7 @@ export function ContactForm() {
           minLength={20}
           rows={5}
           aria-required="true"
-          className="mt-2 w-full border-0 border-b border-rule bg-transparent px-1 py-3 text-[15px] text-ink placeholder:text-mute focus:border-ink focus:outline-none focus:ring-2 focus:ring-red/20"
+          className="mt-2 w-full rounded-2xl border border-rule bg-surface px-5 py-3 text-[15px] text-ink placeholder:text-mute focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
           placeholder="Tell us a bit about what you're looking for..."
         />
       </div>
@@ -144,7 +144,7 @@ export function ContactForm() {
         <button
           type="submit"
           disabled={status === "submitting"}
-          className="h-12 border border-ink bg-ink px-7 text-sm font-medium text-cream transition-colors hover:bg-red hover:border-red disabled:opacity-50"
+          className="h-12 rounded-full bg-red px-7 text-sm font-medium text-cream transition-colors hover:bg-red-deep disabled:cursor-not-allowed disabled:opacity-50"
         >
           {status === "submitting" ? "Sending..." : "Send message"}
         </button>
@@ -201,7 +201,7 @@ function Input({
                 ? "tel"
                 : undefined
         }
-        className="mt-2 h-12 w-full border-0 border-b border-rule bg-transparent px-1 text-[15px] text-ink placeholder:text-mute focus:border-ink focus:outline-none focus:ring-2 focus:ring-red/20"
+        className="mt-2 h-12 w-full rounded-full border border-rule bg-surface px-5 text-[15px] text-ink placeholder:text-mute focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
       />
     </div>
   );
@@ -235,7 +235,7 @@ function Select({
         value={value}
         onChange={onChange ? (e) => onChange(e.target.value) : undefined}
         defaultValue={value === undefined ? options[0] : undefined}
-        className="mt-2 h-12 w-full border-0 border-b border-rule bg-transparent px-1 text-[15px] text-ink focus:border-ink focus:outline-none focus:ring-2 focus:ring-red/20"
+        className="mt-2 h-12 w-full rounded-full border border-rule bg-surface px-5 text-[15px] text-ink focus:border-red focus:outline-none focus:ring-2 focus:ring-red/20"
       >
         {options.map((o) => (
           <option key={o} value={o}>

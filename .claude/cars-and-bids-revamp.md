@@ -102,12 +102,48 @@ card/spacing consistency, and generally push toward "clean, confident
 marketplace" over "sleepy brochure" — without touching copy or adding
 data that isn't already there.
 
-- [ ] `/partners` — partner recruitment page.
-- [ ] `/faq` — check accordion/list styling against the design system.
-- [ ] `/help`, `/help/[category]`, `/help/[category]/[slug]` — help
-      center. Likely the biggest surface area; do the shared layout
-      shell first, individual articles should inherit it for free.
-- [ ] `/contact`
+- [x] `/partners` — partner recruitment page. Was already close: the
+      "Getting listed" steps already used the numbered pillar/step
+      pattern. Fixed the one inconsistency — "What you get" benefit
+      cards had a small uppercase-caption numeral instead of the
+      established `font-display text-2xl text-red` numeral used by the
+      steps directly below and by the landing page's StepCard. No copy
+      or data changed.
+- [x] `/faq` — check accordion/list styling against the design system.
+      Shared `FaqPageTemplate` (`src/components/shared/faq-page.tsx`)
+      renders each question as a `<details>` card; it was `rounded-xl`,
+      which the design system's border-radius table reserves for nested
+      surfaces, not standalone cards. Changed to `rounded-2xl` to match
+      the Card pattern. Everything else on the page (hero, section
+      bands, CTA) already matched established patterns — no other
+      changes needed.
+- [x] `/help`, `/help/[category]`, `/help/[category]/[slug]` — help
+      center. Was already close to the system (cards, sections, pills
+      all matched established shapes). Fixed three inconsistencies:
+      the `/help` info-strip tiles and the article-list link cards on
+      `/help/[category]/[slug]` were `rounded-xl` (reserved for nested
+      surfaces) instead of `rounded-2xl` (standalone cards); the
+      category grid and article-list cards used a bare `hover:shadow-md`
+      instead of the standard card hover (`hover:border-ink/40
+      hover:shadow-lg`); and the article body's `tone: "warn"` callout
+      was styled with `red` tokens instead of `warn`/`warn-deep`, which
+      contradicted the token table's semantic split between "brand
+      action" and "warning". No copy or data changed — `help-chat.tsx`
+      and `help-content.ts` were left untouched (the chat widget already
+      matches the system; the content file is data, not layout).
+- [x] `/contact` — the general contact form (`src/components/contact-form.tsx`)
+      was the last surviving "underline" input style (`border-0 border-b`,
+      `bg-transparent`) on the site; `/signin` had already been migrated
+      off this exact pattern onto boxed inputs for the same reason (visual
+      mismatch with its sibling page). Brought `Input`/`Select`/textarea in
+      line with the sibling marketing form `investor-inquiry-form.tsx`:
+      `rounded-full border border-rule bg-surface` for single-line fields,
+      `rounded-2xl` for the textarea. The submit button was square-cornered
+      `bg-ink`/hover-`bg-red`; changed to the standard Primary button
+      (`rounded-full bg-red` / `hover:bg-red-deep`), matching every other
+      marketing-form submit button on the site. `/contact/page.tsx` itself
+      (hero, 4-card grid, consultation band) already used `rounded-2xl`
+      cards correctly — no changes there. No copy or data changed.
 - [ ] `/trust-and-safety`
 - [ ] `/locations/miami`
 - [ ] `/host-your-car` — operator recruitment landing.

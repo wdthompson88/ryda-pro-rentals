@@ -87,7 +87,7 @@ export default function HelpCenterPage() {
               <Link
                 key={cat.slug}
                 href={`/help/${cat.slug}`}
-                className="group flex flex-col rounded-2xl border border-rule bg-surface p-6 transition-shadow hover:shadow-md"
+                className="group flex flex-col rounded-2xl border border-rule bg-surface p-6 transition-all hover:border-ink/40 hover:shadow-lg"
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-full border border-rule bg-cream-2 font-display text-base text-red">
                   {cat.icon}
@@ -195,7 +195,7 @@ function Strip({
   // tel: links must stay as raw <a>; internal paths get <Link> for prefetch.
   const isExternal = href.startsWith("tel:") || href.startsWith("mailto:") || href.startsWith("http");
   return (
-    <div className="flex flex-col rounded-xl border border-rule bg-surface p-6">
+    <div className="flex flex-col rounded-2xl border border-rule bg-surface p-6">
       <p className="font-display text-lg text-ink">{title}</p>
       <p className="mt-2 flex-1 text-sm leading-relaxed text-ink-soft">{detail}</p>
       {isExternal ? (

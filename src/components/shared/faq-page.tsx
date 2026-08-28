@@ -80,7 +80,7 @@ export function FaqPageTemplate({ data }: { data: FaqPageData }) {
               {section.questions.map((qa) => (
                 <details
                   key={qa.q}
-                  className="group rounded-xl border border-rule bg-surface p-5"
+                  className="group rounded-2xl border border-rule bg-surface p-5"
                 >
                   <summary className="cursor-pointer list-none font-display text-lg text-ink marker:hidden">
                     <span className="flex items-center justify-between gap-4">

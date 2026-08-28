@@ -67,7 +67,7 @@ export default async function CategoryPage({
               <li key={a.slug}>
                 <Link
                   href={`/help/${cat.slug}/${a.slug}`}
-                  className="block rounded-2xl border border-rule bg-surface p-6 transition-shadow hover:shadow-md"
+                  className="block rounded-2xl border border-rule bg-surface p-6 transition-all hover:border-ink/40 hover:shadow-lg"
                 >
                   <p className="font-display text-lg text-ink">{a.q}</p>
                   <p className="mt-2 text-sm leading-relaxed text-ink-soft">
