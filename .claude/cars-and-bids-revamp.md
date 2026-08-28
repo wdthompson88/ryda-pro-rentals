@@ -144,8 +144,28 @@ data that isn't already there.
       marketing-form submit button on the site. `/contact/page.tsx` itself
       (hero, 4-card grid, consultation band) already used `rounded-2xl`
       cards correctly — no changes there. No copy or data changed.
-- [ ] `/trust-and-safety`
-- [ ] `/locations/miami`
+- [x] `/trust-and-safety` — the six-card "what we check" grid was a plain
+      eyebrow/title/body list with no border and no numbering; converted
+      to the bordered numbered card used by `/partners`'s "What you get"
+      and the landing page's `StepCard` (kept the eyebrow as a caption
+      under the numeral — no copy dropped). The "If something goes wrong"
+      four-step grid was unbordered with an outlier `text-sm` numeral (the
+      only one on the site not `text-2xl` — grepped to confirm); now
+      matches `StepCard` exactly. `Coverage` (used 6× across the vetting
+      and payments sections) was `rounded-xl`, the nested-surface radius,
+      on cards that aren't nested in anything — changed to `rounded-2xl`,
+      same fix already applied on `/faq`/`/help`. No copy or data changed.
+- [x] `/locations/miami` — the "Renting in Miami" four-card grid
+      (`Feature`) was an explanatory 3–4 column grid rendered unnumbered,
+      next to several numbered ones elsewhere on the site; per SKILL.md's
+      rule against shipping an unnumbered variant, added the numeral
+      (`font-display text-2xl text-red`) and matched the title size to
+      `StepCard`. Rest of the page (hero, "What RYDA does here" prose,
+      close band) already matched established shapes — left alone. Did
+      not add eyebrow captions above "What RYDA does here" / "Renting in
+      Miami" even though every sibling page's sections have one, because
+      that would mean writing new label copy; noted below instead of
+      guessing at wording.
 - [ ] `/host-your-car` — operator recruitment landing.
 - [ ] `/about`
 - [ ] `/investors`
@@ -170,3 +190,9 @@ data that isn't already there.
 
 (Add entries here if you skip something because it's ambiguous or risky
 — don't guess. Dave will read this in the morning.)
+
+- `/locations/miami`: "What RYDA does here" and "Renting in Miami" are the
+  only section headings on the page (and among the few on the whole site)
+  with no eyebrow caption above the `h2`. Every sibling page has one.
+  Left it alone rather than invent label wording — a human call on what,
+  if anything, those captions should say.

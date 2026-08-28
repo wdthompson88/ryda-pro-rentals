@@ -95,41 +95,50 @@ export default function TrustAndSafetyPage() {
         </div>
       </section>
 
-      {/* Pillars grid */}
+      {/* Pillars grid — bordered numbered cards, matching the pattern
+          established on /partners's "What you get" grid and the landing
+          page's StepCard. Was an unbordered, un-numbered eyebrow list;
+          copy is untouched. */}
       <section className="border-b border-rule bg-cream-2">
         <div className="mx-auto max-w-7xl px-6 py-20 sm:px-10">
-          <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             <Pillar
+              n="01"
               eyebrow="Operators"
               title="Reviewed before anything goes live"
               body="Listing with RYDA starts with an application — company, contact, phone, website, fleet size — that a person reviews. The status on that application is set by RYDA, not by the operator; an operator cannot put themselves live."
             />
             <Pillar
+              n="02"
               eyebrow="Verification"
               title="Stripe verifies the business and the bank account"
               body="Approved operators complete Stripe Express onboarding, where Stripe checks their business details and the bank account payouts land in. Until that is finished RYDA's own system refuses to create a payment link for them — the attempt is rejected, not queued."
             />
             <Pillar
+              n="03"
               eyebrow="Requests"
               title="No card at request"
               body="A request carries your name, your contact details and your dates. It takes no card, it is not a booking, and it does not reserve the car. Nothing is charged until you and the operator have agreed on the dates and the price."
             />
             <Pillar
+              n="04"
               eyebrow="Payments"
               title="One rail, and it's Stripe"
               body="The only payment RYDA ever sends is a Stripe Checkout link, emailed after the operator confirms. The charge is created on the operator's own connected Stripe account, and RYDA's commission is collected as a platform fee on that same charge."
             />
             <Pillar
+              n="05"
               eyebrow="Records"
               title="The booking is written down"
               body="RYDA keeps the request, the dates, the price the operator confirmed, the charge and the commission on it. We cannot decide a dispute between you and an operator, but we can produce what we hold."
             />
             <Pillar
+              n="06"
               eyebrow="Enforcement"
               title="An operator can be switched off"
               body="An operator's account can be paused. While it is, no new payment link can be created for any of their cars, and their listings can be pulled from the browse grid. It is the one lever RYDA has, and it is a real one."
             />
-          </div>
+          </ul>
         </div>
       </section>
 
@@ -400,28 +409,31 @@ export default function TrustAndSafetyPage() {
 }
 
 function Pillar({
+  n,
   eyebrow,
   title,
   body,
 }: {
+  n: string;
   eyebrow: string;
   title: string;
   body: string;
 }) {
   return (
-    <div>
-      <p className="text-xs font-medium uppercase tracking-wider text-red">
+    <li className="rounded-2xl border border-rule bg-surface p-6">
+      <p className="font-display text-2xl text-red">{n}</p>
+      <p className="mt-3 text-xs font-medium uppercase tracking-wider text-mute">
         {eyebrow}
       </p>
-      <p className="mt-3 font-display text-xl text-ink">{title}</p>
+      <p className="mt-1 font-display text-xl text-ink">{title}</p>
       <p className="mt-3 text-sm leading-relaxed text-ink-soft">{body}</p>
-    </div>
+    </li>
   );
 }
 
 function Coverage({ line, detail }: { line: string; detail: string }) {
   return (
-    <div className="rounded-xl border border-rule bg-surface p-5">
+    <div className="rounded-2xl border border-rule bg-surface p-5">
       <p className="font-display text-lg text-ink">{line}</p>
       <p className="mt-2 text-sm leading-relaxed text-ink-soft">{detail}</p>
     </div>
@@ -438,10 +450,10 @@ function Step({
   body: string;
 }) {
   return (
-    <div>
-      <p className="font-display text-sm text-red">{n}</p>
-      <p className="mt-2 font-display text-lg text-ink">{title}</p>
-      <p className="mt-2 text-sm leading-relaxed text-ink-soft">{body}</p>
+    <div className="rounded-2xl border border-rule bg-surface p-6">
+      <p className="font-display text-2xl text-red">{n}</p>
+      <p className="mt-3 font-display text-xl text-ink">{title}</p>
+      <p className="mt-3 text-sm leading-relaxed text-ink-soft">{body}</p>
     </div>
   );
 }

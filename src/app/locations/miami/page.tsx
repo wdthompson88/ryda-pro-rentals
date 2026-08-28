@@ -177,18 +177,22 @@ export default function MiamiPage() {
               what they say without a preamble. */}
           <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             <Feature
+              n="01"
               title="A request, not a booking"
               body="Sending your dates reserves nothing and takes no card. Availability and the final price come from the operator who runs the car."
             />
             <Feature
+              n="02"
               title="Handover is the operator's"
               body="Where you collect the car, whether it can be delivered to you, the deposit and the mileage allowance are the operator's terms, agreed directly between you and them."
             />
             <Feature
+              n="03"
               title="Their contract and insurance"
               body="The rental closes on the operator's own rental agreement and their coverage. RYDA is not a party to it, which is also why the operator, not RYDA, is the one who confirms it."
             />
             <Feature
+              n="04"
               title="No RYDA garage"
               body="RYDA owns no vehicle and runs no storage, service or handover facility here or anywhere else. Every car sits in the garage of the operator who owns it."
             />
@@ -236,10 +240,19 @@ export default function MiamiPage() {
 
 // The Stat component went with the stat band it was written for.
 
-function Feature({ title, body }: { title: string; body: string }) {
+function Feature({
+  n,
+  title,
+  body,
+}: {
+  n: string;
+  title: string;
+  body: string;
+}) {
   return (
     <div className="rounded-2xl border border-rule bg-surface p-6">
-      <p className="font-display text-lg text-ink">{title}</p>
+      <p className="font-display text-2xl text-red">{n}</p>
+      <p className="mt-3 font-display text-xl text-ink">{title}</p>
       <p className="mt-3 text-sm leading-relaxed text-ink-soft">{body}</p>
     </div>
   );
