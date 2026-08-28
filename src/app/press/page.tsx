@@ -87,7 +87,7 @@ export default function PressPage() {
             because we can&apos;t substantiate it — ask us rather than
             estimating it.
           </p>
-          <dl className="mt-10 space-y-5 text-sm">
+          <dl className="mt-10 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-rule bg-rule">
             <Fact label="Legal entity" value="RYDA LLC" />
             <Fact label="Headquarters" value="Miami, FL" />
             <Fact
@@ -140,20 +140,24 @@ export default function PressPage() {
           <h2 className="mt-3 max-w-3xl font-display text-3xl text-ink sm:text-4xl">
             Four things RYDA isn&apos;t.
           </h2>
-          <div className="mt-12 grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
             <Pillar
+              n="01"
               title="Not a rental company"
               body="RYDA holds no fleet, no rental agreement and no insurance policy. The operator holds all three, and the rental is a contract between the customer and them."
             />
             <Pillar
+              n="02"
               title="Not a co-ownership programme"
               body="There are no shares, no vehicle LLCs, no membership tiers and nothing to buy into. Earlier descriptions of RYDA as fractional ownership describe a product this platform does not offer."
             />
             <Pillar
+              n="03"
               title="Not an insurer or a broker"
               body="RYDA does not underwrite, place or verify any policy. Cover comes from the operator's own insurance under the operator's own agreement."
             />
             <Pillar
+              n="04"
               title="Not a payment processor"
               body="Stripe is. RYDA sends one Checkout link, created on the operator's connected account, and its commission rides on that charge as a platform fee."
             />
@@ -231,7 +235,7 @@ export default function PressPage() {
 
 function Fact({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-col gap-1 border-b border-rule pb-3 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8">
+    <div className="flex flex-col gap-1 bg-surface p-5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8">
       <dt className="text-xs uppercase tracking-wider text-mute">{label}</dt>
       <dd className="text-sm leading-relaxed text-ink sm:max-w-md sm:text-right">
         {value}
@@ -240,11 +244,12 @@ function Fact({ label, value }: { label: string; value: string }) {
   );
 }
 
-function Pillar({ title, body }: { title: string; body: string }) {
+function Pillar({ n, title, body }: { n: string; title: string; body: string }) {
   return (
-    <div className="border-t border-rule pt-5">
-      <p className="font-display text-lg text-ink">{title}</p>
-      <p className="mt-3 text-sm leading-relaxed text-ink-soft">{body}</p>
+    <div className="rounded-2xl border border-rule bg-surface p-6">
+      <p className="font-display text-2xl text-red">{n}</p>
+      <p className="mt-3 font-display text-lg text-ink">{title}</p>
+      <p className="mt-2 text-sm leading-relaxed text-ink-soft">{body}</p>
     </div>
   );
 }
