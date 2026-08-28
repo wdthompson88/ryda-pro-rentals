@@ -11,6 +11,7 @@ import {
   getPartnerGallery,
   type PartnerVehicle,
 } from "@/lib/partner-fleet";
+import { getRentalTerms } from "@/lib/partner-rental-terms";
 
 // /rent/[symbol] resolves ONE kind of thing: a partner listing slug
 // (/rent/lamborghini-huracan-evo). The route param is still named
@@ -68,6 +69,7 @@ export default async function RentDetailPage({
 
   const tint = brandTint(r.make);
   const partnerGallery = getPartnerGallery(r);
+  const terms = getRentalTerms(r.slug);
 
   return (
     <>
@@ -125,7 +127,7 @@ export default async function RentDetailPage({
                   {title}
                 </h1>
                 <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-soft">
-                  {`The ${title} is run by a Miami operator on RYDA's rental grid. Send your dates and the operator confirms availability and price directly with you — then closes the rental on their own contract and insurance, at their price. Inquiring through RYDA never costs more than going direct.`}
+                  {`Send your dates and the operator confirms availability and price directly with you, then closes the rental on their own contract and insurance.`}
                 </p>
               </div>
 
@@ -147,6 +149,58 @@ export default async function RentDetailPage({
                   value={r.milesIncluded ?? "Confirmed by operator"}
                 />
               </div>
+
+              {/* Rental terms — the operator's own published deposit,
+                  age requirement and insurance options
+                  (src/lib/partner-rental-terms.ts, scraped from the
+                  listing's gmluxe.net page, not RYDA's to set or
+                  guarantee). This is real, per-car data; it renders
+                  only the fields that specific listing's page actually
+                  states, nothing filled in. Nine listings have no
+                  scraped page at all (dead product-page URL — flagged
+                  separately) and render neither this block nor the
+                  rates table below. */}
+              {terms && (terms.minAgeYears || terms.securityDepositUsd || terms.insuranceOptionsText) && (
+                <div className="mt-6">
+                  <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-mute">
+                    Rental terms
+                  </p>
+                  <div className="mt-2 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-rule bg-rule sm:grid-cols-3">
+                    {terms.minAgeYears && (
+                      <Spec label="Minimum age" value={`${terms.minAgeYears}+`} />
+                    )}
+                    {terms.securityDepositUsd && (
+                      <Spec
+                        label="Security deposit"
+                        value={formatUSD(terms.securityDepositUsd, { decimals: 0 })}
+                      />
+                    )}
+                    {terms.insuranceOptionsText && (
+                      <Spec label="Insurance" value={terms.insuranceOptionsText} long />
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Rates by length — the operator's own multi-day discount
+                  tiers, not RYDA-derived. The booking card's headline
+                  rate is one point on this same curve. */}
+              {terms?.pricingTiers && terms.pricingTiers.length > 0 && (
+                <div className="mt-6">
+                  <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-mute">
+                    Rates by length
+                  </p>
+                  <div className="mt-2 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-rule bg-rule sm:grid-cols-4">
+                    {terms.pricingTiers.map((tier) => (
+                      <Spec
+                        key={tier.minDays}
+                        label={tier.minDays === 1 ? "1+ day" : `${tier.minDays}+ days`}
+                        value={`${formatUSD(tier.ratePerDay, { decimals: 0 })}/day`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Booking card. The headline rate lives INSIDE the client
@@ -327,13 +381,28 @@ export default async function RentDetailPage({
   );
 }
 
-function Spec({ label, value }: { label: string; value: string }) {
+function Spec({
+  label,
+  value,
+  long,
+}: {
+  label: string;
+  value: string;
+  // Sentence-length values (e.g. an insurance clause) read wrong in
+  // font-display — that's reserved for short facts, prices and step
+  // numbers (SKILL.md). `long` swaps to body type instead.
+  long?: boolean;
+}) {
   return (
     <div className="bg-surface p-5">
       <dt className="text-[10px] font-medium uppercase tracking-[0.18em] text-mute">
         {label}
       </dt>
-      <dd className="mt-2 font-display text-lg text-ink">{value}</dd>
+      {long ? (
+        <dd className="mt-2 text-sm leading-relaxed text-ink-soft">{value}</dd>
+      ) : (
+        <dd className="mt-2 font-display text-lg text-ink">{value}</dd>
+      )}
     </div>
   );
 }
