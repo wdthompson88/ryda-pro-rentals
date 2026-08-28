@@ -240,143 +240,15 @@ export default async function RentDetailPage({
         </div>
       </section>
 
-      {/* Trust strip: who hosts the car, then the badges. */}
-      <section className="border-b border-rule">
-        <div className="mx-auto max-w-7xl px-6 py-10 sm:px-10">
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
-            {/* Hosted by — the operator, never RYDA. RYDA owns, stores,
-                insures and operates no vehicle on this platform (Terms
-                §2), so the RYDA monogram that used to sit here was false
-                on every listing. The attribution stays, because "whose
-                car is this?" is the question this slot answers, but the
-                honest answer is an operator we don't name. No
-                response-time claim either — nothing in this codebase
-                measures one — and no vetting claim: Stripe Connect
-                onboarding of a business and a bank account is the only
-                check RYDA runs on an operator. The promise that the
-                operator "introduces themselves when they confirm" is
-                deleted too; nothing in the code produces it. */}
-            <div className="lg:col-span-4">
-              <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-mute">
-                Hosted by
-              </p>
-              <p className="mt-3 font-display text-xl text-ink">
-                A Miami operator
-              </p>
-              <p className="mt-2 text-sm leading-relaxed text-ink-soft">
-                The car is owned and run by an independent Miami operator.
-                RYDA lists it and passes your request on. Listings stay
-                unbranded.
-              </p>
-            </div>
-
-            {/* Trust badges. These may only promise what the lead-gen
-                model delivers — insurance, mileage, and availability are
-                the operator's to confirm, never RYDA's to guarantee.
-                Three badges are deleted: "Min driver age 28+" and
-                "Experience 5+ years" (see the booking column — no such
-                figure exists anywhere in this repo, and eligibility is
-                the operator's), and "Operator · Vetted by RYDA", which
-                presented a payments onboarding step as a safety check.
-                Nothing replaces them. */}
-            <div className="lg:col-span-8">
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                <TrustBadge label="Insurance" value="Operator's policy" />
-                <TrustBadge label="Your price" value="The operator's price" />
-                <TrustBadge label="Availability" value="Operator confirms" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Payment options.
-          A "Deliverable to" column stood beside this one on all 37
-          listing pages and is deleted whole: the heading "Delivery
-          across the region", the line "Most operators deliver and
-          collect across the region", and a six-city drop-off list
-          (Miami Beach, Fort Lauderdale, Palm Beach, Naples, The Keys)
-          plus dead Los Angeles and New York variants of the same list.
-          Nothing in this repo carries a delivery radius, window,
-          minimum or rate for any car — PartnerVehicle has no delivery
-          field — so every word of it was invented, and "most operators"
-          described a population of one (partner is the literal type
-          "GM LUXE"). The LA/NY branches could never render either:
-          market is the literal type "Miami". Delivery is a question for
-          the operator's reply; RYDA has nothing to state here. */}
-      <section className="border-b border-rule bg-cream-2">
-        <div className="mx-auto max-w-7xl px-6 py-10 sm:px-10">
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
-            {/* Payment settles on the OPERATOR's own Stripe account
-                (fee-only direct charges, 0041) — rental money never
-                enters a RYDA balance, and this page must not imply it
-                does. It must not claim the opposite either: the Checkout
-                link is created and emailed BY RYDA, so "no payment
-                through RYDA" sets up a bait-and-switch when that email
-                arrives. */}
-            <div className="lg:col-span-7">
-              <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-red">
-                Payment
-              </p>
-              <p className="mt-2 font-display text-2xl text-ink">
-                Straight to the operator.
-              </p>
-              <p className="mt-2 text-sm text-ink-soft">
-                No card at request. Once the operator confirms your dates we
-                send a secure Stripe link — the charge settles on the
-                operator&apos;s own Stripe account. Your price is the
-                operator&apos;s price.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How the rental works. Every pillar here has to be something the
-          lead-gen model actually delivers — RYDA holds no car, so it
-          promises no insurance, no mileage, no handover, and quotes no
-          duration discount it could not honor. */}
-      <section className="border-b border-rule">
-        <div className="mx-auto max-w-7xl px-6 py-14 sm:px-10">
-          <h2 className="font-display text-3xl text-ink">
-            How the rental works
-          </h2>
-          <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {/* "Your request goes straight to the Miami operator" stood
-                here on all 37 listing pages and was false:
-                PARTNER_INQUIRY_EMAILS in src/lib/partner-contacts.ts is
-                empty — its one entry is commented out pending a signed
-                referral agreement — so partnerInquiryEmail() returns the
-                RYDA team inbox for every car and a person forwards the
-                lead. RYDA in the middle is the truth; say it, so the
-                customer is not left concluding the operator ignored
-                them. */}
-            <Pillar
-              n="01"
-              title="An operator"
-              body="Your request comes to RYDA, and we pass it to the Miami operator who runs this car. They confirm availability directly with you."
-            />
-            <Pillar
-              n="02"
-              title="Their contract & insurance"
-              body="The rental closes on the operator's own agreement and coverage — the same terms you'd get going direct. Delivery, deposit, and mileage are theirs to confirm."
-            />
-            <Pillar
-              n="03"
-              title="The operator's price"
-              body="Inquiring through RYDA never costs more than going direct. Operators pay RYDA a referral commission on bookings we send them — that's the whole model."
-            />
-            <Pillar
-              n="04"
-              title="No card at request"
-              body="No card at request. Nothing is charged until you and the operator confirm the booking together."
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* No ownership-program pitch here, and nowhere else either —
-          that product is not part of this repo. */}
+      {/* Trust strip, Payment options, and "How the rental works" used to
+          stand here as three full-width banner sections. Founder call
+          (Aug 2026): the detail page should read as just the car and
+          the request form. Every fact those sections stated is still
+          on the page — the real per-car data now lives in the Rental
+          terms table above, and the process/payment explanation moved
+          into the collapsed "How this rental works" dropdown inside
+          RentalBookingCard, one click away in the requesting flow
+          itself instead of marketing banners underneath it. */}
     </>
   );
 }
@@ -403,35 +275,6 @@ function Spec({
       ) : (
         <dd className="mt-2 font-display text-lg text-ink">{value}</dd>
       )}
-    </div>
-  );
-}
-
-function Pillar({
-  n,
-  title,
-  body,
-}: {
-  n: string;
-  title: string;
-  body: string;
-}) {
-  return (
-    <div>
-      <p className="font-display text-2xl text-red">{n}</p>
-      <p className="mt-3 font-display text-lg text-ink">{title}</p>
-      <p className="mt-2 text-sm leading-relaxed text-ink-soft">{body}</p>
-    </div>
-  );
-}
-
-function TrustBadge({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-xl border border-rule bg-cream-2/40 px-4 py-3">
-      <p className="text-[10px] uppercase tracking-[0.16em] text-mute">
-        {label}
-      </p>
-      <p className="mt-1 font-display text-base text-ink">{value}</p>
     </div>
   );
 }

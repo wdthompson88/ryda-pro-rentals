@@ -102,6 +102,45 @@ export function RentalBookingCard({
           onListingRateCents={setLiveRateCents}
         />
       </div>
+
+      {/* Collapsed by default — this used to be three full-width banner
+          sections on the page (Hosted by + trust badges, a standalone
+          Payment section, a 4-pillar "How the rental works" grid).
+          Founder call (Aug 2026): the detail page should read as just
+          the car and the request form; the process/payment explanation
+          stays available, one click away, in the requesting flow
+          itself rather than as marketing banners. Every fact here is
+          unchanged from those sections — nothing was cut, only moved
+          and collapsed. */}
+      <details className="group mt-5 border-t border-rule pt-4">
+        <summary className="flex cursor-pointer list-none items-center justify-between text-sm font-medium text-ink marker:hidden">
+          How this rental works
+          <span className="text-lg text-red transition-transform group-open:rotate-45">
+            +
+          </span>
+        </summary>
+        <div className="mt-3 space-y-3 text-xs leading-relaxed text-ink-soft">
+          <p>
+            <span className="font-medium text-ink">An operator.</span> Your
+            request comes to RYDA, and we pass it to the Miami operator who
+            runs this car. They confirm availability directly with you.
+          </p>
+          <p>
+            <span className="font-medium text-ink">
+              Their contract &amp; insurance.
+            </span>{" "}
+            The rental closes on the operator&apos;s own agreement and
+            coverage — the same terms you&apos;d get going direct.
+          </p>
+          <p>
+            <span className="font-medium text-ink">No card at request.</span>{" "}
+            Nothing is charged until you and the operator confirm together.
+            Once confirmed, RYDA emails a secure Stripe link — the charge
+            settles on the operator&apos;s own Stripe account, and RYDA&apos;s
+            commission is collected as a platform fee on that charge.
+          </p>
+        </div>
+      </details>
     </div>
   );
 }
