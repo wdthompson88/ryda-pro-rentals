@@ -23,22 +23,22 @@
 //   component put in the URL.
 //
 //   INQUIRY PATH — POST /api/rental-inquiry, unchanged. Taken for
-//   RYDA-fleet symbols and any car with no listing row, for every
-//   signed-out visitor, and as the FALLBACK when the booking POST
-//   refuses on a ground that retrying cannot fix (see
-//   classifyBookingRefusal). The lead is never lost.
+//   RYDA-fleet symbols and any car with no listing row, and as the
+//   FALLBACK when the booking POST refuses on a ground that retrying
+//   cannot fix (see classifyBookingRefusal). The lead is never lost —
+//   but it is a signed-in member's lead now (see below).
 //
-// WHY SIGNED-OUT VISITORS DO NOT GET THE BOOKING PATH, even though they
-// are offered an account right here. 0047 makes renter_user_id NOT NULL
-// and the route is account-first for the same reason: a booking is a
-// financial record with a renter on it. The account this form creates
-// arrives through supabase.auth.signUp's EMAIL-CONFIRMATION flow, which
-// deliberately returns no session — so at the moment of submit there is
-// no bearer token, and POST /api/rental-bookings would answer 401. We do
-// not silently degrade the promise: a signed-out submit lands the
-// inquiry, and the success copy is the inquiry's ("an operator will
-// reply"), never a booking's. A visitor who already has an account is
-// nudged to sign in first, where the booking path is waiting.
+// WHY A SIGNED-OUT VISITOR IS ASKED TO SIGN IN FIRST (founder decision
+// 2026-08-26, replacing the inline account creation that used to live
+// here). A request goes to the operator with the renter's name, phone
+// and date of birth, so it is sent by a known account or not at all —
+// the Zocdoc shape: pick dates, sign in, confirm your details, send.
+// The button opens RentalSignInDialog for a visitor with no session,
+// and the dates ride along in `next` (?start=&end=) so they are still
+// selected when the visitor comes back — and the confirm step reopens
+// by itself once the calendar, the quote and the profile are in. The
+// anonymous inquiry insert that 0039's RLS allows is no longer
+// reachable from this surface.
 //
 // WHAT THE BOOKING POST DOES NOT CARRY. Its body is exactly
 // { listingId, startDate, endDate, clientToken } — 0047 has no column
@@ -55,16 +55,18 @@
 // it against UUID_RE — the code is the contract, and the id is what the
 // availability route hands us.
 //
-// Account-first, but the lead is never lost:
-//   - Signed-in members: email/password hidden, name/phone prefilled
-//     from their rental profile (or auth metadata), inquiry carries
-//     their user_id server-side via the bearer token.
-//   - Anon visitors: email + password shown ("30 seconds, no card").
-//     On submit we fire supabase.auth.signUp (email-confirmation flow,
-//     no immediate session — mirrors /signup) AND submit the inquiry
-//     anonymously regardless of the signUp outcome. If the email is
-//     already registered we still submit and show a gentle "sign in
-//     next time" note alongside success.
+// THE CONFIRM STEP (RentalConfirmDialog). The car, the dates and the
+// price the renter is about to ask for, then their details — full name,
+// email (read-only, from the account), phone, date of birth — prefilled
+// from whatever is on file (user_profiles, rental_profiles, then auth
+// metadata, in that order: renter-contact.ts) and editable in place.
+// "Send request" validates them (renter-details.ts — the same validator
+// POST /api/rental-bookings runs), SAVES them to the profile so the
+// requirement is a row on file rather than a box that was once
+// non-empty, and only then submits. An under-25 renter is told there,
+// before the request exists, instead of at the operator's confirm step.
+// The inquiry carries the member's user_id server-side via the bearer
+// token, as before.
 //
 // clientToken is generated once per mount so a double-tap / retry
 // dedupes server-side (unique partial index on rental_inquiries)
@@ -94,10 +96,15 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { supabase } from "@/lib/supabase";
 import { authedFetch } from "@/lib/api-fetch";
 import { useAuthStatus } from "@/lib/use-auth-status";
-import { useRentalProfile } from "@/lib/use-rental-profile";
+import { saveRenterDetails, useRentalProfile } from "@/lib/use-rental-profile";
+import { metadataName, metadataPhone } from "@/lib/renter-contact";
+import { EMPTY_RENTER_DETAILS, type RenterDetails } from "@/lib/renter-details";
+import {
+  RentalConfirmDialog,
+  RentalSignInDialog,
+} from "@/components/rental-request-dialog";
 import { anonymousOperatorLabel } from "@/lib/rental-booking-access";
 import {
   FOCUS_RING,
@@ -166,11 +173,6 @@ function shouldShowDegradedNote(
 // `> 0`, so "$1,451 × 3 nights" beside a "$4,352" total that does not
 // multiply out was a real rendering), and formatBookingDay parses a
 // 'YYYY-MM-DD' calendar day in UTC rather than at local noon.
-
-// What happened to the parallel account-creation attempt (anon path
-// only). Rendered as a sub-note in the success state — never blocks
-// or fails the inquiry itself.
-type AccountNote = null | "created" | "existing" | "failed";
 
 /**
  * One idempotency token per form mount, matching the (renter, listing,
@@ -323,6 +325,11 @@ function localISO(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
+const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/;
+
+/** Which door is open between the button and the send — see the header. */
+type RequestDialog = "none" | "signin" | "confirm";
+
 export function RentalInquiryForm({
   vehicleSlug,
   vehicleName,
@@ -346,22 +353,19 @@ export function RentalInquiryForm({
   const { status: authStatus, user } = useAuthStatus();
   // Prefill source for signed-in members. Enabled only once authed so
   // anon visitors never fire a doomed 401 fetch.
-  const { profile } = useRentalProfile(authStatus === "authed");
+  const { profile, loading: profileLoading } = useRentalProfile(
+    authStatus === "authed",
+  );
 
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   // Set only by the 401 branch, so the error block can offer the one
   // action that fixes it instead of telling the renter to try again.
   const [needsSignIn, setNeedsSignIn] = useState(false);
-  const [accountNote, setAccountNote] = useState<AccountNote>(null);
+  const [dialog, setDialog] = useState<RequestDialog>("none");
 
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [phone, setPhone] = useState("");
-  const [message, setMessage] = useState("");
   // Marketing consent is no longer asked for on this form (the
   // pre-ticked "Miami drops and member offers" box is deleted — see the
   // note where it used to render). The value is still submitted because
@@ -394,9 +398,31 @@ export function RentalInquiryForm({
   // outlives its token (a bfcache restore, then new dates).
   const [clientToken, setClientToken] = useState(newClientToken);
 
+  // True when this mount came back from sign-in with dates in the URL —
+  // the cue to reopen the confirm step without another click.
+  const returnedWithDates = useRef(false);
+
   useEffect(() => {
     const today = new Date();
-    setTodayStr(localISO(today));
+    const todayIso = localISO(today);
+    setTodayStr(todayIso);
+    // Dates carried back through sign-in (RentalSignInDialog puts them in
+    // `next`). Read post-mount like everything else here, so the
+    // prerendered page never hydrates against a query it did not see.
+    const params = new URLSearchParams(window.location.search);
+    const urlStart = params.get("start") ?? "";
+    const urlEnd = params.get("end") ?? "";
+    if (
+      ISO_DAY.test(urlStart) &&
+      ISO_DAY.test(urlEnd) &&
+      urlStart <= urlEnd &&
+      urlStart >= todayIso
+    ) {
+      setStartDate((cur) => cur || urlStart);
+      setEndDate((cur) => cur || urlEnd);
+      returnedWithDates.current = true;
+      return;
+    }
     // Default window: 2 weeks out, 3 days — matches the old booking
     // card's "never shows past dates" behavior.
     const s = new Date(today);
@@ -407,18 +433,38 @@ export function RentalInquiryForm({
     setEndDate((cur) => cur || localISO(e));
   }, []);
 
-  // Prefill contact fields for signed-in members without stomping
-  // anything they've already typed. Profile row wins; auth metadata
-  // (set at signup) is the fallback.
-  useEffect(() => {
-    if (authStatus !== "authed") return;
-    const metaName =
-      typeof user?.user_metadata?.name === "string"
-        ? user.user_metadata.name
-        : "";
-    setName((cur) => cur || profile?.name || metaName);
-    setPhone((cur) => cur || profile?.phone || "");
+  // What is on file, as the confirm dialog's starting values. The hook
+  // has already resolved name/phone across user_profiles →
+  // rental_profiles → auth metadata (renter-contact.ts); metadata is read
+  // again here only so a still-loading or failed profile read does not
+  // seed blanks over a member who finished onboarding. Date of birth
+  // lives in user_profiles alone.
+  const initialDetails = useMemo<RenterDetails>(() => {
+    if (authStatus !== "authed") return EMPTY_RENTER_DETAILS;
+    const meta = user?.user_metadata;
+    return {
+      fullName: profile?.name || metadataName(meta),
+      phone: profile?.phone || metadataPhone(meta),
+      dateOfBirth: profile?.dateOfBirth ?? "",
+    };
   }, [authStatus, user, profile]);
+
+  // Back from sign-in with the dates in the URL: reopen the confirm step
+  // once everything it shows is known — the calendar, the quote on a
+  // live car, and what is on file. Once per mount; a renter who presses
+  // Back is not reopened on.
+  useEffect(() => {
+    if (!returnedWithDates.current) return;
+    if (authStatus !== "authed" || profileLoading) return;
+    if (availability.kind === "loading") return;
+    if (availability.kind === "on" && !quote) return;
+    if (!startDate || !endDate || validate()) return;
+    returnedWithDates.current = false;
+    setDialog("confirm");
+    // validate() reads the same state this effect lists; it is a plain
+    // function declaration below and changes with nothing else.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authStatus, profileLoading, availability.kind, quote, startDate, endDate]);
 
   // Carry a signed-in member's STORED marketing consent through the
   // submit unchanged. Same precedence as /account/profile:
@@ -434,8 +480,6 @@ export function RentalInquiryForm({
     setMarketingOptIn(stored);
   }, [authStatus, user, profile]);
 
-  const showAccountFields = authStatus !== "authed";
-
   // ── Which endpoint this form submits to ───────────────────────────
   //
   // The listing's UUID, which only exists once the availability route
@@ -446,19 +490,12 @@ export function RentalInquiryForm({
     availability.kind === "on" ? availability.data.listing.listingId : null;
 
   // Signed in AND bookable. Deliberately decided from render state
-  // rather than re-derived inside onSubmit, so that what the renter is
-  // LOOKING AT and where the click GOES cannot disagree: the fields
-  // below, the button label and the footnote are all gated on this same
-  // flag. See the header for why a signed-out visitor is never routed
-  // here even after the inline signUp.
+  // rather than re-derived inside sendRequest, so that what the renter
+  // is LOOKING AT and where the send GOES cannot disagree: the quote in
+  // the dialog and the footnote are gated on this same flag. A
+  // signed-out visitor never reaches sendRequest at all — the button
+  // opens the sign-in dialog instead.
   const bookingPath = listingId !== null && authStatus === "authed";
-
-  // Fields with nowhere to land on the booking path (0047 stores no note
-  // and no marketing preference, and the POST body has no slot for
-  // either). Rendered on the inquiry path exactly as before. `name` is
-  // NOT in here on purpose — it is what the inquiry FALLBACK needs to
-  // build a lead, and a name field promises the renter nothing.
-  const showLeadExtras = !bookingPath;
 
   // ── The live calendar ─────────────────────────────────────────────
   //
@@ -627,9 +664,6 @@ export function RentalInquiryForm({
         });
       }
     }
-    if (name.trim().length < 2) return "Your name, so the operator knows who's asking.";
-    if (showAccountFields && !email.includes("@"))
-      return "A valid email — it's where the operator's reply lands.";
     return null;
   }
 
@@ -695,7 +729,10 @@ export function RentalInquiryForm({
       if (refusal.action === "fallback") return "fallback";
       if (refusal.action === "refresh") setCalendarNonce((n) => n + 1);
       if (refusal.action === "rotate") setClientToken(newClientToken());
-      if (refusal.action === "signin") setNeedsSignIn(true);
+      if (refusal.action === "signin") {
+        setNeedsSignIn(true);
+        setDialog("signin");
+      }
       setErrorMessage(refusal.message);
       setStatus("error");
       return "handled";
@@ -713,7 +750,11 @@ export function RentalInquiryForm({
     }
   }
 
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  /**
+   * The button. Checks the dates, then opens the right door — nothing
+   * is sent from here (see the header).
+   */
+  function onRequestClick(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (status === "submitting") return;
 
@@ -724,92 +765,62 @@ export function RentalInquiryForm({
       setStatus("error");
       return;
     }
+    setErrorMessage(null);
+    setNeedsSignIn(false);
+    if (status === "error") setStatus("idle");
+    setDialog(authStatus === "authed" ? "confirm" : "signin");
+  }
 
+  /**
+   * "Send request" inside the confirm dialog. Details first — saved to
+   * the member's profile, so the requirement is a row on file and the
+   * booking route's own check reads the same values — then the booking
+   * POST or the inquiry.
+   */
+  async function sendRequest(details: RenterDetails) {
+    if (status === "submitting") return;
     setStatus("submitting");
     setErrorMessage(null);
     setNeedsSignIn(false);
 
+    const saved = await saveRenterDetails(details);
+    if (!saved.ok) {
+      setErrorMessage(saved.error);
+      setStatus("error");
+      return;
+    }
+
     // ── The booking path ──────────────────────────────────────────
-    // Signed in, on a car with a live listing row. There is no account
-    // to create and no lead to write — unless the request is refused on
-    // a ground retrying cannot fix, in which case we drop through to the
-    // inquiry rather than lose the renter.
+    // Signed in, on a car with a live listing row. There is no lead to
+    // write — unless the request is refused on a ground retrying cannot
+    // fix, in which case we drop through to the inquiry rather than
+    // lose the renter.
     if (bookingPath && listingId) {
       const outcome = await submitBooking(listingId);
       if (outcome === "handled") return;
     }
 
-    // ── Parallel account creation (anon path) ─────────────────────
-    // Best-effort, never gates the inquiry. signUp uses the email-
-    // confirmation flow (no immediate session), so the inquiry below
-    // still goes out anonymously either way.
-    let note: AccountNote = null;
-    if (showAccountFields && supabase && password.length >= 8) {
-      try {
-        const origin =
-          typeof window !== "undefined" ? window.location.origin : "";
-        const redirectTo = `${origin}/auth/callback?next=${encodeURIComponent("/account/requests")}`;
-        const { data: suData, error: suErr } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: redirectTo,
-            // Same audit-trail metadata conventions as /signup. No
-            // aged_confirmed here — this form doesn't ask, KYC does.
-            data: {
-              name: name.trim(),
-              marketing_opt_in: marketingOptIn,
-            },
-          },
-        });
-        if (suErr) {
-          note = /already|registered|exists/i.test(suErr.message)
-            ? "existing"
-            : "failed";
-        } else if (
-          // With email confirmation + enumeration protection on,
-          // signUp "succeeds" for an existing email but returns a
-          // user with no identities. Treat that as existing too.
-          suData.user &&
-          Array.isArray(suData.user.identities) &&
-          suData.user.identities.length === 0
-        ) {
-          note = "existing";
-        } else {
-          note = "created";
-        }
-      } catch {
-        note = "failed";
-      }
-    }
-
     // ── The inquiry itself — the lead must never be lost ──────────
     //
-    // Reached three ways: a signed-out visitor, a car with no live
-    // listing, and a booking POST that came back "fallback". In the
-    // third case the account fields were never rendered, so the email
-    // comes off the session — which is exactly what the branch below
-    // already did for signed-in members. `message` and `marketingOptIn`
-    // are likewise whatever the form holds: on the booking path the
-    // note is empty (never collected) and the consent value is the
+    // Reached two ways: a car with no live listing, and a booking POST
+    // that came back "fallback". The email comes off the session — the
+    // dialog shows it read-only for that reason — and the name and phone
+    // are the details just confirmed and saved. `marketingOptIn` is the
     // member's own STORED preference, resolved by the effect above, not
-    // a fresh opt-in this form invented.
+    // a fresh opt-in this form invented. There is no free-text note any
+    // more: 0047 has nowhere to put one, and one flow for every car was
+    // the decision.
     try {
-      const inquiryEmail = showAccountFields ? email : (user?.email ?? email);
-      // authedFetch attaches the bearer when a session exists (so the
-      // API links user_id + upserts rental_profiles) and degrades to a
-      // plain anon fetch otherwise.
       const res = await authedFetch("/api/rental-inquiry", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: name.trim(),
-          email: inquiryEmail,
-          phone: phone.trim() || undefined,
+          name: details.fullName,
+          email: user?.email ?? "",
+          phone: details.phone || undefined,
           vehicleSlug,
           startDate,
           endDate,
-          message: message.trim() || undefined,
           marketingOptIn,
           clientToken,
         }),
@@ -824,7 +835,7 @@ export function RentalInquiryForm({
         );
         throw new Error(j.error || "Submission failed.");
       }
-      setAccountNote(note);
+      setDialog("none");
       setStatus("success");
       setErrorMessage(null);
     } catch {
@@ -860,30 +871,6 @@ export function RentalInquiryForm({
         <p className="mt-3 text-xs text-mute">
           We&apos;ve emailed you a confirmation with the details.
         </p>
-        {accountNote === "created" && (
-          <p className="mt-3 rounded-xl border border-rule bg-cream-2/40 p-3 text-xs text-ink-soft">
-            We also created your RYDA account — confirm the email we just sent
-            and your requests will be waiting in your dashboard.
-          </p>
-        )}
-        {accountNote === "existing" && (
-          <p className="mt-3 rounded-xl border border-rule bg-cream-2/40 p-3 text-xs text-ink-soft">
-            Looks like you already have a RYDA account —{" "}
-            <Link
-              href="/signin?next=%2Faccount%2Frequests"
-              className={`rounded-sm text-red hover:text-red-deep ${FOCUS_RING}`}
-            >
-              sign in
-            </Link>{" "}
-            next time and requests land in your dashboard automatically.
-          </p>
-        )}
-        {accountNote === "failed" && (
-          <p className="mt-3 text-xs text-mute">
-            We couldn&apos;t create your account automatically, but your request
-            went through — nothing else to do.
-          </p>
-        )}
         {authStatus === "authed" && (
           <Link
             href="/account/requests"
@@ -897,7 +884,8 @@ export function RentalInquiryForm({
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <>
+    <form onSubmit={onRequestClick} className="space-y-4">
       {/* Dates — live calendar when the car has one, plain inputs when
           it doesn't (pre-migration, RYDA fleet, or a failed load), and an
           explicit placeholder while we still don't know which.
@@ -1056,137 +1044,7 @@ export function RentalInquiryForm({
         </div>
       )}
 
-      {/* The one nudge a signed-out visitor gets on a bookable car.
-          NOT a wall: the form below still works and still lands the lead
-          (that is the doctrine this funnel is built on). It exists
-          because the booking path needs a session at the moment of
-          submit — signUp here uses the email-confirmation flow and
-          returns none — so a visitor who ALREADY has an account is one
-          click from the better outcome, and nobody else is blocked.
-          `next` returns them to this exact car. */}
-      {availability.kind === "on" && authStatus === "anon" && (
-        <p className="rounded-xl border border-rule bg-cream-2/40 px-4 py-3 text-[11px] leading-relaxed text-ink-soft">
-          Already have a RYDA account?{" "}
-          <Link
-            href={`/signin?next=${encodeURIComponent(`/rent/${vehicleSlug}`)}`}
-            className={`rounded-sm font-medium text-red hover:text-red-deep ${FOCUS_RING}`}
-          >
-            Sign in
-          </Link>{" "}
-          to send these dates as a booking request the operator answers
-          directly. Otherwise fill this in and we&apos;ll route it to them —
-          either way, no card.
-        </p>
-      )}
-
-      <label className="block">
-        <span className="block text-xs font-medium uppercase tracking-wider text-mute">
-          Full name
-        </span>
-        <input
-          type="text"
-          required
-          autoComplete="name"
-          placeholder="Jane Doe"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className={inputCls}
-        />
-      </label>
-
-      {showAccountFields && (
-        <>
-          <label className="block">
-            <span className="block text-xs font-medium uppercase tracking-wider text-mute">
-              Email
-            </span>
-            <input
-              type="email"
-              required
-              autoComplete="email"
-              placeholder="you@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className={inputCls}
-            />
-          </label>
-          <label className="block">
-            <span className="block text-xs font-medium uppercase tracking-wider text-mute">
-              Password
-            </span>
-            <input
-              type="password"
-              required
-              minLength={8}
-              autoComplete="new-password"
-              placeholder="At least 8 characters"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className={inputCls}
-            />
-            <span className="mt-1.5 block text-[11px] text-mute">
-              This creates your RYDA account — 30 seconds, no card.
-            </span>
-          </label>
-        </>
-      )}
-
-      {/* THE THREE FIELDS THE BOOKING PATH DOES NOT RENDER, and the
-          reason is the same for all of them: POST /api/rental-bookings
-          has nowhere to put them. 0047 stores no free-text note and no
-          marketing preference, and parseCreateBody reads exactly four
-          keys. Collecting a note into a request that discards it is the
-          same broken promise as quoting a booking the button cannot
-          create — the defect this file was opened to fix — so on that
-          path they are absent rather than ignored.
-
-          Booking-scoped renter↔operator messaging is build-loop 2E and
-          opens at confirmation (D6); the marketing preference is
-          editable on /account/profile. Phone is optional on a lead and
-          the operator reaches a booked renter through the account. */}
-      {showLeadExtras && (
-        <>
-          <label className="block">
-            <span className="block text-xs font-medium uppercase tracking-wider text-mute">
-              Phone <span className="normal-case tracking-normal">(optional)</span>
-            </span>
-            <input
-              type="tel"
-              autoComplete="tel"
-              placeholder="+1 305 555 0145"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className={inputCls}
-            />
-          </label>
-
-          <label className="block">
-            <span className="block text-xs font-medium uppercase tracking-wider text-mute">
-              Anything else{" "}
-              <span className="normal-case tracking-normal">(optional)</span>
-            </span>
-            <textarea
-              rows={3}
-              placeholder="Delivery address, occasion, questions…"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              className={`${inputCls} h-auto py-3`}
-            />
-          </label>
-
-          {/* A marketing-consent checkbox stood here reading "Send me Miami
-              drops and member offers", pre-ticked. Deleted rather than
-              relabelled: there is no drops programme and no membership, so
-              the box described a product that does not exist, and a
-              pre-ticked consent for it is the one thing that must not ship.
-              RYDA sends no marketing email today. The submitted value is a
-              signed-in member's stored preference (set on /account/profile)
-              and false for everyone else, so requesting a car enrolls
-              nobody. */}
-        </>
-      )}
-
-      {status === "error" && (
+      {status === "error" && dialog === "none" && (
         <p role="alert" className="rounded-xl border border-red/40 bg-red/5 px-4 py-3 text-xs text-red">
           {errorMessage ||
             "Something went wrong. Try again, or email hello@ryda.pro."}
@@ -1212,43 +1070,45 @@ export function RentalInquiryForm({
         disabled={status === "submitting"}
         className={`inline-flex h-12 w-full items-center justify-center rounded-full bg-red px-7 text-sm font-semibold text-cream transition-colors hover:bg-red-deep disabled:cursor-not-allowed disabled:opacity-50 ${FOCUS_RING}`}
       >
-        {status === "submitting"
-          ? "Sending request…"
-          : bookingPath
-            ? "Request these dates"
-            : "Request this car"}
+        {status === "submitting" ? "Sending request…" : "Request these dates"}
       </button>
 
-      {/* GUARDRAIL 3.9: state what the code does. On the booking path the
-          submit creates a rental_bookings row and touches Stripe nowhere
-          — no SetupIntent, no card, no hold — so the footnote says only
-          that, and the "never costs you more than going direct" claim
-          (which belongs to the lead funnel, and which phase 4A sweeps
-          when the on-platform rail lands) is not repeated over a request
-          that carries a frozen price. */}
+      {/* GUARDRAIL 3.9: state what the code does. This button opens a
+          dialog and sends nothing; the sentence about the send itself —
+          and the privacy link — sit beside the Send button in that
+          dialog. What remains here is the one true thing about the
+          price on each path. */}
       <p className="text-center text-[11px] leading-relaxed text-mute">
-        {bookingPath ? (
-          <>
-            No card, no charge — RYDA collects nothing on a request, and
-            these dates aren&apos;t held until the operator confirms. By
-            requesting you agree to RYDA&apos;s{" "}
-          </>
-        ) : (
-          <>
-            Your price is the operator&apos;s price — inquiring through RYDA
-            never costs you more than going direct. By requesting you agree
-            to RYDA&apos;s{" "}
-          </>
-        )}
-        <Link
-          href="/legal/privacy"
-          className={`rounded-sm underline hover:text-ink ${FOCUS_RING}`}
-        >
-          Privacy Policy
-        </Link>
-        .
+        {bookingPath
+          ? "No card, no charge — nothing is held until the operator confirms."
+          : "Your price is the operator's price — inquiring through RYDA never costs you more than going direct."}
       </p>
     </form>
+
+    <RentalSignInDialog
+      open={dialog === "signin"}
+      onClose={() => setDialog("none")}
+      returnTo={`/rent/${vehicleSlug}?start=${startDate}&end=${endDate}`}
+    />
+    <RentalConfirmDialog
+      open={dialog === "confirm"}
+      onClose={() => {
+        if (status !== "submitting") setDialog("none");
+      }}
+      summary={{
+        vehicleName,
+        market,
+        startDate,
+        endDate,
+        quote: bookingPath ? quote : null,
+      }}
+      email={user?.email ?? ""}
+      initial={initialDetails}
+      busy={status === "submitting"}
+      error={status === "error" ? errorMessage : null}
+      onSend={sendRequest}
+    />
+    </>
   );
 }
 
