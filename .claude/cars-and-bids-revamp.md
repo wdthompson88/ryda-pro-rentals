@@ -108,7 +108,19 @@ data that isn't already there.
       action" and "warning". No copy or data changed — `help-chat.tsx`
       and `help-content.ts` were left untouched (the chat widget already
       matches the system; the content file is data, not layout).
-- [ ] `/contact`
+- [x] `/contact` — the general contact form (`src/components/contact-form.tsx`)
+      was the last surviving "underline" input style (`border-0 border-b`,
+      `bg-transparent`) on the site; `/signin` had already been migrated
+      off this exact pattern onto boxed inputs for the same reason (visual
+      mismatch with its sibling page). Brought `Input`/`Select`/textarea in
+      line with the sibling marketing form `investor-inquiry-form.tsx`:
+      `rounded-full border border-rule bg-surface` for single-line fields,
+      `rounded-2xl` for the textarea. The submit button was square-cornered
+      `bg-ink`/hover-`bg-red`; changed to the standard Primary button
+      (`rounded-full bg-red` / `hover:bg-red-deep`), matching every other
+      marketing-form submit button on the site. `/contact/page.tsx` itself
+      (hero, 4-card grid, consultation band) already used `rounded-2xl`
+      cards correctly — no changes there. No copy or data changed.
 - [ ] `/trust-and-safety`
 - [ ] `/locations/miami`
 - [ ] `/host-your-car` — operator recruitment landing.
