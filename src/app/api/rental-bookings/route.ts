@@ -78,6 +78,7 @@ import {
   type RentalOperatorIdentity,
 } from "@/lib/rental-booking-access";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { validateRenterDetails } from "@/lib/renter-details";
 
 export const runtime = "nodejs";
 
@@ -203,6 +204,50 @@ function listingSummary(listing: {
  * 0046 itself, so the calendar behaves identically either side of the
  * migration instead of the route 500ing.
  */
+/**
+ * The renter's own user_profiles row against validateRenterDetails.
+ * Returns the sentence to refuse with, or null when they may proceed.
+ *
+ * Fails closed: a row we cannot read is a profile that is not complete.
+ * Field-level sentences are for a form with fields; here a missing or
+ * malformed value collapses to one line telling the renter where to fix
+ * it, and only the under-age verdict keeps its own words — that one is a
+ * fact about the renter, not about a box.
+ */
+async function checkRenterDetails(
+  db: SupabaseClient,
+  userId: string,
+  pickupDate: string,
+): Promise<string | null> {
+  const res = await db
+    .from("user_profiles")
+    .select("full_name, phone, date_of_birth")
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (res.error) {
+    console.warn("[rental-bookings · profile read]", res.error.message);
+    return "Add your name, phone and date of birth to your profile before requesting.";
+  }
+  const row = (res.data ?? null) as {
+    full_name?: unknown;
+    phone?: unknown;
+    date_of_birth?: unknown;
+  } | null;
+  const str = (v: unknown) => (typeof v === "string" ? v : "");
+  const problem = validateRenterDetails(
+    {
+      fullName: str(row?.full_name),
+      phone: str(row?.phone),
+      dateOfBirth: str(row?.date_of_birth),
+    },
+    pickupDate,
+  );
+  if (!problem) return null;
+  return problem.kind === "under_age"
+    ? problem.message
+    : "Add your name, phone and date of birth to your profile before requesting.";
+}
+
 async function loadListing(
   db: SupabaseClient,
   listingId: string,
@@ -419,6 +464,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { error: "That car isn't taking bookings right now." },
         { status: 409 },
+      );
+    }
+
+    // WHO IS ASKING (founder decision 2026-08-26). A request carries a
+    // name, a phone number and a date of birth, or it does not go: the
+    // confirm dialog saves them to user_profiles before it POSTs, and
+    // this is what makes that a rule rather than a courtesy. Same
+    // validator as the dialog, so the sentence is the same on both sides
+    // of the click. 422 + reason, which the form shows as-is.
+    const detailsProblem = await checkRenterDetails(db, user.id, startDate);
+    if (detailsProblem) {
+      return NextResponse.json(
+        { error: detailsProblem, reason: "profile_incomplete" },
+        { status: 422 },
       );
     }
 

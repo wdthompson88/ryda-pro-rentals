@@ -51,7 +51,9 @@ not to rebuild it.
 ## Source-Of-Truth Areas
 
 - App routes: `src/app`
-- Rental funnel: `src/app/api/rental-inquiry`, `src/components/rental-inquiry-form.tsx`
+- Rental funnel: `src/app/api/rental-inquiry`, `src/components/rental-inquiry-form.tsx`,
+  `src/components/rental-request-dialog.tsx` (sign-in / confirm-your-details popups),
+  `src/lib/renter-details.ts` (what must be on file to request — shared with the booking API)
 - Browse + listings data: `src/components/rental-listings.tsx`, `src/lib/partner-fleet.ts`,
   `src/lib/market-data.ts` (the fleet catalog — feeds the landing page count, the browse
   grid, `/rent/[symbol]`'s `generateStaticParams`, `/locations` and the sitemap; it reads
