@@ -14,8 +14,11 @@ import {
 
 // Rental-first landing page (founder decision, Aug 2026): the homepage
 // does NOT land straight in inventory. "/" tells the whole story —
-// hero, featured fleet, how it works, straight answers, closing CTA —
-// and the car-browsing grid lives at /rent, one click away.
+// hero, featured fleet, the model, straight answers, why the account,
+// how it works, closing CTA — and the car-browsing grid lives at
+// /rent, one click away. Order is deliberate: hero + featured fleet
+// are the pitch, everything explanatory follows, and the three-step
+// "how it works" sits last, right before the final CTA.
 //
 // The model in one breath: browse → request with dates → RYDA passes
 // the request to the operator who runs that car → the operator confirms
@@ -261,51 +264,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── How it works ─────────────────────────────────────────── */}
-      {/* id="how-it-works" — the /how-it-works page was merged into this
-          section (Aug 2026, one-page revamp): the header, footer and
-          every other in-repo link to /how-it-works now points here, and
-          next.config.ts 301-redirects the old URL to this anchor. */}
-      <section
-        id="how-it-works"
-        className="scroll-mt-20 border-b border-rule bg-cream-2 py-16 md:py-24"
-      >
-        <div className="mx-auto max-w-7xl px-6 sm:px-10">
-          <Reveal>
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
-              How it works
-            </p>
-            <h2 className="mt-3 max-w-2xl font-display text-3xl text-ink md:text-4xl">
-              Three steps between you and the keys.
-            </h2>
-          </Reveal>
-          <RevealStagger
-            className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3"
-            staggerMs={80}
-          >
-            <StepCard
-              n="01"
-              title="Browse the fleet"
-              // "Every listing is real, bookable stock" is deleted:
-              // nothing in this repo knows whether a car is free on any
-              // date — the operator confirms availability, which the
-              // third step says.
-              body={`One grid, ${FLEET_COUNT} cars across ${MAKE_COUNT} makes — Toyota and Tesla through Land Rover and Porsche to Ferrari and Lamborghini.`}
-            />
-            <StepCard
-              n="02"
-              title="Request with dates"
-              body="Pick your dates and send one request. A 30-second account keeps your details saved for next time — no card at request. Signed in, the form fills itself and your requests are tracked in one place."
-            />
-            <StepCard
-              n="03"
-              title="Operator confirms — and hands you the keys"
-              body="Your request lands with RYDA, and we pass it to the operator who runs that car. They confirm availability and price, and close the rental on their own contract and insurance. Delivery, deposit, and mileage terms are theirs — agreed directly between you."
-            />
-          </RevealStagger>
-        </div>
-      </section>
-
       {/* ── The model — commission transparency. Formerly its own
              section on /how-it-works; merged here so the whole story
              (steps → money mechanics → trust) reads in one scroll. The
@@ -452,6 +410,56 @@ export default function HomePage() {
               </div>
             </div>
           </Reveal>
+        </div>
+      </section>
+
+      {/* ── How it works ─────────────────────────────────────────── */}
+      {/* id="how-it-works" — the /how-it-works page was merged into this
+          section (Aug 2026, one-page revamp): the header, footer and
+          every other in-repo link to /how-it-works now points here, and
+          next.config.ts 301-redirects the old URL to this anchor. Moved
+          to just above the closing CTA (Aug 2026): founder call was
+          landing page up top, steps at the bottom — the hero + featured
+          fleet carry the pitch, everything explanatory reads in order
+          underneath, and these three steps are the last thing before
+          "go do it". */}
+      <section
+        id="how-it-works"
+        className="scroll-mt-20 border-b border-rule bg-cream-2 py-16 md:py-24"
+      >
+        <div className="mx-auto max-w-7xl px-6 sm:px-10">
+          <Reveal>
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-red">
+              How it works
+            </p>
+            <h2 className="mt-3 max-w-2xl font-display text-3xl text-ink md:text-4xl">
+              Three steps between you and the keys.
+            </h2>
+          </Reveal>
+          <RevealStagger
+            className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3"
+            staggerMs={80}
+          >
+            <StepCard
+              n="01"
+              title="Browse the fleet"
+              // "Every listing is real, bookable stock" is deleted:
+              // nothing in this repo knows whether a car is free on any
+              // date — the operator confirms availability, which the
+              // third step says.
+              body={`One grid, ${FLEET_COUNT} cars across ${MAKE_COUNT} makes — Toyota and Tesla through Land Rover and Porsche to Ferrari and Lamborghini.`}
+            />
+            <StepCard
+              n="02"
+              title="Request with dates"
+              body="Pick your dates and send one request. A 30-second account keeps your details saved for next time — no card at request. Signed in, the form fills itself and your requests are tracked in one place."
+            />
+            <StepCard
+              n="03"
+              title="Operator confirms — and hands you the keys"
+              body="Your request lands with RYDA, and we pass it to the operator who runs that car. They confirm availability and price, and close the rental on their own contract and insurance. Delivery, deposit, and mileage terms are theirs — agreed directly between you."
+            />
+          </RevealStagger>
         </div>
       </section>
 
